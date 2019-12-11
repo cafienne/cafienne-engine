@@ -1,0 +1,30 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_0">
+            <Bounds x="10" y="9" width="807" height="757"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_143">
+            <Bounds x="338" y="147" width="32" height="32"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_144">
+            <Bounds x="518" y="135" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_147">
+            <Bounds x="343" y="258" width="32" height="32"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_148">
+            <Bounds x="515" y="252" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_ilffQ_0">
+            <Bounds x="512" y="154" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_ilffQ_1">
+            <Bounds x="509" y="269" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_141">
+            <Bounds x="87" y="107" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNEdge sourceCMMNElementRef="cm_casefile/testcontext.case_147" targetCMMNElementRef="_ilffQ_1"/>
+        <CMMNEdge sourceCMMNElementRef="cm_casefile/testcontext.case_143" targetCMMNElementRef="_ilffQ_0"/>
+    </CMMNDiagram>
+</CMMNDI>

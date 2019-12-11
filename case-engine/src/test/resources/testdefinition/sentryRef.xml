@@ -1,0 +1,55 @@
+<definitions>
+	<caseFileItemDefinition id="unspecified"/>
+
+    <case id="caseNo_0" name="MainCase" description="Main Case">
+        <caseFileModel>
+            <caseFileItem name="Root" definitionRef="unspecified"/>
+        </caseFileModel>
+        <casePlanModel id="hcmref_0" name="sentryRef">
+            <planItem id="hcmref_2" name="Stage_1" definitionRef="Stage_1">
+                <exitCriterion sentryRef="hcmref_14" />
+                <exitCriterion id="exit_hcmref_19" sentryRef="hcmref_19" />
+            </planItem>
+            <sentry id="hcmref_19" name="hcmref_19">
+                <planItemOnPart sourceRef="Task_1_1" id="ref_id_hcmref_16">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="hcmref_14" name="hcmref_14">
+                <planItemOnPart sourceRef="Task_1" id="ref_id_hcmref_8">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="pid_hcmref_2" name="Stage_1" autoComplete="true">
+                <planItem id="hcmref_8" name="Task_1" definitionRef="Task_1"/>
+                <planItem id="hcmref_16" name="Task_1_1" definitionRef="Task_1_1"/>
+            </stage>
+            <humanTask id="pid_hcmref_8" name="Task_1" isBlocking="true"/>
+            <humanTask id="pid_hcmref_16" name="Task_1_1" isBlocking="true"/>
+            <planItem id="hcmref_4" name="Stage_2" definitionRef="Stage_2">
+                <entryCriterion sentryRef="hcmref_15" />
+            </planItem>
+            <sentry id="hcmref_15" name="hcmref_15">
+                <planItemOnPart exitCriterionRef="hcmref_14" sourceRef="hcmref_2" id="ref_id_hcmref_14">
+                    <standardEvent>exit</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="pid_hcmref_4" name="Stage_2" autoComplete="true">
+                <planItem id="hcmref_10" name="Task_2" definitionRef="Task_2"/>
+            </stage>
+            <humanTask id="pid_hcmref_10" name="Task_2" isBlocking="true"/>
+            <planItem id="hcmref_6" name="Stage_3" definitionRef="Stage_3">
+                <entryCriterion sentryRef="hcmref_20" />
+            </planItem>
+            <sentry id="hcmref_20" name="hcmref_20">
+                <planItemOnPart exitCriterionRef="exit_hcmref_19" sourceRef="hcmref_2" id="ref_id_hcmref_19">
+                    <standardEvent>exit</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="pid_hcmref_6" name="Stage_3" autoComplete="true">
+                <planItem id="hcmref_12" name="Task_3" definitionRef="Task_3"/>
+            </stage>
+            <humanTask id="pid_hcmref_12" name="Task_3" isBlocking="true"/>
+        </casePlanModel>
+    </case>
+</definitions>

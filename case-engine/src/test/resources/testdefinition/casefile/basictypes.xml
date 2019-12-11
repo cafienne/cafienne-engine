@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions>
+	<caseFileItemDefinition id="cfid_AllPropertyTypes" name="AllPropertyTypes" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+		<property name="aString" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+		<property name="aBoolean" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
+		<property name="anInteger" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+		<property name="aSecondString" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+		<property name="RequestType" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+		<property name="aDate" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
+		<property name="aTime" type="http://www.omg.org/spec/CMMN/PropertyType/time"/>
+
+		<property name="aFloat" type="http://www.omg.org/spec/CMMN/PropertyType/float" />
+		<property name="aDouble" type="http://www.omg.org/spec/CMMN/PropertyType/double" />
+		<property name="aDuration" type="http://www.omg.org/spec/CMMN/PropertyType/duration" />
+		<property name="aDateTime" type="http://www.omg.org/spec/CMMN/PropertyType/dateTime" />
+		<property name="aTime" type="http://www.omg.org/spec/CMMN/PropertyType/time" />
+		<property name="aDate" type="http://www.omg.org/spec/CMMN/PropertyType/date" />
+		<property name="aGYearMonth" type="http://www.omg.org/spec/CMMN/PropertyType/gYearMonth" />
+		<property name="aGYear" type="http://www.omg.org/spec/CMMN/PropertyType/gYear" />
+		<property name="aGMonthDay" type="http://www.omg.org/spec/CMMN/PropertyType/gMonthDay" />
+		<property name="aGDay" type="http://www.omg.org/spec/CMMN/PropertyType/gDay" />
+		<property name="aGMonth" type="http://www.omg.org/spec/CMMN/PropertyType/gMonth" />
+		<property name="aHexBinary" type="http://www.omg.org/spec/CMMN/PropertyType/hexBinary" />
+		<property name="aBase64Binary" type="http://www.omg.org/spec/CMMN/PropertyType/base64Binary" />
+		<property name="aAnyURI" type="http://www.omg.org/spec/CMMN/PropertyType/anyURI" />
+		<property name="aQName" type="http://www.omg.org/spec/CMMN/PropertyType/QName" />
+		<property name="aDecimal" type="http://www.omg.org/spec/CMMN/PropertyType/decimal" />
+		<property name="aUnspecified" type="http://www.omg.org/spec/CMMN/PropertyType/Unspecified" />
+	</caseFileItemDefinition>
+
+	<import id="kadaster.xsd" name="AnXMLElement" location="http://kadaster.nl/schemas/kadaster.xsd" namespace="http://ns.kadaster.nl/schema"/>
+	<caseFileItemDefinition id="cfid_XMLElement" name="AnXMLElement" importRef="" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/XSDElement" />
+
+	<caseFileItemDefinition id="cfid_Child" name="ChildItem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+		<property name="aChildString" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+		<property name="aSecondChildString" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+		<property name="aChildInteger" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+	</caseFileItemDefinition>
+
+	<case name="CaseFileDefinitionTest" xmlns="http://www.omg.org/spec/CMMN/20121031/MODEL">
+		<caseFileModel>
+			<caseFileItem id="cfi_AllPropertyTypes" name="AllPropertyTypes" multiplicity="ExactlyOne" definitionRef="cfid_AllPropertyTypes">
+				<children>
+					<caseFileItem id="cfi_Child" name="ChildItem" multiplicity="ZeroOrOne" definitionRef="cfid_Child"/>
+					<caseFileItem id="cfi_ChildArray" name="ArrayOfChildItem" multiplicity="ZeroOrMore" definitionRef="cfid_Child"/>
+					<caseFileItem id="cfi_XMLElement" name="AnXMLElement" multiplicity="ZeroOrOne" definitionRef="cfid_XMLElement" />
+				</children>
+			</caseFileItem>
+			<caseFileItem id="cfi_ArrayOfAllPropertyTypes" name="ArrayOfAllPropertyTypes" multiplicity="ZeroOrMore" definitionRef="cfid_AllPropertyTypes"/>
+		</caseFileModel>
+
+		<input name="inputCaseFile" bindingRef="cfi_AllPropertyTypes" />
+
+		<casePlanModel name="casefile">
+			<planItem name="Task1" definitionRef="Task1">
+			</planItem>
+
+			<humanTask name="Task1" />
+		</casePlanModel>
+	</case>
+</definitions>

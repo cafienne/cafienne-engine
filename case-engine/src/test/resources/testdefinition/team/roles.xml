@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:cafienne="org.cafienne">
+	<caseFileItemDefinition id="unspecified"/>
+	
+	<case name="roles" xmlns="http://www.omg.org/spec/CMMN/20121031/MODEL">
+		<caseFileModel>
+			<caseFileItem name="Root" definitionRef="unspecified"/>
+		</caseFileModel>
+		<casePlanModel name="roles">
+			<planItem name="Item1" definitionRef="Task1" />
+			<planItem name="Stage1" definitionRef="Stage1" />
+			<planItem name="UserEvent1" definitionRef="UserEvent" />
+
+			<stage name="Stage1">
+				<planItem name="Item1.1" definitionRef="Task1" />
+			</stage>
+			<humanTask name="Task1" performerRef="Admin" />
+			<userEvent name="UserEvent" authorizedRoleRefs="Employee Admin" />
+
+			<humanTask name="T2">
+				<planningTable name="T2PlanningTable" authorizedRoleRefs="Employee">
+					<discretionaryItem name="Opnieuw T1" definitionRef="Task1" applicabilityRuleRefs="isValid" />
+					<applicabilityRule name="isValid" sourceRef="CaseFileItem">
+						<condition language="spel">
+							<body>true</body>
+						</condition>
+					</applicabilityRule>
+				</planningTable>
+			</humanTask>
+
+			<planningTable name="mogelijkheden" authorizedRoleRefs="Employee Admin">
+				<discretionaryItem name="Opnieuw T1" definitionRef="Task1" applicabilityRuleRefs="isValid" />
+				<discretionaryItem authorizedRoleRefs="Employee" name="T4" definitionRef="Task1" applicabilityRuleRefs="isValid" />
+				<applicabilityRule name="isValid" sourceRef="CaseFileItem">
+					<condition language="spel">
+						<body>
+							<![CDATA[discretionaryItem.name=="Opnieuw T1"]]>
+						</body>
+					</condition>
+				</applicabilityRule>
+			</planningTable>
+		</casePlanModel>
+		<caseRoles>
+			<role name="Admin">
+				<extensionElements>
+					<cafienne:mutex>Manager</cafienne:mutex>
+				</extensionElements>
+			</role>
+			<role name="Manager">
+				<extensionElements>
+					<cafienne:singleton>true</cafienne:singleton>
+				</extensionElements>
+			</role>
+			<role name="Employee" />
+		</caseRoles>
+	</case>
+</definitions>

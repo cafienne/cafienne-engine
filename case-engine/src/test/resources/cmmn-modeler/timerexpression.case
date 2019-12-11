@@ -1,0 +1,57 @@
+<case id="timerexpression.case" name="timerexpression" description="A case that creates a timer with an expression based on the case file contents" guid="_AqPiG">
+    <caseFileModel>
+        <caseFileItem id="_AqPiG_2" name="timer" multiplicity="ExactlyOne" definitionRef="timer.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__AqPiG_0" name="timerexpression" autoComplete="true">
+        <planItem id="pi_tmr__AqPiG_0" name="AfterPeriod" definitionRef="tmr__AqPiG_0"/>
+        <planItem id="pi_ht__AqPiG_0" name="Task1" definitionRef="ht__AqPiG_0">
+            <entryCriterion id="_AqPiG_3" name="EntryCriterion_0" sentryRef="crit__AqPiG_0"/>
+        </planItem>
+        <planItem id="pi_ht__AqPiG_2" name="simplehumantask" definitionRef="ht__AqPiG_2"/>
+        <planItem id="pi_ht__AqPiG_1" name="HumanTask_0" definitionRef="ht__AqPiG_1">
+            <entryCriterion id="_AqPiG_6" name="EntryCriterion_1" sentryRef="crit__AqPiG_1"/>
+        </planItem>
+        <sentry id="crit__AqPiG_0" name="Sentry_0">
+            <planItemOnPart id="_AqPiG_4" name="PlanItemOnPart_0" sourceRef="pi_tmr__AqPiG_0">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <sentry id="crit__AqPiG_1" name="Sentry_1">
+            <ifPart id="_AqPiG_8" name="IfPart_0">
+                <condition id="_AqPiG_16" name="Expression_0" language="spel">
+                    <body>
+                        <![CDATA[caseInstance.nullpointerException]]>
+                    </body>
+                </condition>
+            </ifPart>
+            <planItemOnPart id="_AqPiG_7" name="PlanItemOnPart_1" sourceRef="pi_ht__AqPiG_2">
+                <standardEvent>complete</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <humanTask id="ht__AqPiG_0" name="Task1" isBlocking="true"/>
+        <humanTask id="ht__AqPiG_2" name="simplehumantask" isBlocking="true">
+            <inputs id="_AqPiG_10" name="Assignee"/>
+            <inputs id="_AqPiG_12" name="Input"/>
+            <outputs id="_AqPiG_14" name="Result" bindingRef="_AqPiG_2"/>
+            <extensionElements mustUnderstand="false">
+                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
+                    <parameterMapping id="_AqPiG_11" sourceRef="_AqPiG_10" targetRef="_bpa7_Assignee"/>
+                    <parameterMapping id="_AqPiG_13" sourceRef="_AqPiG_12" targetRef="_Hun3_Input"/>
+                    <parameterMapping id="_AqPiG_15" sourceRef="_SkQG_Result" targetRef="_AqPiG_14"/>
+                </cafienne:implementation>
+            </extensionElements>
+        </humanTask>
+        <humanTask id="ht__AqPiG_1" name="HumanTask_0" isBlocking="true"/>
+        <timerEvent id="tmr__AqPiG_0" name="AfterPeriod">
+            <timerExpression id="_AqPiG_1" language="spel">
+                <body>
+                    <![CDATA[caseInstance.caseFile.timer.period]]>
+                </body>
+            </timerExpression>
+            <planItemStartTrigger id="_AqPiG_0" name="PlanItemStartTrigger_0">
+                <standardEvent></standardEvent>
+            </planItemStartTrigger>
+        </timerEvent>
+    </casePlanModel>
+    <input id="_AqPiG_5" name="timer" bindingRef="_AqPiG_2"/>
+</case>

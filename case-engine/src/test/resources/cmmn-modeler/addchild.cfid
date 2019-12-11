@@ -1,0 +1,4 @@
+<caseFileItemDefinition name="addchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="effe" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="effe2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+</caseFileItemDefinition>

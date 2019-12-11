@@ -1,0 +1,17 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm__fmPeg_0">
+            <Bounds x="20" y="20" width="800" height="500"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__fmPeg_0">
+            <Bounds x="180" y="110" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__fmPeg_1">
+            <Bounds x="180" y="220" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_fmPeg_1">
+            <Bounds x="14" y="240" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNEdge sourceCMMNElementRef="pi_ht__fmPeg_1" targetCMMNElementRef="_fmPeg_1"/>
+    </CMMNDiagram>
+</CMMNDI>

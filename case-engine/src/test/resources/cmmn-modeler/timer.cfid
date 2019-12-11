@@ -1,0 +1,4 @@
+<caseFileItemDefinition name="timer" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="period" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="dummy" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+</caseFileItemDefinition>

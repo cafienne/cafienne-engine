@@ -1,0 +1,17 @@
+<case id="caseplanexitcriteria.case" name="caseplanexitcriteria" guid="_fmPeg">
+    <caseFileModel>
+        <caseFileItem id="_fmPeg_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__fmPeg_0" name="caseplanexitcriteria" autoComplete="true">
+        <planItem id="pi_ht__fmPeg_0" name="Review" definitionRef="ht__fmPeg_0"/>
+        <planItem id="pi_ht__fmPeg_1" name="Review2" definitionRef="ht__fmPeg_1"/>
+        <sentry id="crit__fmPeg_0" name="Sentry_0">
+            <planItemOnPart id="_fmPeg_3" name="PlanItemOnPart_0" sourceRef="pi_ht__fmPeg_1">
+                <standardEvent>complete</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <exitCriterion id="_fmPeg_1" name="ExitCriterion_0" sentryRef="crit__fmPeg_0"/>
+        <humanTask id="ht__fmPeg_0" name="Review" isBlocking="true"/>
+        <humanTask id="ht__fmPeg_1" name="Review2" isBlocking="true"/>
+    </casePlanModel>
+</case>

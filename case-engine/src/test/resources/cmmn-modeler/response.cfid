@@ -1,0 +1,6 @@
+<caseFileItemDefinition name="Response" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="Message" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="Date" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
+    <property name="Time" type="http://www.omg.org/spec/CMMN/PropertyType/time"/>
+    <property name="SomeBoolean" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
+</caseFileItemDefinition>

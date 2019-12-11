@@ -1,0 +1,265 @@
+package org.cafienne.cmmn.test.task;
+
+import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.matching.MatchResult;
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.akka.command.StartCase;
+import org.cafienne.cmmn.akka.event.TaskOutputFilled;
+import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.instance.casefile.*;
+import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.assertions.CaseAssertion;
+import org.cafienne.cmmn.test.assertions.FailureAssertion;
+import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
+import org.cafienne.humantask.akka.command.ClaimTask;
+import org.cafienne.humantask.akka.command.CompleteHumanTask;
+import org.cafienne.humantask.akka.command.SaveTaskOutput;
+import org.cafienne.humantask.akka.command.ValidateTaskOutput;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+public class TestTaskOutputValidation {
+    private final ValueMap taskOutputFailingValidation = new ValueMap("Decision", "KILLSWITCH");
+    private final ValueMap taskOutputInvalidDecision = new ValueMap("Decision", "afd;lsajfdba");
+
+    private final ValueMap taskOutputDecisionCanceled = new ValueMap("Decision", "Cancel the order");
+    private final ValueMap taskOutputDecisionApproved = new ValueMap("Decision", "Order Approved");
+
+    private final ValueMap validDecisionResponse = new ValueMap(); // Valid task output means there must be empty JSON responded
+    private final ValueMap invalidDecisionResponse = new ValueMap("Status", "NOK", "details", "Field 'decision' has an improper value");
+
+
+    private final TenantUser pete = TestScript.getTestUser("pete", "role1", "role2");
+    private final TenantUser gimy = TestScript.getTestUser("gimy", "no-role");
+
+
+    private final int port = 17382;
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(port);
+
+    @Test
+    public void testTaskOutputValidation() {
+        startWireMocks();
+
+        String caseInstanceId = "OutputValidationTest";
+        TestScript testCase = new TestScript(caseInstanceId);
+
+        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/taskoutputvalidation.xml");
+
+        ValueMap inputs = new ValueMap(
+                "TaskInput", new ValueMap(
+                "Assignee", "me, myself and I",
+                "Content", new ValueMap(
+                "Subject", "Decide on this topic",
+                "Decision", "Yet to be decided")
+        ),
+                "HTTPConfig", new ValueMap("port", port)
+        );
+
+        testCase.addTestStep(new StartCase(pete, caseInstanceId, xml, inputs, null), act -> {
+            CaseAssertion cp = new CaseAssertion(act);
+//            String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
+
+            String taskId = cp.assertPlanItem("HumanTask").getId();
+
+            TaskOutputFilled tof = testCase.getEventListener().awaitTaskOutputFilled("AssertMockServiceIsRunning", e -> true);
+            long responseCode = tof.getTaskOutputParameters().raw("responseCode");
+            TestScript.debugMessage("Ping mock service gave response code " + responseCode);
+
+            /**
+             * SaveTaskOutput - User should not be able to save the task output for Unassigned task
+             */
+            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
+                    new FailureAssertion(action).assertException("ValidateTaskOutput: Output can be validated only for Assigned or Delegated task"));
+
+            /**
+             * ClaimTask - User should be able to claim the task
+             */
+            testCase.addTestStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                taskAssertion.assertAssignee("pete");
+            });
+
+            /**
+             * ValidateTaskOutput - Task output validation fails on wrong user
+             */
+            testCase.addTestStep(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
+                    new FailureAssertion(action).assertException("ValidateTaskOutput: Only the current task assignee (pete) can validate output of task"));
+
+            /**
+             * ValidateTaskOutput - Task output validation should result in a failure when we send "KILLSWITCH"
+             */
+            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputFailingValidation.cloneValueNode()), action ->
+                    new FailureAssertion(action).assertException("Unexpected http response code 500"));
+
+            /**
+             * ValidateTaskOutput - Task output validation fails on wrong output
+             */
+            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                Object object = taskAssertion.getValidationResponse().value();
+                if (!(object instanceof ValueMap)) {
+                    throw new AssertionError("Expecting a ValueMap response from Task Validation, but received something of type " + object.getClass().getName());
+                }
+                ValueMap jsonResponse = (ValueMap) object;
+                if (!jsonResponse.equals(invalidDecisionResponse)) {
+                    TestScript.debugMessage("Would expect an OK Status in\n" + jsonResponse);
+                    throw new AssertionError("Would expect a OK here");
+                }
+
+                TestScript.debugMessage("TaskOutputValidation resulted in errors: " + jsonResponse);
+
+//                taskAssertion.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
+                // Task Output Validation should not lead to new events in the event log.
+                action.getEvents().assertSize(0);
+            });
+
+            /**
+             * ValidateTaskOutput - Task output validation should be ok with decision canceled
+             */
+            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                Object object = taskAssertion.getValidationResponse().value();
+                if (!(object instanceof ValueMap)) {
+                    throw new AssertionError("Expecting a ValueMap response from Task Validation, but received something of type " + object.getClass().getName());
+                }
+                ValueMap jsonResponse = (ValueMap) object;
+                if (!jsonResponse.equals(validDecisionResponse)) {
+                    TestScript.debugMessage("Would expect a OK Status in\n" + jsonResponse);
+                    throw new AssertionError("Would expect a OK here");
+                }
+                testCase.getEventListener().getNewEvents().assertSize(0);
+            });
+
+            /**
+             * ValidateTaskOutput - Task output validation should be ok with decision approved
+             */
+            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                testCase.getEventListener().getNewEvents().assertSize(0);
+            });
+
+            /**
+             * SaveTaskOutput - User should be able to save the task with invalid output
+             */
+            testCase.addTestStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+
+//                casePlan.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
+                testCase.getEventListener().getNewEvents().assertNotEmpty();
+            });
+
+            /**
+             * CompleteTaskOutput - User should not be able to complete the task with invalid output
+             */
+            testCase.addTestStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action ->
+                    new FailureAssertion(action).assertException(InvalidCommandException.class, "Output for task HumanTask is invalid"));
+
+            /**
+             * CompleteTask - Only the current task assignee should be able to complete the task
+             */
+            testCase.addTestStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                testCase.getEventListener().awaitTaskOutputFilled(taskId, taskEvent -> {
+                    ValueMap taskOutput = taskEvent.getTaskOutputParameters();
+                    Value<?> decision = taskOutput.get("TaskOutputParameter");
+                    if (decision == null || decision.equals(Value.NULL)) {
+                        throw new AssertionError("Task misses output parameter 'TaskOutputParameter'");
+                    }
+                    if (decision instanceof StringValue) {
+                        String value = ((StringValue) decision).getValue();
+                        if (!value.equals("Order Approved")) {
+                            throw new AssertionError("Task has invalid output. Expecting 'Order Approved', found " + value);
+                        }
+                    } else {
+                        throw new AssertionError("Decision is not a string value, but a " + decision.getClass().getName());
+                    }
+
+                    return true;
+                });
+
+                taskAssertion.assertTaskCompleted();
+            });
+        });
+
+        testCase.runTest();
+    }
+
+    private void startWireMocks() {
+        //Start wireMock service for mocking process service calls
+        wireMockRule.stubFor(post(urlEqualTo("/validate"))
+                .withHeader("Accept", equalTo("application/json"))
+                .andMatching(request -> matchesValidDecision(request))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(validDecisionResponse.toString())));
+        wireMockRule.stubFor(post(urlEqualTo("/validate"))
+                .withHeader("Accept", equalTo("application/json"))
+                .andMatching(request -> matchesInvalidDecision(request))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(invalidDecisionResponse.toString())));
+        wireMockRule.stubFor(post(urlEqualTo("/validate"))
+                .withHeader("Accept", equalTo("application/json"))
+                .andMatching(request -> matchesInvalidRequest(request))
+                .willReturn(aResponse().withStatus(HttpURLConnection.HTTP_INTERNAL_ERROR).withBody("Something went really wrong in here")));
+        wireMockRule.stubFor(get(urlEqualTo("/ping")).willReturn(aResponse().withStatus(200)));
+    }
+
+    private MatchResult matchesValidDecision(Request request) {
+        try {
+            ValueMap json = JSONReader.parse(request.getBody());
+            json = json.with("task-output");
+            if (json.equals(taskOutputDecisionApproved) || json.equals(taskOutputDecisionCanceled)) {
+                TestScript.debugMessage("\n\nmatching - valid decision\n\n");
+                return MatchResult.of(true);
+            }
+            TestScript.debugMessage("\n\nNO MATCH on valid decision\n\n");
+            return MatchResult.of(false);
+        } catch (IOException | JSONParseFailure e) {
+            TestScript.debugMessage("Invalid JSON");
+            return MatchResult.of(false);
+        }
+    }
+
+    private MatchResult matchesInvalidDecision(Request request) {
+        try {
+            ValueMap json = JSONReader.parse(request.getBody());
+            json = json.with("task-output");
+            if (json.equals(taskOutputDecisionApproved) || json.equals(taskOutputDecisionCanceled) || json.equals(taskOutputFailingValidation)) {
+                TestScript.debugMessage("\n\nNO MATCH on invalid decision\n\n");
+                return MatchResult.of(false);
+            }
+            TestScript.debugMessage("\n\nmatching - invalid decision\n\n");
+            return MatchResult.of(true);
+        } catch (IOException | JSONParseFailure e) {
+            TestScript.debugMessage("Invalid JSON");
+            return MatchResult.of(false);
+        }
+    }
+
+    private MatchResult matchesInvalidRequest(Request request) {
+        try {
+            ValueMap json = JSONReader.parse(request.getBody());
+            json = json.with("task-output");
+            if (json.equals(taskOutputFailingValidation)) {
+                TestScript.debugMessage("\n\nmatching - Failing on validation\n\n");
+                return MatchResult.of(true);
+            } else {
+                TestScript.debugMessage("\n\nNO MATCH on 'Failing on validation'\n\n");
+            }
+            return MatchResult.of(false);
+        } catch (IOException | JSONParseFailure e) {
+            TestScript.debugMessage("Invalid JSON");
+            return MatchResult.of(true);
+        }
+    }
+}

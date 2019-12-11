@@ -1,0 +1,35 @@
+<definitions>
+    <case id="caseteam.case" name="caseteam">
+        <caseFileModel>
+            <caseFileItem id="_jAVt1_3" name="Root" multiplicity="ExactlyOne" definitionRef="string.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__jAVt1_0" name="caseteam" autoComplete="true">
+            <planItem id="pi_ht__jAVt1_0" name="Approve" definitionRef="ht__jAVt1_0"/>
+            <planItem id="pi_ht__jAVt1_1" name="Request" definitionRef="ht__jAVt1_1"/>
+            <planItem id="pi_ht__jAVt1_2" name="Assist" definitionRef="ht__jAVt1_2"/>
+            <humanTask id="ht__jAVt1_0" name="Approve" isBlocking="true" performerRef="_jAVt1_1"/>
+            <humanTask id="ht__jAVt1_1" name="Request" isBlocking="true" performerRef="_jAVt1_0"/>
+            <humanTask id="ht__jAVt1_2" name="Assist" isBlocking="true" performerRef="_jAVt1_2"/>
+        </casePlanModel>
+        <caseRoles id="_jAVt1_0" name="Requestor"/>
+        <caseRoles id="_jAVt1_1" name="Approver"/>
+        <caseRoles id="_jAVt1_2" name="PersonalAssistant" description="Personal Assistant"/>
+    </case>
+    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__jAVt1_0">
+                <Bounds x="30" y="18" width="800" height="500"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__jAVt1_0">
+                <Bounds x="162" y="216" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__jAVt1_1">
+                <Bounds x="162" y="114" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__jAVt1_2">
+                <Bounds x="162" y="318" width="100" height="60"/>
+            </CMMNShape>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

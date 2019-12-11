@@ -1,0 +1,110 @@
+<definitions>
+    <case id="basic.case" name="basic">
+        <caseFileModel>
+            <caseFileItem id="_Jjxp7_17" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__Jjxp7_0" name="basic" autoComplete="true">
+            <planItem id="pi_ht__Jjxp7_0" name="Item1" definitionRef="ht__Jjxp7_0"/>
+            <planItem id="pi_ht__Jjxp7_1" name="Item2" definitionRef="ht__Jjxp7_1"/>
+            <planItem id="pi_ht__Jjxp7_2" name="Item3" definitionRef="ht__Jjxp7_2">
+                <entryCriterion id="_Jjxp7_6" name="S3" sentryRef="crit__Jjxp7_1"/>
+            </planItem>
+            <planItem id="pi__Jjxp7_3" name="Item4" definitionRef="_Jjxp7_3">
+                <exitCriterion id="_Jjxp7_5" name="S4" sentryRef="crit__Jjxp7_0"/>
+            </planItem>
+            <planItem id="pi_ms__Jjxp7_0" name="Milestone" definitionRef="ms__Jjxp7_0">
+                <entryCriterion id="_Jjxp7_8" name="S3.2" sentryRef="crit__Jjxp7_2"/>
+            </planItem>
+            <planItem id="pi_ue__Jjxp7_0" name="Listener" definitionRef="ue__Jjxp7_0"/>
+            <sentry id="crit__Jjxp7_0" name="Sentry_0">
+                <planItemOnPart id="_Jjxp7_12" name="PlanItemOnPart_2" sourceRef="pi_ht__Jjxp7_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart id="_Jjxp7_13" name="PlanItemOnPart_3" sourceRef="pi_ht__Jjxp7_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__Jjxp7_1" name="Sentry_1">
+                <planItemOnPart id="_Jjxp7_10" name="PlanItemOnPart_0" sourceRef="pi_ht__Jjxp7_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__Jjxp7_2" name="Sentry_2">
+                <planItemOnPart id="_Jjxp7_11" name="PlanItemOnPart_1" sourceRef="pi_ht__Jjxp7_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__Jjxp7_3" name="Sentry_3">
+                <planItemOnPart id="_Jjxp7_14" name="PlanItemOnPart_4" sourceRef="pi_ht__Jjxp7_2">
+                    <standardEvent>terminate</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <exitCriterion id="_Jjxp7_9" name="S5" sentryRef="crit__Jjxp7_3"/>
+            <humanTask id="ht__Jjxp7_0" name="Item1" isBlocking="true"/>
+            <humanTask id="ht__Jjxp7_1" name="Item2" isBlocking="true"/>
+            <humanTask id="ht__Jjxp7_2" name="Item3" isBlocking="true"/>
+            <humanTask id="ht__Jjxp7_3" name="Item1.1" isBlocking="true"/>
+            <humanTask id="ht__Jjxp7_4" name="Item1.2" isBlocking="true"/>
+            <milestone id="ms__Jjxp7_0" name="Milestone"/>
+            <userEvent id="ue__Jjxp7_0" name="Listener"/>
+            <stage id="_Jjxp7_3" name="Item4" autoComplete="true">
+                <planItem id="pi_ht__Jjxp7_3" name="Item1.1" definitionRef="ht__Jjxp7_3"/>
+                <planItem id="pi_ht__Jjxp7_4" name="Item1.2" definitionRef="ht__Jjxp7_4"/>
+            </stage>
+        </casePlanModel>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__Jjxp7_0">
+                <Bounds x="20" y="20" width="800" height="500"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__Jjxp7_0">
+                <Bounds x="110" y="80" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__Jjxp7_1">
+                <Bounds x="110" y="190" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__Jjxp7_2">
+                <Bounds x="110" y="300" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi__Jjxp7_3">
+                <Bounds x="300" y="100" width="420" height="140"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_Jjxp7_5">
+                <Bounds x="294" y="160" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_Jjxp7_6">
+                <Bounds x="104" y="320" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ms__Jjxp7_0">
+                <Bounds x="350" y="300" width="100" height="40"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_Jjxp7_8">
+                <Bounds x="344" y="310" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ue__Jjxp7_0">
+                <Bounds x="540" y="300" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_Jjxp7_9">
+                <Bounds x="174" y="510" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__Jjxp7_3">
+                <Bounds x="350" y="140" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__Jjxp7_4">
+                <Bounds x="530" y="140" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__Jjxp7_0" targetCMMNElementRef="_Jjxp7_6">
+                <waypoint x="70" y="110"/>
+                <waypoint x="70" y="330"/>
+            </CMMNEdge>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__Jjxp7_0" targetCMMNElementRef="_Jjxp7_8"/>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__Jjxp7_0" targetCMMNElementRef="_Jjxp7_5"/>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__Jjxp7_1" targetCMMNElementRef="_Jjxp7_5"/>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__Jjxp7_2" targetCMMNElementRef="_Jjxp7_9"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

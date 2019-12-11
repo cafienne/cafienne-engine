@@ -1,0 +1,140 @@
+<definitions>
+	<caseFileItemDefinition
+		definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified"
+		name="Request">
+		<property name="from"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="subject"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="to"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="replyTo"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="body"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="filename"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+		<property name="attachment"
+			type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+	</caseFileItemDefinition>
+	<case description="smtpcall" id="smtpcall.case_smtpcall" name="smtpcall">
+		<caseFileModel>
+			<caseFileItem definitionRef="Request" id="cfi_csIJ7_0"
+				multiplicity="ExactlyOne" name="Request" />
+		</caseFileModel>
+		<casePlanModel autocomplete="true"
+			id="cm_smtpcall.case_smtpcall_0" name="smtpcall">
+			<planItem definitionRef="pid_cm_csIJ7_4" id="cm_csIJ7_4"
+				name="Send test email" />
+			<processTask id="pid_cm_csIJ7_4" isBlocking="true"
+				name="Send test email" processRef="smtp">
+				<inputs bindingRef="cfi_csIJ7_0" id="inTP_cm_csk9m_4_7" name="request" />
+				<parameterMapping id="inPM_cm_csk9m_4_8" sourceRef="inTP_cm_csk9m_4_7"
+					targetRef="from">
+					<transformation language="spel">
+						<body>
+							request.from
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_9" sourceRef="inTP_cm_csk9m_4_7"
+					targetRef="to">
+					<transformation language="spel">
+						<body>
+							request.to
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_10"
+					sourceRef="inTP_cm_csk9m_4_7" targetRef="replyTo">
+					<transformation language="spel">
+						<body>
+							request.replyTo
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_11"
+					sourceRef="inTP_cm_csk9m_4_7" targetRef="body">
+					<transformation language="spel">
+						<body>
+							request.body
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_12"
+					sourceRef="inTP_cm_csk9m_4_7" targetRef="subject">
+					<transformation language="spel">
+						<body>
+							request.subject
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_12"
+					sourceRef="inTP_cm_csk9m_4_7" targetRef="attachment">
+					<transformation language="spel">
+						<body>
+							request.attachment
+						</body>
+					</transformation>
+				</parameterMapping>
+				<parameterMapping id="inPM_cm_csk9m_4_12"
+					sourceRef="inTP_cm_csk9m_4_7" targetRef="filename">
+					<transformation language="spel">
+						<body>
+							request.filename
+						</body>
+					</transformation>
+				</parameterMapping>
+			</processTask>
+		</casePlanModel>
+		<input bindingRef="cfi_csIJ7_0" id="csIJ7_inCPs_0" name="Request" />
+	</case>
+	<process id="smtp"
+		implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified"
+		name="smtp">
+		<input id="request" name="request" />
+		<input id="from" name="from" />
+		<input id="to" name="to" />
+		<input id="replyTo" name="replyTo" />
+		<input id="body" name="body" />
+		<input id="subject" name="subject" />
+		<input id="attachment" name="attachment" />
+		<input id="filename" name="filename" />
+		<extensionElements>
+			<cafienne:implementation
+				class="org.cafienne.processtask.implementation.smtp.SMTPCallDefinition"
+				xmlns:cafienne="org.cafienne">
+				<smtp-server>localhost</smtp-server>
+				<smtp-port>25</smtp-port>
+				<subject>${subject}</subject>
+				<mail-body type="text/html">${body}</mail-body>
+				<from>${from}</from>
+				<reply-to>${replyTo}</reply-to>
+				<to>
+					<address name="${to}">${to}</address>
+				</to>
+				<cc>
+					<address name="${to}">${to}</address>
+					<address name="${to}">${to}</address>
+				</cc>
+				<bcc>
+					<address name="${to}">${to}</address>
+				</bcc>
+				<attachments>
+					<attachment name="${filename}">${attachment}</attachment>
+				</attachments>
+			</cafienne:implementation>
+		</extensionElements>
+	</process>
+	<CMMNDI>
+		<CMMNDiagram>
+			<CMMNShape cmmnElementRef="cm_smtpcall.case_smtpcall_0"
+				name="smtpcall">
+				<Bounds height="264" width="324" x="33" y="10" />
+			</CMMNShape>
+			<CMMNShape cmmnElementRef="cm_csIJ7_4" name="Send test email">
+				<Bounds height="60" width="100" x="78" y="55" />
+			</CMMNShape>
+		</CMMNDiagram>
+	</CMMNDI>
+</definitions>

@@ -1,0 +1,14 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm_expression/valueowner.case_0" name="CaseFileContextExpressions">
+            <Bounds x="10" y="9" width="797" height="585"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_expression/valueowner.case_166" name="TaskWithExpression">
+            <Bounds x="189" y="111" width="164" height="60"/>
+        </CMMNShape>
+    </CMMNDiagram>
+    <validation>
+        <hiddennotices/>
+        <hiddenproblems/>
+    </validation>
+</CMMNDI>

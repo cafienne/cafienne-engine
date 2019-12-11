@@ -1,0 +1,144 @@
+<definitions>
+    <case id="planning.case" name="planning">
+        <caseFileModel>
+            <caseFileItem id="cfi_csQA1_0" name="CaseFileItem" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm_planning.case_planning_0" name="planning" autoComplete="true">
+            <planItem id="cm_csQA1_4" name="T1" definitionRef="pid_cm_csQA1_4"/>
+            <planItem id="cm_csQA1_6" name="T2" definitionRef="pid_cm_csQA1_6"/>
+            <planItem id="cm_csQA1_8" name="T3" definitionRef="pid_cm_csQA1_8">
+                <entryCriterion id="_5pggv_0" name="EntryCriterion_0" sentryRef="cm_csQA1_12"/>
+            </planItem>
+            <planItem id="cm_csQA1_24" name="Stage" definitionRef="pid_cm_csQA1_24">
+                <entryCriterion id="_5pggv_1" name="EntryCriterion_1" sentryRef="cm_csQA1_26"/>
+            </planItem>
+            <sentry id="cm_csQA1_12">
+                <planItemOnPart id="ref_id_cm_csQA1_4" sourceRef="cm_csQA1_4">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart id="ref_id_cm_csQA1_6" sourceRef="cm_csQA1_6">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="cm_csQA1_26">
+                <planItemOnPart id="ref_id_cm_csQA1_8" sourceRef="cm_csQA1_8">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <planningTable id="pt_cm_undefined_3">
+                <discretionaryItem id="cm_csQA1_10" name="T4" definitionRef="pid_cm_csQA1_10" applicabilityRuleRefs="rule_csQA1_1">
+                    <itemControl>
+                        <repetitionRule id="cm_csQA1_10_repetitionRule">
+                            <condition language="spel">
+                                <body>
+                                    <![CDATA[
+                                    true
+                                ]]>
+                                </body>
+                            </condition>
+                        </repetitionRule>
+                    </itemControl>
+                </discretionaryItem>
+                <discretionaryItem id="cm_csQA1_16" name="Opnieuw T1" definitionRef="pid_cm_csQA1_16" applicabilityRuleRefs="rule_csQA1_1"/>
+                <applicabilityRule id="rule_csQA1_1" name="isValid">
+                    <condition language="spel">
+                        <body>
+                            <![CDATA[
+                            discretionaryItem.name=="Opnieuw T1" || (planItem.instance.planItems.?[name=='T2'].size() > 0 && planItem.instance.planItems.?[name=='T2'][0].state == T(org.cafienne.cmmn.instance.State).Active)
+                        ]]>
+                        </body>
+                    </condition>
+                </applicabilityRule>
+            </planningTable>
+            <humanTask id="pid_cm_csQA1_4" name="T1" isBlocking="true"/>
+            <humanTask id="pid_cm_csQA1_6" name="T2" isBlocking="true">
+                <planningTable id="pt_cm_7">
+                    <discretionaryItem id="cm_csQA1_13" name="Opnieuw T1" definitionRef="pid_cm_csQA1_13" applicabilityRuleRefs="rule_csQA1_0"/>
+                    <applicabilityRule id="rule_csQA1_0" name="isValid">
+                        <condition language="spel">
+                            <body>
+                                <![CDATA[
+                                        true
+                                    ]]>
+                            </body>
+                        </condition>
+                    </applicabilityRule>
+                </planningTable>
+            </humanTask>
+            <humanTask id="pid_cm_csQA1_8" name="T3" isBlocking="true"/>
+            <humanTask id="pid_cm_csQA1_27" name="T5" isBlocking="true"/>
+            <humanTask id="pid_cm_csQA1_10" name="T4" isBlocking="true"/>
+            <humanTask id="pid_cm_csQA1_13" name="Opnieuw T1" isBlocking="true"/>
+            <humanTask id="pid_cm_csQA1_16" name="Opnieuw T1" isBlocking="true"/>
+            <stage id="pid_cm_csQA1_24" name="Stage" autoComplete="false">
+                <planningTable id="pt_cm_25">
+                    <discretionaryItem id="cm_csQA1_27" name="T5" definitionRef="pid_cm_csQA1_27"/>
+                </planningTable>
+            </stage>
+        </casePlanModel>
+        <extensionElements mustUnderstand="false">
+            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}
+                                        </cafienne:start-case-model>
+        </extensionElements>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm_planning.case_planning_0">
+                <Bounds x="20" y="20" width="895" height="781"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_4">
+                <Bounds x="127" y="91" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_6">
+                <Bounds x="127" y="207" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_8">
+                <Bounds x="388" y="110" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_5pggv_0">
+                <Bounds x="382" y="129" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_10">
+                <Bounds x="385" y="225" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_16">
+                <Bounds x="382" y="330" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_24">
+                <Bounds x="541" y="59" width="292" height="166"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_27">
+                <Bounds x="630" y="120" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_5pggv_1">
+                <Bounds x="535" y="129" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csQA1_13">
+                <Bounds x="126" y="323" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pt_cm_undefined_3">
+                <Bounds x="300" y="33" width="24" height="16"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pt_cm_7">
+                <Bounds x="149" y="198" width="24" height="16"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pt_cm_25">
+                <Bounds x="591" y="50" width="24" height="16"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="cm_csQA1_4" targetCMMNElementRef="_5pggv_0"/>
+            <CMMNEdge sourceCMMNElementRef="_5pggv_0" targetCMMNElementRef="cm_csQA1_6"/>
+            <CMMNEdge sourceCMMNElementRef="cm_csQA1_8" targetCMMNElementRef="_5pggv_1"/>
+            <CMMNEdge sourceCMMNElementRef="cm_csQA1_6" targetCMMNElementRef="cm_csQA1_13"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

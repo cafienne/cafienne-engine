@@ -1,0 +1,35 @@
+<definitions>
+    <case description="A case that can be used to do authorized planning of discretionary items" id="planning/authorization.case" name="planning/authorization">
+        <caseFileModel>
+            <caseFileItem definitionRef="root.cfid" id="_AdNzA_4" multiplicity="ExactlyOne" name="Root" />
+        </caseFileModel>
+        <casePlanModel autoComplete="true" id="cm__AdNzA_0" name="Planning/Authorization">
+            <planItem definitionRef="ht__AdNzA_0" id="pi_ht__AdNzA_0" name="Task" />
+            <planningTable id="_AdNzA_2" name="PlanningTable_0">
+                <discretionaryItem authorizedRoleRefs="_AdNzA_3" definitionRef="ht__AdNzA_1" id="pi_ht__AdNzA_1" name="PlanMe" />
+            </planningTable>
+            <humanTask id="ht__AdNzA_0" isBlocking="true" name="Task" />
+            <humanTask id="ht__AdNzA_1" isBlocking="true" name="PlanMe" />
+        </casePlanModel>
+        <caseRoles description="role that is allowed to plan the discretionary task" id="_AdNzA_3" name="planner" />
+    </case>
+    <caseFileItemDefinition definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid" name="root">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer" />
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__AdNzA_0" name="Planning/Authorization">
+                <Bounds height="634" width="779" x="10" y="10" />
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__AdNzA_0" name="Task">
+                <Bounds height="60" width="100" x="110" y="110" />
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__AdNzA_1" name="PlanMe">
+                <Bounds height="60" width="100" x="270" y="110" />
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_AdNzA_2" name="PlanningTable_0">
+                <Bounds height="16" width="24" x="290" y="23" />
+            </CMMNShape>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

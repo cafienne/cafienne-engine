@@ -1,0 +1,59 @@
+<case id="repetitivefileitems.case" name="casefile" guid="_3hEkB">
+    <caseFileModel>
+        <caseFileItem id="cfi_csGlQ_0" name="Request" multiplicity="ZeroOrOne" definitionRef="root.cfid">
+            <children>
+                <caseFileItem id="cfi_csGlQ_3" name="Customer" multiplicity="ZeroOrMore" definitionRef="root.cfid"/>
+                <caseFileItem id="cfi_cs9KJ_7" name="Description" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+                <caseFileItem id="cfi_csm0u_3" name="Helper" multiplicity="ZeroOrOne" definitionRef="root.cfid">
+                    <children>
+                        <caseFileItem id="cfi_csm0u_4" name="Name" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+                        <caseFileItem id="cfi_csm0u_7" name="Description" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+                    </children>
+                </caseFileItem>
+            </children>
+        </caseFileItem>
+        <caseFileItem id="cfi_cs9KJ_9" name="Summary" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        <caseFileItem id="cfi_cs9KJ_10" name="Description" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        <caseFileItem id="cfi_cs9KJ_11" name="Identification" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm_cs9KJ_2" name="casefile" autoComplete="true">
+        <planItem id="cm_cs9KJ_6" name="ReviewStage" definitionRef="pid_cm_cs9KJ_6">
+            <entryCriterion id="_3hEkB_0" name="EntryCriterion_0" sentryRef="cm_cs9KJ_8"/>
+        </planItem>
+        <planItem id="cm_cs9KJ_12" name="JustAnotherTask" definitionRef="pid_cm_cs9KJ_12"/>
+        <sentry id="cm_cs9KJ_8">
+            <caseFileItemOnPart sourceRef="cfi_csGlQ_0">
+                <standardEvent>create</standardEvent>
+            </caseFileItemOnPart>
+        </sentry>
+        <humanTask id="pid_cm_cs9KJ_9" name="ReviewRequest" isBlocking="true"/>
+        <humanTask id="pid_cm_cs9KJ_12" name="JustAnotherTask" isBlocking="true"/>
+        <stage id="pid_cm_cs9KJ_6" name="ReviewStage" autoComplete="true">
+            <planItem id="cm_cs9KJ_9" name="ReviewRequest" definitionRef="pid_cm_cs9KJ_9">
+                <itemControl>
+                    <repetitionRule id="cm_cs9KJ_9_repetitionRule" contextRef="cfi_csGlQ_0">
+                        <condition language="spel">
+                            <body>
+                                <![CDATA[
+                                    Request.Customer[0]=="Joost"
+                                ]]>
+                            </body>
+                        </condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+        </stage>
+    </casePlanModel>
+    <input id="csAQm_inCPs_0" name="inputCaseFile" bindingRef="cfi_csGlQ_0"/>
+    <extensionElements mustUnderstand="false">
+        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}
+                    </cafienne:start-case-model>
+    </extensionElements>
+</case>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions>
+	<process id="pdfreport"
+		implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified"
+		name="pdfreport">
+		<input id="customerData" name="customerData" />
+		<input id="customerJrXml" name="customerJrXml" />
+		<input id="orderJrXml" name="orderJrXml" />
+		<output id="pdfReportData" name="pdfReportData" />
+		<extensionElements>
+			<cafienne:implementation
+				class="org.cafienne.processtask.implementation.report.PDFReportDefinition"
+				xmlns:cafienne="org.cafienne">
+				<reportXml name="customerJrXml" />
+				<subReportXml name="orderJrXml" parameterName="ORDER_REPORT" />
+				<reportData name="customerData" />
+				<parameterMapping sourceRef="pdfReportDatas" targetRef="pdfReportData" />
+			</cafienne:implementation>
+		</extensionElements>
+	</process>
+</definitions>

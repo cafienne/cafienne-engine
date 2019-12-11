@@ -1,0 +1,3 @@
+<caseFileItemDefinition name="testchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="world" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+</caseFileItemDefinition>

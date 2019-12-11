@@ -1,0 +1,57 @@
+<definitions>
+    <case id="addChildTest.case" name="addChildTest" description="test for addChild event">
+        <caseFileModel>
+            <caseFileItem id="cfi_addChildTest.case_2" name="test" multiplicity="ZeroOrOne" definitionRef="addchild.cfid">
+                <children>
+                    <caseFileItem id="cfi_addChildTest.case_3" name="testChild" multiplicity="ExactlyOne" definitionRef="testchild.cfid"/>
+                </children>
+            </caseFileItem>
+        </caseFileModel>
+        <casePlanModel id="cm_addChildTest.case_0" name="addChildTest" autoComplete="true">
+            <planItem id="cm_addChildTest.case_197" name="Task_2" definitionRef="pid_cm_addChildTest.case_197">
+                <entryCriterion id="_dTzf7_0" name="EntryCriterion_0" sentryRef="cm_addChildTest.case_199"/>
+            </planItem>
+            <sentry id="cm_addChildTest.case_199">
+                <caseFileItemOnPart sourceRef="cfi_addChildTest.case_2">
+                    <standardEvent>addChild</standardEvent>
+                </caseFileItemOnPart>
+            </sentry>
+            <humanTask id="pid_cm_addChildTest.case_197" name="Task_2" isBlocking="true"/>
+        </casePlanModel>
+        <output id="_uKIcG_outCPs_0" name="out"/>
+        <extensionElements mustUnderstand="false">
+            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}</cafienne:start-case-model>
+        </extensionElements>
+    </case>
+    <caseFileItemDefinition name="addchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="addchild.cfid">
+        <property name="effe" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="effe2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="testchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="testchild.cfid">
+        <property name="world" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm_addChildTest.case_0">
+                <Bounds x="10" y="10" width="806" height="1027"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_addChildTest.case_197">
+                <Bounds x="212" y="173" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_dTzf7_0">
+                <Bounds x="272" y="223" width="12" height="20"/>
+            </CMMNShape>
+            <casefileitem cmmnElementRef="cm_addChildTest.case_198" parentId="cm_addChildTest.case_0" contextRef="cfi_addChildTest.case_2">
+                <Bounds x="439" y="289" width="25" height="40"/>
+            </casefileitem>
+            <CMMNEdge sourceCMMNElementRef="_dTzf7_0" targetCMMNElementRef="cm_addChildTest.case_198"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

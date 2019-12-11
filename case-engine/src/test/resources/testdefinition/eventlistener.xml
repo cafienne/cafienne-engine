@@ -1,0 +1,110 @@
+<definitions>
+    <case id="eventlistener.case" name="eventlistener">
+        <caseFileModel>
+            <caseFileItem id="_vdfDP_15" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__vdfDP_0" name="eventlistener" autoComplete="false">
+            <planItem id="pi_ht__vdfDP_0" name="T1" definitionRef="ht__vdfDP_0">
+                <entryCriterion id="_vdfDP_11" name="UserEventOccurred" sentryRef="crit__vdfDP_1"/>
+            </planItem>
+            <planItem id="pi_ht__vdfDP_1" name="T2" definitionRef="ht__vdfDP_1">
+                <entryCriterion id="_vdfDP_13" name="CodeBasedWaiterOccurred" sentryRef="crit__vdfDP_2"/>
+            </planItem>
+            <planItem id="pi_tmr__vdfDP_0" name="CodeBasedWaiter" definitionRef="tmr__vdfDP_0"/>
+            <planItem id="pi_ue__vdfDP_0" name="UserEvent" definitionRef="ue__vdfDP_0"/>
+            <planItem id="pi_tmr__vdfDP_1" name="DateWaiter" definitionRef="tmr__vdfDP_1"/>
+            <planItem id="pi_tmr__vdfDP_2" name="PeriodWaiter" definitionRef="tmr__vdfDP_2"/>
+            <planItem id="pi_ht__vdfDP_2" name="naTimer" definitionRef="ht__vdfDP_2">
+                <entryCriterion id="_vdfDP_9" name="PeriodWaiterOccurs" sentryRef="crit__vdfDP_0"/>
+            </planItem>
+            <sentry id="crit__vdfDP_0" name="Sentry_0">
+                <planItemOnPart id="_vdfDP_10" name="PlanItemOnPart_0" sourceRef="pi_tmr__vdfDP_2">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__vdfDP_1" name="Sentry_1">
+                <planItemOnPart id="_vdfDP_12" name="PlanItemOnPart_1" sourceRef="pi_ue__vdfDP_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__vdfDP_2" name="Sentry_2">
+                <planItemOnPart id="_vdfDP_14" name="PlanItemOnPart_2" sourceRef="pi_tmr__vdfDP_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="ht__vdfDP_0" name="T1" isBlocking="true"/>
+            <humanTask id="ht__vdfDP_1" name="T2" isBlocking="true"/>
+            <humanTask id="ht__vdfDP_2" name="naTimer" isBlocking="true"/>
+            <userEvent id="ue__vdfDP_0" name="UserEvent"/>
+            <timerEvent id="tmr__vdfDP_0" name="CodeBasedWaiter">
+                <timerExpression id="_vdfDP_3" language="spel">
+                    <body>
+                        <![CDATA[P0DT0H1M]]>
+                    </body>
+                </timerExpression>
+                <planItemStartTrigger id="_vdfDP_2" name="PlanItemStartTrigger_0">
+                    <standardEvent/>
+                </planItemStartTrigger>
+            </timerEvent>
+            <timerEvent id="tmr__vdfDP_1" name="DateWaiter">
+                <timerExpression id="_vdfDP_5" language="spel">
+                    <body>
+                        <![CDATA[P0DT0H1M]]>
+                    </body>
+                </timerExpression>
+                <planItemStartTrigger id="_vdfDP_4" name="PlanItemStartTrigger_1">
+                    <standardEvent/>
+                </planItemStartTrigger>
+            </timerEvent>
+            <timerEvent id="tmr__vdfDP_2" name="PeriodWaiter">
+                <timerExpression id="_vdfDP_7" language="spel">
+                    <body>
+                        <![CDATA[P0DT0H1M]]>
+                    </body>
+                </timerExpression>
+                <planItemStartTrigger id="_vdfDP_6" name="PlanItemStartTrigger_2">
+                    <standardEvent/>
+                </planItemStartTrigger>
+            </timerEvent>
+        </casePlanModel>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__vdfDP_0">
+                <Bounds x="20" y="20" width="800" height="500"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__vdfDP_0">
+                <Bounds x="90" y="90" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__vdfDP_1">
+                <Bounds x="90" y="200" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_tmr__vdfDP_0">
+                <Bounds x="300" y="210" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_tmr__vdfDP_1">
+                <Bounds x="450" y="100" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_tmr__vdfDP_2">
+                <Bounds x="300" y="320" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ue__vdfDP_0">
+                <Bounds x="300" y="100" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__vdfDP_2">
+                <Bounds x="90" y="310" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_vdfDP_11">
+                <Bounds x="184" y="110" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_vdfDP_13">
+                <Bounds x="184" y="220" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="pi_ue__vdfDP_0" targetCMMNElementRef="_vdfDP_11"/>
+            <CMMNEdge sourceCMMNElementRef="pi_tmr__vdfDP_0" targetCMMNElementRef="_vdfDP_13"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

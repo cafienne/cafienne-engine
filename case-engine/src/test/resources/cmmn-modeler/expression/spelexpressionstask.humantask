@@ -1,0 +1,11 @@
+<humantask>
+    <cafienne:implementation
+        xmlns:cafienne="org.cafienne" name="SpelExpressionsTask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition">
+        <input id="_f5oP_HumanTaskInput" name="HumanTaskInput"/>
+        <input id="_yDoJ_Assignee" name="Assignee"/>
+        <input id="_n8NU_DueDate" name="DueDate"/>
+        <output id="_9oOB_TaskOutput" name="Output"/>
+        <output id="_x59I_SpecialOutput" name="SpecialOutput"/>
+        <task-model/>
+    </cafienne:implementation>
+</humantask>

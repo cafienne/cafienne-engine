@@ -1,0 +1,104 @@
+<case id="helloworld.case" name="HelloWorld" description="Hello World" guid="_nTPPc">
+    <caseFileModel>
+        <caseFileItem id="cfi_csVQy_0" name="Greeting" multiplicity="ExactlyOne" definitionRef="greeting.cfid"/>
+        <caseFileItem id="cfi_csVQy_1" name="Response" multiplicity="ExactlyOne" definitionRef="response.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm_HelloWorld.case_HelloWorld_0" name="HelloWorld" autoComplete="true">
+        <planItem id="cm_csVQy_167" name="Receive Greeting and Send response" description="Receive Greeting&#10;and Send response" definitionRef="pid_cm_csVQy_167"/>
+        <planItem id="cm_cs3hg_196" name="Read response" definitionRef="pid_cm_cs3hg_196">
+            <entryCriterion id="_nTPPc_0" name="EntryCriterion_0" sentryRef="cm_cs3hg_198"/>
+        </planItem>
+        <sentry id="cm_cs3hg_198">
+            <planItemOnPart id="ref_id_cm_csVQy_167" sourceRef="cm_csVQy_167">
+                <standardEvent>complete</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <humanTask id="pid_cm_csVQy_167" name="Receive Greeting and Send response" description="Receive Greeting&#10;and Send response" isBlocking="true">
+            <inputs id="inTP_cm_cs2F1_174_1" name="Greeting" bindingRef="cfi_csVQy_0"/>
+            <outputs id="outTP_cm_cs2F1_174_1" name="Response" bindingRef="cfi_csVQy_1"/>
+            <extensionElements mustUnderstand="false">
+                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="sendresponse.humantask">
+                    <parameterMapping id="inPM_cm_cshJq_4_0" sourceRef="inTP_cm_cs2F1_174_1" targetRef="Greeting"/>
+                    <parameterMapping id="outPM_cm_csuYs_174_0" sourceRef="Response" targetRef="outTP_cm_cs2F1_174_1"/>
+                    <assignment id="_nTPPc_3" name="Assignment_0" contextRef="cfi_csVQy_0">
+                        <condition id="_nTPPc_4" name="Expression_0" language="spel">
+                            <body>
+                                <![CDATA[Greeting.To]]>
+                            </body>
+                        </condition>
+                    </assignment>
+                    <duedate id="_nTPPc_6" name="DueDate_0">
+                        <condition id="_nTPPc_7" name="Expression_1" language="spel">
+                            <body>
+                                <![CDATA[T(java.time.Instant).now()]]>
+                            </body>
+                        </condition>
+                    </duedate>
+                </cafienne:implementation>
+            </extensionElements>
+        </humanTask>
+        <humanTask id="pid_cm_cs3hg_196" name="Read response" isBlocking="true">
+            <inputs id="inTP_cm_cs3hg_196_0" name="Response" bindingRef="cfi_csVQy_1"/>
+            <extensionElements mustUnderstand="false">
+                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="readresponse.humantask">
+                    <parameterMapping id="inPM_cm_cs3hg_196_0" sourceRef="inTP_cm_cs3hg_196_0" targetRef="Response"/>
+                    <assignment id="_nTPPc_9" name="Assignment_1" contextRef="cfi_csVQy_0">
+                        <condition id="_nTPPc_10" name="Expression_2" language="spel">
+                            <body>
+                                <![CDATA[Greeting.From]]>
+                            </body>
+                        </condition>
+                    </assignment>
+                    <duedate id="_nTPPc_11" name="DueDate_1">
+                        <condition id="_nTPPc_12" name="Expression_3" language="spel">
+                            <body>
+                                <![CDATA[T(java.time.Instant).now()]]>
+                            </body>
+                        </condition>
+                    </duedate>
+                </cafienne:implementation>
+            </extensionElements>
+        </humanTask>
+    </casePlanModel>
+    <caseRoles id="role_csT3f_0" name="ADMIN" description="admin of the world"/>
+    <input id="csVQy_inCPs_0" name="Greeting" bindingRef="cfi_csVQy_0"/>
+    <extensionElements mustUnderstand="false">
+        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema": {
+    "title": "Greeting",
+    "type": "object",
+    "required": [
+      "Greeting"
+    ],
+    "properties": {
+      "Greeting": {
+        "title": "Your greeting to the World",
+        "type": "object",
+        "properties": {
+          "Message": {
+            "type": "string",
+            "title": "Your message"
+          },
+          "To": {
+            "type": "string",
+            "title": "To whom?"
+          },
+          "From": {
+            "type": "string",
+            "title": "From",
+            "default": "$CURRENT_USER"
+          }
+        }
+      }
+    }
+  },
+  "uiSchema": {
+    "Greeting": {
+      "Message": {"ui:widget": "textarea"},
+      "To" :  {"ui:widget": "user-selector", "multiSelect" : false, "role" : "Receiver"},
+      "From" :  {"ui:widget": "user-selector", "multiSelect" : false, "role" : "Sender"}
+    }
+  }
+}</cafienne:start-case-model>
+    </extensionElements>
+</case>

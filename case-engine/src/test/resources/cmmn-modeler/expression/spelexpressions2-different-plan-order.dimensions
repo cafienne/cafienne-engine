@@ -1,0 +1,33 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm_SpelExpressions.case_SpelExpressions_0">
+            <Bounds x="33" y="17" width="670" height="472"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csNHO_55">
+            <Bounds x="159" y="113" width="226" height="171"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_lRFiK_2">
+            <Bounds x="379" y="189" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csd7G_38">
+            <Bounds x="428" y="178" width="132" height="40"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csdZm_17">
+            <Bounds x="225" y="156" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_lRFiK_1">
+            <Bounds x="486" y="208" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_lRFiK_0">
+            <Bounds x="494" y="168" width="12" height="20"/>
+        </CMMNShape>
+        <textbox cmmnElementRef="_lRFiK_shape_7" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Note: Stage must be activated prior to Milestone.&#10;This order can be determined in CasePlan properties.&#10;Otherwise testcase will not work.">
+            <Bounds x="140" y="330" width="330" height="100"/>
+        </textbox>
+        <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_lRFiK_2"/>
+        <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_lRFiK_1">
+            <waypoint x="274" y="250"/>
+            <waypoint x="492" y="251"/>
+        </CMMNEdge>
+    </CMMNDiagram>
+</CMMNDI>

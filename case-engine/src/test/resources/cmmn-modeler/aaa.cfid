@@ -1,0 +1,5 @@
+<caseFileItemDefinition name="aaa" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="aaa1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="aaa2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="x" type="http://www.omg.org/spec/CMMN/PropertyType/Unspecified"/>
+</caseFileItemDefinition>

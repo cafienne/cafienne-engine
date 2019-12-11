@@ -1,0 +1,5 @@
+<caseFileItemDefinition name="Greeting" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="Message" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="To" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="From" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+</caseFileItemDefinition>

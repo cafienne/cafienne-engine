@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions>
+	<case name="CaseFileDefinitionTest" xmlns="http://www.omg.org/spec/CMMN/20121031/MODEL">
+		<caseFileModel>
+			<caseFileItem name="Request" multiplicity="ZeroOrOne" definitionRef="RequestDefinition">
+				<children>
+					<caseFileItem name="Customer" multiplicity="ZeroOrMore" definitionRef="CustomerDefinition"/>
+					<caseFileItem name="Description" multiplicity="ExactlyOne" definitionRef="String" />
+					<caseFileItem name="ComplexStructure" multiplicity="ZeroOrOne" definitionRef="AddressDefinition">
+						<children>
+							<caseFileItem name="Name" multiplicity="ExactlyOne" definitionRef="String"/>
+							<caseFileItem name="Description" multiplicity="ExactlyOne" definitionRef="String" />
+						</children>
+					</caseFileItem>
+				</children>
+			</caseFileItem>
+			<caseFileItem name="Summary" multiplicity="ExactlyOne" definitionRef="String"/>
+			<caseFileItem name="Description" multiplicity="ExactlyOne" definitionRef="String" />
+			<caseFileItem name="Identification" multiplicity="ExactlyOne" definitionRef="String" />
+		</caseFileModel>
+
+		<input name="inputCaseFile" bindingRef="Request" />
+
+		<casePlanModel name="casefile">
+			<planItem name="Task1" definitionRef="Task1">
+			</planItem>
+
+			<humanTask name="Task1" />
+		</casePlanModel>
+	</case>
+</definitions>

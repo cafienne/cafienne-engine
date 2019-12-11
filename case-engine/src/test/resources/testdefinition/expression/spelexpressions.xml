@@ -1,0 +1,212 @@
+<definitions>
+    <case id="expression/spelexpressions.case" name="SpelExpressions">
+        <caseFileModel>
+            <caseFileItem id="cfi_csdZm_0" name="Content" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+            <caseFileItem id="cfi_csY4k_2" name="Output" multiplicity="ZeroOrMore" definitionRef="root.cfid"/>
+            <caseFileItem id="cfi_csvwt_2" name="CaseID" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+            <caseFileItem id="cfi_csvwt_4" name="TaskName" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+            <caseFileItem id="cfi_cstko_4" name="SpecialOutput" multiplicity="ExactlyOne" definitionRef="root.cfid">
+                <children>
+                    <caseFileItem id="cfi_cstko_5" name="Multi" multiplicity="ZeroOrMore" definitionRef="root.cfid"/>
+                </children>
+            </caseFileItem>
+        </caseFileModel>
+        <casePlanModel id="cm_SpelExpressions.case_SpelExpressions_0" name="SpelExpressions" autoComplete="true">
+            <planItem id="cm_csdZm_17" name="HumanTask" definitionRef="pid_cm_csdZm_17">
+                <exitCriterion id="_p61kw_0" name="ExitCriterion_0" sentryRef="cm_csd7G_39"/>
+                <itemControl>
+                    <repetitionRule id="cm_csdZm_17_repetitionRule" contextRef="cfi_csY4k_2">
+                        <condition language="spel">
+                            <body>
+                                <![CDATA[planItem.index < 2]]>
+                            </body>
+                        </condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <planItem id="cm_csd7G_38" name="Milestone" definitionRef="pid_cm_csd7G_38">
+                <entryCriterion id="_p61kw_1" name="EntryCriterion_0" sentryRef="cm_csd7G_40"/>
+                <entryCriterion id="_p61kw_2" name="EntryCriterion_1" sentryRef="cm_csvwt_46"/>
+                <entryCriterion id="_p61kw_3" name="EntryCriterion_2" sentryRef="cm_cs9mu_47"/>
+                <itemControl>
+                    <repetitionRule id="cm_csd7G_38_repetitionRule">
+                        <condition language="spel">
+                            <body>
+                                <![CDATA[true]]>
+                            </body>
+                        </condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <sentry id="cm_csd7G_39">
+                <planItemOnPart id="ref_id_cm_csd7G_38" sourceRef="cm_csd7G_38">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="cm_csd7G_40">
+                <ifPart contextRef="cfi_csdZm_0">
+                    <condition language="spel">
+                        <body>
+                            <![CDATA[Content != "basic"]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <caseFileItemOnPart sourceRef="cfi_csdZm_0">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </sentry>
+            <sentry id="cm_csvwt_46">
+                <ifPart contextRef="cfi_csY4k_2">
+                    <condition language="spel">
+                        <body>
+                            <![CDATA[caseInstance.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <planItemOnPart id="ref_id_cm_csdZm_17" sourceRef="cm_csdZm_17">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="cm_cs9mu_47">
+                <ifPart contextRef="cfi_cstko_5">
+                    <condition language="spel">
+                        <body>
+                            <![CDATA[caseFileItem.current.index > 2]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <caseFileItemOnPart sourceRef="cfi_cstko_5">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </sentry>
+            <humanTask id="pid_cm_csdZm_17" name="HumanTask" isBlocking="true">
+                <inputs id="inTP_cm_csTql_4_3" name="HumanTaskInput" bindingRef="cfi_csdZm_0"/>
+                <inputs id="inTP_cm_csTql_4_4" name="Assignee"/>
+                <inputs id="inTP_cm_csTql_4_5" name="DueDate"/>
+                <outputs id="outTP_cm_csTql_4_3" name="TaskOutput" bindingRef="cfi_csY4k_2"/>
+                <outputs id="outTP_cm_csTql_4_4" name="TaskName" bindingRef="cfi_csvwt_4"/>
+                <outputs id="outTP_cm_csTql_4_5" name="CaseID" bindingRef="cfi_csvwt_2"/>
+                <outputs id="outTP_cm_cstko_4_3" name="MultiOutput" bindingRef="cfi_cstko_5"/>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="SpelExpressionsTask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="expression/spelexpressionstask.humantask">
+                        <input id="_f5oP_HumanTaskInput" name="HumanTaskInput"/>
+                        <output id="_9oOB_TaskOutput" name="Output"/>
+                        <output id="_x59I_SpecialOutput" name="SpecialOutput"/>
+                        <task-model/>
+                        <assignment id="_nTPPc_3" name="Assignment_0">
+                            <condition id="_nTPPc_4" name="Expression_0" language="spel">
+                                <body>
+                                    <![CDATA[user.id]]>
+                                </body>
+                            </condition>
+                        </assignment>
+                        <duedate id="_nTPPc_6" name="DueDate_0">
+                            <condition id="_nTPPc_7" name="Expression_1" language="spel">
+                                <body>
+                                    <![CDATA[T(java.time.Instant).now()]]>
+                                </body>
+                            </condition>
+                        </duedate>
+                        <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
+                        <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
+                        <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
+                            <transformation language="spel">
+                                <body>
+                                    <![CDATA[task.planItem.name]]>
+                                </body>
+                            </transformation>
+                        </parameterMapping>
+                        <parameterMapping id="outPM_cm_csTql_4_2" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_5">
+                            <transformation language="spel">
+                                <body>
+                                    <![CDATA[caseInstance.id]]>
+                                </body>
+                            </transformation>
+                        </parameterMapping>
+                        <parameterMapping id="outPM_cm_cstko_4_3" sourceRef="_x59I_SpecialOutput" targetRef="outTP_cm_cstko_4_3">
+                            <transformation language="spel">
+                                <body>
+                                    <![CDATA[SpecialOutput.Multi]]>
+                                </body>
+                            </transformation>
+                        </parameterMapping>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
+            <milestone id="pid_cm_csd7G_38" name="Milestone"/>
+        </casePlanModel>
+        <input id="csdZm_inCPs_0" name="InputContent" bindingRef="cfi_csdZm_0"/>
+        <extensionElements mustUnderstand="false">
+            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}
+            </cafienne:start-case-model>
+        </extensionElements>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm_SpelExpressions.case_SpelExpressions_0">
+                <Bounds x="31" y="11" width="670" height="547"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csdZm_17">
+                <Bounds x="222" y="161" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_p61kw_0">
+                <Bounds x="316" y="179" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csd7G_38">
+                <Bounds x="426" y="172" width="132" height="40"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_p61kw_1">
+                <Bounds x="484" y="162" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_p61kw_2">
+                <Bounds x="462" y="202" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_p61kw_3">
+                <Bounds x="510" y="202" width="12" height="20"/>
+            </CMMNShape>
+            <textbox cmmnElementRef="cm_csdZm_19" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="This case shows various SPEL
+expressions that can be used">
+                <Bounds x="100" y="50" width="245" height="84"/>
+            </textbox>
+            <textbox cmmnElementRef="cm_csvwt_44" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Repetition Rule in HumanTask refers to 'context', which is the associated case file item.
+It takes the index to determine that there are not more than 3 outputs.
+
+
+Human Task input just wires the Content from the case file.
+The output of the task is put back into 'Output' case file item, but it is extended with two parameters
+referencing task.planItem.name and caseInstance.id
+Furthermore there can be an output of type &quot;SpecialOutput&quot; which is put in the &quot;Multi&quot; caseFileItem.
+
+The Milestone has various entry criteria with ifPart expressions, it responds to either:
+- Content!=&quot;basic&quot;
+- Output==&quot;stop now&quot;
+- more than 2 plan items HumanTask
+- more than 2 occurences of Multi">
+                <Bounds x="50" y="330" width="630" height="200"/>
+            </textbox>
+            <casefileitem cmmnElementRef="cm_csvwt_45" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_csdZm_0">
+                <Bounds x="480" y="83" width="25" height="40"/>
+            </casefileitem>
+            <casefileitem cmmnElementRef="cm_cs9mu_49" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_cstko_5">
+                <Bounds x="506" y="239" width="25" height="40"/>
+            </casefileitem>
+            <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_p61kw_0"/>
+            <CMMNEdge sourceCMMNElementRef="_p61kw_1" targetCMMNElementRef="cm_csvwt_45"/>
+            <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_p61kw_2">
+                <waypoint x="274" y="251"/>
+                <waypoint x="469" y="251"/>
+            </CMMNEdge>
+            <CMMNEdge sourceCMMNElementRef="cm_cs9mu_49" targetCMMNElementRef="_p61kw_3"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

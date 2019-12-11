@@ -1,0 +1,30 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm__wbsA2_0">
+            <Bounds x="20" y="20" width="800" height="500"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__wbsA2_0">
+            <Bounds x="120" y="80" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi__wbsA2_2">
+            <Bounds x="90" y="200" width="420" height="140"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_wbsA2_4">
+            <Bounds x="164" y="190" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__wbsA2_1">
+            <Bounds x="110" y="230" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__wbsA2_2">
+            <Bounds x="330" y="80" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_wbsA2_10">
+            <Bounds x="324" y="100" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_wbsA2_12">
+            <Bounds x="300" y="33" width="24" height="16"/>
+        </CMMNShape>
+        <CMMNEdge sourceCMMNElementRef="pi_ht__wbsA2_0" targetCMMNElementRef="_wbsA2_4"/>
+        <CMMNEdge sourceCMMNElementRef="pi_ht__wbsA2_0" targetCMMNElementRef="_wbsA2_10"/>
+    </CMMNDiagram>
+</CMMNDI>

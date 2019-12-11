@@ -1,0 +1,22 @@
+<dimensions>
+    <caseplanmodel id="hcmref_0" name="sentryRef" pid_id="pid_hcmref_0" x="9" y="11" width="1602" height="1211"/>
+    <expandedstage id="hcmref_2" name="Stage_1" pid_id="pid_hcmref_2" x="211" y="199" width="405" height="168"/>
+    <task id="hcmref_8" name="Task_1" pid_id="pid_hcmref_8" x="270" y="252" width="100" height="60"/>
+    <exitsentry id="hcmref_14" pid_id="pid_hcmref_14" x="309" y="357" width="12" height="20"/>
+    <exitsentry id="hcmref_19" pid_id="pid_hcmref_19" x="610" y="276" width="12" height="20"/>
+    <expandedstage id="hcmref_4" name="Stage_2" pid_id="pid_hcmref_4" x="224" y="516" width="290" height="194"/>
+    <task id="hcmref_10" name="Task_2" pid_id="pid_hcmref_10" x="321" y="582" width="100" height="60"/>
+    <entrysentry id="hcmref_15" pid_id="pid_hcmref_15" x="308" y="506" width="12" height="20"/>
+    <expandedstage id="hcmref_6" name="Stage_3" pid_id="pid_hcmref_6" x="685" y="174" width="343" height="202"/>
+    <task id="hcmref_12" name="Task_3" pid_id="pid_hcmref_12" x="790" y="258" width="100" height="60"/>
+    <entrysentry id="hcmref_20" pid_id="pid_hcmref_20" x="679" y="277" width="12" height="20"/>
+    <task id="hcmref_16" name="Task_1_1" pid_id="pid_hcmref_16" x="443" y="246" width="100" height="60"/>
+    <connector sourceid="hcmref_8" targetid="hcmref_14"/>
+    <connector sourceid="hcmref_14" targetid="hcmref_15"/>
+    <connector sourceid="hcmref_19" targetid="hcmref_20"/>
+    <connector sourceid="hcmref_16" targetid="hcmref_19"/>
+    <validation>
+        <hiddennotices/>
+        <hiddenproblems/>
+    </validation>
+</dimensions>

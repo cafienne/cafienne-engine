@@ -1,0 +1,142 @@
+<definitions>
+    <case id="casefile/taskinputmapping.case" name="TaskInputMapping" description="This is a test case for task input mapping from the case file">
+        <caseFileModel>
+            <caseFileItem id="cfi_casefile/testcontext.case_3" name="Container" multiplicity="ExactlyOne" definitionRef="arraycontainer.cfid">
+                <children>
+                    <caseFileItem id="cfi_casefile/testcontext.case_4" name="Child" multiplicity="ZeroOrMore" definitionRef="arraynode.cfid"/>
+                </children>
+            </caseFileItem>
+        </caseFileModel>
+        <casePlanModel id="cm_casefile/testcontext.case_0" name="TaskInputMapping" autoComplete="true">
+            <planItem id="cm_casefile/testcontext.case_141" name="Task.AddChild" definitionRef="pid_cm_casefile/testcontext.case_141">
+                <itemControl>
+                    <repetitionRule id="cm_casefile/testcontext.case_141_repetitionRule">
+                        <condition language="spel">
+                            <body>
+                                <![CDATA[true]]>
+                            </body>
+                        </condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <planItem id="cm_casefile/testcontext.case_143" name="Trigger.TaskWithContainer" definitionRef="pid_cm_casefile/testcontext.case_143"/>
+            <planItem id="cm_casefile/testcontext.case_144" name="TaskWithContainer" definitionRef="pid_cm_casefile/testcontext.case_144">
+                <entryCriterion id="_ilffQ_0" name="EntryCriterion_0" sentryRef="cm_casefile/testcontext.case_146"/>
+            </planItem>
+            <planItem id="cm_casefile/testcontext.case_147" name="Trigger.TaskWithChild" definitionRef="pid_cm_casefile/testcontext.case_147"/>
+            <planItem id="cm_casefile/testcontext.case_148" name="TaskWithChild" definitionRef="pid_cm_casefile/testcontext.case_148">
+                <entryCriterion id="_ilffQ_1" name="EntryCriterion_1" sentryRef="cm_casefile/testcontext.case_163"/>
+            </planItem>
+            <sentry id="cm_casefile/testcontext.case_146">
+                <planItemOnPart id="ref_id_cm_casefile/testcontext.case_143" sourceRef="cm_casefile/testcontext.case_143">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="cm_casefile/testcontext.case_163">
+                <planItemOnPart id="ref_id_cm_casefile/testcontext.case_147" sourceRef="cm_casefile/testcontext.case_147">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="pid_cm_casefile/testcontext.case_141" name="Task.AddChild" isBlocking="true">
+                <inputs id="_36T61" name="Assignee"/>
+                <outputs id="_3X9aF" name="Child" bindingRef="cfi_casefile/testcontext.case_4"/>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
+                        <output id="_SkQG_Result" name="Result"/>
+                        <input id="_Hun3_Input" name="Input"/>
+                        <task-model/>
+                        <assignment id="_nTPPc_3" name="Assignment_0">
+                            <condition id="_nTPPc_4" name="Expression_0" language="spel">
+                                <body>
+                                    <![CDATA[user.id]]>
+                                </body>
+                            </condition>
+                        </assignment>
+                        <parameterMapping id="_kHJ0j" sourceRef="_SkQG_Result" targetRef="_3X9aF"/>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
+            <humanTask id="pid_cm_casefile/testcontext.case_144" name="TaskWithContainer" isBlocking="true">
+                <inputs id="_v9FEK" name="inputChildren" bindingRef="cfi_casefile/testcontext.case_3"/>
+                <outputs id="_NXDUT" name="Result"/>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
+                        <output id="_SkQG_Result" name="Result"/>
+                        <input id="_bpa7_Assignee" name="Assignee"/>
+                        <input id="_Hun3_Input" name="Input"/>
+                        <task-model/>
+                        <parameterMapping id="_W00cE" sourceRef="_v9FEK" targetRef="_Hun3_Input">
+                            <transformation language="spel">
+                                <body>
+                                    <![CDATA[inputChildren.Child]]>
+                                </body>
+                            </transformation>
+                        </parameterMapping>
+                        <parameterMapping id="_RkBj2" sourceRef="_SkQG_Result" targetRef="_NXDUT"/>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
+            <humanTask id="pid_cm_casefile/testcontext.case_148" name="TaskWithChild" isBlocking="true">
+                <inputs id="_axaLd" name="inputChild" bindingRef="cfi_casefile/testcontext.case_4"/>
+                <outputs id="_dDqEH" name="Result"/>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
+                        <output id="_SkQG_Result" name="Result"/>
+                        <input id="_bpa7_Assignee" name="Assignee"/>
+                        <input id="_Hun3_Input" name="Input"/>
+                        <task-model/>
+                        <parameterMapping id="_B4VdN" sourceRef="_axaLd" targetRef="_Hun3_Input"/>
+                        <parameterMapping id="_RMhmR" sourceRef="_SkQG_Result" targetRef="_dDqEH"/>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
+            <userEvent id="pid_cm_casefile/testcontext.case_143" name="Trigger.TaskWithContainer"/>
+            <userEvent id="pid_cm_casefile/testcontext.case_147" name="Trigger.TaskWithChild"/>
+        </casePlanModel>
+        <input id="_dJPax_inCPs_0" name="Container" bindingRef="cfi_casefile/testcontext.case_3"/>
+        <extensionElements mustUnderstand="false">
+            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}</cafienne:start-case-model>
+        </extensionElements>
+    </case>
+    <caseFileItemDefinition name="arraycontainer" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="arraycontainer.cfid"/>
+    <caseFileItemDefinition name="arraynode" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="arraynode.cfid">
+        <property name="arrayProp1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_0">
+                <Bounds x="10" y="9" width="807" height="757"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_143">
+                <Bounds x="338" y="147" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_144">
+                <Bounds x="518" y="135" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_147">
+                <Bounds x="343" y="258" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_148">
+                <Bounds x="515" y="252" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_ilffQ_0">
+                <Bounds x="512" y="154" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_ilffQ_1">
+                <Bounds x="509" y="269" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_casefile/testcontext.case_141">
+                <Bounds x="87" y="107" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="cm_casefile/testcontext.case_147" targetCMMNElementRef="_ilffQ_1"/>
+            <CMMNEdge sourceCMMNElementRef="cm_casefile/testcontext.case_143" targetCMMNElementRef="_ilffQ_0"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

@@ -1,0 +1,20 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm__TLYHe_0">
+            <Bounds x="20" y="20" width="670" height="420"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_tmr__TLYHe_0">
+            <Bounds x="110" y="130" width="32" height="32"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__TLYHe_0">
+            <Bounds x="250" y="120" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_TLYHe_1">
+            <Bounds x="244" y="140" width="12" height="20"/>
+        </CMMNShape>
+        <textbox cmmnElementRef="_TLYHe_shape_4" parentId="cm__TLYHe_0" content="This case activates Task1 only after 3 seconds">
+            <Bounds x="140" y="220" width="100" height="60"/>
+        </textbox>
+        <CMMNEdge sourceCMMNElementRef="pi_tmr__TLYHe_0" targetCMMNElementRef="_TLYHe_1"/>
+    </CMMNDiagram>
+</CMMNDI>

@@ -1,0 +1,279 @@
+<definitions>
+    <caseFileItemDefinition id="string" name="string" definitionType="Unspecified"/>
+    <case description="PTP Alert process" id="paxalert.case_PaxAlert" name="PaxAlert">
+        <caseFileModel>
+            <caseFileItem definitionRef="string" id="cfi_csTKE_0" multiplicity="ExactlyOne" name="pde">
+                <children>
+                    <caseFileItem definitionRef="string" id="cfi_csTKE_1" multiplicity="ExactlyOne" name="passenger">
+                        <children>
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_2" multiplicity="ExactlyOne" name="firstname" />
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_3" multiplicity="ExactlyOne" name="lastname" />
+                        </children>
+                    </caseFileItem>
+                    <caseFileItem definitionRef="string" id="cfi_csTKE_4" multiplicity="ZeroOrMore" name="bagage">
+                        <children>
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_5" multiplicity="ExactlyOne" name="tagid" />
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_6" multiplicity="ExactlyOne" name="weight" />
+                        </children>
+                    </caseFileItem>
+                    <caseFileItem definitionRef="string" id="cfi_csTKE_7" multiplicity="ExactlyOne" name="checkin">
+                        <children>
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_8" multiplicity="ExactlyOne" name="flight" />
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_12" multiplicity="ExactlyOne" name="departuretime" />
+                        </children>
+                    </caseFileItem>
+                    <caseFileItem definitionRef="string" id="cfi_csTKE_9" multiplicity="ZeroOrOne" name="background">
+                        <children>
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_10" multiplicity="ExactlyOne" name="result" />
+                            <caseFileItem definitionRef="string" id="cfi_csTKE_11" multiplicity="ExactlyOne" name="date" />
+                        </children>
+                    </caseFileItem>
+                </children>
+            </caseFileItem>
+            <caseFileItem definitionRef="string" id="cfi_cseKh_17" multiplicity="ExactlyOne" name="notifications">
+                <children>
+                    <caseFileItem definitionRef="string" id="cfi_cseKh_27" multiplicity="ZeroOrMore" name="response" />
+                    <caseFileItem definitionRef="string" id="cfi_cseKh_18" multiplicity="ZeroOrMore" name="notification">
+                        <children>
+                            <caseFileItem definitionRef="string" id="cfi_cseKh_19" multiplicity="ExactlyOne" name="body" />
+                            <caseFileItem definitionRef="string" id="cfi_cseKh_20" multiplicity="ExactlyOne" name="title" />
+                            <caseFileItem definitionRef="string" id="cfi_cseKh_24" multiplicity="ExactlyOne" name="type" />
+                        </children>
+                    </caseFileItem>
+                </children>
+            </caseFileItem>
+        </caseFileModel>
+        <casePlanModel autocomplete="true" id="cm_csTKE_0" name="Pax Alert Case">
+            <planItem definitionRef="pid_cm_csTKE_40" id="cm_csTKE_40" name="Execute background check" />
+            <processTask id="pid_cm_csTKE_40" isBlocking="true" name="Execute background check" processRef="backgroundcheck">
+                <inputs bindingRef="cfi_csTKE_1" id="inTP_cm_cscDC_4_1" name="passenger" />
+                <outputs id="outTP_cm_cscDC_4_2" name="responseCode" />
+                <outputs id="outTP_cm_cscDC_4_3" name="responseHeaders" />
+                <outputs id="outTP_cm_cscDC_4_4" name="responseMessage" />
+                <outputs id="outTP_cm_cscDC_4_5" name="responsePayload" />
+                <outputs bindingRef="cfi_csTKE_10" id="outTP_cm_cscDC_4_6" name="result" />
+                <outputs bindingRef="cfi_csTKE_11" id="outTP_cm_cscDC_4_7" name="date" />
+                <parameterMapping id="inPM_cm_cscDC_4_1" sourceRef="inTP_cm_cscDC_4_1" targetRef="backgroundcheck_passenger" />
+                <parameterMapping id="outPM_cm_cscDC_4_2" targetRef="outTP_cm_cscDC_4_2" sourceRef="backgroundcheck_responseCode" />
+                <parameterMapping id="outPM_cm_cscDC_4_3" targetRef="outTP_cm_cscDC_4_3" sourceRef="backgroundcheck_responseHeaders" />
+                <parameterMapping id="outPM_cm_cscDC_4_4" targetRef="outTP_cm_cscDC_4_4" sourceRef="backgroundcheck_responseMessage" />
+                <parameterMapping id="outPM_cm_cscDC_4_5" targetRef="outTP_cm_cscDC_4_5" sourceRef="backgroundcheck_output" />
+                <parameterMapping id="outPM_cm_cscDC_4_6" targetRef="outTP_cm_cscDC_4_6" sourceRef="backgroundcheck_result" />
+                <parameterMapping id="outPM_cm_cscDC_4_7" targetRef="outTP_cm_cscDC_4_7" sourceRef="backgroundcheck_date" />
+            </processTask>
+            <planItem definitionRef="pid_cm_csTKE_45" id="cm_csTKE_45" name="HIT Received" >
+                <entryCriterion name="S1" sentryRef="S1" />
+            </planItem>
+            <sentry id="S1">
+                <ifPart contextRef="cfi_csTKE_10">
+                    <condition language="spel">
+                        <body>result == 'HIT'</body>
+                    </condition>
+                </ifPart>
+                <caseFileItemOnPart sourceRef="cfi_csTKE_10">
+                    <standardEvent>update</standardEvent>
+                </caseFileItemOnPart>
+            </sentry>
+            <milestone id="pid_cm_csTKE_45" name="HIT Received" />
+            <planItem definitionRef="pid_cm_csTKE_52" id="cm_csTKE_52" name="Stakeholder A" >
+                <entryCriterion name="S2" sentryRef="S2" />
+                <exitCriterion name="EX1" sentryRef="EX1" />
+            </planItem>
+            <sentry id="S2">
+                <planItemOnPart id="ref_id_cm_csTKE_45" sourceRef="cm_csTKE_45">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="EX1">
+                <planItemOnPart id="ref_id_cm_csTKE_58" sourceRef="cm_csTKE_58">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage autoComplete="true" id="pid_cm_csTKE_52" name="Stakeholder A">
+                <planItem definitionRef="pid_cm_csTKE_58" id="cm_csTKE_58" name="Baggage Alert" />
+                <planItem definitionRef="pid_cm_csTKE_71" id="cm_csTKE_71" name="Boarding alert" />
+                <planItem definitionRef="pid_cm_csTKE_72" id="cm_csTKE_72" name="Boarding notification" >
+                    <entryCriterion name="S3" sentryRef="S3" />
+                </planItem>
+                <sentry id="S3">
+                    <planItemOnPart id="ref_id_cm_csTKE_71" sourceRef="cm_csTKE_71">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+            </stage>
+            <humanTask id="pid_cm_csTKE_58" isBlocking="true" name="Baggage Alert">
+                <inputs bindingRef="cfi_csTKE_4" id="inTP_cm_csTKE_58_0" name="bagage" />
+            </humanTask>
+            <timerEvent id="pid_cm_csTKE_71" name="Boarding alert">
+                <timerExpression language="spel">
+                    <body>P0DT20S</body>
+                </timerExpression>
+                <planItemStartTrigger sourceRef="cm_csTKE_52">
+                    <standardEvent>start</standardEvent>
+                </planItemStartTrigger>
+            </timerEvent>
+            <processTask id="pid_cm_csTKE_72" isBlocking="true" name="Boarding notification" processRef="notify">
+                <inputs bindingRef="cfi_csTKE_1" id="inTP_cm_cscDC_12_4" name="body" />
+                <inputs id="inTP_cm_cscDC_12_5" name="title">
+                    <bindingRefinement language="spel">
+                        <body>"Boarding notification"</body>
+                    </bindingRefinement>
+                </inputs>
+                <inputs id="inTP_cm_cscDC_12_6" name="type">
+                    <bindingRefinement language="spel">
+                        <body>"note"</body>
+                    </bindingRefinement>
+                </inputs>
+                <inputs bindingRef="cfi_csTKE_0" id="inTP_cm_cscDC_12_7" name="pde" />
+                <outputs id="outTP_cm_cscDC_12_1" name="responseHeaders" />
+                <outputs id="outTP_cm_cscDC_12_2" name="responseCode" />
+                <outputs id="outTP_cm_cscDC_12_3" name="responseMessage" />
+                <outputs bindingRef="cfi_cseKh_27" id="outTP_cm_cscDC_12_4" name="responsePayload" />
+                <parameterMapping id="inPM_cm_cscDC_12_0" sourceRef="inTP_cm_cscDC_12_4" targetRef="notify_body">
+                    <transformation language="spel">
+                        <body>"Pax " + caseInstance.caseFile.pde.passenger.firstname + " will not be boarding"</body>
+                    </transformation>
+                </parameterMapping>
+                <parameterMapping id="inPM_cm_cscDC_12_1" sourceRef="inTP_cm_cscDC_12_5" targetRef="notify_title">
+                    <transformation language="spel">
+                        <body>"Boarding notification"</body>
+                    </transformation>
+                </parameterMapping>
+                <parameterMapping id="inPM_cm_cscDC_12_2" sourceRef="inTP_cm_cscDC_12_6" targetRef="notify_type" />
+                <parameterMapping id="inPM_cm_cscDC_12_3" sourceRef="inTP_cm_cscDC_12_7" targetRef="notify_pde" />
+                <parameterMapping id="outPM_cm_cscDC_12_0" targetRef="outTP_cm_cscDC_12_1" sourceRef="notify_responseHeaders" />
+                <parameterMapping id="outPM_cm_cscDC_12_1" targetRef="outTP_cm_cscDC_12_2" sourceRef="notify_responseCode" />
+                <parameterMapping id="outPM_cm_cscDC_12_2" targetRef="outTP_cm_cscDC_12_3" sourceRef="notify_responseMessage" />
+                <parameterMapping id="outPM_cm_cscDC_12_3" targetRef="outTP_cm_cscDC_12_4" sourceRef="notify_output" />
+            </processTask>
+            <planItem definitionRef="pid_cm_csTKE_54" id="cm_csTKE_54" name="Stakeholder B" >
+                <entryCriterion name="S5" sentryRef="S5" />
+                <exitCriterion name="EX2" sentryRef="EX2" />
+            </planItem>
+            <sentry id="S5">
+                <planItemOnPart id="ref_id_cm_csTKE_45" sourceRef="cm_csTKE_45">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <stage autoComplete="true" id="pid_cm_csTKE_54" name="Stakeholder B">
+                <planItem definitionRef="pid_cm_csTKE_60" id="cm_csTKE_60" name="Passenger Alert" />
+                <planItem definitionRef="pid_cm_csTKE_62" id="cm_csTKE_62" name="Resend alert" />
+                <planItem definitionRef="pid_cm_csTKE_63" id="cm_csTKE_63" name="PTP Arrival notification" >
+                    <entryCriterion name="S6" sentryRef="S6" />
+                </planItem>
+                <sentry id="S6">
+                    <planItemOnPart id="ref_id_cm_csTKE_62" sourceRef="cm_csTKE_62">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+            </stage>
+            <humanTask id="pid_cm_csTKE_60" isBlocking="true" name="Passenger Alert">
+                <inputs bindingRef="cfi_csTKE_1" id="inTP_cm_csTKE_60_0" name="passenger" />
+            </humanTask>
+
+            <sentry id="EX2">
+                <planItemOnPart id="ref_id_cm_csTKE_60" sourceRef="cm_csTKE_60">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <timerEvent id="pid_cm_csTKE_62" name="Resend alert">
+                <timerExpression language="spel">
+                    <body>P0DT10S</body>
+                </timerExpression>
+                <planItemStartTrigger sourceRef="cm_csTKE_54">
+                    <standardEvent>start</standardEvent>
+                </planItemStartTrigger>
+            </timerEvent>
+            <processTask id="pid_cm_csTKE_63" isBlocking="true" name="PTP Arrival notification" processRef="notify">
+                <inputs id="inTP_cm_cscDC_19_4" name="body" />
+                <inputs id="inTP_cm_cscDC_19_5" name="title" />
+                <inputs id="inTP_cm_cscDC_19_6" name="type" />
+                <inputs bindingRef="cfi_csTKE_0" id="inTP_cm_cscDC_19_7" name="pde" />
+                <outputs id="outTP_cm_cscDC_19_1" name="responseHeaders" />
+                <outputs id="outTP_cm_cscDC_19_2" name="responseCode" />
+                <outputs id="outTP_cm_cscDC_19_3" name="responseMessage" />
+                <outputs bindingRef="cfi_cseKh_27" id="outTP_cm_cscDC_19_4" name="responsePayload" />
+                <parameterMapping id="inPM_cm_cscDC_19_0" sourceRef="inTP_cm_cscDC_19_4" targetRef="notify_body">
+                    <transformation language="spel">
+                        <body>"Pax " + caseInstance.caseFile.pde.passenger.firstname + " will arrive shortly"</body>
+                    </transformation>
+                </parameterMapping>
+                <parameterMapping id="inPM_cm_cscDC_19_1" sourceRef="inTP_cm_cscDC_19_5" targetRef="notify_title">
+                    <transformation language="spel">
+                        <body>"PTP arrival alert"</body>
+                    </transformation>
+                </parameterMapping>
+                <parameterMapping id="inPM_cm_cscDC_19_2" sourceRef="inTP_cm_cscDC_19_6" targetRef="notify_type">
+                    <transformation language="spel">
+                        <body>"note"</body>
+                    </transformation>
+                </parameterMapping>
+                <parameterMapping id="inPM_cm_cscDC_19_3" sourceRef="inTP_cm_cscDC_19_7" targetRef="notify_pde" />
+                <parameterMapping id="outPM_cm_cscDC_19_0" targetRef="outTP_cm_cscDC_19_1" sourceRef="notify_responseHeaders" />
+                <parameterMapping id="outPM_cm_cscDC_19_1" targetRef="outTP_cm_cscDC_19_2" sourceRef="notify_responseCode" />
+                <parameterMapping id="outPM_cm_cscDC_19_2" targetRef="outTP_cm_cscDC_19_3" sourceRef="notify_responseMessage" />
+                <parameterMapping id="outPM_cm_cscDC_19_3" targetRef="outTP_cm_cscDC_19_4" sourceRef="notify_output" />
+            </processTask>
+        </casePlanModel>
+        <input bindingRef="cfi_csTKE_0" id="csTKE_inCPs_0" name="pde" />
+    </case>
+    <process id="backgroundcheck" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified" name="backgroundcheck">
+        <input id="backgroundcheck_passenger" name="passenger" />
+        <output id="backgroundcheck_responseCode" name="backgroundcheck_responseCode" />
+        <output id="backgroundcheck_responseHeaders" name="backgroundcheck_responseHeaders" />
+        <output id="backgroundcheck_responseMessage" name="backgroundcheck_responseMessage" />
+        <output id="backgroundcheck_output" name="backgroundcheck_output" />
+        <output id="backgroundcheck_result" name="result" />
+        <output id="backgroundcheck_date" name="date" />
+        <extensionElements xmlns:cafienne="org.cafienne">
+        	<cafienne:implementation class="org.cafienne.processtask.implementation.http.HTTPCallDefinition" name="backgroundcheckExtension">
+	            <url>http://localhost:9888/demo/background</url>
+	            <method>POST</method>
+	            <http-headers>
+	                <http-header name="Accept">application/json</http-header>
+	            </http-headers>
+	            <post-content>${passenger}</post-content>
+	            <parameterMapping sourceRef="responsePayload" targetRef="result">
+	                <transformation language="json">
+	                    <body>$..result</body>
+	                </transformation>
+	            </parameterMapping>
+	            <parameterMapping sourceRef="responsePayload" targetRef="date">
+	                <transformation language="json">
+	                    <body>$..date</body>
+	                </transformation>
+	            </parameterMapping>
+	            <parameterMapping sourceRef="responsePayload" targetRef="backgroundcheck_output" />
+	            <parameterMapping sourceRef="responseCode" targetRef="backgroundcheck_responseCode" />
+	            <parameterMapping sourceRef="responseMessage" targetRef="backgroundcheck_responseMessage" />
+	            <parameterMapping sourceRef="responseHeaders" targetRef="backgroundcheck_responseHeaders" />
+        	</cafienne:implementation>
+        </extensionElements>
+    </process>
+    <process id="notify" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified" name="notify">
+        <input id="notify_body" name="notify_body" />
+        <input id="notify_title" name="title" />
+        <input id="notify_type" name="type" />
+        <input id="notify_pde" name="pde" />
+        <output id="notify_responseHeaders" name="notify_responseHeaders" />
+        <output id="notify_responseCode" name="notify_responseCode" />
+        <output id="notify_responseMessage" name="notify_responseMessage" />
+        <output id="notify_output" name="notify_output" />
+        <extensionElements xmlns:cafienne="org.cafienne">
+        	<cafienne:implementation class="org.cafienne.processtask.implementation.http.HTTPCallDefinition" name="notifyExtension">
+	            <url>https://api.pushbullet.com/v2/pushes</url>
+	            <method>POST</method>
+	            <post-content>{"body": "${notify_body}", "title": "${title}", "type": "${type}"}</post-content>
+	            <http-headers>
+	                <http-header name="Access-Token">o.of0T6YTNWawP9KymmsfTqZfwDteSUPzd</http-header>
+	                <http-header name="Content-Type">application/json</http-header>
+	            </http-headers>
+	            <parameterMapping sourceRef="responsePayload" targetRef="notify_output" />
+	            <parameterMapping sourceRef="responseCode" targetRef="notify_responseCode" />
+	            <parameterMapping sourceRef="responseMessage" targetRef="notify_responseMessage" />
+	            <parameterMapping sourceRef="responseHeaders" targetRef="notify_responseHeaders" />
+	        </cafienne:implementation>
+        </extensionElements>
+    </process>
+</definitions>

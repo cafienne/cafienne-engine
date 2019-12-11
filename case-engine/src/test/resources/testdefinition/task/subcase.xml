@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions>
+	<case name="MainCase" xmlns="http://www.omg.org/spec/CMMN/20121031/MODEL">
+		<casePlanModel name="mainCasePlan">
+			<planItem name="Task1" definitionRef="Task1" />
+			<planItem name="TriggerFailingBlockingSubCaseTask" definitionRef="Task1" />
+			<planItem name="SubCaseTask" definitionRef="SubCaseTask" >
+				<entryCriterion name="S1" sentryRef="S1" />
+			</planItem>
+			<planItem name="NonBlockingSubCaseTask" definitionRef="NonBlockingSubCaseTask" >
+				<entryCriterion name="S2" sentryRef="S2" />
+			</planItem>
+			<planItem name="FailingBlockingSubCaseTask" definitionRef="FailingBlockingSubCaseTask">
+				<entryCriterion name="S3" sentryRef="S3" />
+			</planItem>
+
+			<sentry name="S1">
+				<planItemOnPart sourceRef="Task1">
+					<standardEvent>Complete</standardEvent>
+				</planItemOnPart>
+			</sentry>
+			<sentry name="S2">
+				<planItemOnPart sourceRef="Task1">
+					<standardEvent>Complete</standardEvent>
+				</planItemOnPart>
+			</sentry>
+			<sentry name="S3">
+				<planItemOnPart sourceRef="TriggerFailingBlockingSubCaseTask">
+					<standardEvent>Complete</standardEvent>
+				</planItemOnPart>
+			</sentry>
+			
+			<humanTask name="Task1" />
+			<caseTask name="SubCaseTask" caseRef="SubCase">
+				<inputs name="customerName"/>
+				<parameterMapping sourceRef="customerName" targetRef="inputCustomer">
+					<transformation language="spel">
+						<body>"test customer in case "+caseInstance.getId()</body>
+					</transformation>
+				</parameterMapping>
+				<outputs name="outputCustomerName" bindingRef="Description"/>
+				<parameterMapping sourceRef="OutputParameter1" targetRef="outputCustomerName">
+					<transformation language="spel">
+						<body>"Returned "+OutputParameter1</body>
+					</transformation>
+				</parameterMapping>
+			</caseTask>
+			<caseTask name="FailingBlockingSubCaseTask" isBlocking="true" caseRef="SubCase">
+				<inputs name="customerName" bindingRef="InvalidMainRequest"/>
+				<parameterMapping sourceRef="customerName" targetRef="inputDescription">
+				</parameterMapping>
+			</caseTask>			
+			<caseTask name="NonBlockingSubCaseTask" isBlocking="false" caseRef="SubCase">
+				<inputs name="customerName"/>
+				<parameterMapping sourceRef="customerName" targetRef="inputCustomer">
+					<transformation language="spel">
+						<body>"test customer in case "+caseInstance.getId()</body>
+					</transformation>
+				</parameterMapping>
+			</caseTask>
+		</casePlanModel>
+		<caseFileModel>
+			<caseFileItem name="MainRequest" definitionRef="aString" multiplicity="ExactlyOne">
+				<children>
+					<caseFileItem name="Description" definitionRef="aString" multiplicity="ExactlyOne"/>
+				</children>
+			</caseFileItem>
+			<caseFileItem name="InvalidMainRequest" definitionRef="aStringCalledBoolean" multiplicity="ExactlyOne">
+			</caseFileItem>
+		</caseFileModel> 
+	</case>
+	<case name="SubCase" xmlns="http://www.omg.org/spec/CMMN/20121031/MODEL">
+		<casePlanModel name="subCasePlan" autoComplete="true">
+			<planItem name="Item1" definitionRef="Task1" />
+			<humanTask name="Task1" />
+		</casePlanModel>
+
+		<input name="inputCustomer" bindingRef="Name"/>
+		<input name="inputDescription" bindingRef="RequestDescription"/>
+		<output name="OutputParameter1" bindingRef="Name"/>
+
+		<caseFileModel>
+			<caseFileItem name="Request" definitionRef="aString" multiplicity="ExactlyOne">
+				<children>
+					<caseFileItem name="RequestDescription" definitionRef="aBooleanProp" multiplicity="ExactlyOne"/>
+					<caseFileItem name="Customer" definitionRef="aString" multiplicity="ExactlyOne">
+						<children>
+							<caseFileItem name="Name" definitionRef="aString" multiplicity="ExactlyOne"/>
+							<caseFileItem name="Description" definitionRef="aString" multiplicity="ExactlyOne"/>
+						</children>
+					</caseFileItem>
+				</children>
+			</caseFileItem>
+		</caseFileModel>  
+	</case>
+	
+	<caseFileItemDefinition id="aStringCalledBoolean" name="aStringCalledBoolean" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+		<property name="aBoolean" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+	</caseFileItemDefinition>
+
+	<caseFileItemDefinition name="aString" />
+
+	<caseFileItemDefinition id="aBooleanProp" name="aBooleanProp" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+		<property name="aBoolean" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
+	</caseFileItemDefinition>
+</definitions>

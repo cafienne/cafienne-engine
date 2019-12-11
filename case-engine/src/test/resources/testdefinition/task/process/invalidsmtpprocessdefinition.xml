@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions>
+	<process id="smtp"
+		implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified"
+		name="smtp">
+		<input id="request" name="request" />
+		<input id="from" name="from" />
+		<input id="to" name="to" />
+		<input id="replyTo" name="replyTo" />
+		<input id="body" name="body" />
+		<input id="subject" name="subject" />
+		<input id="attachment" name="attachment" />
+		<input id="filename" name="filename" />
+		<extensionElements>
+			<cafienne:implementation
+				class="org.cafienne.processtask.implementation.smtp.SMTPCallDefinition"
+				xmlns:cafienne="org.cafienne">
+				<smtp-server>localhost</smtp-server>
+				<smtp-port>25</smtp-port>
+				<subject>${subject}</subject>
+				<mail-body type="text/html">${body}</mail-body>
+				<from>${from}</from>
+				<reply-to>${replyTo}</reply-to>
+				<to>
+					<address name="${to}">${to}</address>
+				</to>
+				<cc>
+					<address name="${to}">${to}</address>
+					<address name="${to}">${to}</address>
+				</cc>
+				<bcc>
+					<address name="${to}">${to}</address>
+				</bcc>
+				<attachments>
+					<attachment name="${filename}">${attachment}</attachment>
+				</attachments>
+				<parameterMapping sourceRef="responsesPayload" targetRef="details">
+					<transformation language="json">
+						<body>$.._2</body>
+					</transformation>
+				</parameterMapping>
+			</cafienne:implementation>
+		</extensionElements>
+	</process>
+</definitions>

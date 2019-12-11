@@ -1,0 +1,27 @@
+<case id="timer.case" name="timer" guid="_TLYHe">
+    <caseFileModel>
+        <caseFileItem id="_TLYHe_3" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__TLYHe_0" name="timer" autoComplete="true">
+        <planItem id="pi_tmr__TLYHe_0" name="PeriodWaiter" definitionRef="tmr__TLYHe_0"/>
+        <planItem id="pi_ht__TLYHe_0" name="Task1" definitionRef="ht__TLYHe_0">
+            <entryCriterion id="_TLYHe_1" name="EntryCriterion_0" sentryRef="crit__TLYHe_0"/>
+        </planItem>
+        <sentry id="crit__TLYHe_0" name="Sentry_0">
+            <planItemOnPart id="_TLYHe_2" name="PlanItemOnPart_0" sourceRef="pi_tmr__TLYHe_0">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <humanTask id="ht__TLYHe_0" name="Task1" isBlocking="true"/>
+        <timerEvent id="tmr__TLYHe_0" name="PeriodWaiter">
+            <timerExpression id="_TLYHe_4" language="spel">
+                <body>
+                    <![CDATA[P0DT0H0M3S]]>
+                </body>
+            </timerExpression>
+            <planItemStartTrigger id="_TLYHe_0" name="PlanItemStartTrigger_0">
+                <standardEvent></standardEvent>
+            </planItemStartTrigger>
+        </timerEvent>
+    </casePlanModel>
+</case>

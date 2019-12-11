@@ -1,0 +1,36 @@
+<definitions>
+<!--  This case holds a SPEL expression that cannot be parsed. It is copied form paxalert, but that has no significance, but now there is no time to reduce the case to something simple -->
+    <caseFileItemDefinition id="string" name="string" definitionType="Unspecified"/>
+    <case description="Case that has a wrong spel expression" id="test" name="test">
+        <caseFileModel>
+            <caseFileItem definitionRef="string" id="cfi_csTKE_0" multiplicity="ExactlyOne" name="test"></caseFileItem>
+        </caseFileModel>
+        <casePlanModel autocomplete="true" id="cm_csTKE_0" name="Bad spell">
+            <planItem definitionRef="pid_cm_csTKE_40" id="cm_csTKE_40" name="SimpleTask" />
+            <processTask id="pid_cm_csTKE_40" isBlocking="true" name="Do process task" processRef="simpleProcess">
+                <inputs id="inTP_cm_cscDC_4_1" name="passenger" />
+                <parameterMapping id="inPM_cm_cscDC_4_8" sourceRef="inTP_cm_cscDC_4_1" targetRef="inputParameter">
+									<transformation language="spel"> 
+									<body>
+										caseInstance.getPlanItems().stream().filter(p -> p.getName().equals("test")).findFirst().orElse(caseInstance.getCasePlan()).getId()
+										</body>
+									</transformation>
+                </parameterMapping>
+            </processTask>
+        </casePlanModel>
+        <input bindingRef="cfi_csTKE_0" id="csTKE_inCPs_0" name="test" />
+    </case>
+    <process id="simpleProcess" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified" name="backgroundcheck">
+        <input id="inputParameter" name="inputParameter" />
+        <extensionElements xmlns:cafienne="org.cafienne">
+        	<cafienne:implementation class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
+	            <url>http://nowhere</url>
+	            <method>POST</method>
+	            <http-headers>
+	                <http-header name="Accept">application/json</http-header>
+	            </http-headers>
+	            <post-content>nothing</post-content>
+        	</cafienne:implementation>
+        </extensionElements>
+    </process>
+</definitions>

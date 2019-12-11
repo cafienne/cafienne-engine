@@ -1,0 +1,52 @@
+<definitions>
+    <case id="timer.case" name="timer">
+        <caseFileModel>
+            <caseFileItem id="_TLYHe_3" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__TLYHe_0" name="timer" autoComplete="true">
+            <planItem id="pi_tmr__TLYHe_0" name="PeriodWaiter" definitionRef="tmr__TLYHe_0"/>
+            <planItem id="pi_ht__TLYHe_0" name="Task1" definitionRef="ht__TLYHe_0">
+                <entryCriterion id="_TLYHe_1" name="EntryCriterion_0" sentryRef="crit__TLYHe_0"/>
+            </planItem>
+            <sentry id="crit__TLYHe_0" name="Sentry_0">
+                <planItemOnPart id="_TLYHe_2" name="PlanItemOnPart_0" sourceRef="pi_tmr__TLYHe_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="ht__TLYHe_0" name="Task1" isBlocking="true"/>
+            <timerEvent id="tmr__TLYHe_0" name="PeriodWaiter">
+                <timerExpression id="_TLYHe_4" language="spel">
+                    <body>
+                        <![CDATA[P0DT0H0M3S]]>
+                    </body>
+                </timerExpression>
+                <planItemStartTrigger id="_TLYHe_0" name="PlanItemStartTrigger_0">
+                    <standardEvent/>
+                </planItemStartTrigger>
+            </timerEvent>
+        </casePlanModel>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__TLYHe_0">
+                <Bounds x="20" y="20" width="670" height="420"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_tmr__TLYHe_0">
+                <Bounds x="110" y="130" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__TLYHe_0">
+                <Bounds x="250" y="120" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_TLYHe_1">
+                <Bounds x="244" y="140" width="12" height="20"/>
+            </CMMNShape>
+            <textbox cmmnElementRef="_TLYHe_shape_4" parentId="cm__TLYHe_0" content="This case activates Task1 only after 3 seconds">
+                <Bounds x="140" y="220" width="100" height="60"/>
+            </textbox>
+            <CMMNEdge sourceCMMNElementRef="pi_tmr__TLYHe_0" targetCMMNElementRef="_TLYHe_1"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

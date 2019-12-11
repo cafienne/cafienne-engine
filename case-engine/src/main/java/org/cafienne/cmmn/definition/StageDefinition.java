@@ -1,0 +1,83 @@
+/* 
+ * Copyright 2014 - 2019 Cafienne B.V.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package org.cafienne.cmmn.definition;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
+import org.w3c.dom.Element;
+
+public class StageDefinition extends PlanFragmentDefinition {
+    private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList<PlanItemDefinitionDefinition>(); // Only in the root stage
+
+    private boolean autoComplete = false;
+    private PlanningTableDefinition planningTable;
+
+    public StageDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
+        super(element, definition, parentElement);
+        parse("humanTask", HumanTaskDefinition.class, planItemDefinitions);
+        parse("processTask", ProcessTaskDefinition.class, planItemDefinitions);
+        parse("caseTask", CaseTaskDefinition.class, planItemDefinitions);
+        parse("milestone", MilestoneDefinition.class, planItemDefinitions);
+        parse("userEvent", UserEventDefinition.class, planItemDefinitions);
+        parse("timerEvent", TimerEventDefinition.class, planItemDefinitions);
+        parse("stage", StageDefinition.class, planItemDefinitions);
+
+        autoComplete = Boolean.parseBoolean(parseAttribute("autoComplete", false, "false"));
+        planningTable = parse("planningTable", PlanningTableDefinition.class, false);
+
+    }
+
+    public boolean autoCompletes() {
+        return autoComplete;
+    }
+
+    public PlanningTableDefinition getPlanningTable() {
+        return planningTable;
+    }
+
+    /**
+     * Returns the definition of the discretionary item with the specified name - in this stage or it's human tasks (so not in one of it's children).
+     * @param identifier
+     * @return
+     */
+    public DiscretionaryItemDefinition getDiscretionaryItem(String identifier) {
+        DiscretionaryItemDefinition diDefinition = null;
+        if (planningTable != null) {
+            // Let's first check our stage-level planning table
+            return diDefinition = planningTable.getDiscretionaryItem(identifier);
+        }
+        if (diDefinition == null) {
+            // Perhaps it is in one of our HumanTasks
+            for (PlanItemDefinition planItem : getPlanItems()) {
+                if (planItem.getPlanItemDefinition() instanceof HumanTaskDefinition) {
+                    HumanTaskDefinition task = (HumanTaskDefinition) planItem.getPlanItemDefinition();
+                    PlanningTableDefinition taskTable = task.getPlanningTable();
+                    if (taskTable != null) {
+                        diDefinition = task.getPlanningTable().getDiscretionaryItem(identifier);
+                        if (diDefinition != null) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return diDefinition;
+    }
+
+    public Collection<PlanItemDefinitionDefinition> getPlanItemDefinitions() {
+        return planItemDefinitions;
+    }
+
+    @Override
+    public Stage<?> createInstance(PlanItem planItem) {
+        return new Stage<StageDefinition>(planItem, this);
+    }
+}

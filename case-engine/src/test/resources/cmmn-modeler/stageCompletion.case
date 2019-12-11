@@ -1,0 +1,88 @@
+<case id="stageCompletion.case" name="stageCompletion" guid="_IKPvy">
+    <caseFileModel>
+        <caseFileItem id="cfi_cseOt_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm_stageCompletion.case_stageCompletion_0" name="stageCompletion" autoComplete="true">
+        <planItem id="cm_cseOt_62" name="Stage1" definitionRef="pid_cm_cseOt_62">
+            <entryCriterion id="_IKPvy_0" name="EntryCriterion_0" sentryRef="cm_csRJ5_71"/>
+        </planItem>
+        <planItem id="cm_csRJ5_70" name="TriggerStage1" definitionRef="pid_cm_csRJ5_70"/>
+        <planItem id="cm_csRJ5_72" name="Stage2" definitionRef="pid_cm_csRJ5_72">
+            <entryCriterion id="_IKPvy_1" name="EntryCriterion_1" sentryRef="cm_cso85_100"/>
+        </planItem>
+        <planItem id="cm_cso85_99" name="TriggerStage2" definitionRef="pid_cm_cso85_99"/>
+        <planItem id="cm_cso85_101" name="Stage3" definitionRef="pid_cm_cso85_101">
+            <entryCriterion id="_IKPvy_2" name="EntryCriterion_2" sentryRef="cm_csXD7_109"/>
+        </planItem>
+        <planItem id="cm_csXD7_108" name="TriggerStage3" definitionRef="pid_cm_csXD7_108"/>
+        <sentry id="cm_csRJ5_71">
+            <planItemOnPart id="ref_id_cm_csRJ5_70" sourceRef="cm_csRJ5_70">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <sentry id="cm_cso85_100">
+            <planItemOnPart id="ref_id_cm_cso85_99" sourceRef="cm_cso85_99">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <sentry id="cm_csXD7_109">
+            <planItemOnPart id="ref_id_cm_csXD7_108" sourceRef="cm_csXD7_108">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <humanTask id="pid_cm_cseOt_64" name="Task2" isBlocking="true"/>
+        <humanTask id="pid_cm_cseOt_66" name="Task1" isBlocking="true"/>
+        <humanTask id="pid_cm_csrtZ_73" name="Task3" isBlocking="true"/>
+        <humanTask id="pid_cm_csrtZ_75" name="Task4" isBlocking="true"/>
+        <humanTask id="pid_cm_cso85_103" name="Task5" isBlocking="true"/>
+        <humanTask id="pid_cm_cso85_105" name="Task6" isBlocking="true"/>
+        <userEvent id="pid_cm_csRJ5_70" name="TriggerStage1"/>
+        <userEvent id="pid_cm_cso85_99" name="TriggerStage2"/>
+        <userEvent id="pid_cm_csXD7_108" name="TriggerStage3"/>
+        <stage id="pid_cm_cseOt_62" name="Stage1" autoComplete="false">
+            <planItem id="cm_cseOt_64" name="Task2" definitionRef="pid_cm_cseOt_64">
+                <entryCriterion id="_IKPvy_3" name="EntryCriterion_3" sentryRef="cm_cseOt_69"/>
+            </planItem>
+            <planItem id="cm_cseOt_66" name="Task1" definitionRef="pid_cm_cseOt_66">
+                <itemControl>
+                    <requiredRule id="cm_cseOt_66_requiredRule">
+                        <condition language="spel">
+                            <body>
+                                <![CDATA[
+                                    true
+                                ]]>
+                            </body>
+                        </condition>
+                    </requiredRule>
+                </itemControl>
+            </planItem>
+            <sentry id="cm_cseOt_69">
+                <planItemOnPart id="ref_id_cm_cseOt_66" sourceRef="cm_cseOt_66">
+                    <standardEvent>fault</standardEvent>
+                </planItemOnPart>
+            </sentry>
+        </stage>
+        <stage id="pid_cm_csRJ5_72" name="Stage2" autoComplete="false">
+            <planItem id="cm_csrtZ_73" name="Task3" definitionRef="pid_cm_csrtZ_73"/>
+            <planningTable id="pt_cm_10">
+                <discretionaryItem id="cm_csrtZ_75" name="Task4" definitionRef="pid_cm_csrtZ_75"/>
+            </planningTable>
+        </stage>
+        <stage id="pid_cm_cso85_101" name="Stage3" autoComplete="true">
+            <planItem id="cm_cso85_103" name="Task5" definitionRef="pid_cm_cso85_103"/>
+            <planningTable id="pt_cm_102">
+                <discretionaryItem id="cm_cso85_105" name="Task6" definitionRef="pid_cm_cso85_105"/>
+            </planningTable>
+        </stage>
+    </casePlanModel>
+    <extensionElements mustUnderstand="false">
+        <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}</cafienne:start-case-model>
+    </extensionElements>
+</case>

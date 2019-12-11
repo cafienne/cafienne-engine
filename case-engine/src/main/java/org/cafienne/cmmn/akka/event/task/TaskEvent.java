@@ -1,0 +1,71 @@
+package org.cafienne.cmmn.akka.event.task;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.CaseInstanceEvent;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Task;
+import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
+public abstract class TaskEvent<T extends Task> extends CaseInstanceEvent {
+    private final static Logger logger = LoggerFactory.getLogger(TaskEvent.class);
+
+    private final String taskId;
+    private final String type;
+
+    private enum Fields {
+        taskId, type
+    }
+
+    protected TaskEvent(T task) {
+        super(task.getCaseInstance());
+        this.taskId = task.getId();
+        this.type = task.getPlanItem().getType();
+    }
+
+    protected TaskEvent(ValueMap json) {
+        super(json);
+        this.taskId = json.raw(Fields.taskId);
+        this.type = json.raw(Fields.type);
+    }
+
+    /**
+     * Returns type of task, taken from plan item. Typically HumanTask, ProcessTask or CaseTask.
+     * @return
+     */
+    public String getType() {
+        return this.type;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void writeTaskEvent(JsonGenerator generator) throws IOException {
+        super.writeCaseInstanceEvent(generator);
+        writeField(generator, Fields.taskId, taskId);
+        writeField(generator, Fields.type, type);
+    }
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        writeTaskEvent(generator);
+    }
+
+    @Override
+    final public void recover(Case caseInstance) {
+        PlanItem planItem = caseInstance.getPlanItemById(getTaskId());
+        if (planItem == null) {
+            logger.error("MAJOR ERROR: Cannot recover task event for task with id " + getTaskId() + ", because the plan item cannot be found");
+            return;
+        }
+        T task = planItem.getInstance();
+        this.recoverTaskEvent(task);
+    }
+
+    protected abstract void recoverTaskEvent(T task);
+}

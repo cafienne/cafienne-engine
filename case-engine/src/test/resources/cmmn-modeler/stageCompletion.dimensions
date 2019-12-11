@@ -1,0 +1,74 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm_stageCompletion.case_stageCompletion_0">
+            <Bounds x="10" y="10" width="953" height="846"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cseOt_62">
+            <Bounds x="298" y="62" width="538" height="197"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cseOt_64">
+            <Bounds x="375" y="175" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_IKPvy_3">
+            <Bounds x="420" y="165" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cseOt_66">
+            <Bounds x="377" y="85" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csRJ5_72">
+            <Bounds x="296" y="279" width="534" height="177"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csrtZ_73">
+            <Bounds x="379" y="294" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csrtZ_75">
+            <Bounds x="379" y="371" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_IKPvy_1">
+            <Bounds x="290" y="376" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cso85_99">
+            <Bounds x="108" y="372" width="32" height="32"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cso85_101">
+            <Bounds x="295" y="481" width="535" height="176"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cso85_103">
+            <Bounds x="374" y="500" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cso85_105">
+            <Bounds x="374" y="577" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_IKPvy_2">
+            <Bounds x="289" y="552" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csXD7_108">
+            <Bounds x="107" y="545" width="32" height="32"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_IKPvy_0">
+            <Bounds x="292" y="140" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csRJ5_70">
+            <Bounds x="109" y="131" width="32" height="32"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pt_cm_10">
+            <Bounds x="346" y="270" width="24" height="16"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pt_cm_102">
+            <Bounds x="345" y="472" width="24" height="16"/>
+        </CMMNShape>
+        <textbox cmmnElementRef="cm_cseOt_68" parentId="cm_cseOt_62" content="Stage does not auto complete&#10;It has a required rule on Task1.&#10;Task2 listens to &quot;fail&quot; of Task1&#10;&#10;So it should complete if Task1 is completed,&#10;because Task2 always remains Available.">
+            <Bounds x="508" y="93" width="280" height="130"/>
+        </textbox>
+        <textbox cmmnElementRef="cm_csrtZ_77" parentId="cm_csRJ5_72" content="Stage2 has a discretionary task.&#10;&#10;So completing Task3 should NOT complete the stage,&#10;because it is not autoComplete enabled">
+            <Bounds x="508" y="303" width="300" height="130"/>
+        </textbox>
+        <textbox cmmnElementRef="cm_cso85_107" parentId="cm_cso85_101" content="Stage3 is similar to Stage2, but autoComplete is enabled.&#10;&#10;Hence completing Task5 should complete the stage,&#10;even though there are discretionary items">
+            <Bounds x="510" y="511" width="310" height="120"/>
+        </textbox>
+        <CMMNEdge sourceCMMNElementRef="cm_cseOt_66" targetCMMNElementRef="_IKPvy_3"/>
+        <CMMNEdge sourceCMMNElementRef="cm_cso85_99" targetCMMNElementRef="_IKPvy_1"/>
+        <CMMNEdge sourceCMMNElementRef="cm_csXD7_108" targetCMMNElementRef="_IKPvy_2"/>
+        <CMMNEdge sourceCMMNElementRef="cm_csRJ5_70" targetCMMNElementRef="_IKPvy_0"/>
+    </CMMNDiagram>
+</CMMNDI>

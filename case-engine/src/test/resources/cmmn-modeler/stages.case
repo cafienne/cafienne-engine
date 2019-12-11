@@ -1,0 +1,43 @@
+<case id="stages.case" name="stages" guid="_lSSzB">
+    <caseFileModel>
+        <caseFileItem id="_lSSzB_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__lSSzB_0" name="stages" autoComplete="true">
+        <planItem id="pi_ht__lSSzB_0" name="Item1" definitionRef="ht__lSSzB_0">
+            <entryCriterion id="_lSSzB_2" name="EntryCriterion_0" sentryRef="crit__lSSzB_0"/>
+        </planItem>
+        <planItem id="pi__lSSzB_3" name="Item4" definitionRef="_lSSzB_3"/>
+        <sentry id="crit__lSSzB_0" name="Sentry_0">
+            <planItemOnPart id="_lSSzB_17" name="PlanItemOnPart_1" sourceRef="pi_ht__lSSzB_1">
+                <standardEvent>complete</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <humanTask id="ht__lSSzB_0" name="Item1" isBlocking="true"/>
+        <stage id="_lSSzB_3" name="Item4" autoComplete="true">
+            <planItem id="pi__lSSzB_5" name="Stage1.1" definitionRef="_lSSzB_5"/>
+            <planItem id="pi__lSSzB_7" name="Stage1.2" definitionRef="_lSSzB_7">
+                <entryCriterion id="_lSSzB_10" name="EntryCriterion_1" sentryRef="crit__lSSzB_1"/>
+            </planItem>
+            <planItem id="pi_ht__lSSzB_1" name="Task1.1" definitionRef="ht__lSSzB_1"/>
+            <sentry id="crit__lSSzB_1" name="Sentry_1">
+                <planItemOnPart id="_lSSzB_11" name="PlanItemOnPart_0" sourceRef="pi_ht__lSSzB_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+        </stage>
+        <stage id="_lSSzB_5" name="Stage1.1" autoComplete="true">
+            <planItem id="pi__lSSzB_12" name="Stage1.1.2" definitionRef="_lSSzB_12"/>
+            <planItem id="pi_ht__lSSzB_4" name="Task1 in Stage1.1" definitionRef="ht__lSSzB_4"/>
+        </stage>
+        <stage id="_lSSzB_7" name="Stage1.2" autoComplete="true">
+            <planItem id="pi_ht__lSSzB_3" name="Task1 in Stage 1.2" definitionRef="ht__lSSzB_3"/>
+        </stage>
+        <humanTask id="ht__lSSzB_1" name="Task1.1" isBlocking="true"/>
+        <stage id="_lSSzB_12" name="Stage1.1.2" autoComplete="true">
+            <planItem id="pi_ht__lSSzB_2" name="Task1 in Stage 1.2" definitionRef="ht__lSSzB_2"/>
+        </stage>
+        <humanTask id="ht__lSSzB_2" name="Task1 in Stage 1.2" isBlocking="true"/>
+        <humanTask id="ht__lSSzB_3" name="Task1 in Stage 1.2" isBlocking="true"/>
+        <humanTask id="ht__lSSzB_4" name="Task1 in Stage1.1" isBlocking="true"/>
+    </casePlanModel>
+</case>

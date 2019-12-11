@@ -1,0 +1,24 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm_casefile/getlist_getdetails.case_0" name="getlist_getdetails">
+            <Bounds x="10" y="10" width="710" height="560"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_pt__LQXO7_8" name="GetList">
+            <Bounds x="81" y="104" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_pt__LQXO7_24" name="GetDetails">
+            <Bounds x="350" y="110" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="crit__LQXO7_0" name="Sentry_1">
+            <Bounds x="444" y="130" width="12" height="20"/>
+        </CMMNShape>
+        <casefileitem cmmnElementRef="_LQXO7_shape_4" parentid="cm_casefile/getlist_getdetails.case_0" contextRef="_LQXO7_7">
+            <Bounds x="580" y="120" width="25" height="40"/>
+        </casefileitem>
+        <casefileitem cmmnElementRef="_LQXO7_shape_5" parentid="cm_casefile/getlist_getdetails.case_0" contextRef="_LQXO7_7">
+            <Bounds x="110" y="200" width="25" height="40"/>
+        </casefileitem>
+        <CMMNEdge sourceCMMNElementRef="_LQXO7_shape_4" targetCMMNElementRef="crit__LQXO7_0"/>
+        <CMMNEdge sourceCMMNElementRef="_LQXO7_shape_5" targetCMMNElementRef="pi_pt__LQXO7_8"/>
+    </CMMNDiagram>
+</CMMNDI>

@@ -1,0 +1,178 @@
+<definitions>
+    <case id="stageCompletion.case" name="stageCompletion">
+        <caseFileModel>
+            <caseFileItem id="cfi_cseOt_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm_stageCompletion.case_stageCompletion_0" name="stageCompletion" autoComplete="true">
+            <planItem id="cm_cseOt_62" name="Stage1" definitionRef="pid_cm_cseOt_62">
+                <entryCriterion id="_IKPvy_0" name="EntryCriterion_0" sentryRef="cm_csRJ5_71"/>
+            </planItem>
+            <planItem id="cm_csRJ5_70" name="TriggerStage1" definitionRef="pid_cm_csRJ5_70"/>
+            <planItem id="cm_csRJ5_72" name="Stage2" definitionRef="pid_cm_csRJ5_72">
+                <entryCriterion id="_IKPvy_1" name="EntryCriterion_1" sentryRef="cm_cso85_100"/>
+            </planItem>
+            <planItem id="cm_cso85_99" name="TriggerStage2" definitionRef="pid_cm_cso85_99"/>
+            <planItem id="cm_cso85_101" name="Stage3" definitionRef="pid_cm_cso85_101">
+                <entryCriterion id="_IKPvy_2" name="EntryCriterion_2" sentryRef="cm_csXD7_109"/>
+            </planItem>
+            <planItem id="cm_csXD7_108" name="TriggerStage3" definitionRef="pid_cm_csXD7_108"/>
+            <sentry id="cm_csRJ5_71">
+                <planItemOnPart id="ref_id_cm_csRJ5_70" sourceRef="cm_csRJ5_70">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="cm_cso85_100">
+                <planItemOnPart id="ref_id_cm_cso85_99" sourceRef="cm_cso85_99">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="cm_csXD7_109">
+                <planItemOnPart id="ref_id_cm_csXD7_108" sourceRef="cm_csXD7_108">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="pid_cm_cseOt_64" name="Task2" isBlocking="true"/>
+            <humanTask id="pid_cm_cseOt_66" name="Task1" isBlocking="true"/>
+            <humanTask id="pid_cm_csrtZ_73" name="Task3" isBlocking="true"/>
+            <humanTask id="pid_cm_csrtZ_75" name="Task4" isBlocking="true"/>
+            <humanTask id="pid_cm_cso85_103" name="Task5" isBlocking="true"/>
+            <humanTask id="pid_cm_cso85_105" name="Task6" isBlocking="true"/>
+            <userEvent id="pid_cm_csRJ5_70" name="TriggerStage1"/>
+            <userEvent id="pid_cm_cso85_99" name="TriggerStage2"/>
+            <userEvent id="pid_cm_csXD7_108" name="TriggerStage3"/>
+            <stage id="pid_cm_cseOt_62" name="Stage1" autoComplete="false">
+                <planItem id="cm_cseOt_64" name="Task2" definitionRef="pid_cm_cseOt_64">
+                    <entryCriterion id="_IKPvy_3" name="EntryCriterion_3" sentryRef="cm_cseOt_69"/>
+                </planItem>
+                <planItem id="cm_cseOt_66" name="Task1" definitionRef="pid_cm_cseOt_66">
+                    <itemControl>
+                        <requiredRule id="cm_cseOt_66_requiredRule">
+                            <condition language="spel">
+                                <body>
+                                    <![CDATA[
+                                    true
+                                ]]>
+                                </body>
+                            </condition>
+                        </requiredRule>
+                    </itemControl>
+                </planItem>
+                <sentry id="cm_cseOt_69">
+                    <planItemOnPart id="ref_id_cm_cseOt_66" sourceRef="cm_cseOt_66">
+                        <standardEvent>fault</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+            </stage>
+            <stage id="pid_cm_csRJ5_72" name="Stage2" autoComplete="false">
+                <planItem id="cm_csrtZ_73" name="Task3" definitionRef="pid_cm_csrtZ_73"/>
+                <planningTable id="pt_cm_10">
+                    <discretionaryItem id="cm_csrtZ_75" name="Task4" definitionRef="pid_cm_csrtZ_75"/>
+                </planningTable>
+            </stage>
+            <stage id="pid_cm_cso85_101" name="Stage3" autoComplete="true">
+                <planItem id="cm_cso85_103" name="Task5" definitionRef="pid_cm_cso85_103"/>
+                <planningTable id="pt_cm_102">
+                    <discretionaryItem id="cm_cso85_105" name="Task6" definitionRef="pid_cm_cso85_105"/>
+                </planningTable>
+            </stage>
+        </casePlanModel>
+        <extensionElements mustUnderstand="false">
+            <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
+  "schema":{
+    "title": "",
+    "type": "object",
+    "properties":{
+    }
+  }
+}</cafienne:start-case-model>
+        </extensionElements>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm_stageCompletion.case_stageCompletion_0">
+                <Bounds x="10" y="10" width="953" height="846"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cseOt_62">
+                <Bounds x="298" y="62" width="538" height="197"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cseOt_64">
+                <Bounds x="375" y="175" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_IKPvy_3">
+                <Bounds x="420" y="165" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cseOt_66">
+                <Bounds x="377" y="85" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csRJ5_72">
+                <Bounds x="296" y="279" width="534" height="177"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csrtZ_73">
+                <Bounds x="379" y="294" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csrtZ_75">
+                <Bounds x="379" y="371" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_IKPvy_1">
+                <Bounds x="290" y="376" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cso85_99">
+                <Bounds x="108" y="372" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cso85_101">
+                <Bounds x="295" y="481" width="535" height="176"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cso85_103">
+                <Bounds x="374" y="500" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cso85_105">
+                <Bounds x="374" y="577" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_IKPvy_2">
+                <Bounds x="289" y="552" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csXD7_108">
+                <Bounds x="107" y="545" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_IKPvy_0">
+                <Bounds x="292" y="140" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csRJ5_70">
+                <Bounds x="109" y="131" width="32" height="32"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pt_cm_10">
+                <Bounds x="346" y="270" width="24" height="16"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pt_cm_102">
+                <Bounds x="345" y="472" width="24" height="16"/>
+            </CMMNShape>
+            <textbox cmmnElementRef="cm_cseOt_68" parentId="cm_cseOt_62" content="Stage does not auto complete
+It has a required rule on Task1.
+Task2 listens to &quot;fail&quot; of Task1
+
+So it should complete if Task1 is completed,
+because Task2 always remains Available.">
+                <Bounds x="508" y="93" width="280" height="130"/>
+            </textbox>
+            <textbox cmmnElementRef="cm_csrtZ_77" parentId="cm_csRJ5_72" content="Stage2 has a discretionary task.
+
+So completing Task3 should NOT complete the stage,
+because it is not autoComplete enabled">
+                <Bounds x="508" y="303" width="300" height="130"/>
+            </textbox>
+            <textbox cmmnElementRef="cm_cso85_107" parentId="cm_cso85_101" content="Stage3 is similar to Stage2, but autoComplete is enabled.
+
+Hence completing Task5 should complete the stage,
+even though there are discretionary items">
+                <Bounds x="510" y="511" width="310" height="120"/>
+            </textbox>
+            <CMMNEdge sourceCMMNElementRef="cm_cseOt_66" targetCMMNElementRef="_IKPvy_3"/>
+            <CMMNEdge sourceCMMNElementRef="cm_cso85_99" targetCMMNElementRef="_IKPvy_1"/>
+            <CMMNEdge sourceCMMNElementRef="cm_csXD7_108" targetCMMNElementRef="_IKPvy_2"/>
+            <CMMNEdge sourceCMMNElementRef="cm_csRJ5_70" targetCMMNElementRef="_IKPvy_0"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

@@ -1,0 +1,74 @@
+<definitions>
+    <case id="sentry.case" name="sentry">
+        <caseFileModel>
+            <caseFileItem id="_wbsA2_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__wbsA2_0" name="sentry" autoComplete="true">
+            <planItem id="pi_ht__wbsA2_0" name="Item1" definitionRef="ht__wbsA2_0"/>
+            <planItem id="pi__wbsA2_2" name="Stage1" definitionRef="_wbsA2_2">
+                <entryCriterion id="_wbsA2_4" name="entrySentry" sentryRef="crit__wbsA2_0"/>
+            </planItem>
+            <sentry id="crit__wbsA2_0" name="Sentry_0">
+                <ifPart id="_wbsA2_6" name="IfPart_0">
+                    <condition id="_wbsA2_7" name="Expression_0" language="spel">
+                        <body>
+                            <![CDATA[true]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <planItemOnPart id="_wbsA2_5" name="PlanItemOnPart_0" sourceRef="pi_ht__wbsA2_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__wbsA2_1" name="Sentry_1">
+                <planItemOnPart id="_wbsA2_11" name="PlanItemOnPart_1" sourceRef="pi_ht__wbsA2_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <planningTable id="_wbsA2_12" name="PlanningTable_0">
+                <discretionaryItem id="pi_ht__wbsA2_2" name="Disc1" definitionRef="ht__wbsA2_2">
+                    <entryCriterion id="_wbsA2_10" name="EntryCriterion_0" sentryRef="crit__wbsA2_1"/>
+                </discretionaryItem>
+            </planningTable>
+            <humanTask id="ht__wbsA2_0" name="Item1" isBlocking="true"/>
+            <humanTask id="ht__wbsA2_1" name="Item1.1" isBlocking="true"/>
+            <stage id="_wbsA2_2" name="Stage1" autoComplete="true">
+                <planItem id="pi_ht__wbsA2_1" name="Item1.1" definitionRef="ht__wbsA2_1"/>
+            </stage>
+            <humanTask id="ht__wbsA2_2" name="Disc1" isBlocking="true"/>
+        </casePlanModel>
+    </case>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__wbsA2_0">
+                <Bounds x="20" y="20" width="800" height="500"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__wbsA2_0">
+                <Bounds x="120" y="80" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi__wbsA2_2">
+                <Bounds x="90" y="200" width="420" height="140"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_wbsA2_4">
+                <Bounds x="164" y="190" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__wbsA2_1">
+                <Bounds x="110" y="230" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__wbsA2_2">
+                <Bounds x="330" y="80" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_wbsA2_10">
+                <Bounds x="324" y="100" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_wbsA2_12">
+                <Bounds x="300" y="33" width="24" height="16"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__wbsA2_0" targetCMMNElementRef="_wbsA2_4"/>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__wbsA2_0" targetCMMNElementRef="_wbsA2_10"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>
