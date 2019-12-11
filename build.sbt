@@ -38,7 +38,7 @@
   )
 
   // PROJECT ROOT
-  lazy val cafienne = Project("cafienne-service", file(""))
+  lazy val cafienne = Project("cafienne-engine", file(""))
     .aggregate(
       engine,
       service
@@ -157,8 +157,8 @@
         )
     )
     .settings(
-      packageName in Docker := "cafienne/service",
-      version in Docker := "latest",
+      packageName in Docker := "cafienne/engine",
+      version in Docker := "1.1.0",
       maintainer in Docker := """Cafienne <info@cafienne.io>""",
       defaultLinuxInstallLocation in Docker := "/opt/cafienne",
       bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",
