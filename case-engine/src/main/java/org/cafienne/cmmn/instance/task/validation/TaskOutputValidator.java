@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.instance.task.validation;
 
+import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -56,8 +57,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
         String requestPayload = requestPayloadJson.toString();
         String httpMethod = definition.getMethod().resolveParameters(requestPayloadJson).toString();
 
-        addDebugInfo(() -> httpMethod + " " + targetURL.toString() + " with "+requestPayload);
-
+        addDebugInfo(DebugEvent.class, e -> e.addMessage("Invoking task validation on output of task "+task.getPlanItem().getName()+"["+task.getPlanItem().getId()+"] with "+httpMethod.toUpperCase() + " " + targetURL.toString() + " with ", requestPayloadJson));
 
         // Now fetch and open the URL
         HttpURLConnection httpConnection = null;
@@ -158,6 +158,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                 try {
                     ValueMap responseJSON = JSONReader.parse(httpConnection.getInputStream());
                     output.put(HTTPCallDefinition.RESPONSE_PAYLOAD_PARAMETER, responseJSON);
+                    addDebugInfo(DebugEvent.class, e -> e.addMessage("Response to validation of task "+task.getId()+":", responseJSON));
                     return new ValidationResponse(responseJSON);
                 } catch (IOException | JSONParseFailure e) {
                     return new ValidationError("Technical failure while reading http response although http code was " + responseCode, e);
