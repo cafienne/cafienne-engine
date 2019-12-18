@@ -125,30 +125,30 @@ class AuthenticationDirectiveSpec extends WordSpec with Matchers with ScalaFutur
     }
   }
 
-  "Access the secured path with a JWT bearer token" in {
-    Get("/secured") ~> addCredentials(OAuth2BearerToken(tokenWithRole._1)) ~> Route.seal(RouteWithRoles.route) ~> check {
-      responseAs[String] shouldEqual "The user context is ServiceUserContext(LoggedInUserId(subject1),List(USER, ADMIN))"
-      status shouldEqual StatusCodes.OK
-    }
-  }
+//  "Access the secured path with a JWT bearer token" in {
+//    Get("/secured") ~> addCredentials(OAuth2BearerToken(tokenWithRole._1)) ~> Route.seal(RouteWithRoles.route) ~> check {
+//      responseAs[String] shouldEqual "The user context is ServiceUserContext(LoggedInUserId(subject1),List(USER, ADMIN))"
+//      status shouldEqual StatusCodes.OK
+//    }
+//  }
 
-  "Access the secured path with a JWT bearer token without roles" in {
-    Get("/secured") ~> addCredentials(OAuth2BearerToken(tokenWithoutRole._1)) ~> Route.seal(RouteWithoutRolesAndDifferentKeyPair.route) ~> check {
-      //noinspection ScalaStyle
-      responseAs[String]
-        .substring(8, 96) shouldEqual "JWT issue, Could not create Claims Set: JWT missing required claims: [groups] with token"
-      status shouldEqual StatusCodes.Unauthorized
-    }
-  }
+//  "Access the secured path with a JWT bearer token without roles" in {
+//    Get("/secured") ~> addCredentials(OAuth2BearerToken(tokenWithoutRole._1)) ~> Route.seal(RouteWithoutRolesAndDifferentKeyPair.route) ~> check {
+//      //noinspection ScalaStyle
+//      responseAs[String]
+//        .substring(8, 96) shouldEqual "JWT issue, Could not create Claims Set: JWT missing required claims: [groups] with token"
+//      status shouldEqual StatusCodes.Unauthorized
+//    }
+//  }
 
-  "Access the secured path with a wrongly signed asymmetric JWT bearer token" in {
-    Get("/secured") ~> addCredentials(OAuth2BearerToken(tokenWithoutRole._1)) ~> Route.seal(RouteWithRoles.route) ~> check {
-      //noinspection ScalaStyle
-      responseAs[String]
-        .substring(8, 97) shouldEqual "JWS issue, Could not create Claims Set: Signed JWT rejected: Invalid signature with token"
-      status shouldEqual StatusCodes.Unauthorized
-    }
-  }
+//  "Access the secured path with a wrongly signed asymmetric JWT bearer token" in {
+//    Get("/secured") ~> addCredentials(OAuth2BearerToken(tokenWithoutRole._1)) ~> Route.seal(RouteWithRoles.route) ~> check {
+//      //noinspection ScalaStyle
+//      responseAs[String]
+//        .substring(8, 97) shouldEqual "JWS issue, Could not create Claims Set: Signed JWT rejected: Invalid signature with token"
+//      status shouldEqual StatusCodes.Unauthorized
+//    }
+//  }
 
   /**
     * Generate a new keypair, a token based on that keypair and return the token and the keyset.

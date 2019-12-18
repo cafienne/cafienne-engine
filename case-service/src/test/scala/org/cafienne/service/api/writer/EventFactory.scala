@@ -35,7 +35,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
   def createCaseModified(lastModified: Instant, user: TenantUser = user) : CaseModified = {
     val json = new ValueMap(
       CaseModified.Fields.lastModified, lastModified.toString
-      ,CaseModified.Fields.numFailures, new Integer(0)
+      ,CaseModified.Fields.numFailures, Integer.valueOf(0)
       ,CaseModified.Fields.state, State.Active.toString
       ,ModelEvent.Fields.modelEvent, getModelEvent(user)
     )
@@ -51,8 +51,8 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
       ,PlanItemEvent.Fields.planItemId, planItemId
       ,PlanItemEvent.Fields.`type`, planItemType
       ,PlanItemEvent.Fields.planitem, new ValueMap(
-        PlanItemEvent.Fields.seqNo, new Integer(1)
-        ,PlanItemEvent.Fields.index, new Integer(0)
+        PlanItemEvent.Fields.seqNo, Integer.valueOf(1)
+        ,PlanItemEvent.Fields.index, Integer.valueOf(0)
       )
       ,ModelEvent.Fields.modelEvent, getModelEvent(user)
     )
@@ -73,8 +73,8 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
       ,PlanItemEvent.Fields.planItemId, planItemId
       ,PlanItemEvent.Fields.`type`, planItemType
       ,PlanItemEvent.Fields.planitem, new ValueMap(
-        PlanItemEvent.Fields.seqNo, new Integer(1)
-        ,PlanItemEvent.Fields.index, new Integer(0)
+        PlanItemEvent.Fields.seqNo, Integer.valueOf(1)
+        ,PlanItemEvent.Fields.index, Integer.valueOf(0)
       )
       ,ModelEvent.Fields.modelEvent, getModelEvent(user)
     )
@@ -87,7 +87,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
       CaseFileEvent.Fields.path, path
       ,CaseFileEvent.Fields.value, value
       ,CaseFileEvent.Fields.transition, transition.toString
-      ,CaseFileEvent.Fields.index, new Integer(index)
+      ,CaseFileEvent.Fields.index, Integer.valueOf(index)
 //      ,CaseFileEvent.Fields.name, name
 //      ,CaseFileEvent.Fields.moment, moment.toString
 //      ,CaseFileEvent.Fields.state, state

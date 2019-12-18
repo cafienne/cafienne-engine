@@ -1,8 +1,6 @@
 package org.cafienne.service.api.tasks
 
-import java.sql.Timestamp
 import java.time.Instant
-import java.util.Date
 
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
@@ -52,23 +50,24 @@ class TaskQueriesImplTest extends FlatSpec with MustMatchers with BeforeAndAfter
     res.caseInstanceId must be ("33")
   }
 
-//  it should "retrieve a caseinstanceId by taskId" in {
-//    val res = Await.result(taskQueries.getCaseInstanceId("1", user), 1.second)
-//    res must be (Some("33"))
-//  }
-//
-//  it should "retrieve nothing by unknown taskId" in {
-//    val res = Await.result(taskQueries.getCaseInstanceId("10", user), 1.second)
-//    res must be (None)
-//  }
-//
+  it should "retrieve a caseinstanceId by taskId" in {
+    val res = Await.result(taskQueries.getCaseAndTenantInformation("1", testUser), 1.second)
+    res must be (Some("33", tenant))
+  }
+
+  it should "retrieve nothing by unknown taskId" in {
+    assertThrows[SearchFailure] {
+      Await.result(taskQueries.getCaseAndTenantInformation("10", testUser), 1.second)
+    }
+  }
+
   it should "filter all tasks" in {
     val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, 0, 100, userWithAandB, None), 1.second)
     res.size must be (3)
   }
 
   it should "filter all tasks with caseInstanceId" in {
-    val res = Await.result(taskQueries.getAllTasks(Some("33"), None, None, None, None, None, None, None, None, 0, 100, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getCaseTasks("33", userWithAandB), 1.second)
     res.size must be (2)
   }
 
