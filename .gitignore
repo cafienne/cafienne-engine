@@ -21,6 +21,8 @@ docker-image/target/
 /run/**/avatars
 /run/**/testdefinition
 /run/**/local.conf
+/run/**/*.tmp/
+/run/**/*log
 tags
 wercker.env
 wercker.sh
