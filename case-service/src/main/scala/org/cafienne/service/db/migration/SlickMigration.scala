@@ -1,17 +1,24 @@
 package org.cafienne.service.db.migration
 
 import org.cafienne.infrastructure.jdbc.DbConfig
+import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
-import slick.migration.api.{H2Dialect, Migration, PostgresDialect}
+import slick.migration.api.{Dialect, GenericDialect, Migration}
 
 trait MigrationConfig extends DbConfig {
-  implicit val dialect = getDialect(dbConfig.config.getString("profile"))
+  implicit val dialect = getDialect(dbConfig.profile)
 
-  private def getDialect(profile: String) = {
-    profile match {
-      case p if p.toLowerCase().contains("h2") => new H2Dialect
-      case _ => new PostgresDialect
-    }
+  private def getDialect(profile: JdbcProfile) = {
+    ExtendedGenericDialect(profile)
+  }
+}
+
+class SQLServerDialect extends Dialect[SQLServerProfile]
+
+object ExtendedGenericDialect {
+  def apply(driver: JdbcProfile): Dialect[_ <: JdbcProfile] = driver match {
+    case _: SQLServerProfile    => new SQLServerDialect
+    case _ => GenericDialect(driver)
   }
 }
 
