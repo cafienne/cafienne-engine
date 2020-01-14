@@ -91,7 +91,7 @@ $ ./case-service (or case-service.bat on Windows)
 __!! This is still experimental and needs some work !!__
 
 - This assumes you already have a running docker setup, including docker-compose
-- This config will pull the images _java:latest (based on openjdk) and elasticsearch:latest
+- This config will pull the images _java:latest (based on openjdk)
 - The exposed ports to the host OS are changed to prevent conflicts with the Case Service and ES running
 locally on the host. Add 10000 to the default ports
     - Case Service API: 28082
@@ -102,6 +102,63 @@ locally on the host. Add 10000 to the default ports
 $ cd ./cafienne
 $ sbt docker:publishLocal
 ```
+
+1.b Use the docker hub version to run cafienne. 
+
+By default the docker hub version is pre-packed with a configuration that makes use of a number of environment 
+variables in order to specify the projections database, the event database and the OpenID connect IDP used. 
+
+
+PROJECTION_DB_PROFILE
+
+Valid options are
+ * slick.jdbc.PostgresProfile$
+ * slick.jdbc.HsqldbProfile$
+ 
+PROJECTION_DB_DRIVER
+
+PROJECTION_DB_URL
+
+PROJECTION_DB_USER
+
+PROJECTION_DB_PASSWORD
+
+
+PROJECTION_DB_PROFILE
+
+PROJECTION_DB_DRIVER
+
+PROJECTION_DB_URL
+
+PROJECTION_DB_USER
+
+PROJECTION_DB_PASSWORD
+
+CLUSTER_SEED_NODES
+
+This is a list and is specified like CLUSTER_SEED_NODES.0=akka://ClusterSystem@192.168.1.55:25520 
+
+CAFIENNE_PLATFORM_OWNERS
+
+This is a list and is specified like CAFIENNE_PLATFORM_OWNERS.0=admin
+
+CAFIENNE_PLATFORM_DEFAULT_TENANT
+ 
+CAFIENNE_OIDC_CONNECT_URL
+
+CAFIENNE_OIDC_TOKEN_URL
+
+CAFIENNE_OIDC_KEY_URL
+
+CAFIENNE_OIDC_AUTHORIZATION_URL
+
+CAFIENNE_OIDC_ISSUER
+
+CAFIENNE_CMMN_DEFINITIONS_PATH
+
+CAFIENNE_DEBUG_EVENTS
+
+
 
 2. Create data folders for the external data
 ``` sh

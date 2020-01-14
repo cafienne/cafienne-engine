@@ -205,7 +205,8 @@ object CaseSystem extends LazyLogging {
   }
 
   def config: Config = {
-    val config = ConfigFactory.defaultApplication
+    val fallback = ConfigFactory.defaultReference()
+    val config = ConfigFactory.load().withFallback(fallback)
     config.getConfig("cafienne")
   }
 
