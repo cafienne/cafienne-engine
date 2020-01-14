@@ -2,6 +2,7 @@ package org.cafienne.infrastructure.cqrs
 
 import akka.actor.ActorSystem
 import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
+import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal
 import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 import akka.persistence.query.scaladsl._
@@ -29,9 +30,12 @@ trait ReadJournalProvider extends LazyLogging with ActorSystemProvider {
       return PersistenceQuery(system).readJournalFor("inmemory-read-journal")
         .asInstanceOf[ReadJournal with CurrentPersistenceIdsQuery with CurrentEventsByPersistenceIdQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with EventsByTagQuery]
     }
+    if (configuredJournal.endsWith("jdbc-journal")) {
+      return PersistenceQuery(system).readJournalFor[JdbcReadJournal](JdbcReadJournal.Identifier)
+    }
 
     logger.debug("and throw the exception anyway")
-    throw new RuntimeException(s"Unsupported read journal $configuredJournal, please switch to cassandra for production")
+    throw new RuntimeException(s"Unsupported read journal $configuredJournal, please switch to cassandra or JDBC for production")
   }
 
   def instanceJournal() : CurrentEventsByPersistenceIdQuery = {
@@ -47,8 +51,11 @@ trait ReadJournalProvider extends LazyLogging with ActorSystemProvider {
       return PersistenceQuery(system).readJournalFor("inmemory-read-journal")
         .asInstanceOf[ReadJournal with CurrentPersistenceIdsQuery with CurrentEventsByPersistenceIdQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with EventsByTagQuery]
     }
+    if (configuredJournal.endsWith("jdbc-journal")) {
+      return PersistenceQuery(system).readJournalFor[JdbcReadJournal](JdbcReadJournal.Identifier)
+    }
 
     logger.debug("and throw the exception anyway")
-    throw new RuntimeException(s"Unsupported read journal $configuredJournal, please switch to cassandra for production")
+    throw new RuntimeException(s"Unsupported read journal $configuredJournal, please switch to cassandra or JDBC for production")
   }
 }
