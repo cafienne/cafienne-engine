@@ -25,5 +25,5 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
 
   final def isPlatformOwner: Boolean = CaseSystem.isPlatformOwner(userId)
 
-  final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("User is not registered in tenant "+tenant+"; tenants are: "+tenants))
+  final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("User '" + userId+"' is not registered in tenant "+tenant+"; tenants are: "+tenants))
 }
