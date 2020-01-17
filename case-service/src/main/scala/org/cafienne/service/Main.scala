@@ -27,6 +27,7 @@ import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.task.TaskProjectionsWriter
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.{TaskQueriesImpl, TasksRoute}
+import org.cafienne.service.db.events.EventDatabaseProvider
 import org.cafienne.service.db.migration.Migrate
 import org.h2.tools.Server
 
@@ -37,6 +38,7 @@ import scala.util.{Failure, Success} // required for combining routes
 object Main extends App {
 
   try {
+    //EventDatabaseProvider.createOrMigrate
     Migrate.migrateDatabase()
     startup(Seq("2551"))
   } catch {
@@ -74,6 +76,8 @@ object Main extends App {
       }
       // Start case system in clustered mode.
       CaseSystem.startCluster()
+
+      Thread.sleep(3000)
 
       val taskQueries = new TaskQueriesImpl
       val caseQueries = new CaseQueriesImpl

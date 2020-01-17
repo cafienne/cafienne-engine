@@ -4,7 +4,7 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.lifted.CanBeQueryCondition
 
-trait DbConfig {
+trait ProjectionsDbConfig {
   lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("projectionsDB")
 
   lazy val db = dbConfig.db

@@ -117,8 +117,16 @@ Valid options are
  
 PROJECTION_DB_DRIVER
 
+ * org.postgresql.Driver for Postgres
+ * org.hsqldb.jdbcDriver for HSQL 
+ 
+ 
 PROJECTION_DB_URL
 
+ * "jdbc:postgresql://localhost:5432/projection?reWriteBatchedInserts=true"
+ * jdbc:hsqldb:mem:projections
+ 
+ 
 PROJECTION_DB_USER
 
 PROJECTION_DB_PASSWORD
