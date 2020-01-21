@@ -38,6 +38,6 @@
     <logger name="org.flywaydb" level="DEBUG"/>
     <root level="INFO">
         <appender-ref ref="console"/>
-        <appender-ref ref="async_file" />
+<!--        <appender-ref ref="async_file" />-->
     </root>
 </configuration>

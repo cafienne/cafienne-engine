@@ -103,44 +103,34 @@ $ cd ./cafienne
 $ sbt docker:publishLocal
 ```
 
-1.b Use the docker hub version to run cafienne. 
+##### Use the docker hub version to run cafienne. 
 
 By default the docker hub version is pre-packed with a configuration that makes use of a number of environment 
 variables in order to specify the projections database, the event database and the OpenID connect IDP used. 
 
+At this moment Postgres is supported as database out of the box. By overriding the configuration, its possible to
+have different setups as supported by slick and the akka-persistence drivers.
 
-PROJECTION_DB_PROFILE
-
-Valid options are
- * slick.jdbc.PostgresProfile$
- * slick.jdbc.HsqldbProfile$
- 
-PROJECTION_DB_DRIVER
-
- * org.postgresql.Driver for Postgres
- * org.hsqldb.jdbcDriver for HSQL 
- 
+###### Run the container with environment settings
  
 PROJECTION_DB_URL
 
  * "jdbc:postgresql://localhost:5432/projection?reWriteBatchedInserts=true"
- * jdbc:hsqldb:mem:projections
  
  
 PROJECTION_DB_USER
 
 PROJECTION_DB_PASSWORD
 
+EVENT_DB_URL
 
-PROJECTION_DB_PROFILE
+ * "jdbc:postgresql://localhost:5432/event?reWriteBatchedInserts=true"
+ 
+ 
+EVENT_DB_USER
 
-PROJECTION_DB_DRIVER
+EVENT_DB_PASSWORD
 
-PROJECTION_DB_URL
-
-PROJECTION_DB_USER
-
-PROJECTION_DB_PASSWORD
 
 CLUSTER_SEED_NODES
 
@@ -166,23 +156,17 @@ CAFIENNE_CMMN_DEFINITIONS_PATH
 
 CAFIENNE_DEBUG_EVENTS
 
+###### Use of a custom configuration
 
-
-2. Create data folders for the external data
+1. Create data folders for the external data
 ``` sh
 $ mkdir ~/docker-data/cafienne
 $ mkdir ~/docker-data/cafienne/conf
 $ mkdir ~/docker-data/cafienne/definitions
 $ mkdir ~/docker-data/cafienne/definitions/logs
-$ mkdir ~/docker-data/elasticseach
-$ mkdir ~/docker-data/elasticseach/config
-$ mkdir ~/docker-data/elasticseach/config/scripts
-$ mkdir ~/docker-data/elasticseach/data
-$ mkdir ~/docker-data/elasticseach/plugins
-$ mkdir ~/docker-data/elasticseach/logs
 ```
 
-3. Copy the  `cafienne.conf.docker` file to the `~/docker-data/cafienne/conf` folder
+2. Copy the  `cafienne.conf.docker` file to the `~/docker-data/cafienne/conf` folder
 ``` sh
 $ cp ./cafienne/run/case-service/cafienne.conf.docker ~/docker-data/cafienne/conf/local.conf
 ```
