@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,32 +64,31 @@ public class LastModifiedRegistration {
     }
 
     public void handle(CaseModified event) {
-        handle("case ", event.getActorId(), event.lastModified());
+        handle("case", event.getActorId(), event.lastModified());
     }
 
     private void handle(String actorType, String actorId, Instant newTimestamp) {
         Instant lastKnownTimestamp = lastModifiedRegistration.get(actorId);
         // Now check whether the new timestamp is indeed newer, and if so, update the registration
         if (lastKnownTimestamp == null || lastKnownTimestamp.isBefore(newTimestamp)) {
-            log("New timestamp '" + newTimestamp + "' for " + actorType + actorId);
             lastModifiedRegistration.put(actorId, newTimestamp);
-            informWaiters(actorId, newTimestamp);
+            informWaiters(actorType, actorId, newTimestamp);
         }
     }
 
-    private void informWaiters(String id, Instant newTimestamp) {
+    private void informWaiters(String actorType, String id, Instant newTimestamp) {
         // TODO: should this be synchronized code?? I think so... Or can we better use scala immutable maps?
         synchronized (waiters) {
             List<Waiter> waiterList = waiters.remove(id);
-            List<Waiter> newWaiters = new ArrayList<Waiter>();
+            List<Waiter> newWaiters = new ArrayList<>();
             if (waiterList == null) {
                 return;
             }
 
-            log("Informing " + waiterList.size() + " waiters for entity " + id);
+            log("Found " + newTimestamp + "/" + id+" for " + waiterList.size() + " waiters");
             for (Waiter waiter : waiterList) {
                 if (newTimestamp.isBefore(waiter.moment())) {
-                    log("This waiter needs an even newer event " + waiter);
+                    log("-need " + waiter.notBefore.getLastModified() + "/" + waiter.notBefore.getCaseInstanceId());
                     newWaiters.add(waiter);
                 } else {
                     waiter.stopWaiting();
@@ -106,10 +105,9 @@ public class LastModifiedRegistration {
         synchronized (waiters) {
             List<Waiter> waiterList = waiters.get(waiter.id());
             if (waiterList == null) {
-                waiterList = new ArrayList<Waiter>();
+                waiterList = new ArrayList<>();
                 waiters.put(waiter.id(), waiterList);
             }
-            log("Adding waiter");
             waiterList.add(waiter);
         }
     }
@@ -117,13 +115,16 @@ public class LastModifiedRegistration {
     class Waiter {
         private final CaseLastModified notBefore;
         private final Promise<String> promise;
+        private final long createdAt = System.currentTimeMillis();
 
         Waiter(CaseLastModified notBefore, Promise<String> promise) {
+
             this.notBefore = notBefore;
             this.promise = promise;
         }
 
         void stopWaiting() {
+            log("Waited " + (System.currentTimeMillis() - createdAt) + " milliseconds");
             if (!promise.isCompleted()) {
                 // Only invoke the promise if no one has done it yet
                 promise.success("Your case last modified arrived just now");

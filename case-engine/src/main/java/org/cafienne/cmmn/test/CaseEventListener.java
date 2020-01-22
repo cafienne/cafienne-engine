@@ -8,7 +8,6 @@ import akka.persistence.inmemory.query.javadsl.InMemoryReadJournal;
 import akka.persistence.query.EventEnvelope;
 import akka.persistence.query.Offset;
 import akka.persistence.query.PersistenceQuery;
-import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Source;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.CaseSystem;
@@ -63,7 +62,7 @@ public class CaseEventListener {
             } else {
                 logger.warn("Received unexpected event " + event);
             }
-        }, ActorMaterializer.create(system));
+        }, system);
     }
 
     void sendCommand(Object command) {
