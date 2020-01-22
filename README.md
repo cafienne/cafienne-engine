@@ -115,7 +115,7 @@ have different setups as supported by slick and the akka-persistence drivers.
  
 PROJECTION_DB_URL
 
- * "jdbc:postgresql://localhost:5432/projection?reWriteBatchedInserts=true"
+ * "jdbc:postgresql://localhost:5432/cafienne-query?reWriteBatchedInserts=true"
  
  
 PROJECTION_DB_USER
@@ -124,7 +124,7 @@ PROJECTION_DB_PASSWORD
 
 EVENT_DB_URL
 
- * "jdbc:postgresql://localhost:5432/event?reWriteBatchedInserts=true"
+ * "jdbc:postgresql://localhost:5432/cafienne-eventstore?reWriteBatchedInserts=true"
  
  
 EVENT_DB_USER

@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.ProjectionsDbConfig
+import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
 import org.cafienne.service.db.migration.Migrate
@@ -17,7 +17,7 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, MustMatchers}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with FlatSpecLike with MustMatchers with BeforeAndAfterAll with ProjectionsDbConfig {
+class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with FlatSpecLike with MustMatchers with BeforeAndAfterAll with QueryDbConfig {
 
   implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
 

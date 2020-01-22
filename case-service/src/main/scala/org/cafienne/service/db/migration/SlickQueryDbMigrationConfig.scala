@@ -1,11 +1,11 @@
 package org.cafienne.service.db.migration
 
-import org.cafienne.infrastructure.jdbc.ProjectionsDbConfig
+import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
 import slick.migration.api.{Dialect, GenericDialect, Migration}
 
-trait ProjectionsMigrationConfig extends ProjectionsDbConfig {
+trait QueryDbMigrationConfig extends QueryDbConfig {
   implicit val dialect = getDialect(dbConfig.profile)
 
   private def getDialect(profile: JdbcProfile) = {
@@ -22,6 +22,6 @@ object ExtendedGenericDialect {
   }
 }
 
-trait SlickProjectionsMigrationConfig extends ProjectionsMigrationConfig {
+trait SlickQueryDbMigrationConfig extends QueryDbMigrationConfig {
   def getMigrations(implicit infoProvider: MigrationInfo.Provider[Migration]): Seq[VersionedMigration[String]]
 }

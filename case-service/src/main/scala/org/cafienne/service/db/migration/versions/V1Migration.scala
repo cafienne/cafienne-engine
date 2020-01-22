@@ -4,7 +4,7 @@ import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.cases.CaseTables
 import org.cafienne.service.api.tasks.TaskTables
 import org.cafienne.service.api.participants.UserTables
-import org.cafienne.service.db.migration.SlickProjectionsMigrationConfig
+import org.cafienne.service.db.migration.SlickQueryDbMigrationConfig
 import slick.lifted.TableQuery
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
 import slick.migration.api.{Migration, TableMigration}
@@ -27,7 +27,7 @@ import slick.migration.api.{Migration, TableMigration}
   * DROP table offset_storage CASCADE;
   */
 
-object V1Migration extends SlickProjectionsMigrationConfig
+object V1Migration extends SlickQueryDbMigrationConfig
   with TaskTables
   with CaseTables
   with UserTables

@@ -22,7 +22,7 @@ object NoOffsetStorage extends OffsetStorage {
   override def getOffset(storageName: String): Future[Offset] = Future.successful(Offset.noOffset)
 }
 
-class OffsetStorageImpl extends OffsetStorage with OffsetStoreTables with ProjectionsDbConfig {
+class OffsetStorageImpl extends OffsetStorage with OffsetStoreTables with QueryDbConfig {
 
   import dbConfig.profile.api._
 
@@ -48,7 +48,7 @@ class OffsetStorageImpl extends OffsetStorage with OffsetStoreTables with Projec
   }
 }
 
-trait OffsetStoreTables extends ProjectionsDbConfig {
+trait OffsetStoreTables extends QueryDbConfig {
 
   import java.sql.Timestamp
 
