@@ -34,21 +34,19 @@ public class CaseEventListener {
     private List<ModelEvent> publishedEvents = new ArrayList<>();
     private List<ModelEvent> newEvents = new ArrayList<>();
     private CaseModified lastCaseModifiedEvent;
-    private final ActorSystem system;
     private final ActorRef caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
     private final TestScript testScript;
 
-    CaseEventListener(TestScript testScript, ActorSystem system) {
+    CaseEventListener(TestScript testScript) {
         this.testScript = testScript;
-        this.system = system;
-        // Now create the callback mechanism for the case system
-        this.responseHandlingActor = this.system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
-
-        // Start the case system and fetch a routing proxy, so that we can start sending commands to cases
-        CaseSystem.startLocal(system);
         // Case message router is used to send messages into the case system
         this.caseMessageRouter = CaseSystem.caseMessageRouter();
+
+        final ActorSystem system = CaseSystem.system();
+        // Now create the callback mechanism for the case system
+        this.responseHandlingActor = system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
+
 
         final InMemoryReadJournal readJournal = PersistenceQuery.get(system).getReadJournalFor(InMemoryReadJournal.class, InMemoryReadJournal.Identifier());
         Source<EventEnvelope, NotUsed> source = readJournal.eventsByTag(ModelEvent.TAG, Offset.noOffset());
