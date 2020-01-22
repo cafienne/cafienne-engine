@@ -128,26 +128,13 @@ elif [ "$CMD" = "restart" ]; then
         process_status=$?
   done
 
-# using nohup bash to avoid erros in solaris OS.TODO
+# using nohup bash to avoid errors in solaris OS.TODO
   nohup bash $CAFIENNE_SERVICE_HOME/bin/cafienne-service.sh $args > $CAFIENNE_SERVICE_HOME/data/logs/cafienne-service.log 2>&1 &
   echo $! > $CAFIENNE_SERVICE_HOME/cafienne-service.pid
   exit 0
 elif [ "$CMD" = "console" ]; then
     JAVACMD="$JAVACMD" > $CAFIENNE_SERVICE_HOME/data/logs/cafienne-service.log 2>&1
 elif [ "$CMD" = "docker" ]; then
-    # Wait for elasticsearch to be up and running before starting the service
-    response=""
-    while [ "$response" = "" ]
-    do
-        response=$(curl -s http://elastic:9200/_cluster/health)
-        if [[ ! "$response" =~ "red" ]]; then
-            >&2 echo "ElasticSearch container is up"
-        elif [[ ! "$response" == "" ]]; then
-            >&2 echo "ElasticSearch container is not running yet"
-        fi
-        sleep 2
-    done
-
     JAVACMD="$JAVACMD" > $CAFIENNE_SERVICE_HOME/data/logs/cafienne-service.log 2>&1
 elif [ "$CMD" = "version" ]; then
   cat $CAFIENNE_SERVICE_HOME/bin/version.txt

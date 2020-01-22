@@ -24,7 +24,6 @@
     <logger name="akka.serialization" level="WARN" />
     <logger name="org.cafienne"    level="WARN" />
     <logger name="org.cafienne.service"    level="DEBUG" />
-    <logger name="org.elasticsearch" level="WARN" />
     <logger name="com.datastax" level="WARN"/>
     <logger name="com.wordnik" level="ERROR"/>
     <logger name="com.gettyimages" level="ERROR"/>
