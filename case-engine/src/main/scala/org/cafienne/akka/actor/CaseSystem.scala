@@ -73,7 +73,12 @@ object CaseSystem extends LazyLogging {
     */
   val developerRouteOpen = {
     if (CaseSystem.config.hasPath(debugRouteOpenOption)) {
-      CaseSystem.config.getBoolean(debugRouteOpenOption)
+      val open = CaseSystem.config.getBoolean(debugRouteOpenOption)
+      if (open) {
+        val manyHashes = "\n\n############################################################################################################\n\n"
+        logger.warn(manyHashes+"\tWARNING - Case Service runs in developer mode (the debug route to get all events is open for anyone!)" + manyHashes)
+      }
+      open
     } else {
       false
     }

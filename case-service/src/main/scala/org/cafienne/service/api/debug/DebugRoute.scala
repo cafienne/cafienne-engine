@@ -61,9 +61,6 @@ class DebugRoute
         implicit val valueListMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: ValueList =>
           HttpEntity(ContentTypes.`application/json`, value.toString)
         }
-
-//        println("Entering rout with optional uer "+user)
-
         onComplete(caseEventReader.getEvents(user, caseInstanceId)) {
           case Success(value) => complete(StatusCodes.OK, value)
           case Failure(err) => complete(StatusCodes.NotFound, err)

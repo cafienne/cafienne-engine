@@ -44,7 +44,6 @@ trait ReadJournalProvider extends LazyLogging with ActorSystemProvider {
       logger.warn("Found Level DB based configurations. This has proven to be unreliable. Do not use it in Production systems.")
       return LeveldbReadJournal.Identifier
     } else if (configuredJournal.contains("memory")) {
-      // NOTE: this has not been tested... Perhaps we should check whether dnvriend database supports ReadJournal in the first place...
       return "inmemory-read-journal"
     }
     throw new RuntimeException(s"Cannot find read journal for $configuredJournal, please use Cassandra or JDBC read journal settings")
