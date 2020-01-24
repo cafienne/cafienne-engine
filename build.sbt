@@ -118,6 +118,7 @@
           Deps.levelDbFixed,
           Deps.levelDbJNI,
           Deps.cassandraPersistence,
+          Deps.akkaPersistenceJDBC,
           Deps.akkaQuery,
           Deps.akkaClusterTools,
           Deps.akkaClusterSharding,

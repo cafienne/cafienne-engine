@@ -3,7 +3,7 @@ package org.cafienne.service.api.cases
 import java.time.Instant
 
 import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
-import org.cafienne.infrastructure.jdbc.DbConfig
+import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import slick.lifted
 
 final case class CaseInstance(id: String,
@@ -132,7 +132,7 @@ final case class PlanItemHistory(id: String,
 }
 
 
-trait CaseTables extends DbConfig {
+trait CaseTables extends QueryDbConfig {
 
   import dbConfig.profile.api._
 

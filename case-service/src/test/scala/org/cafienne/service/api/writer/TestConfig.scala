@@ -30,8 +30,6 @@ object TestConfig {
       |            "org.cafienne.akka.actor.event.ModelEvent" = event_serializer
       |            "org.cafienne.akka.actor.command.ModelCommand" = command_serializer
       |            "org.cafienne.akka.actor.command.response.ModelResponse" = response_serializer
-      |            // enable below to check if all events have been serialized without java.io.Serializable
-      |            //"java.io.Serializable" = none
       |          }
       |        }
       |

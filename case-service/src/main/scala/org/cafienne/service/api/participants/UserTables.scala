@@ -1,6 +1,6 @@
 package org.cafienne.service.api.participants
 
-import org.cafienne.infrastructure.jdbc.DbConfig
+import org.cafienne.infrastructure.jdbc.QueryDbConfig
 
 final case class UserRole(userId: String, tenant: String, role_name: String, name: String, email: String = "", enabled: Boolean = true)
 
@@ -10,7 +10,7 @@ final case class Tenant(name: String, enabled: Boolean = true)
 
 final case class TenantOwner(tenant: String, userId: String, enabled: Boolean = true)
 
-trait UserTables extends DbConfig {
+trait UserTables extends QueryDbConfig {
 
   import dbConfig.profile.api._
 

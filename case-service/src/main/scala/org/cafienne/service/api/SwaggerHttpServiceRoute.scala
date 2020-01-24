@@ -12,9 +12,8 @@ import org.cafienne.service.api.participants.{PlatformAdministrationRoute, Regis
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.TasksRoute
 
-class SwaggerHttpServiceRoute(val system: ActorSystem, val mat: ActorMaterializer) extends SwaggerHttpService with Configured {
+class SwaggerHttpServiceRoute(val system: ActorSystem) extends SwaggerHttpService with Configured {
   implicit val actorSystem: ActorSystem = system
-  implicit val materializer: ActorMaterializer = mat
 
   lazy val configuredHost = config.getString("cafienne.api.bindhost")
   lazy val configuredPort = config.getString("cafienne.api.bindport")

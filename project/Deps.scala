@@ -2,10 +2,10 @@ import sbt._
 
 object Deps {
   val depsRepos = Seq(
-    "maven repo"          at "http://repo.maven.apache.org/maven2",
-    "typesafe releases"   at "http://repo.typesafe.com/typesafe/releases",
-    "typesafe snapshots"  at "http://repo.typesafe.com/typesafe/snapshots",
-    "akka repo"           at "http://repo.akka.io/",
+    "maven repo"          at "https://repo.maven.apache.org/maven2",
+    "typesafe releases"   at "https://repo.typesafe.com/typesafe/releases",
+    "typesafe snapshots"  at "https://repo.typesafe.com/typesafe/snapshots",
+    "akka repo"           at "https://repo.akka.io/",
 //    "spray repo"          at "http://repo.spray.io",
 //    "untyped"             at "http://ivy.untyped.com",
     "jasper reports repo" at "http://jasperreports.sourceforge.net/maven2",
@@ -21,9 +21,9 @@ object Deps {
   object V {
     val scala       = "2.12.10"
     val spray       = "1.3.5"
-    val akkaHttp    = "10.1.10"
+    val akkaHttp    = "10.1.11"
     val slf4j       = "1.7.12"
-    val akka        = "2.5.25"
+    val akka        = "2.6.1"
     val jackson     = "2.10.0"
     val lucene      = "6.6.1"
     val enumeratum  = "1.5.12"
@@ -32,16 +32,17 @@ object Deps {
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
   val akkaStream            = "com.typesafe.akka"       %% "akka-stream"                          % V.akka
-  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % V.akka
+  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % "2.5.27"
   val akkaClusterTools      = "com.typesafe.akka"       %% "akka-cluster-tools"                   % V.akka
   val akkaPersistence       = "com.typesafe.akka"       %% "akka-persistence"                     % V.akka    // exclude("org.iq80.leveldb","leveldb")
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
   val akkaClusterSharding   = "com.typesafe.akka"       %% "akka-cluster-sharding"                % V.akka
-  val akkaKryo              = "com.github.romix.akka"   %% "akka-kryo-serialization"              % "0.5.2"
+  val akkaKryo              = "com.github.romix.akka"   %% "akka-kryo-serialization"              % "1.1.3"
   val levelDbFixed          = "org.iq80.leveldb"        %  "leveldb"                              % "0.9"
   val levelDbJNI            = "org.fusesource.leveldbjni" % "leveldbjni-all"                      % "1.8"
-  val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.99"
+  val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.102"
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
+  val akkaPersistenceJDBC   = "com.github.dnvriend"     %% "akka-persistence-jdbc"                % "3.5.2"
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
@@ -49,7 +50,7 @@ object Deps {
 //  val slf4j                 = "org.slf4j"               % "slf4j-simple"                          % "1.7.28"
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "3.1"
   val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.0.13"
-  val config                = "com.typesafe"            %  "config"                               % "1.2.1"
+  val config                = "com.typesafe"            %  "config"                               % "1.4.0"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.0"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
   val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.2.1"
@@ -67,7 +68,7 @@ object Deps {
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
   val akkaHtppJackson       = "com.typesafe.akka"       %% "akka-http-jackson"                    % V.akkaHttp
-  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "0.4.1"
+  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "0.4.2"
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
   val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.0.1"
@@ -104,9 +105,9 @@ object Deps {
   val slick                 = "com.typesafe.slick"      %% "slick"                                % "3.3.2"
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % "3.3.2"
   val postgres              = "org.postgresql"          % "postgresql"                            % "9.4-1206-jdbc42"
-  val h2                    = "com.h2database"          % "h2"                                    % "1.4.185"
+  val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
   val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.0"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.0.7"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.1.4"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.7.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.6.0"
 

@@ -1,11 +1,12 @@
 package org.cafienne.infrastructure.jdbc
 
+import org.cafienne.akka.actor.CaseSystem
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 import slick.lifted.CanBeQueryCondition
 
-trait DbConfig {
-  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("projectionsDB")
+trait QueryDbConfig {
+  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("query-db", CaseSystem.config)
 
   lazy val db = dbConfig.db
 

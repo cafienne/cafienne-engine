@@ -115,13 +115,11 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   def validUser(subRoute: PlatformUser => Route): Route = OIDCAuthentication.user { usr => subRoute(usr)  }
 
   // TODO: this is a temporary switch to enable IDE's debugger to show events
+  @Deprecated // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route) : Route = {
-//    println("Allowing with optional user is: " + CaseSystem.developerRouteOpen)
     if (CaseSystem.developerRouteOpen) {
-//      println("Going with optional user None")
       subRoute(null)
     } else {
-//      println("Anonymous entry is not an option")
       validUser(subRoute)
     }
   }

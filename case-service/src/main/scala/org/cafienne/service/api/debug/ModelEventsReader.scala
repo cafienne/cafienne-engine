@@ -3,7 +3,6 @@ package org.cafienne.service.api.debug
 import akka.Done
 import akka.actor.ActorSystem
 import akka.persistence.query.EventEnvelope
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
@@ -16,9 +15,7 @@ import scala.concurrent.Future
 
 class ModelEventsReader()(implicit override val system: ActorSystem) extends LazyLogging with ReadJournalProvider {
 
-  val journal = instanceJournal()
   implicit val executionContext = system.dispatcher
-  implicit val mat: ActorMaterializer = ActorMaterializer()
 
   def getEvents(user: PlatformUser, actorId: String): Future[ValueList] = {
     getEventsRecursively(user, actorId)
@@ -30,9 +27,6 @@ class ModelEventsReader()(implicit override val system: ActorSystem) extends Laz
     source.runForeach {
       case EventEnvelope(_, _, sequenceNr: Long, event: ModelEvent[_]) => {
         if (user == null || user.tenants.contains(event.tenant) || user.isPlatformOwner) {
-          if (user == null) {
-//            println("Getting debug events for null user")
-          }
           val eventNr = sequenceNr.asInstanceOf[java.lang.Long]
           val eventType = event.getClass.getSimpleName
           val rawJson = event.rawJson

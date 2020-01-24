@@ -91,7 +91,7 @@ $ ./case-service (or case-service.bat on Windows)
 __!! This is still experimental and needs some work !!__
 
 - This assumes you already have a running docker setup, including docker-compose
-- This config will pull the images _java:latest (based on openjdk) and elasticsearch:latest
+- This config will pull the images _java:latest (based on openjdk)
 - The exposed ports to the host OS are changed to prevent conflicts with the Case Service and ES running
 locally on the host. Add 10000 to the default ports
     - Case Service API: 28082
@@ -103,21 +103,70 @@ $ cd ./cafienne
 $ sbt docker:publishLocal
 ```
 
-2. Create data folders for the external data
+##### Use the docker hub version to run cafienne. 
+
+By default the docker hub version is pre-packed with a configuration that makes use of a number of environment 
+variables in order to specify the projections database, the event database and the OpenID connect IDP used. 
+
+At this moment Postgres is supported as database out of the box. By overriding the configuration, its possible to
+have different setups as supported by slick and the akka-persistence drivers.
+
+###### Run the container with environment settings
+ 
+PROJECTION_DB_URL
+
+ * "jdbc:postgresql://localhost:5432/cafienne-query?reWriteBatchedInserts=true"
+ 
+ 
+PROJECTION_DB_USER
+
+PROJECTION_DB_PASSWORD
+
+EVENT_DB_URL
+
+ * "jdbc:postgresql://localhost:5432/cafienne-eventstore?reWriteBatchedInserts=true"
+ 
+ 
+EVENT_DB_USER
+
+EVENT_DB_PASSWORD
+
+
+CLUSTER_SEED_NODES
+
+This is a list and is specified like CLUSTER_SEED_NODES.0=akka://ClusterSystem@192.168.1.55:25520 
+
+CAFIENNE_PLATFORM_OWNERS
+
+This is a list and is specified like CAFIENNE_PLATFORM_OWNERS.0=admin
+
+CAFIENNE_PLATFORM_DEFAULT_TENANT
+ 
+CAFIENNE_OIDC_CONNECT_URL
+
+CAFIENNE_OIDC_TOKEN_URL
+
+CAFIENNE_OIDC_KEY_URL
+
+CAFIENNE_OIDC_AUTHORIZATION_URL
+
+CAFIENNE_OIDC_ISSUER
+
+CAFIENNE_CMMN_DEFINITIONS_PATH
+
+CAFIENNE_DEBUG_EVENTS
+
+###### Use of a custom configuration
+
+1. Create data folders for the external data
 ``` sh
 $ mkdir ~/docker-data/cafienne
 $ mkdir ~/docker-data/cafienne/conf
 $ mkdir ~/docker-data/cafienne/definitions
 $ mkdir ~/docker-data/cafienne/definitions/logs
-$ mkdir ~/docker-data/elasticseach
-$ mkdir ~/docker-data/elasticseach/config
-$ mkdir ~/docker-data/elasticseach/config/scripts
-$ mkdir ~/docker-data/elasticseach/data
-$ mkdir ~/docker-data/elasticseach/plugins
-$ mkdir ~/docker-data/elasticseach/logs
 ```
 
-3. Copy the  `cafienne.conf.docker` file to the `~/docker-data/cafienne/conf` folder
+2. Copy the  `cafienne.conf.docker` file to the `~/docker-data/cafienne/conf` folder
 ``` sh
 $ cp ./cafienne/run/case-service/cafienne.conf.docker ~/docker-data/cafienne/conf/local.conf
 ```

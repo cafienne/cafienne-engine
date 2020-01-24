@@ -51,8 +51,6 @@ public class TestScript {
     private final String testName;
     private final static Logger logger = LoggerFactory.getLogger(TestScript.class);
 
-    private final ActorSystem system;
-
     private boolean testCompleted;
 
     private Deque<ModelTestCommand> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
@@ -140,10 +138,10 @@ public class TestScript {
      */
     public TestScript(String testName) {
         this.testName = testName;
-        this.system = ActorSystem.create("CMMNUnitTestFramework");
+        CaseSystem.start("Case-Engine-Test-Script");
 
         // Start listening to the events coming out of the case persistence mechanism
-        this.eventListener = new CaseEventListener(this, system);
+        this.eventListener = new CaseEventListener(this);
         logger.info("Ready to receive responses from the case system for test '" + testName + "'");
     }
     
@@ -166,18 +164,6 @@ public class TestScript {
         commands.addLast(new CaseTestCommand(this, command, validators));
     }
 
-    // HTD
-//    /**
-//     * Adds a command to the test script, along with an optional list of validators. The validators will be invoked when the command has been handled by
-//     * the case, and the test script has received a response back from the case.
-//     *
-//     * @param command
-//     * @param validators
-//     */
-//    public void addTestStep(HumanTaskCommand command, HumanTaskResponseValidator... validators) {
-//        commands.addLast(new HumanTaskTestCommand(this, command, validators));
-//    }
-
     /**
      * Insert a new test command right after the current test step. Can be used inside validators to
      * add new commands when a response to the command is received.
@@ -187,16 +173,6 @@ public class TestScript {
     public void insertTestStep(CaseCommand command, CaseResponseValidator... validators) {
         commands.addFirst(new CaseTestCommand(this, command, validators));
     }
-
-//    /**
-//     * Insert a new test command right after the current test step. Can be used inside validators to
-//     * add new commands when a response to the command is received.
-//     * @param command
-//     * @param validators
-//     */
-//    public void insertTestStep(HumanTaskCommand command, HumanTaskResponseValidator... validators) {
-//        commands.addFirst(new HumanTaskTestCommand(this, command, validators));
-//    }
     
     public int getActionNumber() {
         return actionNumber;
@@ -342,7 +318,7 @@ public class TestScript {
     private void closeDown() {
         logger.debug("Closing down actor system");
         try {
-            Await.result(system.terminate(), Duration.create(10, "seconds"));
+            Await.result(CaseSystem.system().terminate(), Duration.create(10, "seconds"));
         } catch (Exception ex) {
             logger.error("ISSUE terminating the actor system " + ex.getMessage());
         }

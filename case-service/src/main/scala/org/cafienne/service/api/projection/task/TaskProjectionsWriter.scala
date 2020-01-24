@@ -2,9 +2,7 @@ package org.cafienne.service.api.projection.task
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.persistence.query.scaladsl.EventsByTagQuery
 import akka.persistence.query.{EventEnvelope, Offset}
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
@@ -22,9 +20,6 @@ import scala.util.{Failure, Success}
 class TaskProjectionsWriter(updater: RecordsPersistence, offsetStorage: OffsetStorage)(implicit override val system: ActorSystem) extends LazyLogging with OffsetStorage with ReadJournalProvider {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
-  val journal: EventsByTagQuery = readJournal()
-  implicit val mat: ActorMaterializer = ActorMaterializer()
 
   val offsetStorageName = "TaskProjectionsWriter"
 

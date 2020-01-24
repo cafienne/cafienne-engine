@@ -29,7 +29,7 @@ object MigrationInfoHack {
     })
 }
 
-object Migrate extends MigrationConfig {
+object Migrate extends QueryDbMigrationConfig {
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration._
   import dbConfig.profile.api._

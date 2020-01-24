@@ -3,7 +3,7 @@ package org.cafienne.service.api.tasks
 import java.time.Instant
 
 import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
-import org.cafienne.infrastructure.jdbc.DbConfig
+import org.cafienne.infrastructure.jdbc.QueryDbConfig
 
 final case class Task(id: String,
                       caseInstanceId: String,
@@ -47,7 +47,7 @@ final case class Task(id: String,
   }
 }
 
-trait TaskTables extends DbConfig {
+trait TaskTables extends QueryDbConfig {
 
   import dbConfig.profile.api._
 
