@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance.task.humantask;
 
+import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
@@ -63,7 +64,13 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     @Override
     public ValidationResponse validateOutput(ValueMap potentialRawOutput) {
         if (validator != null) {
-            return validator.validate(potentialRawOutput);
+            ValidationResponse response = validator.validate(potentialRawOutput);
+            if (! response.isValid()) {
+                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task "+getPlanItem().getName()+"["+getPlanItem().getId()+"] failed with ", response.getContent()));
+            } else {
+                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task "+getPlanItem().getName()+"["+getPlanItem().getId()+"] succeeded with ", response.getContent()));
+            }
+            return response;
         } else {
             // Using default validation (checks mandatory parameters to have a value, should also check against case file definition)
             return super.validateOutput(potentialRawOutput);
