@@ -494,7 +494,7 @@ class TasksRoute
             complete(StatusCodes.BadRequest, e.exception.getMessage)
           case value: HumanTaskValidationResponse =>
             respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
-              complete(StatusCodes.Accepted, value)
+              complete(StatusCodes.Accepted, value.value())
             }
           case value: HumanTaskResponse =>
             respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
