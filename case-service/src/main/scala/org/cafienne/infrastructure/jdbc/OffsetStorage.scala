@@ -55,16 +55,14 @@ trait OffsetStoreTables extends QueryDbConfig {
   import dbConfig.profile.api._
 
 
-  final class OffsetStoreTable(tag: Tag) extends Table[OffsetStore](tag, "offset_storage") {
-    def name = column[String]("name", O.PrimaryKey)
+  final class OffsetStoreTable(tag: Tag) extends CafienneTable[OffsetStore](tag, "offset_storage") {
+    def name = keyColumn[String]("name", O.PrimaryKey)
 
     def offsetType = column[String]("offset-type")
 
     def offsetValue = column[String]("offset-value")
 
     def timestamp = column[Timestamp]("timestamp")
-
-    def pk = primaryKey("pk_offset", name)
 
     def * = (name, offsetType, offsetValue, timestamp) <> (create, OffsetStore.unapply)
 

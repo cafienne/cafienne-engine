@@ -15,10 +15,10 @@ class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabasePro
 
   private def createOrMigrate(db: JdbcBackend.Database): Unit = {
     val dbScriptsLocation = Option(system.settings.config.getString("akka-persistence-jdbc.shared-databases.slick.profile")) match {
-      case None => throw new IllegalArgumentException("Cannot Start EventDatabaseProvider, no database setup found at akka-persistence-jdbc.shared-databases")
+      case None => throw new IllegalArgumentException("Cannot start EventDatabaseProvider, no database setup found at akka-persistence-jdbc.shared-databases")
       //case Some("slick.jdbc.H2Profile$") => "h2"
       case Some("slick.jdbc.PostgresProfile$") => "postgres"
-      //case Some("slick.jdbc.SQLServerProfile$") => "sqlserver"
+      case Some("slick.jdbc.SQLServerProfile$") => "sqlserver"
       case Some(other) => throw new IllegalArgumentException(s"Cannot start EventDatabase provider $other is not supported as event database type")
     }
 

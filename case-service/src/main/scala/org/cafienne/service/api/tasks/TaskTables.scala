@@ -52,13 +52,13 @@ trait TaskTables extends QueryDbConfig {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:
-  final class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
+  final class TaskTable(tag: Tag) extends CafienneTable[Task](tag, "task") {
 
-    def id = column[String]("id", O.PrimaryKey)
+    def id = keyColumn[String]("id", O.PrimaryKey)
 
-    def caseInstanceId = column[String]("case_instance_id")
+    def caseInstanceId = keyColumn[String]("case_instance_id")
 
-    def tenant = column[String]("tenant")
+    def tenant = keyColumn[String]("tenant")
 
     def role = column[String]("role", O.Default(""))
 

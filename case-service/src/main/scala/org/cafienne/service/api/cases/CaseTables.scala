@@ -138,9 +138,9 @@ trait CaseTables extends QueryDbConfig {
 
   //TODO: add lowercase index on definition in Postgresql to allow case insensitive searching
 
-  final class CaseInstanceTable(tag: Tag) extends Table[CaseInstance](tag, "case_instance") {
+  final class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseInstance](tag, "case_instance") {
 
-    def id = column[String]("id", O.PrimaryKey)
+    def id = keyColumn[String]("id", O.PrimaryKey)
 
     def tenant = column[String]("tenant")
 
@@ -165,8 +165,9 @@ trait CaseTables extends QueryDbConfig {
     def * = (id, tenant, definition, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy) <> (CaseInstance.tupled, CaseInstance.unapply)
   }
 
-  final class CaseInstanceDefinitionTable(tag: Tag) extends Table[CaseInstanceDefinition](tag, "case_instance_definition") {
-    def caseInstanceId = column[String]("caseInstanceId", O.PrimaryKey)
+  final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTable[CaseInstanceDefinition](tag, "case_instance_definition") {
+
+    def caseInstanceId = keyColumn[String]("caseInstanceId", O.PrimaryKey)
 
     def name = column[String]("name")
 
@@ -185,9 +186,9 @@ trait CaseTables extends QueryDbConfig {
     def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseInstanceDefinition.tupled, CaseInstanceDefinition.unapply)
   }
 
-  final class PlanItemTable(tag: Tag) extends Table[PlanItem](tag, "plan_item") {
+  final class PlanItemTable(tag: Tag) extends CafienneTable[PlanItem](tag, "plan_item") {
 
-    def id = column[String]("id", O.PrimaryKey)
+    def id = keyColumn[String]("id", O.PrimaryKey)
 
     def stageId = column[String]("stage_id")
 
@@ -195,7 +196,7 @@ trait CaseTables extends QueryDbConfig {
 
     def index = column[Int]("index")
 
-    def caseInstanceId = column[String]("case_instance_id")
+    def caseInstanceId = keyColumn[String]("case_instance_id")
 
     def tenant = column[String]("tenant")
 
@@ -235,11 +236,11 @@ trait CaseTables extends QueryDbConfig {
 
   }
 
-  final class PlanItemHistoryTable(tag: Tag) extends Table[PlanItemHistory](tag, "plan_item_history") {
+  final class PlanItemHistoryTable(tag: Tag) extends CafienneTable[PlanItemHistory](tag, "plan_item_history") {
 
-    def id = column[String]("id", O.PrimaryKey)
+    def id = keyColumn[String]("id", O.PrimaryKey)
 
-    def planItemId = column[String]("plan_item_id")
+    def planItemId = keyColumn[String]("plan_item_id")
 
     def stageId = column[String]("stage_id")
 
@@ -281,9 +282,9 @@ trait CaseTables extends QueryDbConfig {
 
   }
 
-  final class CaseFileTable(tag: Tag) extends Table[CaseFile](tag, "case_file") {
+  final class CaseFileTable(tag: Tag) extends CafienneTable[CaseFile](tag, "case_file") {
 
-    def caseInstanceId = column[String]("case_instance_id", O.PrimaryKey)
+    def caseInstanceId = keyColumn[String]("case_instance_id", O.PrimaryKey)
 
     def tenant = column[String]("tenant")
 
@@ -296,13 +297,13 @@ trait CaseTables extends QueryDbConfig {
     def caseInstance = foreignKey("fk_case_file__case_instance", caseInstanceId, caseInstanceTable)(_.id)
   }
 
-  final class CaseInstanceRoleTable(tag: Tag) extends Table[CaseInstanceRole](tag, "case_instance_role") {
+  final class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseInstanceRole](tag, "case_instance_role") {
 
-    def caseInstanceId = column[String]("case_instance_id")
+    def caseInstanceId = keyColumn[String]("case_instance_id")
 
     def tenant = column[String]("tenant")
 
-    def roleName = column[String]("role_name")
+    def roleName = keyColumn[String]("role_name")
 
     def assigned = column[Boolean]("assigned") // true if team members are assigned for this role
 
@@ -315,15 +316,15 @@ trait CaseTables extends QueryDbConfig {
     def caseInstance = foreignKey("fk_case_instance_role__case_instance", caseInstanceId, caseInstanceTable)(_.id)
   }
 
-  final class CaseInstanceTeamMemberTable(tag: Tag) extends Table[CaseInstanceTeamMember](tag, "case_instance_team_member") {
+  final class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTable[CaseInstanceTeamMember](tag, "case_instance_team_member") {
 
-    def caseInstanceId = column[String]("case_instance_id")
+    def caseInstanceId = keyColumn[String]("case_instance_id")
 
     def tenant = column[String]("tenant")
 
-    def role = column[String]("role")
+    def role = keyColumn[String]("role")
 
-    def userId = column[String]("user_id")
+    def userId = keyColumn[String]("user_id")
 
     def active = column[Boolean]("active")
 
