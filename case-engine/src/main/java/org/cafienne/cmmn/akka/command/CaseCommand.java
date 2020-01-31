@@ -39,6 +39,11 @@ public abstract class CaseCommand extends ModelCommand<Case> {
         super(json);
     }
 
+    @Override
+    public final Class<Case> actorClass() {
+        return Case.class;
+    }
+
     /**
      * The id of the case on which to perform the command
      *

@@ -41,7 +41,7 @@ public class CaseEventListener {
     CaseEventListener(TestScript testScript) {
         this.testScript = testScript;
         // Case message router is used to send messages into the case system
-        this.caseMessageRouter = CaseSystem.caseMessageRouter();
+        this.caseMessageRouter = CaseSystem.router();
 
         final ActorSystem system = CaseSystem.system();
         // Now create the callback mechanism for the case system

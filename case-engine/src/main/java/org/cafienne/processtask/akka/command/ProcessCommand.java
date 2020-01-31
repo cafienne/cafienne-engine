@@ -16,6 +16,11 @@ public abstract class ProcessCommand extends ModelCommand<ProcessTaskActor> {
     }
 
     @Override
+    public final Class<ProcessTaskActor> actorClass() {
+        return ProcessTaskActor.class;
+    }
+
+    @Override
     public void validate(ProcessTaskActor modelActor) throws InvalidCommandException {
         // Nothing to validate
     }

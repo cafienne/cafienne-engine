@@ -56,6 +56,13 @@ public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializ
     }
 
     /**
+     * Explicit method to be implemented returning the type of the ModelActor handling this message.
+     * This is required for the message routing within the CaseSystem
+     * @return
+     */
+    public abstract Class<T> actorClass();
+
+    /**
      * Through this method, the command is made aware of the actor that is handling it.
      * @param actor
      */

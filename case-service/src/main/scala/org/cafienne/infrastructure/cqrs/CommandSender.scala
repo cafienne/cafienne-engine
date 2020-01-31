@@ -9,7 +9,7 @@ import org.cafienne.service.Main
 import scala.concurrent.Future
 
 trait CommandSender {
-  private val caseRegion = CaseSystem.caseMessageRouter()
+  private val caseRegion = CaseSystem.router()
 
   implicit val executionContext = scala.concurrent.ExecutionContext.global
   implicit val timeout = Main.caseSystemTimeout

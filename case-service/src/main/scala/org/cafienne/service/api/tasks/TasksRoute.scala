@@ -7,8 +7,6 @@
  */
 package org.cafienne.service.api.tasks
 
-
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
@@ -22,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.akka.command.CaseCommandModels
 import org.cafienne.cmmn.instance.casefile.{ValueList, ValueMap}
@@ -41,10 +40,7 @@ import scala.util.{Failure, Success}
 @Api(value = "tasks", tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TasksRoute
-  (taskQueries: TaskQueries,  taskRegion: ActorRef)
-  (implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider)
-  extends AuthenticatedRoute with TaskReader {
+class TasksRoute(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute with TaskReader {
 
   override def routes = pathPrefix("tasks") {
     getTasksRoute ~
@@ -485,7 +481,7 @@ class TasksRoute
   }
 
   def askCase(command: HumanTaskCommand): Route = {
-    onComplete(taskRegion ? command) {
+    onComplete(CaseSystem.router ? command) {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)

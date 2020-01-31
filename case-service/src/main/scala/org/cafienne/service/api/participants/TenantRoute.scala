@@ -7,10 +7,10 @@
  */
 package org.cafienne.service.api.participants
 
-import akka.actor.ActorRef
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server
 import akka.http.scaladsl.server.Directives._
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
 import org.cafienne.service.Main
 import org.cafienne.service.api.AuthenticatedRoute
@@ -22,15 +22,13 @@ import scala.util.{Failure, Success}
 
 trait TenantRoute extends AuthenticatedRoute {
 
-  def tenantRegion: ActorRef = ???
-
   override def routes: server.Route = ???
 
   import akka.pattern.ask
   implicit val timeout = Main.caseSystemTimeout
 
   def askTenant(command: TenantCommand) = {
-    onComplete(tenantRegion ? command) {
+    onComplete(CaseSystem.router ? command) {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
@@ -53,7 +51,7 @@ trait TenantRoute extends AuthenticatedRoute {
 
             complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, sb.toString))
           }
-          case v: TenantResponse => complete(StatusCodes.NoContent)
+          case _: TenantResponse => complete(StatusCodes.NoContent)
           case TestResponse => complete(StatusCodes.NoContent)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)

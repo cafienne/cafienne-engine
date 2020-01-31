@@ -294,12 +294,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     public void askCase(CaseCommand command, CommandFailureListener left, CommandResponseListener... right) {
         responseListeners.put(command.getMessageId(), new Responder(left, right));
-        CaseSystem.caseMessageRouter().tell(command, self());
+        CaseSystem.router().tell(command, self());
     }
 
     public void askProcess(ProcessCommand command, CommandFailureListener left, CommandResponseListener... right) {
         responseListeners.put(command.getMessageId(), new Responder(left, right));
-        CaseSystem.processMessageRouter().tell(command, self());
+        CaseSystem.router().tell(command, self());
     }
 
     /**

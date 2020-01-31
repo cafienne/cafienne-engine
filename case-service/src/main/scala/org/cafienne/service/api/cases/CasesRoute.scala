@@ -9,7 +9,6 @@ package org.cafienne.service.api.cases
 
 import java.util.UUID
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives.{path, _}
@@ -51,12 +50,9 @@ import scala.util.{Failure, Success}
 @Api(value = "cases", tags = Array("cases"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CasesRoute
-(caseQueries: CaseQueries, caseRegion: ActorRef)
-(implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider)
-  extends AuthenticatedRoute with CaseReader {
+class CasesRoute(caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute with CaseReader {
 
-  implicit def executionContext: ExecutionContextExecutor = actorRefFactory.dispatcher
+  implicit def executionContext: ExecutionContextExecutor = CaseSystem.system.dispatcher
 
   override def routes =
     pathPrefix("cases") {
@@ -757,7 +753,7 @@ class CasesRoute
   implicit val timeout = Main.caseSystemTimeout
 
   def invokeCase(command: CaseCommand) = {
-    onComplete(caseRegion ? command) {
+    onComplete(CaseSystem.router ? command) {
       case Success(value) =>
         value match {
           case e: CommandFailure =>

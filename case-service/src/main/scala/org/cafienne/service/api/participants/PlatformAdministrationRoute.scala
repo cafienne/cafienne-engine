@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.participants
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -27,12 +26,8 @@ import scala.collection.JavaConverters._
 @Api(value = "registration", tags = Array("registration"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/registration")
-class PlatformAdministrationRoute
-  (messageRouter: ActorRef)
-  (implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider)
-  extends TenantRoute {
+class PlatformAdministrationRoute()(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
-  override def tenantRegion = messageRouter
 
   override def routes = {
     createTenant ~

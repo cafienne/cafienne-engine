@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.participants
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import javax.ws.rs._
@@ -16,12 +15,10 @@ import org.cafienne.identity.IdentityProvider
 
 @Api(value = "registration", tags = Array("registration"))
 @Path("/registration")
-class RegistrationRoutes(userQueries: UserQueries, messageRouter: ActorRef)(implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider) extends TenantRoute {
-  val tenantAdministrationRoute = new TenantAdministrationRoute(messageRouter)
-  val participants = new TenantUsersAdministrationRoute(userQueries, messageRouter)
-  val platform = new PlatformAdministrationRoute(messageRouter)
-
-  override def tenantRegion = messageRouter
+class RegistrationRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+  val tenantAdministrationRoute = new TenantAdministrationRoute()
+  val participants = new TenantUsersAdministrationRoute(userQueries)
+  val platform = new PlatformAdministrationRoute()
 
   override def routes = pathPrefix("registration") {
     platform.routes ~

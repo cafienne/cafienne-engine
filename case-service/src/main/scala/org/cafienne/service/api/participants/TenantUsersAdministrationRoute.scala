@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.participants
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
@@ -32,8 +31,7 @@ import scala.util.{Failure, Success}
 @Api(value = "users", tags = Array("registration"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/registration")
-class TenantUsersAdministrationRoute(userQueries: UserQueries, messageRouter: ActorRef)(implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider) extends TenantRoute {
-  override def tenantRegion = messageRouter
+class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   override def routes = {
     addTenantUser ~
