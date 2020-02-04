@@ -20,14 +20,15 @@ trait QueryDbConfig {
 
     /**
       * Creates a String column with the specified name and options.
-      * Overrides O.Length and SqlType options, and replaces with NVARCHAR(1024).
+      * Overrides O.Length and SqlType options, and replaces with NVARCHAR(255).
       * This method can be used in primary key fields and foreign key fields of type String
+      * Typically in fields that hold actor id's, such as Tenant, CaseInstanceId, or TaskId
       * @param columnName
       * @param options
       * @tparam T
       * @return
       */
-    def keyColumn[T](columnName: String, options: ColumnOption[String]*) = {
+    def idColumn[T](columnName: String, options: ColumnOption[String]*) = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -38,12 +39,92 @@ trait QueryDbConfig {
           case true => options.find(o => o.isInstanceOf[Length]) match {
             case Some(_) => options
             case None => {
-              options ++ Seq(SqlType("NVARCHAR(1024)"))
+              options ++ Seq(SqlType("NVARCHAR(255)"))
             }
           }
         }
       }
       super.column[String](columnName, newOptions:_*)
+    }
+
+    /**
+      * Similar to idColumn, but now for storing userId's. Defaults to 255 as length.
+      * @param columnName
+      * @param options
+      * @tparam T
+      * @return
+      */
+    def userColumn[T](columnName: String, options: ColumnOption[String]*) = {
+      // NOTE: This code is invoked many times, also continuously during runtime
+
+      val newOptions = {
+        isSQLServer match {
+          // If not SQL Server then just return the existing definition of the column
+          case false => options
+          // But if it is SQL Server, let's check if the Length is defined. If not, we'll set it to 1024
+          case true => options.find(o => o.isInstanceOf[Length]) match {
+            case Some(_) => options
+            case None => {
+              options ++ Seq(SqlType("NVARCHAR(255)"))
+            }
+          }
+        }
+      }
+      super.column[String](columnName, newOptions: _*)
+    }
+
+    /**
+      * Similar to idColumn, but now for storing states and transitions (technical data). Defaults to 16 as length.
+      * (ParentTerminate is longest value as of now)
+      * @param columnName
+      * @param options
+      * @tparam T
+      * @return
+      */
+    def stateColumn[T](columnName: String, options: ColumnOption[String]*) = {
+      // NOTE: This code is invoked many times, also continuously during runtime
+
+      val newOptions = {
+        isSQLServer match {
+          // If not SQL Server then just return the existing definition of the column
+          case false => options
+          // But if it is SQL Server, let's check if the Length is defined. If not, we'll set it to 1024
+          case true => options.find(o => o.isInstanceOf[Length]) match {
+            case Some(_) => options
+            case None => {
+              options ++ Seq(SqlType("VARCHAR(16)"))
+            }
+          }
+        }
+      }
+      super.column[String](columnName, newOptions: _*)
+    }
+
+
+    /**
+      * Column that can hold json information; NVARCHAR(MAX) by default
+      * @param columnName
+      * @param options
+      * @tparam T
+      * @return
+      */
+    def jsonColumn[T](columnName: String, options: ColumnOption[String]*) = {
+      // NOTE: This code is invoked many times, also continuously during runtime
+
+      val newOptions = {
+        isSQLServer match {
+          // If not SQL Server then just return the existing definition of the column
+          case false => options
+          // But if it is SQL Server, let's check if the Length is defined. If not, we'll set it to 1024
+          case true => options.find(o => o.isInstanceOf[Length]) match {
+            case Some(_) => options
+            case None => {
+              options ++ Seq(SqlType("NVARCHAR(MAX)"))
+            }
+          }
+        }
+      }
+      super.column[String](columnName, newOptions: _*)
     }
   }
 

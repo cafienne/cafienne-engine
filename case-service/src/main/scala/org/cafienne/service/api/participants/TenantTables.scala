@@ -10,7 +10,7 @@ final case class Tenant(name: String, enabled: Boolean = true)
 
 final case class TenantOwner(tenant: String, userId: String, enabled: Boolean = true)
 
-trait UserTables extends QueryDbConfig {
+trait TenantTables extends QueryDbConfig {
 
   import dbConfig.profile.api._
 
@@ -23,16 +23,16 @@ trait UserTables extends QueryDbConfig {
 
     def pk = primaryKey("pk_tenant_owner", (tenant, userId))
 
-    def tenant = keyColumn[String]("tenant")
+    def tenant = idColumn[String]("tenant")
 
-    def userId = keyColumn[String]("userId")
+    def userId = idColumn[String]("userId")
   }
 
   // Schema for the "tenant" table:
   final class TenantTable(tag: Tag) extends CafienneTable[Tenant](tag, "tenant") {
 
     // Columsn
-    def name = keyColumn[String]("name", O.PrimaryKey)
+    def name = idColumn[String]("name", O.PrimaryKey)
     def enabled = column[Boolean]("enabled", O.Default(true))
 
     // Constraints
@@ -45,11 +45,11 @@ trait UserTables extends QueryDbConfig {
 
     def * = (userId, tenant, role_name, name, email, enabled) <> (UserRole.tupled, UserRole.unapply)
 
-    def userId = keyColumn[String]("user_id")
+    def userId = idColumn[String]("user_id")
 
-    def tenant = keyColumn[String]("tenant")
+    def tenant = idColumn[String]("tenant")
 
-    def role_name = keyColumn[String]("role_name")
+    def role_name = idColumn[String]("role_name")
 
     def name = column[String]("name")
 

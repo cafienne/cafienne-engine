@@ -40,13 +40,13 @@ object PlanItemMerger {
 
   def merge(event: TaskInputFilled, current: PlanItem): PlanItem =
     current.copy(
-      taskInput = Some(event.getTaskInputParameters.toString),
-      mappedInput = Some(event.getMappedInputParameters.toString)
+      taskInput = event.getTaskInputParameters.toString,
+      mappedInput = event.getMappedInputParameters.toString
     )
 
   def merge(event: TaskOutputFilled, current: PlanItem): PlanItem =
     current.copy(
-      taskOutput = Some(event.getTaskOutputParameters.toString),
-      rawOutput = Some(event.getRawOutputParameters.toString)
+      taskOutput = event.getTaskOutputParameters.toString,
+      rawOutput = event.getRawOutputParameters.toString
     )
 }

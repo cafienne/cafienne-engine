@@ -15,8 +15,8 @@ trait UserQueries {
 }
 
 
-class UserQueriesImpl extends UserQueries with LazyLogging
-  with UserTables {
+class TenantQueriesImpl extends UserQueries with LazyLogging
+  with TenantTables {
 
   import dbConfig.profile.api._
 

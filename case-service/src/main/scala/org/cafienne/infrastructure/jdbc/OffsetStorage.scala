@@ -56,7 +56,7 @@ trait OffsetStoreTables extends QueryDbConfig {
 
 
   final class OffsetStoreTable(tag: Tag) extends CafienneTable[OffsetStore](tag, "offset_storage") {
-    def name = keyColumn[String]("name", O.PrimaryKey)
+    def name = idColumn[String]("name", O.PrimaryKey)
 
     def offsetType = column[String]("offset-type")
 

@@ -7,14 +7,14 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.ValueMarshallers
-import org.cafienne.service.api.participants.UserQueriesImpl
+import org.cafienne.service.api.participants.TenantQueriesImpl
 import org.scalatest.{FlatSpec, MustMatchers}
 
 class RepositoryRouteTest extends FlatSpec with MustMatchers with ScalatestRouteTest {
 
   val logger = Logging(system, getClass)
 
-  implicit val userRegistration = new IdentityCache(new UserQueriesImpl)
+  implicit val userRegistration = new IdentityCache(new TenantQueriesImpl)
 
   val repositoryRoute = new RepositoryRoute() {
   }

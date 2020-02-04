@@ -18,7 +18,7 @@ import org.cafienne.infrastructure.jdbc.OffsetStorageImpl
 import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.cases.{CaseQueriesImpl, CasesRoute}
 import org.cafienne.service.api.debug.DebugRoute
-import org.cafienne.service.api.participants.{RegistrationRoutes, UserQueriesImpl}
+import org.cafienne.service.api.participants.{RegistrationRoutes, TenantQueriesImpl}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
@@ -61,7 +61,7 @@ object Main extends App {
 
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl
-    val userQueries = new UserQueriesImpl
+    val userQueries = new TenantQueriesImpl
     val updater = new SlickRecordsPersistence
     val offsetStorage = new OffsetStorageImpl
 
