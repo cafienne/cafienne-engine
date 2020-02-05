@@ -82,7 +82,7 @@ class CaseFileWriterTest
       eventually {
         persistence.records.length shouldBe 5
         persistence.records.head shouldBe a[CaseInstance]
-        persistence.records(1) match {
+        persistence.records(2) match {
           case cs: CaseFile =>
             cs.data should be(expectedCaseFileContent)
           case other => assert(false, "CaseFile object expected, found " + other.getClass.getName)

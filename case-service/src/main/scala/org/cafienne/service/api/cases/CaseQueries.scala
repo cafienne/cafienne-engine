@@ -118,7 +118,8 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     val statusFilter = status.getOrElse("")
 
     val tenantSet = tenants(tenant, user)
-    val action = sql"select count(definition) as count, tenant, definition, state, failures from case_instance group by tenant, definition, state, failures".as[(Long, String, String, String, Int)]
+    // NOTE: this uses a direct query. Fields must be escaped with quotes for the in-memory Hsql Database usage.
+    val action = sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" """.as[(Long, String, String, String, Int)]
     db.run(action).map { value =>
       val r = collection.mutable.Map.empty[String, CaseList]
       value.filter(caseInstance => tenantSet.contains(caseInstance._2)).foreach { caseInstance =>

@@ -198,44 +198,44 @@ class TaskQueriesImpl extends TaskQueries
                            timeZone: Option[String]): Future[Seq[(Task)]] = {
 
 
-    // TODO: this should become a join on task roles per user roles per tenant
+    // First determine the set of tenants to query in (either the tenant passed into the method call, or all tenants that the user is member of)
+    val tenantSet = tenants(tenant, user)
+
+    // If there is no assignee given, then we need to query tasks that have a role that the user also has.
+    //  Otherwise the query will not filter on roles
     val roles: Option[Traversable[String]] = assignee match {
-//      case None => Some(user.roles.asScala)
-      case None => None
+      case None => {
+        // TODO: this should become a join on task roles per user roles per tenant; currently any task in any role in any tenant that match together will be given...
+        //  This is noted in issue https://github.com/cafienne/cafienne-engine/issues/14
+        val rolesSet = user.users.filter(tenantUser => tenantSet.contains(tenantUser.tenant)).flatMap(tenantUser => tenantUser.roles)
+        Some(rolesSet)
+      }
       case _ => None
     }
 
-    val tenantSet = tenants(tenant, user)
+    val query = TableQuery[TaskTable]
+      .filter(_.tenant.inSet(tenantSet))
+      .optionFilter(assignee)(_.assignee === _)
+      .optionFilter(roles)((task, _) => task.role === "" || task.role.inSet(roles.getOrElse(Seq(""))))
+      .optionFilter(taskState)(_.taskState === _)
+      .optionFilter(owner)(_.owner === _)
+      .optionFilter(assignee)(_.assignee === _)
+      .optionFilter(dueOn)(_.dueDate >= getStartDate(_, timeZone))
+      .optionFilter(dueOn)(_.dueDate <= getEndDate(_, timeZone))
+      .optionFilter(dueBefore)(_.dueDate < getStartDate(_, timeZone))
+      .optionFilter(dueAfter)(_.dueDate > getEndDate(_, timeZone))
+      .distinctOn(_.caseInstanceId)
+      .sortBy(getTasksSortField(_, sort.getOrElse(Sort("", None))))
+      .drop(from).take(numOfResults)
 
-    for {
-      tasklist <- {
-        val query = TableQuery[TaskTable].
-          filter(_.tenant.inSet(tenantSet))
-          .optionFilter(assignee)(_.assignee === _)
-          .optionFilter(roles)((task, _) => task.role === "" || task.role.inSet(roles.getOrElse(Seq(""))))
-//                    .optionFilter(caseDefinition)(_.caseDefinition === _)
-          .optionFilter(taskState)(_.taskState === _)
-          .optionFilter(owner)(_.owner === _)
-          .optionFilter(assignee)(_.assignee === _)
-          .optionFilter(dueOn)(_.dueDate >= getStartDate(_, timeZone))
-          .optionFilter(dueOn)(_.dueDate <= getEndDate(_, timeZone))
-          .optionFilter(dueBefore)(_.dueDate < getStartDate(_, timeZone))
-          .optionFilter(dueAfter)(_.dueDate > getEndDate(_, timeZone))
-          .distinctOn(_.caseInstanceId)
-          .sortBy(getTasksSortField(_, sort.getOrElse(Sort("", None))))
-          .drop(from).take(numOfResults)
-
-        db.run(query.result)
-        //          .map(records => {
-        //            records.map(tuple => {
-        //              //            println("Foudn task "+tuple.id)
-        //              tuple
-        //            })
-        //          })
-      }
-
-    } yield (tasklist)
-  }
+    db.run(query.result)
+      //          .map(records => {
+      //            records.map(tuple => {
+      //              //            println("Foudn task "+tuple.id)
+      //              tuple
+      //            })
+      //          })
+ }
 
   private def getTasksSortField(rep: (TaskTable), sort: Sort) = {
     val isAsc = sort.sortOrder exists {

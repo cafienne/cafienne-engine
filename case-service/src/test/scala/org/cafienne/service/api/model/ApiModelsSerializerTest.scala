@@ -9,11 +9,11 @@ import scala.collection.JavaConverters._ // for roles to set conversion
 
 class ApiModelsSerializerTest extends FlatSpec with MustMatchers  {
 
-  val minimalJson = "{\"definition\":\"startcase\",\"caseInstanceId\":null,\"name\":\"mycase\",\"debug\":false}"
-  val minimalJsonWithNull = "{\"definition\":\"startcase\",\"caseInstanceId\":null,\"inputs\":null,\"caseTeam\":null,\"name\":\"mycase\",\"debug\":false}"
-  val minimalJsonWithEmptyObjects = "{\"definition\":\"startcase\",\"caseInstanceId\":null,\"inputs\":{},\"caseTeam\":{\"members\":[]},\"name\":\"mycase\",\"debug\":false}"
-  val extendedJson = "{\"definition\":\"startcase2\",\"caseInstanceId\":\"myinstanceid\",\"inputs\":{\"input1\":\"bla\",\"input2\":\"bla\",\"input3\":{\"hello\":\"world\"}},\"caseTeam\":{\"members\":[{\"roles\":[\"ADMIN\"],\"user\":\"gerald\"}]},\"name\":\"case2\",\"debug\":false}"
   val tenant = ""
+  val minimalJson = "{\"definition\":\"startcase\",\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"
+  val minimalJsonWithNull = "{\"definition\":\"startcase\",\"inputs\":null,\"caseTeam\":null,\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"
+  val minimalJsonWithEmptyObjects = "{\"definition\":\"startcase\",\"inputs\":{},\"caseTeam\":{\"members\":[]},\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"
+  val extendedJson = "{\"definition\":\"startcase2\",\"inputs\":{\"input1\":\"bla\",\"input2\":\"bla\",\"input3\":{\"hello\":\"world\"}},\"caseTeam\":{\"members\":[{\"roles\":[\"ADMIN\"],\"user\":\"gerald\"}]},\"tenant\":\"\",\"caseInstanceId\":\"myinstanceid\",\"debug\":false}"
 
   "serialize" should "create proper json of a minimal StartCase API model" in {
     val cmd = StartCase("startcase", new ValueMap(), new CaseTeam(), Some(tenant), None)
