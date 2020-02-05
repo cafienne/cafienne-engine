@@ -42,6 +42,11 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
         super(json);
     }
 
+    @Override
+    public final Class<TenantActor> actorClass() {
+        return TenantActor.class;
+    }
+
     /**
      * Before the case starts processing the command, it will first ask to validate the command.
      * The default implementation is to check whether the case definition is available (i.e., whether StartCase command has been triggered before this command).

@@ -89,7 +89,7 @@ trait CaseServiceRoute extends LazyLogging {
   */
 trait AuthenticatedRoute extends CaseServiceRoute {
 
-  def userCache : IdentityProvider
+  implicit val userCache : IdentityProvider
   val uc = userCache
 
   object OIDCAuthentication extends Directives with AuthenticationDirectives {

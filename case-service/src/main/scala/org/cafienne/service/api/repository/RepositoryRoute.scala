@@ -10,7 +10,6 @@ package org.cafienne.service.api.repository
 import java.io.FileNotFoundException
 
 import javax.ws.rs.{Consumes, GET, POST, Path, Produces}
-import akka.actor._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
@@ -33,10 +32,7 @@ import org.cafienne.identity.IdentityProvider
 @Api(value = "repository", tags = Array("repository"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
-class RepositoryRoute
-()
-(implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider)
-  extends AuthenticatedRoute {
+class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
 
   override def routes: Route =
     pathPrefix("repository") {

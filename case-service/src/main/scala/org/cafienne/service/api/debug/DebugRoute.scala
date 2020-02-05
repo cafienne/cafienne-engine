@@ -8,7 +8,7 @@
 
 package org.cafienne.service.api.debug
 
-import akka.actor.{ActorRefFactory, ActorSystem}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
@@ -28,10 +28,7 @@ import scala.util.{Failure, Success}
 @Api(value = "debug", tags = Array("cases"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/debug")
-class DebugRoute
-  ()
-  (implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider)
-  extends AuthenticatedRoute {
+class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem) extends AuthenticatedRoute {
 
   val caseEventReader = new ModelEventsReader()
 

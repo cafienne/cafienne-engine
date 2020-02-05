@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,9 +29,11 @@ public class ModelResponse implements AkkaSerializable {
         messageId, lastModified, user, commandType
     }
 
-    protected ModelResponse(ModelCommand command) {
+    protected ModelResponse(ModelCommand<?> command) {
         this.messageId = command.getMessageId();
-        this.lastModified = command.getActor().getLastModified();
+        // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
+        //  the actor will not be available. Checking that here. Required for CommandFailure.
+        this.lastModified = command.getActor() != null ? command.getActor().getLastModified() : null;
         this.user = command.getUser();
         this.commandType = command.getClass().getName();
     }
@@ -46,6 +48,7 @@ public class ModelResponse implements AkkaSerializable {
     /**
      * Every {@link ModelCommand} has a message id.
      * Every response to such a command must have the same message id for correlation purposes
+     *
      * @return
      */
     public String getMessageId() {
@@ -54,6 +57,7 @@ public class ModelResponse implements AkkaSerializable {
 
     /**
      * Returns the type of command that gave cause to this response
+     *
      * @return
      */
     public String getCommandType() {

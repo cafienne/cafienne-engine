@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.participants
 
-import akka.actor.{ActorRef, ActorRefFactory, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -22,12 +21,7 @@ import org.cafienne.tenant.akka.command.{AddTenantOwner, GetTenantOwners, Remove
 @Api(value = "registration", tags = Array("registration"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/registration")
-class TenantAdministrationRoute
-  (messageRouter: ActorRef)
-  (implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory, override implicit val userCache: IdentityProvider)
-  extends TenantRoute {
-
-  override def tenantRegion = messageRouter
+class TenantAdministrationRoute()(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   override def routes = {
     addTenantOwner ~

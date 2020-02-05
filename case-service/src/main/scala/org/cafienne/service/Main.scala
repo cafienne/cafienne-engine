@@ -79,9 +79,9 @@ object Main extends App {
 
     // Some routes assume the above created implicit writers
     val apiRoutes =
-      new CasesRoute(caseQueries, CaseSystem.caseMessageRouter).route ~
-      new TasksRoute(taskQueries, CaseSystem.caseMessageRouter).route ~
-      new RegistrationRoutes(userQueries, CaseSystem.tenantMessageRouter()).route ~
+      new CasesRoute(caseQueries).route ~
+      new TasksRoute(taskQueries).route ~
+      new RegistrationRoutes(userQueries).route ~
       new RepositoryRoute().route ~
       new DebugRoute().route ~
       // Add the routes for the API documentation frontend.

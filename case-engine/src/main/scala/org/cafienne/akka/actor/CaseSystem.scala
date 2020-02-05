@@ -9,27 +9,15 @@ package org.cafienne.akka.actor
 
 import java.time.Instant
 import java.util
-import java.util.stream.Collectors
 
 import akka.actor._
-import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
-import akka.persistence.journal.PersistencePluginProxyExtension
-import akka.persistence.query.PersistenceQuery
-import akka.persistence.query.scaladsl.ReadJournal
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.cluster.ClusteredRouterService
 import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.akka.actor.local.LocalRouterService
-import org.cafienne.cmmn.akka.command.CaseCommand
-import org.cafienne.cmmn.instance.Case
+import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
 import org.cafienne.cmmn.repository.DefinitionProvider
-import org.cafienne.processtask.akka.command.ProcessCommand
-import org.cafienne.processtask.instance.ProcessTaskActor
-import org.cafienne.tenant.TenantActor
-import org.cafienne.tenant.akka.command.TenantCommand
 
 /**
   *
@@ -99,8 +87,6 @@ object CaseSystem extends LazyLogging {
   } else {
     ""
   }
-  var messageRouterService: MessageRouterService = _
-  var system: ActorSystem = null
 
   def defaultTenant = {
     if (configuredDefaultTenant.isEmpty) {
@@ -133,30 +119,21 @@ object CaseSystem extends LazyLogging {
     // Create an Akka system
     system = ActorSystem(name)
 
-    // Decide the type of message router service
-    if (system.hasExtension(akka.cluster.Cluster)) {
-      logger.info("Starting case system in cluster mode")
-      messageRouterService = ClusteredRouterService(system)
-    } else {
-      logger.info("Starting case system in local mode")
-      // All we need is a message router
-      messageRouterService = LocalRouterService(system)
+    val routerClazz = system.hasExtension(akka.cluster.Cluster) match{
+      case true => classOf[ClusterRouter]
+      case false => classOf[LocalRouter]
     }
+    messageRouterService = system.actorOf(Props.create(routerClazz));
   }
+
+  var messageRouterService: ActorRef = _
+  var system: ActorSystem = null
 
   /**
     * Retrieve a router for case messages. This will forward the messages to the correct case instance
     */
-  def caseMessageRouter(): ActorRef = {
-    messageRouterService.getCaseMessageRouter()
-  }
-
-  def tenantMessageRouter(): ActorRef = {
-    messageRouterService.getTenantMessageRouter()
-  }
-
-  def processMessageRouter(): ActorRef = {
-    messageRouterService.getProcessMessageRouter()
+  def router(): ActorRef = {
+    messageRouterService
   }
 
   /**
