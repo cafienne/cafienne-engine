@@ -32,7 +32,7 @@ public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, 
             ModelCommand invalidCommand = (ModelCommand) msg;
             // Still set the actor, so that it can create a proper failure response.
             invalidCommand.setActor(this.actor);
-            Exception wrongCommandType = new Exception(this.actor.getClass().getSimpleName() + " cannot handle message because it has not been configured");
+            Exception wrongCommandType = new Exception(this.actor.getClass().getSimpleName() + " cannot handle message '"+msg.getClass().getSimpleName()+"' because it has not been initialized properly");
             addDebugInfo(() -> wrongCommandType.getMessage(), logger);
             CommandFailure response = new CommandFailure((ModelCommand) msg, wrongCommandType);
             sender().tell(response, sender());

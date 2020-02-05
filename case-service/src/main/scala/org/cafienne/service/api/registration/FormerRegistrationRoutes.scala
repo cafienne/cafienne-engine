@@ -5,20 +5,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.service.api.participants
+package org.cafienne.service.api.registration
 
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.service.api.tenant.{TenantRoute, UserQueries}
 
 
 @Api(value = "registration", tags = Array("registration"))
 @Path("/registration")
-class RegistrationRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
-  val tenantAdministrationRoute = new TenantAdministrationRoute()
-  val participants = new TenantUsersAdministrationRoute(userQueries)
-  val platform = new PlatformAdministrationRoute()
+class FormerRegistrationRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+  val tenantAdministrationRoute = new FormerTenantAdministrationRoute()(userCache)
+  val participants = new FormerTenantUsersAdministrationRoute(userQueries)(userCache)
+  val platform = new FormerPlatformAdministrationRoute()(userCache)
 
   override def routes = pathPrefix("registration") {
     platform.routes ~

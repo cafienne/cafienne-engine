@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.service.api.participants
+package org.cafienne.service.api.tenant
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
@@ -21,16 +21,16 @@ import javax.ws.rs.{Consumes, DELETE, GET, POST, PUT, Path, Produces}
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.participants.model._
+import org.cafienne.service.api.tenant.model._
 import org.cafienne.tenant.akka.command.{AddTenantUser, AddTenantUserRoles, DisableTenantUser, EnableTenantUser, RemoveTenantUserRole}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
 
 
-@Api(value = "users", tags = Array("registration"))
+@Api(value = "users", tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/registration")
+@Path("/tenant")
 class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   override def routes = {
@@ -49,7 +49,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Register the user as a case participant",
     description = "Add a user to the tenant, with the specified roles",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "tenant", description = "The tenant to add the user to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
@@ -69,7 +69,6 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
         implicit val format = jsonFormat4(TenantAPI.User)
         entity(as[TenantAPI.User]) {
           newUser =>
-//            System.err.println("New registration: " + newRegistration)
             val tenantOwner = user.getTenantUser(tenant)
             val roles = newUser.roles.asJava
             val name = newUser.name.getOrElse("")
@@ -85,7 +84,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Disable the user as a case participant",
     description = "Disable the user as a case participant",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "userId", description = "Id of user to disable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "tenant", description = "The tenant in which to disable the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -111,7 +110,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Enable the user as a case participant",
     description = "Enable the user as a case participant",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "userId", description = "Id of user to enable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "tenant", description = "The tenant in which to enable the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -137,7 +136,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Add a role to the tenant user",
     description = "Add a role to the tenant user",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "userId", description = "Id of user to add roles to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "tenant", description = "The tenant in which to change the user roles", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -166,7 +165,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Remove the role from the tenant user",
     description = "Remove the role with the specified name from the tenant user",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "tenant", description = "The tenant in which to change the user roles", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "userId", description = "Id of user to remove roles from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -193,7 +192,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Get tenant users",
     description = "Retrieves the list of tenant users",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
@@ -230,7 +229,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Get a tenant user",
     description = "Gets information about the tenant user with the specified id",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -270,7 +269,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   @Operation(
     summary = "Get user information of current user",
     description = "Retrieves the user information of current user",
-    tags = Array("registration"),
+    tags = Array("tenant"),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUser])))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),

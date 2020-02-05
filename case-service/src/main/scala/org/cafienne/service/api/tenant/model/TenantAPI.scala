@@ -1,4 +1,4 @@
-package org.cafienne.service.api.participants.model
+package org.cafienne.service.api.tenant.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 

@@ -1,4 +1,4 @@
-package org.cafienne.service.api.participants
+package org.cafienne.service.api.tenant
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}

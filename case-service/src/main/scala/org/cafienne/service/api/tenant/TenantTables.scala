@@ -1,4 +1,4 @@
-package org.cafienne.service.api.participants
+package org.cafienne.service.api.tenant
 
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
 

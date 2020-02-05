@@ -3,7 +3,7 @@ package org.cafienne.service.db.migration.versions
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.cases.CaseTables
 import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.api.participants.TenantTables
+import org.cafienne.service.api.tenant.TenantTables
 import org.cafienne.service.db.migration.SlickQueryDbMigrationConfig
 import slick.lifted.TableQuery
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}

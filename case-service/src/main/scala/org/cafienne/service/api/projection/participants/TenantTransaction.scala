@@ -4,7 +4,7 @@ import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.jdbc.OffsetStore
-import org.cafienne.service.api.participants.{Tenant, TenantOwner, UserQueries, UserRole}
+import org.cafienne.service.api.tenant.{Tenant, TenantOwner, UserQueries, UserRole}
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.tenant.akka.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 import org.cafienne.tenant.akka.event._
