@@ -3,7 +3,7 @@ package org.cafienne.service.db.migration.versions
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.cases.CaseTables
 import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.api.participants.UserTables
+import org.cafienne.service.api.participants.TenantTables
 import org.cafienne.service.db.migration.SlickQueryDbMigrationConfig
 import slick.lifted.TableQuery
 import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
@@ -30,7 +30,7 @@ import slick.migration.api.{Migration, TableMigration}
 object V1Migration extends SlickQueryDbMigrationConfig
   with TaskTables
   with CaseTables
-  with UserTables
+  with TenantTables
   with OffsetStoreTables {
 
   //Seq[VersionedMigration]
@@ -99,7 +99,9 @@ object V1Migration extends SlickQueryDbMigrationConfig
         _.lastModified,
         _.modifiedBy,
         _.createdBy,
-        _.createdOn
+        _.createdOn,
+        _.caseInput,
+        _.caseOutput
       )
 
     val createCaseInstanceDefinitionTable = TableMigration(TableQuery[CaseInstanceDefinitionTable])
@@ -183,7 +185,11 @@ object V1Migration extends SlickQueryDbMigrationConfig
         _.lastModified,
         _.modifiedBy,
         _.eventType,
-        _.sequenceNr
+        _.sequenceNr,
+        _.taskInput,
+        _.taskOutput,
+        _.mappedInput,
+        _.rawOutput
       )
       .addIndexes(_.idx)
 

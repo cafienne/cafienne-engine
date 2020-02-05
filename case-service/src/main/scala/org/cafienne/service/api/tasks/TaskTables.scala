@@ -52,39 +52,39 @@ trait TaskTables extends QueryDbConfig {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:
-  final class TaskTable(tag: Tag) extends Table[Task](tag, "task") {
+  final class TaskTable(tag: Tag) extends CafienneTable[Task](tag, "task") {
 
-    def id = column[String]("id", O.PrimaryKey)
+    def id = idColumn[String]("id", O.PrimaryKey)
 
-    def caseInstanceId = column[String]("case_instance_id")
+    def caseInstanceId = idColumn[String]("case_instance_id")
 
-    def tenant = column[String]("tenant")
+    def tenant = idColumn[String]("tenant")
 
     def role = column[String]("role", O.Default(""))
 
     def taskName = column[String]("task_name", O.Default(""))
 
-    def taskState = column[String]("task_state", O.Default(""))
+    def taskState = stateColumn[String]("task_state", O.Default(""))
 
-    def assignee = column[String]("assignee", O.Default(""))
+    def assignee = userColumn[String]("assignee", O.Default(""))
 
-    def owner = column[String]("owner", O.Default(""))
+    def owner = userColumn[String]("owner", O.Default(""))
 
     def dueDate = column[Option[Instant]]("due_date")
 
     def createdOn = column[Instant]("created_on")
 
-    def createdBy = column[String]("created_by", O.Default(""))
+    def createdBy = userColumn[String]("created_by", O.Default(""))
 
     def lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = column[String]("modified_by", O.Default(""))
+    def modifiedBy = userColumn[String]("modified_by", O.Default(""))
 
-    def input = column[String]("task_input", O.Default(""))
+    def input = jsonColumn[String]("task_input", O.Default(""))
 
-    def output = column[String]("task_output", O.Default(""))
+    def output = jsonColumn[String]("task_output", O.Default(""))
 
-    def taskModel = column[String]("task_model", O.Default(""))
+    def taskModel = jsonColumn[String]("task_model", O.Default(""))
 
     def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[Task]
   }

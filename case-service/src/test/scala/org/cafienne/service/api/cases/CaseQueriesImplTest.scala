@@ -31,7 +31,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 
   val planItem1_1 = PlanItem(id = UUID.randomUUID().toString, caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
-    modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = None, taskOutput = None, mappedInput = None, rawOutput = None)
+    modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
   val idOfTerminatedCase = "terminated"
   val terminatedCase = CaseInstance(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, name = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
@@ -42,10 +42,11 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 //  val planItemId1 = UUID.randomUUID().toString
   val planItem2_1 = PlanItem(id = UUID.randomUUID().toString, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2-1", index = 0, currentState = "Completed",
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
-    modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = None, taskOutput = None, mappedInput = None, rawOutput = None)
+    modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
-  val planItemHistory2_1 = PlanItemHistory(id = UUID.randomUUID().toString, planItemId = planItem2_1.id, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2", currentState = "", historyState = "", transition = "", index = 0, planItemType = "", required = false, repeating = false, lastModified = Some(Instant.now),
-    modifiedBy = "user1", eventType="?", sequenceNr = 1)
+  val planItemHistory2_1 = PlanItemHistory(id = UUID.randomUUID().toString, planItemId = planItem2_1.id, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2",
+    currentState = "", historyState = "", transition = "", index = 0, planItemType = "", required = false, repeating = false, lastModified = Instant.now,
+    modifiedBy = "user1", eventType="?", sequenceNr = 1, taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
   val caseListActive = CaseList(definition = "aaa bbb ccc", numActive = 1L, numClosed = 0L)
   val caseListDDDEEEFFF = CaseList(definition = "ddd EeE fff", numTerminated = 1L, numCompleted = 1L)

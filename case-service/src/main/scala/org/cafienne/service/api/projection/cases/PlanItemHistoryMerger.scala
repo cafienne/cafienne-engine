@@ -17,7 +17,7 @@ object PlanItemHistoryMerger {
           caseInstanceId = event.getCaseInstanceId(),
           tenant = event.tenant,
           planItemType = event.getType(),
-          lastModified = Some(event.createdOn),
+          lastModified = event.createdOn,
           modifiedBy = event.getUser.id,
           eventType = event.getClass.getName,
           sequenceNr = event.getSequenceNumber
@@ -32,7 +32,7 @@ object PlanItemHistoryMerger {
           historyState = event.getHistoryState().toString,
           currentState = event.getCurrentState.toString,
           transition = event.getTransition.toString,
-          lastModified = None,
+          lastModified = null,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
@@ -45,7 +45,7 @@ object PlanItemHistoryMerger {
           index = event.index,
           tenant = event.tenant,
           repeating = event.isRepeating,
-          lastModified = None,
+          lastModified = null,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
@@ -58,7 +58,7 @@ object PlanItemHistoryMerger {
           index = event.index,
           tenant = event.tenant,
           required = event.isRequired,
-          lastModified = None,
+          lastModified = null,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
@@ -66,5 +66,5 @@ object PlanItemHistoryMerger {
     }
   }
   def merge(modified: CaseModified, current: PlanItemHistory): PlanItemHistory =
-    current.copy(lastModified = Some(modified.lastModified()), modifiedBy = modified.getUser.id)
+    current.copy(lastModified = modified.lastModified(), modifiedBy = modified.getUser.id)
 }

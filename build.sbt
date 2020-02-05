@@ -75,6 +75,7 @@
         Deps.slick,
         Deps.hikariCP,
         Deps.postgres,
+        Deps.sqlserver,
         Deps.h2,
         Deps.hsqldb,
         Deps.slickMigration,
