@@ -1,0 +1,37 @@
+version: '3.1'
+services:
+  cafienne-test-token-service:
+    image: spectare/oidc-token-test-service:latest
+    labels:
+      component: idp-test-service-for-cafienne
+    network_mode: host
+    expose:
+      - 2377
+    ports:
+      - "2377:2377"
+    environment:
+      BIND: 0.0.0.0
+      PORT: 2377
+    hostname: cafienne-test-token-service
+    container_name: cafienne-test-token-service
+
+  cafienne:
+    image: cafienne/engine:latest
+    labels:
+      component: cafienne-engine
+    network_mode: host
+    expose:
+      - 2027
+    ports:
+      - "2027:2027"
+    hostname: cafienne
+    container_name: cafienne
+    healthcheck:
+      test: ["CMD", "wget", "-s", "http://localhost:2027/api-docs/swagger.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
+      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/cafienne/definitions
+      - /home/circleci/cafienne-engine/.circleci/src/conf:/opt/cafienne/conf

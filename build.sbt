@@ -159,7 +159,7 @@
     )
     .settings(
       packageName in Docker := "cafienne/engine",
-      version in Docker := "1.1.0",
+      version in Docker := "latest",
       maintainer in Docker := """Cafienne <info@cafienne.io>""",
       defaultLinuxInstallLocation in Docker := "/opt/cafienne",
       bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",

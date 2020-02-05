@@ -1,0 +1,141 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/cafienne-engine
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Compile code
+          command: sbt compile
+      - run:
+          name: Unit tests
+          command: sbt test
+      - run:
+          name: Docker login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Pull docker images
+          command: docker-compose -f .circleci/docker-test.yml pull
+      - run:
+          name: Build docker image
+          command: sbt docker:publishLocal
+      - run:
+          name: Up the containers
+          command: |
+            sudo docker-compose -f .circleci/docker-test.yml up -d
+            sleep 5
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Clone CMMN-test framework
+          command: |
+            cd ..
+            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+      - run:
+          name: Install dependencies
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm install
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Stop the containers
+          command: docker-compose -f .circleci/docker-test.yml stop
+      - run:
+          name: Push image to docker hub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ];
+            then
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push cafienne/engine:latest
+            else
+              echo "Not pushing image to docker hub"
+            fi
+
+  build for release:
+    working_directory: ~/cafienne-engine
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Check for version TAG
+          command: |
+            echo `git describe --tags --exact-match` > ./version.txt
+            cat ./version.txt
+            TAG=$(cat ./version.txt)
+            printenv
+      - run:
+          name: Compile code
+          command: sbt compile
+      - run:
+          name: Unit tests
+          command: sbt test
+      - run:
+          name: Docker login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Pull docker images
+          command: docker-compose -f .circleci/docker-test.yml pull
+      - run:
+          name: Build docker image
+          command: sbt docker:publishLocal
+      - run:
+          name: Up the containers
+          command: |
+            sudo docker-compose -f .circleci/docker-test.yml up -d
+            sleep 5
+      - run:
+          name: Giving permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Clone CMMN-test framework
+          command: |
+            cd ..
+            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+      - run:
+          name: Install dependencies
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm install
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Stop the containers
+          command: docker-compose -f .circleci/docker-test.yml stop
+      - run:
+          name: Push image to docker hub
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker tag batav/circle-ci:engine batav/circle-ci:$CIRCLE_TAG
+            docker push batav/circle-ci:$CIRCLE_TAG
+
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - build
+      - build for release:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
