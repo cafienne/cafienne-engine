@@ -9,8 +9,10 @@ package org.cafienne.service.api.repository
 
 import java.io.FileNotFoundException
 
+import akka.Done
 import javax.ws.rs.{Consumes, GET, POST, Path, Produces}
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.server
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import io.swagger.annotations._
@@ -27,7 +29,17 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.akka.actor.command.exception.MissingTenantException
+import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
+import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.service.Main
+import org.cafienne.service.api.cases.TestResponse
+import org.cafienne.tenant.akka.command.GetTenantOwners
+import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 @Api(value = "repository", tags = Array("repository"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -64,17 +76,19 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
       validUser { user => {
         parameters('tenant ?) { optionalTenant =>
           try {
-            val definitions = "/" + modelName + ".xml"
             val tenant = optionalTenant.getOrElse(CaseSystem.defaultTenant)
-            logger.debug(s"Loading definitions from ${definitions}")
-            val model = CaseSystem.DefinitionProvider.read(user.getTenantUser(tenant), definitions)
+            logger.debug(s"Loading definitions '${modelName}' from tenant '${tenant}'")
+            val model = CaseSystem.DefinitionProvider.read(user.getTenantUser(tenant), modelName)
             complete(StatusCodes.OK, model.getDocument)
           }
           catch {
-            case e: FileNotFoundException => complete(StatusCodes.NotFound)
+            case m: MissingDefinitionException => complete(StatusCodes.NotFound)
             case i: InvalidDefinitionException => complete(StatusCodes.InternalServerError, i.toXML)
             case t: MissingTenantException => complete(StatusCodes.BadRequest, t.getMessage)
-            case _: Exception => complete(StatusCodes.InternalServerError)
+            case other: Exception => {
+              logger.debug("Unexpected loading failure", other)
+              complete(StatusCodes.InternalServerError)
+            }
           }
         }
       }
@@ -107,7 +121,6 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
           val tenant = optionalTenant.getOrElse(CaseSystem.defaultTenant)
           val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
           for (file <- CaseSystem.DefinitionProvider.list(user.getTenantUser(tenant)).asScala) {
-            val dimensionsFile = file
             var description = "Description"
             try {
               val definitionsDocument = CaseSystem.DefinitionProvider.read(user.getTenantUser(tenant), file)
@@ -116,7 +129,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
               case i: InvalidDefinitionException => description = i.toString
               case t: Throwable => description = "Could not read definition: " + t.getMessage
             }
-            val model = new ValueMap("definitions", file, "dimensions", dimensionsFile, "description", description)
+            val model = new ValueMap("definitions", file, "description", description)
             models.withArray("models").add(model)
           }
           complete(StatusCodes.OK, models)
@@ -126,7 +139,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
     }
   }
 
-  @Path("/validate")
+  @Path("validate")
   @POST
   @Operation(
     summary = "Validate a case model",
@@ -173,26 +186,65 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
   @RequestBody(description = "Definitions XML file", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/xml"))
   def deployModel = post {
-    path("repository" / "deploy" / Segment) { modelName =>
+    path("deploy" / Segment) { modelName =>
       // For deploying files through the network, authorization is mandatory
       validUser { user => {
         parameters('tenant ?) { optionalTenant =>
           entity(as[Document]) { xmlDocument =>
             try {
-              logger.debug(s"Deploying ${modelName}")
               val tenant = optionalTenant.getOrElse(CaseSystem.defaultTenant)
+              logger.debug(s"Deploying '${modelName}' to tenant '${tenant}'")
               val definitions = new DefinitionsDocument(xmlDocument)
+
               // Reaching this point means we have a valid definition, and can simply move on.
-              CaseSystem.DefinitionProvider.write(user.getTenantUser(tenant), modelName + ".xml", definitions)
-              complete(StatusCodes.Created)
+              onComplete(deploy(user, tenant, modelName, definitions)) {
+                case Success(_) => complete(StatusCodes.NoContent)
+                case Failure(error) => {
+                  error match {
+                    case failure: WriteDefinitionException => {
+                      logger.debug("Deployment failure", failure)
+                      complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
+                    }
+                    case other => throw other
+                  }
+                }
+              }
             } catch {
-              case idd: InvalidDefinitionException => complete(StatusCodes.InternalServerError, new Exception(idd.toJSON.toString))
-              case other: Throwable => complete(StatusCodes.InternalServerError)
+              case idd: InvalidDefinitionException => {
+                logger.debug("Deployment failure", idd)
+                complete(StatusCodes.BadRequest, "Cannot deploy " + modelName + ": definition is invalid.")
+              }
+              case other: Throwable => {
+                logger.debug("Unexpected deployment failure", other)
+                complete(StatusCodes.InternalServerError)
+              }
             }
           }
         }
       }
       }
     }
+  }
+
+  private def deploy(user: PlatformUser, tenant: String, modelName: String, definitions: DefinitionsDocument): Future[Any] = {
+    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+    isTenantOwner(user, tenant).map(isOwner => isOwner match {
+      case true => CaseSystem.DefinitionProvider.write(user.getTenantUser(tenant), modelName, definitions)
+      case false => throw new SecurityException("User '"+user.userId+"' does not have the privileges to deploy a definition")
+    })
+  }
+
+  private def isTenantOwner(user: PlatformUser, tenant: String): Future[Boolean] = {
+
+    import akka.pattern.ask
+    implicit val timeout = Main.caseSystemTimeout
+    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+
+    (CaseSystem.router ? new GetTenantOwners(user.getTenantUser(tenant), tenant)).flatMap(response => {
+      response match {
+        case o: TenantOwnersResponse => Future.successful(o.owners.contains(user.userId))
+        case other => Future.successful(false)
+      }
+    })
   }
 }
