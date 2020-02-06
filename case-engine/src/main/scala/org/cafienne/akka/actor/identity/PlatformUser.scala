@@ -21,7 +21,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
     map.toString
   }
 
-  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("Tenant " + tenant +" does not exist, or user is not registered in it"))
+  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("Tenant " + tenant +" does not exist, or user "+userId+" is not registered in it"))
 
   final def isPlatformOwner: Boolean = CaseSystem.isPlatformOwner(userId)
 

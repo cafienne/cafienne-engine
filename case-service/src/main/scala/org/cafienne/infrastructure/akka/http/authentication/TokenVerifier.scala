@@ -1,35 +1,22 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import com.nimbusds.jose.JWSAlgorithm
+import java.text.ParseException
+
+import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.{BadJWEException, BadJWSException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.proc.{BadJOSEException, BadJWEException, BadJWSException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenVerifier[T] {
   def verifyToken(token: String): Future[T]
 }
-class TokenVerificationException(val msg: String) extends Exception(msg) {
-  def this(msg: String, cause: Throwable) {
-    this(msg)
-    initCause(cause)
-  }
-}
-
-object TokenVerificationException {
-  def apply(msg: String): TokenVerificationException =
-    new TokenVerificationException(msg)
-  def apply(msg: String, cause: Throwable): TokenVerificationException =
-    new TokenVerificationException(msg, cause)
-
-  def unapply(e: TokenVerificationException): Option[(String, Option[Throwable])] =
-    Some((e.getMessage, Option(e.getCause)))
-}
 
 class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(implicit ec: ExecutionContext)
-    extends TokenVerifier[ServiceUserContext] {
+    extends TokenVerifier[ServiceUserContext] with LazyLogging {
   import java.util
 
   val jwtProcessor: ConfigurableJWTProcessor[SecurityContext] = new DefaultJWTProcessor()
@@ -62,24 +49,53 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
   override def verifyToken(token: String): Future[ServiceUserContext] = Future {
     import scala.collection.JavaConverters._
     var claimsSet: Option[JWTClaimsSet] = None
+    if (token.isEmpty) {
+      throw new MissingTokenException
+    }
     try {
       //noinspection ScalaStyle
       val ctx: SecurityContext = null //NOTE this is the way the lib expects to get a None when the context is not required.
       claimsSet = Some(jwtProcessor.process(token, ctx))
       claimsSet.fold(throw new TokenVerificationException("Unable to create claimSet for " + token))(
-        cS => ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList)
-      ))
+        cS => ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
+      )
     } catch {
-      case np: NullPointerException => throw TokenVerificationException("Could not create ServiceUserContext based on token " + token, np)
+      case rp: RemoteKeySourceException => {
+        // TODO: this should return a HTTP code 503 Service Unavailable!
+        logger.error("Failure in contacting IDP. Check IDP configuration settings of the case engine.", rp)
+        throw new CannotReachIDPException("Cannot reach the IDP to validate credentials", rp)
+      }
       case nje: BadJWTException =>
-        throw TokenVerificationException("JWT issue, Could not create Claims Set: " + nje.getLocalizedMessage + " with token " + token)
-      case bje: BadJWEException =>
-        throw TokenVerificationException("JWE issue, Could not create Claims Set: " + bje.getLocalizedMessage + " with token " + token)
-      case bje: BadJWSException =>
-        throw TokenVerificationException("JWS issue, Could not create Claims Set: " + bje.getLocalizedMessage + " with token " + token)
-      case ia: IllegalArgumentException if ia.getMessage.startsWith("Invalid UUID") =>
-        throw TokenVerificationException("No UUID for user in Claims Set: " + claimsSet)
-      case e: Exception => throw TokenVerificationException("Could not create ServiceUserContext based on claims " + claimsSet, e)
+//        nje.printStackTrace()
+        val exceptionMessage = nje.getMessage
+        val missingClaimsMsg = """JWT missing required claims"""
+        val invalidIssuerMsg = """JWT "iss" claim doesn't match expected value: """
+        val jwtAudienceRejected = """JWT audience rejected"""
+        val badJson = """Payload of JWS object is not a valid JSON object"""
+        if (nje.getCause.isInstanceOf[ParseException]) {
+//          println("Failure in parsing token")
+          throw new TokenVerificationException("Token parse failure: " + nje.getCause.getLocalizedMessage)
+        }
+
+        if (exceptionMessage.contains(missingClaimsMsg)) {
+          throw new MissingClaimsException(exceptionMessage.replace(missingClaimsMsg, "JWT token misses claims"))
+        }
+        if (exceptionMessage.contains(invalidIssuerMsg)) {
+          val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
+          throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'")
+        }
+        throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
+      case e: BadJOSEException =>
+        // This captures both JWS and JWE exceptions. These are really technical, and logger.debug must be enabled to understand them
+        logger.debug("Encountered JWT issues", e)
+        throw TokenVerificationException("Token cannot be verified: " + e.getLocalizedMessage)
+      case e: ParseException => {
+        throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
+      }
+      case e: Exception => {
+        logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
+        throw new Exception("Token verification failure of type " + e.getClass.getSimpleName, e)
+      }
     }
   }
 }

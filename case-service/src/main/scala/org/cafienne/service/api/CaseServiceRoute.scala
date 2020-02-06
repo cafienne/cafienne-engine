@@ -14,7 +14,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.authentication.AuthenticationDirectives
+import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, CannotReachIDPException}
 import org.cafienne.service.api
 
 import scala.collection.immutable.Seq
@@ -102,8 +102,26 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   override def exceptionHandler = ExceptionHandler {
     case s: SecurityException =>
       extractUri { uri =>
-        logger.info(s"Request to $uri could not be handled normally " + s)
-        complete(HttpResponse(StatusCodes.Unauthorized, entity = s.getMessage()))
+        logger.warn(s"Request to $uri has a security issue: " + s)
+        if (logger.underlying.isInfoEnabled()) {
+          logger.info("", s)
+        } else {
+          logger.warn("Enable info logging to see more details on the security issue")
+        }
+        s match {
+          case e: CannotReachIDPException => {
+            logger.error("Service cannot validate security tokens, because IDP is not reachable")
+            complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = e.getMessage)).andThen(g => {
+              // TODO: this probably should be checked upon system startup in the first place
+//              System.err.println("CANNOT REACH IDP, downing the system")
+//              System.exit(-1)
+//              CaseSystem.system.terminate()
+              g
+            })
+          }
+          case _ => complete(HttpResponse(StatusCodes.Unauthorized, entity = s.getMessage()))
+
+        }
       }
     case other => {
       extractUri { uri =>
