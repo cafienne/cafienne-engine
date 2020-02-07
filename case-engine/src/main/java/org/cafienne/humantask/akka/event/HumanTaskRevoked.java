@@ -12,6 +12,7 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
+import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class HumanTaskRevoked extends HumanTaskTransitioned {
     }
 
     public HumanTaskRevoked(HumanTask task) {
-        super(task, task.getImplementation().getPreviousTaskState(), TaskAction.Revoke);
+        super(task, task.getImplementation().getCurrentTaskState() == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned, TaskAction.Revoke);
         this.assignee = task.getImplementation().getPreviousAssignee();
     }
 

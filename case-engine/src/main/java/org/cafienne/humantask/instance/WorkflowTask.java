@@ -224,7 +224,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         switch (action) {
             case Revoke:
                 assertState(action, TaskState.Delegated, TaskState.Assigned);
-                TaskState nextState = historyTaskState;
+                TaskState nextState = currentTaskState == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned;
                 historyTaskState = currentTaskState;
                 currentTaskState = nextState;
                 lastAction = action;
