@@ -27,13 +27,8 @@ abstract class PlatformTenantCommand extends TenantCommand {
 
     @Override
     public void validate(TenantActor modelActor) throws InvalidCommandException {
-        if (modelActor.exists()) {
-//            System.err.println("Tenant "+modelActor.getId()+ " already exixsts");
-            throw new InvalidCommandException("Tenant already exists");
-        }
-
         if (! CaseSystem.isPlatformOwner(getUser())) {
-            throw new InvalidCommandException("You do not have the privileges to create a tenant");
+            throw new InvalidCommandException("Only platform owners can invoke platform commands");
         }
     }
 

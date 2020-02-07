@@ -1,4 +1,4 @@
-package org.cafienne.service.api.participants
+package org.cafienne.service.api.tenant
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
@@ -25,7 +25,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   val rolesQuery = TableQuery[UserRoleTable]
 
   override def getPlatformUser(userId: String): Future[PlatformUser] = {
-    val query = TableQuery[UserRoleTable].filter(_.userId === userId)
+    val query = TableQuery[UserRoleTable].filter(_.userId === userId).filter(_.enabled === true)
 
     db.run(query.result)
       .map(records => {
@@ -43,12 +43,12 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
         def from(userId: String, usersWithRoles: Seq[(User, Seq[UserRole])]): PlatformUser = {
           val users = usersWithRoles.map(userWithRoles => {
             val user = userWithRoles._1
-            val roles = userWithRoles._2.map(role => role.role_name)
             val emptyRole = userWithRoles._2.find(p => p.role_name == "")
             val enabled = emptyRole.map(r => r.enabled).getOrElse({
               logger.warn("UserRole["+user.id+" in tenant "+user.tenant+" has no role with an empty role name, and is therefore disabled")
               false
             })
+            val roles = userWithRoles._2.filter(role => role.role_name != "").map(role => role.role_name)
             TenantUser(user.id, roles, user.tenant, user.name, user.email, enabled)
           })
           new PlatformUser(userId, users)

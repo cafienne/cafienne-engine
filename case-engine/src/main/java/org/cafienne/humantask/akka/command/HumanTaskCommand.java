@@ -45,11 +45,11 @@ public abstract class HumanTaskCommand extends CaseCommand {
         // Now get the plan item ...
         PlanItem planItem = caseInstance.getPlanItemById(taskId);
         if (planItem == null) {
-            throw new InvalidCommandException("HumanTaskCommand: The task with id " + taskId + " could not be found in case " + caseInstance.getId());
+            throw new InvalidCommandException(this.getClass().getSimpleName() + ": The task with id " + taskId + " could not be found in case " + caseInstance.getId());
         }
         // ... and validate that it's a human task
         if (!(planItem.getInstance() instanceof HumanTask)) {
-            throw new InvalidCommandException("HumanTaskCommand: The plan item with id " + planItem.getId() + " in case " + caseInstance.getId() + " is not a HumanTask");
+            throw new InvalidCommandException(this.getClass().getSimpleName() + ": The plan item with id " + planItem.getId() + " in case " + caseInstance.getId() + " is not a HumanTask");
         }
         // Good. It's a HumanTask
         task = planItem.getInstance();
@@ -57,7 +57,7 @@ public abstract class HumanTaskCommand extends CaseCommand {
         // TODO: validate that this is a proper check (e.g. why could i not Delegate a suspended or failed task??)
         State currentState = task.getPlanItem().getState();
         if (currentState != State.Active) {
-            throw new InvalidCommandException("HumanTaskCommand: Action can not be completed as the task " + planItem.getName() + " (" + taskId + ") is not in Active but in " + currentState + " state");
+            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be done because task " + planItem.getName() + " (" + taskId + ") is not in Active but in " + currentState + " state");
         }
 
         // Now have the actual command do its own validation on the task

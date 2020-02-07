@@ -18,11 +18,13 @@ import org.cafienne.infrastructure.jdbc.OffsetStorageImpl
 import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.cases.{CaseQueriesImpl, CasesRoute}
 import org.cafienne.service.api.debug.DebugRoute
-import org.cafienne.service.api.participants.{RegistrationRoutes, TenantQueriesImpl}
+import org.cafienne.service.api.platform.PlatformRoute
+import org.cafienne.service.api.tenant.{TenantQueriesImpl, TenantRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.task.TaskProjectionsWriter
+import org.cafienne.service.api.registration.FormerRegistrationRoutes
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.{TaskQueriesImpl, TasksRoute}
 import org.cafienne.service.db.migration.Migrate
@@ -81,11 +83,15 @@ object Main extends App {
     val apiRoutes =
       new CasesRoute(caseQueries).route ~
       new TasksRoute(taskQueries).route ~
-      new RegistrationRoutes(userQueries).route ~
+      new TenantRoutes(userQueries).route ~
+      new PlatformRoute().route ~
       new RepositoryRoute().route ~
       new DebugRoute().route ~
       // Add the routes for the API documentation frontend.
-      new SwaggerHttpServiceRoute(system).swaggerUIRoute
+      new SwaggerHttpServiceRoute(system).swaggerUIRoute ~
+      // For as long as it is needed... preferably remove them.
+      new FormerRegistrationRoutes(userQueries).route
+
 
     val apiHost = system.settings.config.getString("cafienne.api.bindhost")
     val apiPort = system.settings.config.getInt("cafienne.api.bindport")

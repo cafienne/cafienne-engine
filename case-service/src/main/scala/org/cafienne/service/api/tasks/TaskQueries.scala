@@ -5,7 +5,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.cases.CaseTables
-import org.cafienne.service.api.participants.TenantTables
+import org.cafienne.service.api.tenant.TenantTables
 
 import scala.concurrent.Future
 

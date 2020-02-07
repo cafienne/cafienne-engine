@@ -1,14 +1,14 @@
 package org.cafienne.service.api
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import com.github.swagger.akka._
 import com.github.swagger.akka.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.infrastructure.Configured
 import org.cafienne.service.api.cases.CasesRoute
-import org.cafienne.service.api.participants.{PlatformAdministrationRoute, RegistrationRoutes, TenantAdministrationRoute, TenantUsersAdministrationRoute}
+import org.cafienne.service.api.platform.PlatformRoute
+import org.cafienne.service.api.tenant.{TenantAdministrationRoute, TenantUsersAdministrationRoute}
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.TasksRoute
 
@@ -22,10 +22,9 @@ class SwaggerHttpServiceRoute(val system: ActorSystem) extends SwaggerHttpServic
     classOf[CasesRoute],
     classOf[TasksRoute],
     classOf[RepositoryRoute],
+    classOf[PlatformRoute],
     classOf[TenantUsersAdministrationRoute],
-    classOf[TenantAdministrationRoute],
-    classOf[PlatformAdministrationRoute],
-    classOf[RegistrationRoutes]
+    classOf[TenantAdministrationRoute]
   )
 
   // override val host = s"$configuredHost:$configuredPort" //the url of your api, not swagger's json endpoint

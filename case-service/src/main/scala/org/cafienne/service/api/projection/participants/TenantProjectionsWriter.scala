@@ -10,7 +10,7 @@ import org.cafienne.akka.actor.serialization.{DeserializationFailure, Unrecogniz
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.infrastructure.jdbc.OffsetStorage
-import org.cafienne.service.api.participants.UserQueries
+import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.tenant.akka.event.{TenantEvent, TenantModified}
 

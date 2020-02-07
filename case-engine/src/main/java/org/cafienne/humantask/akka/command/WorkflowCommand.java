@@ -40,7 +40,7 @@ abstract class WorkflowCommand extends HumanTaskCommand {
                 return;
             }
         }
-        String msg = "HumanTaskCommand: Action can not be completed as the task (" + getTaskId() + ") is in " + currentTaskState + " state, but should be in any of " + Arrays.asList(expectedStates) + " state";
+        String msg = this.getClass().getSimpleName() + " cannot be done because task (" + getTaskId() + ") is in " + currentTaskState + " state, but should be in any of " + Arrays.asList(expectedStates) + " state";
         throw new InvalidCommandException(msg);
     }
 }

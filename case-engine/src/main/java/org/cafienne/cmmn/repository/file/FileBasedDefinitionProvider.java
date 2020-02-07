@@ -21,6 +21,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final static Logger logger = LoggerFactory.getLogger(FileBasedDefinitionProvider.class);
     private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache();
     private String deployDirectory = null;
+    private final String EXTENSION = ".xml";
 
     @Override
     public List<String> list(TenantUser user) {
@@ -41,6 +42,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      */
     @Override
     public DefinitionsDocument read(TenantUser user, String name) throws MissingDefinitionException, InvalidDefinitionException {
+        if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
         try {
             long lastModified = -1; // Note, -1 is the default value for reading files from class path (resourceAsStream)
             InputStream contents = null;
@@ -73,13 +75,19 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
 
     @Override
     public void write(TenantUser user, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
-        String filename = getDeployDirectory() + File.separator + name;
+        if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
+
+        String prefix = getDeployDirectory() + File.separator;
+        String filename = prefix + name;
         File file = new File(filename);
+        File prefixFile = new File(prefix);
         logger.debug("Saving definitions document "+name+" to "+file.getAbsolutePath());
         try {
             XMLHelper.persist(definitionsDocument.getDocument(), file.getAbsoluteFile());
         } catch (IOException | TransformerException e) {
-            throw new WriteDefinitionException("Failed to deploy definitions", e);
+            // Make sure deployment directory details do not make it to the outside world.
+            String internalMessage = e.getMessage().replace(prefixFile.getAbsolutePath() + File.separator, "");
+            throw new WriteDefinitionException("Failed to deploy definitions to '" + name +"': " + internalMessage, e);
         }
     }
 
@@ -128,7 +136,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
         try {
             File[] files = new File(getDeployDirectory()).listFiles();
             for (int i = 0; i < files.length; i++) {
-                if (files[i].getAbsolutePath().endsWith(".xml")) {
+                if (files[i].getAbsolutePath().endsWith(EXTENSION)) {
                     fileNames.add(files[i].getName());
                 }
             }

@@ -56,8 +56,9 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     }
 
     @Override
-    public void validate(TenantActor modelActor) throws InvalidCommandException {
-        if (modelActor.exists()) {
+    public void validate(TenantActor tenant) throws InvalidCommandException {
+        super.validate(tenant);
+        if (tenant.exists()) {
             throw new InvalidCommandException("Tenant already exists");
         }
     }
