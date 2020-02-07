@@ -91,13 +91,13 @@ public class TestHumanTask {
              * ClaimTask - User should not be able to claim already Assigned task
              */
             testCase.addTestStep(new ClaimTask(pete, caseInstanceId, taskId), action ->
-                    new FailureAssertion(action).assertException("Action can not be completed as the task (" + taskId + ") is in Assigned state"));
+                    new FailureAssertion(action).assertException("ClaimTask cannot be done because task (" + taskId + ") is in Assigned state"));
 
             /**
              * AssignTask - Only Unassigned task can be assigned to a user
              */
             testCase.addTestStep(new AssignTask(pete, caseInstanceId, taskId, "gimy"), action ->
-                    new FailureAssertion(action).assertException("Action can not be completed as the task (" + taskId + ") is in Assigned state"));
+                    new FailureAssertion(action).assertException("AssignTask cannot be done because task (" + taskId + ") is in Assigned state"));
 
             /**
              * ValidateTaskOutput - Only the current assignee should be able to validate task output
@@ -176,7 +176,7 @@ public class TestHumanTask {
              * DelegateTask - Already delegated task can not be further delegated
              */
             testCase.addTestStep(new DelegateTask(pete, caseInstanceId, taskId, "pete"), action ->
-                    new FailureAssertion(action).assertException("Action can not be completed as the task (" + taskId + ") is in Delegated state"));
+                    new FailureAssertion(action).assertException("DelegateTask cannot be done because task (" + taskId + ") is in Delegated state"));
 
             /**
              * RevokeTask - User should be able to revoke a task from Delegated state

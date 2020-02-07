@@ -57,7 +57,7 @@ public class FailureAssertion extends ModelTestCommandAssertion {
         SerializedException exception = assertException(Exception.class);
         String message = exception.getMessage();
         if (! message.contains(expectedMessage)) {
-            throw new AssertionError("Received a CommandFailure with an unexpected message. Expecting " + expectedMessage+", received "+message);
+            throw new AssertionError("Received a CommandFailure with an unexpected message.\nExpecting :" + expectedMessage+"\nReceived  :"+message);
         }
         return this;
     }
