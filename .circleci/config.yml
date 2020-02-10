@@ -124,8 +124,8 @@ jobs:
           name: Push image to docker hub
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker tag batav/circle-ci:engine batav/circle-ci:$CIRCLE_TAG
-            docker push batav/circle-ci:$CIRCLE_TAG
+            docker tag cafienne/engine:latest cafienne/engine:$CIRCLE_TAG
+            docker push cafienne/engine:$CIRCLE_TAG
 
 
 workflows:
