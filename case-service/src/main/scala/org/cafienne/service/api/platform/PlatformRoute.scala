@@ -46,7 +46,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
     }
   }
 
-  @Path("/platform")
+  @Path("/")
   @POST
   @Operation(
     summary = "Register a new tenant",
