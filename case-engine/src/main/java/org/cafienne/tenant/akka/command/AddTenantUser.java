@@ -47,7 +47,7 @@ public class AddTenantUser extends TenantCommand {
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantUserCreated(tenant, userId, name, email)).updateState(tenant);
+        tenant.addEvent(new TenantUserCreated(tenant, userId, name, email));
         // Add all the roles
         roles.forEach(role -> tenant.addEvent(new TenantUserRoleAdded(tenant, userId, role)));
         return new TenantResponse(this);

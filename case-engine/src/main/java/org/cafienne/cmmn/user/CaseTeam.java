@@ -71,7 +71,7 @@ public class CaseTeam {
      */
     public void addMember(CaseTeamMember member) {
         members.add(member);
-        caseInstance.storeInternallyGeneratedEvent(new TeamMemberAdded(caseInstance, member)).finished();
+        caseInstance.addEvent(new TeamMemberAdded(caseInstance, member)).finished();
     }
 
     /**
@@ -80,7 +80,7 @@ public class CaseTeam {
      */
     public void removeMember(CaseTeamMember member) {
         members.remove(member);
-        caseInstance.storeInternallyGeneratedEvent(new TeamMemberRemoved(caseInstance, member)).finished();
+        caseInstance.addEvent(new TeamMemberRemoved(caseInstance, member)).finished();
     }
 
     /**

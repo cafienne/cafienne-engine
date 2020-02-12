@@ -50,7 +50,7 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
     private void evaluateTargetMoment() {
         // Plan/resume the timer ...
         this.targetMoment = this.getDefinition().getMoment(this);
-        getCaseInstance().storeInternallyGeneratedEvent(new TimerSet(this)).finished();
+        getCaseInstance().addEvent(new TimerSet(this)).finished();
     }
 
     public void recover(TimerSet event) {

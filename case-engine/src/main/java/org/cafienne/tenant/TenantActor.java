@@ -4,11 +4,13 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.akka.command.TenantCommand;
-import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.TenantEvent;
+import org.cafienne.tenant.akka.event.TenantModified;
+import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.platform.TenantDisabled;
 import org.cafienne.tenant.akka.event.platform.TenantEnabled;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +24,6 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
 
     public TenantActor() {
         super(TenantCommand.class, TenantEvent.class);
-        System.out.println("Created tenant actor with path "+this.self().path());
     }
 
     @Override
@@ -36,8 +37,8 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     @Override
-    protected CommandHandler createCommandHandler(TenantCommand msg) {
-        return new TenantCommandHandler(this, msg);
+    public TenantModified createLastModifiedEvent(Instant lastModified) {
+        return new TenantModified(this, lastModified);
     }
 
     public boolean exists() {
@@ -45,6 +46,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void setInitialState(TenantCreated tenantCreated) {
+        this.setEngineVersion(tenantCreated.engineVersion);
         this.creationEvent = tenantCreated;
     }
 

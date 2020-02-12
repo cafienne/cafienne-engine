@@ -22,9 +22,4 @@ public abstract class ProcessInstanceEvent extends ModelEvent<ProcessTaskActor> 
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
     }
-
-    public void recover(ProcessTaskActor process) {
-        // No process recovery supported currently.
-        // System.out.println("Recovering process ...");
-    }
 }

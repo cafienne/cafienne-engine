@@ -42,7 +42,7 @@ public class RemoveTenantOwner extends TenantCommand {
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new OwnerRemoved(tenant, userId)).updateState(tenant);
+        tenant.addEvent(new OwnerRemoved(tenant, userId));
         return new TenantResponse(this);
     }
 

@@ -40,7 +40,7 @@ public class AddTenantOwner extends TenantCommand {
     @Override
     public TenantResponse process(TenantActor tenant) {
         if (! tenant.isOwner(userId)) {
-            tenant.addEvent(new OwnerAdded(tenant, userId)).updateState(tenant);
+            tenant.addEvent(new OwnerAdded(tenant, userId));
         }
         return new TenantResponse(this);
     }

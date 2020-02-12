@@ -22,7 +22,7 @@ public class EnableTenant extends PlatformTenantCommand {
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantEnabled(tenant)).updateState(tenant);
+        tenant.addEvent(new TenantEnabled(tenant));
         return new TenantResponse(this);
     }
 

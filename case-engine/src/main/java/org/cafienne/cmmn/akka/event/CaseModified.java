@@ -71,8 +71,8 @@ public class CaseModified extends CaseInstanceEvent {
     }
 
     @Override
-    public void recover(Case caseInstance) {
-        caseInstance.recoverLastModified(lastModified);
+    public void updateState(Case caseInstance) {
+        caseInstance.setLastModified(lastModified);
     }
 
     @Override

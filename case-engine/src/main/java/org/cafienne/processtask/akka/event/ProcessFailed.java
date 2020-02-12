@@ -8,7 +8,6 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 public class ProcessFailed extends ProcessEnded {
     public ProcessFailed(ProcessTaskActor actor, ValueMap outputParameters) {
         super(actor, outputParameters);
-
     }
 
     public ProcessFailed(ValueMap json) {

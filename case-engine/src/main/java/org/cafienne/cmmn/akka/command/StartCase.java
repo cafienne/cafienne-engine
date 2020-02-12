@@ -16,6 +16,7 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
+import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -144,16 +145,14 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     @Override
     public CaseResponse process(Case caseInstance) {
         if (debugMode) {
+            caseInstance.addEvent(new DebugEnabled(caseInstance));
             logger.debug("Starting case "+ actorId +" of type "+ definition.getName()+" in debug mode");
         } else {
             logger.debug("Starting case "+ actorId +" of type "+ definition.getName());
         }
-        caseInstance.switchDebugMode(debugMode);
 
         // First set the definition
-        CaseDefinitionApplied event = new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName(), CaseSystem.version());
-        caseInstance.addEvent(event).updateState(caseInstance);
-        event.finished();
+        caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName())).finished();
 
         // Apply input parameters. This may also fill the CaseFile
         caseInstance.addDebugInfo(DebugEvent.class, e -> e.addMessage("Input parameters for new case of type "+ definition.getName(), inputParameters));

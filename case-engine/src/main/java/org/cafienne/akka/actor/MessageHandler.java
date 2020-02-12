@@ -5,7 +5,9 @@ import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.debug.DebugAppender;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
@@ -45,7 +47,9 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
 
     private final static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
-    protected final List<ModelEvent> events = new ArrayList<>();
+    private final static int avgNumEvents = 30;
+
+    protected final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
 
     private DebugEvent debugEvent;
 
@@ -63,6 +67,15 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * @return
      */
     abstract protected InvalidCommandException runSecurityChecks();
+
+    protected void checkEngineVersion() {
+        // First check whether the engine version has changed or not; this may lead to an EngineVersionChanged event
+        ValueMap currentEngineVersion = CaseSystem.version();
+        if (!currentEngineVersion.equals(actor.getEngineVersion())) {
+            logger.info(this + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
+            addModelEvent(0, new EngineVersionChanged(actor, currentEngineVersion));
+        }
+    }
 
     /**
      * Lifecycle method
@@ -87,11 +100,12 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * @param event
      */
     public <EV extends E> EV addEvent(EV event) {
-        if (actor.recoveryRunning()) {
-            logger.debug("Not storing internally generated event because recovery is running. Event is of type " + event.getClass().getSimpleName());
-            return event;
-        }
-        events.add(event);
+        return addModelEvent(events.size(), event);
+    }
+
+    private <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
+        events.add(index, event);
+        event.updateState(actor);
         return event;
     }
 

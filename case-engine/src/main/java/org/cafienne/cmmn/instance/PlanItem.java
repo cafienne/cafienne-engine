@@ -20,7 +20,6 @@ import org.cafienne.util.Guid;
 import org.cafienne.cmmn.definition.*;
 import org.w3c.dom.Element;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -82,7 +81,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         addDebugInfo(() -> "Creating plan item " + getName() + (owningStage == null ? " in case" : " in stage " + getStage().getPlanItem().getName()) + " with id " + id);
 
         // Raise an event and then do some real logic
-        PlanItemCreated event = caseInstance.storeInternallyGeneratedEvent(new PlanItemCreated(this));
+        PlanItemCreated event = caseInstance.addEvent(new PlanItemCreated(this));
 
         // Create our typed instance (task / stage / milestone / eventlistener)
         this.instance = reference.createInstance(this);
@@ -235,7 +234,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         if (action != null) // means, a transition happened.
         {
             PlanItemTransitioned event = new PlanItemTransitioned(this);
-            getCaseInstance().storeInternallyGeneratedEvent(event);
+            getCaseInstance().addEvent(event);
 
             addDebugInfo(() -> "Handling transition " + getName() + "." + transition + " from " + getHistoryState() + " to " + getState());
 
@@ -355,7 +354,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      */
     void evaluateRepetitionRule() {
         repetitionRuleOutcome = getPlanItemControl().getRepetitionRule().evaluate(this);
-        getCaseInstance().storeInternallyGeneratedEvent(new RepetitionRuleEvaluated(this)).finished();
+        getCaseInstance().addEvent(new RepetitionRuleEvaluated(this)).finished();
     }
 
     /**
@@ -363,7 +362,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      */
     void evaluateRequiredRule() {
         this.requiredRuleOutcome = getPlanItemControl().getRequiredRule().evaluate(this);
-        getCaseInstance().storeInternallyGeneratedEvent(new RequiredRuleEvaluated(this)).finished();
+        getCaseInstance().addEvent(new RequiredRuleEvaluated(this)).finished();
     }
 
     /**

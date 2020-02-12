@@ -32,10 +32,4 @@ public abstract class TenantEvent extends ModelEvent<TenantActor> {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
     }
-
-    public abstract void updateState(TenantActor tenant);
-
-    public final void recover(TenantActor tenant) {
-        updateState(tenant);
-    }
 }

@@ -63,6 +63,9 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         return this.actorId;
     }
 
+    public void finished() {
+    }
+
     /**
      * Returns the complete context of the user that caused the event to happen
      *
@@ -72,7 +75,11 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         return tenantUser;
     }
 
-    abstract public void recover(M actor);
+    public abstract void updateState(M actor);
+
+    public void recover(M actor) {
+        this.updateState(actor);
+    }
 
     protected void writeModelEvent(JsonGenerator generator) throws IOException {
         generator.writeFieldName(Fields.modelEvent.toString());

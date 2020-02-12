@@ -11,10 +11,14 @@ import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<C, C, E, A> {
+import java.time.Instant;
+import java.util.Arrays;
+
+public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
     protected final C command;
@@ -64,10 +68,7 @@ public abstract class CommandHandler<C extends ModelCommand, E extends ModelEven
 
     @Override
     protected void process() {
-        getLogger().info("---------- User " + command.getUser().id() + " in case " + this.actor.getId() + " starts command " + command);
-
-//        addDebugInfo(DebugEvent.class, e -> e.addMessage("---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), command.toJson()));
-        addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), getLogger());
+        addDebugInfo(DebugEvent.class, e -> e.addMessage("---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), command.toJson()));
 
         // First, simple, validation
         try {
@@ -87,12 +88,73 @@ public abstract class CommandHandler<C extends ModelCommand, E extends ModelEven
         try {
             // Leave the actual work of processing to the command itself.
             setNextResponse(command.process(actor));
-            getLogger().info("---------- User " + command.getUser().id() + " in case " + this.actor.getId() + " completed command " + command);
+            logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
         } catch (CommandException e) {
             setNextResponse(new CommandFailure(getCommand(), e));
-            getLogger().info("---------- User " + command.getUser().id() + " in case " + this.actor.getId() + " failed to complete command " + command + "\nwith exception", e);
             actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception");
             actor.addDebugInfo(() -> e);
+        }
+    }
+
+    @Override
+    protected final void complete() {
+        // Handling the incoming message can result in 3 different scenarios that are dealt with below:
+        // 1. The message resulted in an exception that needs to be returned to the client; Possibly the case must be restarted.
+        // 2. The message did not result in state changes (e.g., when fetching discretionary items), and the response can be sent straight away
+        // 3. The message resulted in state changes, so the new events need to be persisted, and after persistence the response is sent back to the client.
+
+        if (hasFailures()) { // Means there is a response AND it is of type CommandFailure
+            if (actor.getLastModified() != null) {
+                response.setLastModified(actor.getLastModified());
+            }
+
+            // Inform the sender about the failure
+            sender().tell(response, self());
+
+            // In case of failure we still want to store the debug events. Actually, mostly we need this in case of failure (what else are we debugging for)
+            Object[] debugEvents = events.stream().filter(e -> e instanceof DebugEvent).toArray();
+            if (debugEvents.length > 0) {
+                actor.persistAll(Arrays.asList(debugEvents), e -> {});
+            }
+
+            // If we have created events (other than debug events) from the failure, then we are in inconsistent state and need to restart the actor.
+            if (events.size() > debugEvents.length) {
+                actor.getScheduler().clearSchedules(); // Remove all schedules.
+                Throwable exception = ((CommandFailure) response).internalException();
+                logger.error("Encountered failure in handling msg of type " + command.getClass().getName() + "; restarting " + actor, exception);
+                actor.supervisorStrategy().restartChild(self(), exception, true);
+            }
+        } else if (hasOnlyDebugEvents()) { // Nothing to persist, just respond to the client if there is something to say
+            if (response != null) {
+                response.setLastModified(actor.getLastModified());
+                // Now tell the sender about the response
+                sender().tell(response, self());
+                // Also store the debug events if there are
+                if (! events.isEmpty()) {
+                    actor.persistAll(events, e -> {});
+                }
+            }
+        } else {
+            // We have events to persist.
+            //  Add a "transaction" event at the last moment
+            checkEngineVersion();
+
+            // Change the last modified moment of this case; update it in the response, and publish an event about it
+            Instant lastModified = Instant.now();
+            addEvent(actor.createLastModifiedEvent(lastModified));
+            if (response != null) {
+                response.setLastModified(lastModified);
+            }
+
+            // Now persist the events in one shot
+            logger.debug("Persisting " + events.size() + " events out of command " + command);
+            ModelEvent lastEvent = events.get(events.size()-1);
+            actor.persistAll(events, (ModelEvent event) -> {
+                logger.debug(actor + " persisted event of type " + event.getClass().getSimpleName());
+                if (event == lastEvent && response != null) {
+                    sender().tell(response, actor.self());
+                }
+            });
         }
     }
 
@@ -107,6 +169,11 @@ public abstract class CommandHandler<C extends ModelCommand, E extends ModelEven
 
     protected void setNextResponse(ModelResponse response) {
         this.response = response;
+    }
+
+    protected boolean hasOnlyDebugEvents() {
+        boolean hasOnlyDebugEvents = ! events.stream().anyMatch(e -> ! (e instanceof DebugEvent));
+        return hasOnlyDebugEvents;
     }
 
     protected boolean hasFailures() {

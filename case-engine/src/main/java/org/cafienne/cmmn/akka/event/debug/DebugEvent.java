@@ -65,8 +65,8 @@ public class DebugEvent extends ModelEvent {
     }
 
     @Override
-    public void recover(ModelActor actor) {
-        // nothing to recover
+    public void updateState(ModelActor actor) {
+        // nothing to update
     }
 
     @Override

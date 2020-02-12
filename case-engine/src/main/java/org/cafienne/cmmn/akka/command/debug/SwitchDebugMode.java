@@ -11,7 +11,10 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.event.debug.DebugDisabled;
+import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.CaseInstanceEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 
@@ -52,7 +55,10 @@ public class SwitchDebugMode extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        caseInstance.switchDebugMode(debugMode);
+        if (debugMode!=caseInstance.debugMode()) {
+            if (debugMode) caseInstance.addEvent(new DebugEnabled(caseInstance));
+            else caseInstance.addEvent(new DebugDisabled(caseInstance));
+        }
         return new CaseResponse(this);
     }
 

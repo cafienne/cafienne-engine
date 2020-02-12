@@ -19,13 +19,13 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, updater: Recor
   val rolesByUserAndRoleName = scala.collection.mutable.HashMap[(String, String), UserRole]()
 
   val modifiedUsers: Iterable[String] = {
-    println("Modified: "+rolesByUserAndRoleName.keySet)
+//    println("Modified: "+rolesByUserAndRoleName.keySet)
     rolesByUserAndRoleName.keySet.map(key => key._1).toSet
   }
 
   private def storeRole(role: UserRole) = {
     val key = (role.userId, role.role_name)
-    println("Storing role "+key+": "+role)
+//    println("Storing role "+key+": "+role)
     rolesByUserAndRoleName.put(key, role)
     Future.successful(Done)
   }
