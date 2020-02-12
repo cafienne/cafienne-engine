@@ -43,12 +43,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @GET
   @Operation(
     summary = "Get the casefile",
-    description = "Get the case file of case file item for the specified case instance",
+    description = "Get the case file from the specified case instance",
     tags = Array("case file"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "caseFileItem", description = "Case file item to get from the case file", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "index", description = "The n-th instance of the requested case file item", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer])),
       new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
@@ -91,9 +89,9 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def createCaseFileItem = post {
     validUser { user =>
-      path(Segment / "casefile" / "create" / Segment) { (caseInstanceId, path) =>
-        entity(as[ValueMap]) { value =>
-          askCase(user, caseInstanceId, user => new CreateCaseFileItem(user, caseInstanceId, value, path))
+      path(Segment / "casefile" / "create" / RemainingPath) { (caseInstanceId, path) =>
+        entity(as[Value[_]]) { json =>
+          askCase(user, caseInstanceId, user => new CreateCaseFileItem(user, caseInstanceId, json, path.toString))
         }
       }
     }
@@ -118,9 +116,9 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def replaceCaseFileItem = put {
     validUser { user =>
-      path(Segment / "casefile" / "replace" / Segment) { (caseInstanceId, path) =>
-        entity(as[ValueMap]) { value =>
-          askCase(user, caseInstanceId, user => new ReplaceCaseFileItem(user, caseInstanceId, value, path))
+      path(Segment / "casefile" / "replace" / RemainingPath) { (caseInstanceId, path) =>
+        entity(as[Value[_]]) { json =>
+          askCase(user, caseInstanceId, user => new ReplaceCaseFileItem(user, caseInstanceId, json, path.toString))
         }
       }
     }
@@ -142,13 +140,13 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
-  @Consumes(Array("application/json"))
   def updateCaseFileItem = put {
     validUser { user =>
-      path(Segment / "casefile" / "update" / Segment) { (caseInstanceId, path) =>
-        entity(as[ValueMap]) { value =>
-          askCase(user, caseInstanceId, user => new UpdateCaseFileItem(user, caseInstanceId, value, path))
+      path(Segment / "casefile" / "update" / RemainingPath) { (caseInstanceId, path) => {
+        entity(as[Value[_]]) { json =>
+          askCase(user, caseInstanceId, user => new UpdateCaseFileItem(user, caseInstanceId, json, path.toString))
         }
+      }
       }
     }
   }
@@ -171,8 +169,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def deleteCaseFileItem = delete {
     validUser { user =>
-      path(Segment / "casefile" / "delete" / Segment) { (caseInstanceId, path) =>
-        askCase(user, caseInstanceId, user => new DeleteCaseFileItem(user, caseInstanceId, path))
+      path(Segment / "casefile" / "delete" / RemainingPath) { (caseInstanceId, path) =>
+        askCase(user, caseInstanceId, user => new DeleteCaseFileItem(user, caseInstanceId, path.toString))
       }
     }
   }
