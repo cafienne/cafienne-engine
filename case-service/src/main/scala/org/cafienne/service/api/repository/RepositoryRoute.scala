@@ -7,37 +7,32 @@
  */
 package org.cafienne.service.api.repository
 
-import java.io.FileNotFoundException
-
-import akka.Done
-import javax.ws.rs.{Consumes, GET, POST, Path, Produces}
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import io.swagger.annotations._
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
-import org.cafienne.cmmn.instance.casefile.ValueMap
-import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.service.api.AuthenticatedRoute
-import org.w3c.dom.Document
-import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import javax.ws.rs._
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.MissingTenantException
-import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
 import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
+import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.Main
-import org.cafienne.service.api.cases.TestResponse
+import org.cafienne.service.api.AuthenticatedRoute
 import org.cafienne.tenant.akka.command.GetTenantOwners
-import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
+import org.cafienne.tenant.akka.command.response.TenantOwnersResponse
+import org.w3c.dom.Document
 
+import scala.collection.immutable.Seq
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -45,6 +40,10 @@ import scala.util.{Failure, Success}
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
 class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
+
+  override def apiClasses(): Seq[Class[_]] = {
+    Seq(classOf[RepositoryRoute])
+  }
 
   override def routes: Route =
     pathPrefix("repository") {
@@ -82,7 +81,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
             complete(StatusCodes.OK, model.getDocument)
           }
           catch {
-            case m: MissingDefinitionException => complete(StatusCodes.NotFound)
+            case m: MissingDefinitionException => complete(StatusCodes.NotFound, "A model with name " + modelName + " cannot be found")
             case i: InvalidDefinitionException => complete(StatusCodes.InternalServerError, i.toXML)
             case t: MissingTenantException => complete(StatusCodes.BadRequest, t.getMessage)
             case other: Exception => {

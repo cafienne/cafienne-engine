@@ -82,6 +82,14 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
   def routes : Route
+
+  /**
+    * Override this method in your route to expose the Swagger API classes
+    * @return
+    */
+  def apiClasses(): Seq[Class[_]] = {
+    Seq()
+  }
 }
 
 /**

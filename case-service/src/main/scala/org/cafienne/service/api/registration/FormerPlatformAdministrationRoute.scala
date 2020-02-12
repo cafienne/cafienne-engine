@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.TenantRoute
 import org.cafienne.service.api.tenant.model.TenantAPI
+import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, EnableTenant}
 
 import scala.collection.JavaConverters._

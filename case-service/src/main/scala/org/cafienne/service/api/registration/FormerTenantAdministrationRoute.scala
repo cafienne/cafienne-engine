@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.TenantRoute
+import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command.{AddTenantOwner, GetTenantOwners, RemoveTenantOwner}
 
 @Api(value = "registration", tags = Array("registration"))

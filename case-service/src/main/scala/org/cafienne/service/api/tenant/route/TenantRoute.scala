@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.service.api.tenant
+package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server
@@ -14,7 +14,6 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
 import org.cafienne.service.Main
 import org.cafienne.service.api.AuthenticatedRoute
-import org.cafienne.service.api.cases.TestResponse
 import org.cafienne.tenant.akka.command.TenantCommand
 import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
 
@@ -52,7 +51,6 @@ trait TenantRoute extends AuthenticatedRoute {
             complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, sb.toString))
           }
           case _: TenantResponse => complete(StatusCodes.NoContent)
-          case TestResponse => complete(StatusCodes.NoContent)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }

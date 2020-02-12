@@ -2,8 +2,9 @@ package org.cafienne.service.api.projection.slick
 
 import akka.Done
 import org.cafienne.infrastructure.jdbc.{OffsetStore, OffsetStoreTables}
-import org.cafienne.service.api.cases.{CaseFile, CaseInstance, CaseInstanceDefinition, CaseInstanceRole, CaseInstanceTeamMember, CaseTables, PlanItem, PlanItemHistory}
-import org.cafienne.service.api.tenant.{Tenant, TenantOwner, User, UserRole, TenantTables}
+import org.cafienne.service.api.cases.table.CaseTables
+import org.cafienne.service.api.cases.{CaseFile, CaseInstance, CaseInstanceDefinition, CaseInstanceRole, CaseInstanceTeamMember, PlanItem, PlanItemHistory}
+import org.cafienne.service.api.tenant.{Tenant, TenantOwner, TenantTables, User, UserRole}
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.tasks.{Task, TaskTables}
 

@@ -1,31 +1,15 @@
 package org.cafienne.service.api
 
-import akka.actor.ActorSystem
 import com.github.swagger.akka._
 import com.github.swagger.akka.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.infrastructure.Configured
-import org.cafienne.service.api.cases.CasesRoute
-import org.cafienne.service.api.platform.PlatformRoute
-import org.cafienne.service.api.tenant.{TenantAdministrationRoute, TenantUsersAdministrationRoute}
-import org.cafienne.service.api.repository.RepositoryRoute
-import org.cafienne.service.api.tasks.TasksRoute
 
-class SwaggerHttpServiceRoute(val system: ActorSystem) extends SwaggerHttpService with Configured {
-  implicit val actorSystem: ActorSystem = system
+class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends SwaggerHttpService with Configured {
 
   lazy val configuredHost = config.getString("cafienne.api.bindhost")
   lazy val configuredPort = config.getString("cafienne.api.bindport")
-
-  override val apiClasses = Set[Class[_]](classOf[CaseServiceRoute],
-    classOf[CasesRoute],
-    classOf[TasksRoute],
-    classOf[RepositoryRoute],
-    classOf[PlatformRoute],
-    classOf[TenantUsersAdministrationRoute],
-    classOf[TenantAdministrationRoute]
-  )
 
   // override val host = s"$configuredHost:$configuredPort" //the url of your api, not swagger's json endpoint
   override val basePath = "/" //the basePath for the API you are exposing
@@ -70,7 +54,7 @@ class SwaggerHttpServiceRoute(val system: ActorSystem) extends SwaggerHttpServic
 
   override def securitySchemes: Map[String, SecurityScheme] = Map("openId" -> oauth2ForOpenIdConnectHack)
 
-  def swaggerUIRoute = get {
+  def route = get {
     routes ~
       pathPrefix("") {
         pathEndOrSingleSlash {
