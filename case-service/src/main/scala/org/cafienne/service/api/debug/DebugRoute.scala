@@ -25,7 +25,7 @@ import org.cafienne.service.api.AuthenticatedRoute
 
 import scala.util.{Failure, Success}
 
-@Api(value = "debug", tags = Array("cases"))
+@Api(value = "debug", tags = Array("case"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/debug")
 class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem) extends AuthenticatedRoute {

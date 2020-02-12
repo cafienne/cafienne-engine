@@ -11,7 +11,8 @@ import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.{TenantRoute, UserQueries}
+import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.tenant.route.TenantRoute
 
 
 @Api(value = "registration", tags = Array("registration"))

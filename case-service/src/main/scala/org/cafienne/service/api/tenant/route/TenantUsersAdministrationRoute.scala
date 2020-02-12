@@ -5,24 +5,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.service.api.tenant
+package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
-import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import javax.ws.rs.{Consumes, DELETE, GET, POST, PUT, Path, Produces}
+import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.model._
-import org.cafienne.tenant.akka.command.{AddTenantUser, AddTenantUserRoles, DisableTenantUser, EnableTenantUser, RemoveTenantUserRole}
+import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.tenant.akka.command._
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}

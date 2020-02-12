@@ -22,7 +22,8 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.model._
-import org.cafienne.service.api.tenant.{TenantRoute, UserQueries}
+import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command._
 
 import scala.collection.JavaConverters._

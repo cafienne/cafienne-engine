@@ -32,15 +32,19 @@ import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.{Main, api}
 import org.cafienne.service.api.{AuthenticatedRoute, Sort}
-import org.cafienne.service.api.cases.TestResponse
 import org.cafienne.service.api.model.Examples
 
+import scala.collection.immutable.Seq
 import scala.util.{Failure, Success}
 
 @Api(value = "tasks", tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TasksRoute(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute with TaskReader {
+class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute with TaskReader {
+
+  override def apiClasses(): Seq[Class[_]] = {
+    Seq(classOf[TaskRoutes])
+  }
 
   override def routes = pathPrefix("tasks") {
     getTasksRoute ~
@@ -74,7 +78,7 @@ class TasksRoute(taskQueries: TaskQueries)(override implicit val userCache: Iden
       new Parameter(name = "numberOfResults", description = "Number of tasks", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
       new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String], allowableValues = Array("taskstate", "assignee", "owner", "duedate", "createdby", "modifiedby", "lastmodified"))),
       new Parameter(name = "sortOrder", description = "Sort direction", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "notBefore", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
       new Parameter(name = "timeZone", description = "Time zone offset.Provide the time zone offset in the format '+01:00' ", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
@@ -193,7 +197,7 @@ class TasksRoute(taskQueries: TaskQueries)(override implicit val userCache: Iden
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "taskId", description = "Id of the task to retrieve", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "notBefore", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String], example="timestamp;caseInstanceId"), required = false),
+      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String], example="timestamp;caseInstanceId"), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Task found and returned", responseCode = "200"),
@@ -496,7 +500,6 @@ class TasksRoute(taskQueries: TaskQueries)(override implicit val userCache: Iden
             respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
               complete(StatusCodes.Accepted, value)
             }
-          case TestResponse => complete(StatusCodes.Accepted)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }

@@ -8,25 +8,29 @@
 package org.cafienne.service
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
+import akka.http.javadsl.server.Directives
+import akka.http.scaladsl.{Http, server}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.BuildInfo
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.jdbc.OffsetStorageImpl
-import org.cafienne.service.api.SwaggerHttpServiceRoute
-import org.cafienne.service.api.cases.{CaseQueriesImpl, CasesRoute}
+import org.cafienne.service.api.{CaseServiceRoute, SwaggerHttpServiceRoute}
+import org.cafienne.service.api.cases.CaseQueriesImpl
+import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.platform.PlatformRoute
-import org.cafienne.service.api.tenant.{TenantQueriesImpl, TenantRoutes}
+import org.cafienne.service.api.tenant.TenantQueriesImpl
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.task.TaskProjectionsWriter
 import org.cafienne.service.api.registration.FormerRegistrationRoutes
 import org.cafienne.service.api.repository.RepositoryRoute
-import org.cafienne.service.api.tasks.{TaskQueriesImpl, TasksRoute}
+import org.cafienne.service.api.tasks.{TaskQueriesImpl, TaskRoutes}
+import org.cafienne.service.api.tenant.route.{TenantAdministrationRoute, TenantRoutes, TenantUsersAdministrationRoute}
 import org.cafienne.service.db.migration.Migrate
 
 import scala.concurrent.Await
@@ -69,28 +73,50 @@ object Main extends App {
 
     implicit val userCache = new IdentityCache(userQueries)
 
-    val caseProjection = new CaseProjectionsWriter(updater, offsetStorage)
-    caseProjection.start()
-    val taskProjection = new TaskProjectionsWriter(updater, offsetStorage)
-    taskProjection.start()
-    val participantsProjection = new TenantProjectionsWriter(userQueries, updater, offsetStorage)
-    participantsProjection.start()
+    new CaseProjectionsWriter(updater, offsetStorage).start()
+    new TaskProjectionsWriter(updater, offsetStorage).start()
+    new TenantProjectionsWriter(userQueries, updater, offsetStorage).start()
 
     // When running with H2, you can start a debug web server on port 8082.
     checkH2InDebugMode()
 
     // Some routes assume the above created implicit writers
-    val apiRoutes =
-      new CasesRoute(caseQueries).route ~
-      new TasksRoute(taskQueries).route ~
-      new TenantRoutes(userQueries).route ~
-      new PlatformRoute().route ~
-      new RepositoryRoute().route ~
-      new DebugRoute().route ~
+    val caseServiceRoutes: Seq[CaseServiceRoute] = Seq(
+      new CasesRoutes(caseQueries),
+      new TaskRoutes(taskQueries),
+      new TenantRoutes(userQueries),
+      new PlatformRoute(),
+      new RepositoryRoute(),
+      new DebugRoute()
+    )
+
+    // Find the API classes of the routes and pass the to Swagger
+    val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses)
+
+    caseServiceRoutes.companion
+
+    // For unclear reasons we cannot map the Seq(CaseServiceRoute)
+    val apiRoutes = {
+      caseServiceRoutes.toArray.apply(0).route ~
+        caseServiceRoutes.toArray.apply(1).route ~
+        caseServiceRoutes.toArray.apply(2).route ~
+        caseServiceRoutes.toArray.apply(3).route ~
+        caseServiceRoutes.toArray.apply(4).route ~
+        caseServiceRoutes.toArray.apply(5).route ~
+//      mainRoute ~
       // Add the routes for the API documentation frontend.
-      new SwaggerHttpServiceRoute(system).swaggerUIRoute ~
+      new SwaggerHttpServiceRoute(apiClasses.toSet).route ~
       // For as long as it is needed... preferably remove them.
       new FormerRegistrationRoutes(userQueries).route
+    }
+
+    // UNCLEAR why below does not work. It compiles, it runs, but it does not do what we want it to do (i.e., tests are failing with "route not found 404")
+    //    caseServiceRoutes.foreach(route => apiRoutes ~ {
+    //      println("\n\nAdding route from "+route.getClass.getSimpleName)
+    //      val r = route.route
+    //      println("it is: "+r)
+    //      route.route
+    //    })
 
 
     val apiHost = system.settings.config.getString("cafienne.api.bindhost")

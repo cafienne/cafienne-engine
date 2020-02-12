@@ -23,19 +23,23 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.Main
 import org.cafienne.service.api.AuthenticatedRoute
-import org.cafienne.service.api.cases.TestResponse
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command.TenantCommand
 import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, EnableTenant}
 import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
 
 import scala.collection.JavaConverters._
+import scala.collection.immutable.Seq
 import scala.util.{Failure, Success}
 
 @Api(value = "platform", tags = Array("platform"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
 class PlatformRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
+
+  override def apiClasses(): Seq[Class[_]] = {
+    Seq(classOf[PlatformRoute])
+  }
 
   override def routes = {
     pathPrefix("platform") {
@@ -46,7 +50,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
     }
   }
 
-  @Path("/platform")
+  @Path("/")
   @POST
   @Operation(
     summary = "Register a new tenant",
@@ -175,7 +179,6 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
             complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, sb.toString))
           }
           case _: TenantResponse => complete(StatusCodes.NoContent)
-          case TestResponse => complete(StatusCodes.NoContent)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }

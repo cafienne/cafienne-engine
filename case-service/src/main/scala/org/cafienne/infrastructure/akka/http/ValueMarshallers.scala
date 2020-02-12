@@ -3,7 +3,7 @@ package org.cafienne.infrastructure.akka.http
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueList, ValueMap}
+import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueList, ValueMap}
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Document
 
@@ -22,6 +22,10 @@ object ValueMarshallers {
     */
   implicit val DocumentUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(`application/xml`).map(data => {
     XMLHelper.loadXML(data.getBytes())
+  })
+
+  implicit val ValueUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
+    JSONReader.parse(data).asInstanceOf[Value[_]]
   })
 
   implicit val ValueMapUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
