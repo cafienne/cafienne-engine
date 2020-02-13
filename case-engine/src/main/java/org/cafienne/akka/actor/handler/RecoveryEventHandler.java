@@ -22,6 +22,18 @@ public class RecoveryEventHandler<C extends ModelCommand, E extends ModelEvent, 
     }
 
     protected void process() {
+        msg.recover(actor);
+    }
+
+    @Override
+    public <EV extends E> EV addEvent(EV event) {
+        // NOTE: This commit makes it possible to handle actor state updates from events only.
+        //  Such has been implemented for TenantActor and ProcessTaskActor, and partly for Case.
+        //  Enabling the logging will showcase where this pattern has not been completely done.
+//        System.out.println("Recovering " + actor + " generates event of type " + event.getClass().getSimpleName());
+
+        logger.debug("Not storing internally generated event because recovery is running. Event is of type " + event.getClass().getSimpleName());
+        return event;
     }
 
     protected void complete() {

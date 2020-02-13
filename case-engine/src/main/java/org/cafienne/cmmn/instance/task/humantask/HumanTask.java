@@ -50,7 +50,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     public <T extends HumanTaskEvent> T addEvent(T event) {
-        return getCaseInstance().storeInternallyGeneratedEvent(event);
+        return getCaseInstance().addEvent(event);
     }
 
     /**
@@ -83,7 +83,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
     @Override
     protected void startImplementation(ValueMap inputParameters) {
-        getCaseInstance().storeInternallyGeneratedEvent(new HumanTaskCreated(this)).updateState(workflow);
+        getCaseInstance().addEvent(new HumanTaskCreated(this)).updateState(workflow);
         getCaseInstance().addEvent(new HumanTaskInputSaved(this, getMappedInputParameters())).updateState(workflow);
 
     }

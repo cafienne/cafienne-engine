@@ -13,6 +13,8 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+
 /**
  * Handler for responses from other model actors.
  * Responses are typically the result of a command that the {@link ModelActor} has sent to another model
@@ -72,11 +74,21 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
     }
 
     protected void complete() {
-        if (events.isEmpty()) {
-            return;
+        if (!events.isEmpty()) {
+            // We have events to persist.
+
+            // First check the engine version.
+            checkEngineVersion();
+
+            //  Add a "transaction" event at the last moment
+
+            // Change the last modified moment of this actor and publish an event about it
+            addEvent(actor.createLastModifiedEvent(Instant.now()));
+
+            // Now persist the events in one shot
+            String debugMsg = "Storing "+events.size()+" events that came out of a response to command of type "+msg.getCommandType();
+            addDebugInfo(() -> debugMsg, logger);
+            actor.persistAll(events, event -> {});
         }
-        String debugMsg = "Storing "+events.size()+" events that came out of a response to command of type "+msg.getCommandType();
-        addDebugInfo(() -> debugMsg, logger);
-        actor.persistAll(events, e -> {});
     }
 }

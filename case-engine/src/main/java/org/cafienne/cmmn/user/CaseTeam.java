@@ -70,8 +70,7 @@ public class CaseTeam {
      * @param member
      */
     public void addMember(CaseTeamMember member) {
-        members.add(member);
-        caseInstance.storeInternallyGeneratedEvent(new TeamMemberAdded(caseInstance, member)).finished();
+        caseInstance.addEvent(new TeamMemberAdded(caseInstance, member)).finished();
     }
 
     /**
@@ -79,8 +78,7 @@ public class CaseTeam {
      * @param member
      */
     public void removeMember(CaseTeamMember member) {
-        members.remove(member);
-        caseInstance.storeInternallyGeneratedEvent(new TeamMemberRemoved(caseInstance, member)).finished();
+        caseInstance.addEvent(new TeamMemberRemoved(caseInstance, member)).finished();
     }
 
     /**
@@ -105,13 +103,14 @@ public class CaseTeam {
         return null;
     }
 
-    /**
-     * Akka recovery method - does no validations.
-     * @param user
-     * @param roles
-     */
-    public void recoverMember(String user, Set<String> roles) {
-        addMember(new CaseTeamMember(this, user, roles, caseInstance));
+    public void updateState(TeamMemberAdded event) {
+        CaseTeamMember newMember = new CaseTeamMember(this, event.getUserId(), event.getRoles(), caseInstance);
+        members.add(newMember);
+    }
+
+    public void updateState(TeamMemberRemoved event) {
+        CaseTeamMember member = this.getMember(event.getUserId());
+        members.remove(member);
     }
 
     /**

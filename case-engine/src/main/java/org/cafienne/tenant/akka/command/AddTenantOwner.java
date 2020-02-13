@@ -32,6 +32,9 @@ public class AddTenantOwner extends TenantCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
+        if (! tenant.isUser(userId)) {
+            throw new InvalidCommandException("User " + userId +" first must be registered in tenant " + tenant.getId());
+        }
         if (tenant.isOwner(userId)) {
             // SHOULD WE THROW AN EXCEPTION HERE?
         }
@@ -40,7 +43,7 @@ public class AddTenantOwner extends TenantCommand {
     @Override
     public TenantResponse process(TenantActor tenant) {
         if (! tenant.isOwner(userId)) {
-            tenant.addEvent(new OwnerAdded(tenant, userId)).updateState(tenant);
+            tenant.addEvent(new OwnerAdded(tenant, userId));
         }
         return new TenantResponse(this);
     }

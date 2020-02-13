@@ -47,30 +47,17 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
         return schedule;
     }
 
-    private void evaluateTargetMoment() {
-        // Plan/resume the timer ...
-        this.targetMoment = this.getDefinition().getMoment(this);
-        getCaseInstance().storeInternallyGeneratedEvent(new TimerSet(this)).finished();
-    }
-
-    public void recover(TimerSet event) {
+    public void updateState(TimerSet event) {
         this.targetMoment = event.getTargetMoment();
         if (schedule == null) {
             setSchedule();
         }
     }
 
-    public Instant getTargetMoment() {
-        if (targetMoment == null) {
-            evaluateTargetMoment();
-        }
-        return targetMoment;
-    }
-
     private void setSchedule() {
 //        System.out.println("\n\n\n setting schedule\n\n");
         MakePlanItemTransition command = new MakePlanItemTransition(getCaseInstance().getCurrentUser(), getCaseInstance().getId(), this.getId(), Transition.Occur, this.getPlanItem().getName());
-        schedule = scheduleWork(getTargetMoment(), command);
+        schedule = scheduleWork(targetMoment, command);
     }
 
     private void removeSchedule() {
@@ -81,8 +68,7 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
 
     @Override
     protected void createInstance() {
-        // Upon creation we will schedule a timer to make our plan item "Occur" at the specified moment.
-        setSchedule();
+        getCaseInstance().addEvent(new TimerSet(this)).finished();
     }
 
     @Override

@@ -16,6 +16,8 @@ import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.casefile.LongValue;
+import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.cafienne.cmmn.definition.*;
@@ -157,11 +159,48 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public Instant evaluateDueDate(HumanTask task, DueDateDefinition definition) throws InvalidExpressionException {
-        return evaluateConstraint(task.getCaseInstance(), new DueDateContext(definition, task), definition.getType());
+        Object outcome = evaluateConstraint(task.getCaseInstance(), new DueDateContext(definition, task), definition.getType());
+        if (outcome == null || outcome == Value.NULL) {
+            return null;
+        }
+        if (outcome instanceof Instant) {
+            return (Instant) outcome;
+        }
+        if (outcome instanceof java.util.Date) {
+            return ((java.util.Date) outcome).toInstant();
+        }
+        if (outcome instanceof java.sql.Date) {
+            return ((java.sql.Date) outcome).toInstant();
+        }
+        if (outcome instanceof Long) {
+            return Instant.ofEpochMilli((Long)outcome);
+        }
+        if (outcome instanceof LongValue) {
+            return Instant.ofEpochMilli(((LongValue)outcome).getValue());
+        }
+        if (outcome instanceof String) {
+            try {
+                return Instant.parse(outcome.toString());
+            } catch (DateTimeParseException e) {
+                throw new InvalidExpressionException("Cannot parse string '"+outcome+"' to Instant: " + e.getMessage(), e);
+            }
+        }
+        if (outcome instanceof StringValue) {
+            try {
+                return Instant.parse(((StringValue) outcome).getValue());
+            } catch (DateTimeParseException e) {
+                throw new InvalidExpressionException("Cannot parse string '"+outcome+"' to Instant: " + e.getMessage(), e);
+            }
+        }
+        throw new InvalidExpressionException("Outcome of due date expression cannot be interpreted as a due date, it is of type "+outcome.getClass().getName());
     }
 
     @Override
     public String evaluateAssignee(HumanTask task, AssignmentDefinition definition) throws InvalidExpressionException {
-        return evaluateConstraint(task.getCaseInstance(), new AssignmentContext(definition, task), definition.getType());
+        Object outcome = evaluateConstraint(task.getCaseInstance(), new AssignmentContext(definition, task), definition.getType());
+        if (outcome == null || outcome == Value.NULL) {
+            return null;
+        }
+        return outcome.toString();
     }
 }

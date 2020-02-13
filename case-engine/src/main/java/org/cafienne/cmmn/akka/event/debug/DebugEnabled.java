@@ -29,8 +29,8 @@ public class DebugEnabled extends CaseInstanceEvent {
     }
 
     @Override
-    public void recover(Case caseInstance) {
-        caseInstance.switchDebugMode(true);
+    public void updateState(Case actor) {
+        actor.setDebugMode(true);
     }
 
     @Override

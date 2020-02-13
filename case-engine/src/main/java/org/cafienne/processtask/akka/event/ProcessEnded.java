@@ -6,12 +6,12 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 
 import java.io.IOException;
 
-class ProcessEnded extends ProcessInstanceEvent {
+public abstract class ProcessEnded extends ProcessInstanceEvent {
     private enum Fields {
         output
     }
 
-    private final ValueMap output;
+    public final ValueMap output;
 
     protected ProcessEnded(ProcessTaskActor actor, ValueMap outputParameters) {
         super(actor);
@@ -21,6 +21,11 @@ class ProcessEnded extends ProcessInstanceEvent {
     protected ProcessEnded(ValueMap json) {
         super(json);
         this.output = readMap(json, Fields.output);
+    }
+
+    @Override
+    public void updateState(ProcessTaskActor actor) {
+        // Nothing to update here. (as of now)
     }
 
     @Override

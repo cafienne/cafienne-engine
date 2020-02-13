@@ -54,6 +54,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         if (assignment != null) {
             try {
                 String assignee = assignment.evaluate(this.task);
+                addDebugInfo(() -> "Assignee expression in task "+task.getPlanItem().getName()+"["+task.getPlanItem().getId()+" resulted in: " + assignee);
 
                 /**
                  * TODO: Validate assignee?! Against CaseTeam ???
@@ -70,10 +71,10 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         if (dueDateExpression != null) {
             try {
                 Instant dueDate = dueDateExpression.evaluate(this.task);
+                addDebugInfo(() -> "Due date expression in task "+task.getPlanItem().getName()+"["+task.getPlanItem().getId()+" resulted in: " + dueDate);
+
                 if (dueDate != null) {
                     task.addEvent(new HumanTaskDueDateFilled(task, dueDate)).updateState(this);
-                } else {
-                    addDebugInfo(() -> "Due date expression in task "+task.getPlanItem().getName()+"["+task.getPlanItem().getId()+" resulted in null.");
                 }
             } catch (Exception e) {
                 addDebugInfo(DebugEvent.class, d -> d.addMessage("Failed to evaluate expression on task due date", e));

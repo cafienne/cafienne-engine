@@ -118,6 +118,6 @@ public interface CMMNExpressionEvaluator {
      * @return
      */
     default Instant evaluateDueDate(HumanTask task, DueDateDefinition definition) throws InvalidExpressionException {
-        return Instant.now();
+        return null;
     }
 }

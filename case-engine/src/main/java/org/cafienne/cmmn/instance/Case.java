@@ -11,9 +11,8 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.akka.actor.handler.ResponseHandler;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.event.EngineVersionChanged;
+import org.cafienne.cmmn.akka.event.CaseModified;
 import org.cafienne.cmmn.akka.event.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.debug.DebugDisabled;
 import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
@@ -48,16 +47,6 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      * The moment at which the case is created
      */
     private Instant createdOn;
-
-    /**
-     * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
-     * If a Case instance is recovered by Akka, then the version will be overwritten in {@link Case#recoverVersion(ValueMap)}.
-     * Whenever then a new incoming message is handled by the Case actor - one leading to events, i.e., state changes, then
-     * the actor will insert a new event EngineVersionChanged.
-     * For new Cases, the CaseDefinitionApplied event will generate the current version
-     */
-    private ValueMap engineVersion = CaseSystem.version();
-
     /**
      * List of plan items in the case.
      */
@@ -123,33 +112,8 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
     }
 
     @Override
-    protected CommandHandler createCommandHandler(CaseCommand msg) {
-        return new CaseCommandHandler(this, msg);
-    }
-
-    @Override
-    protected ResponseHandler createResponseHandler(ModelResponse response) {
-        return new CaseResponseMessageHandler(this, response);
-    }
-
-    @Override
-    public CaseCommand getCurrentCommand() {
-        CaseCommandHandler c = currentHandler();
-        return c.getCommand();
-    }
-
-    /**
-     * Check whether the current engine version is equal to the one used until now.
-     * If they differ, then a {@link EngineVersionChanged} is logged.
-     */
-    EngineVersionChanged checkEngineVersion() {
-        ValueMap currentEngineVersion = CaseSystem.version();
-        if (!currentEngineVersion.equals(engineVersion)) {
-            logger.info("Case " + getId() + " changed engine version from\n" + engineVersion + " to\n" + currentEngineVersion);
-            this.engineVersion = currentEngineVersion;
-            return new EngineVersionChanged(this, currentEngineVersion);
-        }
-        return null;
+    public CaseModified createLastModifiedEvent(Instant lastModified) {
+        return new CaseModified(this, lastModified, failingPlanItems.size());
     }
 
     /**
@@ -177,40 +141,6 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      */
     public CaseTeamMember getCurrentTeamMember() {
         return getCaseTeam().getTeamMember(getCurrentUser());
-    }
-
-    /**
-     * This methods is invoked by the case to buffer the events that originate from a command
-     *
-     * @param event
-     */
-    public <T extends CaseInstanceEvent> T storeInternallyGeneratedEvent(T event) {
-        if (recoveryRunning()) {
-            logger.debug("Not storing internally generated event because recovery is running. Event " + event);
-            return event;
-        }
-
-        if (currentHandler() instanceof CaseCommandHandler) {
-            CaseCommandHandler h = currentHandler();
-            return h.storeInternallyGeneratedEvent(event);
-        } else {
-            currentHandler().addEvent(event);
-            return event;
-        }
-    }
-
-    /**
-     * Internal framework method, used to set the current event back to it's parent if the current event finished
-     *
-     * @param event
-     */
-    void setCurrentEvent(CaseInstanceEvent event) {
-        if (!recoveryRunning()) {
-            if (currentHandler() instanceof CaseCommandHandler) {
-                CaseCommandHandler h = currentHandler();
-                h.setCurrentEvent(event);
-            }
-        }
     }
 
     /**
@@ -373,16 +303,8 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      *
      * @param debugMode
      */
-    public void switchDebugMode(boolean debugMode) {
-        if (this.debugMode != debugMode) {
-            this.debugMode = debugMode;
-            if (debugMode) {
-                storeInternallyGeneratedEvent(new DebugEnabled(this)).finished();
-            } else {
-                storeInternallyGeneratedEvent(new DebugDisabled(this)).finished();
-            }
-            logger.debug("Changed debug mode in case " + getId() + " to " + debugMode);
-        }
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
     }
 
     /**
@@ -454,14 +376,6 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      */
     public CaseTeam getCaseTeam() {
         return caseTeam;
-    }
-
-    public void recoverLastModified(Instant lastModified) {
-        setLastModified(lastModified);
-    }
-
-    public void recoverVersion(ValueMap version) {
-        this.engineVersion = version;
     }
 
     public void recoverPlanItem(PlanItemCreated event) {

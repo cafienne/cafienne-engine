@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -185,7 +184,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
         CaseFileEvent event = new CaseFileEvent(this.getCaseInstance(), this.getName(), transition, getValue(), getPath(), getState(), indexInArray);
         // Now inform the sentry network of our change
-        getCaseInstance().storeInternallyGeneratedEvent(event);
+        getCaseInstance().addEvent(event);
 
         addDebugInfo(() -> "Handling case file item transition " + getName() + "." + transition);
 

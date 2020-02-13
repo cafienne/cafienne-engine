@@ -27,7 +27,7 @@ public class OwnerRemoved extends TenantEvent {
 
     @Override
     public void updateState(TenantActor tenant) {
-        tenant.removeOwner(userId);
+        tenant.updateState(this);
     }
 
     @Override

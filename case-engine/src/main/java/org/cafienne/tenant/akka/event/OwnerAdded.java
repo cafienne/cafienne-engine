@@ -27,7 +27,7 @@ public class OwnerAdded extends TenantEvent {
 
     @Override
     public void updateState(TenantActor tenant) {
-        tenant.addOwner(userId);
+        tenant.updateState(this);
     }
 
     @Override

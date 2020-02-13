@@ -13,4 +13,8 @@ public class InvalidExpressionException extends CommandException {
     public InvalidExpressionException(String message, Throwable t) {
         super(message, t);
     }
+
+    public InvalidExpressionException(String message) {
+        super(message);
+    }
 }

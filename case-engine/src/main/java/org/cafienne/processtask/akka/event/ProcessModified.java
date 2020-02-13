@@ -31,6 +31,11 @@ public class ProcessModified extends ProcessInstanceEvent {
         this.lastModified = value.rawInstant(Fields.lastModified);
     }
 
+    @Override
+    public void updateState(ProcessTaskActor actor) {
+        actor.setLastModified(lastModified);
+    }
+
     /**
      * Returns the moment at which the case was last modified
      * @return
@@ -38,7 +43,6 @@ public class ProcessModified extends ProcessInstanceEvent {
     public Instant lastModified() {
         return lastModified;
     }
-
 
     @Override
     public String toString() {

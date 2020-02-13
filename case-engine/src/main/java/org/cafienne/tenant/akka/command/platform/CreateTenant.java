@@ -65,16 +65,16 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantCreated(tenant)).updateState(tenant);
+        tenant.addEvent(new TenantCreated(tenant));
         // Register the owners as TenantUsers with the specified roles
         owners.forEach(owner -> {
-            tenant.addEvent(new TenantUserCreated(tenant, owner.id(), owner.name(), owner.email())).updateState(tenant);
+            tenant.addEvent(new TenantUserCreated(tenant, owner.id(), owner.name(), owner.email()));
             // Add all the roles
             owner.roles().foreach(role -> tenant.addEvent(new TenantUserRoleAdded(tenant, owner.id(), role)));
         });
 
         // Register the owners as TenantOwners
-        owners.forEach(owner -> tenant.addEvent(new OwnerAdded(tenant, owner.id())).updateState(tenant));
+        owners.forEach(owner -> tenant.addEvent(new OwnerAdded(tenant, owner.id())));
         return new TenantResponse(this);
     }
 

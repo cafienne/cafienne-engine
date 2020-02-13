@@ -31,7 +31,7 @@ public class EnableTenantUser extends TenantCommand {
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantUserEnabled(tenant, userId)).updateState(tenant);
+        tenant.addEvent(new TenantUserEnabled(tenant, userId));
         return new TenantResponse(this);
     }
 

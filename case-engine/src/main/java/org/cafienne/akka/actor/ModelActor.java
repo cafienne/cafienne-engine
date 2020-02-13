@@ -16,7 +16,9 @@ import org.cafienne.akka.actor.handler.*;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.debug.DebugAppender;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
@@ -74,11 +76,28 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     private Instant lastModified;
 
+    /**
+     * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
+     * If a ModelActor is recovered by Akka, then the version will be overwritten in {@link ModelActor#setEngineVersion(ValueMap)}.
+     * Whenever then a new incoming message is handled by the Case actor - one leading to events, i.e., state changes, then
+     * the actor will insert a new event EngineVersionChanged.
+     * For new Cases, the CaseDefinitionApplied event will generate the current version
+     */
+    private ValueMap engineVersion;
+
     protected ModelActor(Class<C> commandClass, Class<E> eventClass) {
         this.id = self().path().name();
         this.commandClass = commandClass;
         this.eventClass = eventClass;
         this.scheduler = new CaseScheduler(this);
+    }
+
+    public ValueMap getEngineVersion() {
+        return this.engineVersion;
+    }
+
+    public void setEngineVersion(ValueMap version) {
+        this.engineVersion = version;
     }
 
     /**
@@ -149,13 +168,16 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param event
      */
     protected void handleRecoveryEvent(Object event) {
-        if (eventClass.isAssignableFrom(event.getClass())) {
-            if (tenant == null) {
-                tenant = ((E) event).tenant;
-            }
+        if (tenant == null && event instanceof ModelEvent) {
+            // Probably this is the very first event in this actor...
+            tenant = ((ModelEvent) event).tenant;
+        }
+
+        if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
             handler = createRecoveryHandler((E) event);
             logger.debug("Recovery in " + getClass().getSimpleName() + " " + getId() + ": recovering " + event);
-            ((E) event).recover(this);
+            handler.process();
+            handler.complete();
         } else if (event instanceof DebugEvent) {
             // No recovery from debug events ...
         } else if (event instanceof ModelEvent) {
@@ -187,6 +209,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         clearSelfCleaner();
 
         handler = createMessageHandler(msg);
+
         InvalidCommandException securityIssue = handler.runSecurityChecks();
         if (securityIssue == null) {
             // Only process if we did not find any security issues.
@@ -266,7 +289,19 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param msg
      * @return
      */
-    protected abstract CommandHandler createCommandHandler(C msg);
+    protected CommandHandler createCommandHandler(C msg) {
+        return new CommandHandler(this, msg);
+    }
+
+    /**
+     * This method must be implemented by CommandHandlers to handle the fact that state changes
+     * have taken place while handling the command. The ModelActor will get a new last modified timestamp,
+     * and the actor should add an event for that to the log, so that projections can define and commit
+     * a transaction scope
+     * @param lastModified
+     * @return
+     */
+    public abstract E createLastModifiedEvent(Instant lastModified);
 
     protected ResponseHandler createResponseHandler(ModelResponse response) {
         return new ResponseHandler(this, response);

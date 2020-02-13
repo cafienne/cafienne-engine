@@ -40,6 +40,11 @@ public class TeamMemberAdded extends CaseTeamEvent {
         writeField(generator, Fields.roles, roles);
     }
 
+    @Override
+    public void updateState(Case actor) {
+        actor.getCaseTeam().updateState(this);
+    }
+
     /**
      * Name/id of user that is added.
      * @return
@@ -54,10 +59,5 @@ public class TeamMemberAdded extends CaseTeamEvent {
      */
     public Set<String> getRoles() {
         return roles;
-    }
-
-    @Override
-    public void recover(Case caseInstance) {
-        caseInstance.getCaseTeam().recoverMember(userId, roles);
     }
 }

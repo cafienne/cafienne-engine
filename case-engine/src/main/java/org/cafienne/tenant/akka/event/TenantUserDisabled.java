@@ -27,6 +27,7 @@ public class TenantUserDisabled extends TenantEvent {
 
     @Override
     public void updateState(TenantActor tenant) {
+        tenant.updateState(this);
     }
 
     @Override

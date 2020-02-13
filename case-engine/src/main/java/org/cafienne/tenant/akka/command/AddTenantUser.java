@@ -43,11 +43,14 @@ public class AddTenantUser extends TenantCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
+        if (tenant.isUser(userId)) {
+            throw new InvalidCommandException("User " + userId + " already exists in tenant " + tenant.getId());
+        }
     }
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantUserCreated(tenant, userId, name, email)).updateState(tenant);
+        tenant.addEvent(new TenantUserCreated(tenant, userId, name, email));
         // Add all the roles
         roles.forEach(role -> tenant.addEvent(new TenantUserRoleAdded(tenant, userId, role)));
         return new TenantResponse(this);

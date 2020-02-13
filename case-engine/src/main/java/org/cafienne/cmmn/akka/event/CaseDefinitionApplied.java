@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -32,7 +33,7 @@ public class CaseDefinitionApplied extends CaseInstanceEvent {
         createdOn, createdBy, parentActorId, rootActorId, caseName, definition, engineVersion
     }
 
-    public CaseDefinitionApplied(Case caseInstance, String rootCaseId, String parentCaseId, CaseDefinition definition, String caseName, ValueMap engineVersion) {
+    public CaseDefinitionApplied(Case caseInstance, String rootCaseId, String parentCaseId, CaseDefinition definition, String caseName) {
         super(caseInstance);
         this.createdOn = Instant.now();
         this.createdBy = caseInstance.getCurrentUser().id();
@@ -44,7 +45,7 @@ public class CaseDefinitionApplied extends CaseInstanceEvent {
         //  So, at that moment we also store the engine version.
         //  TODO: perhaps better to distinguish CaseStarted or CaseCreated from CaseDefinitionApplied
         //   If so, then we can also suffice with storing root id and so in the CaseCreated, rather than in case definition applied. Same for engine version.
-        this.engineVersion = engineVersion;
+        this.engineVersion = CaseSystem.version();
     }
 
     public CaseDefinitionApplied(ValueMap json) {
@@ -102,13 +103,8 @@ public class CaseDefinitionApplied extends CaseInstanceEvent {
         return this.definition;
     }
 
-    @Override
-    public void recover(Case caseInstance) {
-        updateState(caseInstance);
-    }
-
     public void updateState(Case caseInstance) {
-        caseInstance.recoverVersion(engineVersion);
+        caseInstance.setEngineVersion(engineVersion);
         caseInstance.applyCaseDefinition(this.definition, getParentCaseId(), getRootCaseId());
     }
 
