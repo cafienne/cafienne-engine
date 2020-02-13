@@ -19,15 +19,17 @@ public class TimerSet extends CaseInstanceEvent {
 
     private final Instant targetMoment;
     private final String timerId;
+    private transient TimerEvent timerEvent;
 
     private enum Fields {
         timerId, targetMoment
     }
 
-    public TimerSet(TimerEvent event) {
-        super(event.getCaseInstance());
-        this.timerId = event.getId();
-        this.targetMoment = event.getTargetMoment();
+    public TimerSet(TimerEvent timerEvent) {
+        super(timerEvent.getCaseInstance());
+        this.timerEvent = timerEvent;
+        this.timerId = timerEvent.getId();
+        this.targetMoment = timerEvent.getDefinition().getMoment(timerEvent);
     }
 
     public TimerSet(ValueMap json) {
@@ -45,14 +47,16 @@ public class TimerSet extends CaseInstanceEvent {
     }
 
     @Override
-    final public void recover(Case caseInstance) {
-        PlanItem planItem = caseInstance.getPlanItemById(getTimerId());
-        if (planItem == null) {
-            logger.error("MAJOR ERROR: Cannot recover task event for task with id " + getTimerId() + ", because the plan item cannot be found");
-            return;
+    public void updateState(Case actor) {
+        if (timerEvent == null) {
+            PlanItem planItem = actor.getPlanItemById(getTimerId());
+            if (planItem == null) {
+                logger.error("MAJOR ERROR: Cannot recover task timerEvent for task with id " + getTimerId() + ", because the plan item cannot be found");
+                return;
+            }
+            timerEvent = planItem.getInstance();
         }
-        TimerEvent timer = planItem.getInstance();
-        timer.recover(this);
+        timerEvent.updateState(this);
     }
 
     @Override
@@ -64,6 +68,6 @@ public class TimerSet extends CaseInstanceEvent {
 
     @Override
     public String toString() {
-        return "Timer event "+getTimerId()+" has target moment " + targetMoment;
+        return "Timer timerEvent "+getTimerId()+" has target moment " + targetMoment;
     }
 }

@@ -41,6 +41,11 @@ public class TeamMemberRemoved extends CaseTeamEvent {
         writeField(generator, Fields.roles, roles);
     }
 
+    @Override
+    public void updateState(Case actor) {
+        actor.getCaseTeam().updateState(this);
+    }
+
     /**
      * Id of user that is removed.
      * @return
@@ -54,11 +59,5 @@ public class TeamMemberRemoved extends CaseTeamEvent {
      */
     public Set<String> getRoles() {
         return roles;
-    }
-
-    @Override
-    public void recover(Case caseInstance) {
-        CaseTeamMember member = caseInstance.getCaseTeam().getMember(userId);
-        caseInstance.getCaseTeam().removeMember(member);
     }
 }
