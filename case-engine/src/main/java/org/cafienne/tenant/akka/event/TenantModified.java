@@ -55,6 +55,6 @@ public class TenantModified extends TenantEvent {
 
     @Override
     public void updateState(TenantActor tenant) {
-        tenant.setLastModified(lastModified);
+        tenant.updateState(this);
     }
 }

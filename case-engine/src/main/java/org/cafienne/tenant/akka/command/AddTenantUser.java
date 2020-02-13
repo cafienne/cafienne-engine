@@ -43,6 +43,9 @@ public class AddTenantUser extends TenantCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
+        if (tenant.isUser(userId)) {
+            throw new InvalidCommandException("User " + userId + " already exists in tenant " + tenant.getId());
+        }
     }
 
     @Override

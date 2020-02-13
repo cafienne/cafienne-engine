@@ -31,7 +31,7 @@ public class TenantUserRoleAdded extends TenantEvent {
 
     @Override
     public void updateState(TenantActor tenant) {
-        // No state to update. Simply pass the event
+        tenant.updateState(this);
     }
 
     @Override
