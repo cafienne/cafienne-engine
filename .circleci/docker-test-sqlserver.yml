@@ -1,0 +1,58 @@
+version: '3.1'
+services:
+
+  sql-server:
+    image: cafienne/sqlserver:latest
+    labels:
+      component: cafienne-sql-server
+    network_mode: host
+    expose:
+      - 1433
+    ports:
+      - "1433:1433"
+    hostname: sql-server
+    container_name: sql-server
+    environment:
+      SA_PASSWORD: Abc_123456
+      ACCEPT_EULA: Y
+      QUERY_DB: cafienneQuery
+      EVENT_DB: cafienneEventstore
+
+  cafienne-test-token-service:
+    image: spectare/oidc-token-test-service:latest
+    labels:
+      component: idp-test-service-for-cafienne
+    network_mode: host
+    expose:
+      - 2377
+    ports:
+      - "2377:2377"
+    hostname: cafienne-test-token-service
+    container_name: cafienne-test-token-service
+    environment:
+      BIND: 0.0.0.0
+      PORT: 2377
+
+  cafienne:
+    image: cafienne/engine:latest
+    labels:
+      component: cafienne-engine
+    network_mode: host
+    expose:
+      - 2027
+    ports:
+      - "2027:2027"
+    hostname: cafienne
+    container_name: cafienne
+    environment:
+      PROJECTION_DB_URL: ${PROJECTION_DB_URL:-jdbc:sqlserver://sql-server:1433;DatabaseName=cafienneQuery;}
+      EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:sqlserver://sql-server:1433;DatabaseName=cafienneEventstore;}
+    healthcheck:
+      test: ["CMD", "wget", "-s", "http://localhost:2027/api-docs/swagger.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
+      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/cafienne/definitions
+      - /home/circleci/cafienne-engine/.circleci/src/sqlserver-conf:/opt/cafienne/conf
