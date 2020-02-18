@@ -12,23 +12,6 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Docker login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-      - run:
-          name: Pull docker images
-          command: docker-compose -f .circleci/docker-test.yml pull
-      - run:
-          name: Build docker image
-          command: sbt docker:publishLocal
-      - run:
-          name: Up the containers
-          command: |
-            sudo docker-compose -f .circleci/docker-test.yml up -d
-            sleep 5
-      - run:
-          name: Give permissions
-          command: sudo chmod -R 777 ./
-      - run:
           name: Clone CMMN-test framework
           command: |
             cd ..
@@ -40,17 +23,118 @@ jobs:
             cd ./cmmn-test-framework
             npm install
       - run:
+          name: Docker login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Pull docker images
+          command: |
+            docker-compose -f .circleci/docker-test-inmemory.yml pull
+            docker-compose -f .circleci/docker-test-postgresql.yml pull
+            docker-compose -f .circleci/docker-test-sqlserver.yml pull
+            docker-compose -f .circleci/docker-test-cassandra.yml pull
+      - run:
+          name: Build docker image
+          command: sbt docker:publishLocal
+
+      # Starting docker environment for In-memory testing
+      - run:
+          name: Up the containers for In-memory testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-inmemory.yml up -d
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
           name: Test engine against framework
           command: |
             cd ..
             cd ./cmmn-test-framework
             npm run dev
       - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-inmemory.yml stop
+            docker rm $(docker ps -a -q)
+
+      # Starting docker environment for Postgresql testing
+      - run:
+          name: Up the containers for Postgresql testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-postgresql.yml up -d
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
           name: Docker logs of engine
           command: docker logs cafienne
       - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
           name: Stop the containers
-          command: docker-compose -f .circleci/docker-test.yml stop
+          command: |
+            docker-compose -f .circleci/docker-test-postgresql.yml stop
+            docker rm $(docker ps -a -q)
+
+      # Starting docker environment for Sqlserver testing
+      - run:
+          name: Up the containers for Sqlserver testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-sqlserver.yml up -d
+            sleep 15
+            sudo docker restart cafienne
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-sqlserver.yml stop
+            docker rm $(docker ps -a -q)
+
+      # Starting docker environment for Cassandra testing
+      - run:
+          name: Up the containers for Cassandra testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-cassandra.yml up -d
+            sleep 20
+            sudo docker restart cafienne
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-cassandra.yml stop
+            docker rm $(docker ps -a -q)
       - run:
           name: Push image to docker hub
           command: |
@@ -81,23 +165,6 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Docker login
-          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-      - run:
-          name: Pull docker images
-          command: docker-compose -f .circleci/docker-test.yml pull
-      - run:
-          name: Build docker image
-          command: sbt docker:publishLocal
-      - run:
-          name: Up the containers
-          command: |
-            sudo docker-compose -f .circleci/docker-test.yml up -d
-            sleep 5
-      - run:
-          name: Giving permissions
-          command: sudo chmod -R 777 ./
-      - run:
           name: Clone CMMN-test framework
           command: |
             cd ..
@@ -109,17 +176,118 @@ jobs:
             cd ./cmmn-test-framework
             npm install
       - run:
+          name: Docker login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Pull docker images
+          command: |
+            docker-compose -f .circleci/docker-test-inmemory.yml pull
+            docker-compose -f .circleci/docker-test-postgresql.yml pull
+            docker-compose -f .circleci/docker-test-sqlserver.yml pull
+            docker-compose -f .circleci/docker-test-cassandra.yml pull
+      - run:
+          name: Build docker image
+          command: sbt docker:publishLocal
+
+      # Starting docker environment for In-memory testing
+      - run:
+          name: Up the containers for In-memory testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-inmemory.yml up -d
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
           name: Test engine against framework
           command: |
             cd ..
             cd ./cmmn-test-framework
             npm run dev
       - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-inmemory.yml stop
+            docker rm $(docker ps -a -q)
+
+      # Starting docker environment for Postgresql testing
+      - run:
+          name: Up the containers for Postgresql testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-postgresql.yml up -d
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
           name: Docker logs of engine
           command: docker logs cafienne
       - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
           name: Stop the containers
-          command: docker-compose -f .circleci/docker-test.yml stop
+          command: |
+            docker-compose -f .circleci/docker-test-postgresql.yml stop
+            docker rm $(docker ps -a -q)
+
+      # Starting docker environment for Sqlserver testing
+      - run:
+          name: Up the containers for Sqlserver testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-sqlserver.yml up -d
+            sleep 15
+            sudo docker restart cafienne
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-sqlserver.yml stop
+            docker rm $(docker ps -a -q)
+
+      # Starting docker environment for Cassandra testing
+      - run:
+          name: Up the containers for Cassandra testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-cassandra.yml up -d
+            sleep 20
+            sudo docker restart cafienne
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-cassandra.yml stop
+            docker rm $(docker ps -a -q)
       - run:
           name: Push image to docker hub
           command: |
