@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -20,7 +21,7 @@ import java.time.Instant;
 
 @Manifest
 public class CaseDefinitionApplied extends CaseInstanceEvent {
-    private final ValueMap engineVersion;
+    private final CafienneVersion engineVersion;
     private final String caseName;
     private final String parentCaseId;
     private final String rootCaseId;
@@ -56,7 +57,7 @@ public class CaseDefinitionApplied extends CaseInstanceEvent {
         this.parentCaseId = readField(json, Fields.parentActorId);
         this.caseName = readField(json, Fields.caseName);
         this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
-        this.engineVersion = readMap(json, Fields.engineVersion);
+        this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
     }
 
     /**
@@ -117,6 +118,6 @@ public class CaseDefinitionApplied extends CaseInstanceEvent {
         writeField(generator, Fields.parentActorId, parentCaseId);
         writeField(generator, Fields.caseName, caseName);
         writeField(generator, Fields.definition, definition);
-        writeField(generator, Fields.engineVersion, engineVersion);
+        writeField(generator, Fields.engineVersion, engineVersion.json());
     }
 }

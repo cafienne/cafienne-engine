@@ -15,7 +15,6 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.config.CafienneConfig
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
-import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
 
 /**
   *
@@ -52,14 +51,13 @@ object CaseSystem extends LazyLogging {
     *
     * @return
     */
-  def version: ValueMap = JSONReader.parse(org.cafienne.cmmn.akka.BuildInfo.toJson)
+  val version = new CafienneVersion
 
   /**
     * Start the Case System. This will spin up an akka system according to the specifications
     * @return
     */
   def start(name: String = "Cafienne-Case-System") = {
-
     // Create an Akka system
     system = ActorSystem(name)
 

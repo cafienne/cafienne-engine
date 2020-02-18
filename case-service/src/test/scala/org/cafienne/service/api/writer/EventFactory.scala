@@ -22,7 +22,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     val json = new ValueMap(
       CaseDefinitionApplied.Fields.caseName, caseDefinition.getName
       ,CaseDefinitionApplied.Fields.definition, caseDefinition.toJSON
-      ,CaseDefinitionApplied.Fields.engineVersion, CaseSystem.version
+      ,CaseDefinitionApplied.Fields.engineVersion, CaseSystem.version.json
       ,CaseDefinitionApplied.Fields.parentActorId, ""
       ,CaseDefinitionApplied.Fields.rootActorId, actorId
       ,CaseDefinitionApplied.Fields.createdOn, Instant.now
