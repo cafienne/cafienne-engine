@@ -24,12 +24,11 @@ trait ReadJournalProvider extends LazyLogging with ActorSystemProvider {
   }
 
   private def findReadJournalSetting(): String = {
-    if (CaseSystem.config.hasPath("query-db.read-journal")) {
-      val explicitReadJournal = CaseSystem.config.getString("query-db.read-journal")
-      logger.debug("Using explicit read journal configuration reference: " + explicitReadJournal)
+
+    val explicitReadJournal = CaseSystem.config.queryDB.readJournal
+    if (!explicitReadJournal.isEmpty) {
       return explicitReadJournal
     }
-
 
     import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
     import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal

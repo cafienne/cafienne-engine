@@ -20,7 +20,7 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
   val openIdSecurityScheme = new SecurityScheme()
     .name("openId")
     .`type`(SecurityScheme.Type.OPENIDCONNECT)
-    .openIdConnectUrl(CaseSystem.OIDC.connectUrl)
+    .openIdConnectUrl(CaseSystem.config.OIDC.connectUrl)
 
   /* https://stackoverflow.com/questions/41918845/keycloak-integration-in-swagger
     "securityDefinitions": {
@@ -46,9 +46,9 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
               .addString("openid", "openid")
               .addString("profile", "profile")
           )
-          .tokenUrl(CaseSystem.OIDC.tokenUrl)
+          .tokenUrl(CaseSystem.config.OIDC.tokenUrl)
           //.extensions(Map("x-tokenName" -> "id_token").asInstanceOf[Map[String, AnyRef]].asJava) doesn't work with openapi 3
-          .authorizationUrl(CaseSystem.OIDC.authorizationUrl)
+          .authorizationUrl(CaseSystem.config.OIDC.authorizationUrl)
       )
     )
 

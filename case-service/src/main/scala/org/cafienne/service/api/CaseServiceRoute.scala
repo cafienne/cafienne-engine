@@ -101,8 +101,8 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   val uc = userCache
 
   object OIDCAuthentication extends Directives with AuthenticationDirectives {
-    protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(CaseSystem.OIDC.keysUrl))
-    protected val issuer                                = CaseSystem.OIDC.issuer
+    protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(CaseSystem.config.OIDC.keysUrl))
+    protected val issuer                                = CaseSystem.config.OIDC.issuer
     override protected val userCache: IdentityProvider = uc
     override protected implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   }
@@ -143,7 +143,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   // TODO: this is a temporary switch to enable IDE's debugger to show events
   @Deprecated // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route) : Route = {
-    if (CaseSystem.developerRouteOpen) {
+    if (CaseSystem.config.developerRouteOpen) {
       subRoute(null)
     } else {
       validUser(subRoute)

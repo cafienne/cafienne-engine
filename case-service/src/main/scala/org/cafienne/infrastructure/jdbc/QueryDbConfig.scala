@@ -9,7 +9,7 @@ import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
 trait QueryDbConfig {
-  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("query-db", CaseSystem.config)
+  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", CaseSystem.config.queryDB.config)
 
   lazy val db = dbConfig.db
 

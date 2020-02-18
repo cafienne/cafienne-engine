@@ -58,7 +58,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param caseTeamInput       The CaseTeam for the case
      */
     public StartCase(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeamInput) {
-        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeamInput, CaseSystem.debugEnabled());
+        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeamInput, CaseSystem.config().actor().debugEnabled());
     }
 
     /**

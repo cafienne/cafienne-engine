@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test;
 
-import akka.actor.ActorSystem;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.CaseSystem;
@@ -69,7 +68,7 @@ public class TestScript {
      */
     public static DefinitionsDocument getDefinitions(String fileName) {
         try {
-            return CaseSystem.DefinitionProvider().read(null, fileName);
+            return CaseSystem.config().repository().DefinitionProvider().read(null, fileName);
         } catch (MissingDefinitionException | InvalidDefinitionException e) {
             throw new RuntimeException(e);
         }
@@ -100,7 +99,7 @@ public class TestScript {
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
         try {
-            CaseSystem.DefinitionProvider().read(null, fileName);
+            CaseSystem.config().repository().DefinitionProvider().read(null, fileName);
         } catch (MissingDefinitionException e) {
             throw new AssertionError(e);
         }

@@ -227,7 +227,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     private void enableSelfCleaner() {
         // Now set the new selfCleaner
-        long idlePeriod = CaseSystem.ActorIdlePeriod();
+        long idlePeriod = CaseSystem.config().actor().idlePeriod();
         FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
         selfCleaner = getScheduler().schedule(duration, () -> {
             logger.debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");

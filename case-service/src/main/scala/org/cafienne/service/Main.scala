@@ -119,8 +119,8 @@ object Main extends App {
     //    })
 
 
-    val apiHost = system.settings.config.getString("cafienne.api.bindhost")
-    val apiPort = system.settings.config.getInt("cafienne.api.bindport")
+    val apiHost = CaseSystem.config.api.bindHost
+    val apiPort = CaseSystem.config.api.bindPort
     val httpServer = Http().bindAndHandle(apiRoutes, apiHost, apiPort)
     httpServer onComplete {
       case Success(answer) ⇒ {
@@ -138,7 +138,7 @@ object Main extends App {
   private def checkH2InDebugMode()(implicit system:ActorSystem): Unit = {
     import org.h2.tools.Server
 
-    if (CaseSystem.config.hasPath("query-db.debug") && CaseSystem.config.getBoolean("query-db.debug")) {
+    if (CaseSystem.config.queryDB.debug) {
       Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start()
     }
   }
