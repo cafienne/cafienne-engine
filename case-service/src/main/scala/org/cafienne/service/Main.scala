@@ -21,7 +21,7 @@ import org.cafienne.service.api.{CaseServiceRoute, SwaggerHttpServiceRoute}
 import org.cafienne.service.api.cases.CaseQueriesImpl
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
-import org.cafienne.service.api.platform.PlatformRoute
+import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, PlatformRoute}
 import org.cafienne.service.api.tenant.TenantQueriesImpl
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
@@ -65,6 +65,9 @@ object Main extends App {
       Await.result(system.terminate(), 20.seconds)
     }
 
+    // First, start platform bootstrap configuration
+    BootstrapPlatformConfiguration.run()
+
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl
     val userQueries = new TenantQueriesImpl
@@ -92,8 +95,6 @@ object Main extends App {
 
     // Find the API classes of the routes and pass the to Swagger
     val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses)
-
-    caseServiceRoutes.companion
 
     // For unclear reasons we cannot map the Seq(CaseServiceRoute)
     val apiRoutes = {

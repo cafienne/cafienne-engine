@@ -1,0 +1,14 @@
+{
+  "name": "world",
+  "owners": ["lana", "suzy"],
+  "users" : [{
+  "id" : "suzy",
+  "roles" : ["employee", "manager"]
+  }, {
+    "id" : "lana",
+    "roles" : ["employee", "manager"]
+  }, {
+    "id" : "hank",
+    "roles" : ["pa"]
+  }]
+}
