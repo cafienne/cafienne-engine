@@ -1,6 +1,7 @@
 package org.cafienne.akka.actor.identity
 
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.cmmn.instance.casefile.ValueMap
 
 final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
@@ -10,6 +11,22 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
       case Some(value) => Seq(value)
       case None => tenants
     }
+  }
+
+  /**
+    * If the user is registered in one tenant only, that tenant is returned.
+    * Otherwise, the default tenant of the platform is returned (even if the user is not part of it...???)
+    * @return
+    */
+  final def defaultTenant: String = {
+    if (tenants.length == 1) {
+      tenants.head
+    }
+    val configuredDefaultTenant = CaseSystem.config.platform.defaultTenant
+    if (configuredDefaultTenant.isEmpty) {
+      throw new MissingTenantException("Tenant property must have a value")
+    }
+    configuredDefaultTenant
   }
 
   final def toJSON: String  = {

@@ -4,7 +4,6 @@ import java.util
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.akka.actor.identity.TenantUser
 
 class PlatformConfig(val parentConfig: Config) extends LazyLogging {
@@ -27,9 +26,6 @@ class PlatformConfig(val parentConfig: Config) extends LazyLogging {
       config.getString("default-tenant")
     } else {
       ""
-    }
-    if (configuredDefaultTenant.isEmpty) {
-      throw new MissingTenantException("Tenant property must have a value")
     }
     configuredDefaultTenant
   }

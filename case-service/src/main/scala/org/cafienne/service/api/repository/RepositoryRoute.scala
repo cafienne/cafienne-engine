@@ -75,7 +75,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
       validUser { user => {
         parameters('tenant ?) { optionalTenant =>
           try {
-            val tenant = optionalTenant.getOrElse(CaseSystem.config.platform.defaultTenant)
+            val tenant = optionalTenant.getOrElse(user.defaultTenant)
             logger.debug(s"Loading definitions '${modelName}' from tenant '${tenant}'")
             val model = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), modelName)
             complete(StatusCodes.OK, model.getDocument)
@@ -117,7 +117,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
         validUser { user => {
           import scala.collection.JavaConverters._
 
-          val tenant = optionalTenant.getOrElse(CaseSystem.config.platform.defaultTenant)
+          val tenant = optionalTenant.getOrElse(user.defaultTenant)
           val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
           for (file <- CaseSystem.config.repository.DefinitionProvider.list(user.getTenantUser(tenant)).asScala) {
             var description = "Description"
@@ -191,7 +191,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
         parameters('tenant ?) { optionalTenant =>
           entity(as[Document]) { xmlDocument =>
             try {
-              val tenant = optionalTenant.getOrElse(CaseSystem.config.platform.defaultTenant)
+              val tenant = optionalTenant.getOrElse(user.defaultTenant)
               logger.debug(s"Deploying '${modelName}' to tenant '${tenant}'")
               val definitions = new DefinitionsDocument(xmlDocument)
 

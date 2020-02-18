@@ -263,9 +263,9 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
           entity(as[StartCase]) { payload =>
             try {
               val tenant = payload.tenant match {
-                case None => CaseSystem.config.platform.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
+                case None => user.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
                 case Some(string) => string.isEmpty match {
-                  case true => CaseSystem.config.platform.defaultTenant
+                  case true => user.defaultTenant
                   case false => payload.tenant.get
                 }
               }
