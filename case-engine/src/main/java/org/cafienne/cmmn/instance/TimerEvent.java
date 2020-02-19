@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,7 +27,7 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
     }
 
     private Cancellable schedule;
-    private Instant targetMoment =  null;
+    private Instant targetMoment = null;
 
     private Cancellable scheduleWork(Instant moment, MakePlanItemTransition command) {
         // Note: this code needs some refactoring
@@ -38,11 +38,11 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
 
         FiniteDuration duration = Duration.create(delay, TimeUnit.MILLISECONDS);
         Runnable job = () -> {
-            addDebugInfo(() -> "Raising timer event " + getPlanItem().getName() + "/" + getPlanItem().getId());
+            addDebugInfo(() -> "Raising timer event " + getName() + "/" + getId());
             getCaseInstance().askCase(command, failure -> // Is logging an error sufficient? Or should we go Fault?!
-                logger.error("Could not make event "+getPlanItem().getId()+" occur\n" + failure));
+                logger.error("Could not make event " + getId() + " occur\n" + failure));
         };
-        
+
         Cancellable schedule = getCaseInstance().getScheduler().schedule(duration, job);
         return schedule;
     }
@@ -56,7 +56,7 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
 
     private void setSchedule() {
 //        System.out.println("\n\n\n setting schedule\n\n");
-        MakePlanItemTransition command = new MakePlanItemTransition(getCaseInstance().getCurrentUser(), getCaseInstance().getId(), this.getId(), Transition.Occur, this.getPlanItem().getName());
+        MakePlanItemTransition command = new MakePlanItemTransition(getCaseInstance().getCurrentUser(), getCaseInstance().getId(), this.getId(), Transition.Occur, this.getName());
         schedule = scheduleWork(targetMoment, command);
     }
 

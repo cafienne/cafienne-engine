@@ -17,6 +17,15 @@ import java.io.InputStream;
  */
 public class JSONReader {
 
+    private static JsonFactory getJSONFactory() {
+        JsonFactory factory = new JsonFactory();
+        factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        factory.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        factory.configure(JsonParser.Feature.ALLOW_YAML_COMMENTS, true);
+        return factory;
+    }
+
     /**
      * Parse the specified string into a {@link Value} object
      * @param jsonString
@@ -25,16 +34,12 @@ public class JSONReader {
      * @throws IOException
      */
     public static <T extends Value<?>> T parse(String jsonString) throws IOException, JSONParseFailure {
-        JsonFactory factory = new JsonFactory();
-        factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        JsonParser jp = factory.createParser(jsonString);
+        JsonParser jp = getJSONFactory().createParser(jsonString);
         return (T) read(jp, null);
     }
 
     public static <T extends Value<?>> T parse(InputStream jsonStream) throws IOException, JSONParseFailure {
-        JsonFactory factory = new JsonFactory();
-        factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        JsonParser jp = factory.createParser(jsonStream);
+        JsonParser jp = getJSONFactory().createParser(jsonStream);
         return (T) read(jp, null);
     }
 
@@ -45,8 +50,7 @@ public class JSONReader {
      * @throws IOException
      */
     public static <T extends Value<?>> T parse(byte[] bytes) throws IOException, JSONParseFailure {
-        JsonFactory factory = new JsonFactory();
-        JsonParser jp = factory.createParser(bytes);
+        JsonParser jp = getJSONFactory().createParser(bytes);
         return (T) read(jp, null);
     }
 

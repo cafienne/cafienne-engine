@@ -39,7 +39,7 @@ public class ValueTests {
         ValueList list = output.withArray("Multi");
         for (int i = 0; i<list.size(); i++) {
             Object ith = list.get(i).getValue();
-            if (!ith.equals(new Long(i))) { // Note: every number is converted to Long...
+            if (!ith.equals(Long.valueOf(i))) { // Note: every number is converted to Long...
                 throw new AssertionError("Member "+i+" in list is not " + i + ", but "+list.get(i).getValue());
             }
         }

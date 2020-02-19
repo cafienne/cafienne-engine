@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,12 +34,12 @@ public class UserEvent extends PlanItemDefinitionInstance<UserEventDefinition> {
         if (authorizedRoles.isEmpty()) { // No roles defined, so it is allowed.
             return true;
         }
-        
+
         CaseTeamMember currentUser = getCaseInstance().getCurrentTeamMember();
         if (currentUser == null) { // No user found, but there must be one with a role
-            throw new TransitionDeniedException("You do not have the permission to raise the event " + getPlanItem().getName());
+            throw new TransitionDeniedException("You do not have the permission to raise the event " + getName());
         }
-        
+
         // Now fetch roles of current user within this case and see if there is one that matches one of the authorized roles
         Set<CaseRoleDefinition> rolesOfCurrentUser = currentUser.getRoles();
         for (CaseRoleDefinition role : authorizedRoles) {
@@ -48,7 +48,7 @@ public class UserEvent extends PlanItemDefinitionInstance<UserEventDefinition> {
             }
         }
         // Apparently no matching role was found.s
-        throw new TransitionDeniedException("You do not have the permission to raise the event " + getPlanItem().getName());
+        throw new TransitionDeniedException("You do not have the permission to raise the event " + getName());
     }
 
     @Override

@@ -2,6 +2,8 @@ package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Manifest wrapper is simple wrapper class around the {@link Manifest}, that parses and analyses
  * it in order to have faster usage in runtime.
@@ -78,7 +80,7 @@ class ManifestWrapper {
         for (int i = 0; i < possiblyUnorderedMigrators.length; i++) {
             Class<? extends Migrator> migratorClass = possiblyUnorderedMigrators[i];
             try {
-                Migrator migrator = migratorClass.newInstance();
+                Migrator migrator = migratorClass.getDeclaredConstructor().newInstance();
                 TargetVersion target = migrator.getClass().getAnnotation(TargetVersion.class);
                 if (target == null) {
                     throw new RuntimeException("Migrator " + migratorClass.getName() + " misses a TargetVersion annotation");
@@ -90,7 +92,7 @@ class ManifestWrapper {
                 // TODO: Must we handle those cases where the fromVersion is higher than current version or lower than 0?
                 // And what about Migrators that have no TargetVersion? Can we somehow enforce this through code?
                 migrators[fromVersion] = migrator;
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new RuntimeException("Migrator class " + migratorClass.getName() + " in ManifestWrapper of " + eventClass.getName() + " cannot be instantiated", e.fillInStackTrace());
             }
         }

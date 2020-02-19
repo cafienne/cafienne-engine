@@ -57,7 +57,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
         String requestPayload = requestPayloadJson.toString();
         String httpMethod = definition.getMethod().resolveParameters(requestPayloadJson).toString();
 
-        addDebugInfo(DebugEvent.class, e -> e.addMessage("Invoking task validation on output of task "+task.getPlanItem().getName()+"["+task.getPlanItem().getId()+"] with "+httpMethod.toUpperCase() + " " + targetURL.toString() + " with ", requestPayloadJson));
+        addDebugInfo(DebugEvent.class, e -> e.addMessage("Invoking task validation on output of task " + task.getName() + "[" + task.getId() + "] with " + httpMethod.toUpperCase() + " " + targetURL.toString() + " with ", requestPayloadJson));
 
         // Now fetch and open the URL
         HttpURLConnection httpConnection = null;
@@ -93,7 +93,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                         ostream.flush();
                         ostream.close();
                     } catch (ConnectException e) {
-                        return new ValidationError("Cannot establish connection to "+targetURL, e);
+                        return new ValidationError("Cannot establish connection to " + targetURL, e);
                     } catch (IOException e) {
                         return new ValidationError("Failed to write content to " + targetURL, e);
                     }
@@ -140,7 +140,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                     output.put(HTTPCallDefinition.RESPONSE_PAYLOAD_PARAMETER, new StringValue(errorMessage.toString()));
 
                     // Although there is no exception here, we still raise a fault, because the HTTP_CODE is not range 200-299
-                    return new ValidationError(output, new Exception("Unexpected http response code "+responseCode));
+                    return new ValidationError(output, new Exception("Unexpected http response code " + responseCode));
                 } catch (IOException e) {
                     output.put(HTTPCallDefinition.RESPONSE_PAYLOAD_PARAMETER, new StringValue(errorMessage.toString()));
                     return new ValidationError(output, e);
@@ -158,7 +158,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                 try {
                     ValueMap responseJSON = JSONReader.parse(httpConnection.getInputStream());
                     output.put(HTTPCallDefinition.RESPONSE_PAYLOAD_PARAMETER, responseJSON);
-                    addDebugInfo(DebugEvent.class, e -> e.addMessage("Response to validation of task "+task.getId()+":", responseJSON));
+                    addDebugInfo(DebugEvent.class, e -> e.addMessage("Response to validation of task " + task.getId() + ":", responseJSON));
                     return new ValidationResponse(responseJSON);
                 } catch (IOException | JSONParseFailure e) {
                     return new ValidationError("Technical failure while reading http response although http code was " + responseCode, e);

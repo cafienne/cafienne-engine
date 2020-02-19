@@ -78,7 +78,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         this.type = reference.getType();
         this.index = index;
 
-        addDebugInfo(() -> "Creating plan item " + getName() + (owningStage == null ? " in case" : " in stage " + getStage().getPlanItem().getName()) + " with id " + id);
+        addDebugInfo(() -> "Creating plan item " + getName() + (owningStage == null ? " in case" : " in stage " + getStage().getName()) + " with id " + id);
 
         // Raise an event and then do some real logic
         PlanItemCreated event = caseInstance.addEvent(new PlanItemCreated(this));

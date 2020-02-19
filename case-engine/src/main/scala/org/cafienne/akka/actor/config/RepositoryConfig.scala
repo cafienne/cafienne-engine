@@ -19,7 +19,7 @@ class RepositoryConfig(val parentConfig: Config) extends LazyLogging {
     */
   lazy val DefinitionProvider: DefinitionProvider = {
     val providerClassName = config.getString("provider")
-    Class.forName(providerClassName).newInstance().asInstanceOf[DefinitionProvider]
+    Class.forName(providerClassName).getDeclaredConstructor().newInstance().asInstanceOf[DefinitionProvider]
   }
 
   lazy val location: String = {
