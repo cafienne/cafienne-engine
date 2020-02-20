@@ -113,7 +113,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      */
     public String getDeployDirectory() {
         if (deployDirectory == null) {
-            deployDirectory = CaseSystem.config().getString("definitions.location");
+            deployDirectory = CaseSystem.config().repository().location();
             File file = new File(deployDirectory);
             if (!file.exists()) {
                 logger.warn("The deploy directory '" + file.getAbsolutePath() + "' does not exist (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path until the deploy directory is created.");

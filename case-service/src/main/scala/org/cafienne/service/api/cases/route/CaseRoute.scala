@@ -263,19 +263,19 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
           entity(as[StartCase]) { payload =>
             try {
               val tenant = payload.tenant match {
-                case None => CaseSystem.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
+                case None => user.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
                 case Some(string) => string.isEmpty match {
-                  case true => CaseSystem.defaultTenant
+                  case true => user.defaultTenant
                   case false => payload.tenant.get
                 }
               }
-              val definitionsDocument = CaseSystem.DefinitionProvider.read(user.getTenantUser(tenant), payload.definition)
+              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), payload.definition)
               val caseDefinition = definitionsDocument.getFirstCase
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
               val inputParameters = payload.inputs
               val caseTeam = payload.caseTeam
-              val debugMode = payload.debug.getOrElse(CaseSystem.debugEnabled)
+              val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
               invokeCase(new akka.command.StartCase(tenant, user.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingTenantException => complete(StatusCodes.BadRequest, e.getMessage)

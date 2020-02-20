@@ -44,17 +44,13 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         this.workflow = getDefinition().getImplementationDefinition().createInstance(this);
     }
 
-    @Deprecated
-    public String getName() {
-        return getPlanItem().getName();
-    }
-
     public <T extends HumanTaskEvent> T addEvent(T event) {
         return getCaseInstance().addEvent(event);
     }
 
     /**
      * Returns the state tracking implementation of the task
+     *
      * @return
      */
     public WorkflowTask getImplementation() {
@@ -65,10 +61,10 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     public ValidationResponse validateOutput(ValueMap potentialRawOutput) {
         if (validator != null) {
             ValidationResponse response = validator.validate(potentialRawOutput);
-            if (! response.isValid()) {
-                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task "+getPlanItem().getName()+"["+getPlanItem().getId()+"] failed with ", response.getContent()));
+            if (!response.isValid()) {
+                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task " + getName() + "[" + getId() + "] failed with ", response.getContent()));
             } else {
-                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task "+getPlanItem().getName()+"["+getPlanItem().getId()+"] succeeded with ", response.getContent()));
+                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task " + getName() + "[" + getId() + "] succeeded with ", response.getContent()));
             }
             return response;
         } else {
@@ -91,7 +87,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     @Override
     protected void terminateInstance() {
         if (getPlanItem().getHistoryState() == State.Available) {
-            addDebugInfo(() -> "Terminating human task '"+getPlanItem().getName()+"' without it being started; no need to inform the task actor");
+            addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
             addEvent(new HumanTaskTerminated(this)).updateState(this.getImplementation());
         }
@@ -152,7 +148,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
         // Now check if the user has the performer role.
         if (!currentUserIsAuthorized()) {
-            throw new TransitionDeniedException("You do not have the permission to perform the task " + getPlanItem().getName());
+            throw new TransitionDeniedException("You do not have the permission to perform the task " + getName());
         }
 
         return true;
@@ -171,7 +167,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
         CaseTeamMember currentUser = getCaseInstance().getCurrentTeamMember();
         if (currentUser == null) { // Well, there MUST be a user...
-            throw new TransitionDeniedException("You do not have the permission to perform the task " + getPlanItem().getName());
+            throw new TransitionDeniedException("You do not have the permission to perform the task " + getName());
         }
 
         // Now check if the user has the performer role.
@@ -194,10 +190,10 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 //	public void goComplete(ValueMap rawOutput) {
 //        ValidationResponse validate = this.validateOutput(rawOutput);
 //        if (validate instanceof ValidationError) {
-//            throw new InvalidCommandException("Output for task "+this.getPlanItem().getName()+" could not be validated due to an error", validate.getException());
+//            throw new InvalidCommandException("Output for task "+this.getName()+" could not be validated due to an error", validate.getException());
 //        } else {
 //            if (! validate.getContent().getValue().isEmpty()) {
-//                throw new InvalidCommandException("Output for task "+this.getPlanItem().getName()+" is invalid\n" + validate.getContent());
+//                throw new InvalidCommandException("Output for task "+this.getName()+" is invalid\n" + validate.getContent());
 //            }
 //        }
 //		super.goComplete(workflow.saveOutput(rawOutput));

@@ -73,10 +73,10 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
      * @param transition
      */
     void tryCompletion(PlanItem child, Transition transition) {
-        addDebugInfo(() -> "Checking completion for " + this.getClass().getSimpleName() + " '" + this.getPlanItem().getName() + "' because of semi-terminal child '" + child.getName() + "'->" + transition);
+        addDebugInfo(() -> "Checking completion for " + this.getClass().getSimpleName() + " '" + this.getName() + "' because of semi-terminal child '" + child.getName() + "'->" + transition);
         this.isManualCompletion = false; // Now switch this flag. It is set back in
         if (this.isCompletionAllowed()) {
-            addDebugInfo(() -> this.getClass().getSimpleName() + " '" + this.getPlanItem().getName() + "' is allowed to complete, source: '" + child.getName() + "'->" + transition);
+            addDebugInfo(() -> this.getClass().getSimpleName() + " '" + this.getName() + "' is allowed to complete, source: '" + child.getName() + "'->" + transition);
             getPlanItem().makeTransition(Transition.Complete);
         }
         this.isManualCompletion = true; // Now switch the flag back. Is only required if isCompletionAllowed returns false.
@@ -100,18 +100,18 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         for (PlanItem childItem : planItems) {
             // There shouldn't be any active item.
             if (childItem.getState() == State.Active) {
-                addDebugInfo(() -> "Stage '" + getPlanItem().getName() + "' cannot auto complete, because '" + childItem.getName() + "' is still Active");
+                addDebugInfo(() -> "Stage '" + getName() + "' cannot auto complete, because '" + childItem.getName() + "' is still Active");
                 return false;
             }
             if (!childItem.getState().isSemiTerminal()) {
                 if (autoCompletes || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
                     if (childItem.isRequired()) { // Stage cannot complete if required items are not in semi-terminal state
-                        addDebugInfo(() -> "Stage " + getPlanItem().getName() + " cannot complete, because " + childItem.getName() + " is required and has state " + childItem.getState());
+                        addDebugInfo(() -> "Stage " + getName() + " cannot complete, because " + childItem.getName() + " is required and has state " + childItem.getState());
                         return false;
                     }
                 } else {
                     // Stage cannot complete if not all children are semi-terminal
-                    addDebugInfo(() -> "Stage " + getPlanItem().getName() + " cannot complete, because " + childItem.getName() + " has state " + childItem.getState());
+                    addDebugInfo(() -> "Stage " + getName() + " cannot complete, because " + childItem.getName() + " has state " + childItem.getState());
                     return false;
                 }
             }

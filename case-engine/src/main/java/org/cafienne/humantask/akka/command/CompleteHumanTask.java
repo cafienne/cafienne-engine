@@ -110,7 +110,7 @@ public class CompleteHumanTask extends HumanTaskCommand {
 
     @Override
     public String toString() {
-        String taskName = task != null ? task.getPlanItem().getName() + " with id " + getTaskId() : getTaskId() + " (unknown name)";
+        String taskName = task != null ? task.getName() + " with id " + getTaskId() : getTaskId() + " (unknown name)";
         return "Complete HumanTask '" + taskName + "' with output\n" + taskOutput;
     }
 

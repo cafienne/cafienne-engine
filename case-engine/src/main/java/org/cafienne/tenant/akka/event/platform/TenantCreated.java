@@ -1,6 +1,7 @@
 package org.cafienne.tenant.akka.event.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
@@ -11,7 +12,7 @@ import java.io.IOException;
 
 @Manifest
 public class TenantCreated extends PlatformEvent {
-    public final ValueMap engineVersion;
+    public final CafienneVersion engineVersion;
 
     public enum Fields {
         createdOn, createdBy, parentActorId, rootActorId, caseName, definition, engineVersion
@@ -24,7 +25,7 @@ public class TenantCreated extends PlatformEvent {
 
     public TenantCreated(ValueMap json) {
         super(json);
-        this.engineVersion = readMap(json, Fields.engineVersion);
+        this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
     }
 
     @Override
@@ -35,6 +36,6 @@ public class TenantCreated extends PlatformEvent {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.engineVersion, engineVersion);
+        writeField(generator, Fields.engineVersion, engineVersion.json());
     }
 }

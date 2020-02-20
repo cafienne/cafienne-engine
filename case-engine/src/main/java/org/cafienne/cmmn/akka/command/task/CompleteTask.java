@@ -116,7 +116,7 @@ public class CompleteTask extends CaseCommand {
 
     @Override
     public String toString() {
-        String taskName = task != null ? task.getPlanItem().getName() +" with id "+taskId : taskId +" (unknown name)";
+        String taskName = task != null ? task.getName() +" with id "+taskId : taskId +" (unknown name)";
         return "CompleteTask "+taskName + " with output\n" + taskOutput;
     }
 

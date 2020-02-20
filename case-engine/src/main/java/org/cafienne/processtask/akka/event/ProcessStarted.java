@@ -1,6 +1,7 @@
 package org.cafienne.processtask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -18,7 +19,7 @@ public class ProcessStarted extends ProcessInstanceEvent {
     public final ValueMap inputParameters;
     public transient ProcessDefinition definition;
     public final boolean debugMode;
-    public final ValueMap engineVersion;
+    public final CafienneVersion engineVersion;
 
     private enum Fields {
         parentActorId, rootActorId, name, input, processDefinition, debugMode, engineVersion
@@ -37,7 +38,7 @@ public class ProcessStarted extends ProcessInstanceEvent {
 
     public ProcessStarted(ValueMap json) {
         super(json);
-        this.engineVersion = readMap(json, Fields.engineVersion);
+        this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
         this.name = json.raw(Fields.name);
         this.parentActorId = json.raw(Fields.parentActorId);
         this.rootActorId = json.raw(Fields.rootActorId);
@@ -60,6 +61,6 @@ public class ProcessStarted extends ProcessInstanceEvent {
         writeField(generator, Fields.rootActorId, rootActorId);
         writeField(generator, Fields.debugMode, debugMode);
         writeField(generator, Fields.processDefinition, definition);
-        writeField(generator, Fields.engineVersion, engineVersion);
+        writeField(generator, Fields.engineVersion, engineVersion.json());
     }
 }

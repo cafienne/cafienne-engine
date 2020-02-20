@@ -1,6 +1,7 @@
 package org.cafienne.akka.actor.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -10,20 +11,20 @@ import java.io.IOException;
 @Manifest
 public class EngineVersionChanged extends ModelEvent {
 
-    private final ValueMap version;
+    private final CafienneVersion version;
 
     private enum Fields {
         version
     }
 
-    public EngineVersionChanged(ModelActor actor, ValueMap version) {
+    public EngineVersionChanged(ModelActor actor, CafienneVersion version) {
         super(actor);
         this.version = version;
     }
 
     public EngineVersionChanged(ValueMap json) {
         super(json);
-        this.version = readMap(json, Fields.version);
+        this.version = new CafienneVersion(readMap(json, Fields.version));
     }
 
     @Override
@@ -35,7 +36,7 @@ public class EngineVersionChanged extends ModelEvent {
      * Returns the version of the engine that is currently applied in the case
      * @return
      */
-    public ValueMap version() {
+    public CafienneVersion version() {
         return version;
     }
 
@@ -47,6 +48,6 @@ public class EngineVersionChanged extends ModelEvent {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
-        super.writeField(generator, Fields.version, version);
+        super.writeField(generator, Fields.version, version.json());
     }
 }

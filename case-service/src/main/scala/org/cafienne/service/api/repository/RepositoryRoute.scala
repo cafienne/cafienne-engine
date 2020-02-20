@@ -75,9 +75,9 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
       validUser { user => {
         parameters('tenant ?) { optionalTenant =>
           try {
-            val tenant = optionalTenant.getOrElse(CaseSystem.defaultTenant)
+            val tenant = optionalTenant.getOrElse(user.defaultTenant)
             logger.debug(s"Loading definitions '${modelName}' from tenant '${tenant}'")
-            val model = CaseSystem.DefinitionProvider.read(user.getTenantUser(tenant), modelName)
+            val model = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), modelName)
             complete(StatusCodes.OK, model.getDocument)
           }
           catch {
@@ -117,12 +117,12 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
         validUser { user => {
           import scala.collection.JavaConverters._
 
-          val tenant = optionalTenant.getOrElse(CaseSystem.defaultTenant)
+          val tenant = optionalTenant.getOrElse(user.defaultTenant)
           val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
-          for (file <- CaseSystem.DefinitionProvider.list(user.getTenantUser(tenant)).asScala) {
+          for (file <- CaseSystem.config.repository.DefinitionProvider.list(user.getTenantUser(tenant)).asScala) {
             var description = "Description"
             try {
-              val definitionsDocument = CaseSystem.DefinitionProvider.read(user.getTenantUser(tenant), file)
+              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), file)
               description = definitionsDocument.getFirstCase().getDescription();
             } catch {
               case i: InvalidDefinitionException => description = i.toString
@@ -191,7 +191,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
         parameters('tenant ?) { optionalTenant =>
           entity(as[Document]) { xmlDocument =>
             try {
-              val tenant = optionalTenant.getOrElse(CaseSystem.defaultTenant)
+              val tenant = optionalTenant.getOrElse(user.defaultTenant)
               logger.debug(s"Deploying '${modelName}' to tenant '${tenant}'")
               val definitions = new DefinitionsDocument(xmlDocument)
 
@@ -228,7 +228,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
   private def deploy(user: PlatformUser, tenant: String, modelName: String, definitions: DefinitionsDocument): Future[Any] = {
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
     isTenantOwner(user, tenant).map(isOwner => isOwner match {
-      case true => CaseSystem.DefinitionProvider.write(user.getTenantUser(tenant), modelName, definitions)
+      case true => CaseSystem.config.repository.DefinitionProvider.write(user.getTenantUser(tenant), modelName, definitions)
       case false => throw new SecurityException("User '"+user.userId+"' does not have the privileges to deploy a definition")
     })
   }

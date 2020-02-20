@@ -90,7 +90,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem> {
                 Element planItemXML = parentElement.getOwnerDocument().createElement("planitem");
                 planItemXML.setAttribute("last", lastTransition);
                 planItemXML.setAttribute("id", planItem.getId());
-                planItemXML.setAttribute("stage", planItem.getStage().getPlanItem().getId());
+                planItemXML.setAttribute("stage", planItem.getStage().getId());
                 onPartXML.appendChild(planItemXML);
             }
         }

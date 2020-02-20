@@ -22,12 +22,20 @@ public abstract class PlanItemDefinitionInstance<T extends PlanItemDefinitionDef
     }
 
     /**
-     * Returns the id of the instance.
+     * Returns the id of the instance (which is the plan item id).
      *
      * @return
      */
     public String getId() {
         return planItem.getId();
+    }
+
+    /**
+     * Returns the name of the instance (which is the plan item name).
+     * @return
+     */
+    public String getName() {
+        return getPlanItem().getName();
     }
 
     /**

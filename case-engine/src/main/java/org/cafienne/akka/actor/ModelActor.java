@@ -13,12 +13,10 @@ import org.cafienne.akka.actor.command.response.CommandResponseListener;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.handler.*;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.debug.DebugAppender;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
@@ -78,12 +76,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
-     * If a ModelActor is recovered by Akka, then the version will be overwritten in {@link ModelActor#setEngineVersion(ValueMap)}.
+     * If a ModelActor is recovered by Akka, then the version will be overwritten in {@link ModelActor#setEngineVersion(CafienneVersion)}.
      * Whenever then a new incoming message is handled by the Case actor - one leading to events, i.e., state changes, then
      * the actor will insert a new event EngineVersionChanged.
      * For new Cases, the CaseDefinitionApplied event will generate the current version
      */
-    private ValueMap engineVersion;
+    private CafienneVersion engineVersion;
 
     protected ModelActor(Class<C> commandClass, Class<E> eventClass) {
         this.id = self().path().name();
@@ -92,11 +90,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         this.scheduler = new CaseScheduler(this);
     }
 
-    public ValueMap getEngineVersion() {
+    public CafienneVersion getEngineVersion() {
         return this.engineVersion;
     }
 
-    public void setEngineVersion(ValueMap version) {
+    public void setEngineVersion(CafienneVersion version) {
         this.engineVersion = version;
     }
 
@@ -227,7 +225,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     private void enableSelfCleaner() {
         // Now set the new selfCleaner
-        long idlePeriod = CaseSystem.ActorIdlePeriod();
+        long idlePeriod = CaseSystem.config().actor().idlePeriod();
         FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
         selfCleaner = getScheduler().schedule(duration, () -> {
             logger.debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");

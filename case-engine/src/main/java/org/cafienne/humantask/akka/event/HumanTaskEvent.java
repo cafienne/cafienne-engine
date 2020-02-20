@@ -32,8 +32,8 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
      */
     protected HumanTaskEvent(HumanTask task) {
         super(task);
-        this.taskName = task.getPlanItem().getName();
-        this.taskId = task.getPlanItem().getId();
+        this.taskName = task.getName();
+        this.taskId = task.getId();
     }
 
     protected HumanTaskEvent(ValueMap json) {
