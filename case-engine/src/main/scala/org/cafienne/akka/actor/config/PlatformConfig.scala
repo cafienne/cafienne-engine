@@ -30,6 +30,17 @@ class PlatformConfig(val parentConfig: Config) extends LazyLogging {
     configuredDefaultTenant
   }
 
+  /**
+    * Config property for reading a specific file with bootstrap tenant setup
+    */
+  lazy val bootstrapFile = {
+    if (config.hasPath("bootstrap-file")) {
+      config.getString("bootstrap-file")
+    } else {
+      ""
+    }
+  }
+
   def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
 
   def isPlatformOwner(userId: String): Boolean = {
