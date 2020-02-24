@@ -163,6 +163,7 @@
       version in Docker := "latest",
       maintainer in Docker := """Cafienne <info@cafienne.io>""",
       defaultLinuxInstallLocation in Docker := "/opt/cafienne",
+      bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml"""",
       bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",
       dockerExposedPorts := Seq(2027, 9999),
       dockerBaseImage := "cafienne/base:openjdk-11",

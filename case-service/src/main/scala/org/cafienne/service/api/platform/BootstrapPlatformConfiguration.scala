@@ -30,13 +30,29 @@ object BootstrapPlatformConfiguration extends LazyLogging {
   }
 
   private def findConfigFile(): Option[File] = {
-    logger.debug("Checking for any bootstrap configuration of the case system")
+    logger.warn("Checking presence of bootstrap configuration for the case system")
+    val bootstrapTenantConfFileName = CaseSystem.config.platform.bootstrapFile
+    if (!bootstrapTenantConfFileName.trim.isEmpty) {
+      val configFile = new File(bootstrapTenantConfFileName)
+      if (! configFile.exists()) {
+        logger.warn("Sleeping a bit, becuase file " + bootstrapTenantConfFileName+" seems to not (yet) exist")
+        Thread.sleep(1000) // Sometimes in docker, volume is not mounted fast enough it seems. Therefore we put a wait statement of 1 second and then check again.
+        if (! configFile.exists()) {
+          throw new BootstrapFailure(s"The configured bootstrap tenant file cannot be found at '${configFile.getAbsolutePath}' (conf value: '${bootstrapTenantConfFileName}')")
+        }
+        logger.warn("Sleeping a bit helped, becuase file " + bootstrapTenantConfFileName+" now exists")
+      }
+      return Some(configFile)
+    }
+
     val defaultTenant = CaseSystem.config.platform.defaultTenant
     if (defaultTenant.trim.isEmpty) {
-      logger.info("Default tenant is empty. Skipping bootstrap attempts")
+      logger.warn("Default tenant is empty and bootstrap-file is not filled. Skipping bootstrap attempts")
       return None
     }
 
+    val confFile = new File(defaultTenant + ".conf")
+    if (confFile.exists()) return Some(confFile)
     val jsonFile = new File(defaultTenant + ".json")
     if (jsonFile.exists()) return Some(jsonFile)
     val ymlFile = new File(defaultTenant + ".yml")
@@ -44,7 +60,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     val yamlFile = new File(defaultTenant + ".yaml")
     if (yamlFile.exists()) return Some(yamlFile)
 
-    logger.info(s"Skipping bootstrap tenant configuration for '$defaultTenant', because a file '${jsonFile}', '${ymlFile}' or '${yamlFile}' cannot be found")
+    logger.warn(s"Skipping bootstrap tenant configuration for '$defaultTenant', because a file '${confFile}', '${jsonFile}', '${ymlFile}' or '${yamlFile}' cannot be found")
     None
    }
 
@@ -114,12 +130,12 @@ object BootstrapPlatformConfiguration extends LazyLogging {
       response match {
         case e: CommandFailure => {
           if (e.exception().getMessage.toLowerCase().contains("already exists")) {
-            logger.info("Bootstrap tenant '" + bootstrapTenant.name + "' already exists; ignoring bootstrap info")
+            logger.info("Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
           } else {
-            logger.warn("Bootstrap tenant '" + bootstrapTenant.name + "' creation failed with an unexpected exception", e)
+            logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
           }
         }
-        case t: TenantResponse => logger.info("Completed creation of bootstrap tenant '" + bootstrapTenant.name + "'")
+        case t: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
         case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
         case t: Throwable => throw t
         case other => logger.error("Unexpected response during creation of bootstrap tenant, of type " + other.getClass.getName)
