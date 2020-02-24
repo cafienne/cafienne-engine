@@ -7,24 +7,32 @@
  */
 package org.cafienne.processtask.implementation.report;
 
+import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
+import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class PDFReport extends SubProcess<PDFReportDefinition> {
     private final static Logger logger = LoggerFactory.getLogger(PDFReport.class);
+
+    final static String REPORT_DATA_TAG = "reportData";
 
     public PDFReport(ProcessTaskActor processTask, PDFReportDefinition definition) {
         super(processTask, definition);
@@ -54,43 +62,49 @@ public class PDFReport extends SubProcess<PDFReportDefinition> {
 
     private void generateReport() {
         try {
-            ValueMap processInputParameters = processTaskActor.getMappedInputParameters();
-            definition.setInputParameters(processInputParameters);
+            long start = System.currentTimeMillis();
 
-            InputStream jrXmlInputStream = definition.getJasperReportXml();
-            InputStream dataInputStream = definition.getJasperReportJsonData();
+            Map<String, Object> jasperParameters = new HashMap<String, Object>();
+            jasperParameters.put(JsonQueryExecuterFactory.JSON_INPUT_STREAM, definition.createDataStream(this));
+            jasperParameters.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, "yyyy-MM-dd");
+            jasperParameters.put(JsonQueryExecuterFactory.JSON_NUMBER_PATTERN, "#,##0.##");
+            jasperParameters.put(JsonQueryExecuterFactory.JSON_LOCALE, Locale.ENGLISH);
+            jasperParameters.put(JRParameter.REPORT_LOCALE, Locale.US);
 
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put(JsonQueryExecuterFactory.JSON_INPUT_STREAM, dataInputStream);
-            params.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, "yyyy-MM-dd");
-            params.put(JsonQueryExecuterFactory.JSON_NUMBER_PATTERN, "#,##0.##");
-            params.put(JsonQueryExecuterFactory.JSON_LOCALE, Locale.ENGLISH);
-            params.put(JRParameter.REPORT_LOCALE, Locale.US);
-
-            definition.getJasperSubReportXmls().forEach((paramName, subReportDef) -> {
+            definition.getSubReportDefinitions().forEach(subReport -> {
+                String subReportName = subReport.getSubReportName();
                 try {
-                    params.put(paramName, JasperCompileManager.compileReport(subReportDef));
+                    JasperReport subReportje = subReport.createInstance(this);
+                    jasperParameters.put(subReportName, subReportje);
                 } catch (JRException e) {
-                    raiseFault(new RuntimeException("Could not compile parameter " + paramName + " into report definition", e));
+                    raiseFault(new RuntimeException("Could not compile parameter " + subReportName + " into report definition", e));
+                    return;
+                } catch (IllegalArgumentException iae) {
+                    raiseFault(iae);
                     return;
                 }
             });
 
-            long start = System.currentTimeMillis();
-            JasperReport jReport = JasperCompileManager.compileReport(jrXmlInputStream);
-            JasperPrint jPrint = JasperFillManager.fillReport(jReport, params);
+            JasperReport jReport = definition.getReportDefinition().createInstance(this);
+            JasperPrint jPrint = JasperFillManager.fillReport(jReport, jasperParameters);
 
             ByteArrayOutputStream reportOutput = new ByteArrayOutputStream();
             JasperExportManager.exportReportToPdfStream(jPrint, reportOutput);
 
-            processTaskActor.addDebugInfo(() -> "PDF Report - Filling time : " + (System.currentTimeMillis() - start));
-
             String encodedOutput = Base64.getEncoder().encodeToString(reportOutput.toByteArray());
-            setRawOutputParameter(PDFReportDefinition.PDF_REPORT_DATA, Value.convert(encodedOutput));
+            setRawOutputParameter(PDFReportDefinition.PDF_REPORT_DATA, new StringValue(encodedOutput));
+
+            processTaskActor.addDebugInfo(() -> "PDF Report - Filling time : " + (System.currentTimeMillis() - start));
             raiseComplete();
 
         } catch (JRException e) {
             raiseFault(new RuntimeException("Error while generating pdf report", e));
+        } catch (MissingParameterException mpe) {
+            raiseFault(mpe);
         }
+    }
+
+    ValueMap getInputParameters() {
+        return processTaskActor.getMappedInputParameters();
     }
 }
