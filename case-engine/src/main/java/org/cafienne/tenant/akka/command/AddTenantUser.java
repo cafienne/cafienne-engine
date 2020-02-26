@@ -61,5 +61,7 @@ public class AddTenantUser extends TenantCommand {
         super.write(generator);
         writeField(generator, Fields.userId, userId);
         writeField(generator, Fields.roles, roles);
+        writeField(generator, Fields.name, name);
+        writeField(generator, Fields.email, email);
     }
 }
