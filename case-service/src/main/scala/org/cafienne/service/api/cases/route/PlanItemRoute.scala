@@ -34,8 +34,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   val caseFileRoute = new CaseFileRoute(caseQueries)(userCache)
   val caseTeamRoute = new CaseTeamRoute(caseQueries)(userCache)
 
-  override def routes =
-    pathPrefix("cases") {
+  override def routes = {
       getPlanItems ~
       getPlanItem ~
       planItemTransition ~
