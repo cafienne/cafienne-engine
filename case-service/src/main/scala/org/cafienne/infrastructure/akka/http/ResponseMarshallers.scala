@@ -3,6 +3,7 @@ package org.cafienne.infrastructure.akka.http
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.akka.command.response.{CaseResponse, CaseResponseWithValueMap}
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueList, ValueMap}
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse
@@ -43,13 +44,10 @@ object ResponseMarshallers {
   implicit val tenantOwnersResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { o: TenantOwnersResponse =>
     val sb = new StringBuilder("[")
     val owners = o.owners
-    var first = true
+    var postfix = ""
     owners.forEach(o => {
-      if (! first) {
-        sb.append(", ")
-      }
-      sb.append("\"" + o + "\"")
-      if (first) first = false
+      sb.append(postfix + "\"" + o + "\"")
+      postfix = ", "
     })
     sb.append("]")
 
@@ -57,10 +55,25 @@ object ResponseMarshallers {
   }
 
   /**
-    * Simple CaseResponse converter to JSON
+    * Simple TenantUser converter to JSON
+    * This does not spit out the enabled property of TenantUser
     */
-//  implicit val tenantResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: TenantResponse =>
-//    // TODO: extend this code to include case-last-modified header?!
-//    HttpEntity(ContentTypes.`application/json`, "{}")
-//  }
+  implicit val tenantUserMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { user: TenantUser =>
+      HttpEntity(ContentTypes.`application/json`, user.toJson.toString)
+  }
+
+  /**
+    * Simple TenantUser list converter to JSON
+    */
+  implicit val tenantUsersMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { users: Seq[TenantUser] =>
+    val sb = new StringBuilder("[")
+    var postfix = ""
+    users.foreach(tenantUser => {
+      sb.append(postfix + tenantUser.toJson.toString)
+      postfix = ", "
+    })
+    sb.append("]")
+
+    HttpEntity(ContentTypes.`application/json`, sb.toString)
+  }
 }

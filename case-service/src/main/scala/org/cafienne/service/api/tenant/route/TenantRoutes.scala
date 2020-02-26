@@ -19,11 +19,11 @@ import scala.collection.immutable.Seq
 @Api(value = "tenant", tags = Array("tenant"))
 @Path("/tenant")
 class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
-  val tenantAdministrationRoute = new TenantAdministrationRoute()(userCache)
-  val participants = new TenantUsersAdministrationRoute(userQueries)(userCache)
+  val tenantAdministrationRoute = new TenantOwnersRoute(userQueries)(userCache)
+  val participants = new TenantUsersRoute(userQueries)(userCache)
 
   override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[TenantAdministrationRoute], classOf[TenantUsersAdministrationRoute])
+    Seq(classOf[TenantOwnersRoute], classOf[TenantUsersRoute])
   }
 
   override def routes = pathPrefix("tenant") {

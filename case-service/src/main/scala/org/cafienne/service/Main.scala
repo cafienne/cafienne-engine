@@ -30,7 +30,7 @@ import org.cafienne.service.api.projection.task.TaskProjectionsWriter
 import org.cafienne.service.api.registration.FormerRegistrationRoutes
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.{TaskQueriesImpl, TaskRoutes}
-import org.cafienne.service.api.tenant.route.{TenantAdministrationRoute, TenantRoutes, TenantUsersAdministrationRoute}
+import org.cafienne.service.api.tenant.route.{TenantOwnersRoute, TenantRoutes, TenantUsersRoute}
 import org.cafienne.service.db.migration.Migrate
 
 import scala.concurrent.Await

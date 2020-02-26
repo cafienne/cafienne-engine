@@ -12,6 +12,7 @@ import akka.http.scaladsl.server
 import akka.http.scaladsl.server.Directives._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
+import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.Main
 import org.cafienne.service.api.AuthenticatedRoute
 import org.cafienne.tenant.akka.command.TenantCommand
@@ -32,24 +33,7 @@ trait TenantRoute extends AuthenticatedRoute {
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
-          case o: TenantOwnersResponse => {
-
-            // TODO: akkhttp will support some form of json serialization of a set of strings. To be found :).
-            val sb = new StringBuilder("[")
-            val owners = o.owners
-            var first = true
-            owners.forEach(o => {
-              if (! first) {
-                sb.append(", ")
-              }
-              sb.append("\"" + o + "\"")
-              if (first) first = false
-            })
-            sb.append("]")
-
-
-            complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, sb.toString))
-          }
+          case tenantOwners: TenantOwnersResponse => complete(StatusCodes.OK, tenantOwners)
           case _: TenantResponse => complete(StatusCodes.NoContent)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)

@@ -2,6 +2,7 @@ package org.cafienne.service.api.tenant
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.service.api.tasks.SearchFailure
 
 import scala.collection.mutable
 import scala.concurrent.Future
@@ -10,6 +11,8 @@ trait UserQueries {
   def getPlatformUser(userId: String) : Future[PlatformUser] = ???
 
   def getTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
+
+  def getDisabledTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
 
   def getTenantUser(user: PlatformUser, tenant: String, userId: String): Future[TenantUser] = ???
 }
@@ -27,8 +30,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   override def getPlatformUser(userId: String): Future[PlatformUser] = {
     val query = TableQuery[UserRoleTable].filter(_.userId === userId).filter(_.enabled === true)
 
-    db.run(query.result)
-      .map(records => {
+    db.run(query.result).map(records => {
         val rolesPerTenant = mutable.Map[String, Seq[UserRole]]()
         val tenantUsers = mutable.Map[String, User]()
         records.map(r => {
@@ -54,25 +56,28 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
           new PlatformUser(userId, users)
         }
 
-
         from(userId, allUsersWitRoles)
       })
   }
 
-  override def getTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
+  private def readAllTenantUsers(user: PlatformUser, tenant: String) = {
     // First a security check
     user.shouldBelongTo(tenant)
 
-    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant).filter(_.role_name === "")
+    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant)
     db.run(users.result).map(roleRecords => {
+      // First sort and store all roles by user-id
       val users = mutable.Map[String, Seq[UserRole]]()
       roleRecords.map(role => {
         val knownRoles = users.getOrElse(role.userId, Seq())
         users.put(role.userId, knownRoles :+ role)
       })
-      val tenantUsers = users.keys.map(userId => {
-        val roles = users.getOrElse(userId, Seq())
-        val roleNames = roles.map(role => role.role_name)
+
+      // Now go through all the UserRole objects per user-id and map them to TenantUser objects
+      val tenantUsers = users.map(entry => {
+        val userId = entry._1
+        val roles = entry._2
+        val roleNames = roles.map(role => role.role_name).filter(roleName => !roleName.trim.isEmpty)
         val userIdentifyingRole = roles.find(role => role.role_name == "").getOrElse(UserRole(userId, "", tenant, "", "", false))
         TenantUser(userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
       })
@@ -80,9 +85,27 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     })
   }
 
+  override def getTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
+    readAllTenantUsers(user, tenant).map(p => p.filter(t => t.enabled))
+  }
+
+  override def getDisabledTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
+    readAllTenantUsers(user, tenant).map(p => p.filterNot(t => t.enabled))
+  }
+
+  // Note: this also returns a user if the account for that user has been disabled
   override def getTenantUser(user: PlatformUser, tenant: String, userId: String): Future[TenantUser] = {
     // First a security check
     user.shouldBelongTo(tenant);
-    getPlatformUser(userId).map(u => u.getTenantUser(tenant))
+    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant).filter(_.userId === userId)
+    db.run(users.result).map(roleRecords => {
+      // Filter out names of enabled roles
+      val roleNames = roleRecords.filter(role => role.enabled).map(role => role.role_name).filter(roleName => !roleName.trim.isEmpty)
+      // Filter out user
+      val userIdentifyingRole = roleRecords.find(role => role.role_name == "").getOrElse({
+        throw new SearchFailure(s"User '${userId}' cannot be found")
+      })
+      TenantUser(userIdentifyingRole.userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
+    })
   }
 }

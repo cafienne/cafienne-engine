@@ -12,7 +12,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
+import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -21,28 +21,108 @@ import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.model._
+import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.api.tenant.UserQueries
-import org.cafienne.tenant.akka.command._
+import org.cafienne.service.api.tenant.model.TenantAPI
+import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenantUserRoles, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
 
-
-@Api(value = "users", tags = Array("tenant"))
+@Api(value = "tenant", tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
-class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   override def routes = {
-    addTenantUser ~
+    addTenantOwner ~
+      removeTenantOwner ~
+      getTenantOwners ~
+      addTenantUser ~
       addTenantUserRoles ~
       removeTenantUserRole ~
       enableTenantUser ~
       disableTenantUser ~
-      getTenantUsers ~
-      getTenantUser ~
-      getUserInformation
+      getDisabledUserAccounts
+  }
+
+  @Path("/{tenant}/owners/{userId}")
+  @PUT
+  @Operation(
+    summary = "Add a tenant owner",
+    description = "Add a user to the group of owners of the tenant. Only tenant owners have permission to manage tenant user information",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "userId", description = "Id of user to be added", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant to add the owner to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "204", description = "Owner added successfully"),
+      new ApiResponse(responseCode = "400", description = "Owner information is invalid"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Consumes(Array("application/json"))
+  def addTenantOwner = put {
+    validUser { tenantOwner =>
+      path(Segment / "owners" / Segment) { (tenant, userId) =>
+        val user = tenantOwner.getTenantUser(tenant)
+        askTenant(new AddTenantOwner(user, tenant, userId))
+      }
+    }
+  }
+
+  @Path("/{tenant}/owners/{userId}")
+  @DELETE
+  @Operation(
+    summary = "Remove a tenant owner",
+    description = "Remove the user with the specified id from the group of tenant owners",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "userId", description = "Id of user to be removed", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant to remove the owner from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "204", description = "Owner removed successfully"),
+      new ApiResponse(responseCode = "400", description = "Owner information is invalid"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Consumes(Array("application/json"))
+  def removeTenantOwner = delete {
+    validUser { tenantOwner =>
+      path(Segment / "owners" / Segment) { (tenant, userId) =>
+        val user = tenantOwner.getTenantUser(tenant)
+        askTenant(new RemoveTenantOwner(user, tenant, userId))
+      }
+    }
+  }
+
+  @Path("/{tenant}/owners")
+  @GET
+  @Operation(
+    summary = "Get tenant owners",
+    description = "Retrieves the list of tenant owners",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "The tenant to retrieve owners from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "204", description = "List of user ids of that are owner of the tenant", content = Array(new Content(schema = new Schema(implementation = classOf[Set[String]])))),
+      new ApiResponse(responseCode = "400", description = "Invalid request"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Produces(Array("application/json"))
+  def getTenantOwners = get {
+    validUser { tenantOwner =>
+      path(Segment / "owners") { tenant =>
+        if (tenantOwner.isPlatformOwner) {
+//          println("Cannot go there as platform owner")
+        }
+        askTenant(new GetTenantOwners(tenantOwner.getTenantUser(tenant), tenant))
+      }
+    }
   }
 
   @Path("/{tenant}/users")
@@ -99,7 +179,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   def disableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "disable") { (tenant, userId) =>
-//        System.err.println("Disabling user " + userId + " in tenant " + tenant)
+        //        System.err.println("Disabling user " + userId + " in tenant " + tenant)
         val user = tenantOwner.getTenantUser(tenant)
         askTenant(new DisableTenantUser(user, tenant, userId))
       }
@@ -125,7 +205,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   def enableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "enable") { (tenant, userId) =>
-//        System.err.println("Enabling user " + userId + " in tenant " + tenant)
+        //        System.err.println("Enabling user " + userId + " in tenant " + tenant)
         val user = tenantOwner.getTenantUser(tenant)
         askTenant(new EnableTenantUser(user, tenant, userId))
       }
@@ -154,7 +234,7 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   def addTenantUserRoles = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-//            System.err.println("New roles for user " + userId + " in tenant " + tenant + ": " + roles)
+        //            System.err.println("New roles for user " + userId + " in tenant " + tenant + ": " + roles)
         val user = tenantOwner.getTenantUser(tenant)
         askTenant(new AddTenantUserRoles(user, tenant, userId, role))
       }
@@ -181,39 +261,34 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
   def removeTenantUserRole = delete {
     validUser { user =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-//            System.err.println("Remove role for user " + userId + " in tenant " + tenant + ": " + role)
+        //            System.err.println("Remove role for user " + userId + " in tenant " + tenant + ": " + role)
         val tenantOwner = user.getTenantUser(tenant)
         askTenant(new RemoveTenantUserRole(tenantOwner, tenant, userId, role))
       }
     }
   }
 
-  @Path("/{tenant}/users")
+  @Path("/{tenant}/disabled-accounts")
   @GET
   @Operation(
-    summary = "Get tenant users",
-    description = "Retrieves the list of tenant users",
+    summary = "Get a list of disabled user accounts",
+    description = "Retrieves the list of disabled user accounts",
     tags = Array("tenant"),
     parameters = Array(
-      new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant to retrieve accounts from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUser]))))),
+      new ApiResponse(responseCode = "204", description = "List of user accounts that have been disabled in the tenant", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TenantUser]])))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
   )
   @Produces(Array("application/json"))
-  def getTenantUsers = get {
-    validUser { platformUser =>
-      path(Segment / "users") { tenant =>
-        onComplete(userQueries.getTenantUsers(platformUser, tenant)) {
+  def getDisabledUserAccounts = get {
+    validUser { tenantOwner =>
+      path(Segment / "disabled-accounts") { tenant =>
+        onComplete(userQueries.getDisabledTenantUsers(tenantOwner, tenant)) {
           case Success(users) =>
-            implicit val usersMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { users: Seq[TenantUser] =>
-              val vList = new ValueList()
-              users.foreach(u => vList.add(u.toJson))
-              HttpEntity(ContentTypes.`application/json`, vList.toString)
-            }
             complete(StatusCodes.OK, users)
           case Failure(err) =>
             err match {
@@ -221,71 +296,8 @@ class TenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit
               case _ => complete(StatusCodes.InternalServerError, err)
             }
         }
-      }
+
     }
-  }
-
-  @Path("/{tenant}/users/{userId}")
-  @GET
-  @Operation(
-    summary = "Get a tenant user",
-    description = "Gets information about the tenant user with the specified id",
-    tags = Array("tenant"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUser]))))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
-    )
-  )
-  @Produces(Array("application/json"))
-  def getTenantUser = get {
-    validUser { platformUser =>
-      path(Segment / "users" / Segment) { (tenant, userId) =>
-        platformUser.shouldBelongTo(tenant)
-
-        onComplete(userQueries.getPlatformUser(userId)) {
-          case Success(requestedUser) =>
-            val tenantUserInformation = requestedUser.getTenantUser(tenant)
-            implicit val tenantUserMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { user: TenantUser =>
-              HttpEntity(ContentTypes.`application/json`, user.toJson.toString)
-            }
-
-            complete(StatusCodes.OK, tenantUserInformation)
-          case Failure(err) =>
-            err match {
-              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
-              case _ => complete(StatusCodes.InternalServerError, err)
-            }
-        }
-      }
-    }
-  }
-
-  @Path("/user-information")
-  @GET
-  @Operation(
-    summary = "Get user information of current user",
-    description = "Retrieves the user information of current user",
-    tags = Array("tenant"),
-    responses = Array(
-      new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUser])))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
-    )
-  )
-  @Produces(Array("application/json"))
-  def getUserInformation = get {
-    pathPrefix("user-information") {
-      pathEndOrSingleSlash {
-        validUser { user =>
-          val value = HttpEntity(ContentTypes.`application/json`, user.toJSON)
-          complete(StatusCodes.OK, value)
-        }
-      }
     }
   }
 }
