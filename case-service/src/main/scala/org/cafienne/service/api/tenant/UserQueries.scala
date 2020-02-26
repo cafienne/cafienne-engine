@@ -63,16 +63,20 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     // First a security check
     user.shouldBelongTo(tenant)
 
-    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant).filter(_.role_name === "")
+    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant)
     db.run(users.result).map(roleRecords => {
+      // First sort and store all roles by user-id
       val users = mutable.Map[String, Seq[UserRole]]()
       roleRecords.map(role => {
         val knownRoles = users.getOrElse(role.userId, Seq())
         users.put(role.userId, knownRoles :+ role)
       })
-      val tenantUsers = users.keys.map(userId => {
-        val roles = users.getOrElse(userId, Seq())
-        val roleNames = roles.map(role => role.role_name)
+
+      // Now go through all the UserRole objects per user-id and map them to TenantUser objects
+      val tenantUsers = users.map(entry => {
+        val userId = entry._1
+        val roles = entry._2
+        val roleNames = roles.map(role => role.role_name).filter(roleName => !roleName.trim.isEmpty)
         val userIdentifyingRole = roles.find(role => role.role_name == "").getOrElse(UserRole(userId, "", tenant, "", "", false))
         TenantUser(userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
       })
