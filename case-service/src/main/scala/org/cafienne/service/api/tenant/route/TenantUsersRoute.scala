@@ -7,8 +7,7 @@
  */
 package org.cafienne.service.api.tenant.route
 
-import akka.http.scaladsl.marshalling.Marshaller
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -17,11 +16,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
-import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
+import org.cafienne.service.api.tasks.SearchFailure
 import org.cafienne.service.api.tenant.model._
 import org.cafienne.service.api.tenant.UserQueries
+
 
 import scala.util.{Failure, Success}
 
@@ -57,11 +57,6 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       path(Segment / "users") { tenant =>
         onComplete(userQueries.getTenantUsers(platformUser, tenant)) {
           case Success(users) =>
-            implicit val usersMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { users: Seq[TenantUser] =>
-              val vList = new ValueList()
-              users.foreach(u => vList.add(u.toJson))
-              HttpEntity(ContentTypes.`application/json`, vList.toString)
-            }
             complete(StatusCodes.OK, users)
           case Failure(err) =>
             err match {
@@ -93,20 +88,23 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
   def getTenantUser = get {
     validUser { platformUser =>
       path(Segment / "users" / Segment) { (tenant, userId) =>
-        platformUser.shouldBelongTo(tenant)
-
-        onComplete(userQueries.getPlatformUser(userId)) {
-          case Success(requestedUser) =>
-            val tenantUserInformation = requestedUser.getTenantUser(tenant)
-            implicit val tenantUserMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { user: TenantUser =>
-              HttpEntity(ContentTypes.`application/json`, user.toJson.toString)
+        onComplete(userQueries.getTenantUser(platformUser, tenant, userId)) {
+          case Success(tenantUserInformation) =>
+            if (tenantUserInformation.enabled) {
+              complete(StatusCodes.OK, tenantUserInformation)
+            } else {
+              // TODO: perhaps this should be allowed for tenant owners?
+              logger.warn(s"User with id '${platformUser.userId}' tries to fetch tenant user '${userId}' but that account has been disabled")
+              complete(StatusCodes.NotFound)
             }
-
-            complete(StatusCodes.OK, tenantUserInformation)
-          case Failure(err) =>
-            err match {
+          case Failure(failure) =>
+            failure match {
+              case _: SearchFailure => complete(StatusCodes.NotFound)
               case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
-              case _ => complete(StatusCodes.InternalServerError, err)
+              case _ => {
+                logger.warn(s"Ran into an exception while getting user '${userId}' in tenant '${tenant}'", failure)
+                complete(StatusCodes.InternalServerError)
+              }
             }
         }
       }

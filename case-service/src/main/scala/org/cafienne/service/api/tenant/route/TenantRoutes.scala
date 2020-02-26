@@ -19,7 +19,7 @@ import scala.collection.immutable.Seq
 @Api(value = "tenant", tags = Array("tenant"))
 @Path("/tenant")
 class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
-  val tenantAdministrationRoute = new TenantOwnersRoute()(userCache)
+  val tenantAdministrationRoute = new TenantOwnersRoute(userQueries)(userCache)
   val participants = new TenantUsersRoute(userQueries)(userCache)
 
   override def apiClasses(): Seq[Class[_]] = {

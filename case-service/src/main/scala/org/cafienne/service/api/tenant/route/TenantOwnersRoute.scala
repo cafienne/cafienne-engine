@@ -7,6 +7,8 @@
  */
 package org.cafienne.service.api.tenant.route
 
+import akka.http.scaladsl.marshalling.Marshaller
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -16,15 +18,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
+import org.cafienne.akka.actor.identity.TenantUser
+import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
+import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenantUserRoles, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
+
 import scala.collection.JavaConverters._
+import scala.util.{Failure, Success}
 
 @Api(value = "tenant", tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
-class TenantOwnersRoute()(override implicit val userCache: IdentityProvider) extends TenantRoute {
+class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   override def routes = {
     addTenantOwner ~
@@ -34,7 +42,8 @@ class TenantOwnersRoute()(override implicit val userCache: IdentityProvider) ext
       addTenantUserRoles ~
       removeTenantUserRole ~
       enableTenantUser ~
-      disableTenantUser
+      disableTenantUser ~
+      getDisabledUserAccounts
   }
 
   @Path("/{tenant}/owners/{userId}")
@@ -256,6 +265,39 @@ class TenantOwnersRoute()(override implicit val userCache: IdentityProvider) ext
         val tenantOwner = user.getTenantUser(tenant)
         askTenant(new RemoveTenantUserRole(tenantOwner, tenant, userId, role))
       }
+    }
+  }
+
+  @Path("/{tenant}/disabled-accounts")
+  @GET
+  @Operation(
+    summary = "Get a list of disabled user accounts",
+    description = "Retrieves the list of disabled user accounts",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "The tenant to retrieve accounts from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "204", description = "List of user accounts that have been disabled in the tenant", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TenantUser]])))),
+      new ApiResponse(responseCode = "400", description = "Invalid request"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Produces(Array("application/json"))
+  def getDisabledUserAccounts = get {
+    validUser { tenantOwner =>
+      path(Segment / "disabled-accounts") { tenant =>
+        onComplete(userQueries.getDisabledTenantUsers(tenantOwner, tenant)) {
+          case Success(users) =>
+            complete(StatusCodes.OK, users)
+          case Failure(err) =>
+            err match {
+              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
+              case _ => complete(StatusCodes.InternalServerError, err)
+            }
+        }
+
+    }
     }
   }
 }
