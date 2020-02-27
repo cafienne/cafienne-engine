@@ -26,8 +26,8 @@ import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
+import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 import org.cafienne.service.Main
-import org.cafienne.service.api.AuthenticatedRoute
 import org.cafienne.tenant.akka.command.GetTenantOwners
 import org.cafienne.tenant.akka.command.response.TenantOwnersResponse
 import org.w3c.dom.Document

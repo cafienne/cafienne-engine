@@ -7,7 +7,6 @@
  */
 package org.cafienne.humantask.akka.command;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -34,15 +33,8 @@ public class ClaimTask extends WorkflowCommand {
          * TODO: 2. Check whether the current user is part of CaseTeam. If not what to do?
          */
 
-        /*
-         * TODO Temporary code for demo. Adding current user to the case team. This will be removed => WK: when?
-         */
-
-
-        task.getCaseInstance().getCaseTeam().addCurrentUser(getUser());
-
         if (!task.currentUserIsAuthorized()) {
-            throw new InvalidCommandException("No permission to perform this task");
+            throw new SecurityException("No permission to perform this task");
         }
 
         validateState(task, TaskState.Unassigned);

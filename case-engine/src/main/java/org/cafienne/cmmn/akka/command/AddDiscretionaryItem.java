@@ -65,6 +65,7 @@ public class AddDiscretionaryItem extends CaseCommand {
 
     @Override
     public void validate(Case caseInstance) {
+        super.validate(caseInstance);
         PlanItem alreadyExisting = caseInstance.getPlanItemById(planItemId);
         if (alreadyExisting != null) {
             throw new InvalidCommandException("Cannot plan a discretionary item named '" + name + "' with the specified id " + planItemId + ", because the case already has a plan item with that id");

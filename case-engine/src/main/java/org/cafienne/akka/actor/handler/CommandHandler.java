@@ -89,6 +89,10 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             // Leave the actual work of processing to the command itself.
             setNextResponse(command.process(actor));
             logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
+        } catch (SecurityException e) {
+            actor.addDebugInfo(() -> e);
+            setNextResponse(new SecurityFailure(getCommand(), e));
+            logger.debug("===== Command was not authorized ======");
         } catch (CommandException e) {
             setNextResponse(new CommandFailure(getCommand(), e));
             actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception");

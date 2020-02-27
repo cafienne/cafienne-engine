@@ -17,25 +17,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.Main
-import org.cafienne.service.api.AuthenticatedRoute
+import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command.TenantCommand
-import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, EnableTenant}
-import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
+import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
-import scala.util.{Failure, Success}
 
 @Api(value = "platform", tags = Array("platform"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
+class PlatformRoute()(override implicit val userCache: IdentityProvider) extends CommandRoute {
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[PlatformRoute])
@@ -151,36 +145,8 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
     }
   }
 
-  private def askPlatform(command: TenantCommand) = {
-    import akka.pattern.ask
-    implicit val timeout = Main.caseSystemTimeout
-
-    onComplete(CaseSystem.router ? command) {
-      case Success(value) =>
-        value match {
-          case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
-          case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
-          case o: TenantOwnersResponse => {
-
-            // TODO: akkhttp will support some form of json serialization of a set of strings. To be found :).
-            val sb = new StringBuilder("[")
-            val owners = o.owners
-            var first = true
-            owners.forEach(o => {
-              if (! first) {
-                sb.append(", ")
-              }
-              sb.append("\"" + o + "\"")
-              if (first) first = false
-            })
-            sb.append("]")
-
-
-            complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, sb.toString))
-          }
-          case _: TenantResponse => complete(StatusCodes.NoContent)
-        }
-      case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
-    }
+  private def askPlatform(command: PlatformTenantCommand) = {
+    askModelActor(command)
   }
+
 }

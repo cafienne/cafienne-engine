@@ -66,6 +66,13 @@ public abstract class CaseCommand extends ModelCommand<Case> {
         if (caseInstance.getDefinition() == null) {
             throw new InvalidCommandException("Cannot handle command of type " + getClass().getName() + "; StartCase not yet sent, or not in this user context");
         }
+
+        /*
+         * TODO Temporary code for demo. Adding current user to the case team. This will be removed => WK: when?
+         */
+
+        // By default add the current user to the case team (will be ignored if user is already in the team)
+        caseInstance.getCaseTeam().addCurrentUser(caseInstance.getCurrentUser());
     }
 
     /**

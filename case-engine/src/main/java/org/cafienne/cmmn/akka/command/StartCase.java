@@ -154,12 +154,14 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         // First set the definition
         caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName())).finished();
 
+        // First setup the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
+        caseTeam.getMembers().forEach(newMember -> caseInstance.getCaseTeam().addMember(newMember));
+        // By default add the current user to the case team; this will be ignored if the user is already in the case team
+        caseInstance.getCaseTeam().addCurrentUser(caseInstance.getCurrentUser());
+
         // Apply input parameters. This may also fill the CaseFile
         caseInstance.addDebugInfo(DebugEvent.class, e -> e.addMessage("Input parameters for new case of type "+ definition.getName(), inputParameters));
         caseInstance.setInputParameters(inputParameters);
-
-        // Add members to case team
-        caseTeam.getMembers().forEach(newMember -> caseInstance.getCaseTeam().addMember(newMember));
 
         // Now trigger the Create transition on the case plan, to make the case actually go running
         PlanItem casePlan = caseInstance.getCasePlan();
