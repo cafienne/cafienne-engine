@@ -34,13 +34,6 @@ public class ClaimTask extends WorkflowCommand {
          * TODO: 2. Check whether the current user is part of CaseTeam. If not what to do?
          */
 
-        /*
-         * TODO Temporary code for demo. Adding current user to the case team. This will be removed => WK: when?
-         */
-
-
-        task.getCaseInstance().getCaseTeam().addCurrentUser(getUser());
-
         if (!task.currentUserIsAuthorized()) {
             throw new InvalidCommandException("No permission to perform this task");
         }

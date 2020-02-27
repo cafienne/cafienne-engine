@@ -61,7 +61,7 @@ public class Basic {
             PlanItemAssertion listener = casePlan.assertPlanItem("Listener");
             listener.assertLastTransition(Transition.Create, State.Available, State.Null);
             
-            action.getEvents().filter(caseInstanceId).assertSize(55);
+            action.getEvents().filter(caseInstanceId).assertSize(56);
         });
         
         // Completing Item1 should activate sentries S3 and S3.2
