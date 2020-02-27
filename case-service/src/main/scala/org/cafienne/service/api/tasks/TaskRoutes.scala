@@ -8,30 +8,27 @@
 package org.cafienne.service.api.tasks
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.annotations._
 import javax.ws.rs.{GET, POST, PUT, Path, Produces}
-import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.akka.command.CaseCommandModels
 import org.cafienne.cmmn.instance.casefile.{ValueList, ValueMap}
-import org.cafienne.humantask.akka.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.humantask.akka.command.{AssignTask, ClaimTask, CompleteHumanTask, DelegateTask, HumanTaskCommand, RevokeTask, SaveTaskOutput, ValidateTaskOutput}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.service.{Main, api}
-import org.cafienne.service.api.{AuthenticatedRoute, Sort}
+import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.service.api
+import org.cafienne.service.api.Sort
 import org.cafienne.service.api.model.Examples
 
 import scala.collection.immutable.Seq
@@ -40,7 +37,7 @@ import scala.util.{Failure, Success}
 @Api(value = "tasks", tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute with TaskReader {
+class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with TaskReader {
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[TaskRoutes])
@@ -466,42 +463,17 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
       }
     }
 
-  import akka.pattern.ask
-
-  implicit val timeout = Main.caseSystemTimeout
-
   def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
     val retrieveCaseIdAndTenant = taskQueries.getCaseAndTenantInformation(taskId, platformUser)
 
     onComplete(retrieveCaseIdAndTenant) {
       case Success(retrieval) => {
         retrieval match {
-          case Some(caseInstanceId) => askCase(createTaskCommand.apply(caseInstanceId._1, platformUser.getTenantUser(caseInstanceId._2)))
+          case Some(caseInstanceId) => askModelActor(createTaskCommand.apply(caseInstanceId._1, platformUser.getTenantUser(caseInstanceId._2)))
           case None => complete(StatusCodes.NotFound, "A task with id " + taskId + " cannot be found in the system")
         }
       }
       case Failure(error) => complete(StatusCodes.InternalServerError, error)
-    }
-  }
-
-  def askCase(command: HumanTaskCommand): Route = {
-    onComplete(CaseSystem.router ? command) {
-      case Success(value) =>
-        value match {
-          case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
-          case e: CommandFailure =>
-            // This should probably return something like "Command not accepted", so not 500 but something 400
-            complete(StatusCodes.BadRequest, e.exception.getMessage)
-          case value: HumanTaskValidationResponse =>
-            respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
-              complete(StatusCodes.Accepted, value.value())
-            }
-          case value: HumanTaskResponse =>
-            respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
-              complete(StatusCodes.Accepted, value)
-            }
-        }
-      case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }
   }
 

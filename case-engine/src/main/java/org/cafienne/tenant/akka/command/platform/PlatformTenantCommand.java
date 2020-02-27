@@ -16,7 +16,7 @@ import java.io.IOException;
  * PlatformTenantCommands can only be executed by platform owners
  */
 @Manifest
-abstract class PlatformTenantCommand extends TenantCommand {
+public abstract class PlatformTenantCommand extends TenantCommand {
     protected PlatformTenantCommand(PlatformUser user, String tenantId) {
         super(TenantUser.fromPlatformOwner(user, tenantId), tenantId);
     }

@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs.{GET, Path, Produces}
 import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.AuthenticatedRoute
+import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 
 import scala.util.{Failure, Success}
 

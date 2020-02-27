@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.api.tenant.UserQueries

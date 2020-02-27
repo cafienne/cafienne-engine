@@ -276,7 +276,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val inputParameters = payload.inputs
               val caseTeam = payload.caseTeam
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
-              invokeCase(new akka.command.StartCase(tenant, user.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              askModelActor(new akka.command.StartCase(tenant, user.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingTenantException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)

@@ -16,8 +16,9 @@ import akka.util.Timeout
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.BuildInfo
 import org.cafienne.identity.IdentityCache
+import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.OffsetStorageImpl
-import org.cafienne.service.api.{CaseServiceRoute, SwaggerHttpServiceRoute}
+import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.cases.CaseQueriesImpl
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
