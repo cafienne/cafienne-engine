@@ -48,7 +48,7 @@ public class UserEvent extends PlanItemDefinitionInstance<UserEventDefinition> {
             }
         }
         // Apparently no matching role was found.s
-        throw new TransitionDeniedException("You do not have the permission to raise the event " + getName());
+        throw new SecurityException("User '"+currentUser.getUserId()+"' does not have the permission to raise the event " + getName());
     }
 
     @Override
