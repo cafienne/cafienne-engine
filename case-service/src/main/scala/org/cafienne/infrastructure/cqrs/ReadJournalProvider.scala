@@ -17,6 +17,7 @@ trait ReadJournalProvider extends LazyLogging with ActorSystemProvider {
 
   /**
     * Provides the requested journal
+    *
     * @return
     */
   def journal() = {
