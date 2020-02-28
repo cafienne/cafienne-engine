@@ -1,6 +1,5 @@
 package org.cafienne.akka.actor.handler;
 
-import org.cafienne.akka.actor.MessageHandler;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.CommandException;
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.Arrays;
 
-public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<C, C, E, A> {
+public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
     protected final C command;

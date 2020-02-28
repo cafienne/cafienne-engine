@@ -114,7 +114,10 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      *
      * @param event
      */
-    public void addDebugEvent(DebugEvent event) {
+    private void addDebugEvent(DebugEvent event) {
+        if (actor.recoveryRunning()) {
+            return;
+        }
         events.add(event);
     }
 

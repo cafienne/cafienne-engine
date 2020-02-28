@@ -10,6 +10,12 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handler for messages that are sent to a ModelActor before the ModelActor has received a {@link org.cafienne.akka.actor.command.BootstrapCommand}.
+ * @param <C>
+ * @param <E>
+ * @param <A>
+ */
 public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(NotConfiguredHandler.class);
 
@@ -23,7 +29,6 @@ public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, 
     }
 
     final protected void process() {
-
     }
 
     final protected void complete() {

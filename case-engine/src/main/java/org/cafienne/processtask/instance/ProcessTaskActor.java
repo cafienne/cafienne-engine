@@ -76,7 +76,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         addDebugInfo(DebugEvent.class, e ->
             e.addMessage("Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters));
 
-        currentHandler().addEvent(new ProcessCompleted(this, processOutputParameters));
+        addEvent(new ProcessCompleted(this, processOutputParameters));
 
         askCase(new CompleteTask(this, processOutputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
@@ -86,7 +86,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     }
 
     public void failed(ValueMap processOutputParameters) {
-        currentHandler().addEvent(new ProcessFailed(this, processOutputParameters));
+        addEvent(new ProcessFailed(this, processOutputParameters));
         addDebugInfo(DebugEvent.class, e ->
             e.addMessage("Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters));
 
@@ -101,6 +101,6 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         addDebugInfo(() -> "Terminating process " + getName());
         taskImplementation.terminate();
         addDebugInfo(() -> "Terminated process implementation");
-        currentHandler().addEvent(new ProcessTerminated(this));
+        addEvent(new ProcessTerminated(this));
     }
 }
