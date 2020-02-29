@@ -6,8 +6,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.cqrs.TaggedEventConsumer
-import org.cafienne.infrastructure.jdbc.OffsetStorage
+import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, TaggedEventConsumer}
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.tenant.akka.event.{TenantEvent, TenantModified}
@@ -15,13 +14,13 @@ import org.cafienne.tenant.akka.event.{TenantEvent, TenantModified}
 import scala.concurrent.Future
 
 class TenantProjectionsWriter
-  (userQueries: UserQueries, updater: RecordsPersistence, override val offsetStorage: OffsetStorage)
-  (implicit val system: ActorSystem, implicit val userCache: IdentityProvider) extends LazyLogging with OffsetStorage with TaggedEventConsumer {
+  (userQueries: UserQueries, updater: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)
+  (implicit val system: ActorSystem, implicit val userCache: IdentityProvider) extends LazyLogging with TaggedEventConsumer {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override val offsetStorageName = "TenantProjectionsWriter"
-  override val eventTag: String = TenantEvent.TAG
+  override val offsetStorage: OffsetStorage = offsetStorageProvider.storage("TenantProjectionsWriter")
+  override val tag: String = TenantEvent.TAG
 
   private val transactionCache = new scala.collection.mutable.HashMap[String, TenantTransaction]
   private def getTransaction(tenantId: String) = transactionCache.getOrElseUpdate(tenantId, new TenantTransaction(tenantId, userQueries, updater))
@@ -37,7 +36,7 @@ class TenantProjectionsWriter
               // Remove transaction with tenant records and commit it
               //  Also update the TenantReader if we add one.
               transactionCache.remove(tenant)
-              transaction.commit(offsetStorageName, newOffset).flatMap(_ => {
+              transaction.commit(offsetStorage.name, newOffset).flatMap(_ => {
                 userCache.clear(transaction.modifiedUsers)
                 // TenantReader.inform(tm)
                 Future.successful(Done)

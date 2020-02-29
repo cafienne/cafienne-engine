@@ -7,14 +7,12 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.NoOffsetStorage
 import org.cafienne.service.api.cases.CaseInstance
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class CaseInstanceWriterTest

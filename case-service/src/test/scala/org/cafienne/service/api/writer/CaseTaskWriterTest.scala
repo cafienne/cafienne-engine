@@ -8,7 +8,6 @@ import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.instance.{State, Transition}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.NoOffsetStorage
 import org.cafienne.service.api.cases.CaseInstance
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.scalatest.concurrent.Eventually

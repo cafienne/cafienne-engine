@@ -9,7 +9,6 @@ import org.cafienne.cmmn.instance.CaseFileItemTransition
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.NoOffsetStorage
 import org.cafienne.service.api.cases.{CaseFile, CaseInstance}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.scalatest.concurrent.Eventually

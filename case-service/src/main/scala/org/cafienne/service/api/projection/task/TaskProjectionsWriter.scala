@@ -7,19 +7,18 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.cmmn.akka.event.CaseModified
 import org.cafienne.humantask.akka.event.HumanTaskEvent
-import org.cafienne.infrastructure.cqrs.TaggedEventConsumer
-import org.cafienne.infrastructure.jdbc.OffsetStorage
+import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, TaggedEventConsumer}
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.tasks.TaskReader
 
 import scala.concurrent.Future
 
-class TaskProjectionsWriter(updater: RecordsPersistence, override val offsetStorage: OffsetStorage)(implicit override val system: ActorSystem) extends LazyLogging with OffsetStorage with TaggedEventConsumer {
+class TaskProjectionsWriter(updater: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)(implicit override val system: ActorSystem) extends LazyLogging with TaggedEventConsumer {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override val offsetStorageName = "TaskProjectionsWriter"
-  override val eventTag: String = HumanTaskEvent.TAG
+  override val offsetStorage: OffsetStorage = offsetStorageProvider.storage("TaskProjectionsWriter")
+  override val tag: String = HumanTaskEvent.TAG
 
   private val transactionCache = new scala.collection.mutable.HashMap[String, TaskTransaction]
   private def getTransaction(taskId: String) = transactionCache.getOrElseUpdate(taskId, new TaskTransaction(taskId, updater))
@@ -34,7 +33,7 @@ class TaskProjectionsWriter(updater: RecordsPersistence, override val offsetStor
         val transaction = getTransaction(evt.getActorId)
         transactionCache.remove(evt.getActorId)
         transaction.updateLastModifiedInformationInTasks(evt)
-        transaction.commit(offsetStorageName, newOffset).flatMap(_ => {
+        transaction.commit(offsetStorage.name, newOffset).flatMap(_ => {
           TaskReader.inform(evt)
           Future.successful(Done)
         })

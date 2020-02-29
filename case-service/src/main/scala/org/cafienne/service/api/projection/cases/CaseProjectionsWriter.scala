@@ -7,19 +7,18 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.cmmn.akka.event.CaseModified
 import org.cafienne.cmmn.instance.CaseInstanceEvent
-import org.cafienne.infrastructure.cqrs.TaggedEventConsumer
-import org.cafienne.infrastructure.jdbc.OffsetStorage
+import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, TaggedEventConsumer}
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.projection.RecordsPersistence
 
 import scala.concurrent.Future
 
-class CaseProjectionsWriter(persistence: RecordsPersistence, override val offsetStorage: OffsetStorage)(implicit override val system: ActorSystem) extends LazyLogging with TaggedEventConsumer {
+class CaseProjectionsWriter(persistence: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)(implicit override val system: ActorSystem) extends LazyLogging with TaggedEventConsumer {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override val offsetStorageName = "CaseProjectionsWriter"
-  override val eventTag: String = CaseInstanceEvent.TAG
+  override val offsetStorage: OffsetStorage = offsetStorageProvider.storage("CaseProjectionsWriter")
+  override val tag: String = CaseInstanceEvent.TAG
 
   private val transactionCache = new scala.collection.mutable.HashMap[String, CaseTransaction]
   private def getTransaction(caseInstanceId: String) = transactionCache.getOrElseUpdate(caseInstanceId, new CaseTransaction(caseInstanceId, persistence))
@@ -32,7 +31,7 @@ class CaseProjectionsWriter(persistence: RecordsPersistence, override val offset
           evt match {
             case cm: CaseModified => {
               transactionCache.remove(evt.getActorId)
-              transaction.commit(offsetStorageName, newOffset, cm).flatMap(_ => {
+              transaction.commit(offsetStorage.name, newOffset, cm).flatMap(_ => {
                 CaseReader.inform(cm)
                 Future.successful(Done)
               })

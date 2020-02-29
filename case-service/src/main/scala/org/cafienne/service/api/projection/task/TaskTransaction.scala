@@ -5,7 +5,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.akka.event.CaseModified
 import org.cafienne.humantask.akka.event._
-import org.cafienne.infrastructure.jdbc.OffsetStore
+import org.cafienne.infrastructure.cqrs.NamedOffset
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.tasks.Task
 
@@ -78,7 +78,7 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
     records ++= this.tasks.values
 
     // Even if there are no new records, we will still update the offset store
-    records += OffsetStore.fromOffset(offsetName, offset)
+    records += NamedOffset(offsetName, offset)
 
     persistence.bulkUpdate(records.filter(r => r != null))
   }

@@ -1,7 +1,8 @@
 package org.cafienne.service.api.projection.slick
 
 import akka.Done
-import org.cafienne.infrastructure.jdbc.{OffsetStore, OffsetStoreTables}
+import org.cafienne.infrastructure.cqrs.NamedOffset
+import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.cases.table.CaseTables
 import org.cafienne.service.api.cases.{CaseFile, CaseInstance, CaseInstanceDefinition, CaseInstanceRole, CaseInstanceTeamMember, PlanItem, PlanItemHistory}
 import org.cafienne.service.api.tenant.{Tenant, TenantOwner, TenantTables, User, UserRole}
@@ -46,7 +47,7 @@ class SlickRecordsPersistence
       case value: CaseFile => caseFileQuery.insertOrUpdate(value)
       case value: CaseInstanceRole => caseInstanceRoleQuery.insertOrUpdate(value)
       case value: CaseInstanceTeamMember => caseInstanceTeamMemberQuery.insertOrUpdate(value)
-      case value: OffsetStore => offsetQuery.insertOrUpdate(value)
+      case value: NamedOffset => offsetQuery.insertOrUpdate(value)
       case value: UserRole => rolesQuery.insertOrUpdate(value)
       case value: Tenant => tenantsQuery.insertOrUpdate(value)
       case value: TenantOwner => tenantOwnersQuery.insertOrUpdate(value)
