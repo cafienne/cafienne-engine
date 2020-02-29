@@ -43,9 +43,12 @@ object Main extends App {
     Migrate.migrateDatabase()
     startup()
   } catch {
-    case t: Throwable =>
-      t.printStackTrace()
-      System.exit(-1)
+    case t: Throwable => stop(t)
+  }
+
+  def stop(t: Throwable) = {
+    t.printStackTrace()
+    System.exit(-1)
   }
 
   def httpRoutesTimeout = Timeout(15 seconds) // This is the timeout that the http engine uses to wait for futures

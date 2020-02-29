@@ -47,7 +47,10 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   def start(): Unit = {
     runStream() onComplete {
       case Success(_) => //
-      case Failure(ex) => logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
+      case Failure(ex) => {
+        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
+        Main.stop(ex)
+      }
     }
   }
 
