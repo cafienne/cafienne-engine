@@ -1,33 +1,24 @@
 package org.cafienne.akka.actor.config
 
-import com.typesafe.config.Config
-import com.typesafe.scalalogging.LazyLogging
+import java.util.concurrent.TimeUnit
+
+import scala.concurrent.duration.FiniteDuration
 
 
-class QueryDBConfig(val parentConfig: Config) extends LazyLogging {
+class QueryDBConfig(val parent: CafienneConfig) extends MandatoryConfig {
+  val path = "query-db"
+  override val exception: Throwable = new IllegalArgumentException("Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings")
 
-  lazy val config = {
-    if (parentConfig.hasPath("query-db")) {
-      parentConfig.getConfig("query-db")
-    } else {
-      throw new IllegalArgumentException("Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings")
-    }
-  }
+  lazy val restartSettings = new RestartConfig(this)
+  lazy val debug = readBoolean("debug", false)
+  lazy val readJournal = readString("read-journal", "")
+}
 
-  lazy val debug = {
-    if (config.hasPath("debug")) {
-      config.getBoolean("debug")
-    }
-    false
-  }
+class RestartConfig(val parent: QueryDBConfig) extends CafienneBaseConfig {
+  val path = "restart-stream"
 
-  lazy val readJournal = {
-    if (config.hasPath("read-journal")) {
-      val explicitReadJournal = config.getString("read-journal")
-      logger.debug("Using explicit read journal configuration reference: " + explicitReadJournal)
-      explicitReadJournal
-    } else {
-      ""
-    }
-  }
+  lazy val minBackoff = readDuration("min-back-off", FiniteDuration(500, TimeUnit.MILLISECONDS))
+  lazy val maxBackoff = readDuration("max-back-off", FiniteDuration(30, TimeUnit.SECONDS))
+  lazy val randomFactor = readNumber("random-factor", 0.2).doubleValue()
+  lazy val maxRestarts = readInt("max-restarts", 20)
 }
