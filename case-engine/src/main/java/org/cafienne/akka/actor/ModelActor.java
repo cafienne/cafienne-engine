@@ -357,11 +357,17 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param right   Optional listener to handle response success.
      */
     public void askCase(CaseCommand command, CommandFailureListener left, CommandResponseListener... right) {
+        if (recoveryRunning()) {
+            return;
+        }
         responseListeners.put(command.getMessageId(), new Responder(left, right));
         CaseSystem.router().tell(command, self());
     }
 
     public void askProcess(ProcessCommand command, CommandFailureListener left, CommandResponseListener... right) {
+        if (recoveryRunning()) {
+            return;
+        }
         responseListeners.put(command.getMessageId(), new Responder(left, right));
         CaseSystem.router().tell(command, self());
     }
