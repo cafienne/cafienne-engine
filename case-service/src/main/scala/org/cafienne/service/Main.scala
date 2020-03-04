@@ -87,6 +87,8 @@ object Main extends App {
 
     // Some routes assume the above created implicit writers
     val caseServiceRoutes: Seq[CaseServiceRoute] = Seq(
+
+      // BE CAREFUL WHEN ADDING / REMOVING ROUTES: it also must be done in below apiRoutes statements!
       new CaseEngineHealthRoute(),
       new CasesRoutes(caseQueries),
       new TaskRoutes(taskQueries),
@@ -94,6 +96,8 @@ object Main extends App {
       new PlatformRoutes(),
       new RepositoryRoute(),
       new DebugRoute()
+      // BE CAREFUL WHEN ADDING / REMOVING ROUTES: it also must be done in below apiRoutes statements!
+      
     )
 
     // Find the API classes of the routes and pass the to Swagger
@@ -107,6 +111,7 @@ object Main extends App {
         caseServiceRoutes.toArray.apply(3).route ~
         caseServiceRoutes.toArray.apply(4).route ~
         caseServiceRoutes.toArray.apply(5).route ~
+        caseServiceRoutes.toArray.apply(6).route ~
 //      mainRoute ~
       // Add the routes for the API documentation frontend.
       new SwaggerHttpServiceRoute(apiClasses.toSet).route ~
