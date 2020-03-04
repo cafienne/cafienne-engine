@@ -101,7 +101,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
         offsetStorage.getOffset.map {
           case offset: Offset => {
             logger.debug("Starting from offset " + offset)
-            journal.eventsByTag(tag, Offset.noOffset)
+            journal.eventsByTag(tag, offset)
           }
           case err: Throwable => {
             logger.error("Received an error while asking for offset; start reading from offset 0; error was: ", err)
