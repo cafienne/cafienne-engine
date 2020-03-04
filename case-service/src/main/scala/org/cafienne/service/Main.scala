@@ -20,7 +20,7 @@ import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.cases.CaseQueriesImpl
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
-import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, PlatformRoutes}
+import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
@@ -87,6 +87,7 @@ object Main extends App {
 
     // Some routes assume the above created implicit writers
     val caseServiceRoutes: Seq[CaseServiceRoute] = Seq(
+      new CaseEngineHealthRoute(),
       new CasesRoutes(caseQueries),
       new TaskRoutes(taskQueries),
       new TenantRoutes(userQueries),

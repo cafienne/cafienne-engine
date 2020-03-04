@@ -23,15 +23,13 @@ import scala.collection.immutable.Seq
 class PlatformRoutes()(override implicit val userCache: IdentityProvider) extends CommandRoute {
 
   val tenantRoutes = new PlatformRoute()
-  val healthRoutes = new CaseEngineHealthRoute()
 
   override def routes: Route = pathPrefix("platform") {
-    tenantRoutes.routes ~
-    healthRoutes.routes
+    tenantRoutes.routes
   }
 
   override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[PlatformRoute], classOf[CaseEngineHealthRoute])
+    Seq(classOf[PlatformRoute])
   }
 
 }

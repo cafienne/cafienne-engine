@@ -13,19 +13,23 @@ import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 
+import scala.collection.immutable.Seq
+
 @Api(tags = Array("platform"))
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/platform")
+@Path("/")
 class CaseEngineHealthRoute() extends CaseServiceRoute {
 
-  override def routes = {
-      health ~
-      version
+
+  // For now, directly in the main, and not as child of PlatformRoutes;
+  //  Otherwise, routes are not available when case system is not healthy (because platform routes are AuthenticatedRoute)
+  override def routes = { health ~ version }
+
+  override def apiClasses(): Seq[Class[_]] = {
+    Seq(classOf[CaseEngineHealthRoute])
   }
 
   @Path("/health")
