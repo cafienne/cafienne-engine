@@ -26,22 +26,16 @@ import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, E
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
-@Api(value = "platform", tags = Array("platform"))
+@Api(tags = Array("platform"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
 class PlatformRoute()(override implicit val userCache: IdentityProvider) extends CommandRoute {
 
-  override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[PlatformRoute])
-  }
-
   override def routes = {
-    pathPrefix("platform") {
       createTenant ~
       disableTenant ~
       enableTenant ~
       getUserInformation
-    }
   }
 
   @Path("/")

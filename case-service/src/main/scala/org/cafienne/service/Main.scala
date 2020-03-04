@@ -8,22 +8,19 @@
 package org.cafienne.service
 
 import akka.actor.ActorSystem
-import akka.http.javadsl.server.Directives
-import akka.http.scaladsl.{Http, server}
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.BuildInfo
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
-import org.cafienne.infrastructure.jdbc.{JDBCBasedOffsetStorageProvider, OffsetStorageImpl}
+import org.cafienne.infrastructure.jdbc.JDBCBasedOffsetStorageProvider
 import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.cases.CaseQueriesImpl
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
-import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, PlatformRoute}
-import org.cafienne.service.api.tenant.TenantQueriesImpl
+import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, PlatformRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
@@ -31,7 +28,8 @@ import org.cafienne.service.api.projection.task.TaskProjectionsWriter
 import org.cafienne.service.api.registration.FormerRegistrationRoutes
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.{TaskQueriesImpl, TaskRoutes}
-import org.cafienne.service.api.tenant.route.{TenantOwnersRoute, TenantRoutes, TenantUsersRoute}
+import org.cafienne.service.api.tenant.TenantQueriesImpl
+import org.cafienne.service.api.tenant.route.TenantRoutes
 import org.cafienne.service.db.migration.Migrate
 
 import scala.concurrent.Await
@@ -92,7 +90,7 @@ object Main extends App {
       new CasesRoutes(caseQueries),
       new TaskRoutes(taskQueries),
       new TenantRoutes(userQueries),
-      new PlatformRoute(),
+      new PlatformRoutes(),
       new RepositoryRoute(),
       new DebugRoute()
     )

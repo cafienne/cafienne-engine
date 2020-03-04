@@ -54,6 +54,11 @@ object CaseSystem extends LazyLogging {
   val version = new CafienneVersion
 
   /**
+    * Health monitor has latest status information on health of the Case System
+    */
+  val health = new HealthMonitor
+
+  /**
     * Start the Case System. This will spin up an akka system according to the specifications
     * @return
     */
