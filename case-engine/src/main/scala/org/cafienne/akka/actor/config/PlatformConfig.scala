@@ -6,15 +6,9 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.TenantUser
 
-class PlatformConfig(val parentConfig: Config) extends LazyLogging {
-
-  val config = {
-    if (parentConfig.hasPath("platform")) {
-      parentConfig.getConfig("platform")
-    } else {
-      throw new IllegalArgumentException("Check configuration property 'cafienne.platform'. This must be available")
-    }
-  }
+class PlatformConfig(val parent: CafienneConfig) extends MandatoryConfig {
+  val path = "platform"
+  override val exception: Throwable = new IllegalArgumentException("Check configuration property 'cafienne.platform'. This must be available")
 
   val platformOwners: util.List[String] = config.getStringList("owners")
   if (platformOwners.isEmpty) {
@@ -22,24 +16,14 @@ class PlatformConfig(val parentConfig: Config) extends LazyLogging {
   }
 
   lazy val defaultTenant = {
-    val configuredDefaultTenant = if (config.hasPath("default-tenant")) {
-      config.getString("default-tenant")
-    } else {
-      ""
-    }
+    val configuredDefaultTenant = readString("default-tenant", "")
     configuredDefaultTenant
   }
 
   /**
     * Config property for reading a specific file with bootstrap tenant setup
     */
-  lazy val bootstrapFile = {
-    if (config.hasPath("bootstrap-file")) {
-      config.getString("bootstrap-file")
-    } else {
-      ""
-    }
-  }
+  lazy val bootstrapFile = readString("bootstrap-file", "")
 
   def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
 
@@ -48,5 +32,4 @@ class PlatformConfig(val parentConfig: Config) extends LazyLogging {
     logger.debug("Checking whether user " + userId + " is a platform owner; list of owners: " + platformOwners)
     platformOwners.stream().filter(o => o.equalsIgnoreCase(userId)).count() > 0
   }
-
 }

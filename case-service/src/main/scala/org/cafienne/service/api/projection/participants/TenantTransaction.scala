@@ -3,7 +3,7 @@ package org.cafienne.service.api.projection.participants
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.jdbc.OffsetStore
+import org.cafienne.infrastructure.cqrs.NamedOffset
 import org.cafienne.service.api.tenant.{Tenant, TenantOwner, UserQueries, UserRole}
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.tenant.akka.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
@@ -108,7 +108,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, updater: Recor
     records ++= tenants.values
 
     // Even if there are no new records, we will still update the offset store
-    records += OffsetStore.fromOffset(offsetName, offset)
+    records += NamedOffset(offsetName, offset)
 
     updater.bulkUpdate(records.filter(r => r != null))
   }

@@ -16,7 +16,7 @@ import org.cafienne.service.api.tenant.UserQueries
 import scala.collection.immutable.Seq
 
 
-@Api(value = "tenant", tags = Array("tenant"))
+@Api(tags = Array("tenant"))
 @Path("/tenant")
 class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
   val tenantAdministrationRoute = new TenantOwnersRoute(userQueries)(userCache)

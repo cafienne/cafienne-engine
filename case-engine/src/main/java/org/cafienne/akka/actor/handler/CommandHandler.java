@@ -1,6 +1,5 @@
 package org.cafienne.akka.actor.handler;
 
-import org.cafienne.akka.actor.MessageHandler;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.CommandException;
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.Arrays;
 
-public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<C, C, E, A> {
+public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
     protected final C command;
@@ -113,30 +112,26 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             }
 
             // Inform the sender about the failure
-            sender().tell(response, self());
+            actor.reply(response);
 
             // In case of failure we still want to store the debug events. Actually, mostly we need this in case of failure (what else are we debugging for)
             Object[] debugEvents = events.stream().filter(e -> e instanceof DebugEvent).toArray();
             if (debugEvents.length > 0) {
-                actor.persistAll(Arrays.asList(debugEvents), e -> {});
+                actor.persistEvents(Arrays.asList(debugEvents));
             }
 
             // If we have created events (other than debug events) from the failure, then we are in inconsistent state and need to restart the actor.
             if (events.size() > debugEvents.length) {
-                actor.getScheduler().clearSchedules(); // Remove all schedules.
                 Throwable exception = ((CommandFailure) response).internalException();
-                logger.error("Encountered failure in handling msg of type " + command.getClass().getName() + "; restarting " + actor, exception);
-                actor.supervisorStrategy().restartChild(self(), exception, true);
+                actor.failedWithInvalidState(this, exception);
             }
         } else if (hasOnlyDebugEvents()) { // Nothing to persist, just respond to the client if there is something to say
             if (response != null) {
                 response.setLastModified(actor.getLastModified());
                 // Now tell the sender about the response
-                sender().tell(response, self());
+                actor.reply(response);
                 // Also store the debug events if there are
-                if (! events.isEmpty()) {
-                    actor.persistAll(events, e -> {});
-                }
+                actor.persistEvents(events);
             }
         } else {
             // We have events to persist.
@@ -149,16 +144,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             if (response != null) {
                 response.setLastModified(lastModified);
             }
-
-            // Now persist the events in one shot
-            logger.debug("Persisting " + events.size() + " events out of command " + command);
-            ModelEvent lastEvent = events.get(events.size()-1);
-            actor.persistAll(events, (ModelEvent event) -> {
-                logger.debug(actor + " persisted event of type " + event.getClass().getSimpleName());
-                if (event == lastEvent && response != null) {
-                    sender().tell(response, actor.self());
-                }
-            });
+            actor.persistEventsAndThenReply(events, response);
         }
     }
 

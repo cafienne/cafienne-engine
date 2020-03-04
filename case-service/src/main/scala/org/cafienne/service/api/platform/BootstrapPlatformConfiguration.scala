@@ -130,7 +130,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
       response match {
         case e: CommandFailure => {
           if (e.exception().getMessage.toLowerCase().contains("already exists")) {
-            logger.info("Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
+            logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
           } else {
             logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
           }

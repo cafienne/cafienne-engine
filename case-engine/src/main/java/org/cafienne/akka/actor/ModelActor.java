@@ -28,6 +28,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -140,12 +141,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @return
      */
     public TenantUser getCurrentUser() {
-        return handler.getUser();
-    }
-
-    @Override
-    public final Receive createReceiveRecover() {
-        return receiveBuilder().match(Object.class, this::handleRecoveryEvent).build();
+        return currentHandler().getUser();
     }
 
     /**
@@ -159,64 +155,57 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         return this.scheduler;
     }
 
-    /**
-     * Basic lifecycle handling of events upon recovery of this ModelActor.
-     * Be careful in overriding it.
-     *
-     * @param event
-     */
-    protected void handleRecoveryEvent(Object event) {
-        if (tenant == null && event instanceof ModelEvent) {
-            // Probably this is the very first event in this actor...
-            tenant = ((ModelEvent) event).tenant;
-        }
+    @Override
+    public final Receive createReceiveRecover() {
+        return receiveBuilder().match(Object.class, event -> {
+            // Steps:
+            // 1. Set tenant if not yet available
+            // 2. Check whether this is a valid type of ModelEvent for this type of ModelActor
+            //    a. If so, run the recovery handler for it
+            //    b. Ignore DebugEvents and RecoveryCompleted message
+            //    c. In all other cases print warn statements, with a special check for other ModelEvents
 
-        if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
-            handler = createRecoveryHandler((E) event);
-            logger.debug("Recovery in " + getClass().getSimpleName() + " " + getId() + ": recovering " + event);
-            handler.process();
-            handler.complete();
-        } else if (event instanceof DebugEvent) {
-            // No recovery from debug events ...
-        } else if (event instanceof ModelEvent) {
-            // Weird: ModelEvents in recovery of other models??
-            logger.warn("Received unexpected recovery event of type "+event.getClass().getName()+" in actor of type "+getClass().getName());
-        } else if (event instanceof RecoveryCompleted) {
-            logger.info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
-        } else {
-            logger.warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
-        }
+            // Step 1
+            if (tenant == null && event instanceof ModelEvent) {
+                tenant = ((ModelEvent) event).tenant;
+            }
+            // Step 2
+            if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
+                // Step 2a.
+                runHandler(createRecoveryHandler((E) event));
+            } else if (event instanceof DebugEvent) {
+                // Step 2b.
+                // No recovery from debug events ...
+            } else if (event instanceof RecoveryCompleted) {
+                // Step 2b.
+                logger.info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
+            } else if (event instanceof ModelEvent) {
+                // Step 2c. Weird: ModelEvents in recovery of other models??
+                logger.warn("Received unexpected recovery event of type "+event.getClass().getName()+" in actor of type "+getClass().getName());
+            } else {
+                // Step 2c.
+                logger.warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
+            }
+        }).build();
     }
 
     @Override
     public final Receive createReceive() {
-        return receiveBuilder().match(Object.class, this::handleIncomingMessage).build();
+        return receiveBuilder().match(Object.class, msg -> {
+            // Steps:
+            // 1. Remove self cleaner
+            // 2. Handle message
+            // 3. Set a new self cleaner (basically resets the timer)
+            clearSelfCleaner();
+            runHandler(createMessageHandler(msg));
+            enableSelfCleaner();
+        }).build();
     }
 
     /**
      * SelfCleaner provides a mechanism to have the ModelActor remove itself from memory after a specific idle period.
      */
     private Cancellable selfCleaner = null;
-
-    /**
-     * Basic lifecycle handling for incoming messages in this ModelActor.
-     *
-     * @param msg
-     */
-    final protected void handleIncomingMessage(Object msg) {
-        clearSelfCleaner();
-
-        handler = createMessageHandler(msg);
-
-        InvalidCommandException securityIssue = handler.runSecurityChecks();
-        if (securityIssue == null) {
-            // Only process if we did not find any security issues.
-            handler.process();
-        }
-        handler.complete();
-
-        enableSelfCleaner();
-    }
 
     private void clearSelfCleaner() {
         // Receiving message should reset the self-cleaning timer
@@ -258,10 +247,74 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         }
     }
 
-    private MessageHandler handler;
+    /**
+     * Execute the lifecycle in handling the incoming message:
+     * - run security checks
+     * - if no issues from there, invoke process method
+     * - and finally invoke complete method.
+     *
+     * @param handler
+     */
+    private void runHandler(MessageHandler handler) {
+        this.currentMessageHandler = handler;
 
-    protected <T extends MessageHandler> T currentHandler() {
-        return (T) handler;
+        InvalidCommandException securityIssue = this.currentMessageHandler.runSecurityChecks();
+        if (securityIssue == null) {
+            // Only process if we did not find any security issues.
+            this.currentMessageHandler.process();
+        }
+        this.currentMessageHandler.complete();
+    }
+
+    private MessageHandler currentMessageHandler;
+
+    /**
+     * Returns a typed version of the current message handler
+     * @param <T>
+     * @return
+     */
+    private <T extends MessageHandler> T currentHandler() {
+        return (T) currentMessageHandler;
+    }
+
+    /**
+     * Basic handler for commands received in this ModelActor.
+     * Be careful in overriding it.
+     *
+     * @param command
+     */
+    protected CommandHandler createCommandHandler(C command) {
+        return new CommandHandler(this, command);
+    }
+
+    /**
+     * Basic handler for response messages received from other ModelActors in this ModelActor.
+     * Be careful in overriding it.
+     *
+     * @param response
+     */
+    protected ResponseHandler createResponseHandler(ModelResponse response) {
+        return new ResponseHandler(this, response);
+    }
+
+    /**
+     * Basic handler for wrongly typed messages received in this ModelActor.
+     * Be careful in overriding it.
+     *
+     * @param message
+     */
+    protected InvalidMessageHandler createInvalidMessageHandler(Object message) {
+        return new InvalidMessageHandler(this, message);
+    }
+
+    /**
+     * Basic handler of events upon recovery of this ModelActor.
+     * Be careful in overriding it.
+     *
+     * @param event
+     */
+    protected RecoveryEventHandler createRecoveryHandler(E event) {
+        return new RecoveryEventHandler(this, event);
     }
 
     /**
@@ -282,16 +335,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     /**
-     * ModelActors can override this method to create their own handler for the command.
-     *
-     * @param msg
-     * @return
-     */
-    protected CommandHandler createCommandHandler(C msg) {
-        return new CommandHandler(this, msg);
-    }
-
-    /**
      * This method must be implemented by CommandHandlers to handle the fact that state changes
      * have taken place while handling the command. The ModelActor will get a new last modified timestamp,
      * and the actor should add an event for that to the log, so that projections can define and commit
@@ -300,18 +343,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @return
      */
     public abstract E createLastModifiedEvent(Instant lastModified);
-
-    protected ResponseHandler createResponseHandler(ModelResponse response) {
-        return new ResponseHandler(this, response);
-    }
-
-    protected InvalidMessageHandler createInvalidMessageHandler(Object message) {
-        return new InvalidMessageHandler(this, message);
-    }
-
-    protected RecoveryEventHandler createRecoveryHandler(E message) {
-        return new RecoveryEventHandler(this, message);
-    }
 
     public Responder getResponseListener(String msgId) {
         return responseListeners.get(msgId);
@@ -344,13 +375,65 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         return tenant;
     }
 
+    /**
+     * Method for a MessageHandler to persist it's events
+     * @param events
+     * @param <T>
+     */
+    public <T> void persistEvents(List<T> events) {
+        persistEventsAndThenReply(events, null);
+    }
+
+    /**
+     * Model actor can send a reply to a command with this method
+     * @param response
+     */
+    public void reply(ModelResponse response) {
+        logger.debug("Sending response of type " + response.getClass().getSimpleName() + " from " + this);
+        sender().tell(response, self());
+    }
+
+    /**
+     * Method for a MessageHandler to persist it's events, and be called back after all events have been persisted
+     * @param events
+     * @param response
+     * @param <T>
+     */
+    public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
+        if (events.isEmpty()) {
+            return;
+        }
+        logger.debug("Persisting " + events.size() + " events in " + this);
+        T lastEvent = events.get(events.size() - 1);
+        persistAll(events, e -> {
+            CaseSystem.health().writeJournal().isOK();
+            logger.debug("Persisted an event of type "+e.getClass().getName()+" in actor "+this);
+            if (e == lastEvent && response != null) {
+                reply(response);
+            }
+        });
+    }
+
+    /**
+     * If the command handler has changed ModelActor state, but then ran into an unhandled exception,
+     * the actor will remove itself from memory and start again.
+     * @param handler
+     * @param exception
+     */
+    public void failedWithInvalidState(CommandHandler handler, Throwable exception) {
+        this.getScheduler().clearSchedules(); // Remove all schedules.
+        logger.error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
+        this.supervisorStrategy().restartChild(self(), exception, true);
+    }
+
     private void handlePersistFailure(Throwable cause, Object event, long seqNr) {
         // This code is invoked when there is a problem in connecting to the database while persisting events.
         //  Can also happen when a serialization of an event to JSON fails. In that case, recovery of the case seems not to work,
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
+        CaseSystem.health().writeJournal().hasFailed(cause);
         logger.error("Failure in "+getClass().getSimpleName()+" " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
-        sender().tell(new CommandFailure(getCurrentCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")), self());
+        reply(new CommandFailure(getCurrentCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
         context().stop(self());
     }
 
@@ -365,9 +448,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     public <T extends DebugEvent> void addDebugInfo(Class<T> eventClass, DebugAppender<T> appender) {
-        if (!recoveryRunning()) {
-            currentHandler().addDebugInfo(eventClass, appender);
-        }
+        currentHandler().addDebugInfo(eventClass, appender);
     }
 
     /**
@@ -378,15 +459,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param appender
      */
     public void addDebugInfo(DebugStringAppender appender) {
-        if (!recoveryRunning()) {
-            currentHandler().addDebugInfo(appender, getLogger());
-        }
+        currentHandler().addDebugInfo(appender, getLogger());
     }
 
     public void addDebugInfo(DebugExceptionAppender appender) {
-        if (!recoveryRunning()) {
-            currentHandler().addDebugInfo(appender, getLogger());
-        }
+        currentHandler().addDebugInfo(appender, getLogger());
     }
 
     /**

@@ -3,7 +3,7 @@ package org.cafienne.infrastructure.akka.http.route
 import java.net.URL
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.Directives.{complete, extractUri}
+import akka.http.scaladsl.server.Directives.{complete, extractExecutionContext, extractUri}
 import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
 import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
@@ -30,7 +30,14 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     override protected implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   }
 
+  override def caseSystemMustBeHealthy = {
+    if (! CaseSystem.health.ok) {
+      throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
+    }
+  }
+
   override def exceptionHandler = ExceptionHandler {
+    case h: UnhealthyCaseSystem => complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = h.getLocalizedMessage))
     case s: SecurityException =>
       extractUri { uri =>
         logger.warn(s"Request to $uri has a security issue: " + s)
@@ -61,7 +68,10 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
-  def validUser(subRoute: PlatformUser => Route): Route = OIDCAuthentication.user { usr => subRoute(usr)  }
+  def validUser(subRoute: PlatformUser => Route): Route = {
+    caseSystemMustBeHealthy
+    OIDCAuthentication.user { usr => subRoute(usr)  }
+  }
 
   // TODO: this is a temporary switch to enable IDE's debugger to show events
   @Deprecated // but no alternative yet...

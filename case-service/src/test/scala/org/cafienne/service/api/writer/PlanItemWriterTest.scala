@@ -7,7 +7,6 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.NoOffsetStorage
 import org.cafienne.service.api.cases.{CaseInstance, PlanItem}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.db.migration.Migrate

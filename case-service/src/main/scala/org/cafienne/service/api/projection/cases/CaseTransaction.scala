@@ -8,7 +8,7 @@ import org.cafienne.cmmn.akka.event.team.{TeamMemberAdded, TeamMemberRemoved}
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
 import org.cafienne.cmmn.instance.{CaseInstanceEvent, PlanItemEvent}
-import org.cafienne.infrastructure.jdbc.OffsetStore
+import org.cafienne.infrastructure.cqrs.NamedOffset
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.projection.RecordsPersistence
 
@@ -161,7 +161,7 @@ class CaseTransaction(caseInstanceId: String, persistence: RecordsPersistence)(i
 
     // If we reach this point, we have real events handled and content added,
     // so also update the offset of the last event handled in this projection
-    records += OffsetStore.fromOffset(offsetName, offset)
+    records += NamedOffset(offsetName, offset)
 
 //    println("Committing "+records.size+" records into the database for "+offset)
 

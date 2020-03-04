@@ -63,6 +63,8 @@ public abstract class CaseCommand extends ModelCommand<Case> {
      * @throws InvalidCommandException If the command is invalid
      */
     public void validate(Case caseInstance) throws InvalidCommandException {
+        // TODO: this check is probably no longer needed, because the BootstrapCommand is supposed to handle this logic.
+        //  And the ModelActor will refuse messages if the BootstrapCommand is not yet handled.
         if (caseInstance.getDefinition() == null) {
             throw new InvalidCommandException("Cannot handle command of type " + getClass().getName() + "; StartCase not yet sent, or not in this user context");
         }

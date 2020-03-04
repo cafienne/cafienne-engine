@@ -13,6 +13,7 @@ import akka.actor._
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.config.CafienneConfig
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 
@@ -52,6 +53,11 @@ object CaseSystem extends LazyLogging {
     * @return
     */
   val version = new CafienneVersion
+
+  /**
+    * Health monitor has latest status information on health of the Case System
+    */
+  val health = new HealthMonitor
 
   /**
     * Start the Case System. This will spin up an akka system according to the specifications

@@ -10,6 +10,12 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handler for messages that are sent to a ModelActor before the ModelActor has received a {@link org.cafienne.akka.actor.command.BootstrapCommand}.
+ * @param <C>
+ * @param <E>
+ * @param <A>
+ */
 public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(NotConfiguredHandler.class);
 
@@ -23,7 +29,6 @@ public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, 
     }
 
     final protected void process() {
-
     }
 
     final protected void complete() {
@@ -35,17 +40,12 @@ public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, 
             Exception wrongCommandType = new Exception(this.actor.getClass().getSimpleName() + " cannot handle message '"+msg.getClass().getSimpleName()+"' because it has not been initialized properly");
             addDebugInfo(() -> wrongCommandType.getMessage(), logger);
             CommandFailure response = new CommandFailure((ModelCommand) msg, wrongCommandType);
-            sender().tell(response, sender());
+            actor.reply(response);
         } else {
             logger.warn(actor.getClass().getSimpleName() + " " + actor.getId() + " received a message it cannot handle, of type " + msg.getClass().getName());
         }
 
-        if (! events.isEmpty()) {
-            logger.debug("Persisting "+events.size()+" events that come out of handling an invalid message of type "+msg.getClass().getName());
-            actor.persistAll(events, e -> {
-                logger.debug("Persisted an event of type "+e.getClass().getName()+" in actor "+actor.getClass().getSimpleName() + "["+actor.getId()+"]");
-            });
-        }
+        actor.persistEvents(events);
     }
 
     @Override

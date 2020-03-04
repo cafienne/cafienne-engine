@@ -1,18 +1,8 @@
 package org.cafienne.akka.actor.config
 
-import com.typesafe.config.Config
-import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.repository.DefinitionProvider
-
-class ApiConfig(val parentConfig: Config) extends LazyLogging {
-
-  lazy val config = {
-    if (parentConfig.hasPath("api")) {
-      parentConfig.getConfig("api")
-    } else {
-      throw new IllegalArgumentException("Cafienne API is not configured. Check local.conf for 'cafienne.api' settings")
-    }
-  }
+class ApiConfig(val parent: CafienneConfig) extends MandatoryConfig {
+  val path = "api"
+  override val exception = new IllegalArgumentException("Cafienne API is not configured. Check local.conf for 'cafienne.api' settings")
 
   lazy val bindHost = {
     config.getString("bindhost")

@@ -28,7 +28,7 @@ import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenan
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
 
-@Api(value = "tenant", tags = Array("tenant"))
+@Api(tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {

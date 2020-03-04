@@ -26,7 +26,7 @@ import org.cafienne.service.api.tenant.UserQueries
 import scala.util.{Failure, Success}
 
 
-@Api(value = "users", tags = Array("tenant"))
+@Api(tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {

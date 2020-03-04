@@ -8,14 +8,6 @@
 package org.cafienne.service.api.registration
 
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
-import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{Content, Schema}
-import io.swagger.v3.oas.annotations.parameters.RequestBody
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.model.TenantAPI
@@ -24,9 +16,6 @@ import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, E
 
 import scala.collection.JavaConverters._
 
-@Api(value = "registration", tags = Array("registration"))
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/registration")
 class FormerPlatformAdministrationRoute()(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
 
@@ -36,20 +25,6 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
     enableTenant
   }
 
-  @Path("/")
-  @POST
-  @Operation(
-    summary = "Register a new tenant",
-    description = "Register a new tenant with it's owners",
-    tags = Array("registration"),
-    responses = Array(
-      new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
-      new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
-    )
-  )
-  @RequestBody(description = "Tenant", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.Tenant]))))
-  @Consumes(Array("application/json"))
   def createTenant = post {
     pathEndOrSingleSlash {
       validUser { platformOwner =>
@@ -66,22 +41,6 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
       }
     }
   }
-
-  @Path("/{tenant}/disable")
-  @PUT
-  @Operation(
-    summary = "Disable a tenant",
-    description = "Disabling a tenant can only be done by platform owners",
-    tags = Array("registration"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "The tenant to disable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
-      new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
-    )
-  )
   def disableTenant = put {
     validUser { platformOwner =>
       path(Segment / "disable") { tenant =>
@@ -90,21 +49,6 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
     }
   }
 
-  @Path("/{tenant}/enable")
-  @PUT
-  @Operation(
-    summary = "Enable a tenant",
-    description = "Enabling a tenant can only be done by platform owners",
-    tags = Array("registration"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "The tenant to enable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
-      new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
-    )
-  )
   def enableTenant = put {
     validUser { platformOwner =>
       path(Segment / "disable") { tenant =>
