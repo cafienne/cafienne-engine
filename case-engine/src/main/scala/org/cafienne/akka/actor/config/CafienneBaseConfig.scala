@@ -1,5 +1,8 @@
 package org.cafienne.akka.actor.config
 
+import java.time.Duration
+import java.util.concurrent.TimeUnit
+
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 
@@ -26,7 +29,7 @@ trait CafienneBaseConfig extends LazyLogging {
 
   lazy val config: Config = {
     if (parent.config.hasPath(path)) {
-      parent.config.atPath(path)
+      parent.config.getConfig(path)
     } else {
       null
     }
@@ -35,42 +38,48 @@ trait CafienneBaseConfig extends LazyLogging {
   def readNumber(path: String, default: Number): Number = {
     if (config != null && config.hasPath(path)) {
       config.getNumber(path)
+    } else {
+      default
     }
-    default
   }
 
   def readLong(path: String, default: Long): Long = {
     if (config != null && config.hasPath(path)) {
       config.getLong(path)
+    } else {
+      default
     }
-    default
   }
 
   def readInt(path: String, default: Int): Int = {
     if (config != null && config.hasPath(path)) {
       config.getInt(path)
+    } else {
+      default
     }
-    default
   }
 
   def readString(path: String, default: String): String = {
     if (config != null && config.hasPath(path)) {
       config.getString(path)
+    } else {
+      default
     }
-    default
   }
 
   def readBoolean(path: String, default: Boolean): Boolean = {
     if (config != null && config.hasPath(path)) {
       config.getBoolean(path)
+    } else {
+      default
     }
-    default
   }
 
   def readDuration(name: String, default: FiniteDuration): FiniteDuration = {
     if (config != null && config.hasPath(name)) {
-      config.getDuration(name)
+      FiniteDuration(config.getDuration(name).toMillis, TimeUnit.MILLISECONDS)
+    } else {
+      default
     }
-    default
   }
 }
