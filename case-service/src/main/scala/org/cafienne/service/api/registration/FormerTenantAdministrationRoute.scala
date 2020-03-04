@@ -19,7 +19,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command.{AddTenantOwner, GetTenantOwners, RemoveTenantOwner}
 
-@Api(value = "registration", tags = Array("registration"))
+@Api(tags = Array("registration"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/registration")
 class FormerTenantAdministrationRoute()(override implicit val userCache: IdentityProvider) extends TenantRoute {

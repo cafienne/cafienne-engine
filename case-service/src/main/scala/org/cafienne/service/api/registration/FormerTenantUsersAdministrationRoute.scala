@@ -30,7 +30,7 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
 
 
-@Api(value = "users", tags = Array("registration"))
+@Api(tags = Array("registration"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/registration")
 class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {

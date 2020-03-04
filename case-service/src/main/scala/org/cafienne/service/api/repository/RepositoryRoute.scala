@@ -36,7 +36,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-@Api(value = "repository", tags = Array("repository"))
+@Api(tags = Array("repository"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
 class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {

@@ -14,8 +14,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.route.TenantRoute
 
-
-@Api(value = "registration", tags = Array("registration"))
+@Api(tags = Array("registration"))
 @Path("/registration")
 class FormerRegistrationRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
   val tenantAdministrationRoute = new FormerTenantAdministrationRoute()(userCache)

@@ -34,7 +34,7 @@ import org.cafienne.service.api.model.Examples
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success}
 
-@Api(value = "tasks", tags = Array("tasks"))
+@Api(tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
 class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with TaskReader {

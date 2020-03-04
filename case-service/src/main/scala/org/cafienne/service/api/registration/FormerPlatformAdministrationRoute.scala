@@ -24,7 +24,7 @@ import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, E
 
 import scala.collection.JavaConverters._
 
-@Api(value = "registration", tags = Array("registration"))
+@Api(tags = Array("registration"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/registration")
 class FormerPlatformAdministrationRoute()(override implicit val userCache: IdentityProvider) extends TenantRoute {
