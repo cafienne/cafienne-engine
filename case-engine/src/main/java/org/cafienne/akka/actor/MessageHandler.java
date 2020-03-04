@@ -121,24 +121,6 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         events.add(event);
     }
 
-    /**
-     * Returns the actor ref of the sender of the original message.
-     *
-     * @return
-     */
-    protected ActorRef sender() {
-        return sender;
-    }
-
-    /**
-     * Returns the actor ref of the model actor.
-     *
-     * @return
-     */
-    protected ActorRef self() {
-        return actor.self();
-    }
-
     public <T extends DebugEvent> void createDebugInfo(Class<T> eventClass, DebugAppender<T> appender) {
         if (actor.debugMode()) {
             try {

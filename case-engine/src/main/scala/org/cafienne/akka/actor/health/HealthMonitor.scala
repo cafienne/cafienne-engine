@@ -1,0 +1,40 @@
+package org.cafienne.akka.actor.health
+
+import java.util
+
+import org.cafienne.cmmn.instance.casefile.ValueMap
+
+import scala.collection.mutable.Set
+import scala.collection.JavaConverters._
+
+class HealthMonitor() {
+
+  // Make it an ordered set, so that the json structure is stable.
+  private val measures: Set[HealthMeasurePoint] = new util.LinkedHashSet[HealthMeasurePoint]().asScala
+
+  val queryDB = addMeasure("query-db")
+  val idp = addMeasure("idp")
+  val writeJournal = addMeasure("write-journal")
+  val readJournal = addMeasure("read-journal")
+
+  private val description = "Health indication of the Case Engine is currently " + health
+
+  private def health = if (ok) "OK" else "NOK"
+
+  def ok(): Boolean = {
+    measures.find(p => p.unhealthy).map(_ => false).getOrElse(true)
+  }
+
+  def status: String = {
+    val json = new ValueMap("Status", health, "Description", description)
+    val points = json.withArray("measure-points")
+    measures.foreach(measure => points.add(new ValueMap(measure.key, measure.asJSON)))
+    json.toString
+  }
+
+  def addMeasure(key: String): HealthMeasurePoint = {
+    val measure = new HealthMeasurePoint(key)
+    measures += measure
+    measure
+  }
+}

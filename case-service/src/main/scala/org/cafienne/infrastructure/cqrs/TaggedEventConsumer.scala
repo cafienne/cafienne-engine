@@ -49,35 +49,42 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
       case Success(_) => //
       case Failure(ex) => {
         logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
-        Main.stop(ex)
+        CaseSystem.health.readJournal.hasFailed(ex)
       }
     }
   }
 
   def runStream(): Future[Done] = {
     restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1) {
-      case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: ModelEvent[_]) => {
-        consumeModelEvent(newOffset, persistenceId, sequenceNr, evt)
-      }
-      case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: DeserializationFailure) => {
-        logger.error("Ignoring event of type '" + evt.manifest + "' with invalid contents. It could not be deserialized. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr, evt.exception)
-        logger.debug("Event blob: " + new String(evt.blob))
-        Future.successful(Done)
-      }
-      case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: UnrecognizedManifest) => {
-        logger.error("Ignoring unrecognized event of type '" + evt.manifest + "'. Event type is probably deprecated. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
-        logger.debug("Event contents: " + new String(evt.blob))
-        Future.successful(Done)
-      }
-      case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: Any) => {
-        logger.error("Ignoring unknown event of type '" + evt.getClass.getName + "'. Event type is perhaps created through some other product. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
-        Future.successful(Done)
-      }
-      case other => {
-        logger.error("Received something from the Stream that is not even an EventEnvelope?! It has class " + other.getClass.getName)
-        Future.successful(Done)
+      element => {
+        CaseSystem.health.readJournal.isOK
+        handleSourceElement(element)
       }
     }.runWith(Sink.ignore)
+  }
+
+  def handleSourceElement(element: AnyRef): Future[Done] = element match {
+    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: ModelEvent[_]) => {
+      consumeModelEvent(newOffset, persistenceId, sequenceNr, evt)
+    }
+    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: DeserializationFailure) => {
+      logger.error("Ignoring event of type '" + evt.manifest + "' with invalid contents. It could not be deserialized. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr, evt.exception)
+      logger.debug("Event blob: " + new String(evt.blob))
+      Future.successful(Done)
+    }
+    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: UnrecognizedManifest) => {
+      logger.error("Ignoring unrecognized event of type '" + evt.manifest + "'. Event type is probably deprecated. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
+      logger.debug("Event contents: " + new String(evt.blob))
+      Future.successful(Done)
+    }
+    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: Any) => {
+      logger.error("Ignoring unknown event of type '" + evt.getClass.getName + "'. Event type is perhaps created through some other product. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
+      Future.successful(Done)
+    }
+    case other => {
+      logger.error("Received something from the Stream that is not even an EventEnvelope?! It has class " + other.getClass.getName)
+      Future.successful(Done)
+    }
   }
 
   private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
@@ -94,7 +101,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
         offsetStorage.getOffset.map {
           case offset: Offset => {
             logger.debug("Starting from offset " + offset)
-            journal.eventsByTag(tag, offset)
+            journal.eventsByTag(tag, Offset.noOffset)
           }
           case err: Throwable => {
             logger.error("Received an error while asking for offset; start reading from offset 0; error was: ", err)

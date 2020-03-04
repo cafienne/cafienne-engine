@@ -13,6 +13,7 @@ import akka.actor._
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.config.CafienneConfig
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 

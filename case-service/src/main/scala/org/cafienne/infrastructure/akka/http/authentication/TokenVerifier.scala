@@ -8,6 +8,7 @@ import com.nimbusds.jose.proc.{BadJOSEException, BadJWEException, BadJWSExceptio
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.CaseSystem
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,44 +58,54 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
       val ctx: SecurityContext = null //NOTE this is the way the lib expects to get a None when the context is not required.
       claimsSet = Some(jwtProcessor.process(token, ctx))
       claimsSet.fold(throw new TokenVerificationException("Unable to create claimSet for " + token))(
-        cS => ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
+        cS => {
+          CaseSystem.health.idp.isOK
+          ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
+        }
       )
     } catch {
       case rp: RemoteKeySourceException => {
         // TODO: this should return a HTTP code 503 Service Unavailable!
         logger.error("Failure in contacting IDP. Check IDP configuration settings of the case engine.", rp)
-        throw new CannotReachIDPException("Cannot reach the IDP to validate credentials", rp)
+        val failure = new CannotReachIDPException("Cannot reach the IDP to validate credentials", rp)
+        CaseSystem.health.idp.hasFailed(failure)
+        throw  failure
       }
-      case nje: BadJWTException =>
-//        nje.printStackTrace()
-        val exceptionMessage = nje.getMessage
-        val missingClaimsMsg = """JWT missing required claims"""
-        val invalidIssuerMsg = """JWT "iss" claim doesn't match expected value: """
-        val jwtAudienceRejected = """JWT audience rejected"""
-        val badJson = """Payload of JWS object is not a valid JSON object"""
-        if (nje.getCause.isInstanceOf[ParseException]) {
-//          println("Failure in parsing token")
-          throw new TokenVerificationException("Token parse failure: " + nje.getCause.getLocalizedMessage)
-        }
+      case other => {
+        CaseSystem.health.idp.isOK
+        other match {
+          case nje: BadJWTException =>
+            //        nje.printStackTrace()
+            val exceptionMessage = nje.getMessage
+            val missingClaimsMsg = """JWT missing required claims"""
+            val invalidIssuerMsg = """JWT "iss" claim doesn't match expected value: """
+            val jwtAudienceRejected = """JWT audience rejected"""
+            val badJson = """Payload of JWS object is not a valid JSON object"""
+            if (nje.getCause.isInstanceOf[ParseException]) {
+              //          println("Failure in parsing token")
+              throw new TokenVerificationException("Token parse failure: " + nje.getCause.getLocalizedMessage)
+            }
 
-        if (exceptionMessage.contains(missingClaimsMsg)) {
-          throw new MissingClaimsException(exceptionMessage.replace(missingClaimsMsg, "JWT token misses claims"))
+            if (exceptionMessage.contains(missingClaimsMsg)) {
+              throw new MissingClaimsException(exceptionMessage.replace(missingClaimsMsg, "JWT token misses claims"))
+            }
+            if (exceptionMessage.contains(invalidIssuerMsg)) {
+              val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
+              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'")
+            }
+            throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
+          case e: BadJOSEException =>
+            // This captures both JWS and JWE exceptions. These are really technical, and logger.debug must be enabled to understand them
+            logger.debug("Encountered JWT issues", e)
+            throw TokenVerificationException("Token cannot be verified: " + e.getLocalizedMessage)
+          case e: ParseException => {
+            throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
+          }
+          case e: Exception => {
+            logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
+            throw new Exception("Token verification failure of type " + e.getClass.getSimpleName, e)
+          }
         }
-        if (exceptionMessage.contains(invalidIssuerMsg)) {
-          val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
-          throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'")
-        }
-        throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
-      case e: BadJOSEException =>
-        // This captures both JWS and JWE exceptions. These are really technical, and logger.debug must be enabled to understand them
-        logger.debug("Encountered JWT issues", e)
-        throw TokenVerificationException("Token cannot be verified: " + e.getLocalizedMessage)
-      case e: ParseException => {
-        throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
-      }
-      case e: Exception => {
-        logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
-        throw new Exception("Token verification failure of type " + e.getClass.getSimpleName, e)
       }
     }
   }

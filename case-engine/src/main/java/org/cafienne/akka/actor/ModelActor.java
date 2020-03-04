@@ -28,6 +28,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -374,13 +375,65 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         return tenant;
     }
 
+    /**
+     * Method for a MessageHandler to persist it's events
+     * @param events
+     * @param <T>
+     */
+    public <T> void persistEvents(List<T> events) {
+        persistEventsAndThenReply(events, null);
+    }
+
+    /**
+     * Model actor can send a reply to a command with this method
+     * @param response
+     */
+    public void reply(ModelResponse response) {
+        logger.debug("Sending response of type " + response.getClass().getSimpleName() + " from " + this);
+        sender().tell(response, self());
+    }
+
+    /**
+     * Method for a MessageHandler to persist it's events, and be called back after all events have been persisted
+     * @param events
+     * @param response
+     * @param <T>
+     */
+    public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
+        if (events.isEmpty()) {
+            return;
+        }
+        logger.debug("Persisting " + events.size() + " events in " + this);
+        T lastEvent = events.get(events.size() - 1);
+        persistAll(events, e -> {
+            CaseSystem.health().writeJournal().isOK();
+            logger.debug("Persisted an event of type "+e.getClass().getName()+" in actor "+this);
+            if (e == lastEvent && response != null) {
+                reply(response);
+            }
+        });
+    }
+
+    /**
+     * If the command handler has changed ModelActor state, but then ran into an unhandled exception,
+     * the actor will remove itself from memory and start again.
+     * @param handler
+     * @param exception
+     */
+    public void failedWithInvalidState(CommandHandler handler, Throwable exception) {
+        this.getScheduler().clearSchedules(); // Remove all schedules.
+        logger.error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
+        this.supervisorStrategy().restartChild(self(), exception, true);
+    }
+
     private void handlePersistFailure(Throwable cause, Object event, long seqNr) {
         // This code is invoked when there is a problem in connecting to the database while persisting events.
         //  Can also happen when a serialization of an event to JSON fails. In that case, recovery of the case seems not to work,
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
+        CaseSystem.health().writeJournal().hasFailed(cause);
         logger.error("Failure in "+getClass().getSimpleName()+" " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
-        sender().tell(new CommandFailure(getCurrentCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")), self());
+        reply(new CommandFailure(getCurrentCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
         context().stop(self());
     }
 
