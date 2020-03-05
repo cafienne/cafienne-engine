@@ -46,7 +46,7 @@ object Migrate extends QueryDbMigrationConfig {
       flyway.migrate()
     } catch {
       case e: Exception => {
-        logger.error("An issue with migration happened {}", e.getMessage)
+        logger.error("An issue with migration happened", e)
         val res = db.stream(my)
         val bla = res.foreach { r => logger.debug("Migration: {}", r)}
         val answer = Await.result(bla, 5.seconds)
