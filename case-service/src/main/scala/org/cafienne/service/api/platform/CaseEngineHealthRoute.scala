@@ -26,10 +26,33 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
 
   // For now, directly in the main, and not as child of PlatformRoutes;
   //  Otherwise, routes are not available when case system is not healthy (because platform routes are AuthenticatedRoute)
-  override def routes = { health ~ version }
+  override def routes = { health ~ version ~ status }
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[CaseEngineHealthRoute])
+  }
+
+  @Path("/status")
+  @GET
+  @Operation(
+    summary = "Get platform health information as http status code",
+    description = "Retrieves the health status information of the Case Engine",
+    tags = Array("platform"),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "Platform health is ok"),
+      new ApiResponse(responseCode = "503", description = "Platform health is not ok")
+    )
+  )
+  def status = get {
+    pathPrefix("status") {
+      pathEndOrSingleSlash {
+        if (CaseSystem.health.ok) {
+          complete(StatusCodes.OK)
+        } else {
+          complete(StatusCodes.ServiceUnavailable)
+        }
+      }
+    }
   }
 
   @Path("/health")
@@ -39,8 +62,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
     description = "Retrieves the health status information of the Case Engine",
     tags = Array("platform"),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "Platform health is ok", content = Array(new Content(schema = new Schema(implementation = classOf[Object])))),
-      new ApiResponse(responseCode = "503", description = "Platform health is not ok"),
+      new ApiResponse(responseCode = "200", description = "Platform health report", content = Array(new Content(schema = new Schema(implementation = classOf[Object])))),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
   )
@@ -48,11 +70,11 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def health = get {
     pathPrefix("health") {
       pathEndOrSingleSlash {
-        val value = HttpEntity(ContentTypes.`application/json`, CaseSystem.health.status)
+        val value = HttpEntity(ContentTypes.`application/json`, CaseSystem.health.report)
         complete(StatusCodes.OK, value)
-        }
       }
     }
+  }
 
   @Path("/version")
   @GET

@@ -17,7 +17,7 @@ class HealthMonitor() {
   val writeJournal = addMeasure("write-journal")
   val readJournal = addMeasure("read-journal")
 
-  private val description = "Health indication of the Case Engine is currently " + health
+  private def description = "Health indication of the Case Engine is currently " + health
 
   private def health = if (ok) "OK" else "NOK"
 
@@ -25,7 +25,7 @@ class HealthMonitor() {
     measures.find(p => p.unhealthy).map(_ => false).getOrElse(true)
   }
 
-  def status: String = {
+  def report: String = {
     val json = new ValueMap("Status", health, "Description", description)
     val points = json.withArray("measure-points")
     measures.foreach(measure => points.add(new ValueMap(measure.key, measure.asJSON)))
