@@ -28,7 +28,6 @@ trait CaseServiceRoute extends LazyLogging {
   val handleErrors = handleRejections(rejectionHandler) & handleExceptions(exceptionHandler)
 
   val route: Route = handleErrors {
-    caseSystemMustBeHealthy
     extractExecutionContext { implicit executor =>
       cors(corsSettings) {
         handleErrors { req => {
@@ -72,9 +71,6 @@ trait CaseServiceRoute extends LazyLogging {
     logger.info("Bumped into an exception in " + this.getClass().getSimpleName() + " on uri " + uri + ":\n" + t)
     logger.debug("Bumped into an exception in " + this.getClass().getSimpleName() + " on uri " + uri + ":\n" + t, t)
     complete(HttpResponse(StatusCodes.InternalServerError))
-  }
-
-  def caseSystemMustBeHealthy: Unit = {
   }
 
   def routes: Route

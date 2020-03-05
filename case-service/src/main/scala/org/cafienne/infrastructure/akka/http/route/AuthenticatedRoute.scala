@@ -30,9 +30,16 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     override protected implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   }
 
-  override def caseSystemMustBeHealthy = {
+  def caseSystemMustBeHealthy = {
     if (! CaseSystem.health.ok) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
+    }
+  }
+
+  def validUser(subRoute: PlatformUser => Route): Route = {
+    OIDCAuthentication.user { platformUser =>
+      caseSystemMustBeHealthy
+      subRoute(platformUser)
     }
   }
 
@@ -68,11 +75,6 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
-  def validUser(subRoute: PlatformUser => Route): Route = {
-    caseSystemMustBeHealthy
-    OIDCAuthentication.user { usr => subRoute(usr)  }
-  }
-
   // TODO: this is a temporary switch to enable IDE's debugger to show events
   @Deprecated // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route) : Route = {
@@ -82,6 +84,4 @@ trait AuthenticatedRoute extends CaseServiceRoute {
       validUser(subRoute)
     }
   }
-
-
 }

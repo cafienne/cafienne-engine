@@ -17,7 +17,7 @@ class HealthMonitor() {
   val writeJournal = addMeasure("write-journal")
   val readJournal = addMeasure("read-journal")
 
-  private val description = "Health indication of the Case Engine is currently " + health
+  private def description = "Health indication of the Case Engine is currently " + health
 
   private def health = if (ok) "OK" else "NOK"
 
