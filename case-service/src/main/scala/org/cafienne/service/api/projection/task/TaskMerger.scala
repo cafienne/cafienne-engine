@@ -11,6 +11,7 @@ object TaskMerger {
   def apply(evt: HumanTaskAssigned, current: Task): Task = current.copy(assignee = evt.assignee)
   def apply(evt: HumanTaskRevoked, current: Task): Task = current.copy(assignee = evt.assignee)
   def apply(evt: HumanTaskCompleted, current: Task): Task = current.copy(output = evt.getTaskOutput.toString)
+  def apply(evt: HumanTaskTerminated, current: Task): Task = current // Nothing to do
   def apply(evt: HumanTaskDueDateFilled, current: Task): Task = current.copy(dueDate = Some(evt.dueDate))
   def apply(evt: HumanTaskOwnerChanged, current: Task): Task = current.copy(owner = evt.owner)
   def apply(evt: HumanTaskOutputSaved, current: Task): Task = current.copy(output = evt.getTaskOutput.toString)

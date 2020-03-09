@@ -57,6 +57,7 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
             case evt: HumanTaskActivated => TaskMerger(evt, copy)
             case evt: HumanTaskRevoked => TaskMerger(evt, copy)
             case evt: HumanTaskCompleted => TaskMerger(evt, copy)
+            case evt: HumanTaskTerminated => TaskMerger(evt, copy)
             case other => {
               System.err.println("We missed out on HumanTaskTransition event of type " + other.getClass.getName)
               copy
