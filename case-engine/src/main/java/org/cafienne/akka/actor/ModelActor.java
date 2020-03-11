@@ -19,7 +19,7 @@ import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.akka.event.CaseFileEvent;
-import org.cafienne.cmmn.instance.PlanItemEvent;
+import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
 import org.slf4j.Logger;

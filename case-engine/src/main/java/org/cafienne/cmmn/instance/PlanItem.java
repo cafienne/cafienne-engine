@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,17 +7,16 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
-import org.cafienne.cmmn.akka.event.PlanItemTransitioned;
-import org.cafienne.cmmn.akka.event.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.akka.event.RequiredRuleEvaluated;
+import org.cafienne.cmmn.akka.event.plan.*;
+import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
 import org.cafienne.util.Guid;
-import org.cafienne.cmmn.definition.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class PlanItem extends CMMNElement<PlanItemDefinition> {
+    private final static Logger logger = LoggerFactory.getLogger(PlanItem.class);
 
     private final String id;
     private final String name;
@@ -50,22 +50,56 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
     /**
      * Constructor for adding discretionary items to the plan
      */
-    public PlanItem(String id, DiscretionaryItemDefinition definition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
+    private PlanItem(String id, DiscretionaryItemDefinition definition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
         this(id, definition.getName(), definition.getEntryCriteria(), definition.getExitCriteria(), null, definition, reference, caseInstance, owningStage, index);
     }
 
     /**
      * Constructor for adding plan items to the plan
      */
-    public PlanItem(String id, PlanItemDefinition definition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
+    private PlanItem(String id, PlanItemDefinition definition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
         this(id, definition.getName(), definition.getEntryCriteria(), definition.getExitCriteria(), definition, null, reference, caseInstance, owningStage, index);
     }
 
     /**
      * Constructor for adding case plan
      */
-    public PlanItem(String id, CasePlanDefinition reference, Case caseInstance) {
+    private PlanItem(String id, CasePlanDefinition reference, Case caseInstance) {
         this(id, reference.getName(), null, reference.getExitCriteria(), null, null, reference, caseInstance, null, 0);
+    }
+
+    public static PlanItem create(Case actor, PlanItemCreated event) {
+        String stageId = event.getStageId();
+        if (stageId.isEmpty()) {
+            CasePlanDefinition definition = actor.getDefinition().getCasePlanModel();
+            PlanItem planItem = new PlanItem(event.planItemId, definition, actor);
+            actor.setCasePlan(planItem);
+            return planItem;
+        } else {
+            // Lookup the stage to which the plan item belongs,
+            // then lookup the definition for the plan item
+            // and then instantiate it.
+            PlanItem owningPlanItem = actor.getPlanItemById(stageId);
+            if (owningPlanItem == null) {
+                logger.error("MAJOR ERROR: we cannot find the stage with id " + stageId + ", and therefore cannot recover plan item " + event);
+                return null;
+            }
+
+            Stage<?> stage = owningPlanItem.getInstance();
+            PlanItemDefinition definition = stage.getDefinition().getPlanItem(event.planItemName);
+            // If definition == null, try to see if it's a discretionaryItem
+            if (definition == null) {
+                DiscretionaryItemDefinition diDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
+                if (diDefinition == null) {
+                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.getStageId() + ", and therefore cannot recover plan item " + event);
+                }
+                PlanItemDefinitionDefinition reference = diDefinition.getPlanItemDefinition();
+                return new PlanItem(event.planItemId, diDefinition, reference, actor, stage, event.index);
+            } else {
+                PlanItemDefinitionDefinition reference = definition.getPlanItemDefinition();
+                return new PlanItem(event.planItemId, definition, reference, actor, stage, event.index);
+            }
+        }
     }
 
     private PlanItem(String id, String name, Collection<EntryCriterionDefinition> definedEntryCriteria, Collection<ExitCriterionDefinition> definedExitCriteria, PlanItemDefinition planItemDefinition,
@@ -78,10 +112,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         this.type = reference.getType();
         this.index = index;
 
-        addDebugInfo(() -> "Creating plan item " + getName() + (owningStage == null ? " in case" : " in stage " + getStage().getName()) + " with id " + id);
-
-        // Raise an event and then do some real logic
-        caseInstance.addEvent(new PlanItemCreated(this));
+        addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (stage == null ? " in case" : " in "+stage));
 
         // Create our typed instance (task / stage / milestone / eventlistener)
         this.instance = reference.createInstance(this);
@@ -176,23 +207,24 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
     /**
      * Starts the plan item's lifecycle (basically triggers Transition.Create)
      */
-    void beginLifecycle() {
-        addDebugInfo(() -> "Starting lifecycle of plan item " + getName());
+    public void beginLifecycle() {
+        addDebugInfo(() -> this + ": starting lifecycle");
         makeTransition(Transition.Create);
     }
 
     /**
      * Tries to set a lock for the next transition
+     *
      * @param transition
      * @return
      */
     boolean prepareTransition(Transition transition) {
         if (nextTransition != Transition.None) {
-            addDebugInfo(() -> "Trying to prepareTransition "+transition+" on "+this+", but we are already transitioning "+nextTransition);
+            addDebugInfo(() -> this + ": trying to prepareTransition " + transition + " on " + this + ", but we are already transitioning " + nextTransition);
             return false;
         }
         nextTransition = transition;
-        addDebugInfo(() -> "Acquired lock for transition "+transition+" on "+this);
+        addDebugInfo(() -> this + ": acquired lock for transition " + transition + " on " + this);
         return true;
     }
 
@@ -205,6 +237,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * then the Task.complete transition is invoked. Completion of the task now invokes prepareTransition,
      * and thereby acquires a "transition lock", which then makes the terminating sentry on that task
      * await the completion. Or better: it does not await completion, but is simply ignored.
+     *
      * @param transition
      * @return
      */
@@ -225,33 +258,15 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      */
     public void makeTransition(Transition transition) {
         if (!hasLock(transition)) { // First check to determine whether we are allowed to make this transition.
-            addDebugInfo(() -> "Cannot acquire lock for transition "+transition+" on "+this+"; but we are already transitioning "+nextTransition);
+            addDebugInfo(() -> this + ": cannot acquire lock for transition " + transition + " since currently transitioning " + nextTransition);
             return;
         }
-        StateMachine.Action action = stateMachine.transition(this, transition);
-        if (action != null) // means, a transition happened.
-        {
-            getCaseInstance().addEvent(new PlanItemTransitioned(this));
-
-            addDebugInfo(() -> "Handling transition " + getName() + "." + transition + " from " + getHistoryState() + " to " + getState());
-
-            // First execute the related state machine action (e.g., activating a timer, releasing a subprocess, suspending, etc.etc.)
-            action.execute(this, transition);
-
-            // Then inform the activating sentries
-            connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
-
-            // Now check stage completion; but only if we're in semi terminal state (and of course if we are in a stage).
-            if (stage != null && state.isSemiTerminal()) {
-                stage.tryCompletion(this, transition);
-            }
-
-            // Finally iterate the terminating sentries and inform them
-            connectedExitCriteria.forEach(onPart -> onPart.inform(this));
-
-            addDebugInfo(() -> "Completed transition from " + getHistoryState() + " to " + getState() + " in plan item " + getName());
+        PlanItemTransitioned event = stateMachine.transition(this, transition);
+        if (event != null) { // means, a transition happened.
+            addDebugInfo(() -> this + ".StateMachine makes transition: " + event);
+            getCaseInstance().addEvent(event);
         } else {
-            addDebugInfo(() -> "Transition " + transition + " has no effect on " + this + " (current state remains " + getState() + ")");
+            addDebugInfo(() -> this + ".StateMachine: transition " + transition + " has no effect, current state remains " + getState());
         }
     }
 
@@ -283,30 +298,12 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
     }
 
     /**
-     * Internal method to be used by StateMachine (and recovery) to set the new state and the transition causing it
-     *
-     * @param newState
-     */
-    void setState(State newState, State historyState, Transition transition) {
-        this.state = newState;
-        this.historyState = historyState;
-        this.lastTransition = transition;
-
-        // Now update the case about our status, so that it can publish the proper aggregate event
-        if (state == State.Failed) {
-            getCaseInstance().addFailure(this);
-        } else {
-            getCaseInstance().noFailure(this);
-        }
-    }
-
-    /**
      * To keep track of plan item history, every event generated by this plan item gets a sequence number that is unique _only_ wihtin the plan item.
      *
      * @return
      */
-    int getNextEventNumber() {
-        return planItemEventCounter++;
+    public int getNextEventNumber() {
+        return ++planItemEventCounter;
     }
 
     /**
@@ -348,16 +345,16 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * Evaluates the repetition rule on the plan item. Typically done when the plan item goes into Active state
      */
     void evaluateRepetitionRule() {
-        repetitionRuleOutcome = getPlanItemControl().getRepetitionRule().evaluate(this);
-        getCaseInstance().addEvent(new RepetitionRuleEvaluated(this));
+        boolean repeats = getPlanItemControl().getRepetitionRule().evaluate(this);
+        getCaseInstance().addEvent(new RepetitionRuleEvaluated(this, repeats));
     }
 
     /**
      * Evaluates the required rule on the plan item. Typically done when the plan item goes into Active state
      */
     void evaluateRequiredRule() {
-        this.requiredRuleOutcome = getPlanItemControl().getRequiredRule().evaluate(this);
-        getCaseInstance().addEvent(new RequiredRuleEvaluated(this));
+        boolean required = getPlanItemControl().getRequiredRule().evaluate(this);
+        getCaseInstance().addEvent(new RequiredRuleEvaluated(this, required));
     }
 
     /**
@@ -390,32 +387,29 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * Additionally checks that the containing stage is still active.
      */
     public void repeat() {
+        addDebugInfo(() -> this + ": initiating repeat logic for next item");
+
         // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
         if (getStage().getPlanItem().getState() != State.Active) {
             // The stage that contains us is no longer active. So we will not prepare any repeat item.
             // This code is typically invoked if the the stage terminates or completes, causing the repeating element to terminate.
+            addDebugInfo(() -> this + ": not repeating because stage is not active " + getName());
             return;
         }
 
         // Re-evaluate the repetition rule, and if the outcome is true, the start the repeat item (but only if it is not a discretionary).
+        addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat() ");
         evaluateRepetitionRule();
         if (repeats()) {
             if (getDefinition() == null) {
                 // Means we are discretionary, and adding to the plan must be done manually
                 return;
             }
-            addDebugInfo(() -> "Creating repeat item");
             // Generate an id for the repeat item
             String repeatItemId = new Guid().toString();
             // Create a new plan item
-            addDebugInfo(() -> "Starting repeat item " + (index+1));
-            PlanItem repeatItem = new PlanItem(repeatItemId, getName(), getDefinition().getEntryCriteria(), getDefinition().getExitCriteria(), getDefinition(), null, getDefinition().getPlanItemDefinition(), getCaseInstance(), stage, index+1);
-//            repeatItem.isRepeatingCurrently = true;
-//            repeatItem.index = this.index + 1;
-            // Begin the lifecycle of the repeat item
-            repeatItem.beginLifecycle();
-
-            addDebugInfo(() -> "Started repeat item " + (index+1));
+            addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
+            getCaseInstance().addEvent(new PlanItemCreated(stage, getDefinition(), repeatItemId, index + 1));
         }
     }
 
@@ -426,47 +420,79 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * @param transition
      */
     void checkEntryCriteria(Transition transition) {
+        addDebugInfo(() -> this + ": dhecking EntryCriteria in " + getName() + " with transition " + transition);
         if (getEntryCriteria().size() == 0) { // No entry criteria means get started immediately
+            addDebugInfo(() -> this + ": no EntryCriteria found, making transition " + transition);
             makeTransition(transition);
         } else {
             // If the plan item is being repeated, then the entry criteria have been satisfied already;
             // avoid keep repeating ourselves
             if (index > 0) {
+                addDebugInfo(() -> this + ": Not making transition because this is a repeat item");
                 return;
             }
             // Evaluate sentries to see whether one is already active, and, if so, make the transition
             for (EntryCriterion criterion : getEntryCriteria()) {
                 if (criterion.isSatisfied()) {
+                    addDebugInfo(() -> this + ": an EntryCriterion is satisfied, making transition " + transition);
                     makeTransition(transition);
                     return;
                 }
             }
+            addDebugInfo(() -> this + ": Not making transition because no entry criteria are satisfied");
         }
     }
 
-    public void recover(RepetitionRuleEvaluated event) {
+    public void updateState(RepetitionRuleEvaluated event) {
         this.repetitionRuleOutcome = event.isRepeating();
     }
 
-    public void recover(RequiredRuleEvaluated event) {
-        this.repetitionRuleOutcome = event.isRequired();
+    public void updateState(RequiredRuleEvaluated event) {
+        this.requiredRuleOutcome = event.isRequired();
     }
 
-    public void recover(PlanItemTransitioned event) {
-        this.setState(event.getCurrentState(), event.getHistoryState(), event.getTransition());
+    public void updateState(PlanItemTransitioned event) {
+        this.state = event.getCurrentState();
+        this.historyState = event.getHistoryState();
+        this.lastTransition = event.getTransition();
+    }
+
+    public void runBehavior(PlanItemTransitioned pit) {
+        Transition transition = pit.getTransition();
+        State newState = pit.getCurrentState();
+        State oldState = pit.getHistoryState();
+        addDebugInfo(() -> this + ": handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
+
+        // First execute the related state machine action (e.g., activating a timer, releasing a subprocess, suspending, etc.etc.)
+        StateMachine.Action action = stateMachine.getAction(newState);
+        action.execute(this, transition);
+
+        // Then inform the activating sentries
+        connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
+
+        // Now check stage completion; but only if we're in semi terminal state (and of course if we are in a stage).
+        if (stage != null && state.isSemiTerminal()) {
+            stage.tryCompletion(this, transition);
+        }
+
+        // Finally iterate the terminating sentries and inform them
+        connectedExitCriteria.forEach(onPart -> onPart.inform(this));
+
+        addDebugInfo(() -> this + ": completed handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
     }
 
     /**
      * Akka recovery method
+     *
      * @param event
      */
-    void recover(PlanItemEvent event) {
+    public void updateSequenceNumber(PlanItemEvent event) {
         this.planItemEventCounter = event.getSequenceNumber();
     }
 
     @Override
     public String toString() {
-        return instance.getClass().getSimpleName() + "['" + this.name + "']";
+        return type + "[" + getName() + "." + index + "]";
     }
 
     public void dumpMemoryStateToXML(Element parentElement) {

@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.task;
 
 import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.event.PlanItemTransitioned;
+import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.State;

@@ -7,13 +7,9 @@
  */
 package org.cafienne.cmmn.instance;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
-import org.cafienne.cmmn.definition.*;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.definition.PlanningTableDefinition;
+import org.cafienne.cmmn.definition.StageDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
@@ -21,13 +17,15 @@ import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.cafienne.util.Guid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-public class Stage<T extends StageDefinition> extends PlanFragment<T> {
-    private final static Logger logger = LoggerFactory.getLogger(Stage.class);
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     private final Collection<PlanItem> planItems = new ArrayList<PlanItem>();
     private final Map<CriterionDefinition, Criterion> sentries = new LinkedHashMap<>();
 
@@ -73,10 +71,10 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
      * @param transition
      */
     void tryCompletion(PlanItem child, Transition transition) {
-        addDebugInfo(() -> "Checking completion for " + this.getClass().getSimpleName() + " '" + this.getName() + "' because of semi-terminal child '" + child.getName() + "'->" + transition);
+        addDebugInfo(() -> this + ": checking completion because of semi-terminal child '" + child.getName() + "'->" + transition);
         this.isManualCompletion = false; // Now switch this flag. It is set back in
         if (this.isCompletionAllowed()) {
-            addDebugInfo(() -> this.getClass().getSimpleName() + " '" + this.getName() + "' is allowed to complete, source: '" + child.getName() + "'->" + transition);
+            addDebugInfo(() -> this + ": completing because of source transition " + child + "." + transition);
             getPlanItem().makeTransition(Transition.Complete);
         }
         this.isManualCompletion = true; // Now switch the flag back. Is only required if isCompletionAllowed returns false.
@@ -97,21 +95,25 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
          */
         // BOTTOMLINE interpretation: the stage will try to complete each time a child reaches semiterminal state, or if the transition to complete is manually invoked
         // Here we check both.
+        addDebugInfo(() -> {
+            String msg = getPlanItems().stream().map(p -> "\n" + p.getName() + "[index=" + p.getIndex()+", state="+p.getState()+", required="+p.isRequired()+"]").collect(Collectors.toList()).toString();
+            return this + ": checking " + planItems.size() +" plan items for completion:" + msg;
+        });
         for (PlanItem childItem : planItems) {
             // There shouldn't be any active item.
             if (childItem.getState() == State.Active) {
-                addDebugInfo(() -> "Stage '" + getName() + "' cannot auto complete, because '" + childItem.getName() + "' is still Active");
+                addDebugInfo(() -> this + " cannot auto complete, because '" + childItem.getName() + "' is still Active");
                 return false;
             }
             if (!childItem.getState().isSemiTerminal()) {
                 if (autoCompletes || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
                     if (childItem.isRequired()) { // Stage cannot complete if required items are not in semi-terminal state
-                        addDebugInfo(() -> "Stage " + getName() + " cannot complete, because " + childItem.getName() + " is required and has state " + childItem.getState());
+                        addDebugInfo(() -> this + " cannot complete, because " + childItem.getName() + " is required and has state " + childItem.getState());
                         return false;
                     }
                 } else {
                     // Stage cannot complete if not all children are semi-terminal
-                    addDebugInfo(() -> "Stage " + getName() + " cannot complete, because " + childItem.getName() + " has state " + childItem.getState());
+                    addDebugInfo(() -> this + " cannot complete, because " + childItem.getName() + " has state " + childItem.getState());
                     return false;
                 }
             }
@@ -120,6 +122,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         // And, finally, check if there are no discretionary items, but only if we're not completing manually and autoCompletion is false
         if (!autoCompletes && !isManualCompletion) {
             if (hasDiscretionaryItems()) {
+                addDebugInfo(() -> this + " cannot complete, because there are still discretionary items");
                 return false;
             }
         }
@@ -149,13 +152,11 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
         // Create the child plan items and begin their life-cycle
         getDefinition().getPlanItems().forEach(planItemDefinition -> {
+            int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(planItemDefinition.getDefinition().getName())).count()).intValue();
 
             // Generate an id for the child item
             String childItemId = new Guid().toString();
-            // Create a new plan item
-            PlanItem childItem = new PlanItem(childItemId, planItemDefinition, planItemDefinition.getPlanItemDefinition(), getCaseInstance(), this, 0);
-            // Begin the lifecycle of the child item
-            childItem.beginLifecycle();
+            getCaseInstance().addEvent(new PlanItemCreated(this, planItemDefinition, childItemId, index));
         });
     }
 
@@ -253,28 +254,8 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     void plan(DiscretionaryItem discretionaryItem, String planItemId) {
-        Long index = this.planItems.stream().filter(planItem -> planItem.getName().equals(discretionaryItem.getDefinition().getName())).count();
-        PlanItem planItem = new PlanItem(planItemId, discretionaryItem.getDefinition(), discretionaryItem.getDefinition().getPlanItemDefinition(), getCaseInstance(), this, index.intValue());
-        if (this.getPlanItem().getState() == State.Active) {
-            // Begin the lifecycle only if the state is active. Otherwise, the plan item will be started when the state becomes active.
-            planItem.beginLifecycle();
-        }
-    }
+        int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(discretionaryItem.getDefinition().getName())).count()).intValue();
 
-    void recoverPlanItem(PlanItemCreated event) {
-        PlanItemDefinition definition = this.getDefinition().getPlanItem(event.planItemName);
-        // If definition == null, try to see if it's a discretionaryItem
-        if (definition == null) {
-            DiscretionaryItemDefinition diDefinition = this.getDefinition().getDiscretionaryItem(event.planItemName);
-            if (diDefinition == null) {
-                logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + this.getId() + ", and therefore cannot recover plan item " + event);
-                return;
-            }
-            PlanItemDefinitionDefinition reference = diDefinition.getPlanItemDefinition();
-            new PlanItem(event.planItemId, diDefinition, reference, getCaseInstance(), this, event.index);
-        } else {
-            PlanItemDefinitionDefinition reference = definition.getPlanItemDefinition();
-            new PlanItem(event.planItemId, definition, reference, getCaseInstance(), this, event.index);
-        }
+        getCaseInstance().addEvent(new PlanItemCreated(this, discretionaryItem.getDefinition(), planItemId, index));
     }
 }

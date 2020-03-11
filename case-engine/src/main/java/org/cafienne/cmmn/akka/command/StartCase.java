@@ -16,14 +16,12 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
@@ -164,8 +162,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         caseInstance.setInputParameters(inputParameters);
 
         // Now trigger the Create transition on the case plan, to make the case actually go running
-        PlanItem casePlan = caseInstance.getCasePlan();
-        caseInstance.makePlanItemTransition(casePlan, Transition.Create);
+        caseInstance.addEvent(new PlanItemCreated(caseInstance));
 
         ValueMap json = new ValueMap();
         json.put("caseInstanceId", new StringValue(caseInstance.getId()));

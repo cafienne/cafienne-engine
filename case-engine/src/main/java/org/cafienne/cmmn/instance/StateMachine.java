@@ -7,11 +7,11 @@
  */
 package org.cafienne.cmmn.instance;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.cafienne.akka.actor.command.exception.CommandException;
+import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 
 /**
  * Simple state machine logic, with an indirection to figure out where we are and where we go
@@ -29,27 +29,15 @@ class StateMachine {
     }
 
     /**
-     * Configures a possible transition from one state to the other.
-     *
-     * @param transition
-     * @param fromState
-     * @param targetState
-     */
-    private void addTransition(Transition transition, State fromState, State targetState) {
-        Map<Transition, Target> stateTransitions = getTransitions(fromState);
-        stateTransitions.put(transition, getTarget(targetState));
-    }
-
-    /**
      * Configures a possible transition from a set of states to a target state.
-     *
-     * @param transition
-     * @param fromState
+     *  @param transition
      * @param targetState
+     * @param fromStates
      */
-    private void addTransition(Transition transition, State[] fromStates, State targetState) {
+    private void addTransition(Transition transition, State targetState, State... fromStates) {
         for (State fromState : fromStates) {
-            addTransition(transition, fromState, targetState);
+            Map<Transition, Target> stateTransitions = getTransitions(fromState);
+            stateTransitions.put(transition, getTarget(targetState));
         }
     }
 
@@ -81,7 +69,7 @@ class StateMachine {
     private Map<Transition, Target> getTransitions(State state) {
         Map<Transition, Target> stateTransitions = transitions.get(state);
         if (stateTransitions == null) {
-            stateTransitions = new HashMap<Transition, Target>();
+            stateTransitions = new HashMap<>();
             transitions.put(state, stateTransitions);
         }
         return stateTransitions;
@@ -95,8 +83,9 @@ class StateMachine {
      * @param transition
      * @return
      */
-    Action transition(PlanItem planItem, Transition transition) {
+    PlanItemTransitioned transition(PlanItem planItem, Transition transition) {
         State currentState = planItem.getState();
+
         Map<Transition, Target> stateTransitions = transitions.get(currentState);
         Target target = stateTransitions.get(transition);
         if (target != null) {
@@ -105,15 +94,18 @@ class StateMachine {
                 // We have to fetch the target again, based on the history state, as that will contain the proper action
                 target = getTarget(planItem.getHistoryState());
             }
-            if (!planItem.getInstance().isTransitionAllowed(transition)) // Evaluate the guard (if any)
-            {
+            // Evaluate the guard (if any)
+            if (!planItem.getInstance().isTransitionAllowed(transition)) {
                 return null;
             }
-            planItem.setState(target.state, currentState, transition);
-            return target.action;
+            return new PlanItemTransitioned(planItem, target.state, currentState, transition);
         } else {
             return null; // no transition
         }
+    }
+
+    Action getAction(State state) {
+        return getTarget(state).action;
     }
 
     private class Target {
@@ -130,6 +122,7 @@ class StateMachine {
     /**
      * Action to be executed when a plan item has entered a state
      */
+    @FunctionalInterface
     interface Action // To be executed once a state is entered
     {
         /**
@@ -143,14 +136,14 @@ class StateMachine {
     static final StateMachine EventMilestone = new StateMachine();
 
     static {
-        EventMilestone.addTransition(Transition.Create, State.Null, State.Available);
-        EventMilestone.addTransition(Transition.Suspend, State.Available, State.Suspended);
-        EventMilestone.addTransition(Transition.ParentSuspend, State.Available, State.Suspended);
-        EventMilestone.addTransition(Transition.Terminate, State.Available, State.Terminated);
-        EventMilestone.addTransition(Transition.Occur, State.Available, State.Completed);
-        EventMilestone.addTransition(Transition.Resume, State.Suspended, State.Available);
-        EventMilestone.addTransition(Transition.ParentResume, State.Suspended, State.Available);
-        EventMilestone.addTransition(Transition.ParentTerminate, new State[] { State.Available, State.Suspended }, State.Terminated);
+        EventMilestone.addTransition(Transition.Create, State.Available, State.Null);
+        EventMilestone.addTransition(Transition.Suspend, State.Suspended, State.Available);
+        EventMilestone.addTransition(Transition.ParentSuspend, State.Suspended, State.Available);
+        EventMilestone.addTransition(Transition.Terminate, State.Terminated, State.Available);
+        EventMilestone.addTransition(Transition.Occur, State.Completed, State.Available);
+        EventMilestone.addTransition(Transition.Resume, State.Available, State.Suspended);
+        EventMilestone.addTransition(Transition.ParentResume, State.Available, State.Suspended);
+        EventMilestone.addTransition(Transition.ParentTerminate, State.Terminated, new State[] { State.Available, State.Suspended });
 
         EventMilestone.setAction(State.Terminated, (PlanItem p, Transition t) -> p.getInstance().terminateInstance());
         EventMilestone.setAction(State.Suspended, (PlanItem p, Transition t) -> p.getInstance().suspendInstance());
@@ -172,23 +165,24 @@ class StateMachine {
     static final StateMachine TaskStage = new StateMachine();
 
     static {
-        TaskStage.addTransition(Transition.Create, State.Null, State.Available);
-        TaskStage.addTransition(Transition.Enable, State.Available, State.Enabled);
-        TaskStage.addTransition(Transition.Start, State.Available, State.Active);
-        TaskStage.addTransition(Transition.Disable, State.Enabled, State.Disabled);
-        TaskStage.addTransition(Transition.ManualStart, State.Enabled, State.Active);
-        TaskStage.addTransition(Transition.Suspend, State.Active, State.Suspended);
-        TaskStage.addTransition(Transition.Fault, State.Active, State.Failed);
-        TaskStage.addTransition(Transition.Complete, State.Active, State.Completed);
-        TaskStage.addTransition(Transition.Terminate, State.Active, State.Terminated);
-        TaskStage.addTransition(Transition.Exit, new State[] { State.Available, State.Active, State.Enabled, State.Disabled, State.Suspended, State.Failed }, State.Terminated);
-        TaskStage.addTransition(Transition.Resume, State.Suspended, State.Active);
-        TaskStage.addTransition(Transition.Reactivate, State.Failed, State.Active);
-        TaskStage.addTransition(Transition.Reenable, State.Disabled, State.Enabled);
-        TaskStage.addTransition(Transition.ParentSuspend, new State[] { State.Available, State.Active, State.Enabled, State.Disabled }, State.Suspended);
-        TaskStage.addTransition(Transition.ParentResume, State.Suspended, null);
+        TaskStage.addTransition(Transition.Create, State.Available, State.Null);
+        TaskStage.addTransition(Transition.Enable, State.Enabled, State.Available);
+        TaskStage.addTransition(Transition.Start, State.Active, State.Available);
+        TaskStage.addTransition(Transition.Disable, State.Disabled, State.Enabled);
+        TaskStage.addTransition(Transition.ManualStart, State.Active, State.Enabled);
+        TaskStage.addTransition(Transition.Suspend, State.Suspended, State.Active);
+        TaskStage.addTransition(Transition.Fault, State.Failed, State.Active);
+        TaskStage.addTransition(Transition.Complete, State.Completed, State.Active);
+        TaskStage.addTransition(Transition.Terminate, State.Terminated, State.Active);
+        TaskStage.addTransition(Transition.Exit, State.Terminated, new State[] { State.Available, State.Active, State.Enabled, State.Disabled, State.Suspended, State.Failed });
+        TaskStage.addTransition(Transition.Resume, State.Active, State.Suspended);
+        TaskStage.addTransition(Transition.Reactivate, State.Active, State.Failed);
+        TaskStage.addTransition(Transition.Reenable, State.Enabled, State.Disabled);
+        TaskStage.addTransition(Transition.ParentSuspend, State.Suspended, new State[] { State.Available, State.Active, State.Enabled, State.Disabled });
+        TaskStage.addTransition(Transition.ParentResume, null, State.Suspended);
 
         TaskStage.setAction(State.Available, (PlanItem p, Transition t) -> {
+            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Available' action for plan item " + p.getName());
             p.getInstance().createInstance();
             p.evaluateRepetitionRule();
             p.evaluateRequiredRule();
@@ -198,6 +192,7 @@ class StateMachine {
             p.checkEntryCriteria(transition);
         });
         TaskStage.setAction(State.Active, (PlanItem p, Transition t) -> {
+            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Active' action for plan item " + p.getName());
             if (t == Transition.Start || t == Transition.ManualStart) {
                 p.getInstance().startInstance();
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
@@ -212,12 +207,14 @@ class StateMachine {
         TaskStage.setAction(State.Enabled, (PlanItem p, Transition t) -> p.makeTransition(Transition.Start));
         TaskStage.setAction(State.Suspended, (PlanItem p, Transition t) -> p.getInstance().suspendInstance());
         TaskStage.setAction(State.Completed, (PlanItem p, Transition t) -> {
+            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Completed' action for plan item " + p.getName());
             p.getInstance().completeInstance();
             if (p.getEntryCriteria().isEmpty()) {
                 p.repeat();
             }
         });
         TaskStage.setAction(State.Terminated, (PlanItem p, Transition t) -> {
+            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Terminated' action for plan item " + p.getName());
             p.getInstance().terminateInstance();
             if (p.getEntryCriteria().isEmpty()) {
                 p.repeat();
@@ -230,13 +227,13 @@ class StateMachine {
     static final StateMachine CasePlan = new StateMachine();
 
     static {
-        CasePlan.addTransition(Transition.Create, State.Null, State.Active);
-        CasePlan.addTransition(Transition.Suspend, State.Active, State.Suspended);
-        CasePlan.addTransition(Transition.Terminate, State.Active, State.Terminated);
-        CasePlan.addTransition(Transition.Complete, State.Active, State.Completed);
-        CasePlan.addTransition(Transition.Fault, State.Active, State.Failed);
-        CasePlan.addTransition(Transition.Reactivate, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended }, State.Active);
-        CasePlan.addTransition(Transition.Close, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended }, State.Closed);
+        CasePlan.addTransition(Transition.Create, State.Active, State.Null);
+        CasePlan.addTransition(Transition.Suspend, State.Suspended, State.Active);
+        CasePlan.addTransition(Transition.Terminate, State.Terminated, State.Active);
+        CasePlan.addTransition(Transition.Complete, State.Completed, State.Active);
+        CasePlan.addTransition(Transition.Fault, State.Failed, State.Active);
+        CasePlan.addTransition(Transition.Reactivate, State.Active, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended });
+        CasePlan.addTransition(Transition.Close, State.Closed, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended });
 
         CasePlan.setAction(State.Suspended, (PlanItem p, Transition t) -> p.getInstance().suspendInstance());
         CasePlan.setAction(State.Completed, (PlanItem p, Transition t) -> p.getInstance().completeInstance());

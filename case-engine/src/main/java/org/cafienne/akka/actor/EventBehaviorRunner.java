@@ -2,7 +2,7 @@ package org.cafienne.akka.actor;
 
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.cmmn.akka.event.CaseFileEvent;
-import org.cafienne.cmmn.instance.PlanItemEvent;
+import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 
 import java.util.ArrayList;
 import java.util.List;

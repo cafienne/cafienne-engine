@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.instance.PlanItemDefinitionInstance;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.task.cmmn.CaseTask;

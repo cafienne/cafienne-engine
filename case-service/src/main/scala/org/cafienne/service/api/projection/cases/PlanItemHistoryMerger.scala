@@ -1,7 +1,7 @@
 package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event._
-import org.cafienne.cmmn.instance.PlanItemEvent
+import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
 import org.cafienne.service.api.cases.PlanItemHistory
 
 object PlanItemHistoryMerger {

@@ -6,22 +6,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.cafienne.cmmn.instance;
+package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
-import org.cafienne.cmmn.instance.casefile.LongValue;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.CaseInstanceEvent;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.Instant;
 
-public abstract class PlanItemEvent extends CaseInstanceEvent implements AkkaSerializable {
+public abstract class PlanItemEvent extends CaseInstanceEvent {
     private final static Logger logger = LoggerFactory.getLogger(PlanItemEvent.class);
+
+    protected final transient PlanItem planItem;
 
     public final String planItemId;
     public final String type;
@@ -32,12 +32,22 @@ public abstract class PlanItemEvent extends CaseInstanceEvent implements AkkaSer
         planItemId, type, planitem, seqNo, index
     }
 
+    @Deprecated
     protected PlanItemEvent(PlanItem planItem) {
-        super(planItem.getCaseInstance());
-        this.planItemId = planItem.getId();
-        this.seqNo = planItem.getNextEventNumber();
-        this.type = planItem.getType();
-        this.index = planItem.getIndex();
+        this(planItem.getCaseInstance(), planItem.getId(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
+    }
+
+    protected PlanItemEvent(Case actor, String planItemId, String type, int index, int seqNo) {
+        this(actor, planItemId, type, index, seqNo, null);
+    }
+
+    protected PlanItemEvent(Case actor, String planItemId, String type, int index, int seqNo, PlanItem planItem) {
+        super(actor);
+        this.planItemId = planItemId;
+        this.seqNo = seqNo;
+        this.type = type;
+        this.index = index;
+        this.planItem = planItem;
     }
 
     protected PlanItemEvent(ValueMap json) {
@@ -47,6 +57,7 @@ public abstract class PlanItemEvent extends CaseInstanceEvent implements AkkaSer
         ValueMap planItemJson = readMap(json, Fields.planitem);
         this.seqNo = ((Long) planItemJson.raw(Fields.seqNo)).intValue();
         this.index = ((Long)readField(planItemJson, Fields.index)).intValue();
+        this.planItem = null;
     }
 
     public void writePlanItemEvent(JsonGenerator generator) throws IOException {
@@ -62,25 +73,23 @@ public abstract class PlanItemEvent extends CaseInstanceEvent implements AkkaSer
         generator.writeEndObject();
     }
 
-    protected void recoverEvent(Case caseInstance) {
-        throw new RuntimeException("This method may  not be invoekd");
-    }
-
     @Override
-    final public void recover(Case caseInstance) {
-        if (this instanceof PlanItemCreated) {
-            this.recoverEvent(caseInstance);
-        }
-        PlanItem planItem = caseInstance.getPlanItemById(getPlanItemId());
+    public void updateState(Case actor) {
+        PlanItem planItem = actor.getPlanItemById(planItemId);
         if (planItem == null) {
-            logger.error("MAJOR ERROR: Cannot recover plan item transition for plan item with id " + getPlanItemId() + ", because the plan item cannot be found");
+            // Ouch!
+            logger.error("Error while updating state from event " + getClass().getSimpleName()+": cannot find plan item with id " + getPlanItemId() + " in case " + actor);
             return;
         }
-        planItem.recover(this);
-        this.recoverPlanItemEvent(planItem);
+        planItem.updateSequenceNumber(this);
+        updatePlanItemState(planItem);
     }
 
-    abstract protected void recoverPlanItemEvent(PlanItem planItem);
+    abstract protected void updatePlanItemState(PlanItem planItem);
+
+    protected String getName() {
+        return planItem != null ? planItem.getName() : "PlanItem";
+    }
 
     /**
      * Returns type of task, taken from plan item. Typically HumanTask, ProcessTask or CaseTask.

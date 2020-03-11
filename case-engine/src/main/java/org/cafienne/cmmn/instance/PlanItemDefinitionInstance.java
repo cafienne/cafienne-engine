@@ -48,11 +48,7 @@ public abstract class PlanItemDefinitionInstance<T extends PlanItemDefinitionDef
     }
 
     public String toString() {
-        String prefix = "CasePlanModel";
-        if (this.planItem != null) {
-            prefix = this.planItem.getName();
-        }
-        return prefix + " (" + this.getClass().getSimpleName() + " '" + this.getDefinition().getName() + "'). Current state is " + planItem.getState();
+        return getPlanItem().toString();
     }
 
     public String getType() {
