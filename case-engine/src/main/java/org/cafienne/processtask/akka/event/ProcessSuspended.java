@@ -2,21 +2,25 @@ package org.cafienne.processtask.akka.event;
 
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
-public class ProcessTerminated extends ProcessEnded {
-    public ProcessTerminated(ProcessTaskActor actor) {
-        super(actor, new ValueMap());
+public class ProcessSuspended extends ProcessInstanceEvent {
+    public ProcessSuspended(ProcessTaskActor actor) {
+        super(actor);
     }
 
-    public ProcessTerminated(ValueMap json) {
+    public ProcessSuspended(ValueMap json) {
         super(json);
     }
 
     @Override
+    public void updateState(ProcessTaskActor actor) {
+        // Nothing to update
+    }
+
+    @Override
     public void runBehavior() {
-        actor.terminate();
+        actor.suspend();
     }
 }

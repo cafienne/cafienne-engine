@@ -67,8 +67,8 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
 
     @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
-        // Apparently process has failed and we're trying again?
-        startImplementation(inputParameters);
+        // Apparently process has failed so we can trying again
+        tell(new ReactivateProcess(getCaseInstance().getCurrentUser(), getId(), inputParameters));
     }
 
     private void tell(ProcessCommand command) {

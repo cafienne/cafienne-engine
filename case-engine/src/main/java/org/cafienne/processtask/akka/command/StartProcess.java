@@ -80,7 +80,6 @@ public class StartProcess extends ProcessCommand implements BootstrapCommand {
     @Override
     public ProcessResponse process(ProcessTaskActor process) {
         process.addEvent(new ProcessStarted(process, this));
-        process.start();
         return new ProcessResponse(this);
     }
 

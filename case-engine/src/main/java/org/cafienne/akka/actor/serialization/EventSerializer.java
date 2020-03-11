@@ -74,6 +74,9 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
         addManifestWrapper(ProcessStarted.class, ProcessStarted::new);
         addManifestWrapper(ProcessCompleted.class, ProcessCompleted::new);
         addManifestWrapper(ProcessFailed.class, ProcessFailed::new);
+        addManifestWrapper(ProcessReactivated.class, ProcessReactivated::new);
+        addManifestWrapper(ProcessResumed.class, ProcessResumed::new);
+        addManifestWrapper(ProcessSuspended.class, ProcessSuspended::new);
         addManifestWrapper(ProcessTerminated.class, ProcessTerminated::new);
         addManifestWrapper(ProcessModified.class, ProcessModified::new);
     }

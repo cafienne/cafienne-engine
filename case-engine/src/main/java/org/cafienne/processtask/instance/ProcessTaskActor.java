@@ -52,7 +52,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         return name;
     }
 
-    public void setInitialState(ProcessStarted event) {
+    public void updateState(ProcessStarted event) {
         this.setEngineVersion(event.engineVersion);
         this.debugMode = event.debugMode;
         this.definition = event.definition;
@@ -63,9 +63,22 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         this.inputParameters = event.inputParameters;
     }
 
+    public void updateState(ProcessReactivated event) {
+        this.inputParameters = event.inputParameters;
+    }
+
+    public SubProcess<?> getImplementation() {
+        return this.taskImplementation;
+    }
+
     public void start() {
         addDebugInfo(() -> "Starting process task " + name + " with input parameters", inputParameters);
         taskImplementation.start();
+    }
+
+    public void reactivate() {
+        addDebugInfo(() -> "Reactivating process " + getName());
+        taskImplementation.reactivate();
     }
 
     public Logger getLogger() {
@@ -95,10 +108,18 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         });
     }
 
+    public void suspend() {
+        addDebugInfo(() -> "Suspending process " + getName());
+        taskImplementation.suspend();
+    }
+
+    public void resume() {
+        addDebugInfo(() -> "Resuming process " + getName());
+        taskImplementation.resume();
+    }
+
     public void terminate() {
         addDebugInfo(() -> "Terminating process " + getName());
         taskImplementation.terminate();
-        addDebugInfo(() -> "Terminated process implementation");
-        addEvent(new ProcessTerminated(this));
     }
 }
