@@ -18,6 +18,8 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.cmmn.akka.event.CaseFileEvent;
+import org.cafienne.cmmn.instance.PlanItemEvent;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
 import org.slf4j.Logger;
@@ -101,6 +103,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Returns the id of the parent of this model, i.e., the one that created this model
      * and maintains it's lifecycle. Should return null or an empty string if there is none.
+     *
      * @return
      */
     public abstract String getParentActorId();
@@ -108,6 +111,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Returns the id of the parent of this model, i.e., the one that created this model
      * and maintains it's lifecycle. Should return null or an empty string if there is none.
+     *
      * @return
      */
     public abstract String getRootActorId();
@@ -128,6 +132,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Returns true if the model actor runs in debug mode, false otherwise.
+     *
      * @return
      */
     public boolean debugMode() {
@@ -180,7 +185,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                 logger.info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
             } else if (event instanceof ModelEvent) {
                 // Step 2c. Weird: ModelEvents in recovery of other models??
-                logger.warn("Received unexpected recovery event of type "+event.getClass().getName()+" in actor of type "+getClass().getName());
+                logger.warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
             } else {
                 // Step 2c.
                 logger.warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
@@ -269,6 +274,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Returns a typed version of the current message handler
+     *
      * @param <T>
      * @return
      */
@@ -325,6 +331,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Adds an event to the current message handler
+     *
      * @param event
      * @param <EV>
      * @return
@@ -338,6 +345,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * have taken place while handling the command. The ModelActor will get a new last modified timestamp,
      * and the actor should add an event for that to the log, so that projections can define and commit
      * a transaction scope
+     *
      * @param lastModified
      * @return
      */
@@ -382,6 +390,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Method for a MessageHandler to persist it's events
+     *
      * @param events
      * @param <T>
      */
@@ -391,6 +400,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Model actor can send a reply to a command with this method
+     *
      * @param response
      */
     public void reply(ModelResponse response) {
@@ -400,19 +410,31 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Method for a MessageHandler to persist it's events, and be called back after all events have been persisted
+     *
      * @param events
      * @param response
      * @param <T>
      */
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
+        StringBuilder msg = new StringBuilder();
+        events.forEach(e -> {
+            msg.append("\n\t");
+            if (e instanceof PlanItemEvent) {
+                msg.append(e.toString());
+            } else if (e instanceof CaseFileEvent) {
+                msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
+            } else {
+                msg.append(e.getClass().getSimpleName() + ", ");
+            }
+        });
+        logger.debug("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this + msg + "\n");
         if (events.isEmpty()) {
             return;
         }
-        logger.debug("Persisting " + events.size() + " events in " + this);
         T lastEvent = events.get(events.size() - 1);
         persistAll(events, e -> {
             CaseSystem.health().writeJournal().isOK();
-            logger.debug("Persisted an event of type "+e.getClass().getName()+" in actor "+this);
+            logger.debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
             if (e == lastEvent && response != null) {
                 reply(response);
             }
@@ -422,6 +444,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * If the command handler has changed ModelActor state, but then ran into an unhandled exception,
      * the actor will remove itself from memory and start again.
+     *
      * @param handler
      * @param exception
      */
@@ -437,7 +460,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
         CaseSystem.health().writeJournal().hasFailed(cause);
-        logger.error("Failure in "+getClass().getSimpleName()+" " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
+        logger.error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
         reply(new CommandFailure(getCurrentCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
         context().stop(self());
     }
@@ -487,6 +510,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Returns the logger of the model actor
+     *
      * @return
      */
     protected Logger getLogger() {

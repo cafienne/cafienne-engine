@@ -134,8 +134,12 @@ public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializ
         writeField(generator, Fields.user, user);
     }
 
+    public String getCommandDescription() {
+        return getClass().getSimpleName();
+    }
+
     public String toString() {
-        return "Command [" + getClass().getSimpleName() + "]" + super.toString();
+        return "Command [" + getCommandDescription() + "]" + super.toString();
     }
 
     public Value<?> toJson() {

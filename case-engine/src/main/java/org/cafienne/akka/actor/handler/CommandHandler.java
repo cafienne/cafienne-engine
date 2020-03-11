@@ -30,8 +30,9 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
     public CommandHandler(A actor, C msg) {
         super(actor, msg);
-        this.user = msg.getUser();
         this.command = msg;
+        this.user = command.getUser();
+        addDebugInfo(() -> "\n\n\txxxxxxxxxxxxxxxxxxxx new command " + command.getCommandDescription() +" xxxxxxxxxxxxxxx\n\n", logger);
     }
 
     protected Logger getLogger() {
@@ -59,7 +60,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         if (issue != null) {
             final Exception e = issue;
             addDebugInfo(() -> e, logger);
-            setNextResponse(new SecurityFailure(msg, issue));
+            setNextResponse(new SecurityFailure(command, issue));
         }
 
         return issue;
@@ -67,7 +68,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
     @Override
     protected void process() {
-        addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), command.toJson(), getLogger());
+        addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getCommandDescription() , command.toJson(), getLogger());
 
         // First, simple, validation
         try {

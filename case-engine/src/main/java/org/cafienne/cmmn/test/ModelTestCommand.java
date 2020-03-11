@@ -30,6 +30,10 @@ public interface ModelTestCommand<C extends ModelCommand, R extends ModelRespons
 
     CaseEventListener getEventListener();
 
+    default String getCommandDescription() {
+        return getActualCommand().getCommandDescription();
+    }
+
     /**
      * Temporary hack to have some case printing after all for now.
      * @return
