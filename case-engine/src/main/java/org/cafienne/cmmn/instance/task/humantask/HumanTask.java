@@ -7,28 +7,24 @@
  */
 package org.cafienne.cmmn.instance.task.humantask;
 
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.cmmn.user.CaseTeamMember;
-import org.cafienne.cmmn.instance.*;
 import org.cafienne.humantask.akka.event.*;
 import org.cafienne.humantask.instance.WorkflowTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
 
 public class HumanTask extends Task<HumanTaskDefinition> {
-    private final static Logger logger = LoggerFactory.getLogger(HumanTask.class);
 
-    private WorkflowTask workflow;
+    private final WorkflowTask workflow;
     private final TaskOutputValidator validator;
 
     public HumanTask(PlanItem planItem, HumanTaskDefinition definition) {
@@ -79,8 +75,9 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
     @Override
     protected void startImplementation(ValueMap inputParameters) {
-        getCaseInstance().addEvent(new HumanTaskCreated(this)).updateState(workflow);
-        getCaseInstance().addEvent(new HumanTaskInputSaved(this, getMappedInputParameters())).updateState(workflow);
+        getCaseInstance().addEvent(new HumanTaskCreated(this));
+        getImplementation().beginLifeCycle();
+        getCaseInstance().addEvent(new HumanTaskInputSaved(this, getMappedInputParameters()));
 
     }
 
@@ -89,18 +86,18 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         if (getPlanItem().getHistoryState() == State.Available) {
             addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
-            addEvent(new HumanTaskTerminated(this)).updateState(this.getImplementation());
+            addEvent(new HumanTaskTerminated(this));
         }
     }
 
     @Override
     protected void suspendInstance() {
-        addEvent(new HumanTaskSuspended(this)).updateState(this.getImplementation());
+        addEvent(new HumanTaskSuspended(this));
     }
 
     @Override
     protected void resumeInstance() {
-        addEvent(new HumanTaskResumed(this)).updateState(this.getImplementation());
+        addEvent(new HumanTaskResumed(this));
     }
 
     @Override

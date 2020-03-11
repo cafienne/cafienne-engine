@@ -27,7 +27,7 @@ import java.io.IOException;
  * This command must be used to complete a human task with additional task output parameters.
  */
 @Manifest
-public class CompleteHumanTask extends HumanTaskCommand {
+public class CompleteHumanTask extends WorkflowCommand {
     protected final ValueMap taskOutput;
     protected Task<?> task;
 
@@ -68,7 +68,7 @@ public class CompleteHumanTask extends HumanTaskCommand {
             throw new InvalidCommandException("CompleteTask: Action can not be completed as the task (" + getTaskId() + ") is not in Active but in " + currentState + " state");
         }
 
-        String currentTaskAssignee = task.getImplementation().getTaskAssignee();
+        String currentTaskAssignee = task.getImplementation().getAssignee();
         if (currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty()) {
             throw new InvalidCommandException("CompleteHumanTask: Only Assigned or Delegated task can be completed");
         }
@@ -78,11 +78,7 @@ public class CompleteHumanTask extends HumanTaskCommand {
             throw new InvalidCommandException("CompleteTask: Only the current task assignee (" + currentTaskAssignee + ") can complete the task (" + task.getId() + ")");
         }
 
-        TaskState currentTaskState = task.getImplementation().getCurrentTaskState();
-        if (!(currentTaskState == TaskState.Assigned || currentTaskState == TaskState.Delegated)) {
-            throw new InvalidCommandException("CompleteHumanTask: Action can not be completed as the task (" + getTaskId() + ") is in " + currentTaskState + " state, but should be in any of ["
-                    + TaskState.Assigned + ", " + TaskState.Delegated + "] state");
-        }
+        validateState(task, TaskState.Assigned, TaskState.Delegated);
     }
 
     public ValueMap getTaskOutput() {
@@ -104,7 +100,9 @@ public class CompleteHumanTask extends HumanTaskCommand {
         }
 
 
-        task.addEvent(new HumanTaskCompleted(task, this.taskOutput)).updateState(task.getImplementation());
+        task.addEvent(new HumanTaskCompleted(task, this.taskOutput));
+        // This will generate PlanItemTransitioned and CaseFileItem events
+        task.goComplete(this.taskOutput);
         return new HumanTaskResponse(this);
     }
 

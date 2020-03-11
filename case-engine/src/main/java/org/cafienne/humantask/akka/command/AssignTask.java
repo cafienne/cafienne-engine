@@ -15,6 +15,7 @@ import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskAssigned;
+import org.cafienne.humantask.akka.event.HumanTaskOwnerChanged;
 import org.cafienne.humantask.instance.TaskState;
 
 import java.io.IOException;
@@ -49,7 +50,8 @@ public class AssignTask extends WorkflowCommand {
 
     @Override
     public HumanTaskResponse process(HumanTask task) {
-        task.addEvent(new HumanTaskAssigned(task, this.assignee)).updateState(task.getImplementation());
+        task.addEvent(new HumanTaskAssigned(task, this.assignee));
+        task.addEvent(new HumanTaskOwnerChanged(task, this.assignee));
         return new HumanTaskResponse(this);
     }
 

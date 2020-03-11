@@ -23,8 +23,4 @@ public class HumanTaskDelegated extends HumanTaskAssigned {
     public HumanTaskDelegated(ValueMap json) {
         super(json);
     }
-
-    public void updateState(WorkflowTask task) {
-        task.delegate(assignee);
-    }
 }

@@ -44,7 +44,7 @@ public class ValidateTaskOutput extends WorkflowCommand {
 	
 	@Override
     public void validate(HumanTask task) {
-		String currentTaskAssignee = task.getImplementation().getTaskAssignee();
+		String currentTaskAssignee = task.getImplementation().getAssignee();
 		if( currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty() ) {
 		    throw new InvalidCommandException("ValidateTaskOutput: Output can be validated only for Assigned or Delegated task (" + task.getId() + ")");
 		}

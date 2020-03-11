@@ -9,6 +9,7 @@ package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
@@ -42,8 +43,10 @@ public class HumanTaskAssigned extends HumanTaskTransitioned {
         this.assignee = readField(json, Fields.assignee);
     }
 
-    public void updateState(WorkflowTask task) {
-        task.assign(assignee);
+    @Override
+    public void updateState(Case caseInstance) {
+        super.updateState(caseInstance);
+        getTask().getImplementation().updateState(this);
     }
 
     @Override

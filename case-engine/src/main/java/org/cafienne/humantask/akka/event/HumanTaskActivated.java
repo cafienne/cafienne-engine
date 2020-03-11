@@ -42,11 +42,6 @@ public class HumanTaskActivated extends HumanTaskTransitioned {
     }
 
     @Override
-    public void updateState(WorkflowTask task) {
-        task.activate(performer, taskModel);
-    }
-
-    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeTransitionEvent(generator);
         writeField(generator, Fields.performer, performer);

@@ -23,8 +23,4 @@ public class HumanTaskClaimed extends HumanTaskAssigned {
     public HumanTaskClaimed(ValueMap json) {
         super(json);
     }
-
-    public void updateState(WorkflowTask task) {
-        task.claim(assignee);
-    }
 }

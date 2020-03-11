@@ -12,22 +12,17 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
 @Manifest
 public class HumanTaskResumed extends HumanTaskTransitioned {
     public HumanTaskResumed(HumanTask task) {
-        super(task, task.getImplementation().getPreviousTaskState(), TaskAction.Resume);
+        super(task, task.getImplementation().getHistoryState(), TaskAction.Resume);
     }
 
     public HumanTaskResumed(ValueMap json) {
         super(json);
-    }
-
-    public void updateState(WorkflowTask task) {
-        task.resume();
     }
 
     @Override

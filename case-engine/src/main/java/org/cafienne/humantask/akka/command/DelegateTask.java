@@ -45,7 +45,7 @@ public class DelegateTask extends WorkflowCommand {
         // TODO: 1. Validate whether delegate is a valid user in the system
         // TODO: 2. Check whether the current user has the privilege to delegate the task to delegate
         // TODO: 3. Check whether the delegate is part of CaseTeam. If not what to do?
-        String currentTaskAssignee = task.getImplementation().getTaskAssignee();
+        String currentTaskAssignee = task.getImplementation().getAssignee();
         if (currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty()) {
             throw new InvalidCommandException("DelegateTask: Only Assigned task can be delegated");
         }
@@ -59,7 +59,7 @@ public class DelegateTask extends WorkflowCommand {
 
     @Override
     public HumanTaskResponse process(HumanTask task) {
-        task.addEvent(new HumanTaskDelegated(task, assignee)).updateState(task.getImplementation());
+        task.addEvent(new HumanTaskDelegated(task, assignee));
         return new HumanTaskResponse(this);
     }
 

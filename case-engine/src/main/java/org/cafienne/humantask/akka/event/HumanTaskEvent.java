@@ -64,11 +64,4 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
     public String getTaskName() {
         return taskName;
     }
-
-    @Override
-    public final void updateState(Case caseInstance) {
-        recoverHumanTaskEvent(getTask().getImplementation());
-    }
-
-    abstract protected void recoverHumanTaskEvent(WorkflowTask task);
 }

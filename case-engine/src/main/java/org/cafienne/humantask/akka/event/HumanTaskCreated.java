@@ -30,10 +30,6 @@ public class HumanTaskCreated extends HumanTaskEvent {
         this.createdBy = readField(json, Fields.createdBy);
     }
 
-    public void updateState(WorkflowTask task) {
-        task.start();
-    }
-
     public Instant getCreatedOn() {
         return createdOn;
     }
@@ -52,10 +48,5 @@ public class HumanTaskCreated extends HumanTaskEvent {
         super.writeHumanTaskEvent(generator);
         writeField(generator, Fields.createdOn, createdOn);
         writeField(generator, Fields.createdBy, createdBy);
-    }
-
-    @Override
-    protected void recoverHumanTaskEvent(WorkflowTask task) {
-        updateState(task);
     }
 }

@@ -13,7 +13,6 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
@@ -25,10 +24,6 @@ public class HumanTaskTerminated extends HumanTaskTransitioned {
 
     public HumanTaskTerminated(ValueMap json) {
         super(json);
-    }
-
-    public void updateState(WorkflowTask task) {
-        task.terminate();
     }
 
     @Override

@@ -34,17 +34,9 @@ public class HumanTaskDueDateFilled extends HumanTaskEvent {
         this.dueDate = json.rawInstant(Fields.dueDate);
     }
 
-    public void updateState(WorkflowTask task) {
-        task.setDueDate(dueDate);
-    }
-
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeHumanTaskEvent(generator);
         writeField(generator, Fields.dueDate, dueDate);
-    }
-
-    protected void recoverHumanTaskEvent(WorkflowTask task) {
-        updateState(task);
     }
 }

@@ -20,11 +20,6 @@ abstract class WorkflowCommand extends HumanTaskCommand {
         super(tenantUser, caseInstanceId, taskId);
     }
 
-    @Deprecated
-    protected WorkflowCommand(TenantUser tenantUser, String taskId) {
-        this(tenantUser, null, taskId);
-    }
-
     protected WorkflowCommand(ValueMap json) {
         super(json);
     }
@@ -34,7 +29,7 @@ abstract class WorkflowCommand extends HumanTaskCommand {
      * @param task
      * @param expectedStates*/
     protected void validateState(HumanTask task, TaskState... expectedStates) {
-        TaskState currentTaskState = task.getImplementation().getCurrentTaskState();
+        TaskState currentTaskState = task.getImplementation().getCurrentState();
         for (int i = 0; i < expectedStates.length; i++) {
             if (expectedStates[i].equals(currentTaskState)) {
                 return;

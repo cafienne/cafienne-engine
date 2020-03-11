@@ -43,7 +43,7 @@ public class FillTaskDueDate extends HumanTaskCommand {
 
 	@Override
 	public HumanTaskResponse process(HumanTask task) {
-		task.addEvent(new HumanTaskDueDateFilled(task, this.dueDate)).updateState(task.getImplementation());
+		task.addEvent(new HumanTaskDueDateFilled(task, this.dueDate));
 		return new HumanTaskResponse(this);
 	}
 

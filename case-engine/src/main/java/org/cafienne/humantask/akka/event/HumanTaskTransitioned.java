@@ -8,6 +8,7 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
@@ -33,7 +34,7 @@ public abstract class HumanTaskTransitioned extends HumanTaskEvent {
     }
 
     protected HumanTaskTransitioned(HumanTask task, TaskState currentState, TaskAction transition) {
-        this(task, currentState, task.getImplementation().getPreviousTaskState(), transition);
+        this(task, currentState, task.getImplementation().getCurrentState(), transition);
     }
 
     protected HumanTaskTransitioned(ValueMap json) {
@@ -45,14 +46,20 @@ public abstract class HumanTaskTransitioned extends HumanTaskEvent {
 
     public void writeTransitionEvent(JsonGenerator generator) throws IOException {
         super.writeHumanTaskEvent(generator);
-        writeField(generator, Fields.currentState, currentState);
         writeField(generator, Fields.historyState, historyState);
         writeField(generator, Fields.transition, transition);
+        writeField(generator, Fields.currentState, currentState);
     }
 
     @Override
     public String toString() {
         return "Task " + getTaskName() + "[" + getTaskId() + "]." + getTransition() + ", causing transition from " + getHistoryState() + " to " + getCurrentState();
+    }
+
+
+    @Override
+    public void updateState(Case caseInstance) {
+        getTask().getImplementation().updateState(this);
     }
 
     /**
@@ -80,12 +87,5 @@ public abstract class HumanTaskTransitioned extends HumanTaskEvent {
      */
     public TaskAction getTransition() {
         return transition;
-    }
-
-    abstract protected void updateState(WorkflowTask task);
-
-    @Override
-    final protected void recoverHumanTaskEvent(WorkflowTask task) {
-        updateState(task);
     }
 }
