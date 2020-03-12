@@ -105,6 +105,10 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
                 addDebugInfo(() -> this + " cannot auto complete, because '" + childItem.getName() + "' is still Active");
                 return false;
             }
+            if (childItem.getState() == State.Null) {
+                addDebugInfo(() -> "Stage '" + getName() + "' cannot auto complete, because '" + childItem.getName() + "' is still in NULL state (awaits Create)");
+                return false;
+            }
             if (!childItem.getState().isSemiTerminal()) {
                 if (autoCompletes || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
                     if (childItem.isRequired()) { // Stage cannot complete if required items are not in semi-terminal state
