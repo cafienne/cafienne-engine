@@ -1,43 +1,43 @@
 <CMMNDI>
     <CMMNDiagram>
         <CMMNShape cmmnElementRef="cm_SpelExpressions.case_SpelExpressions_0">
-            <Bounds x="31" y="11" width="670" height="547"/>
+            <Bounds x="30" y="10" width="670" height="547"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="cm_csdZm_17">
-            <Bounds x="222" y="161" width="100" height="60"/>
+            <Bounds x="220" y="160" width="100" height="60"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_0">
-            <Bounds x="316" y="179" width="12" height="20"/>
+            <Bounds x="314" y="178" width="12" height="20"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="cm_csd7G_38">
-            <Bounds x="426" y="172" width="132" height="40"/>
+            <Bounds x="430" y="170" width="132" height="40"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_1">
-            <Bounds x="484" y="162" width="12" height="20"/>
+            <Bounds x="489" y="160" width="12" height="20"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_2">
-            <Bounds x="462" y="202" width="12" height="20"/>
+            <Bounds x="464" y="200" width="12" height="20"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_3">
-            <Bounds x="510" y="202" width="12" height="20"/>
+            <Bounds x="519" y="200" width="12" height="20"/>
         </CMMNShape>
         <textbox cmmnElementRef="cm_csdZm_19" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="This case shows various SPEL&#10;expressions that can be used">
-            <Bounds x="100" y="50" width="245" height="84"/>
+            <Bounds x="99" y="49" width="245" height="84"/>
         </textbox>
         <textbox cmmnElementRef="cm_csvwt_44" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Repetition Rule in HumanTask refers to 'context', which is the associated case file item.&#10;It takes the index to determine that there are not more than 3 outputs.&#10;&#10;&#10;Human Task input just wires the Content from the case file.&#10;The output of the task is put back into 'Output' case file item, but it is extended with two parameters&#10;referencing task.planItem.name and caseInstance.id&#10;Furthermore there can be an output of type &quot;SpecialOutput&quot; which is put in the &quot;Multi&quot; caseFileItem.&#10;&#10;The Milestone has various entry criteria with ifPart expressions, it responds to either:&#10;- Content!=&quot;basic&quot;&#10;- Output==&quot;stop now&quot;&#10;- more than 2 plan items HumanTask&#10;- more than 2 occurences of Multi">
-            <Bounds x="50" y="330" width="630" height="200"/>
+            <Bounds x="49" y="329" width="630" height="200"/>
         </textbox>
         <casefileitem cmmnElementRef="cm_csvwt_45" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_csdZm_0">
-            <Bounds x="480" y="83" width="25" height="40"/>
+            <Bounds x="479" y="82" width="25" height="40"/>
         </casefileitem>
         <casefileitem cmmnElementRef="cm_cs9mu_49" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_cstko_5">
-            <Bounds x="506" y="239" width="25" height="40"/>
+            <Bounds x="510" y="240" width="25" height="40"/>
         </casefileitem>
         <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_p61kw_0"/>
         <CMMNEdge sourceCMMNElementRef="_p61kw_1" targetCMMNElementRef="cm_csvwt_45"/>
         <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_p61kw_2">
             <waypoint x="274" y="251"/>
-            <waypoint x="469" y="251"/>
+            <waypoint x="480" y="250"/>
         </CMMNEdge>
         <CMMNEdge sourceCMMNElementRef="cm_cs9mu_49" targetCMMNElementRef="_p61kw_3"/>
     </CMMNDiagram>

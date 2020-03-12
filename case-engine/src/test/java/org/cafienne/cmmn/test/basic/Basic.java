@@ -14,10 +14,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
-import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
-import org.cafienne.cmmn.test.assertions.StageAssertion;
-import org.cafienne.cmmn.test.assertions.TaskAssertion;
+import org.cafienne.cmmn.test.assertions.*;
 import org.junit.Test;
 
 public class Basic {
@@ -60,8 +57,23 @@ public class Basic {
 
             PlanItemAssertion listener = casePlan.assertPlanItem("Listener");
             listener.assertLastTransition(Transition.Create, State.Available, State.Null);
-            
-            action.getEvents().filter(caseInstanceId).assertSize(56);
+
+            PublishedEventsAssertion startCaseEvents = action.getEvents().filter(caseInstanceId);
+            TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
+            if (startCaseEvents.getEvents().size() != 56) {
+                TestScript.debugMessage("Expected these events:\nCaseDefinitionApplied: 1\n" +
+                        "TeamMemberAdded: 1\n" +
+                        "PlanItemCreated: 9\n" +
+                        "PlanItemTransitioned: 14\n" +
+                        "RepetitionRuleEvaluated: 7\n" +
+                        "RequiredRuleEvaluated: 7\n" +
+                        "TaskInputFilled: 4\n" +
+                        "HumanTaskCreated: 4\n" +
+                        "HumanTaskActivated: 4\n" +
+                        "HumanTaskInputSaved: 4\n" +
+                        "CaseModified: 1");
+            }
+            startCaseEvents.assertSize(56);
         });
         
         // Completing Item1 should activate sentries S3 and S3.2

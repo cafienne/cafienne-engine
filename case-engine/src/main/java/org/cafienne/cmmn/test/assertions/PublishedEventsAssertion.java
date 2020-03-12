@@ -3,7 +3,6 @@ package org.cafienne.cmmn.test.assertions;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.cmmn.akka.event.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.slf4j.Logger;
@@ -11,7 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -143,6 +144,14 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
         }
 
         return this;
+    }
+
+    public String enumerateEventsByType() {
+        Map<Class<?>, Integer> eventsByType = new LinkedHashMap<>();
+        events.forEach(event -> eventsByType.put(event.getClass(), (eventsByType.getOrDefault(event.getClass(), Integer.valueOf(0)) + 1)));
+        StringBuilder sb = new StringBuilder();
+        eventsByType.forEach((eventClass, number) -> sb.append(eventClass.getSimpleName() +": " + number + "\n"));
+        return sb.toString();
     }
 
     /**
