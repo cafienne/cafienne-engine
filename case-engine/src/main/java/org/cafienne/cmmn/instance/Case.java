@@ -9,6 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
@@ -30,7 +31,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
+public class Case extends ModelActor<CaseCommand, CaseEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(Case.class);
 
@@ -75,7 +76,7 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
     private final CaseTeam caseTeam = new CaseTeam(this);
 
     public Case() {
-        super(CaseCommand.class, CaseInstanceEvent.class);
+        super(CaseCommand.class, CaseEvent.class);
         this.createdOn = Instant.now();
         this.sentryNetwork = new SentryNetwork(this);
 

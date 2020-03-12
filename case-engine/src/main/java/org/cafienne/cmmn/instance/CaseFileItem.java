@@ -7,8 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.akka.event.CaseFileEvent;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -142,50 +141,32 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
     }
 
-    private boolean changeState(CaseFileItemTransition transition) {
-        if (transition == null)
-            return true;
+    private void makeTransition(CaseFileItemTransition transition, State newState, Value value) {
+        // Now inform the sentry network of our change
+        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, value, getPath(), indexInArray));
+    }
 
-        if (state == State.Null) {
-            if (transition == CaseFileItemTransition.Create) {
-                state = State.Available;
-                return true;
-            } else {
-                return false;
-            }
-        } else if (state == State.Available) {
-            if (transition == CaseFileItemTransition.Delete) {
-                state = State.Discarded;
-                return true;
-            } else if (transition == CaseFileItemTransition.Create) {
-                if (getLastTransition() == null) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                // Remain in this state.
-                return true;
-            }
-        } else // this means (state == CaseFileState.Discarded)
-        {
-            // Cannot do anything in discarded state
-            return false;
+    public void updateState(CaseFileEvent event) {
+        addDebugInfo(() -> "CaseFile["+getName()+"]: updating CaseFileItem state based on CaseFileEvent");
+        this.state = event.getState();
+        this.indexInArray = event.getIndex();
+        this.lastTransition = event.getTransition();
+        this.setValue(event.getValue());
+        if (this.array != null) { // Update the array we belong too as well
+            this.array.childChanged(this);
         }
     }
 
-    private void makeTransition(CaseFileItemTransition transition) {
-        if (!changeState(transition)) {
-            throw new TransitionDeniedException("Cannot apply transition " + transition + " on CaseFileItem " + getName() + ", because it is in state " + state);
+    public void runBehavior(CaseFileEvent event) {
+        addDebugInfo(() -> "CaseFile["+getName()+"]: Run behavior for transition " + event.getTransition());
+
+        Value<?> valueToPropagate = this.value;
+
+        if (array != null) { // Update the array we belong too as well
+            array.childChanged(this);
+            valueToPropagate = array.getValue();
         }
-
-        // Update our transition
-        this.lastTransition = transition;
-
-        // Now inform the sentry network of our change
-        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), transition, getValue(), getPath(), getState(), indexInArray));
-
-        addDebugInfo(() -> "Handling case file item transition " + getName() + "." + transition);
+        propagateValueChange(getName(), valueToPropagate);
 
         // Then inform the activating sentries
         connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
@@ -193,36 +174,32 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // Finally iterate the terminating sentries and inform them
         connectedExitCriteria.forEach(onPart -> onPart.inform(this));
 
-        addDebugInfo(() -> "Completed case file item transition " + getName() + "." + transition);
+        addDebugInfo(() -> "CaseFile["+getName()+"]: Completed behavior for transition " + event.getTransition());
     }
 
-    // TODO: The following 4 methods should generate specific events instyead of generic CaseFileEvent event
+    // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
     public void createContent(Value<?> newContent) {
         validateState(State.Null, "create");
         validateContents(newContent);
-        setValue(newContent);
-        makeTransition(CaseFileItemTransition.Create);
+        makeTransition(CaseFileItemTransition.Create, State.Available, newContent);
     }
 
     public void replaceContent(Value<?> newContent) {
         validateState(State.Available, "replace");
         validateContents(newContent);
-        setValue(newContent);
-        makeTransition(CaseFileItemTransition.Replace);
+        makeTransition(CaseFileItemTransition.Replace, State.Available, newContent);
     }
 
     public void updateContent(Value<?> newContent) {
         validateState(State.Available, "update");
         validateContents(newContent);
-        mergeValue(newContent);
-        makeTransition(CaseFileItemTransition.Update);
+        makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(newContent));
     }
 
     public void deleteContent() {
         validateState(State.Available, "delete");
         removedValue = value;
-        setValue(Value.NULL);
-        makeTransition(CaseFileItemTransition.Delete);
+        makeTransition(CaseFileItemTransition.Delete, State.Discarded, Value.NULL);
         // Now recursively also delete all of our children... Are you sure? Isn't this overinterpreting the spec?
         getChildren().forEach((definition, childItem) -> childItem.deleteContent());
     }
@@ -255,14 +232,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
         this.value = newValue;
         if (newValue != null) newValue.setOwner(this);
-
-        Value<?> valueToPropagate = newValue;
-
-        if (array != null) { // Update the array we belong too as well
-            array.childChanged(this);
-            valueToPropagate = array.getValue();
-        }
-        propagateValueChange(getName(), valueToPropagate);
     }
 
     /**
@@ -284,10 +253,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 addDebugInfo(() -> "Cannot propagate change in " + getPath()+" into parent, because it's value is not a ValueMap but a " + parent.value.getClass().getName());
             }
         }
-    }
-
-    private void mergeValue(Value<?> newValue) {
-        setValue(value.merge(newValue));
     }
 
     /**
@@ -398,19 +363,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     CaseFileItem resolve(Path currentPath) {
         return this;
-    }
-
-    /**
-     * Akka helper method, in order to restore case file item state upon recovery. Not to be used by any other application.
-     */
-    public void recover(CaseFileEvent event) {
-        this.state = event.getState();
-        this.indexInArray = event.getIndex();
-        this.lastTransition = event.getTransition();
-        this.value = event.getValue();
-        if (this.array != null) { // Update the array we belong too as well
-            this.array.childChanged(this);
-        }
     }
 
     /**

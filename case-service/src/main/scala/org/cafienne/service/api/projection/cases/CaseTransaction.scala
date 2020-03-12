@@ -6,9 +6,9 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.akka.event.team.{TeamMemberAdded, TeamMemberRemoved}
 import org.cafienne.cmmn.akka.event._
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent
 import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
-import org.cafienne.cmmn.instance.CaseInstanceEvent
 import org.cafienne.infrastructure.cqrs.NamedOffset
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.projection.RecordsPersistence
@@ -27,7 +27,7 @@ class CaseTransaction(caseInstanceId: String, persistence: RecordsPersistence)(i
   val caseInstanceRoles = scala.collection.mutable.HashMap[String, CaseInstanceRole]()
   val caseInstanceTeamMembers = scala.collection.mutable.HashMap[String, CaseInstanceTeamMember]() // key = <role>:<userid>
 
-  def handleEvent(evt: CaseInstanceEvent): Future[Done] = {
+  def handleEvent(evt: CaseEvent): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " in case " + caseInstanceId)
     getCaseInstance(evt.getActorId, evt.getUser).map {
       case Some(value) => {

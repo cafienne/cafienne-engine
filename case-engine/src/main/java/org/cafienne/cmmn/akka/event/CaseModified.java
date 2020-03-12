@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.LongValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -18,7 +17,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class CaseModified extends CaseInstanceEvent {
+public class CaseModified extends CaseEvent {
     private final Instant lastModified;
     private final int numFailures;
     private final State state;

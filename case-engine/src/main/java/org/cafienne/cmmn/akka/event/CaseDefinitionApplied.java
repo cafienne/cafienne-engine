@@ -13,14 +13,13 @@ import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class CaseDefinitionApplied extends CaseInstanceEvent {
+public class CaseDefinitionApplied extends CaseEvent {
     private final CafienneVersion engineVersion;
     private final String caseName;
     private final String parentCaseId;

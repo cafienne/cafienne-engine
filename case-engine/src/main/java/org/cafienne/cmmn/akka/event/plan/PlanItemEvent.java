@@ -10,7 +10,7 @@ package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public abstract class PlanItemEvent extends CaseInstanceEvent {
+public abstract class PlanItemEvent extends CaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(PlanItemEvent.class);
 
     protected final transient PlanItem planItem;

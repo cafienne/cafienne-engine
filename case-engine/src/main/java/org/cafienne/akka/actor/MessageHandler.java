@@ -6,7 +6,7 @@ import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;

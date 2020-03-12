@@ -5,10 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.event;
+package org.cafienne.cmmn.akka.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -16,13 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.Instant;
 
 /**
  * Event caused by a transition on a CaseFileItem
  */
 @Manifest
-public class CaseFileEvent extends CaseInstanceEvent {
+public class CaseFileEvent extends CaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
     private final String name;
@@ -36,13 +36,13 @@ public class CaseFileEvent extends CaseInstanceEvent {
         name, transition, value, path, state, index
     }
 
-    public CaseFileEvent(Case caseInstance, String name, CaseFileItemTransition transition, Value<?> newValue, Path path, State currentState, int index) {
+    public CaseFileEvent(Case caseInstance, String name, State newState, CaseFileItemTransition transition, Value<?> newValue, Path path, int index) {
         super(caseInstance);
         this.name = name;
         this.transition = transition;
         this.value = newValue;
         this.path = path.toString();
-        this.state = currentState;
+        this.state = newState;
         this.index = index;
     }
 
@@ -113,19 +113,25 @@ public class CaseFileEvent extends CaseInstanceEvent {
         return path;
     }
 
+    private transient CaseFileItem caseFileItem;
+
     @Override
-    public void recover(Case caseInstance) {
+    public void updateState(Case caseInstance) {
         try {
             // Have to recover it this way in order to overcome fact that Path.definition is not serializable
             Path recoveredPath = new Path(path, caseInstance);
 
             // Resolve the path on the case file
-            CaseFileItem caseFileItem = caseInstance.getCaseFile().getItem(recoveredPath);
-
-            caseFileItem.recover(this);
+            caseFileItem = caseInstance.getCaseFile().getItem(recoveredPath);
+            caseFileItem.updateState(this);
         } catch (InvalidPathException shouldNotHappen) {
             logger.error("Could not recover path on case instance?!", shouldNotHappen);
         }
+    }
+
+    @Override
+    public void runBehavior() {
+        caseFileItem.runBehavior(this);
     }
 
     @Override

@@ -2,9 +2,10 @@ package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.cmmn.akka.event.*;
-import org.cafienne.cmmn.akka.event.debug.DebugDisabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.cmmn.akka.event.DebugDisabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
+import org.cafienne.akka.actor.event.DebugEvent;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;

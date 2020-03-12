@@ -12,7 +12,6 @@ import java.time.format.DateTimeParseException;
 
 import com.jayway.jsonpath.JsonPathException;
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueList;

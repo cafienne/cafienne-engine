@@ -6,6 +6,7 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.akka.event._
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent
 import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.ValueMap

@@ -3,7 +3,7 @@ package org.cafienne.cmmn.akka.event.plan.eventlistener;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class TimerSet extends CaseInstanceEvent {
+public class TimerSet extends CaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(TimerSet.class);
 
     private final Instant targetMoment;

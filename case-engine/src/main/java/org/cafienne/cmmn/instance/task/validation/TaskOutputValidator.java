@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.instance.task.validation;
 
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;

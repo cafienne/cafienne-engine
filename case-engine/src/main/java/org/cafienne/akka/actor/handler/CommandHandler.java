@@ -10,7 +10,7 @@ import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

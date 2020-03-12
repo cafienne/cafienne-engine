@@ -114,8 +114,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             // It's the latest and greatest new child
             actualValueOfCaseFileItemArray.add(childContent);
         } else {
-            throw new InvalidCommandException(
-                    "We're not letting you in, number " + childIndex + ", because we only have " + actualValueOfCaseFileItemArray.size() + " items, and it seems you're skipping one or more");
+            throw new InvalidCommandException("We're not letting you in, number " + childIndex + ", because we only have " + actualValueOfCaseFileItemArray.size() + " items, and it seems you're skipping one or more");
         }
     }
 

@@ -1,10 +1,8 @@
 package org.cafienne.processtask.instance;
 
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.cmmn.akka.command.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.task.FailTask;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.akka.command.ProcessCommand;
 import org.cafienne.processtask.akka.event.*;

@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions.file;
 
-import org.cafienne.cmmn.akka.event.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueList;

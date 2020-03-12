@@ -17,7 +17,7 @@ import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
