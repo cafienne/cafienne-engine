@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.matching.MatchResult;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.event.TaskOutputFilled;
+import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.test.TestScript;

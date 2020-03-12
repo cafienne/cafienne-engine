@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions.event;
 
 import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.akka.event.TaskOutputFilled;
+import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 
 /**
  * Assertions around a TaskOutputFilled event

@@ -16,13 +16,7 @@ import org.cafienne.cmmn.instance.casefile.Value;
  * CaseInputParameters are passed upon Case creation. They are then bound to the case file (possibly triggering sentries in the case).
  */
 public class CaseInputParameter extends Parameter<InputParameterDefinition> {
-    public CaseInputParameter(InputParameterDefinition definition, Case caseInstance) {
-        super(definition, caseInstance);
-    }
-
-    @Override
-    public void setValue(Value<?> value) {
-        super.setValue(value);
-        super.bindParameterToCaseFile();
+    public CaseInputParameter(InputParameterDefinition definition, Case caseInstance, Value value) {
+        super(definition, caseInstance, value);
     }
 }

@@ -2,6 +2,7 @@ package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
+import org.cafienne.cmmn.akka.event.plan.task.{TaskInputFilled, TaskOutputFilled}
 import org.cafienne.service.api.cases.PlanItem
 
 object PlanItemMerger {

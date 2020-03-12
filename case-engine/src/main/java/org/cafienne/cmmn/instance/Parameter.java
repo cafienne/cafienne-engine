@@ -14,12 +14,13 @@ import org.cafienne.cmmn.instance.casefile.Value;
 import java.io.Serializable;
 
 public class Parameter<T extends ParameterDefinition> extends CMMNElement<T> implements Serializable {
-    private Value<?> value = Value.NULL; // Default value is Null.
+    private Value<?> value; // Default value is Null.
     private final String name;
 
-    protected Parameter(T definition, Case caseInstance) {
+    protected Parameter(T definition, Case caseInstance, Value value) {
         super(caseInstance, definition);
         this.name = definition.getName();
+        this.value = value == null ? Value.NULL : value;
     }
 
     @Override
@@ -34,14 +35,6 @@ public class Parameter<T extends ParameterDefinition> extends CMMNElement<T> imp
      */
     public Value<?> getValue() {
         return value;
-    }
-
-    /**
-     * Sets the value of the parameter
-     * @param parameterValue
-     */
-    public void setValue(Value<?> parameterValue) {
-        this.value = parameterValue;
     }
 
     /**

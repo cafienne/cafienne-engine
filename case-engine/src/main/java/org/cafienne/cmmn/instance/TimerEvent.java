@@ -9,7 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import akka.actor.Cancellable;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.event.eventlistener.TimerSet;
+import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.definition.TimerEventDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

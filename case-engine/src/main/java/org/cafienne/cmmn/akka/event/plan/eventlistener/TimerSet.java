@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.akka.event.eventlistener;
+package org.cafienne.cmmn.akka.event.plan.eventlistener;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;

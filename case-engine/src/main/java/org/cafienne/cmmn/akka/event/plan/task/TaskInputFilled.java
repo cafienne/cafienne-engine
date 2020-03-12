@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.event;
+package org.cafienne.cmmn.akka.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.akka.event.task.TaskEvent;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
@@ -57,7 +57,7 @@ public class TaskInputFilled extends TaskEvent {
     }
 
     @Override
-    protected void recoverTaskEvent(Task task) {
-        task.recoverTaskEvent(this);
+    public void updateState(Case caseInstance) {
+        getTask().updateState(this);
     }
 }
