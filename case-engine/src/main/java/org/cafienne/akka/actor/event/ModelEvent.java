@@ -79,6 +79,10 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         return tenantUser;
     }
 
+    /**
+     * UpdateState will be invoked when an event is added or recovered.
+     * @param actor
+     */
     public abstract void updateState(M actor);
 
     /**
@@ -89,7 +93,11 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         // Default behavior is none
     }
 
-    public void recover(M actor) {
+    /**
+     * Internal framework method
+     * @param actor
+     */
+    public final void recover(M actor) {
         this.actor = actor;
         this.updateState(actor);
     }
