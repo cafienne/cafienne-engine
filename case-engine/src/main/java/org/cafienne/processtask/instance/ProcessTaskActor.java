@@ -64,7 +64,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     }
 
     public void start() {
-        addDebugInfo(DebugEvent.class, e -> e.addMessage("Starting process task " + name + " with input parameters", inputParameters));
+        addDebugInfo(() -> "Starting process task " + name + " with input parameters", inputParameters);
         taskImplementation.start();
     }
 
@@ -73,8 +73,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     }
 
     public void completed(ValueMap processOutputParameters) {
-        addDebugInfo(DebugEvent.class, e ->
-            e.addMessage("Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters));
+        addDebugInfo(() -> "Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);
 
         addEvent(new ProcessCompleted(this, processOutputParameters));
 
@@ -87,8 +86,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
 
     public void failed(ValueMap processOutputParameters) {
         addEvent(new ProcessFailed(this, processOutputParameters));
-        addDebugInfo(DebugEvent.class, e ->
-            e.addMessage("Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters));
+        addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);
 
         askCase(new FailTask(this, processOutputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);

@@ -7,21 +7,20 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.cafienne.cmmn.akka.event.debug.SentryEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
 import org.cafienne.cmmn.definition.sentry.SentryDefinition;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueList;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
+
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Sentry extends CMMNElement<SentryDefinition> {
     // On parts are stored by their source for easy lookup.
@@ -135,7 +134,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      * @param onPart
      */
     private void connect(CaseFileItem caseFileItem, CaseFileItemOnPart onPart) {
-        addDebugInfo(SentryEvent.class, event -> event.addMessage("Connecting case file item " + caseFileItem + " to " + criterion, this));
+        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + criterion);
         onPart.connect(caseFileItem);
     }
 
@@ -148,10 +147,10 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      */
     private void connect(PlanItem planItem, PlanItemOnPart onPart) {
         if (doesNotBelongToSiblingStage(planItem)) {
-            addDebugInfo(SentryEvent.class, event -> event.addMessage("Connecting plan item " + planItem + " to " + criterion, this));
+            addDebugInfo(() -> "Connecting plan item " + planItem + " to " + criterion);
             onPart.connect(planItem);
         } else {
-            addDebugInfo(SentryEvent.class, event -> event.addMessage("Not connecting plan item " + planItem + " to " + criterion + " because it belongs to a sibling stage", this));
+            addDebugInfo(() -> "Not connecting plan item " + planItem + " to " + criterion + " because it belongs to a sibling stage");
         }
     }
 
@@ -187,8 +186,9 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     }
 
     private boolean evaluateIfPart() {
-        addDebugInfo(SentryEvent.class, event -> event.addMessage("Evaluating if part '"+getDefinition().getIfPart().getExpressionDefinition().getBody()+"'", this));
+        addDebugInfo(() -> "Evaluating if part '"+getDefinition().getIfPart().getExpressionDefinition().getBody()+"'");
         boolean ifPartOutcome = getDefinition().getIfPart().evaluate(this);
+        addDebugInfo(() -> "If part evaluation results in: " + ifPartOutcome);
         // TODO: make sure to store the outcome of the ifpart evaluation?
         return ifPartOutcome;
     }
@@ -200,9 +200,9 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     void activate(OnPart<?, ?> activator) {
         inactiveOnParts.remove(activator);
         if (inactiveOnParts.isEmpty()) {
-            addDebugInfo(SentryEvent.class, event -> event.addMessage(criterion + " has become active.", this));
+            addDebugInfo(() -> criterion + " has become active.", this);
         } else {
-            addDebugInfo(SentryEvent.class, event -> event.addMessage(criterion + " has "+inactiveOnParts.size()+" remaining inactive on parts", this));
+            addDebugInfo(() -> criterion + " has "+inactiveOnParts.size()+" remaining inactive on parts", this);
         }
         if (isSatisfied()) {
             isActive = true;
@@ -218,7 +218,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     void deactivate(OnPart<?, ?> activator) {
         isActive = false;
         inactiveOnParts.add(activator);
-        addDebugInfo(SentryEvent.class, event -> event.addMessage(criterion + " now has "+inactiveOnParts.size()+" inactive on parts", this));
+        addDebugInfo(() -> criterion + " now has "+inactiveOnParts.size()+" inactive on parts", this);
     }
 
     public Element dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {

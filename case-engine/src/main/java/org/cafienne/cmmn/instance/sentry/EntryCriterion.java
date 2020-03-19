@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.akka.event.debug.SentryEvent;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
@@ -27,7 +26,7 @@ public class EntryCriterion extends Criterion {
         //  stage to provide the single instance being in state Available having the specified Definition (but then Discretionary and PlanItem must be merged in code)
         List<PlanItem> planItemsCurrentlyEligible = stage.getPlanItems().stream().filter(p -> p.getName().equals(targetPlanItemName) && p.getState().equals(State.Available)).collect(Collectors.toList());
         for (PlanItem planItem : planItemsCurrentlyEligible) {
-            addDebugInfo(SentryEvent.class, event -> event.addMessage("Entry criterion of '" + planItem + "' is satisfied and will trigger "+targetTransition, this.sentry));
+            addDebugInfo(() -> "Entry criterion of '" + planItem + "' is satisfied and will trigger "+targetTransition, this.sentry);
             planItem.repeat();
             planItem.makeTransition(targetTransition);
         }

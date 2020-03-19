@@ -11,14 +11,13 @@ import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.CommandFailureListener;
 import org.cafienne.akka.actor.command.response.CommandResponseListener;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.handler.*;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.cmmn.akka.event.debug.DebugEvent;
-import org.cafienne.cmmn.instance.debug.DebugAppender;
-import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
+import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
 import org.slf4j.Logger;
@@ -453,10 +452,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         handlePersistFailure(cause, event, seqNr);
     }
 
-    public <T extends DebugEvent> void addDebugInfo(Class<T> eventClass, DebugAppender<T> appender) {
-        currentHandler().addDebugInfo(eventClass, appender);
-    }
-
     /**
      * Add debug info to the case if debug is enabled.
      * If the case runs in debug mode (or if Log4J has debug enabled for this logger),
@@ -468,8 +463,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         currentHandler().addDebugInfo(appender, getLogger());
     }
 
-    public void addDebugInfo(DebugExceptionAppender appender) {
-        currentHandler().addDebugInfo(appender, getLogger());
+    public void addDebugInfo(DebugStringAppender appender, Value json) {
+        currentHandler().addDebugInfo(appender, json, getLogger());
+    }
+
+    public void addDebugInfo(DebugStringAppender appender, Exception exception) {
+        currentHandler().addDebugInfo(appender, exception, getLogger());
     }
 
     /**

@@ -62,9 +62,9 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         if (validator != null) {
             ValidationResponse response = validator.validate(potentialRawOutput);
             if (!response.isValid()) {
-                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task " + getName() + "[" + getId() + "] failed with ", response.getContent()));
+                addDebugInfo(() -> "Ouput validation for task " + getName() + "[" + getId() + "] failed with ", response.getContent());
             } else {
-                addDebugInfo(DebugEvent.class, e -> e.addMessage("Ouput validation for task " + getName() + "[" + getId() + "] succeeded with ", response.getContent()));
+                addDebugInfo(() -> "Ouput validation for task " + getName() + "[" + getId() + "] succeeded with ", response.getContent());
             }
             return response;
         } else {

@@ -254,8 +254,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param newValue
      */
     public void setValue(Value<?> newValue) {
-        String type = newValue == null ? "" : newValue.getClass().getName();
-        addDebugInfo(DebugEvent.class, e -> e.addMessage("Setting case file item [" + getPath() + "] value", newValue));
+        addDebugInfo(() -> "Setting case file item [" + getPath() + "] value", newValue);
 
         this.value = newValue;
         if (newValue != null) newValue.setOwner(this);

@@ -38,21 +38,16 @@ public class DebugEvent extends ModelEvent {
         this.messages = readMap(json, Fields.messages);
     }
 
-    public void addMessage(Throwable exception) {
-        add(Value.convertThrowable(exception));
-    }
-
     public void addMessage(String msg) {
         add(new StringValue(msg));
     }
 
-    public void addMessage(String msg, Throwable exception) {
-        addMessage(msg);
-        addMessage(exception);
+    public void addMessage(Value json) {
+        add(json);
     }
 
-    public void addMessage(String msg, Value<?> json) {
-        add(new ValueMap(msg, json));
+    public void addMessage(Throwable exception) {
+        add(Value.convertThrowable(exception));
     }
 
     private void add(Value<?> value) {

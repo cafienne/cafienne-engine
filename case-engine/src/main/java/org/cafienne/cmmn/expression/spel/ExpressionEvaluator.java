@@ -77,8 +77,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
             caseInstance.addDebugInfo(() -> "Evaluated " + ruleTypeDescription + ". Outcome: " + value);
             return value;
         } catch (SpelEvaluationException invalidExpression) {
-            caseInstance.addDebugInfo(() -> "Failure in evaluating "+ruleTypeDescription+", with expression "+expressionString.trim());
-            caseInstance.addDebugInfo(() -> invalidExpression);
+            caseInstance.addDebugInfo(() -> "Failure in evaluating "+ruleTypeDescription+", with expression "+expressionString.trim(), invalidExpression);
             throw new InvalidExpressionException("Could not evaluate " + spelExpression.getExpressionString() + "\n" + invalidExpression.getLocalizedMessage(), invalidExpression);
         }
     }

@@ -58,7 +58,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
         if (issue != null) {
             final Exception e = issue;
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(msg, issue));
         }
 
@@ -67,18 +67,18 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
     @Override
     protected void process() {
-        addDebugInfo(DebugEvent.class, e -> e.addMessage("---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), command.toJson()));
+        addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), command.toJson(), getLogger());
 
         // First, simple, validation
         try {
             command.validate(actor);
         } catch (SecurityException e) {
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
             logger.debug("===== Command was not authorized ======");
             return;
         } catch (InvalidCommandException e) {
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new CommandFailure(getCommand(), e));
             logger.debug("===== Command was invalid ======");
             return;
@@ -89,13 +89,13 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             setNextResponse(command.process(actor));
             logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
         } catch (SecurityException e) {
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
             logger.debug("===== Command was not authorized ======");
         } catch (CommandException e) {
             setNextResponse(new CommandFailure(getCommand(), e));
-            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception");
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception", logger);
+            addDebugInfo(() -> e, logger);
         }
     }
 

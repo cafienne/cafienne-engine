@@ -63,7 +63,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                     task.addEvent(new HumanTaskAssigned(task, assignee)).updateState(this);
                 }
             } catch (Exception e) {
-                addDebugInfo(DebugEvent.class, d -> d.addMessage("Failed to evaluate expression to assign task", e));
+                addDebugInfo(() -> "Failed to evaluate expression to assign task", e);
             }
         }
 
@@ -77,7 +77,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                     task.addEvent(new HumanTaskDueDateFilled(task, dueDate)).updateState(this);
                 }
             } catch (Exception e) {
-                addDebugInfo(DebugEvent.class, d -> d.addMessage("Failed to evaluate expression on task due date", e));
+                addDebugInfo(() -> "Failed to evaluate expression on task due date", e);
             }
         }
     }
