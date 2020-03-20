@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
 
@@ -288,8 +289,14 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      * @return
      */
     public Collection<DiscretionaryItem> getDiscretionaryItems() {
+        addDebugInfo(() -> "Retrieving discretionary items of " + this);
         Collection<DiscretionaryItem> items = new ArrayList<DiscretionaryItem>();
         getCasePlan().getInstance().retrieveDiscretionaryItems(items);
+        addDebugInfo(() -> {
+            StringBuilder itemsString = new StringBuilder();
+            items.forEach(item -> itemsString.append("\n\t" + item.getDefinition() + " in " + item.getParentId()));
+            return "Discretionary items of " + this + itemsString;
+        });
         return items;
     }
 

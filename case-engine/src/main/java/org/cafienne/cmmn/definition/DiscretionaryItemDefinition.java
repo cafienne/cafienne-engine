@@ -90,13 +90,19 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
         if (isAlreadyPlanned(containingPlanItem)) {
             return false;
         }
-        for (ApplicabilityRuleDefinition rule : getApplicabilityRules()) {
-            // If any of the rules evaluates to false, the discretionary item is not allowed
-            if (!rule.evaluate(containingPlanItem, rule, this)) {
-                return false;
+        if (getApplicabilityRules().isEmpty()) {
+            containingPlanItem.getCaseInstance().addDebugInfo(() -> this + ": item is applicable because rules are not defined");
+            return true;
+        } else {
+            containingPlanItem.getCaseInstance().addDebugInfo(() -> this + ": checking " + getApplicabilityRules().size() + " applicability rule(s)");
+            for (ApplicabilityRuleDefinition rule : getApplicabilityRules()) {
+                // If any of the rules evaluates to false, the discretionary item is not allowed
+                if (!rule.evaluate(containingPlanItem, rule, this)) {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
     }
 
     /**
@@ -126,7 +132,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
 
         discretionaryXML.setAttribute("name", getName());
         // System.out.println("Dumping memory state for table item "+getName()+", having "+getApplicabilityRules().size()+" rules");
-        discretionaryXML.setAttribute("applicable", "" + isApplicable(stage.getPlanItem()));
+//        discretionaryXML.setAttribute("applicable", "" + isApplicable(stage.getPlanItem()));
 
         // Also print the roles.
         super.dumpMemoryStateToXML(discretionaryXML, stage);
@@ -157,5 +163,11 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
             return this; // We're the one.
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        if (definition == null) return super.toString();
+        return "DiscretionaryItem[" + definition.getType() + " '" + getName() + "']";
     }
 }

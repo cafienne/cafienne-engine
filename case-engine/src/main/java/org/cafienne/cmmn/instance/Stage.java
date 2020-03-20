@@ -177,6 +177,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     protected void retrieveDiscretionaryItems(Collection<DiscretionaryItem> items) {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
         if (table != null) {
+            addDebugInfo(() -> "Iterating planning table items in " + this);
             table.evaluate(this.getPlanItem(), items);
         }
         // Now also retrieve discretionaries for our children

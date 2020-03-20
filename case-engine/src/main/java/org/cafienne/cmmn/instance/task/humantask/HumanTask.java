@@ -123,6 +123,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     protected void retrieveDiscretionaryItems(Collection<DiscretionaryItem> items) {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
         if (table != null) {
+            addDebugInfo(() -> "Iterating planning table items in " + this);
             table.evaluate(this.getPlanItem(), items);
         }
     }

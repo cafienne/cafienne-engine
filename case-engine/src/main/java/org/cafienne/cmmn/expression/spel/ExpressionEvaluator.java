@@ -70,11 +70,11 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         // TODO: improve the type checking and raise better error message if we're getting back the wrong type.
 
         try {
-            caseInstance.addDebugInfo(() -> "Evaluating " + ruleTypeDescription + " -> " + expressionString.trim());
+            caseInstance.addDebugInfo(() -> "Evaluating " + ruleTypeDescription + "\n\t" + expressionString.trim());
             // Not checking it. If it fails, it really fails.
             @SuppressWarnings("unchecked")
             T value = (T) spelExpression.getValue(context);
-            caseInstance.addDebugInfo(() -> "Evaluated " + ruleTypeDescription + ". Outcome: " + value);
+            caseInstance.addDebugInfo(() -> "Outcome\n\t" + value);
             return value;
         } catch (SpelEvaluationException invalidExpression) {
             caseInstance.addDebugInfo(() -> "Failure in evaluating "+ruleTypeDescription+", with expression "+expressionString.trim(), invalidExpression);
@@ -153,7 +153,8 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
-        return evaluateConstraint(containingPlanItem.getCaseInstance(), new ApplicabilityRuleContext(containingPlanItem, discretionaryItemDefinition, ruleDefinition), "Evaluating applicability rule " + ruleDefinition.getName());
+        String description = "applicability rule '" + ruleDefinition.getName() + "' for discretionary item " + discretionaryItemDefinition;
+        return evaluateConstraint(containingPlanItem.getCaseInstance(), new ApplicabilityRuleContext(containingPlanItem, discretionaryItemDefinition, ruleDefinition), description);
     }
 
     @Override
