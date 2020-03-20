@@ -68,7 +68,7 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
 
     @Override
     protected void createInstance() {
-        getCaseInstance().addEvent(new TimerSet(this)).finished();
+        getCaseInstance().addEvent(new TimerSet(this));
     }
 
     @Override

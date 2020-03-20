@@ -70,9 +70,6 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         return this.actorId;
     }
 
-    public void finished() {
-    }
-
     /**
      * Returns the complete context of the user that caused the event to happen
      *

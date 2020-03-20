@@ -182,9 +182,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // Update our transition
         this.lastTransition = transition;
 
-        CaseFileEvent event = new CaseFileEvent(this.getCaseInstance(), this.getName(), transition, getValue(), getPath(), getState(), indexInArray);
         // Now inform the sentry network of our change
-        getCaseInstance().addEvent(event);
+        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), transition, getValue(), getPath(), getState(), indexInArray));
 
         addDebugInfo(() -> "Handling case file item transition " + getName() + "." + transition);
 
@@ -195,8 +194,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         connectedExitCriteria.forEach(onPart -> onPart.inform(this));
 
         addDebugInfo(() -> "Completed case file item transition " + getName() + "." + transition);
-
-        event.finished();
     }
 
     // TODO: The following 4 methods should generate specific events instyead of generic CaseFileEvent event

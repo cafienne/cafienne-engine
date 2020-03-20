@@ -81,7 +81,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         addDebugInfo(() -> "Creating plan item " + getName() + (owningStage == null ? " in case" : " in stage " + getStage().getName()) + " with id " + id);
 
         // Raise an event and then do some real logic
-        PlanItemCreated event = caseInstance.addEvent(new PlanItemCreated(this));
+        caseInstance.addEvent(new PlanItemCreated(this));
 
         // Create our typed instance (task / stage / milestone / eventlistener)
         this.instance = reference.createInstance(this);
@@ -104,8 +104,6 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
             CasePlan casePlan = getInstance();
             definedExitCriteria.forEach(c -> exitCriteria.add(casePlan.getExitCriterion(c)));
         }
-
-        event.finished();
     }
 
     public void connectOnPart(PlanItemOnPart onPart) {
@@ -233,8 +231,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         StateMachine.Action action = stateMachine.transition(this, transition);
         if (action != null) // means, a transition happened.
         {
-            PlanItemTransitioned event = new PlanItemTransitioned(this);
-            getCaseInstance().addEvent(event);
+            getCaseInstance().addEvent(new PlanItemTransitioned(this));
 
             addDebugInfo(() -> "Handling transition " + getName() + "." + transition + " from " + getHistoryState() + " to " + getState());
 
@@ -253,8 +250,6 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
             connectedExitCriteria.forEach(onPart -> onPart.inform(this));
 
             addDebugInfo(() -> "Completed transition from " + getHistoryState() + " to " + getState() + " in plan item " + getName());
-
-            event.finished();
         } else {
             addDebugInfo(() -> "Transition " + transition + " has no effect on " + this + " (current state remains " + getState() + ")");
         }
@@ -354,7 +349,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      */
     void evaluateRepetitionRule() {
         repetitionRuleOutcome = getPlanItemControl().getRepetitionRule().evaluate(this);
-        getCaseInstance().addEvent(new RepetitionRuleEvaluated(this)).finished();
+        getCaseInstance().addEvent(new RepetitionRuleEvaluated(this));
     }
 
     /**
@@ -362,7 +357,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      */
     void evaluateRequiredRule() {
         this.requiredRuleOutcome = getPlanItemControl().getRequiredRule().evaluate(this);
-        getCaseInstance().addEvent(new RequiredRuleEvaluated(this)).finished();
+        getCaseInstance().addEvent(new RequiredRuleEvaluated(this));
     }
 
     /**

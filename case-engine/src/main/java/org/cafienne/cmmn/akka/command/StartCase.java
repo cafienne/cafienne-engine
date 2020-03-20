@@ -152,7 +152,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         }
 
         // First set the definition
-        caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName())).finished();
+        caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName()));
 
         // First setup the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
         caseTeam.getMembers().forEach(newMember -> caseInstance.getCaseTeam().addMember(newMember));

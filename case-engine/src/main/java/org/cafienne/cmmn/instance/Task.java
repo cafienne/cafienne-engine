@@ -150,9 +150,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
             }
         }
 
-        final TaskInputFilled event = new TaskInputFilled(this, taskInputParameters, mappedInputParameters);
-        getCaseInstance().addEvent(event);
-        event.finished();
+        getCaseInstance().addEvent(new TaskInputFilled(this, taskInputParameters, mappedInputParameters));
     }
 
     /**
@@ -195,9 +193,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
             });
         }
 
-        TaskOutputFilled event = new TaskOutputFilled(this, taskOutputParameters, rawOutputParameters);
-        getCaseInstance().addEvent(event);
-        event.finished();
+        getCaseInstance().addEvent(new TaskOutputFilled(this, taskOutputParameters, rawOutputParameters));
     }
 
     protected ValueMap getInputParameters() {
