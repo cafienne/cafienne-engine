@@ -3,21 +3,18 @@ package org.cafienne.akka.actor;
 import akka.actor.ActorRef;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.event.EngineVersionChanged;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.debug.DebugAppender;
+import org.cafienne.akka.actor.event.DebugEvent;
+import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
+import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -103,54 +100,56 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         return addModelEvent(events.size(), event);
     }
 
+    private EventBehaviorRunner currentBehavior = null;
+    private boolean addingEvent = false;
+
     private <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
         events.add(index, event);
+
+        addDebugInfo(() -> "Added event "+ event.getClass().getSimpleName() + ". Updating actor state with it", logger);
+        if (addingEvent) {
+            // TODO: This is a print statement to show where the engine still runs old style
+            if (indentedConsoleLoggingEnabled && !(event instanceof DebugEvent)) {
+                addDebugInfo(() -> new Exception("Adding event while updating state?!"), logger);
+            }
+        }
+        addingEvent = true;
         event.updateState(actor);
+        addingEvent = false;
+        // Now run the behavior that comes with the event, if any
+        if (currentBehavior != null) {
+            currentBehavior.addEvent(event);
+        } else {
+            currentBehavior = new EventBehaviorRunner(this, event);
+            currentBehavior.start();
+            currentBehavior = null;
+        }
         return event;
     }
 
     /**
-     * Method that can be invoked to add a DebugEvent
-     *
-     * @param event
+     * Get or create the debug event for this message handler.
+     * Only one debug event per handler, containing all debug messages.
+     * @return
      */
-    private void addDebugEvent(DebugEvent event) {
-        if (actor.recoveryRunning()) {
-            return;
-        }
-        events.add(event);
-    }
-
-    public <T extends DebugEvent> void createDebugInfo(Class<T> eventClass, DebugAppender<T> appender) {
-        if (actor.debugMode()) {
-            try {
-                Constructor<?>[] constructors = eventClass.getConstructors();
-                @SuppressWarnings("unchecked")
-                Constructor<T> tConstructor = (Constructor<T>) Arrays.stream(constructors).filter(c ->
-                        c.getParameterCount() == 1 && c.getParameterTypes()[0].isAssignableFrom(actor.getClass())
-                ).findFirst().orElseThrow(() -> new NoSuchMethodException("Cannot find a proper constructor for event " + eventClass.getName()));
-                T newEvent = tConstructor.newInstance(actor);
-                this.debugEvent = newEvent;
-                this.addDebugEvent(newEvent);
-                appender.add(newEvent);
-            } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                // Awesome. Now what?
-                logger.error("Cannot instantiate debug event of type " + eventClass.getName(), e);
+    private DebugEvent getDebugEvent() {
+        if (debugEvent == null) {
+            debugEvent = new DebugEvent(this.actor);
+            if (! actor.recoveryRunning()) {
+                events.add(debugEvent);
             }
         }
+        return debugEvent;
     }
 
-    public <T extends DebugEvent> void addDebugInfo(Class<T> eventClass, DebugAppender<T> appender) {
-        if (actor.debugMode()) {
-            DebugEvent current = this.debugEvent;
-            // If current debug event is not set or if it is not of the correct class, we'll create a new one.
-            if (current != null && eventClass.equals(current.getClass())) {
-                // Reuse existing event
-                appender.add((T) current);
-            } else {
-                createDebugInfo(eventClass, appender);
-            }
-        }
+    protected void addDebugInfo(DebugStringAppender appender, Value json, Logger logger) {
+        addDebugInfo(appender, logger);
+        addDebugInfo(() -> json, logger);
+    }
+
+    protected void addDebugInfo(DebugStringAppender appender, Exception exception, Logger logger) {
+        addDebugInfo(appender, logger);
+        addDebugInfo(() -> exception, logger);
     }
 
     /**
@@ -162,16 +161,23 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      */
     public void addDebugInfo(DebugStringAppender appender, Logger logger) {
         // First check whether at all we should add some message.
-        if (!actor.debugMode() && !logger.isDebugEnabled()) {
+        if (skipLogMessages()) {
             return;
         }
 
         // First ensure log message is only generated once.
         String logMessage = appender.debugInfo();
 
+        // In special develop/debug cases, we want to do indented logging to console.
+        //  This is particularly required because handling one ModelEvent may lead
+        //  to new ModelEvents that also need to be handled. IndentedLogging shows the stack.
+        if (indentedConsoleLoggingEnabled) {
+            debugIndentedConsoleLogging(logMessage);
+        }
+
         // If running in debug mode, add an event.
         if (actor.debugMode()) {
-            this.addDebugInfo(DebugEvent.class, e -> e.addMessage(logMessage));
+            getDebugEvent().addMessage(logMessage);
         }
 
         // If Log4J is enabled in debug mode, we will also invoke the appender.
@@ -180,23 +186,94 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         }
     }
 
+    public void addDebugInfo(DebugJsonAppender appender, Logger logger) {
+        // First check whether at all we should add some message.
+        if (skipLogMessages()) {
+            return;
+        }
+
+        // First ensure log message is only generated once.
+        Value json = appender.info();
+
+        // In special develop/debug cases, we want to do indented logging to console.
+        //  This is particularly required because handling one ModelEvent may lead
+        //  to new ModelEvents that also need to be handled. IndentedLogging shows the stack.
+        if (indentedConsoleLoggingEnabled) {
+            debugIndentedConsoleLogging(json);
+        }
+
+        // If running in debug mode, add an event.
+        if (actor.debugMode()) {
+            getDebugEvent().addMessage(json);
+        }
+
+        // If Log4J is enabled in debug mode, we will also invoke the appender.
+        if (logger.isDebugEnabled()) {
+            logger.debug(json.toString());
+        }
+    }
+
     public void addDebugInfo(DebugExceptionAppender appender, Logger logger) {
         // First check whether at all we should add some message.
-        if (!actor.debugMode() && !logger.isDebugEnabled()) {
+        if (skipLogMessages()) {
             return;
         }
 
         // First ensure log message is only generated once.
         Throwable t = appender.exceptionInfo();
 
+        // In special develop/debug cases, we want to do indented logging to console.
+        //  This is particularly required because handling one ModelEvent may lead
+        //  to new ModelEvents that also need to be handled. IndentedLogging shows the stack.
+        if (indentedConsoleLoggingEnabled) {
+            debugIndentedConsoleLogging(t);
+        }
+
         // If running in debug mode, add an event.
         if (actor.debugMode()) {
-            this.addDebugInfo(DebugEvent.class, e -> e.addMessage(t));
+            getDebugEvent().addMessage(t);
         }
 
         // If Log4J is enabled in debug mode, we will also invoke the appender.
         if (logger.isDebugEnabled()) {
             logger.debug(t.getMessage(), t);
+        }
+    }
+
+    /**
+     * Whether or not to write log messages.
+     * Log messages are created through invocation of FunctionalInterface, and if this
+     * method returns false, those interfaces are not invoked, in an attempt to improve runtime performance.
+     * @return
+     */
+    private boolean skipLogMessages() {
+        return ! (indentedConsoleLoggingEnabled || actor.debugMode() || logger.isDebugEnabled());
+    }
+
+    /**
+     * Making package private so that EventBehaviorRunner can read it
+     */
+    final boolean indentedConsoleLoggingEnabled = false;
+
+    /**
+     * Internal framework method only.
+     * Making package private so that EventBehaviorRunner can read it
+     */
+    final void debugIndentedConsoleLogging(Object object) {
+        if (object instanceof Throwable) {
+            // Print exception with newline before and after it. Will not be indented
+            System.out.println("\n");
+            ((Throwable) object).printStackTrace(System.out);
+            System.out.println("\n");
+        } else {
+            // Convert Value to String if required
+            String logMessage = String.valueOf(object);
+            // Now get current level of indent from current behavior (recursive method)
+            String indent = currentBehavior == null ? "" : currentBehavior.getIndent();
+            // Make sure if it is a message with newlines, the new lines also get indented
+            logMessage = logMessage.replaceAll("\n", "\n" + indent);
+            // Print to console.
+            System.out.println(indent + logMessage);
         }
     }
 }

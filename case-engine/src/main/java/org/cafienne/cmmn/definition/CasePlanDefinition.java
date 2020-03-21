@@ -7,16 +7,18 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.sentry.CasePlanExitCriterionDefinition;
+import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
+import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.CasePlan;
+import org.cafienne.cmmn.instance.Stage;
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.cafienne.cmmn.definition.sentry.CasePlanExitCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.cafienne.cmmn.instance.CasePlan;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.w3c.dom.Element;
-
-public class CasePlanDefinition extends StageDefinition {
+public class CasePlanDefinition extends StageDefinition implements ItemDefinition {
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>(); // Only in the root stage
 
     public CasePlanDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
@@ -25,10 +27,21 @@ public class CasePlanDefinition extends StageDefinition {
     }
 
     @Override
-    public CasePlan createInstance(PlanItem planItem) {
-        return new CasePlan(planItem, this);
+    public CasePlan createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new CasePlan(id, this, caseInstance);
     }
 
+    @Override
+    public ItemControlDefinition getPlanItemControl() {
+        throw new NullPointerException("CasePlanDefinition does not have item control; it should not be asked for...");
+    }
+
+    @Override
+    public PlanItemDefinitionDefinition getPlanItemDefinition() {
+        return this;
+    }
+
+    @Override
     public Collection<ExitCriterionDefinition> getExitCriteria() {
         return exitCriteria;
     }

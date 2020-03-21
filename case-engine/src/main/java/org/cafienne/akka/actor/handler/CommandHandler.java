@@ -10,7 +10,7 @@ import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +30,9 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
     public CommandHandler(A actor, C msg) {
         super(actor, msg);
-        this.user = msg.getUser();
         this.command = msg;
+        this.user = command.getUser();
+        addDebugInfo(() -> "\n\n\txxxxxxxxxxxxxxxxxxxx new command " + command.getCommandDescription() +" xxxxxxxxxxxxxxx\n\n", logger);
     }
 
     protected Logger getLogger() {
@@ -58,8 +59,8 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
         if (issue != null) {
             final Exception e = issue;
-            actor.addDebugInfo(() -> e);
-            setNextResponse(new SecurityFailure(msg, issue));
+            addDebugInfo(() -> e, logger);
+            setNextResponse(new SecurityFailure(command, issue));
         }
 
         return issue;
@@ -67,18 +68,18 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
     @Override
     protected void process() {
-        addDebugInfo(DebugEvent.class, e -> e.addMessage("---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getClass().getSimpleName(), command.toJson()));
+        addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getCommandDescription() , command.toJson(), getLogger());
 
         // First, simple, validation
         try {
             command.validate(actor);
         } catch (SecurityException e) {
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
             logger.debug("===== Command was not authorized ======");
             return;
         } catch (InvalidCommandException e) {
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new CommandFailure(getCommand(), e));
             logger.debug("===== Command was invalid ======");
             return;
@@ -89,13 +90,13 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             setNextResponse(command.process(actor));
             logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
         } catch (SecurityException e) {
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
             logger.debug("===== Command was not authorized ======");
         } catch (CommandException e) {
             setNextResponse(new CommandFailure(getCommand(), e));
-            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception");
-            actor.addDebugInfo(() -> e);
+            addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception", logger);
+            addDebugInfo(() -> e, logger);
         }
     }
 

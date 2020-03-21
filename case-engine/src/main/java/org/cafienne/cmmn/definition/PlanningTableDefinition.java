@@ -7,17 +7,13 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.instance.*;
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import org.cafienne.cmmn.instance.CasePlan;
-import org.cafienne.cmmn.instance.DiscretionaryItem;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.State;
-import org.w3c.dom.Element;
 
 public class PlanningTableDefinition extends TableItemDefinition {
     private final Collection<TableItemDefinition> tableItems = new ArrayList<TableItemDefinition>();
@@ -43,7 +39,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
     }
 
     @Override
-    public Element dumpMemoryStateToXML(Element parentElement, Stage<?> stage) {
+    public Element dumpMemoryStateToXML(Element parentElement, Stage stage) {
         Element planningTableXML = parentElement.getOwnerDocument().createElement("PlanningTable");
         parentElement.appendChild(planningTableXML);
 
@@ -177,9 +173,9 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
         // Refactoring thought: this code could also be placed in PlanItemDefinitionInstance, with specific overriding in CasePlan, Stage and HumanTask;
         // however, the algorithm is described in a single place in the specification, section 7.7 on page 80.
         State planItemState = planItem.getState();
-        if (planItem.getInstance() instanceof CasePlan) {
+        if (planItem instanceof CasePlan) {
             return planItemState == State.Active || planItemState == State.Failed || planItemState == State.Suspended || planItemState == State.Completed || planItemState == State.Terminated;
-        } else if (planItem.getInstance() instanceof Stage) {
+        } else if (planItem instanceof Stage) {
             return planItemState == State.Active || planItemState == State.Available || planItemState == State.Enabled || planItemState == State.Disabled || planItemState == State.Failed
                     || planItemState == State.Suspended;
         } else { // Must be a HumanTask
@@ -194,7 +190,7 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
      */
     public abstract void evaluate(PlanItem containingPlanItem, Collection<DiscretionaryItem> items);
 
-    public Element dumpMemoryStateToXML(Element tableItemXML, Stage<?> stage) {
+    public Element dumpMemoryStateToXML(Element tableItemXML, Stage stage) {
         Collection<CaseRoleDefinition> roles = getAuthorizedRoles();
         for (CaseRoleDefinition role : roles) {
             String roleName = role.getName();

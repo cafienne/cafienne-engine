@@ -7,17 +7,19 @@
  */
 package org.cafienne.cmmn.instance;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.CaseTaskDefinition;
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
 import org.cafienne.cmmn.user.CaseTeamMember;
 import org.w3c.dom.Element;
 
-public class UserEvent extends PlanItemDefinitionInstance<UserEventDefinition> {
-    public UserEvent(PlanItem planItem, UserEventDefinition definition) {
-        super(planItem, definition, StateMachine.EventMilestone);
+import java.util.Collection;
+import java.util.Set;
+
+public class UserEvent extends PlanItem<UserEventDefinition> {
+    public UserEvent(String id, int index, ItemDefinition itemDefinition, UserEventDefinition definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
 
     public Collection<CaseRoleDefinition> getAuthorizedRoles() {

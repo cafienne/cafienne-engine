@@ -1,16 +1,15 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.event;
+package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.PlanItemEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
@@ -23,9 +22,9 @@ public class RepetitionRuleEvaluated extends PlanItemEvent {
         isRepeating
     }
 
-    public RepetitionRuleEvaluated(PlanItem planItem) {
+    public RepetitionRuleEvaluated(PlanItem planItem, boolean repeats) {
         super(planItem);
-        this.isRepeating = planItem.repeats();
+        this.isRepeating = repeats;
     }
 
     public RepetitionRuleEvaluated(ValueMap json) {
@@ -39,17 +38,17 @@ public class RepetitionRuleEvaluated extends PlanItemEvent {
 
     @Override
     public String toString() {
-        return "Repetition rule outcome for " + getPlanItemId() + ": " + isRepeating();
+        return getClass().getSimpleName() + "[" + getName() + "/" + getPlanItemId() + "]: REPEAT = " + isRepeating;
+    }
+
+    @Override
+    protected void updatePlanItemState(PlanItem planItem) {
+        planItem.updateState(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         writePlanItemEvent(generator);
         writeField(generator, Fields.isRepeating, this.isRepeating);
-    }
-
-    @Override
-    protected void recoverPlanItemEvent(PlanItem planItem) {
-        planItem.recover(this);
     }
 }

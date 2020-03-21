@@ -17,7 +17,7 @@ import org.cafienne.cmmn.instance.casefile.Value;
  */
 public class CaseOutputParameter extends Parameter<OutputParameterDefinition> {
     public CaseOutputParameter(OutputParameterDefinition definition, Case caseInstance) {
-        super(definition, caseInstance);
+        super(definition, caseInstance, null);
     }
 
     @Override

@@ -70,15 +70,14 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         // TODO: improve the type checking and raise better error message if we're getting back the wrong type.
 
         try {
-            caseInstance.addDebugInfo(() -> "Evaluating " + ruleTypeDescription + " -> " + expressionString.trim());
+            caseInstance.addDebugInfo(() -> "Evaluating " + ruleTypeDescription + ": " + expressionString.trim());
             // Not checking it. If it fails, it really fails.
             @SuppressWarnings("unchecked")
             T value = (T) spelExpression.getValue(context);
-            caseInstance.addDebugInfo(() -> "Evaluated " + ruleTypeDescription + ". Outcome: " + value);
+            caseInstance.addDebugInfo(() -> "Outcome: " + value);
             return value;
         } catch (SpelEvaluationException invalidExpression) {
-            caseInstance.addDebugInfo(() -> "Failure in evaluating "+ruleTypeDescription+", with expression "+expressionString.trim());
-            caseInstance.addDebugInfo(() -> invalidExpression);
+            caseInstance.addDebugInfo(() -> "Failure in evaluating "+ruleTypeDescription+", with expression "+expressionString.trim(), invalidExpression);
             throw new InvalidExpressionException("Could not evaluate " + spelExpression.getExpressionString() + "\n" + invalidExpression.getLocalizedMessage(), invalidExpression);
         }
     }
@@ -139,7 +138,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
-        return evaluateConstraint(planItem.getCaseInstance(), new ItemControlContext(ruleDefinition, planItem));
+        return evaluateConstraint(planItem.getCaseInstance(), new PlanItemContext(ruleDefinition, planItem));
     }
 
     @Override
@@ -154,12 +153,13 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
-        return evaluateConstraint(containingPlanItem.getCaseInstance(), new ApplicabilityRuleContext(containingPlanItem, discretionaryItemDefinition, ruleDefinition), "Evaluating applicability rule " + ruleDefinition.getName());
+        String description = "applicability rule '" + ruleDefinition.getName() + "' for discretionary item " + discretionaryItemDefinition;
+        return evaluateConstraint(containingPlanItem.getCaseInstance(), new ApplicabilityRuleContext(containingPlanItem, discretionaryItemDefinition, ruleDefinition), description);
     }
 
     @Override
     public Instant evaluateDueDate(HumanTask task, DueDateDefinition definition) throws InvalidExpressionException {
-        Object outcome = evaluateConstraint(task.getCaseInstance(), new DueDateContext(definition, task), definition.getType());
+        Object outcome = evaluateConstraint(task.getCaseInstance(), new PlanItemContext(definition, task), "due date expression");
         if (outcome == null || outcome == Value.NULL) {
             return null;
         }
@@ -197,7 +197,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public String evaluateAssignee(HumanTask task, AssignmentDefinition definition) throws InvalidExpressionException {
-        Object outcome = evaluateConstraint(task.getCaseInstance(), new AssignmentContext(definition, task), definition.getType());
+        Object outcome = evaluateConstraint(task.getCaseInstance(), new PlanItemContext(definition, task), "assignment expression");
         if (outcome == null || outcome == Value.NULL) {
             return null;
         }

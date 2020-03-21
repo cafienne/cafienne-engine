@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
@@ -19,19 +20,21 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.parameter.TaskOutputParameter;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.cmmn.akka.event.TaskInputFilled;
-import org.cafienne.cmmn.akka.event.TaskOutputFilled;
+import org.cafienne.cmmn.akka.event.plan.task.TaskInputFilled;
+import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefinitionInstance<D> {
-    private ValueMap taskInputParameters = new ValueMap();
-    private ValueMap taskOutputParameters = new ValueMap();
-    private ValueMap mappedInputParameters = new ValueMap();
+public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
+    private ValueMap taskInput = new ValueMap();
+    private ValueMap implementationInput = new ValueMap();
 
-    protected Task(PlanItem planItem, D definition) {
-        super(planItem, definition, StateMachine.TaskStage);
+    private ValueMap implementationOutput = new ValueMap();
+    private ValueMap taskOutput = new ValueMap();
+
+    protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage, StateMachine.TaskStage);
     }
 
     @Override
@@ -48,7 +51,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
     @Override
     final protected void startInstance() {
         transformInputParameters();
-        startImplementation(mappedInputParameters);
+        startImplementation(implementationInput);
     }
 
     abstract protected void startImplementation(ValueMap inputParameters);
@@ -62,7 +65,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
     @Override
     protected void reactivateInstance() {
         transformInputParameters();
-        reactivateImplementation(mappedInputParameters);
+        reactivateImplementation(implementationInput);
     }
 
     abstract protected void reactivateImplementation(ValueMap inputParameters);
@@ -73,27 +76,24 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
     }
 
     public ValidationResponse validateOutput(ValueMap potentialRawOutput) {
-        taskOutputParameters.getValue().clear(); // Make sure to clear, to avoid repeated calls re-using the earlier mapped output
-
-        if (potentialRawOutput == null) {
-            potentialRawOutput = new ValueMap();
-        }
-
+        // Create maps to store the values that must be validated.
+        ValueMap implementationOutput = potentialRawOutput == null ? new ValueMap() : potentialRawOutput;
+        ValueMap potentialTaskOutput = new ValueMap();
         Vector<String> validationErrors = new Vector<>();
 
         Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
         for (ParameterMappingDefinition mapping : mappings) {
             if (!mapping.isInputParameterMapping()) {
-                String rawOutputParameterName = mapping.getSource().getName();
-                Value<?> value = potentialRawOutput.get(rawOutputParameterName);
-                TaskOutputParameter outputParameter = mapping.transformOutput(this, value);
-                taskOutputParameters.put(outputParameter.getDefinition().getName(), outputParameter.getValue());
+                String implementationOutputParameterName = mapping.getSource().getName();
+                Value<?> implementationOutputParameterValue = implementationOutput.get(implementationOutputParameterName);
+                Value<?> outputParameter = mapping.transformOutput(this, implementationOutputParameterValue);
+                potentialTaskOutput.put(mapping.getTarget().getName(), outputParameter);
             }
         }
 
         getDefinition().getOutputParameters().forEach((name, parameterDefinition) -> {
             if (parameterDefinition.isMandatory()) {
-                Value<?> parameterValue = taskOutputParameters.get(name);
+                Value<?> parameterValue = potentialTaskOutput.get(name);
                 if (parameterValue.equals(Value.NULL)) {
                     validationErrors.add("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
                 }
@@ -104,8 +104,8 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
             throw new InvalidCommandException(validationErrors.toString());
         }
 
-        taskOutputParameters.getValue().clear(); // Make sure to clear, to avoid results of
-        return new ValidationResponse(taskOutputParameters);
+        // Everything went ok, let's return an empty value map
+        return new ValidationResponse(new ValueMap());
     }
 
     /**
@@ -125,13 +125,14 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
     }
 
     private void makeTransitionWithOutput(ValueMap rawOutputParameters, Transition transition) {
-        getPlanItem().prepareTransition(transition);
+        prepareTransition(transition);
         transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
-        getPlanItem().makeTransition(transition);
+        makeTransition(transition);
     }
 
     protected void transformInputParameters() {
-        mappedInputParameters = new ValueMap();
+        ValueMap mappedInputParameters = new ValueMap();
+        ValueMap taskInputParameters = new ValueMap();
 
         Map<String, TaskInputParameter> inputParameters = new LinkedHashMap<>();
         getDefinition().getInputParameters().forEach((name, inputParameterDefinition) -> {
@@ -150,58 +151,52 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
             }
         }
 
-        final TaskInputFilled event = new TaskInputFilled(this, taskInputParameters, mappedInputParameters);
-        getCaseInstance().addEvent(event);
-        event.finished();
+        getCaseInstance().addEvent(new TaskInputFilled(this, taskInputParameters, mappedInputParameters));
     }
 
     /**
      * Fill the output parameters of the task, based on the output parameters of the implementation
      * of the task (i.e., based on the output of the sub process or sub case that was invoked).
      *
-     * @param rawOutputParameters
+     * @param implementationOutput
      * @param validateOutput Indicates whether a check on mandatory parameter values must be done
      */
-    protected void transformOutputParameters(ValueMap rawOutputParameters, boolean validateOutput) {
-        if (rawOutputParameters == null) {
-            rawOutputParameters = new ValueMap();
+    protected void transformOutputParameters(ValueMap implementationOutput, boolean validateOutput) {
+        if (implementationOutput == null) {
+            implementationOutput = new ValueMap();
         }
-        
+
+        // First, transform values of all raw output parameters into task parameters
+        ValueMap newTaskOutput = new ValueMap();
         Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
         for (ParameterMappingDefinition mapping : mappings) {
             if (!mapping.isInputParameterMapping()) {
                 String rawOutputParameterName = mapping.getSource().getName();
-                Value<?> value = rawOutputParameters.get(rawOutputParameterName);
-                TaskOutputParameter outputParameter = mapping.transformOutput(this, value);
-                outputParameter.bind();
-                taskOutputParameters.put(outputParameter.getDefinition().getName(), outputParameter.getValue());
+                String taskOutputParameterName = mapping.getTarget().getName();
+                Value<?> rawValue = implementationOutput.get(rawOutputParameterName);
+                Value<?> taskOutputParameterValue = mapping.transformOutput(this, rawValue);
+                newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
             }
         }
 
+        // Now check that all mandatory parameters have a non-null value
         if (validateOutput) {
             getDefinition().getOutputParameters().forEach((name, parameterDefinition) -> {
                 if (parameterDefinition.isMandatory()) {
 //                    System.out.println("Validating mandatory output parameter "+name);
-                    Value<?> parameterValue = taskOutputParameters.get(name);
-//                    System.out.println(" Value is of type "+parameterValue.getClass().getSimpleName()+", holding\n"+parameterValue);
+                    Value<?> parameterValue = newTaskOutput.get(name);
                     if (parameterValue.equals(Value.NULL)) {
-//                        System.out.println("Raising invalid");
                         throw new InvalidCommandException("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
                     }
-                } else {
-//                    System.out.println("Output parameter "+name+" is not mandatory");
-
                 }
             });
         }
 
-        TaskOutputFilled event = new TaskOutputFilled(this, taskOutputParameters, rawOutputParameters);
-        getCaseInstance().addEvent(event);
-        event.finished();
+        getCaseInstance().addEvent(new TaskOutputFilled(this, newTaskOutput, implementationOutput));
     }
 
     protected ValueMap getInputParameters() {
-        return taskInputParameters;
+        return taskInput;
     }
 
     /**
@@ -209,14 +204,14 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
      * @return mapped input parameters for task
      */
     public ValueMap getMappedInputParameters() {
-        return mappedInputParameters;
+        return implementationInput;
     }
 
     @Override
     protected void dumpMemoryStateToXML(Element planItemXML) {
         super.dumpMemoryStateToXML(planItemXML);
-        taskInputParameters.fieldNames().forEachRemaining(fieldName -> appendParameter(fieldName, taskInputParameters.get(fieldName), planItemXML, "inputs"));
-        taskOutputParameters.fieldNames().forEachRemaining(fieldName -> appendParameter(fieldName, taskOutputParameters.get(fieldName), planItemXML, "outputs"));
+        taskInput.fieldNames().forEachRemaining(fieldName -> appendParameter(fieldName, taskInput.get(fieldName), planItemXML, "inputs"));
+        taskOutput.fieldNames().forEachRemaining(fieldName -> appendParameter(fieldName, taskOutput.get(fieldName), planItemXML, "outputs"));
     }
 
     private void appendParameter(String parameterName, Value<?> value, Element planItemXML, String tagName) {
@@ -227,13 +222,23 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
         paramXML.appendChild(valueNode);
     }
 
-    public void recoverTaskEvent(TaskInputFilled event) {
-        this.taskInputParameters = event.getTaskInputParameters();
-        this.mappedInputParameters = event.getMappedInputParameters();
+    public void updateState(TaskInputFilled event) {
+        this.taskInput = event.getTaskInputParameters();
+        this.implementationInput = event.getMappedInputParameters();
     }
 
-    public void recoverTaskEvent(TaskOutputFilled event) {
-        this.taskOutputParameters = event.getTaskOutputParameters();
-    }
+    public void updateState(TaskOutputFilled event) {
+        this.implementationOutput = event.getRawOutputParameters();
+        this.taskOutput = event.getTaskOutputParameters();
 
+        Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
+        for (ParameterMappingDefinition mapping : mappings) {
+            if (!mapping.isInputParameterMapping()) {
+                String taskOutputParameterName = mapping.getTarget().getName();
+                Value<?> taskOutputParameterValue = taskOutput.get(taskOutputParameterName);
+                TaskOutputParameter outputParameter = new TaskOutputParameter(mapping.getTarget(), getCaseInstance(), taskOutputParameterValue);
+                outputParameter.bind();
+            }
+        }
+    }
 }

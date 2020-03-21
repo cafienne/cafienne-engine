@@ -13,6 +13,7 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskClaimed;
+import org.cafienne.humantask.akka.event.HumanTaskOwnerChanged;
 import org.cafienne.humantask.instance.TaskState;
 
 @Manifest
@@ -42,7 +43,9 @@ public class ClaimTask extends WorkflowCommand {
     
     @Override
     public HumanTaskResponse process(HumanTask task) {
-        task.addEvent(new HumanTaskClaimed(task, this.user.id())).updateState(task.getImplementation());
+        String claimer = this.user.id();
+        task.addEvent(new HumanTaskClaimed(task, claimer));
+        task.addEvent(new HumanTaskOwnerChanged(task, claimer));
         return new HumanTaskResponse(this);
     }
 }

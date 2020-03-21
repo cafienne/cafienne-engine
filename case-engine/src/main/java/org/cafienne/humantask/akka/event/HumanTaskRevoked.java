@@ -7,7 +7,6 @@
  */
 package org.cafienne.humantask.akka.event;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -15,36 +14,13 @@ import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 
-import java.io.IOException;
-
 @Manifest
-public class HumanTaskRevoked extends HumanTaskTransitioned {
-    /**
-     * New assignee of the task
-     */
-    public final String assignee; // assignee of the task
-
-    private enum Fields {
-        assignee
-    }
-
-    public HumanTaskRevoked(HumanTask task) {
-        super(task, task.getImplementation().getCurrentTaskState() == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned, TaskAction.Revoke);
-        this.assignee = task.getImplementation().getPreviousAssignee();
+public class HumanTaskRevoked extends HumanTaskAssigned{
+    public HumanTaskRevoked(HumanTask task, String previousAssignee) {
+        super(task, previousAssignee, task.getImplementation().getCurrentState() == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned, TaskAction.Revoke);
     }
 
     public HumanTaskRevoked(ValueMap json) {
         super(json);
-        this.assignee = readField(json, Fields.assignee);
-    }
-
-    public void updateState(WorkflowTask task) {
-        task.revoke();
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeTransitionEvent(generator);
-        writeField(generator, Fields.assignee, assignee);
     }
 }

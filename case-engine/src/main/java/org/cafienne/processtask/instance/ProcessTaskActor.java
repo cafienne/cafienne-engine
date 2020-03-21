@@ -1,10 +1,8 @@
 package org.cafienne.processtask.instance;
 
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.cmmn.akka.command.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.task.FailTask;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.akka.command.ProcessCommand;
 import org.cafienne.processtask.akka.event.*;
@@ -52,7 +50,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         return name;
     }
 
-    public void setInitialState(ProcessStarted event) {
+    public void updateState(ProcessStarted event) {
         this.setEngineVersion(event.engineVersion);
         this.debugMode = event.debugMode;
         this.definition = event.definition;
@@ -63,9 +61,22 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         this.inputParameters = event.inputParameters;
     }
 
+    public void updateState(ProcessReactivated event) {
+        this.inputParameters = event.inputParameters;
+    }
+
+    public SubProcess<?> getImplementation() {
+        return this.taskImplementation;
+    }
+
     public void start() {
-        addDebugInfo(DebugEvent.class, e -> e.addMessage("Starting process task " + name + " with input parameters", inputParameters));
+        addDebugInfo(() -> "Starting process task " + name + " with input parameters", inputParameters);
         taskImplementation.start();
+    }
+
+    public void reactivate() {
+        addDebugInfo(() -> "Reactivating process " + getName());
+        taskImplementation.reactivate();
     }
 
     public Logger getLogger() {
@@ -73,8 +84,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     }
 
     public void completed(ValueMap processOutputParameters) {
-        addDebugInfo(DebugEvent.class, e ->
-            e.addMessage("Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters));
+        addDebugInfo(() -> "Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);
 
         addEvent(new ProcessCompleted(this, processOutputParameters));
 
@@ -87,8 +97,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
 
     public void failed(ValueMap processOutputParameters) {
         addEvent(new ProcessFailed(this, processOutputParameters));
-        addDebugInfo(DebugEvent.class, e ->
-            e.addMessage("Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters));
+        addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);
 
         askCase(new FailTask(this, processOutputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
@@ -97,10 +106,18 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         });
     }
 
+    public void suspend() {
+        addDebugInfo(() -> "Suspending process " + getName());
+        taskImplementation.suspend();
+    }
+
+    public void resume() {
+        addDebugInfo(() -> "Resuming process " + getName());
+        taskImplementation.resume();
+    }
+
     public void terminate() {
         addDebugInfo(() -> "Terminating process " + getName());
         taskImplementation.terminate();
-        addDebugInfo(() -> "Terminated process implementation");
-        addEvent(new ProcessTerminated(this));
     }
 }

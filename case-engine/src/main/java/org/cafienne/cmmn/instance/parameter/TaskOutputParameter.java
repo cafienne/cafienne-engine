@@ -11,14 +11,15 @@ import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
+import org.cafienne.cmmn.instance.casefile.Value;
 
 /**
  * A TaskOutputParameter is created right before a task completes.
  * If its value is set (after it is mapped from the raw output of the task), it is bound to the case file.
  */
 public class TaskOutputParameter extends Parameter<ParameterDefinition> {
-    public TaskOutputParameter(ParameterDefinition definition, Case caseInstance) {
-        super(definition, caseInstance);
+    public TaskOutputParameter(ParameterDefinition definition, Case caseInstance, Value value) {
+        super(definition, caseInstance, value);
     }
 
     @Override

@@ -11,10 +11,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.akka.event.debug.DebugDisabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
+import org.cafienne.cmmn.akka.event.DebugDisabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 

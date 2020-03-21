@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.cmmn.test.assertions.file.CaseFileItemAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;

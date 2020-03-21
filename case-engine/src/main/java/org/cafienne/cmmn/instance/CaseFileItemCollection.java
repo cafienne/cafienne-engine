@@ -7,18 +7,14 @@
  */
 package org.cafienne.cmmn.instance;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
-    private final static Logger logger = LoggerFactory.getLogger(CaseFileItemCollection.class);
-
     private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap<CaseFileItemDefinition, CaseFileItem>();
     private final String name;
     public final int instanceNumber;

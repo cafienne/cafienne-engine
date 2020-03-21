@@ -2,11 +2,17 @@ package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.cmmn.akka.event.*;
-import org.cafienne.cmmn.akka.event.debug.DebugDisabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
-import org.cafienne.cmmn.akka.event.debug.SentryEvent;
-import org.cafienne.cmmn.akka.event.eventlistener.TimerSet;
+import org.cafienne.cmmn.akka.event.DebugDisabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
+import org.cafienne.akka.actor.event.DebugEvent;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
+import org.cafienne.cmmn.akka.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.akka.event.plan.task.TaskInputFilled;
+import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.akka.event.team.TeamMemberAdded;
 import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
 import org.cafienne.humantask.akka.event.*;
@@ -28,7 +34,6 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
 
     private static void registerBaseEvents() {
         addManifestWrapper(DebugEvent.class, DebugEvent::new);
-        addManifestWrapper(SentryEvent.class, SentryEvent::new);
         addManifestWrapper(DebugDisabled.class, DebugDisabled::new);
         addManifestWrapper(DebugEnabled.class, DebugEnabled::new);
     }
@@ -70,6 +75,9 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
         addManifestWrapper(ProcessStarted.class, ProcessStarted::new);
         addManifestWrapper(ProcessCompleted.class, ProcessCompleted::new);
         addManifestWrapper(ProcessFailed.class, ProcessFailed::new);
+        addManifestWrapper(ProcessReactivated.class, ProcessReactivated::new);
+        addManifestWrapper(ProcessResumed.class, ProcessResumed::new);
+        addManifestWrapper(ProcessSuspended.class, ProcessSuspended::new);
         addManifestWrapper(ProcessTerminated.class, ProcessTerminated::new);
         addManifestWrapper(ProcessModified.class, ProcessModified::new);
     }

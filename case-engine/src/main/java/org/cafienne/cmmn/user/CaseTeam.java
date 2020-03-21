@@ -70,7 +70,7 @@ public class CaseTeam {
      * @param member
      */
     public void addMember(CaseTeamMember member) {
-        caseInstance.addEvent(new TeamMemberAdded(caseInstance, member)).finished();
+        caseInstance.addEvent(new TeamMemberAdded(caseInstance, member));
     }
 
     /**
@@ -78,7 +78,7 @@ public class CaseTeam {
      * @param member
      */
     public void removeMember(CaseTeamMember member) {
-        caseInstance.addEvent(new TeamMemberRemoved(caseInstance, member)).finished();
+        caseInstance.addEvent(new TeamMemberRemoved(caseInstance, member));
     }
 
     /**

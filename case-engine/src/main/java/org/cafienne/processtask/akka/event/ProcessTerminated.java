@@ -2,6 +2,7 @@ package org.cafienne.processtask.akka.event;
 
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
@@ -12,5 +13,10 @@ public class ProcessTerminated extends ProcessEnded {
 
     public ProcessTerminated(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    public void runBehavior() {
+        actor.terminate();
     }
 }

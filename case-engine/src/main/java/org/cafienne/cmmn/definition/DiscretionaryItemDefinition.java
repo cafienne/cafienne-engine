@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DiscretionaryItemDefinition extends TableItemDefinition {
+public class DiscretionaryItemDefinition extends TableItemDefinition implements ItemDefinition {
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
@@ -62,6 +62,11 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
     }
 
     @Override
+    public boolean isDiscretionary() {
+        return true;
+    }
+
+    @Override
     protected void resolveReferences() {
         super.resolveReferences();
         this.definition = getCaseDefinition().findPlanItemDefinition(planItemDefinitionRefValue);
@@ -90,13 +95,19 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
         if (isAlreadyPlanned(containingPlanItem)) {
             return false;
         }
-        for (ApplicabilityRuleDefinition rule : getApplicabilityRules()) {
-            // If any of the rules evaluates to false, the discretionary item is not allowed
-            if (!rule.evaluate(containingPlanItem, rule, this)) {
-                return false;
+        if (getApplicabilityRules().isEmpty()) {
+            containingPlanItem.getCaseInstance().addDebugInfo(() -> this + ": item is applicable because rules are not defined");
+            return true;
+        } else {
+            containingPlanItem.getCaseInstance().addDebugInfo(() -> this + ": checking " + getApplicabilityRules().size() + " applicability rule(s)");
+            for (ApplicabilityRuleDefinition rule : getApplicabilityRules()) {
+                // If any of the rules evaluates to false, the discretionary item is not allowed
+                if (!rule.evaluate(containingPlanItem, rule, this)) {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
     }
 
     /**
@@ -107,7 +118,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
     private boolean isAlreadyPlanned(PlanItem containingPlanItem) {
         // Go through all plan items in the containing stage, check if there is one with our name
         // and then check if it is not repeating. If not, then there is one, and we cannot add more, so then we are "already planned".
-        Stage<?> containingStage = containingPlanItem.getInstance() instanceof Stage<?> ? containingPlanItem.getInstance() : containingPlanItem.getStage();
+        Stage containingStage = containingPlanItem instanceof Stage ? (Stage) containingPlanItem : containingPlanItem.getStage();
         Collection<PlanItem> currentPlanItemsInStage = containingStage.getPlanItems();
         for (PlanItem planItem : currentPlanItemsInStage) {
             if (planItem.getName().equals(this.getName())) {
@@ -121,12 +132,12 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
     }
 
     @Override
-    public Element dumpMemoryStateToXML(Element parentElement, Stage<?> stage) {
+    public Element dumpMemoryStateToXML(Element parentElement, Stage stage) {
         Element discretionaryXML = parentElement.getOwnerDocument().createElement("discretionaryItem");
 
         discretionaryXML.setAttribute("name", getName());
         // System.out.println("Dumping memory state for table item "+getName()+", having "+getApplicabilityRules().size()+" rules");
-        discretionaryXML.setAttribute("applicable", "" + isApplicable(stage.getPlanItem()));
+//        discretionaryXML.setAttribute("applicable", "" + isApplicable(stage.getPlanItem()));
 
         // Also print the roles.
         super.dumpMemoryStateToXML(discretionaryXML, stage);
@@ -157,5 +168,11 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
             return this; // We're the one.
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        if (definition == null) return super.toString();
+        return "DiscretionaryItem[" + definition.getType() + " '" + getName() + "']";
     }
 }

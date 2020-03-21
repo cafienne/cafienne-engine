@@ -14,14 +14,14 @@ import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.command.exception.MissingTenantException;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
- * When the case has succesfully handled the command, it will persist the resulting {@link CaseInstanceEvent}s, and send a reply back, see {@link CaseResponse}.
+ * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */
 public abstract class CaseCommand extends ModelCommand<Case> {
     /**

@@ -33,10 +33,6 @@ public class HumanTaskOutputSaved extends HumanTaskEvent {
 		this.taskOutput = readMap(json, Fields.taskOutput);
 	}
 
-	public void updateState(WorkflowTask task) {
-		task.setOutput(taskOutput);
-	}
-
 	public ValueMap getTaskOutput() {
 		return taskOutput;
 	}
@@ -50,10 +46,5 @@ public class HumanTaskOutputSaved extends HumanTaskEvent {
 	public void write(JsonGenerator generator) throws IOException {
 		super.writeHumanTaskEvent(generator);
 		writeField(generator, Fields.taskOutput, taskOutput);
-	}
-
-	@Override
-	protected void recoverHumanTaskEvent(WorkflowTask task) {
-		updateState(task);
 	}
 }

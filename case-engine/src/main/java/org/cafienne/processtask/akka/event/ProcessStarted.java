@@ -49,7 +49,12 @@ public class ProcessStarted extends ProcessInstanceEvent {
 
     @Override
     public void updateState(ProcessTaskActor actor) {
-        actor.setInitialState(this);
+        actor.updateState(this);
+    }
+
+    @Override
+    public void runBehavior() {
+        actor.start();
     }
 
     @Override

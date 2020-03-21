@@ -8,7 +8,8 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.akka.event.task.TaskEvent;
+import org.cafienne.cmmn.akka.event.plan.task.TaskEvent;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.WorkflowTask;
@@ -63,11 +64,4 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
     public String getTaskName() {
         return taskName;
     }
-
-    @Override
-    final protected void recoverTaskEvent(HumanTask task) {
-        recoverHumanTaskEvent(task.getImplementation());
-    }
-
-    abstract protected void recoverHumanTaskEvent(WorkflowTask task);
 }

@@ -16,14 +16,12 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
-import org.cafienne.cmmn.akka.event.debug.DebugEnabled;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
@@ -152,7 +150,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         }
 
         // First set the definition
-        caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName())).finished();
+        caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName()));
 
         // First setup the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
         caseTeam.getMembers().forEach(newMember -> caseInstance.getCaseTeam().addMember(newMember));
@@ -160,12 +158,11 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         caseInstance.getCaseTeam().addCurrentUser(caseInstance.getCurrentUser());
 
         // Apply input parameters. This may also fill the CaseFile
-        caseInstance.addDebugInfo(DebugEvent.class, e -> e.addMessage("Input parameters for new case of type "+ definition.getName(), inputParameters));
+        caseInstance.addDebugInfo(() -> "Input parameters for new case of type "+ definition.getName(), inputParameters);
         caseInstance.setInputParameters(inputParameters);
 
         // Now trigger the Create transition on the case plan, to make the case actually go running
-        PlanItem casePlan = caseInstance.getCasePlan();
-        caseInstance.makePlanItemTransition(casePlan, Transition.Create);
+        caseInstance.addEvent(new PlanItemCreated(caseInstance));
 
         ValueMap json = new ValueMap();
         json.put("caseInstanceId", new StringValue(caseInstance.getId()));

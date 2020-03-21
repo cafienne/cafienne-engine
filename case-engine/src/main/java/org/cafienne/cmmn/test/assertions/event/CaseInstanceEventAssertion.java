@@ -1,12 +1,12 @@
 package org.cafienne.cmmn.test.assertions.event;
 
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 
 /**
  * Basic assertions around case instance events.
  * @param <T>
  */
-public class CaseInstanceEventAssertion<T extends CaseInstanceEvent> {
+public class CaseInstanceEventAssertion<T extends CaseEvent> {
     protected final T event;
     protected CaseInstanceEventAssertion(T event) {
         this.event = event;

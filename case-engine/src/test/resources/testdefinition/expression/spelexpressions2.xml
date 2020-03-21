@@ -75,7 +75,7 @@
                         <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
                             <transformation language="spel">
                                 <body>
-                                    <![CDATA[task.planItem.name]]>
+                                    <![CDATA[task.name]]>
                                 </body>
                             </transformation>
                         </parameterMapping>

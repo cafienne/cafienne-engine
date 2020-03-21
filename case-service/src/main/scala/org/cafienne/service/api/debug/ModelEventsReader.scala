@@ -7,7 +7,7 @@ import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.cmmn.akka.event.PlanItemCreated
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated
 import org.cafienne.cmmn.instance.casefile.{ValueList, ValueMap}
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 

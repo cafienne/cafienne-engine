@@ -1,7 +1,7 @@
 package org.cafienne.service.api.projection.cases
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.akka.event.CaseFileEvent
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent
 import org.cafienne.cmmn.instance.CaseFileItemTransition
 import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
 

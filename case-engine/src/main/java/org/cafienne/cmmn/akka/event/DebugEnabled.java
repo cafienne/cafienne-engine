@@ -5,12 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.event.debug;
+package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseInstanceEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
@@ -19,18 +18,18 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugDisabled extends CaseInstanceEvent {
-    public DebugDisabled(Case caseInstance) {
+public class DebugEnabled extends CaseEvent {
+    public DebugEnabled(Case caseInstance) {
         super(caseInstance);
     }
 
-    public DebugDisabled(ValueMap json) {
+    public DebugEnabled(ValueMap json) {
         super(json);
     }
 
     @Override
     public void updateState(Case actor) {
-        actor.setDebugMode(false);
+        actor.setDebugMode(true);
     }
 
     @Override

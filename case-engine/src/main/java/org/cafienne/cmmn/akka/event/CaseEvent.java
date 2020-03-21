@@ -5,22 +5,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.instance;
+package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
 
-public abstract class CaseInstanceEvent extends ModelEvent<Case> {
+public abstract class CaseEvent extends ModelEvent<Case> {
     public static final String TAG = "cafienne:case";
 
-    protected CaseInstanceEvent(Case caseInstance) {
+    protected CaseEvent(Case caseInstance) {
         super(caseInstance);
     }
 
-    protected CaseInstanceEvent(ValueMap json) {
+    protected CaseEvent(ValueMap json) {
         super(json);
     }
 
@@ -34,6 +35,5 @@ public abstract class CaseInstanceEvent extends ModelEvent<Case> {
 
     @Override
     public void updateState(Case actor) {
-//        System.out.println("No update state for event of type " + getClass().getSimpleName());
     }
 }

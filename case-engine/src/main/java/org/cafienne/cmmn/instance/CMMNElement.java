@@ -7,10 +7,10 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.instance.debug.DebugAppender;
+import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.sentry.Sentry;
 
 public class CMMNElement<T extends CMMNElementDefinition> {
     private final Case caseInstance;
@@ -32,8 +32,16 @@ public class CMMNElement<T extends CMMNElementDefinition> {
         this.definition = definition;
     }
 
-    protected <T extends DebugEvent> void addDebugInfo(Class<T> eventClass, DebugAppender<T> appender) {
-        getCaseInstance().addDebugInfo(eventClass, appender);
+    protected void addDebugInfo(DebugStringAppender appender, Sentry sentry) {
+        addDebugInfo(appender, sentry.toJson());
+    }
+
+    protected void addDebugInfo(DebugStringAppender appender, Exception e) {
+        getCaseInstance().addDebugInfo(appender, e);
+    }
+
+    protected void addDebugInfo(DebugStringAppender appender, Value v) {
+        getCaseInstance().addDebugInfo(appender, v);
     }
 
     protected void addDebugInfo(DebugStringAppender appender) {

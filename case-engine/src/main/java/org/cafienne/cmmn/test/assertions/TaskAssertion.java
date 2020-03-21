@@ -7,8 +7,8 @@
  */
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
-import org.cafienne.cmmn.instance.PlanItemDefinitionInstance;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.task.cmmn.CaseTask;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -23,7 +23,7 @@ public class TaskAssertion extends PlanItemAssertion {
     }
 
     @Override
-    public <T extends PlanItemDefinitionInstance<?>> TaskAssertion assertType(Class<T> typeClass) {
+    public <T extends PlanItem<?>> TaskAssertion assertType(Class<T> typeClass) {
         return (TaskAssertion) super.assertType(typeClass);
     }
 }

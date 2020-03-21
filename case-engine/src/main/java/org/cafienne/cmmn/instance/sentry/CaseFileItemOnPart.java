@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.akka.event.debug.SentryEvent;
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.instance.CaseFileItem;
 import org.cafienne.cmmn.instance.CaseFileItemTransition;
@@ -32,7 +31,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
 
     @Override
     void connect(CaseFileItem caseFileItem) {
-        addDebugInfo(SentryEvent.class, event -> event.addMessage("Connecting on part " + getDefinition().getId() + " to case file item " + caseFileItem, this.sentry));
+        addDebugInfo(() -> "Connecting on part " + getDefinition().getId() + " to case file item " + caseFileItem);
         connectedCaseFileItems.add(caseFileItem);
         caseFileItem.connectOnPart(this);
     }
@@ -41,7 +40,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     //  yet to build up the experience with proper use case!! Especially update moments and the like.
     @Override
     public void inform(CaseFileItem caseFileItem) {
-        addDebugInfo(SentryEvent.class, event -> event.addMessage("Case file item " + caseFileItem.getPath() + " informs " + sentry.criterion +" about transition " + caseFileItem.getLastTransition() + ".", this.sentry));
+        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + sentry.criterion +" about transition " + caseFileItem.getLastTransition() + ".");
         lastTransition = caseFileItem.getLastTransition();
         boolean newActive = standardEvent.equals(lastTransition);
         if (isActive != newActive) {

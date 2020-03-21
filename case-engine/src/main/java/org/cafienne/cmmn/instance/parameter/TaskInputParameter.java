@@ -19,7 +19,7 @@ import org.cafienne.cmmn.instance.casefile.Value;
  */
 public class TaskInputParameter extends Parameter<InputParameterDefinition> {
     public TaskInputParameter(InputParameterDefinition definition, Case caseInstance) {
-        super(definition, caseInstance);
+        super(definition, caseInstance, null);
     }
 
     @Override

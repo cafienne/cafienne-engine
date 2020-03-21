@@ -49,9 +49,7 @@
                         <requiredRule id="cm_cseOt_66_requiredRule">
                             <condition language="spel">
                                 <body>
-                                    <![CDATA[
-                                    true
-                                ]]>
+                                    <![CDATA[true]]>
                                 </body>
                             </condition>
                         </requiredRule>

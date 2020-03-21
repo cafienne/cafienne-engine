@@ -11,7 +11,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.akka.event.PlanItemTransitioned;
+import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;

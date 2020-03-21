@@ -184,15 +184,13 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
      *
      * @param task
      * @param value The raw output parameter value after the "content" of the task has been executed, i.e., the output of the subprocess or subcase
-     * @return A TaskOutputParameter that contains the mapped value
+     * @return The mapped value
      */
-    public TaskOutputParameter transformOutput(Task<?> task, Value<?> value) {
+    public Value<?> transformOutput(Task<?> task, Value<?> value) {
         Value<?> targetValue = value;
         if (transformation != null && !transformation.getBody().isEmpty()) {
             targetValue = transformation.getEvaluator().evaluateOutputParameterTransformation(task.getCaseInstance(), value, source, target, task);
         }
-        TaskOutputParameter targetParameter = new TaskOutputParameter(target, task.getCaseInstance());
-        targetParameter.setValue(targetValue);
-        return targetParameter;
+        return targetValue;
     }
 }

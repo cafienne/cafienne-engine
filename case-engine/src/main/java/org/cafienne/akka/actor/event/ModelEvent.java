@@ -24,15 +24,22 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
     public final String tenant;
     private final TenantUser tenantUser;
 
+    /**
+     * During recovery, Actor is set in call to {@link ModelEvent#recover(ModelActor)}
+     * So during {@link ModelEvent#updateState(ModelActor)} it can be used.
+     */
+    protected transient M actor;
+
     public enum Fields {
         tenant, actorId, user, modelEvent
     }
 
-    protected ModelEvent(ModelActor actor) {
+    protected ModelEvent(M actor) {
         this.json = new ValueMap();
         this.actorId = actor.getId();
         this.tenant = actor.getTenant();
         this.tenantUser = actor.getCurrentUser();
+        this.actor = actor;
     }
 
     protected ModelEvent(ValueMap json) {
@@ -63,9 +70,6 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         return this.actorId;
     }
 
-    public void finished() {
-    }
-
     /**
      * Returns the complete context of the user that caused the event to happen
      *
@@ -75,9 +79,26 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         return tenantUser;
     }
 
+    /**
+     * UpdateState will be invoked when an event is added or recovered.
+     * @param actor
+     */
     public abstract void updateState(M actor);
 
-    public void recover(M actor) {
+    /**
+     * Events can implement behavior to be run after the event has updated it's state.
+     * This method will only be invoked when the model actor is not running in recovery mode.
+     */
+    public void runBehavior() {
+        // Default behavior is none
+    }
+
+    /**
+     * Internal framework method
+     * @param actor
+     */
+    public final void recover(M actor) {
+        this.actor = actor;
         this.updateState(actor);
     }
 

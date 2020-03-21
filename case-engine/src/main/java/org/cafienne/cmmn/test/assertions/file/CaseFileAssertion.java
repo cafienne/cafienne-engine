@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions.file;
 
-import org.cafienne.cmmn.akka.event.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;

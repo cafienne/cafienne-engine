@@ -35,11 +35,6 @@ public class HumanTaskCompleted extends HumanTaskTransitioned {
         this.taskOutput = readMap(json, Fields.taskOutput);
     }
 
-    public void updateState(WorkflowTask task) {
-        task.setOutput(taskOutput);
-        task.complete();
-    }
-
     /**
      * Get assignee for the task
      * @return assignee for the task

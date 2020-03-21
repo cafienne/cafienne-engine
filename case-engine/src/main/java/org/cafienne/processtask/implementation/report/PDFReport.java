@@ -7,30 +7,20 @@
  */
 package org.cafienne.processtask.implementation.report;
 
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
 import org.cafienne.cmmn.instance.casefile.StringValue;
-import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
-import org.cafienne.util.XMLHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class PDFReport extends SubProcess<PDFReportDefinition> {
-    private final static Logger logger = LoggerFactory.getLogger(PDFReport.class);
 
     final static String REPORT_DATA_TAG = "reportData";
 

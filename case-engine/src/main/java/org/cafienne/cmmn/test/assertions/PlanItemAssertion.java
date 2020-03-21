@@ -7,12 +7,12 @@
  */
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
-import org.cafienne.cmmn.akka.event.PlanItemTransitioned;
-import org.cafienne.cmmn.akka.event.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.akka.event.RequiredRuleEvaluated;
-import org.cafienne.cmmn.instance.PlanItemDefinitionInstance;
-import org.cafienne.cmmn.instance.PlanItemEvent;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
+import org.cafienne.cmmn.akka.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.CaseTestCommand;
@@ -53,7 +53,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand
         return this.name;
     }
 
-    protected <T extends PlanItemDefinitionInstance<?>> PlanItemAssertion assertType(Class<T> ...typeClasses) {
+    protected <T extends PlanItem<?>> PlanItemAssertion assertType(Class<T> ...typeClasses) {
         for (int i=0; i<typeClasses.length; i++) {
             if (this.type.equals(typeClasses[i].getSimpleName())) {
                 return this;
@@ -67,7 +67,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand
      *
      * @param typeClass
      */
-    public <T extends PlanItemDefinitionInstance<?>> PlanItemAssertion assertType(Class<T> typeClass) {
+    public <T extends PlanItem<?>> PlanItemAssertion assertType(Class<T> typeClass) {
         if (!type.equals(typeClass.getSimpleName())) {
             throw new AssertionError("Plan item " + name + " is of type " + type + ", but is expected to be of type " + typeClass.getSimpleName());
         }

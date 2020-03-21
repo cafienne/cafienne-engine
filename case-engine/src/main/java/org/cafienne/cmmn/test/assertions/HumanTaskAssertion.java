@@ -2,12 +2,8 @@ package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.CaseTestCommand;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.filter.EventFilter;
-import org.cafienne.cmmn.test.humantask.HumanTaskTestCommand;
 import org.cafienne.humantask.akka.command.response.HumanTaskValidationResponse;
 import org.cafienne.humantask.akka.event.*;
-import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
 
 import java.time.Instant;

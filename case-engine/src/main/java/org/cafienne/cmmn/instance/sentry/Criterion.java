@@ -9,7 +9,7 @@ public abstract class Criterion extends CMMNElement<CriterionDefinition> {
     protected final Stage<?> stage;
     protected final Sentry sentry;
 
-    protected Criterion(Stage<?> stage, CriterionDefinition definition) {
+    protected Criterion(Stage stage, CriterionDefinition definition) {
         super(stage, definition);
         this.stage = stage;
         this.sentry = new Sentry(stage, this);

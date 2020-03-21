@@ -12,7 +12,6 @@ import java.time.format.DateTimeParseException;
 
 import com.jayway.jsonpath.JsonPathException;
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.cmmn.akka.event.debug.DebugEvent;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueList;
@@ -84,7 +83,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         }
 
         // Announce we're doing this
-        caseInstance.addDebugInfo(DebugEvent.class, e -> e.addMessage("Evaluating expression " + jsonPath, value));
+        caseInstance.addDebugInfo(() -> "Evaluating expression " + jsonPath, value);
 
         // Convert the Value<?> to String, because there is no ValueMap implementation for JsonPath (yet)
         String json = String.valueOf(value);
@@ -110,7 +109,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
             final Value<?> finalOutput = output; // So that we can use it in the logging lambda
 
-            caseInstance.addDebugInfo(DebugEvent.class, e -> e.addMessage("Result of json evaluation", finalOutput));
+            caseInstance.addDebugInfo(() -> "Result of json evaluation", finalOutput);
             return finalOutput;
 
         } catch (InvalidJsonException e) {

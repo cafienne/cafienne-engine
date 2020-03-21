@@ -9,6 +9,7 @@ package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.WorkflowTask;
@@ -37,17 +38,14 @@ public class HumanTaskOwnerChanged extends HumanTaskEvent {
         this.owner = readField(json, Fields.owner);
     }
 
-    public void updateState(WorkflowTask task) {
-        task.setOwner(owner);
-    }
-
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeHumanTaskEvent(generator);
         writeField(generator, Fields.owner, owner);
     }
 
-    protected void recoverHumanTaskEvent(WorkflowTask task) {
-        updateState(task);
+    @Override
+    public void updateState(Case caseInstance) {
+        getTask().getImplementation().updateState(this);
     }
 }

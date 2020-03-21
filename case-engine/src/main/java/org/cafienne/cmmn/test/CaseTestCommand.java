@@ -118,6 +118,10 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
         return testScript.getEventListener();
     }
 
+    public String getCommandDescription() {
+        return "CaseTestCommand[" + getActualCommand().getCommandDescription() +"]";
+    }
+
     @Override
     public String toString() {
         return "Test command "+getActionNumber()+" of type " + getActualCommand().getClass().getSimpleName()+" resulted in " + getEvents().getEvents().size()+" events";

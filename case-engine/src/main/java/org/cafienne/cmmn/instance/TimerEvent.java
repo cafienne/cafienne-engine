@@ -9,7 +9,8 @@ package org.cafienne.cmmn.instance;
 
 import akka.actor.Cancellable;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.event.eventlistener.TimerSet;
+import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.TimerEventDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,11 @@ import scala.concurrent.duration.FiniteDuration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition> {
+public class TimerEvent extends PlanItem<TimerEventDefinition> {
     private final static Logger logger = LoggerFactory.getLogger(TimerEvent.class);
 
-    public TimerEvent(PlanItem planItem, TimerEventDefinition definition) {
-        super(planItem, definition, StateMachine.EventMilestone);
+    public TimerEvent(String id, int index, ItemDefinition itemDefinition, TimerEventDefinition definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
 
     private Cancellable schedule;
@@ -68,7 +69,7 @@ public class TimerEvent extends PlanItemDefinitionInstance<TimerEventDefinition>
 
     @Override
     protected void createInstance() {
-        getCaseInstance().addEvent(new TimerSet(this)).finished();
+        getCaseInstance().addEvent(new TimerSet(this));
     }
 
     @Override

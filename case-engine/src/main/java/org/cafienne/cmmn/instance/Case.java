@@ -9,8 +9,8 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
-import org.cafienne.cmmn.akka.event.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -19,7 +19,6 @@ import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
 import org.cafienne.cmmn.user.CaseTeam;
 import org.cafienne.cmmn.user.CaseTeamMember;
-import org.cafienne.util.Guid;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
+public class Case extends ModelActor<CaseCommand, CaseEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(Case.class);
 
@@ -45,7 +42,7 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
     /**
      * List of plan items in the case.
      */
-    private Collection<PlanItem> planItems = new ArrayList<PlanItem>();
+    private Collection<PlanItem> planItems = new ArrayList<>();
     /**
      * Pointer to the case file instance of the case.
      */
@@ -61,7 +58,7 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
     /**
      * Root level plan item of the case.
      */
-    private PlanItem casePlan;
+    private CasePlan casePlan;
 
     /**
      * Identifier of parent case that caused this case to start.
@@ -78,14 +75,8 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      */
     private final CaseTeam caseTeam = new CaseTeam(this);
 
-    /**
-     * The set of failing plan items keeps track of those plan items that have {@link State#Failed}. This list is used
-     * to notify the event stream about failures at case instance level, rather than at individual plan item level.
-     */
-    final Set<PlanItem> failingPlanItems = new HashSet<>();
-
     public Case() {
-        super(CaseCommand.class, CaseInstanceEvent.class);
+        super(CaseCommand.class, CaseEvent.class);
         this.createdOn = Instant.now();
         this.sentryNetwork = new SentryNetwork(this);
 
@@ -108,25 +99,8 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
 
     @Override
     public CaseModified createLastModifiedEvent(Instant lastModified) {
-        return new CaseModified(this, lastModified, failingPlanItems.size());
-    }
-
-    /**
-     * Internal framework method to notify the case instance that the plan item is in {@link State#Failed}
-     *
-     * @param planItem
-     */
-    void addFailure(PlanItem planItem) {
-        failingPlanItems.add(planItem);
-    }
-
-    /**
-     * Internal framework method to notify the case instance that the plan item is not in {@link State#Failed}
-     *
-     * @param planItem
-     */
-    void noFailure(PlanItem planItem) {
-        failingPlanItems.remove(planItem);
+        int numFailedPlanItems = Long.valueOf(planItems.stream().filter(p -> p.getState() == org.cafienne.cmmn.instance.State.Failed).count()).intValue();
+        return new CaseModified(this, lastModified, numFailedPlanItems);
     }
 
     /**
@@ -144,9 +118,6 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      * @param planItem
      */
     void registerPlanItem(PlanItem planItem) {
-        if (planItem.getStage() == null) {
-            casePlan = planItem;
-        }
         planItems.add(planItem);
     }
 
@@ -196,8 +167,8 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      * @param id
      * @return
      */
-    public PlanItem getPlanItemById(String id) {
-        return planItems.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    public <T extends PlanItem> T getPlanItemById(String id) {
+        return (T) planItems.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
     }
 
     /**
@@ -254,18 +225,16 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
         return sentryNetwork;
     }
 
+    void setCasePlan(CasePlan casePlan) {
+        this.casePlan = casePlan;
+    }
+
     /**
      * Returns the root plan item
      *
      * @return
      */
-    public PlanItem getCasePlan() {
-        if (casePlan == null) {
-            // Note: although we assign to case plan, this is also done in registerPlanItem method
-            // so not per se needed here. (it is done in registerPlanItem because of Akka recovery)
-            casePlan = new PlanItem(new Guid().toString(), definition.getCasePlanModel(), this);
-        }
-
+    public CasePlan getCasePlan() {
         return casePlan;
     }
 
@@ -288,8 +257,14 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      * @return
      */
     public Collection<DiscretionaryItem> getDiscretionaryItems() {
+        addDebugInfo(() -> "Retrieving discretionary items of " + this);
         Collection<DiscretionaryItem> items = new ArrayList<DiscretionaryItem>();
-        getCasePlan().getInstance().retrieveDiscretionaryItems(items);
+        getCasePlan().retrieveDiscretionaryItems(items);
+        addDebugInfo(() -> {
+            StringBuilder itemsString = new StringBuilder();
+            items.forEach(item -> itemsString.append("\n\t" + item.getDefinition() + " in " + item.getParentId()));
+            return "Discretionary items of " + this + itemsString;
+        });
         return items;
     }
 
@@ -319,8 +294,8 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
         CaseDefinition definition = getDefinition();
         inputParameters.getValue().forEach((name, externalParameter) -> {
             InputParameterDefinition inputParameterDefinition = definition.getInputParameters().get(name);
-            CaseInputParameter parameter = new CaseInputParameter(inputParameterDefinition, this);
-            parameter.setValue(externalParameter);
+            CaseInputParameter parameter = new CaseInputParameter(inputParameterDefinition, this, externalParameter);
+            parameter.bindParameterToCaseFile();
         });
     }
 
@@ -371,22 +346,5 @@ public class Case extends ModelActor<CaseCommand, CaseInstanceEvent> {
      */
     public CaseTeam getCaseTeam() {
         return caseTeam;
-    }
-
-    public void recoverPlanItem(PlanItemCreated event) {
-        if (event.stageId.isEmpty()) { // then it is the caseplan, so use a different constructor
-            new PlanItem(event.planItemId, this.getDefinition().getCasePlanModel(), this);
-        } else {
-            // Lookup the stage to which the plan item belongs,
-            // then lookup the definition for the plan item
-            // and then instantiate it.
-            PlanItem owningPlanItem = this.getPlanItemById(event.stageId);
-            if (owningPlanItem == null) {
-                logger.error("MAJOR ERROR: we cannot find the stage with id " + event.stageId + ", and therefore cannot recover  plan item " + event);
-                return;
-            }
-            Stage<?> stage = owningPlanItem.getInstance();
-            stage.recoverPlanItem(event);
-        }
     }
 }

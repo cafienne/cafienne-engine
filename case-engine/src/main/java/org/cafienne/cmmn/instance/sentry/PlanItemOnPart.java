@@ -7,18 +7,17 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.cafienne.cmmn.akka.event.debug.SentryEvent;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
-public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem> {
-    private Collection<PlanItem> connectedPlanItems = new ArrayList<PlanItem>();
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
+    private Collection<PlanItem> connectedPlanItems = new ArrayList<>();
     private final Object standardEvent;
     private final String sourceName;
     private boolean isActive;
@@ -33,7 +32,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem> {
 
     @Override
     void connect(PlanItem planItem) {
-        addDebugInfo(SentryEvent.class, event -> event.addMessage("Connecting " + sentry.criterion + " to plan item " + planItem, this.sentry));
+        addDebugInfo(() -> "Connecting " + sentry.criterion + " to plan item " + planItem);
         connectedPlanItems.add(planItem);
         planItem.connectOnPart(this);
         if (getDefinition().getRelatedExitCriterion() != null) {
@@ -43,7 +42,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem> {
 
     @Override
     public void inform(PlanItem planItem) {
-        addDebugInfo(SentryEvent.class, event -> event.addMessage("Plan item " + planItem + " informs " + sentry.criterion + " about transition " + planItem.getLastTransition(), this.sentry));
+        addDebugInfo(() -> "Plan item " + planItem + " informs " + sentry.criterion + " about transition " + planItem.getLastTransition());
         lastTransition = planItem.getLastTransition();
         isActive = standardEvent.equals(lastTransition);
         if (isActive) {
@@ -51,7 +50,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem> {
                 if (relatedExitCriterion.isActive()) {
                     sentry.activate(this);
                 } else {
-                    addDebugInfo(SentryEvent.class, event -> event.addMessage(sentry.criterion + ": onPart '" + sourceName + "=>" + lastTransition + "' is not activated, because related exit criterion is not active", this.sentry));
+                    addDebugInfo(() -> sentry.criterion + ": onPart '" + sourceName + "=>" + lastTransition + "' is not activated, because related exit criterion is not active", this.sentry);
                 }
             } else {
                 // Bingo, we have a hit

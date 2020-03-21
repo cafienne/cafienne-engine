@@ -12,10 +12,7 @@ import org.cafienne.cmmn.akka.command.team.PutTeamMember;
 import org.cafienne.cmmn.akka.command.team.RemoveTeamMember;
 import org.cafienne.cmmn.akka.command.team.SetCaseTeam;
 import org.cafienne.humantask.akka.command.*;
-import org.cafienne.processtask.akka.command.ResumeProcess;
-import org.cafienne.processtask.akka.command.StartProcess;
-import org.cafienne.processtask.akka.command.SuspendProcess;
-import org.cafienne.processtask.akka.command.TerminateProcess;
+import org.cafienne.processtask.akka.command.*;
 import org.cafienne.tenant.akka.command.*;
 import org.cafienne.tenant.akka.command.platform.BootstrapTenant;
 import org.cafienne.tenant.akka.command.platform.CreateTenant;
@@ -26,13 +23,14 @@ import org.cafienne.tenant.akka.command.EnableTenantUser;
 public class CommandSerializer extends AkkaCaseObjectSerializer {
     static {
         addCaseCommands();
+        addHumanTaskCommands();
+        addProcessActorCommands();
         addTenantCommands();
         addPlatformCommands();
     }
 
     private static void addCaseCommands() {
         addManifestWrapper(StartCase.class, StartCase::new);
-        addManifestWrapper(StartProcess.class, StartProcess::new);
         addManifestWrapper(AddDiscretionaryItem.class, AddDiscretionaryItem::new);
         addManifestWrapper(GetDiscretionaryItems.class, GetDiscretionaryItems::new);
         addManifestWrapper(MakeCaseTransition.class, MakeCaseTransition::new);
@@ -47,6 +45,9 @@ public class CommandSerializer extends AkkaCaseObjectSerializer {
         addManifestWrapper(PutTeamMember.class, PutTeamMember::new);
         addManifestWrapper(RemoveTeamMember.class, RemoveTeamMember::new);
         addManifestWrapper(SetCaseTeam.class, SetCaseTeam::new);
+    }
+
+    private static void addHumanTaskCommands() {
         addManifestWrapper(AssignTask.class, AssignTask::new);
         addManifestWrapper(ClaimTask.class, ClaimTask::new);
         addManifestWrapper(CompleteHumanTask.class, CompleteHumanTask::new);
@@ -55,7 +56,12 @@ public class CommandSerializer extends AkkaCaseObjectSerializer {
         addManifestWrapper(RevokeTask.class, RevokeTask::new);
         addManifestWrapper(SaveTaskOutput.class, SaveTaskOutput::new);
         addManifestWrapper(ValidateTaskOutput.class, ValidateTaskOutput::new);
+    }
+
+    private static void addProcessActorCommands() {
+        addManifestWrapper(StartProcess.class, StartProcess::new);
         addManifestWrapper(ResumeProcess.class, ResumeProcess::new);
+        addManifestWrapper(ReactivateProcess.class, ReactivateProcess::new);
         addManifestWrapper(SuspendProcess.class, SuspendProcess::new);
         addManifestWrapper(TerminateProcess.class, TerminateProcess::new);
     }

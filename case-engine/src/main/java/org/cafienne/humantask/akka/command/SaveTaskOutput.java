@@ -46,7 +46,7 @@ public class SaveTaskOutput extends WorkflowCommand {
 
 	@Override
     public void validate(HumanTask task) {
-		String currentTaskAssignee = task.getImplementation().getTaskAssignee();
+		String currentTaskAssignee = task.getImplementation().getAssignee();
 		if( currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty() ) {
 		    throw new InvalidCommandException("SaveTaskOutput: Output can be saved only for Assigned or Delegated task (" + task.getId() + ")");
 		}
@@ -62,7 +62,7 @@ public class SaveTaskOutput extends WorkflowCommand {
 
     @Override
     public HumanTaskResponse process(HumanTask task) {
-		task.addEvent(new HumanTaskOutputSaved(task, this.taskOutput)).updateState(task.getImplementation());
+		task.addEvent(new HumanTaskOutputSaved(task, this.taskOutput));
 		return new HumanTaskResponse(this);
 	}
 
