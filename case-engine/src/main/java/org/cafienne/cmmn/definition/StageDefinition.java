@@ -7,17 +7,17 @@
  */
 package org.cafienne.cmmn.definition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Stage;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class StageDefinition extends PlanFragmentDefinition {
     private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList<PlanItemDefinitionDefinition>(); // Only in the root stage
 
-    private boolean autoComplete = false;
+    private boolean autoComplete;
     private PlanningTableDefinition planningTable;
 
     public StageDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
@@ -77,7 +77,7 @@ public class StageDefinition extends PlanFragmentDefinition {
     }
 
     @Override
-    public Stage<?> createInstance(PlanItem planItem) {
-        return new Stage<StageDefinition>(planItem, this);
+    public Stage createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new Stage(id, index, itemDefinition, this, stage, caseInstance);
     }
 }

@@ -12,7 +12,7 @@ public class ExitCriterion extends Criterion {
     private final String targetPlanItemName;
     private final Transition targetTransition;
 
-    public ExitCriterion(Stage<?> stage, ExitCriterionDefinition definition) {
+    public ExitCriterion(Stage stage, ExitCriterionDefinition definition) {
         super(stage, definition);
         targetPlanItemName = definition.getTarget();
         targetTransition = Transition.Exit;

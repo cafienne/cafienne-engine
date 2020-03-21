@@ -7,9 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.instance.Milestone;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
 public class MilestoneDefinition extends PlanItemDefinitionDefinition {
@@ -18,8 +16,8 @@ public class MilestoneDefinition extends PlanItemDefinitionDefinition {
     }
 
     @Override
-    public Milestone createInstance(PlanItem planItem) {
-        return new Milestone(planItem, this);
+    public Milestone createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new Milestone(id, index, itemDefinition, this, stage);
     }
 
     @Override

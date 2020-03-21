@@ -95,7 +95,7 @@ class StateMachine {
                 target = getTarget(planItem.getHistoryState());
             }
             // Evaluate the guard (if any)
-            if (!planItem.getInstance().isTransitionAllowed(transition)) {
+            if (!planItem.isTransitionAllowed(transition)) {
                 return null;
             }
             return new PlanItemTransitioned(planItem, target.state, currentState, transition);
@@ -145,18 +145,18 @@ class StateMachine {
         EventMilestone.addTransition(Transition.ParentResume, State.Available, State.Suspended);
         EventMilestone.addTransition(Transition.ParentTerminate, State.Terminated, new State[] { State.Available, State.Suspended });
 
-        EventMilestone.setAction(State.Terminated, (PlanItem p, Transition t) -> p.getInstance().terminateInstance());
-        EventMilestone.setAction(State.Suspended, (PlanItem p, Transition t) -> p.getInstance().suspendInstance());
+        EventMilestone.setAction(State.Terminated, (PlanItem p, Transition t) -> p.terminateInstance());
+        EventMilestone.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
         EventMilestone.setAction(State.Available, (PlanItem p, Transition t) -> {
             if (t == Transition.Create) {
-                p.getInstance().createInstance();
-                if (p.getInstance() instanceof Milestone) {
+                p.createInstance();
+                if (p instanceof Milestone) {
                     p.evaluateRepetitionRule();
                     p.evaluateRequiredRule();
                     p.checkEntryCriteria(Transition.Occur);
                 }
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
-                p.getInstance().resumeInstance();
+                p.resumeInstance();
             }
         });
     }
@@ -183,7 +183,7 @@ class StateMachine {
 
         TaskStage.setAction(State.Available, (PlanItem p, Transition t) -> {
             p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Available' action for plan item " + p.getName());
-            p.getInstance().createInstance();
+            p.createInstance();
             p.evaluateRepetitionRule();
             p.evaluateRequiredRule();
 
@@ -194,33 +194,33 @@ class StateMachine {
         TaskStage.setAction(State.Active, (PlanItem p, Transition t) -> {
             p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Active' action for plan item " + p.getName());
             if (t == Transition.Start || t == Transition.ManualStart) {
-                p.getInstance().startInstance();
+                p.startInstance();
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
-                p.getInstance().resumeInstance();
+                p.resumeInstance();
             } else if (t == Transition.Reactivate) {
-                p.getInstance().reactivateInstance();
+                p.reactivateInstance();
             } else {
                 // Ignoring it...; but for now throw an exception to see if we ever run into this code.
                 throw new CommandException("FIRST TIME EXCEPTION: I am an unexpected transition on this stage/task");
             }
         });
         TaskStage.setAction(State.Enabled, (PlanItem p, Transition t) -> p.makeTransition(Transition.Start));
-        TaskStage.setAction(State.Suspended, (PlanItem p, Transition t) -> p.getInstance().suspendInstance());
+        TaskStage.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
         TaskStage.setAction(State.Completed, (PlanItem p, Transition t) -> {
             p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Completed' action for plan item " + p.getName());
-            p.getInstance().completeInstance();
+            p.completeInstance();
             if (p.getEntryCriteria().isEmpty()) {
                 p.repeat();
             }
         });
         TaskStage.setAction(State.Terminated, (PlanItem p, Transition t) -> {
             p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Terminated' action for plan item " + p.getName());
-            p.getInstance().terminateInstance();
+            p.terminateInstance();
             if (p.getEntryCriteria().isEmpty()) {
                 p.repeat();
             }
         });
-        TaskStage.setAction(State.Failed, (PlanItem p, Transition t) -> p.getInstance().failInstance());
+        TaskStage.setAction(State.Failed, (PlanItem p, Transition t) -> p.failInstance());
     }
 
     // State machine configuration for the case plan
@@ -235,16 +235,16 @@ class StateMachine {
         CasePlan.addTransition(Transition.Reactivate, State.Active, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended });
         CasePlan.addTransition(Transition.Close, State.Closed, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended });
 
-        CasePlan.setAction(State.Suspended, (PlanItem p, Transition t) -> p.getInstance().suspendInstance());
-        CasePlan.setAction(State.Completed, (PlanItem p, Transition t) -> p.getInstance().completeInstance());
-        CasePlan.setAction(State.Terminated, (PlanItem p, Transition t) -> p.getInstance().terminateInstance());
-        CasePlan.setAction(State.Failed, (PlanItem p, Transition t) -> p.getInstance().failInstance());
+        CasePlan.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
+        CasePlan.setAction(State.Completed, (PlanItem p, Transition t) -> p.completeInstance());
+        CasePlan.setAction(State.Terminated, (PlanItem p, Transition t) -> p.terminateInstance());
+        CasePlan.setAction(State.Failed, (PlanItem p, Transition t) -> p.failInstance());
         CasePlan.setAction(State.Active, (PlanItem p, Transition t) -> {
             if (t == Transition.Create) {
                 // Create plan items
-                p.getInstance().startInstance();
+                p.startInstance();
             } else {
-                p.getInstance().resumeInstance();
+                p.resumeInstance();
             }
         });
     }

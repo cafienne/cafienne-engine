@@ -10,10 +10,10 @@ package org.cafienne.cmmn.akka.command.task;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
-import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
@@ -70,38 +70,12 @@ public class CompleteTask extends CaseCommand {
             throw new InvalidCommandException("Invalid or missing task id");
         }
 
-        if (!(planItem.getInstance() instanceof Task<?>)) {
+        if (!(planItem instanceof Task)) {
             throw new InvalidCommandException("Invalid or missing task id");
         }
 
         // Set the task pointer.
-        task = planItem.getInstance();
-
-//        if (task instanceof HumanTask) {
-//            HumanTask task = planItem.getInstance();
-//            State currentState = task.getPlanItem().getState();
-//            if (currentState != State.Active) {
-//                throw new InvalidCommandException("CompleteTask: Action can not be completed as the task (" + taskId + ") is not in Active but in " + currentState + " state");
-//            }
-//
-//            String currentTaskAssignee = task.getWorkflowInteraction().getTaskAssignee();
-//            if (currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty()) {
-//                throw new InvalidCommandException("CompleteHumanTask: Only Assigned or Delegated task can be completed");
-//            }
-//
-//            String userId = getUser().id();
-//            if (!userId.equals(currentTaskAssignee)) {
-//                throw new InvalidCommandException("CompleteTask: Only the current task assignee (" + currentTaskAssignee + ") can complete the task (" + task.getId() + ")");
-//            }
-//
-//            TaskState currentTaskState = task.getWorkflowInteraction().getCurrentTaskState();
-//            if (!(currentTaskState == TaskState.Assigned || currentTaskState == TaskState.Delegated)) {
-//                throw new InvalidCommandException("CompleteHumanTask: Action can not be completed as the task (" + taskId + ") is in " + currentTaskState + " state, but should be in any of ["
-//                        + TaskState.Assigned + ", " + TaskState.Delegated + "] state");
-//            }
-//        } else {
-//            // TODO: Add validation for ProcessTask & CaseTask
-//        }
+        task = (Task) planItem;
     }
 
     @Override

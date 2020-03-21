@@ -7,10 +7,11 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.MilestoneDefinition;
 
-public class Milestone extends PlanItemDefinitionInstance<MilestoneDefinition> {
-    public Milestone(PlanItem planItem, MilestoneDefinition definition) {
-        super(planItem, definition, StateMachine.EventMilestone);
+public class Milestone extends PlanItem<MilestoneDefinition> {
+    public Milestone(String id, int index, ItemDefinition itemDefinition, MilestoneDefinition definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
 }

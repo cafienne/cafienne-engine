@@ -8,9 +8,9 @@ import org.cafienne.cmmn.instance.Transition;
 public class CasePlanExitCriterion extends ExitCriterion {
     private final PlanItem casePlan;
     
-    public CasePlanExitCriterion(Stage<?> stage, CasePlanExitCriterionDefinition definition) {
+    public CasePlanExitCriterion(Stage stage, CasePlanExitCriterionDefinition definition) {
         super(stage, definition);
-        this.casePlan = stage.getPlanItem();
+        this.casePlan = stage;
     }
     
     @Override

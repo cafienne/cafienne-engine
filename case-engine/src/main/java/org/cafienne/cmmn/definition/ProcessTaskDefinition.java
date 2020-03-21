@@ -7,8 +7,9 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.w3c.dom.Element;
 
@@ -32,8 +33,8 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
     }
 
     @Override
-    public ProcessTask createInstance(PlanItem planItem) {
-        return new ProcessTask(planItem, this);
+    public ProcessTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new ProcessTask(id, index, itemDefinition, this, stage);
     }
 
 	@Override

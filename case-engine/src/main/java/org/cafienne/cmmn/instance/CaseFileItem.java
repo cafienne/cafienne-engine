@@ -24,8 +24,6 @@ import java.util.Map.Entry;
 
 public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> {
 
-    private final static Logger logger = LoggerFactory.getLogger(CaseFileItem.class);
-
     private final List<CaseFileItemOnPart> connectedEntryCriteria = new ArrayList<>();
     private final List<CaseFileItemOnPart> connectedExitCriteria = new ArrayList<>();
 
@@ -111,7 +109,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         if (list.contains(onPart)) {
             return; // do not connect more than once
         }
-        PlanItem onPartStage = onPart.getSentry().getStage().getPlanItem();
+        Stage onPartStage = onPart.getSentry().getStage();
         int i = 0;
         // Iterate the list until we encounter an onPart that does not contain the new sentry.
         // TODO: examine this logic as it is copied from PlanItemOnPart. Can we do without?

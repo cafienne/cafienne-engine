@@ -7,8 +7,9 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.PlanItemDefinitionInstance;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
 
@@ -28,7 +29,7 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
         return defaultControl;
     }
 
-    public abstract PlanItemDefinitionInstance<?> createInstance(PlanItem planItem);
+    public abstract PlanItem createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance);
 
     /**
      * Returns the transition that is to be invoked on the plan item when one of the entry criteria sentries is satisfied

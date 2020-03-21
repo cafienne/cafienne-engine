@@ -24,7 +24,7 @@ public class ExitCriterionDefinition extends CriterionDefinition {
         return Transition.Exit;
     }
 
-    public ExitCriterion createInstance(Stage<?> stage) {
+    public ExitCriterion createInstance(Stage stage) {
         return new ExitCriterion(stage, this);
     }
 }

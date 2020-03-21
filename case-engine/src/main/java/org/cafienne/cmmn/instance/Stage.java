@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
 import org.cafienne.cmmn.definition.StageDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
@@ -33,13 +34,13 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     private final boolean autoCompletes; // This is the flag set in the definition.
     private boolean isManualCompletion = true; // This is a status keeping track of the cause of the attempt to complete (this info cannot be passed through the statemachine)
 
-    public Stage(PlanItem planItem, T definition) {
-        this(planItem, definition, StateMachine.TaskStage);
+    public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance) {
+        this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);
     }
 
-    protected Stage(PlanItem planItem, T definition, StateMachine stateMachine) {
-        super(planItem, definition, stateMachine);
-        this.autoCompletes = getDefinition().autoCompletes();
+    protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance, StateMachine stateMachine) {
+        super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
+        this.autoCompletes = definition.autoCompletes();
     }
 
     public EntryCriterion getEntryCriterion(EntryCriterionDefinition definition) {
@@ -60,6 +61,10 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         return (ExitCriterion) criterion;
     }
 
+    void register(PlanItem child) {
+        planItems.add(child);
+    }
+
     public Collection<PlanItem> getPlanItems() {
         return planItems;
     }
@@ -75,7 +80,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         this.isManualCompletion = false; // Now switch this flag. It is set back in
         if (this.isCompletionAllowed()) {
             addDebugInfo(() -> this + ": completing because of source transition " + child + "." + transition);
-            getPlanItem().makeTransition(Transition.Complete);
+            makeTransition(Transition.Complete);
         }
         this.isManualCompletion = true; // Now switch the flag back. Is only required if isCompletionAllowed returns false.
     }
@@ -155,23 +160,23 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         planItems.forEach(item -> item.beginLifecycle());
 
         // Create the child plan items and begin their life-cycle
-        getDefinition().getPlanItems().forEach(planItemDefinition -> {
-            int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(planItemDefinition.getDefinition().getName())).count()).intValue();
+        getDefinition().getPlanItems().forEach(itemDefinition -> {
+            int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(itemDefinition.getDefinition().getName())).count()).intValue();
 
             // Generate an id for the child item
             String childItemId = new Guid().toString();
-            getCaseInstance().addEvent(new PlanItemCreated(this, planItemDefinition, childItemId, index));
+            getCaseInstance().addEvent(new PlanItemCreated(this, itemDefinition, childItemId, index));
         });
     }
 
     @Override
     protected boolean hasDiscretionaryItems() {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
-        if (table != null && table.hasItems(this.getPlanItem())) {
+        if (table != null && table.hasItems(this)) {
             return true;
         }
         for (PlanItem child : getPlanItems()) {
-            if (child.getInstance().hasDiscretionaryItems()) {
+            if (child.hasDiscretionaryItems()) {
                 return true;
             }
         }
@@ -183,10 +188,10 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
         if (table != null) {
             addDebugInfo(() -> "Iterating planning table items in " + this);
-            table.evaluate(this.getPlanItem(), items);
+            table.evaluate(this, items);
         }
         // Now also retrieve discretionaries for our children
-        getPlanItems().forEach(p -> p.getInstance().retrieveDiscretionaryItems(items));
+        getPlanItems().forEach(p -> p.retrieveDiscretionaryItems(items));
     }
 
     @Override
@@ -247,14 +252,14 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         if (planItem == null) {
             return false;
         }
-        Stage<?> planItemsParent = planItem.getStage();
+        Stage planItemsParent = planItem.getStage();
         if (planItemsParent == null) {
             return false;
         }
         if (planItemsParent == this) {
             return true;
         }
-        return contains(planItemsParent.getPlanItem());
+        return contains(planItemsParent);
     }
 
     void plan(DiscretionaryItem discretionaryItem, String planItemId) {

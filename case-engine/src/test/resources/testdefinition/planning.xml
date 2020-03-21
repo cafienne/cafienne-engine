@@ -31,9 +31,7 @@
                         <repetitionRule id="cm_csQA1_10_repetitionRule">
                             <condition language="spel">
                                 <body>
-                                    <![CDATA[
-                                    true
-                                ]]>
+                                    <![CDATA[true]]>
                                 </body>
                             </condition>
                         </repetitionRule>
@@ -43,9 +41,7 @@
                 <applicabilityRule id="rule_csQA1_1" name="isValid">
                     <condition language="spel">
                         <body>
-                            <![CDATA[
-                            discretionaryItem.name=="Opnieuw T1" || (planItem.instance.planItems.?[name=='T2'].size() > 0 && planItem.instance.planItems.?[name=='T2'][0].state == T(org.cafienne.cmmn.instance.State).Active)
-                        ]]>
+                            <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.planItems.?[name=='T2'].size() > 0 && stage.planItems.?[name=='T2'][0].state == T(org.cafienne.cmmn.instance.State).Active)]]>
                         </body>
                     </condition>
                 </applicabilityRule>
@@ -57,9 +53,7 @@
                     <applicabilityRule id="rule_csQA1_0" name="isValid">
                         <condition language="spel">
                             <body>
-                                <![CDATA[
-                                        true
-                                    ]]>
+                                <![CDATA[true]]>
                             </body>
                         </condition>
                     </applicabilityRule>

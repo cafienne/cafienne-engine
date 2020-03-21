@@ -9,22 +9,16 @@ package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.definition.PlanItemDefinition;
-import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.util.Guid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
 public class PlanItemCreated extends PlanItemEvent {
-    private final static Logger logger = LoggerFactory.getLogger(PlanItemCreated.class);
-
     public final Instant createdOn;
     public final String createdBy;
     public final String planItemName;
@@ -40,21 +34,17 @@ public class PlanItemCreated extends PlanItemEvent {
         this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);
     }
 
-    public PlanItemCreated(Stage stage, DiscretionaryItemDefinition definition, String planItemId, int index) {
-        this(stage.getCaseInstance(), planItemId, definition.getName(), stage, definition.getPlanItemDefinition(), index);
-        this.isDiscretionary = true;
+    public PlanItemCreated(Stage stage, ItemDefinition definition, String planItemId, int index) {
+        this(stage.getCaseInstance(), planItemId, definition.getName(), stage, definition, index);
     }
 
-    public PlanItemCreated(Stage stage, PlanItemDefinition definition, String planItemId, int index) {
-        this(stage.getCaseInstance(), planItemId, definition.getName(), stage, definition.getPlanItemDefinition(), index);
-    }
-
-    private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage stage, PlanItemDefinitionDefinition definition, int index) {
-        super(caseInstance, planItemId, definition.getType(), index, 0);
+    private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage stage, ItemDefinition definition, int index) {
+        super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0);
         this.createdOn = Instant.now();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.planItemName = name;
         this.stageId = stage == null ? "" : stage.getId();
+        this.isDiscretionary = definition.isDiscretionary();
     }
 
     public PlanItemCreated(ValueMap json) {
@@ -79,7 +69,7 @@ public class PlanItemCreated extends PlanItemEvent {
     }
 
 
-    private PlanItem planItem;
+    private transient PlanItem planItem;
 
     @Override
     public void updateState(Case actor) {
@@ -90,7 +80,7 @@ public class PlanItemCreated extends PlanItemEvent {
     public void runBehavior() {
         if (planItem.getStage() == null) {
             planItem.beginLifecycle();
-        } else if (planItem.getStage().getPlanItem().getState() == State.Active) {
+        } else if (planItem.getStage().getState() == State.Active) {
             // Begin the lifecycle only if the state is active. Otherwise, the plan item will be started when the state becomes active.
             planItem.beginLifecycle();
         } else {

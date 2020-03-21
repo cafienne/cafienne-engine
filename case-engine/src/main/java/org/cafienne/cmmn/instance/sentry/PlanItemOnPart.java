@@ -16,8 +16,8 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem> {
-    private Collection<PlanItem> connectedPlanItems = new ArrayList<PlanItem>();
+public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
+    private Collection<PlanItem> connectedPlanItems = new ArrayList<>();
     private final Object standardEvent;
     private final String sourceName;
     private boolean isActive;

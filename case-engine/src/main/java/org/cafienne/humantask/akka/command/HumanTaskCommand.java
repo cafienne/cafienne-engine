@@ -48,14 +48,14 @@ public abstract class HumanTaskCommand extends CaseCommand {
             throw new InvalidCommandException(this.getClass().getSimpleName() + ": The task with id " + taskId + " could not be found in case " + caseInstance.getId());
         }
         // ... and validate that it's a human task
-        if (!(planItem.getInstance() instanceof HumanTask)) {
+        if (!(planItem instanceof HumanTask)) {
             throw new InvalidCommandException(this.getClass().getSimpleName() + ": The plan item with id " + planItem.getId() + " in case " + caseInstance.getId() + " is not a HumanTask");
         }
         // Good. It's a HumanTask
-        task = planItem.getInstance();
+        task = (HumanTask) planItem;
 
         // TODO: validate that this is a proper check (e.g. why could i not Delegate a suspended or failed task??)
-        State currentState = task.getPlanItem().getState();
+        State currentState = task.getState();
         if (currentState != State.Active) {
             throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be done because task " + planItem.getName() + " (" + taskId + ") is not in Active but in " + currentState + " state");
         }

@@ -7,13 +7,12 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.UserEvent;
-import org.w3c.dom.Element;
 
 public class UserEventDefinition extends PlanItemDefinitionDefinition {
     private final String authorizedRoleRefs;
@@ -39,8 +38,8 @@ public class UserEventDefinition extends PlanItemDefinitionDefinition {
         return authorizedRoles;
     }
 
-    public UserEvent createInstance(PlanItem planItem) {
-        return new UserEvent(planItem, this);
+    public UserEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new UserEvent(id, index, itemDefinition, this, stage);
     }
 
     @Override

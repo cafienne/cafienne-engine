@@ -9,16 +9,12 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PlanItemDefinition extends CMMNElementDefinition {
-    private final static Logger logger = LoggerFactory.getLogger(PlanItemDefinition.class);
-
+public class PlanItemDefinition extends CMMNElementDefinition implements ItemDefinition {
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();

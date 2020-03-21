@@ -49,12 +49,11 @@ public class TimerSet extends CaseEvent {
     @Override
     public void updateState(Case actor) {
         if (timerEvent == null) {
-            PlanItem planItem = actor.getPlanItemById(getTimerId());
-            if (planItem == null) {
+            timerEvent = actor.getPlanItemById(getTimerId());
+            if (timerEvent == null) {
                 logger.error("MAJOR ERROR: Cannot recover task timerEvent for task with id " + getTimerId() + ", because the plan item cannot be found");
                 return;
             }
-            timerEvent = planItem.getInstance();
         }
         timerEvent.updateState(this);
     }

@@ -7,9 +7,7 @@
  */
 package org.cafienne.cmmn.instance.task.humantask;
 
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
-import org.cafienne.cmmn.definition.HumanTaskDefinition;
-import org.cafienne.cmmn.definition.PlanningTableDefinition;
+import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -27,8 +25,8 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     private final WorkflowTask workflow;
     private final TaskOutputValidator validator;
 
-    public HumanTask(PlanItem planItem, HumanTaskDefinition definition) {
-        super(planItem, definition);
+    public HumanTask(String id, int index, ItemDefinition itemDefinition, HumanTaskDefinition definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage);
 
         // Create an instance of the output validator if we have one
         TaskOutputValidatorDefinition outputValidator = getDefinition().getTaskOutputValidator();
@@ -83,7 +81,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
     @Override
     protected void terminateInstance() {
-        if (getPlanItem().getHistoryState() == State.Available) {
+        if (getHistoryState() == State.Available) {
             addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
             addEvent(new HumanTaskTerminated(this));
@@ -111,7 +109,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     protected boolean hasDiscretionaryItems() {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
         if (table != null) {
-            return table.hasItems(this.getPlanItem());
+            return table.hasItems(this);
         }
         return false;
     }
@@ -121,7 +119,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
         if (table != null) {
             addDebugInfo(() -> "Iterating planning table items in " + this);
-            table.evaluate(this.getPlanItem(), items);
+            table.evaluate(this, items);
         }
     }
 

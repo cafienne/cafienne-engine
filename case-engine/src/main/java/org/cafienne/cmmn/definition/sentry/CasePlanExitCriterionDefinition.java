@@ -35,7 +35,7 @@ public class CasePlanExitCriterionDefinition extends ExitCriterionDefinition {
     }
 
     @Override
-    public CasePlanExitCriterion createInstance(Stage<?> stage) {
+    public CasePlanExitCriterion createInstance(Stage stage) {
         return new CasePlanExitCriterion(stage, this);
     }
 }

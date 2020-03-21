@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.cafienne.cmmn.definition.sentry.SentryDefinition;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.PlanItemDefinitionInstance;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     }
 
     @Override
-    public PlanItemDefinitionInstance<?> createInstance(PlanItem planItem) {
+    public PlanItem createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
         throw new RuntimeException("Not yet implemented");
     }
 

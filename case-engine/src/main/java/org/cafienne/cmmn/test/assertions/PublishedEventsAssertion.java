@@ -5,8 +5,6 @@ import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.filter.EventFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
  */
 public class PublishedEventsAssertion<E extends ModelEvent> {
     private final List<E> events;
-    private final static Logger logger = LoggerFactory.getLogger(PublishedEventsAssertion.class);
 
     public PublishedEventsAssertion(List<E> publishedEvents) {
         this.events = publishedEvents;

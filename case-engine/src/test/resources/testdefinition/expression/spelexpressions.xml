@@ -110,7 +110,7 @@
                         <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
                             <transformation language="spel">
                                 <body>
-                                    <![CDATA[task.planItem.name]]>
+                                    <![CDATA[task.name]]>
                                 </body>
                             </transformation>
                         </parameterMapping>
@@ -182,7 +182,7 @@ It takes the index to determine that there are not more than 3 outputs.
 
 Human Task input just wires the Content from the case file.
 The output of the task is put back into 'Output' case file item, but it is extended with two parameters
-referencing task.planItem.name and caseInstance.id
+referencing task.name and caseInstance.id
 Furthermore there can be an output of type &quot;SpecialOutput&quot; which is put in the &quot;Multi&quot; caseFileItem.
 
 The Milestone has various entry criteria with ifPart expressions, it responds to either:

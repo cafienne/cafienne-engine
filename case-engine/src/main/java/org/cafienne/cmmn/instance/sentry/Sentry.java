@@ -37,7 +37,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     /**
      * Stage that holds this sentry.
      */
-    private final Stage<?> stage;
+    private final Stage stage;
 
     /**
      * Criterion that holds this sentry.
@@ -49,7 +49,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      */
     private boolean isActive;
 
-    Sentry(Stage<?> stage, Criterion criterion) {
+    Sentry(Stage stage, Criterion criterion) {
         super(stage, criterion.getDefinition().getSentryDefinition());
         this.stage = stage;
         this.criterion = criterion;
@@ -77,7 +77,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
         inactiveOnParts.add(onPart);
 
         for (PlanItem planItem : getCaseInstance().getPlanItems()) {
-            if (onPartDefinition.getSource().equals(planItem.getDefinition())) {
+            if (onPartDefinition.getSource().equals(planItem.getItemDefinition())) {
                 connect(planItem, onPart);
             }
         }
@@ -110,7 +110,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      * @param planItem
      */
     public void connect(PlanItem planItem) {
-        PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getDefinition());
+        PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getItemDefinition());
         if (onPart != null) {
             connect(planItem, onPart);
         }
@@ -166,7 +166,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
         if (stage.contains(planItem)) {
             return true;
         }
-        if (planItem.getStage().contains(stage.getPlanItem())) {
+        if (planItem.getStage().contains(stage)) {
             return true;
         }
         return false;
@@ -231,12 +231,12 @@ public class Sentry extends CMMNElement<SentryDefinition> {
             String targetPlanItemName = criterion.getDefinition().getTarget();
             Transition targetTransition = criterion.getDefinition().getTransition();
             if (targetPlanItemName == null) {
-                sentryXML.setAttribute("target", stage.getDefinition().getName() + "." + targetTransition);
+                sentryXML.setAttribute("target", stage.getItemDefinition().getName() + "." + targetTransition);
             } else {
                 sentryXML.setAttribute("target", targetPlanItemName + "." + targetTransition);
             }
         } else {
-            sentryXML.setAttribute("stage", this.stage.getDefinition().getName());
+            sentryXML.setAttribute("stage", this.stage.getItemDefinition().getName());
         }
 
         this.onParts.forEach((d, onPart) -> {
@@ -275,7 +275,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      *
      * @return
      */
-    public Stage<?> getStage() {
+    public Stage getStage() {
         return stage;
     }
 

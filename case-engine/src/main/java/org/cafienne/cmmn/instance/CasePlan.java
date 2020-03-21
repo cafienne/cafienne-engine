@@ -18,8 +18,13 @@ import org.slf4j.LoggerFactory;
 public class CasePlan extends Stage<CasePlanDefinition> {
     private final static Logger logger = LoggerFactory.getLogger(CasePlan.class);
 
-    public CasePlan(PlanItem planItem, CasePlanDefinition definition) {
-        super(planItem, definition, StateMachine.CasePlan);
+    public CasePlan(String id, CasePlanDefinition definition, Case caseInstance) {
+        super(id, 0, definition, definition, null, caseInstance, StateMachine.CasePlan);
+        // We are the case plan, so make sure we connect the exit criteria
+        //  can be done only here, because collection is created in constructor of stage, and hence
+        //  not available in constructor of PlanItem
+        definition.getExitCriteria().forEach(c -> getExitCriteria().add(getExitCriterion(c)));
+        caseInstance.setCasePlan(this);
     }
 
     @Override

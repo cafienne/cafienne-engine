@@ -7,11 +7,12 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.processtask.definition.ProcessDefinition;
 import org.w3c.dom.Element;
 
 public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> {
@@ -80,8 +81,8 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     }
 
     @Override
-    public HumanTask createInstance(PlanItem planItem) {
-        return new HumanTask(planItem, this);
+    public HumanTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new HumanTask(id, index, itemDefinition, this, stage);
     }
 
     public PlanningTableDefinition getPlanningTable() {

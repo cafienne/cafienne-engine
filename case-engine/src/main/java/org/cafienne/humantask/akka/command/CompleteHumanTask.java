@@ -63,7 +63,7 @@ public class CompleteHumanTask extends WorkflowCommand {
         //   But todo: task can also be suspended from parent, in that case we have to invaliate this command as well....
 
 //        super.validate(modelActor);
-        State currentState = task.getPlanItem().getState();
+        State currentState = task.getState();
         if (currentState != State.Active) {
             throw new InvalidCommandException("CompleteTask: Action can not be completed as the task (" + getTaskId() + ") is not in Active but in " + currentState + " state");
         }

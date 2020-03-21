@@ -7,8 +7,9 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.task.cmmn.CaseTask;
-import org.cafienne.cmmn.instance.PlanItem;
 import org.w3c.dom.Element;
 
 public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
@@ -32,8 +33,8 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
     }
 
     @Override
-    public CaseTask createInstance(PlanItem planItem) {
-        return new CaseTask(planItem, this);
+    public CaseTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new CaseTask(id, index, itemDefinition, this, stage);
     }
 
 	@Override

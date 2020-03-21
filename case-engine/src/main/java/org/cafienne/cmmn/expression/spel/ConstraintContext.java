@@ -13,17 +13,14 @@ import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.CaseFileItemArray;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.sentry.Sentry;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 
 /**
  * A ConstraintContext provides named context to expressions that are executed
- * from within Constraints (see {@link ApplicabilityRuleContext}, {@link IfPartContext} and {@link ItemControlContext}).
+ * from within Constraints (see {@link ApplicabilityRuleContext}, {@link IfPartContext} and {@link PlanItemContext}).
  * Constraints can take a CaseFileItem as context, and the name of this CaseFileItem can be used in the expression.
  * <p></p>
  * Furthermore we have the following properties available:
@@ -73,19 +70,42 @@ class ConstraintContext<T extends ConstraintDefinition> extends ExpressionContex
 }
 
 /**
- * ItemControl is defined for Required rule, Repetition rule and Manual Activation rule.
- * These rules always execute on a PlanItem, hence the plan item is also provided as an
- * additional context, through <code>planItem</code>.
+ * Context of current plan item. Can be referred to by it's type (task, stage, milestone or event), or by plain "planitem".
+ * Used for evalution of item control rules (required, repetition, manual activation), and for
+ * custom HumanTask settings on Assignment and DueDate.
  */
-class ItemControlContext extends ConstraintContext<ConstraintDefinition> {
+class PlanItemContext<T extends ConstraintDefinition> extends ConstraintContext<T> {
     /**
      * The plan item on which this rule is executed
      */
     public final PlanItem planItem;
+    private final String planItemType;
 
-    protected ItemControlContext(ConstraintDefinition constraint, PlanItem planItem) {
+    protected PlanItemContext(T constraint, PlanItem planItem) {
         super(constraint, planItem.getCaseInstance());
         this.planItem = planItem;
+        this.planItemType =
+            planItem instanceof Task ? "task" : // It is either a Task (human-, process- or casetask, but in all cases "task")
+            planItem instanceof Stage ? "stage" : // or a Stage (caseplan or stage)
+            planItem instanceof Milestone ? "milestone" : // or a Milestone
+            "event"; // or an event listener (timer event, user event)
+    }
+
+    @Override
+    public boolean canRead(String propertyName) {
+        if  (propertyName.equalsIgnoreCase("planItem") || propertyName.equalsIgnoreCase(planItemType)) {
+            return true;
+        }
+        return super.canRead(propertyName);
+    }
+
+    @Override
+    public Value<?> read(String propertyName) {
+        if (propertyName.equalsIgnoreCase("planItem") || propertyName.equalsIgnoreCase(planItemType)) {
+            return Value.convert(planItem);
+        } else { // How on earth did we end up here???
+            return super.read(propertyName);
+        }
     }
 }
 
@@ -94,26 +114,19 @@ class ItemControlContext extends ConstraintContext<ConstraintDefinition> {
  * This context provides the additional information with the properties <code>planItem</code> and <code>discretionaryItem</code>.
  * <p>See {@link ApplicabilityRuleContext#planItem} and {@link ApplicabilityRuleContext#discretionaryItem}
  */
-class ApplicabilityRuleContext extends ConstraintContext<ApplicabilityRuleDefinition> {
-    /**
-     * The plan item (either Stage or HumanTask) on which the discretionary item is defined
-     */
-    public final PlanItem planItem;
+class ApplicabilityRuleContext extends PlanItemContext<ApplicabilityRuleDefinition> {
     /**
      * The definition of the discretionary item (can be used e.g. to fetch the name)
      */
     public final DiscretionaryItemDefinition discretionaryItem;
 
     protected ApplicabilityRuleContext(PlanItem planItem, DiscretionaryItemDefinition itemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
-        super(ruleDefinition, planItem.getCaseInstance());
-        this.planItem = planItem;
+        super(ruleDefinition, planItem);
         this.discretionaryItem = itemDefinition;
     }
 
     @Override
     public Value<?> read(String propertyName) {
-        if (propertyName.equals("planItem"))
-            return Value.convert(planItem);
         if (propertyName.equals("discretionaryItem"))
             return Value.convert(discretionaryItem);
         return super.read(propertyName);
@@ -138,38 +151,6 @@ class IfPartContext extends ConstraintContext<IfPartDefinition> {
     public Value<?> read(String propertyName) {
         if (propertyName.equals("sentry"))
             return Value.convert(sentry);
-        return super.read(propertyName);
-    }
-}
-
-class DueDateContext extends ConstraintContext<DueDateDefinition> {
-    public final HumanTask task;
-
-    protected DueDateContext(DueDateDefinition definition, HumanTask task) {
-        super(definition, task.getCaseInstance());
-        this.task = task;
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        if (propertyName.equals("task"))
-            return Value.convert(task);
-        return super.read(propertyName);
-    }
-}
-
-class AssignmentContext extends ConstraintContext<AssignmentDefinition> {
-    public final HumanTask task;
-
-    protected AssignmentContext(AssignmentDefinition definition, HumanTask task) {
-        super(definition, task.getCaseInstance());
-        this.task = task;
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        if (propertyName.equals("task"))
-            return Value.convert(task);
         return super.read(propertyName);
     }
 }

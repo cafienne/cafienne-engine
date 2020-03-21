@@ -7,21 +7,18 @@
  */
 package org.cafienne.cmmn.instance.task.process;
 
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ProcessTaskDefinition;
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.processtask.akka.command.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProcessTask extends Task<ProcessTaskDefinition> {
-    private final static Logger logger = LoggerFactory.getLogger(ProcessTask.class);
-
-    public ProcessTask(PlanItem planItem, ProcessTaskDefinition definition) {
-        super(planItem, definition);
+    public ProcessTask(String id, int index, ItemDefinition itemDefinition, ProcessTaskDefinition definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage);
     }
 
     @Override
@@ -58,7 +55,7 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
 
     @Override
     protected void terminateInstance() {
-        if (getPlanItem().getHistoryState() == State.Available) {
+        if (getHistoryState() == State.Available) {
             addDebugInfo(() -> "Terminating process task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
             tell(new TerminateProcess(getCaseInstance().getCurrentUser(), getId()));

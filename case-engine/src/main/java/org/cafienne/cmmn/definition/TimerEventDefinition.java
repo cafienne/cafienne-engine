@@ -7,13 +7,12 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.w3c.dom.Element;
+
 import java.time.Duration;
 import java.time.Instant;
-
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.TimerEvent;
-import org.cafienne.cmmn.instance.Transition;
-import org.w3c.dom.Element;
 
 public class TimerEventDefinition extends PlanItemDefinitionDefinition {
     private final ExpressionDefinition timerExpression;
@@ -46,8 +45,8 @@ public class TimerEventDefinition extends PlanItemDefinitionDefinition {
     }
 
     @Override
-    public TimerEvent createInstance(PlanItem planItem) {
-        return new TimerEvent(planItem, this);
+    public TimerEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+        return new TimerEvent(id, index, itemDefinition, this, stage);
     }
 
     @Override

@@ -13,8 +13,9 @@ import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -26,8 +27,8 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     private final String subCaseId;
     private final Case mainCase;
 
-    public CaseTask(PlanItem planItem, CaseTaskDefinition definition) {
-        super(planItem, definition);
+    public CaseTask(String id, int index, ItemDefinition itemDefinition, CaseTaskDefinition definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage);
         subCaseId = getId(); // Our planitem id will also be the id of the subcase.
         mainCase = getCaseInstance();
     }
@@ -76,7 +77,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
             left -> goFault(new ValueMap("failure", left.toJson())),
             right -> {
                 if (!getDefinition().isBlocking()) {
-                    getPlanItem().makeTransition(Transition.Complete);
+                    makeTransition(Transition.Complete);
                 }
             });
     }

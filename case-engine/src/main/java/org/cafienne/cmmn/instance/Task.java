@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
@@ -25,15 +26,15 @@ import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefinitionInstance<D> {
+public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     private ValueMap taskInput = new ValueMap();
     private ValueMap implementationInput = new ValueMap();
 
     private ValueMap implementationOutput = new ValueMap();
     private ValueMap taskOutput = new ValueMap();
 
-    protected Task(PlanItem planItem, D definition) {
-        super(planItem, definition, StateMachine.TaskStage);
+    protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage stage) {
+        super(id, index, itemDefinition, definition, stage, StateMachine.TaskStage);
     }
 
     @Override
@@ -124,9 +125,9 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItemDefiniti
     }
 
     private void makeTransitionWithOutput(ValueMap rawOutputParameters, Transition transition) {
-        getPlanItem().prepareTransition(transition);
+        prepareTransition(transition);
         transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
-        getPlanItem().makeTransition(transition);
+        makeTransition(transition);
     }
 
     protected void transformInputParameters() {

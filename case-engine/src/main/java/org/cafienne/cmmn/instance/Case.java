@@ -42,7 +42,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * List of plan items in the case.
      */
-    private Collection<PlanItem> planItems = new ArrayList<PlanItem>();
+    private Collection<PlanItem> planItems = new ArrayList<>();
     /**
      * Pointer to the case file instance of the case.
      */
@@ -58,7 +58,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * Root level plan item of the case.
      */
-    private PlanItem casePlan;
+    private CasePlan casePlan;
 
     /**
      * Identifier of parent case that caused this case to start.
@@ -167,8 +167,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      * @param id
      * @return
      */
-    public PlanItem getPlanItemById(String id) {
-        return planItems.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    public <T extends PlanItem> T getPlanItemById(String id) {
+        return (T) planItems.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
     }
 
     /**
@@ -225,7 +225,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         return sentryNetwork;
     }
 
-    public void setCasePlan(PlanItem casePlan) {
+    void setCasePlan(CasePlan casePlan) {
         this.casePlan = casePlan;
     }
 
@@ -234,7 +234,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public PlanItem getCasePlan() {
+    public CasePlan getCasePlan() {
         return casePlan;
     }
 
@@ -259,7 +259,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     public Collection<DiscretionaryItem> getDiscretionaryItems() {
         addDebugInfo(() -> "Retrieving discretionary items of " + this);
         Collection<DiscretionaryItem> items = new ArrayList<DiscretionaryItem>();
-        getCasePlan().getInstance().retrieveDiscretionaryItems(items);
+        getCasePlan().retrieveDiscretionaryItems(items);
         addDebugInfo(() -> {
             StringBuilder itemsString = new StringBuilder();
             items.forEach(item -> itemsString.append("\n\t" + item.getDefinition() + " in " + item.getParentId()));

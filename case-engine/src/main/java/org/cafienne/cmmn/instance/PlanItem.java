@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,8 +9,6 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.plan.*;
 import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
@@ -23,99 +21,127 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class PlanItem extends CMMNElement<PlanItemDefinition> {
+public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> {
     private final static Logger logger = LoggerFactory.getLogger(PlanItem.class);
 
+    /**
+     * Unique identifier of the plan item, typically a guid
+     */
     private final String id;
+    /**
+     * If the plan item repeats, each item has 1 higher index (0, 1, 2, ...)
+     */
+    private final int index;
+    /**
+     * Name of the plan item, taken from the ItemDefinition
+     */
     private final String name;
+    /**
+     * Type of plan item, taken from the PlanItemDefinitionDefinition (HumanTask, Stage, CaseTask, Milestone, etc)
+     */
     private final String type;
+    /**
+     * Stage to which this plan item belongs (null for CasePlan)
+     */
+    private final Stage stage;
+    /**
+     * The actual plan item definition (or discretionary item definition, or caseplan definition).
+     */
+    private final ItemDefinition itemDefinition;
+    /**
+     * State machine that executes behavior
+     */
+    private final StateMachine stateMachine;
+
+    /**
+     * Outgoing criteria (i.e., for plan items interested in our transitions)
+     */
+    private final List<PlanItemOnPart> connectedEntryCriteria = new ArrayList<PlanItemOnPart>();
+    private final List<PlanItemOnPart> connectedExitCriteria = new ArrayList<PlanItemOnPart>();
+    /**
+     * Our entry and exit criteria (i.e., to plan items and case file items of interest to us)
+     */
+    private final Collection<EntryCriterion> entryCriteria = new ArrayList<>();
+    private final Collection<ExitCriterion> exitCriteria = new ArrayList<>();
+    /**
+     * Whether we repeat or not
+     */
     private boolean repetitionRuleOutcome;
+    /**
+     * Whether we are required
+     */
     private boolean requiredRuleOutcome;
+    /**
+     * Current state machine state and last transition and history state.
+     */
     private Transition lastTransition = Transition.None;
     private State state = State.Null;
     private State historyState = State.Null;
+    /**
+     * Number of PlanItem events we have generated
+     */
     private int planItemEventCounter = 0; // Akka event sequence number
-    private int index;
-
-    private Stage<?> stage;
-    private PlanItemDefinitionInstance<?> instance;
-    private StateMachine stateMachine; // State machine that executes our behavior
-    private final List<PlanItemOnPart> connectedEntryCriteria = new ArrayList<PlanItemOnPart>();
-    private final List<PlanItemOnPart> connectedExitCriteria = new ArrayList<PlanItemOnPart>();
-    private final Collection<EntryCriterion> entryCriteria = new ArrayList<>();
-    private final Collection<ExitCriterion> exitCriteria = new ArrayList<>();
-
-    private DiscretionaryItemDefinition def; // Yilk, this is ugly. Need to come up with something better!
 
     /**
-     * Constructor for adding discretionary items to the plan
+     * Creates a PlanItem within the Case based on the information in the event.
+     * @param caseInstance
+     * @param event
+     * @return
      */
-    private PlanItem(String id, DiscretionaryItemDefinition definition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
-        this(id, definition.getName(), definition.getEntryCriteria(), definition.getExitCriteria(), null, definition, reference, caseInstance, owningStage, index);
-    }
-
-    /**
-     * Constructor for adding plan items to the plan
-     */
-    private PlanItem(String id, PlanItemDefinition definition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
-        this(id, definition.getName(), definition.getEntryCriteria(), definition.getExitCriteria(), definition, null, reference, caseInstance, owningStage, index);
-    }
-
-    /**
-     * Constructor for adding case plan
-     */
-    private PlanItem(String id, CasePlanDefinition reference, Case caseInstance) {
-        this(id, reference.getName(), null, reference.getExitCriteria(), null, null, reference, caseInstance, null, 0);
-    }
-
-    public static PlanItem create(Case actor, PlanItemCreated event) {
+    public static PlanItem create(Case caseInstance, PlanItemCreated event) {
         String stageId = event.getStageId();
         if (stageId.isEmpty()) {
-            CasePlanDefinition definition = actor.getDefinition().getCasePlanModel();
-            PlanItem planItem = new PlanItem(event.planItemId, definition, actor);
-            actor.setCasePlan(planItem);
-            return planItem;
+            CasePlanDefinition definition = caseInstance.getDefinition().getCasePlanModel();
+            return definition.createInstance(event.planItemId, 0, definition, null, caseInstance);
         } else {
             // Lookup the stage to which the plan item belongs,
             // then lookup the definition for the plan item
             // and then instantiate it.
-            PlanItem owningPlanItem = actor.getPlanItemById(stageId);
-            if (owningPlanItem == null) {
+            Stage<?> stage = caseInstance.getPlanItemById(stageId);
+            if (stage == null) {
                 logger.error("MAJOR ERROR: we cannot find the stage with id " + stageId + ", and therefore cannot recover plan item " + event);
                 return null;
             }
 
-            Stage<?> stage = owningPlanItem.getInstance();
-            PlanItemDefinition definition = stage.getDefinition().getPlanItem(event.planItemName);
+            ItemDefinition itemDefinition = stage.getDefinition().getPlanItem(event.planItemName);
             // If definition == null, try to see if it's a discretionaryItem
-            if (definition == null) {
-                DiscretionaryItemDefinition diDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
-                if (diDefinition == null) {
+            if (itemDefinition == null) {
+                itemDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
+                if (itemDefinition == null) {
                     logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.getStageId() + ", and therefore cannot recover plan item " + event);
                 }
-                PlanItemDefinitionDefinition reference = diDefinition.getPlanItemDefinition();
-                return new PlanItem(event.planItemId, diDefinition, reference, actor, stage, event.index);
-            } else {
-                PlanItemDefinitionDefinition reference = definition.getPlanItemDefinition();
-                return new PlanItem(event.planItemId, definition, reference, actor, stage, event.index);
             }
+
+            PlanItemDefinitionDefinition reference = itemDefinition.getPlanItemDefinition();
+            return reference.createInstance(event.getPlanItemId(), event.getIndex(), itemDefinition, stage, caseInstance);
         }
     }
 
-    private PlanItem(String id, String name, Collection<EntryCriterionDefinition> definedEntryCriteria, Collection<ExitCriterionDefinition> definedExitCriteria, PlanItemDefinition planItemDefinition,
-                     DiscretionaryItemDefinition discretionaryDefinition, PlanItemDefinitionDefinition reference, Case caseInstance, Stage<?> owningStage, int index) {
-        super(caseInstance, planItemDefinition);
+    protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, StateMachine stateMachine) {
+        this(id, index, itemDefinition, definition, parent.getCaseInstance(), parent, stateMachine);
+    }
+
+    /**
+     * Constructor for CasePlan (and Stages also use it)
+     * @param id
+     * @param index
+     * @param itemDefinition
+     * @param definition
+     * @param caseInstance
+     * @param parent
+     * @param stateMachine
+     */
+    protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage parent, StateMachine stateMachine) {
+        super(caseInstance, definition);
         this.id = id;
-        this.def = discretionaryDefinition;
-        this.stage = owningStage;
-        this.name = name;
-        this.type = reference.getType();
+        this.itemDefinition = itemDefinition;
+        this.stage = parent;
+        this.name = itemDefinition.getName();
+        this.type = definition.getType();
         this.index = index;
+        this.stateMachine = stateMachine;
 
         addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (stage == null ? " in case" : " in "+stage));
-
-        // Create our typed instance (task / stage / milestone / eventlistener)
-        this.instance = reference.createInstance(this);
 
         // Register at case level
         getCaseInstance().registerPlanItem(this);
@@ -123,17 +149,15 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         // Now connect to the rest of the network of plan items and sentries
         if (stage != null) {
             // Register with parent stage
-            stage.getPlanItems().add(this);
+            stage.register(this);
 
             // Link ourselves to any existing sentries in the case
             getCaseInstance().getSentryNetwork().connect(this);
 
-            // Create new sentries within the case to which we will react
-            definedEntryCriteria.forEach(c -> entryCriteria.add(stage.getEntryCriterion(c)));
-            definedExitCriteria.forEach(c -> exitCriteria.add(stage.getExitCriterion(c)));
-        } else { // We are the case plan, so make sure we connect the exit criteria
-            CasePlan casePlan = getInstance();
-            definedExitCriteria.forEach(c -> exitCriteria.add(casePlan.getExitCriterion(c)));
+            // Create new sentries within the case to which we will react;
+            // Case Plan has to do this himself.
+            itemDefinition.getEntryCriteria().forEach(c -> entryCriteria.add(stage.getEntryCriterion(c)));
+            itemDefinition.getExitCriteria().forEach(c -> exitCriteria.add(stage.getExitCriterion(c)));
         }
     }
 
@@ -156,52 +180,13 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         if (list.contains(onPart)) {
             return; // do not connect more than once
         }
-        PlanItem onPartStage = onPart.getSentry().getStage().getPlanItem();
+        Stage onPartStage = onPart.getSentry().getStage();
         int i = 0;
         // Iterate the list until we encounter an onPart that does not contain the new sentry.
         while (i < list.size() && list.get(i).getSentry().getStage().contains(onPartStage)) {
             i++;
         }
         list.add(i, onPart);
-    }
-
-    /**
-     * Returns the (database) identifier for this plan item.
-     *
-     * @return
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Returns the name of the plan item.
-     *
-     * @return
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the typed instance for this plan item (e.g., a HumanTask, a Stage, a Milestone, etc.) The type is cast to the generic for ease of coding
-     *
-     * @return
-     */
-    public <T extends PlanItemDefinitionInstance<?>> T getInstance() {
-        // For convenience of callers we are doing the cast
-        @SuppressWarnings("unchecked")
-        T typedInstance = (T) instance;
-        return typedInstance;
-    }
-
-    /**
-     * Returns the stage to which this plan item belongs.
-     *
-     * @return
-     */
-    public Stage<?> getStage() {
-        return stage;
     }
 
     /**
@@ -263,7 +248,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         }
         PlanItemTransitioned event = stateMachine.transition(this, transition);
         if (event != null) { // means, a transition happened.
-            addDebugInfo(() -> this + ".StateMachine makes transition: " + event);
+            addDebugInfo(() -> this + ".StateMachine allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
             getCaseInstance().addEvent(event);
         } else {
             addDebugInfo(() -> this + ".StateMachine: transition " + transition + " has no effect, current state remains " + getState());
@@ -306,21 +291,8 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         return ++planItemEventCounter;
     }
 
-    /**
-     * Returns the plan item type, e.g. CaseTask, Stage, UserEvent, etc.
-     *
-     * @return
-     */
-    public String getType() {
-        return type;
-    }
-
     public boolean repeats() {
         return repetitionRuleOutcome;
-    }
-
-    void setStateMachine(StateMachine stateMachine) {
-        this.stateMachine = stateMachine;
     }
 
     /**
@@ -345,7 +317,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * Evaluates the repetition rule on the plan item. Typically done when the plan item goes into Active state
      */
     void evaluateRepetitionRule() {
-        boolean repeats = getPlanItemControl().getRepetitionRule().evaluate(this);
+        boolean repeats = itemDefinition.getPlanItemControl().getRepetitionRule().evaluate(this);
         getCaseInstance().addEvent(new RepetitionRuleEvaluated(this, repeats));
     }
 
@@ -353,7 +325,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * Evaluates the required rule on the plan item. Typically done when the plan item goes into Active state
      */
     void evaluateRequiredRule() {
-        boolean required = getPlanItemControl().getRequiredRule().evaluate(this);
+        boolean required = itemDefinition.getPlanItemControl().getRequiredRule().evaluate(this);
         getCaseInstance().addEvent(new RequiredRuleEvaluated(this, required));
     }
 
@@ -362,15 +334,8 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * resulted in true, Start when it resulted in false.
      */
     Transition evaluateManualActivationRule() {
-        boolean manualActivation = getPlanItemControl().getManualActivationRule().evaluate(this);
+        boolean manualActivation = itemDefinition.getPlanItemControl().getManualActivationRule().evaluate(this);
         return manualActivation ? Transition.Enable : Transition.Start;
-    }
-
-    ItemControlDefinition getPlanItemControl() {
-        if (def != null) {
-            return def.getPlanItemControl();
-        }
-        return getDefinition().getPlanItemControl();
     }
 
     /**
@@ -390,7 +355,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         addDebugInfo(() -> this + ": initiating repeat logic for next item");
 
         // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
-        if (getStage().getPlanItem().getState() != State.Active) {
+        if (getStage().getState() != State.Active) {
             // The stage that contains us is no longer active. So we will not prepare any repeat item.
             // This code is typically invoked if the the stage terminates or completes, causing the repeating element to terminate.
             addDebugInfo(() -> this + ": not repeating because stage is not active " + getName());
@@ -401,7 +366,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat() ");
         evaluateRepetitionRule();
         if (repeats()) {
-            if (getDefinition() == null) {
+            if (itemDefinition.isDiscretionary()) {
                 // Means we are discretionary, and adding to the plan must be done manually
                 return;
             }
@@ -409,8 +374,12 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
             String repeatItemId = new Guid().toString();
             // Create a new plan item
             addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
-            getCaseInstance().addEvent(new PlanItemCreated(stage, getDefinition(), repeatItemId, index + 1));
+            getCaseInstance().addEvent(new PlanItemCreated(stage, itemDefinition, repeatItemId, index + 1));
         }
+    }
+
+    public ItemDefinition getItemDefinition() {
+        return itemDefinition;
     }
 
     /**
@@ -420,7 +389,7 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      * @param transition
      */
     void checkEntryCriteria(Transition transition) {
-        addDebugInfo(() -> this + ": dhecking EntryCriteria in " + getName() + " with transition " + transition);
+        addDebugInfo(() -> this + ": checking EntryCriteria in " + getName() + " with transition " + transition);
         if (getEntryCriteria().size() == 0) { // No entry criteria means get started immediately
             addDebugInfo(() -> this + ": no EntryCriteria found, making transition " + transition);
             makeTransition(transition);
@@ -490,54 +459,21 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
         this.planItemEventCounter = event.getSequenceNumber();
     }
 
-    @Override
-    public String toString() {
-        return type + "[" + getName() + "." + index + "]";
+    /**
+     * Returns the id of the instance (which is the plan item id).
+     *
+     * @return
+     */
+    public String getId() {
+        return id;
     }
 
-    public void dumpMemoryStateToXML(Element parentElement) {
-        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
-        parentElement.appendChild(planItemXML);
-        planItemXML.setAttribute("_id", this.getId());
-        planItemXML.setAttribute("name", this.getName());
-        if (repeats() || index > 0) {
-            planItemXML.setAttribute("index", "" + index);
-        }
-
-        // Print the repeat attribute if there is a repetition rule defined for this plan item.
-        if (getDefinition() != null && !getPlanItemControl().getRepetitionRule().isDefault()) {
-            planItemXML.setAttribute("repeat", "" + repeats());
-        }
-
-        planItemXML.setAttribute("state", "" + this.getState());
-        planItemXML.setAttribute("transition", "" + this.getLastTransition());
-        planItemXML.setAttribute("history", "" + this.getHistoryState());
-
-        // Let instance append it's information.
-        instance.dumpMemoryStateToXML(planItemXML);
-
-        if (!getEntryCriteria().isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
-            for (EntryCriterion criterion : getEntryCriteria()) {
-                criterion.dumpMemoryStateToXML(planItemXML, true);
-            }
-        }
-        if (!getExitCriteria().isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
-            for (ExitCriterion criterion : getExitCriteria()) {
-                criterion.dumpMemoryStateToXML(planItemXML, true);
-            }
-        }
-
-        if (!connectedEntryCriteria.isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed before stage completion check "));
-            connectedEntryCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
-        }
-
-        if (!connectedExitCriteria.isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed after stage completion check "));
-            connectedExitCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
-        }
+    /**
+     * Returns the name of the instance (which is the plan item name).
+     * @return
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -547,5 +483,76 @@ public class PlanItem extends CMMNElement<PlanItemDefinition> {
      */
     public int getIndex() {
         return index;
+    }
+
+    /**
+     * Returns the plan item type, e.g. CaseTask, Stage, UserEvent, etc.
+     *
+     * @return
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Returns the stage to which this plan item belongs.
+     *
+     * @return
+     */
+    public Stage getStage() {
+        return stage;
+    }
+
+    public String toString() {
+        return type + "[" + getName() + "." + index + "]";
+    }
+
+    /**
+     * Default Guard implementation for an intended transition on the plan item. Typical implementation inside a Stage to check whether completion is allowed, or in HumanTask to check whether the
+     * current user has sufficient roles to e.g. complete a task.
+     *
+     * @param transition - The transition that the plan item is about to undergo
+     * @return
+     */
+    protected boolean isTransitionAllowed(Transition transition) {
+        return true;
+    }
+
+    protected void createInstance() {
+    }
+
+    protected void completeInstance() {
+    }
+
+    protected void terminateInstance() {
+    }
+
+    protected void startInstance() {
+    }
+
+    protected void suspendInstance() {
+    }
+
+    protected void resumeInstance() {
+    }
+
+    protected void reactivateInstance() {
+    }
+
+    protected void failInstance() {
+    }
+
+    protected void dumpMemoryStateToXML(Element planItemXML) {
+    }
+
+    protected void retrieveDiscretionaryItems(Collection<DiscretionaryItem> items) {
+    }
+
+    /**
+     * Indicates whether discretionary items are available for planning (applicable only for Stages and HumanTasks)
+     * @return false if it is a milestone or eventlistener
+     */
+    protected boolean hasDiscretionaryItems() {
+        return false;
     }
 }

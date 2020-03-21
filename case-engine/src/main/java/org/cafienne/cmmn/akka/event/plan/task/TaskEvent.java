@@ -23,7 +23,7 @@ public abstract class TaskEvent<T extends Task> extends CaseEvent {
     protected TaskEvent(T task) {
         super(task.getCaseInstance());
         this.taskId = task.getId();
-        this.type = task.getPlanItem().getType();
+        this.type = task.getType();
     }
 
     protected TaskEvent(ValueMap json) {
@@ -33,12 +33,10 @@ public abstract class TaskEvent<T extends Task> extends CaseEvent {
     }
 
     protected T getTask() {
-        PlanItem planItem = actor.getPlanItemById(getTaskId());
-        if (planItem == null) {
+        T task = actor.getPlanItemById(getTaskId());
+        if (task == null) {
             logger.error("MAJOR ERROR: Cannot recover task event for task with id " + getTaskId() + ", because the plan item cannot be found");
-            return null;
         }
-        T task = planItem.getInstance();
         return task;
     }
 

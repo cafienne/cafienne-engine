@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DiscretionaryItemDefinition extends TableItemDefinition {
+public class DiscretionaryItemDefinition extends TableItemDefinition implements ItemDefinition {
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
@@ -59,6 +59,11 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
 
     public Collection<ExitCriterionDefinition> getExitCriteria() {
         return exitCriteria;
+    }
+
+    @Override
+    public boolean isDiscretionary() {
+        return true;
     }
 
     @Override
@@ -113,7 +118,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
     private boolean isAlreadyPlanned(PlanItem containingPlanItem) {
         // Go through all plan items in the containing stage, check if there is one with our name
         // and then check if it is not repeating. If not, then there is one, and we cannot add more, so then we are "already planned".
-        Stage<?> containingStage = containingPlanItem.getInstance() instanceof Stage<?> ? containingPlanItem.getInstance() : containingPlanItem.getStage();
+        Stage containingStage = containingPlanItem instanceof Stage ? (Stage) containingPlanItem : containingPlanItem.getStage();
         Collection<PlanItem> currentPlanItemsInStage = containingStage.getPlanItems();
         for (PlanItem planItem : currentPlanItemsInStage) {
             if (planItem.getName().equals(this.getName())) {
@@ -127,7 +132,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition {
     }
 
     @Override
-    public Element dumpMemoryStateToXML(Element parentElement, Stage<?> stage) {
+    public Element dumpMemoryStateToXML(Element parentElement, Stage stage) {
         Element discretionaryXML = parentElement.getOwnerDocument().createElement("discretionaryItem");
 
         discretionaryXML.setAttribute("name", getName());
