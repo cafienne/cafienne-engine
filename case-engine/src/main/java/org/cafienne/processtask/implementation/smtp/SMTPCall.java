@@ -64,6 +64,9 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
 
         // Set mail properties based on process definition
         Properties mailServerProperties = new Properties();
+        String port = definition.getSMTPPort();
+        String mailServer = definition.getSMTPServer();
+
         mailServerProperties.put("mail.smtp.port", definition.getSMTPPort());
 
         // Generate mail to send
@@ -120,15 +123,19 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
 
         // Setup connection and send mail
         try {
+            processTaskActor.addDebugInfo(() -> "Connecting to port " + port +" on mail server " + mailServer);
+            long now = System.currentTimeMillis();
             Transport transport = mailSession.getTransport("smtp");
-            transport.connect(definition.getSMTPServer(), "", "");
+            transport.connect(mailServer, "", "");
             transport.sendMessage(mailMessage, mailMessage.getAllRecipients());
             transport.close();
+            processTaskActor.addDebugInfo(() -> "Completed sending email in " + (System.currentTimeMillis() - now) + " milliseconds");
         } catch (NoSuchProviderException ex) {
             // we should never get here since provider is set hardcoded to "smtp"
             raiseFault(new RuntimeException("No such provider", ex));
             return;
         } catch (MessagingException mex) {
+            processTaskActor.addDebugInfo(() -> "Unable to process and send SMTP message", mex);
             raiseFault(new RuntimeException("Unable to process and send SMTP message", mex));
             return;
         }
@@ -155,18 +162,23 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
 
         // Set mail content / body
         String body = definition.getMailBody().resolveParameters(processInputParameters).toString();
+        processTaskActor.addDebugInfo(() -> "Setting message body to " + body);
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart.setContent(body, definition.getMailBodyType());
         multipart.addBodyPart(messageBodyPart);
 
         // Add the attachments if any
+        processTaskActor.addDebugInfo(() -> "Adding " + definition.getAttachments().size() +" attachments");
         for (Attachment attachment : definition.getAttachments()) {
             BodyPart attachmentPart = new MimeBodyPart();
             String content = attachment.getContent().resolveParameters(processInputParameters).toString();
+
             DataSource source = new ByteArrayDataSource(Base64.getDecoder().decode(content), "application/octet-stream");
             attachmentPart.setDataHandler(new DataHandler(source));
-            attachmentPart.setFileName(attachment.getName().resolveParameters(processInputParameters).toString());
+            String fileName = attachment.getName().resolveParameters(processInputParameters).toString();
+            attachmentPart.setFileName(fileName);
             multipart.addBodyPart(attachmentPart);
+            processTaskActor.addDebugInfo(() -> "Added attachment '" + fileName + "' of length " + content.length() + " bytes");
         }
 
         mailMessage.setContent(multipart);

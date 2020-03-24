@@ -7,17 +7,17 @@
  */
 package org.cafienne.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class StringTemplate {
 
     private final String sourceString;
-    private StrSubstitutor strSubstitutor;
+    private StringSubstitutor strSubstitutor;
 
     public StringTemplate(String string) {
         this.sourceString = string;
@@ -45,7 +45,7 @@ public class StringTemplate {
     }
 
     public StringTemplate resolveParameters(ValueMap processInputParameters) {
-        this.strSubstitutor = new StrSubstitutor(processInputParameters.getValue());
+        this.strSubstitutor = new StringSubstitutor(processInputParameters.getValue());
         return this;
     }
 }
