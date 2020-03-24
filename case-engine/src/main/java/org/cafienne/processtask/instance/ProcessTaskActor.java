@@ -88,11 +88,12 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
 
         addEvent(new ProcessCompleted(this, processOutputParameters));
 
-        askCase(new CompleteTask(this, processOutputParameters), failure -> {
-            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
-        }, success -> {
-            addDebugInfo(() -> "Completed process task " + getId() + " " + name + " in parent");
-        });
+        askCase(new CompleteTask(this, processOutputParameters),
+            failure -> {
+                addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
+                logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
+            },
+            success -> addDebugInfo(() -> "Completed process task " + getId() + " '" + name + "' in parent " + parentActorId));
     }
 
     public void failed(ValueMap processOutputParameters) {

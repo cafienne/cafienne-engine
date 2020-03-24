@@ -11,4 +11,5 @@ abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelC
     protected ValidMessageHandler(A actor, M msg) {
         super(actor, msg, msg.getUser());
     }
+
 }
