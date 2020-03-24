@@ -20,7 +20,7 @@
 <!--    <logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG"/>-->
     <!--<logger name="slick.jdbc.JdbcBackend.statementAndParameter" level="DEBUG"/>-->
     <!--<logger name="slick.jdbc.JdbcBackend.parameter" level="DEBUG"/>-->
-    <logger name="org.flywaydb" level="DEBUG"/>
+    <logger name="org.flywaydb" level="INFO"/>
     <root level="INFO">
         <appender-ref ref="console"/>
     </root>
