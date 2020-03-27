@@ -45,31 +45,29 @@
             </sentry>
             <humanTask id="pid_cm_csdZm_17" name="HumanTask" isBlocking="true">
                 <inputs id="inTP_cm_csTql_4_3" name="HumanTaskInput" bindingRef="cfi_csdZm_0"/>
-                <inputs id="inTP_cm_csTql_4_4" name="Assignee"/>
-                <inputs id="inTP_cm_csTql_4_5" name="DueDate"/>
                 <outputs id="outTP_cm_csTql_4_3" name="TaskOutput" bindingRef="cfi_csY4k_2"/>
                 <outputs id="outTP_cm_csTql_4_4" name="TaskName" bindingRef="cfi_csvwt_4"/>
                 <outputs id="outTP_cm_csTql_4_5" name="CaseID" bindingRef="cfi_csvwt_2"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="SpelExpressionsTask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="expression/spelexpressionstask.humantask">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="SpelExpressionsTask" description="" humanTaskRef="expression/spelexpressionstask.humantask">
                         <input id="_f5oP_HumanTaskInput" name="HumanTaskInput"/>
                         <output id="_9oOB_TaskOutput" name="Output"/>
                         <output id="_x59I_SpecialOutput" name="SpecialOutput"/>
                         <task-model/>
-                        <assignment id="_nTPPc_3" name="Assignment_0">
-                            <condition id="_nTPPc_4" name="Expression_0" language="spel">
-                                <body>
-                                    <![CDATA[user.id]]>
-                                </body>
-                            </condition>
-                        </assignment>
-                        <duedate id="_nTPPc_6" name="DueDate_0">
-                            <condition id="_nTPPc_7" name="Expression_1" language="spel">
+                        <duedate id="_lRFiK_5">
+                            <condition id="_lRFiK_6" language="spel">
                                 <body>
                                     <![CDATA[T(java.time.Instant).now()]]>
                                 </body>
                             </condition>
                         </duedate>
+                        <assignment id="_lRFiK_12">
+                            <condition id="_lRFiK_13" language="spel">
+                                <body>
+                                    <![CDATA[user.id]]>
+                                </body>
+                            </condition>
+                        </assignment>
                         <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
                         <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
                         <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
@@ -143,6 +141,11 @@
             <CMMNShape cmmnElementRef="_lRFiK_0">
                 <Bounds x="494" y="168" width="12" height="20"/>
             </CMMNShape>
+            <textbox cmmnElementRef="_lRFiK_shape_7" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Note: Stage must be activated prior to Milestone.
+This order can be determined in CasePlan properties.
+Otherwise testcase will not work.">
+                <Bounds x="140" y="330" width="330" height="100"/>
+            </textbox>
             <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_lRFiK_2"/>
             <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_lRFiK_1">
                 <waypoint x="274" y="250"/>

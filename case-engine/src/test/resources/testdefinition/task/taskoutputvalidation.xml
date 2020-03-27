@@ -24,48 +24,68 @@
                 <entryCriterion id="_qgYaQ_25" name="EntryCriterion_0" sentryRef="crit__qgYaQ_0"/>
             </planItem>
             <planItem id="pi_pt__qgYaQ_0" name="AssertMockServiceIsRunning" definitionRef="pt__qgYaQ_0"/>
-            <sentry id="crit__qgYaQ_0" name="Sentry_0">
-                <planItemOnPart id="_qgYaQ_27" name="PlanItemOnPart_0" sourceRef="pi_pt__qgYaQ_0">
+            <planItem id="pi_ht__qgYaQ_1" name="HumanTask2" definitionRef="ht__qgYaQ_1"/>
+            <planItem id="pi_ht__qgYaQ_2" name="HumanTask_0" definitionRef="ht__qgYaQ_2"/>
+            <sentry id="crit__qgYaQ_0">
+                <planItemOnPart id="_qgYaQ_27" sourceRef="pi_pt__qgYaQ_0">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
             <humanTask id="ht__qgYaQ_0" name="HumanTask" isBlocking="true">
                 <inputs id="_qgYaQ_7" name="DueDate" bindingRef="_qgYaQ_0"/>
-                <inputs id="_qgYaQ_9" name="Assignee"/>
-                <inputs id="_qgYaQ_11" name="Owner"/>
-                <inputs id="_qgYaQ_13" name="Content"/>
                 <inputs id="_qgYaQ_18" name="TaskInputParameter"/>
+                <inputs id="_qgYaQ_9" name="Owner"/>
                 <outputs id="_qgYaQ_15" name="TaskOutputParameter" bindingRef="_qgYaQ_5">
                     <extensionElements mustUnderstand="false">
                         <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
                     </extensionElements>
                 </outputs>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="humanTaskTest" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
-                        <input id="_DdDX_DueDate" name="DueDate"/>
-                        <input id="_jg3q_Assignee" name="Assignee"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
                         <input id="_ydL3_Owner" name="Owner"/>
                         <input id="_67M8_Content" name="Content"/>
                         <output id="_DtOu_Decision" name="Decision"/>
                         <task-model> { "JSONSchema" : "Some schema in here" }</task-model>
-                        <parameterMapping id="_qgYaQ_8" name="ParameterMapping_0" sourceRef="_qgYaQ_18" targetRef="_DdDX_DueDate">
-                            <transformation id="_qgYaQ_10" name="Expression_0" language="spel">
+                        <duedate id="_qgYaQ_10">
+                            <condition id="_qgYaQ_24" language="spel">
                                 <body>
                                     <![CDATA["2016-06-10T08:16:34.048792086Z"]]>
                                 </body>
-                            </transformation>
-                        </parameterMapping>
-                        <parameterMapping id="_qgYaQ_14" name="ParameterMapping_3" sourceRef="_qgYaQ_18" targetRef="_67M8_Content">
-                            <transformation id="_qgYaQ_12" name="Expression_1" language="spel">
+                            </condition>
+                        </duedate>
+                        <parameterMapping id="_qgYaQ_14" sourceRef="_qgYaQ_18" targetRef="_67M8_Content">
+                            <transformation id="_qgYaQ_12" language="spel">
                                 <body>
                                     <![CDATA[TaskInputParameter.Content]]>
                                 </body>
                             </transformation>
                         </parameterMapping>
-                        <parameterMapping id="_qgYaQ_16" name="ParameterMapping_4" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_15"/>
+                        <parameterMapping id="_qgYaQ_16" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_15"/>
+                        <parameterMapping id="_qgYaQ_11" sourceRef="_qgYaQ_9" targetRef="_ydL3_Owner"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
+            <humanTask id="ht__qgYaQ_1" name="HumanTask2" isBlocking="true">
+                <inputs id="_qgYaQ_50" name="Owner"/>
+                <inputs id="_qgYaQ_52" name="Content"/>
+                <outputs id="_qgYaQ_54" name="Decision">
+                    <extensionElements mustUnderstand="false">
+                        <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                    </extensionElements>
+                </outputs>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="" humanTaskRef="humanTaskTest.humantask">
+                        <input id="_ydL3_Owner" name="Owner"/>
+                        <input id="_67M8_Content" name="Content"/>
+                        <output id="_DtOu_Decision" name="Decision"/>
+                        <task-model> { "JSONSchema" : "Some schema in here" }</task-model>
+                        <parameterMapping id="_qgYaQ_51" sourceRef="_qgYaQ_50" targetRef="_ydL3_Owner"/>
+                        <parameterMapping id="_qgYaQ_53" sourceRef="_qgYaQ_52" targetRef="_67M8_Content"/>
+                        <parameterMapping id="_qgYaQ_55" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_54"/>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
+            <humanTask id="ht__qgYaQ_2" name="HumanTask_0" isBlocking="true"/>
             <processTask id="pt__qgYaQ_0" name="AssertMockServiceIsRunning" isBlocking="true" processRef="AssertMockServiceIsRunning.process">
                 <inputs id="_qgYaQ_28" name="httpPort" bindingRef="_qgYaQ_32"/>
                 <inputs id="_qgYaQ_34" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
@@ -74,9 +94,9 @@
                         <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
                     </extensionElements>
                 </outputs>
-                <parameterMapping id="_qgYaQ_31" name="ParameterMapping_6" sourceRef="_Wddw_responseCode" targetRef="_qgYaQ_30"/>
-                <parameterMapping id="_qgYaQ_33" name="ParameterMapping_7" sourceRef="_qgYaQ_34" targetRef="_FC9h_httpPort">
-                    <transformation id="_qgYaQ_41" name="Expression_3" language="spel">
+                <parameterMapping id="_qgYaQ_31" sourceRef="_Wddw_responseCode" targetRef="_qgYaQ_30"/>
+                <parameterMapping id="_qgYaQ_33" sourceRef="_qgYaQ_34" targetRef="_FC9h_httpPort">
+                    <transformation id="_qgYaQ_41" language="spel">
                         <body>
                             <![CDATA[HTTPConfig.port]]>
                         </body>
@@ -123,16 +143,26 @@
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__qgYaQ_0">
-                <Bounds x="20" y="20" width="800" height="500"/>
+                <Bounds x="20" y="20" width="730" height="470"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__qgYaQ_0">
-                <Bounds x="420" y="110" width="100" height="60"/>
+                <Bounds x="420" y="110" width="160" height="60"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_pt__qgYaQ_0">
                 <Bounds x="100" y="100" width="190" height="80"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="_qgYaQ_25">
                 <Bounds x="414" y="130" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__qgYaQ_1">
+                <Bounds x="420" y="320" width="160" height="60"/>
+            </CMMNShape>
+            <textbox cmmnElementRef="_qgYaQ_shape_4" parentId="cm__qgYaQ_0" content="HumanTask has a custom web service validator
+HumanTask2 has default validation and a mandatory output parameter">
+                <Bounds x="160" y="220" width="450" height="60"/>
+            </textbox>
+            <CMMNShape cmmnElementRef="pi_ht__qgYaQ_2">
+                <Bounds x="150" y="320" width="100" height="60"/>
             </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="pi_pt__qgYaQ_0" targetCMMNElementRef="_qgYaQ_25"/>
         </CMMNDiagram>

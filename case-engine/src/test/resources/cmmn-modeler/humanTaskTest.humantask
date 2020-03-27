@@ -1,7 +1,5 @@
 <humantask>
-    <cafienne:implementation xmlns:cafienne="org.cafienne" name="humanTaskTest" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition">
-        <input id="_DdDX_DueDate" name="DueDate"/>
-        <input id="_jg3q_Assignee" name="Assignee"/>
+    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="humanTaskTest" description="">
         <input id="_ydL3_Owner" name="Owner"/>
         <input id="_67M8_Content" name="Content"/>
         <output id="_DtOu_Decision" name="Decision"/>

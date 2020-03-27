@@ -12,35 +12,24 @@
                 </caseFileItem>
             </children>
         </caseFileItem>
-        <caseFileItem id="_kBPkc_25" multiplicity="ExactlyOne"/>
     </caseFileModel>
     <casePlanModel id="cm__kBPkc_0" name="TestHumanTask" autoComplete="true">
         <planItem id="pi_ht__kBPkc_0" name="HumanTask" definitionRef="ht__kBPkc_0"/>
         <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true">
             <inputs id="_kBPkc_7" name="DueDate" bindingRef="_kBPkc_0"/>
-            <inputs id="_kBPkc_9" name="Assignee"/>
-            <inputs id="_kBPkc_11" name="Owner"/>
-            <inputs id="_kBPkc_13" name="Content"/>
             <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
             <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask">
-                    <parameterMapping id="_kBPkc_8" name="ParameterMapping_0" sourceRef="_kBPkc_18" targetRef="_DdDX_DueDate">
-                        <transformation id="_kBPkc_19" name="Expression_0" language="spel">
-                            <body>
-                                <![CDATA["2016-06-10T08:16:34.048792086Z"]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
-                    <parameterMapping id="_kBPkc_14" name="ParameterMapping_3" sourceRef="_kBPkc_18" targetRef="_67M8_Content">
-                        <transformation id="_kBPkc_20" name="Expression_1" language="spel">
+                    <parameterMapping id="_kBPkc_14" sourceRef="_kBPkc_18" targetRef="_67M8_Content">
+                        <transformation id="_kBPkc_20" language="spel">
                             <body>
                                 <![CDATA[TaskInputParameter.Content]]>
                             </body>
                         </transformation>
                     </parameterMapping>
-                    <parameterMapping id="_kBPkc_16" name="ParameterMapping_4" sourceRef="_DtOu_Decision" targetRef="_kBPkc_15">
-                        <transformation id="_kBPkc_21" name="Expression_2" language="spel">
+                    <parameterMapping id="_kBPkc_16" sourceRef="_DtOu_Decision" targetRef="_kBPkc_15">
+                        <transformation id="_kBPkc_21" language="spel">
                             <body>
                                 <![CDATA[Decision]]>
                             </body>

@@ -91,13 +91,6 @@
                         <output id="_9oOB_TaskOutput" name="Output"/>
                         <output id="_x59I_SpecialOutput" name="SpecialOutput"/>
                         <task-model/>
-                        <assignment id="_p61kw_5">
-                            <condition id="_p61kw_6" language="spel">
-                                <body>
-                                    <![CDATA[user.id]]>
-                                </body>
-                            </condition>
-                        </assignment>
                         <duedate id="_p61kw_7">
                             <condition id="_p61kw_8" language="spel">
                                 <body>
@@ -105,6 +98,13 @@
                                 </body>
                             </condition>
                         </duedate>
+                        <assignment id="_p61kw_5">
+                            <condition id="_p61kw_6" language="spel">
+                                <body>
+                                    <![CDATA[user.id]]>
+                                </body>
+                            </condition>
+                        </assignment>
                         <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
                         <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
                         <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
@@ -167,7 +167,7 @@
                 <Bounds x="489" y="160" width="12" height="20"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="_p61kw_2">
-                <Bounds x="469" y="200" width="12" height="20"/>
+                <Bounds x="464" y="200" width="12" height="20"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="_p61kw_3">
                 <Bounds x="519" y="200" width="12" height="20"/>
@@ -202,7 +202,7 @@ The Milestone has various entry criteria with ifPart expressions, it responds to
             <CMMNEdge sourceCMMNElementRef="_p61kw_1" targetCMMNElementRef="cm_csvwt_45"/>
             <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_p61kw_2">
                 <waypoint x="274" y="251"/>
-                <waypoint x="469" y="251"/>
+                <waypoint x="480" y="250"/>
             </CMMNEdge>
             <CMMNEdge sourceCMMNElementRef="cm_cs9mu_49" targetCMMNElementRef="_p61kw_3"/>
         </CMMNDiagram>
