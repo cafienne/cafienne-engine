@@ -49,6 +49,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                  */
                 if (assignee != null && !assignee.trim().isEmpty()) {
                     task.addEvent(new HumanTaskAssigned(task, assignee));
+                    task.addEvent(new HumanTaskOwnerChanged(task, assignee));
                 }
             } catch (Exception e) {
                 addDebugInfo(() -> "Failed to evaluate expression to assign task", e);
