@@ -14,6 +14,7 @@ import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
+import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.assertions.event.TaskOutputAssertion;
 import org.cafienne.humantask.akka.command.CompleteHumanTask;
 import org.junit.Test;
@@ -72,19 +73,48 @@ public class VariousSpelExpressions2 {
             CaseAssertion cp = new CaseAssertion(caseStarted);
             TestScript.debugMessage("Start of case: " + cp);
 
-            // Milestone must have occured, causing stage and task to be terminated
+            // Milestone must have occured, causing stage and task to be terminated;
+            //  But they must also have been active
+            testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active);
+            testCase.getEventListener().awaitPlanItemState("Stage", State.Active);
             testCase.getEventListener().awaitPlanItemState("HumanTask", State.Terminated);
             testCase.getEventListener().awaitPlanItemState("Stage", State.Terminated);
             testCase.getEventListener().awaitPlanItemState("Milestone", State.Completed);
+
+            PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
+            TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
+            if (startCaseEvents.getEvents().size() != 33) {
+                TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
+                        "CaseDefinitionApplied: 1\n" +
+                        "TeamMemberAdded: 1\n" +
+                        "CaseFileEvent: 1\n" +
+                        "PlanItemCreated: 4\n" +
+                        "PlanItemTransitioned: 10\n" +
+                        "RepetitionRuleEvaluated: 4\n" +
+                        "RequiredRuleEvaluated: 3\n" +
+                        "TaskInputFilled: 1\n" +
+                        "HumanTaskCreated: 1\n" +
+                        "HumanTaskActivated: 1\n" +
+                        "HumanTaskAssigned: 1\n" +
+                        "HumanTaskOwnerChanged: 1\n" +
+                        "HumanTaskDueDateFilled: 1\n" +
+                        "HumanTaskInputSaved: 1\n" +
+                        "HumanTaskTerminated: 1\n" +
+                        "CaseModified: 1\n");
+            }
+            caseStarted.getEvents().assertSize(33);
         });
 
         testCase.runTest();
     }
 
-
     @Test
-    public void testMilestoneTerminationOnDifferentInput_FAILS_BECAUSE_OF_DIFFERENT_PLAN_ORDER() {
+    public void testMilestoneTerminationOnDifferentInput_DIFFERENT_PLAN_ORDER_XML_SHOULD_NOT_HAVE_DIFFERENT_BEHAVIOR() {
         // NOTE: THIS TEST HAS A DIFFERENT DEFINITION, BUT THE ONLY DIFFERENCE IS THAT IT HAS A DIFFERENT ORDER OF THE XML INSIDE THE CASE PLAN
+
+        // See below old comments.
+        // This now has finally been fixed. Order or XML no longer relevant! Tests should have same output.
+
         // Subsequently, this test has a DIFFERENT outcome than the test written directly above here.
         // One can consider this a bug ...
         //  The "cause" of the "bug" is that the lifecycle of a stage (the caseplan) is started, and within that lifecycle all child plan items
@@ -98,10 +128,36 @@ public class VariousSpelExpressions2 {
             CaseAssertion cp = new CaseAssertion(caseStarted);
             TestScript.debugMessage("Start of case: " + cp);
 
-            // Milestone must have occured, causing stage and task to be terminated
+            // Milestone must have occured, causing stage and task to be terminated;
+            //  But they must also have been active
             testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active);
             testCase.getEventListener().awaitPlanItemState("Stage", State.Active);
+            testCase.getEventListener().awaitPlanItemState("HumanTask", State.Terminated);
+            testCase.getEventListener().awaitPlanItemState("Stage", State.Terminated);
             testCase.getEventListener().awaitPlanItemState("Milestone", State.Completed);
+
+            PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
+            TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
+            if (startCaseEvents.getEvents().size() != 33) {
+                TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
+                        "CaseDefinitionApplied: 1\n" +
+                        "TeamMemberAdded: 1\n" +
+                        "CaseFileEvent: 1\n" +
+                        "PlanItemCreated: 4\n" +
+                        "PlanItemTransitioned: 10\n" +
+                        "RepetitionRuleEvaluated: 4\n" +
+                        "RequiredRuleEvaluated: 3\n" +
+                        "TaskInputFilled: 1\n" +
+                        "HumanTaskCreated: 1\n" +
+                        "HumanTaskActivated: 1\n" +
+                        "HumanTaskAssigned: 1\n" +
+                        "HumanTaskOwnerChanged: 1\n" +
+                        "HumanTaskDueDateFilled: 1\n" +
+                        "HumanTaskInputSaved: 1\n" +
+                        "HumanTaskTerminated: 1\n" +
+                        "CaseModified: 1\n");
+            }
+            caseStarted.getEvents().assertSize(33);
         });
 
         testCase.runTest();
