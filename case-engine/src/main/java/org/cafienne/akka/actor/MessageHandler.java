@@ -135,7 +135,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
     private DebugEvent getDebugEvent() {
         if (debugEvent == null) {
             debugEvent = new DebugEvent(this.actor);
-            if (! actor.recoveryRunning()) {
+            if (actor.debugMode() && !actor.recoveryRunning()) {
                 events.add(debugEvent);
             }
         }
@@ -161,82 +161,30 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      */
     public void addDebugInfo(DebugStringAppender appender, Logger logger) {
         // First check whether at all we should add some message.
-        if (skipLogMessages()) {
-            return;
-        }
-
-        // First ensure log message is only generated once.
-        String logMessage = appender.debugInfo();
-
-        // In special develop/debug cases, we want to do indented logging to console.
-        //  This is particularly required because handling one ModelEvent may lead
-        //  to new ModelEvents that also need to be handled. IndentedLogging shows the stack.
-        if (indentedConsoleLoggingEnabled) {
-            debugIndentedConsoleLogging(logMessage);
-        }
-
-        // If running in debug mode, add an event.
-        if (actor.debugMode()) {
-            getDebugEvent().addMessage(logMessage);
-        }
-
-        // If Log4J is enabled in debug mode, we will also invoke the appender.
-        if (logger.isDebugEnabled()) {
-            logger.debug(logMessage);
+        if (logDebugMessages()) {
+            // Ensure log message is only generated once.
+            String logMessage = appender.debugInfo();
+            logger.debug(logMessage); // plain log4j
+            debugIndentedConsoleLogging(logMessage); // special dev indentation in console
+            getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
         }
     }
 
     public void addDebugInfo(DebugJsonAppender appender, Logger logger) {
-        // First check whether at all we should add some message.
-        if (skipLogMessages()) {
-            return;
-        }
-
-        // First ensure log message is only generated once.
-        Value json = appender.info();
-
-        // In special develop/debug cases, we want to do indented logging to console.
-        //  This is particularly required because handling one ModelEvent may lead
-        //  to new ModelEvents that also need to be handled. IndentedLogging shows the stack.
-        if (indentedConsoleLoggingEnabled) {
-            debugIndentedConsoleLogging(json);
-        }
-
-        // If running in debug mode, add an event.
-        if (actor.debugMode()) {
-            getDebugEvent().addMessage(json);
-        }
-
-        // If Log4J is enabled in debug mode, we will also invoke the appender.
-        if (logger.isDebugEnabled()) {
+        if (logDebugMessages()) {
+            Value json = appender.info();
             logger.debug(json.toString());
+            debugIndentedConsoleLogging(json);
+            getDebugEvent().addMessage(json);
         }
     }
 
     public void addDebugInfo(DebugExceptionAppender appender, Logger logger) {
-        // First check whether at all we should add some message.
-        if (skipLogMessages()) {
-            return;
-        }
-
-        // First ensure log message is only generated once.
-        Throwable t = appender.exceptionInfo();
-
-        // In special develop/debug cases, we want to do indented logging to console.
-        //  This is particularly required because handling one ModelEvent may lead
-        //  to new ModelEvents that also need to be handled. IndentedLogging shows the stack.
-        if (indentedConsoleLoggingEnabled) {
-            debugIndentedConsoleLogging(t);
-        }
-
-        // If running in debug mode, add an event.
-        if (actor.debugMode()) {
-            getDebugEvent().addMessage(t);
-        }
-
-        // If Log4J is enabled in debug mode, we will also invoke the appender.
-        if (logger.isDebugEnabled()) {
+        if (logDebugMessages()) {
+            Throwable t = appender.exceptionInfo();
             logger.debug(t.getMessage(), t);
+            debugIndentedConsoleLogging(t);
+            getDebugEvent().addMessage(t);
         }
     }
 
@@ -246,8 +194,8 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * method returns false, those interfaces are not invoked, in an attempt to improve runtime performance.
      * @return
      */
-    private boolean skipLogMessages() {
-        return ! (indentedConsoleLoggingEnabled || actor.debugMode() || logger.isDebugEnabled());
+    private boolean logDebugMessages() {
+        return indentedConsoleLoggingEnabled || actor.debugMode() || logger.isDebugEnabled();
     }
 
     /**
@@ -260,6 +208,8 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * Making package private so that EventBehaviorRunner can read it
      */
     final void debugIndentedConsoleLogging(Object object) {
+        if (! indentedConsoleLoggingEnabled) return;
+
         if (object instanceof Throwable) {
             // Print exception with newline before and after it. Will not be indented
             System.out.println("\n");

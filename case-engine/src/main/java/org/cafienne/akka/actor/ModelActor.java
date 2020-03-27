@@ -415,7 +415,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param response
      */
     public void reply(ModelResponse response) {
-        logger.debug("Sending response of type " + response.getClass().getSimpleName() + " from " + this);
+        if (logger.isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+            String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
+            logger.debug(msg);
+            currentMessageHandler.debugIndentedConsoleLogging(msg);
+        }
         sender().tell(response, self());
     }
 
@@ -427,25 +431,30 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param <T>
      */
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
-        StringBuilder msg = new StringBuilder();
-        events.forEach(e -> {
-            msg.append("\n\t");
-            if (e instanceof PlanItemEvent) {
-                msg.append(e.toString());
-            } else if (e instanceof CaseFileEvent) {
-                msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
-            } else {
-                msg.append(e.getClass().getSimpleName() + ", ");
-            }
-        });
-        logger.debug("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this + msg + "\n");
+        if (logger.isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+            StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
+            events.forEach(e -> {
+                msg.append("\n\t");
+                if (e instanceof PlanItemEvent) {
+                    msg.append(e.toString());
+                } else if (e instanceof CaseFileEvent) {
+                    msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
+                } else {
+                    msg.append(e.getClass().getSimpleName() + ", ");
+                }
+            });
+            logger.debug(msg + "\n");
+            currentMessageHandler.debugIndentedConsoleLogging(msg + "\n");
+        }
         if (events.isEmpty()) {
             return;
         }
         T lastEvent = events.get(events.size() - 1);
         persistAll(events, e -> {
             CaseSystem.health().writeJournal().isOK();
-            logger.debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
+            }
             if (e == lastEvent && response != null) {
                 reply(response);
             }
