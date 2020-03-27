@@ -56,6 +56,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * Reference to current command being processed by the ModelActor.
      */
     protected C currentCommand;
+    /**
+     * User context of current message
+     */
+    private TenantUser currentUser;
 
     /**
      * Flag indicating whether the model actor runs in debug mode or not
@@ -151,12 +155,16 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     /**
-     * Returns the user context of the current command (or event, when running in recovery mode)
+     * Returns the user context of the current command, event or response
      *
      * @return
      */
     public TenantUser getCurrentUser() {
-        return currentHandler().getUser();
+        return currentUser;
+    }
+
+    final void setCurrentUser(TenantUser user) {
+        this.currentUser = user;
     }
 
     /**
@@ -244,7 +252,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                 if (msg instanceof BootstrapCommand) {
                     this.tenant = ((BootstrapCommand) msg).tenant();
                 } else {
-                    return new NotConfiguredHandler(this, msg);
+                    return new NotConfiguredHandler(this, (ModelCommand) msg);
                 }
             }
             C command = (C) msg;
@@ -254,7 +262,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         } else if (msg instanceof ModelResponse) {
             if (tenant == null) {
                 // We cannot handle responses if we have not been properly initialized.
-                return new NotConfiguredHandler(this, msg);
+                return new NotConfiguredHandler(this, (ModelResponse) msg);
             }
             return createResponseHandler((ModelResponse) msg);
         } else {

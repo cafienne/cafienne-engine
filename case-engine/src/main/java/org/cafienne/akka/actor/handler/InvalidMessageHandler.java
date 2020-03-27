@@ -14,7 +14,7 @@ public class InvalidMessageHandler<C extends ModelCommand, E extends ModelEvent,
     private final static Logger logger = LoggerFactory.getLogger(InvalidMessageHandler.class);
 
     public InvalidMessageHandler(A actor, Object msg) {
-        super(actor, msg);
+        super(actor, msg, TenantUser.NONE());
     }
 
     @Override
@@ -43,8 +43,4 @@ public class InvalidMessageHandler<C extends ModelCommand, E extends ModelEvent,
         actor.persistEvents(events);
     }
 
-    @Override
-    protected TenantUser getUser() {
-        return null;
-    }
 }

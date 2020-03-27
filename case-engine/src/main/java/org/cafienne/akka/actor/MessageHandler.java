@@ -50,8 +50,9 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
 
     private DebugEvent debugEvent;
 
-    protected MessageHandler(A actor, M msg) {
+    protected MessageHandler(A actor, M msg, TenantUser user) {
         this.actor = actor;
+        this.actor.setCurrentUser(user);
         // Take a copy of the sender at the moment we start handling the message (for lifecycle safety).
         this.sender = actor.sender();
         this.msg = msg;
@@ -83,13 +84,6 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * Lifecycle method
      */
     abstract protected void complete();
-
-    /**
-     * Returns the TenantUser that has initiated this message. May return null (typically in the case of InvalidMessages).
-     *
-     * @return
-     */
-    abstract protected TenantUser getUser();
 
     /**
      * Adds an event generated while handling the incoming message

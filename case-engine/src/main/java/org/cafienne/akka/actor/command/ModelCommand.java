@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -18,7 +19,7 @@ import org.cafienne.util.Guid;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializable {
+public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializable, TenantUserMessage {
     protected final String msgId;
     public final String actorId;
     protected transient T actor;

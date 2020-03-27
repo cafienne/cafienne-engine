@@ -58,4 +58,9 @@ object TenantUser {
     if (!CaseSystem.isPlatformOwner(user.userId)) throw new SecurityException("Only platform owners can execute this type of command")
     TenantUser(user.userId, Seq(), tenantId, "", "", true)
   }
+
+  /**
+    * An empty TenantUser (can be used in invalid messages)
+    */
+  val NONE = TenantUser("", Seq(), "", "", "", false)
 }

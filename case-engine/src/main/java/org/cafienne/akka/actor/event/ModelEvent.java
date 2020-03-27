@@ -9,13 +9,14 @@ package org.cafienne.akka.actor.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
 
-public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializable {
+public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializable, TenantUserMessage {
     public static final String TAG = "cafienne";
     private final ValueMap json;
 
