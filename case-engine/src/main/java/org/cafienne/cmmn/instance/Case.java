@@ -269,15 +269,6 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     }
 
     /**
-     * Internal framework method to enable/disable debug mode
-     *
-     * @param debugMode
-     */
-    public void setDebugMode(boolean debugMode) {
-        this.debugMode = debugMode;
-    }
-
-    /**
      * Internal framework method to support Akka command handling and recovery
      */
     public void applyCaseDefinition(CaseDefinition definition, String parentCaseId, String rootCaseId) {

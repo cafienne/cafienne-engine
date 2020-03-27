@@ -60,7 +60,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    protected boolean debugMode = false;
+    private boolean debugMode = false;
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.
@@ -128,6 +128,17 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     @Override
     public String persistenceId() {
         return this.id;
+    }
+
+    /**
+     * Switch debug mode of the ModelActor.
+     * When debug mode is enabled, log messages will be added to a DebugEvent that is persisted upon handling
+     * an incoming message or recovery.
+     *
+     * @param debugMode
+     */
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
     }
 
     /**
