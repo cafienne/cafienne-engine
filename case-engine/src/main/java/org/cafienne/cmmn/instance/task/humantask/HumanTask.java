@@ -171,8 +171,8 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     @Override
-    protected void dumpMemoryStateToXML(Element planItemXML) {
-        super.dumpMemoryStateToXML(planItemXML);
+    protected void dumpImplementationToXML(Element planItemXML) {
+        super.dumpImplementationToXML(planItemXML);
 //        workflow.dumpMemoryStateToXML(planItemXML);
         CaseRoleDefinition performer = getPerformer();
         if (performer != null) {

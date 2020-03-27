@@ -231,7 +231,8 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     @Override
-    protected void dumpMemoryStateToXML(Element stageXML) {
+    protected void dumpImplementationToXML(Element stageXML) {
+        super.dumpImplementationToXML(stageXML);
         for (PlanItem child : planItems) {
             child.dumpMemoryStateToXML(stageXML);
         }

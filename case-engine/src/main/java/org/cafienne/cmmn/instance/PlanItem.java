@@ -507,6 +507,54 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         return type + "[" + getName() + "." + index + "]";
     }
 
+    protected void dumpImplementationToXML(Element planItemXML) {
+    }
+
+    protected void dumpMemoryStateToXML(Element parentElement) {
+        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
+        parentElement.appendChild(planItemXML);
+        planItemXML.setAttribute("_id", this.getId());
+        planItemXML.setAttribute("name", this.getName());
+        if (repeats() || index > 0) {
+            planItemXML.setAttribute("index", "" + index);
+        }
+
+        // Print the repeat attribute if there is a repetition rule defined for this plan item.
+        if (! (this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+            planItemXML.setAttribute("repeat", "" + repeats());
+        }
+
+        planItemXML.setAttribute("state", "" + this.getState());
+        planItemXML.setAttribute("transition", "" + this.getLastTransition());
+        planItemXML.setAttribute("history", "" + this.getHistoryState());
+
+        // Let instance append it's information.
+        dumpImplementationToXML(planItemXML);
+
+        if (!getEntryCriteria().isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
+            for (EntryCriterion criterion : getEntryCriteria()) {
+                criterion.dumpMemoryStateToXML(planItemXML, true);
+            }
+        }
+        if (!getExitCriteria().isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
+            for (ExitCriterion criterion : getExitCriteria()) {
+                criterion.dumpMemoryStateToXML(planItemXML, true);
+            }
+        }
+
+        if (!connectedEntryCriteria.isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed before stage completion check "));
+            connectedEntryCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
+        }
+
+        if (!connectedExitCriteria.isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed after stage completion check "));
+            connectedExitCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
+        }
+    }
+
     /**
      * Default Guard implementation for an intended transition on the plan item. Typical implementation inside a Stage to check whether completion is allowed, or in HumanTask to check whether the
      * current user has sufficient roles to e.g. complete a task.
@@ -540,9 +588,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void failInstance() {
-    }
-
-    protected void dumpMemoryStateToXML(Element planItemXML) {
     }
 
     protected void retrieveDiscretionaryItems(Collection<DiscretionaryItem> items) {
