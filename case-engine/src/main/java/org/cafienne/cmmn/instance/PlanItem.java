@@ -426,23 +426,38 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.lastTransition = event.getTransition();
     }
 
-    public void runBehavior(PlanItemTransitioned pit) {
-        Transition transition = pit.getTransition();
-        State newState = pit.getCurrentState();
-        State oldState = pit.getHistoryState();
-        addDebugInfo(() -> this + ": handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
+    public void runStateMachineAction(PlanItemTransitioned event) {
+        Transition transition = event.getTransition();
+        State newState = event.getCurrentState();
+        State oldState = event.getHistoryState();
+        addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
 
         // First execute the related state machine action (e.g., activating a timer, releasing a subprocess, suspending, etc.etc.)
         StateMachine.Action action = stateMachine.getAction(newState);
         action.execute(this, transition);
+    }
 
+    public void informConnectedEntryCriteria(PlanItemTransitioned event) {
         // Then inform the activating sentries
         connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
+    }
+
+    public void runStageCompletionCheck(PlanItemTransitioned event) {
+        Transition transition = event.getTransition();
+        State newState = event.getCurrentState();
+        State oldState = event.getHistoryState();
+        addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
 
         // Now check stage completion; but only if we're in semi terminal state (and of course if we are in a stage).
         if (stage != null && state.isSemiTerminal()) {
             stage.tryCompletion(this, transition);
         }
+    }
+
+    public void informConnectedExitCriteria(PlanItemTransitioned event) {
+        Transition transition = event.getTransition();
+        State newState = event.getCurrentState();
+        State oldState = event.getHistoryState();
 
         // Finally iterate the terminating sentries and inform them
         connectedExitCriteria.forEach(onPart -> onPart.inform(this));

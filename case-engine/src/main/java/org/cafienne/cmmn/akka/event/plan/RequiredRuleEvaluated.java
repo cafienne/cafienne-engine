@@ -37,7 +37,7 @@ public class RequiredRuleEvaluated extends PlanItemEvent {
     }
 
     @Override
-    public String toString() {
+    public String getDescription() {
         return getClass().getSimpleName() + "[" + getName() + "/" + getPlanItemId() + "]: REQUIRED = " + isRequired;
     }
 

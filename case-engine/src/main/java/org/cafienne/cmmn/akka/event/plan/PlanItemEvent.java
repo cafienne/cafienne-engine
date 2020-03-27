@@ -88,7 +88,7 @@ public abstract class PlanItemEvent extends CaseEvent {
     abstract protected void updatePlanItemState(PlanItem planItem);
 
     protected String getName() {
-        return planItem != null ? planItem.getName() : "PlanItem";
+        return planItem != null ? planItem.getName() + "." + getIndex() : "PlanItem";
     }
 
     /**

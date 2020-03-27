@@ -61,6 +61,11 @@ public class CaseFileEvent extends CaseEvent {
         return path + "->" + transition + " with value\n" + getValue() + "\n";
     }
 
+    @Override
+    public String getDescription() {
+        return this.getClass().getSimpleName() + "['" + path + "']." + getTransition().toString().toLowerCase() + "() ===> " + getState();
+    }
+
     /**
      * Returns the transition that the case file item went through.
      *
@@ -130,8 +135,18 @@ public class CaseFileEvent extends CaseEvent {
     }
 
     @Override
-    public void runBehavior() {
-        caseFileItem.runBehavior(this);
+    public boolean hasBehavior() {
+        return true;
+    }
+
+    @Override
+    public void runImmediateBehavior() {
+        caseFileItem.informConnectedEntryCriteria(this);
+    }
+
+    @Override
+    public void runDelayedBehavior() {
+        caseFileItem.informConnectedExitCriteria(this);
     }
 
     @Override

@@ -89,8 +89,32 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
     /**
      * Events can implement behavior to be run after the event has updated it's state.
      * This method will only be invoked when the model actor is not running in recovery mode.
+     * This method will be invoked immediately after the event has updated it's state.
+     * ImmediateBehavior in itself may also generate new events. If behavior must be executed
+     * after the immediate behavior of those new events is generated, then the method
+     * runDelayedBehavior can be implemented with it.
      */
-    public void runBehavior() {
+    public void runImmediateBehavior() {
+        // Default behavior is none
+    }
+
+    /**
+     * Override this method and return true if the ModelEvent subclass has
+     * particular implementations for {@link ModelEvent#runImmediateBehavior()} or {@link ModelEvent#runDelayedBehavior()}
+     *
+     * @return
+     */
+    public boolean hasBehavior() {
+        return false;
+    }
+
+    /**
+     * Events can implement behavior to be run after the event has updated it's state.
+     * This method will only be invoked when the model actor is not running in recovery mode.
+     * DelayedBehavior is executed after any events generated during immediate behavior have executed
+     * their immediate behavior
+     */
+    public void runDelayedBehavior() {
         // Default behavior is none
     }
 
@@ -111,5 +135,19 @@ public abstract class ModelEvent<M extends ModelActor> implements AkkaSerializab
         generator.writeFieldName(Fields.user.toString());
         tenantUser.write(generator);
         generator.writeEndObject();
+    }
+
+    /**
+     * Override this method to make a description of the event that is based on it's content.
+     * This method is invoked from toString().
+     * @return
+     */
+    public String getDescription() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public String toString() {
+        return getDescription();
     }
 }

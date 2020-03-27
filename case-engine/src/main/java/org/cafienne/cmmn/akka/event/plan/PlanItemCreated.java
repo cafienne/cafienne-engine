@@ -56,8 +56,8 @@ public class PlanItemCreated extends PlanItemEvent {
     }
 
     @Override
-    public String toString() {
-        return "PlanItemCreated [" + getType() +"-" + getPlanItemName() + "/" + getPlanItemId() +"]" + (getStageId().isEmpty() ? "" : " in stage " + getStageId());
+    public String getDescription() {
+        return "PlanItemCreated [" + getType() +"-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() +"]" + (getStageId().isEmpty() ? "" : " in stage " + getStageId());
     }
 
     public String getPlanItemName() {
@@ -68,7 +68,6 @@ public class PlanItemCreated extends PlanItemEvent {
         return stageId;
     }
 
-
     private transient PlanItem planItem;
 
     @Override
@@ -77,7 +76,12 @@ public class PlanItemCreated extends PlanItemEvent {
     }
 
     @Override
-    public void runBehavior() {
+    public boolean hasBehavior() {
+        return true;
+    }
+
+    @Override
+    public void runImmediateBehavior() {
         if (planItem.getStage() == null) {
             planItem.beginLifecycle();
         } else if (planItem.getStage().getState() == State.Active) {

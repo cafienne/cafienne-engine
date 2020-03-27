@@ -37,7 +37,7 @@ public class RepetitionRuleEvaluated extends PlanItemEvent {
     }
 
     @Override
-    public String toString() {
+    public String getDescription() {
         return getClass().getSimpleName() + "[" + getName() + "/" + getPlanItemId() + "]: REPEAT = " + isRepeating;
     }
 

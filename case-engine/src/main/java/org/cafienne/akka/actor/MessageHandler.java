@@ -94,30 +94,25 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         return addModelEvent(events.size(), event);
     }
 
-    private EventBehaviorRunner currentBehavior = null;
+    private EventBehaviorRunner currentBehavior = new EventBehaviorRunner(this);
     private boolean addingEvent = false;
 
     private <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
         events.add(index, event);
 
-        addDebugInfo(() -> "Added event "+ event.getClass().getSimpleName() + ". Updating actor state with it", logger);
+        addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);
         if (addingEvent) {
             // TODO: This is a print statement to show where the engine still runs old style
             if (indentedConsoleLoggingEnabled && !(event instanceof DebugEvent)) {
-                addDebugInfo(() -> new Exception("Adding event while updating state?!"), logger);
+//                addDebugInfo(() -> new Exception("Adding event while updating state?!"), logger);
+                addDebugInfo(() -> "Adding event while updating state?!", logger);
             }
         }
         addingEvent = true;
         event.updateState(actor);
         addingEvent = false;
         // Now run the behavior that comes with the event, if any
-        if (currentBehavior != null) {
-            currentBehavior.addEvent(event);
-        } else {
-            currentBehavior = new EventBehaviorRunner(this, event);
-            currentBehavior.start();
-            currentBehavior = null;
-        }
+        currentBehavior.pushEvent(event);
         return event;
     }
 

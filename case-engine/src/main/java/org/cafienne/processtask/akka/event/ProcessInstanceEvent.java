@@ -19,6 +19,11 @@ public abstract class ProcessInstanceEvent extends ModelEvent<ProcessTaskActor> 
     }
 
     @Override
+    public boolean hasBehavior() {
+        return true;
+    }
+
+    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
     }

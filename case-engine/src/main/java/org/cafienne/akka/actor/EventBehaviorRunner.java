@@ -11,81 +11,88 @@ class EventBehaviorRunner {
     private static final String SINGLE_INDENT = "  ";
 
     private final MessageHandler handler;
-    private final ModelEvent source;
-    private final int depth;
-    private final List<EventBehaviorRunner> runners = new ArrayList<>();
-    private EventBehaviorRunner currentRunner = this;
-    private String indent;
+    private Frame currentFrame = null;
+    private String indent = SINGLE_INDENT;
 
-    EventBehaviorRunner(MessageHandler handler, ModelEvent event) {
-        this(handler, event, 1);
-    }
-
-    EventBehaviorRunner(MessageHandler handler, ModelEvent event, int depth) {
+    EventBehaviorRunner(MessageHandler handler) {
         this.handler = handler;
-        this.source = event;
-        this.depth = depth;
-        this.indent = createIndent();
     }
 
-    private String createIndent() {
-        StringBuilder sb = new StringBuilder("");
-        for (int i=0; i<depth; i++) {
-            sb.append(SINGLE_INDENT);
+    void pushEvent(ModelEvent event) {
+        if (event.hasBehavior()) {
+            Frame frame = new Frame(event, currentFrame);
+            frame.runNow();
         }
-        return sb.toString();
-    }
-
-    void start() {
-        if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("\nExecuting behavior for " + sourceDescription() +"...");
-        indent = indent + " ";
-        source.runBehavior();
-        if (runners.size() > 0) {
-            if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("Completed top level behavior. Starting " + runners.size()+" behaviors at level ["+(depth+1)+"] for " + sourceDescription()+".");
-        }
-        runners.forEach(runner -> {
-            currentRunner = runner;
-            runner.start();
-        });
-        if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("...Finished run for " + sourceDescription());
-        currentRunner = this;
-    }
-
-    void addEvent(ModelEvent event) {
-//        oldApproach(event);
-        newApproach(event);
-    }
-
-    private void oldApproach(ModelEvent event) {
-        event.runBehavior();
-    }
-
-    private void newApproach(ModelEvent event) {
 //        internalLog("Putting handler for " + event.getClass().getSimpleName() + " one level deeper  (at level " +depth +"[" + sourceDescription()+ "])");
-        if (currentRunner == this) {
-            EventBehaviorRunner runner = new EventBehaviorRunner(handler, event, this.depth + 1);
-            if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("\nCreated " + runner);
-            runners.add(runner);
-        } else {
-            currentRunner.addEvent(event);
-        }
     }
 
     String getIndent() {
-        if (currentRunner == this) {
-            return indent;
-        } else {
-            return currentRunner.getIndent();
+        return indent;
+    }
+
+    private class Frame {
+        private final ModelEvent event;
+        private final Frame parent;
+        private final List<Frame> children = new ArrayList<>();
+        private final int depth;
+        private String mainIndent;
+        private String subIndent;
+
+        Frame(ModelEvent event, Frame parent) {
+            this.event = event;
+            this.parent = parent;
+            this.depth = parent == null ? 1 : parent.depth + 1;
+            this.mainIndent = createIndent();
+            this.subIndent = this.mainIndent + " ";
         }
-    }
 
-    private String sourceDescription() {
-        String sourceDescription = source instanceof PlanItemEvent || source instanceof CaseFileEvent ? source.toString() : source.getClass().getSimpleName();
-        return sourceDescription;
-    }
+        private String createIndent() {
+            StringBuilder sb = new StringBuilder("");
+            for (int i=0; i<depth; i++) {
+                sb.append(SINGLE_INDENT);
+            }
+            return sb.toString();
+        }
 
-    @Override
-    public String toString() {
-        return "EventBehaviorRunner[depth=" + depth + "]: " + sourceDescription();
+        void runNow() {
+            indent = this.mainIndent;
+            if (currentFrame == null) {
+                currentFrame = this;
+            }
+            if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("\n-------- " + this + "Running immmediate behavior for " + event.getDescription() );
+            indent = this.subIndent;
+            this.event.runImmediateBehavior();
+            indent = this.mainIndent;
+            if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("-------- " + this + "Finished immmediate behavior for " + event.getDescription() +"\n");
+            if (currentFrame == this) {
+                // Top level, immediately execute the delayed behavior
+                runLater();
+            } else {
+                // Postpone the execution of the delayed behavior
+                if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("* postponing delayed behavior for " + event.getDescription());
+                currentFrame.children.add(this);
+            }
+        }
+
+        void runLater() {
+            currentFrame = this;
+            indent = this.mainIndent;
+            if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("\n******** " + this + "Running delayed behavior for " + event.getDescription());
+            indent = subIndent;
+            event.runDelayedBehavior();
+            if (children.size() > 0) {
+                if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging(this + "Loading " + children.size()+" nested frames at level ["+(depth+1)+"] as a consequence of " + event.getDescription());
+            }
+            children.forEach(frame -> frame.runLater());
+            indent = mainIndent;
+            if (handler.indentedConsoleLoggingEnabled) handler.debugIndentedConsoleLogging("******** " + this + "Completed delayed behavior for " + event.getDescription());
+            currentFrame = parent;
+            indent = parent != null ? parent.mainIndent : "";
+        }
+
+        @Override
+        public String toString() {
+            return "StackFrame[" + depth + "]: ";
+        }
     }
 }
