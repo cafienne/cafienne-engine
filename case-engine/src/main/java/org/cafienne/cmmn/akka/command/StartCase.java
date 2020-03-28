@@ -162,7 +162,9 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         caseInstance.setInputParameters(inputParameters);
 
         // Now trigger the Create transition on the case plan, to make the case actually go running
-        caseInstance.addEvent(new PlanItemCreated(caseInstance));
+        PlanItemCreated pic = new PlanItemCreated(caseInstance);
+        caseInstance.addEvent(pic);
+        caseInstance.addEvent(pic.createStartEvent());
 
         ValueMap json = new ValueMap();
         json.put("caseInstanceId", new StringValue(caseInstance.getId()));

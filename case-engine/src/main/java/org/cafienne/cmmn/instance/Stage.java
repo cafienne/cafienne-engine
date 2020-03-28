@@ -153,7 +153,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     @Override
     protected void startInstance() {
         // First start the discretionary items that have already been planned.
-        planItems.forEach(item -> item.beginLifecycle());
+        planItems.forEach(item -> item.makeTransition(Transition.Create));
 
         // Create the child plan items and begin their life-cycle
         getDefinition().getPlanItems().forEach(itemDefinition -> {
@@ -161,7 +161,9 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
             // Generate an id for the child item
             String childItemId = new Guid().toString();
-            getCaseInstance().addEvent(new PlanItemCreated(this, itemDefinition, childItemId, index));
+            PlanItemCreated pic = new PlanItemCreated(this, itemDefinition, childItemId, index);
+            getCaseInstance().addEvent(pic);
+            getCaseInstance().addEvent(pic.createStartEvent());
         });
     }
 
@@ -262,6 +264,12 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     void plan(DiscretionaryItem discretionaryItem, String planItemId) {
         int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(discretionaryItem.getDefinition().getName())).count()).intValue();
 
-        getCaseInstance().addEvent(new PlanItemCreated(this, discretionaryItem.getDefinition(), planItemId, index));
+        PlanItemCreated pic = new PlanItemCreated(this, discretionaryItem.getDefinition(), planItemId, index);
+        getCaseInstance().addEvent(pic);
+        if (this.getState() == State.Active) {
+            // Only generate a start transition for the new discretionary item if this stage is active.
+            //  Otherwise the start transition will be generated when this stage becomes active.
+            getCaseInstance().addEvent(pic.createStartEvent());
+        }
     }
 }

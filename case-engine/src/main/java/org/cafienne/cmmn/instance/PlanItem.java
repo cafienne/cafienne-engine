@@ -190,14 +190,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Starts the plan item's lifecycle (basically triggers Transition.Create)
-     */
-    public void beginLifecycle() {
-        addDebugInfo(() -> this + ": starting lifecycle");
-        makeTransition(Transition.Create);
-    }
-
-    /**
      * Tries to set a lock for the next transition
      *
      * @param transition
@@ -374,7 +366,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             String repeatItemId = new Guid().toString();
             // Create a new plan item
             addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
-            getCaseInstance().addEvent(new PlanItemCreated(stage, itemDefinition, repeatItemId, index + 1));
+            PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
+            getCaseInstance().addEvent(pic);
+            getCaseInstance().addEvent(pic.createStartEvent());
         }
     }
 

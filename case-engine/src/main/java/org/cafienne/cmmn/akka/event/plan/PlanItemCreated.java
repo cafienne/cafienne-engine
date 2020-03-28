@@ -24,10 +24,12 @@ public class PlanItemCreated extends PlanItemEvent {
     public final String planItemName;
     public final String stageId;
 
-    private transient boolean isDiscretionary = false;
-
     public enum Fields {
         name, stageId, createdOn, createdBy
+    }
+
+    public PlanItemTransitioned createStartEvent() {
+        return new PlanItemTransitioned(this.planItem, stageId.isEmpty() ? State.Active : State.Available, State.Null, Transition.Create);
     }
 
     public PlanItemCreated(Case caseInstance) {
@@ -44,7 +46,6 @@ public class PlanItemCreated extends PlanItemEvent {
         this.createdBy = caseInstance.getCurrentUser().id();
         this.planItemName = name;
         this.stageId = stage == null ? "" : stage.getId();
-        this.isDiscretionary = definition.isDiscretionary();
     }
 
     public PlanItemCreated(ValueMap json) {
@@ -57,7 +58,7 @@ public class PlanItemCreated extends PlanItemEvent {
 
     @Override
     public String getDescription() {
-        return "PlanItemCreated [" + getType() +"-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() +"]" + (getStageId().isEmpty() ? "" : " in stage " + getStageId());
+        return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]" + (getStageId().isEmpty() ? "" : " in stage " + getStageId());
     }
 
     public String getPlanItemName() {
@@ -73,29 +74,6 @@ public class PlanItemCreated extends PlanItemEvent {
     @Override
     public void updateState(Case actor) {
         planItem = PlanItem.create(actor, this);
-    }
-
-    @Override
-    public boolean hasBehavior() {
-        return true;
-    }
-
-    @Override
-    public void runImmediateBehavior() {
-        if (planItem.getStage() == null) {
-            planItem.beginLifecycle();
-        } else if (planItem.getStage().getState() == State.Active) {
-            // Begin the lifecycle only if the state is active. Otherwise, the plan item will be started when the state becomes active.
-            planItem.beginLifecycle();
-        } else {
-            if (this.isDiscretionary) {
-                // That makes sense: a discretionary item that is already planned, but Stage is not yet active.
-                //  Stage will begin the lifecycle of the discretionary when the stage becomes active itself.
-            } else {
-                // This is really weird. Also have not seen this behavior so far.
-                actor.addDebugInfo(() -> "\n\n\nState is not active. We will not start the PIC " + this+" \n\n\n");
-            }
-        }
     }
 
     @Override
