@@ -94,7 +94,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         return addModelEvent(events.size(), event);
     }
 
-    private EventBehaviorRunner currentBehavior = new EventBehaviorRunner(this);
+    private EventBehaviorCallStack behaviorCallStack = new EventBehaviorCallStack(this);
     private boolean addingEvent = false;
 
     private <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
@@ -112,7 +112,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         event.updateState(actor);
         addingEvent = false;
         // Now run the behavior that comes with the event, if any
-        currentBehavior.pushEvent(event);
+        behaviorCallStack.pushEvent(event);
         return event;
     }
 
@@ -208,7 +208,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
             // Convert Value to String if required
             String logMessage = String.valueOf(object);
             // Now get current level of indent from current behavior (recursive method)
-            String indent = currentBehavior == null ? "" : currentBehavior.getIndent();
+            String indent = behaviorCallStack == null ? "" : behaviorCallStack.getIndent();
             // Make sure if it is a message with newlines, the new lines also get indented
             logMessage = logMessage.replaceAll("\n", "\n" + indent);
             // Print to console.

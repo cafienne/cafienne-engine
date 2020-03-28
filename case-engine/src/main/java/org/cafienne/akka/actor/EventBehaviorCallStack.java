@@ -7,14 +7,14 @@ import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-class EventBehaviorRunner {
+class EventBehaviorCallStack {
     private static final String SINGLE_INDENT = "  ";
 
     private final MessageHandler handler;
     private Frame currentFrame = null;
     private String indent = SINGLE_INDENT;
 
-    EventBehaviorRunner(MessageHandler handler) {
+    EventBehaviorCallStack(MessageHandler handler) {
         this.handler = handler;
     }
 
