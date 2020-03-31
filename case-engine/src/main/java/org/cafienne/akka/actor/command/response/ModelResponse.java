@@ -8,6 +8,7 @@
 package org.cafienne.akka.actor.command.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
@@ -19,7 +20,7 @@ import java.time.Instant;
 /**
  * Interface for creating responses to {@link ModelCommand}
  */
-public class ModelResponse implements AkkaSerializable {
+public class ModelResponse implements AkkaSerializable, TenantUserMessage {
     private final String messageId;
     private Instant lastModified;
     private final TenantUser user;

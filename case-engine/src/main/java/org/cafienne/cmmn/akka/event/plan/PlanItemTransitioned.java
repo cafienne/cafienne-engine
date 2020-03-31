@@ -52,8 +52,20 @@ public class PlanItemTransitioned extends PlanItemEvent {
     }
 
     @Override
-    public void runBehavior() {
-        planItem.runBehavior(this);
+    public boolean hasBehavior() {
+        return true;
+    }
+
+    @Override
+    public void runImmediateBehavior() {
+        planItem.runStateMachineAction(this);
+        planItem.informConnectedEntryCriteria(this);
+    }
+
+    @Override
+    public void runDelayedBehavior() {
+        planItem.runStageCompletionCheck(this);
+        planItem.informConnectedExitCriteria(this);
     }
 
     public Transition getTransition() {
@@ -61,7 +73,7 @@ public class PlanItemTransitioned extends PlanItemEvent {
     }
 
     @Override
-    public String toString() {
+    public String getDescription() {
         return this.getClass().getSimpleName() + "[" + getName() + "/" + getPlanItemId() + "]: " + getHistoryState() + "." + getTransition().toString().toLowerCase() + "() ===> " + getCurrentState();
     }
 

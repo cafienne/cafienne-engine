@@ -34,9 +34,7 @@
                     <repetitionRule id="cm_cs9KJ_9_repetitionRule" contextRef="cfi_csGlQ_0">
                         <condition language="spel">
                             <body>
-                                <![CDATA[
-                                    Request.Customer[0]=="Joost"
-                                ]]>
+                                <![CDATA[Request.Customer[0]=="Joost"]]>
                             </body>
                         </condition>
                     </repetitionRule>

@@ -32,7 +32,7 @@ public class ProcessReactivated extends ProcessInstanceEvent {
     }
 
     @Override
-    public void runBehavior() {
+    public void runImmediateBehavior() {
         actor.reactivate();
     }
 

@@ -16,7 +16,7 @@ public class ProcessTerminated extends ProcessEnded {
     }
 
     @Override
-    public void runBehavior() {
+    public void runImmediateBehavior() {
         actor.terminate();
     }
 }

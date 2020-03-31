@@ -56,11 +56,15 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * Reference to current command being processed by the ModelActor.
      */
     protected C currentCommand;
+    /**
+     * User context of current message
+     */
+    private TenantUser currentUser;
 
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    protected boolean debugMode = false;
+    private boolean debugMode = false;
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.
@@ -131,6 +135,17 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     /**
+     * Switch debug mode of the ModelActor.
+     * When debug mode is enabled, log messages will be added to a DebugEvent that is persisted upon handling
+     * an incoming message or recovery.
+     *
+     * @param debugMode
+     */
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    /**
      * Returns true if the model actor runs in debug mode, false otherwise.
      *
      * @return
@@ -140,12 +155,16 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     /**
-     * Returns the user context of the current command (or event, when running in recovery mode)
+     * Returns the user context of the current command, event or response
      *
      * @return
      */
     public TenantUser getCurrentUser() {
-        return currentHandler().getUser();
+        return currentUser;
+    }
+
+    final void setCurrentUser(TenantUser user) {
+        this.currentUser = user;
     }
 
     /**
@@ -233,7 +252,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                 if (msg instanceof BootstrapCommand) {
                     this.tenant = ((BootstrapCommand) msg).tenant();
                 } else {
-                    return new NotConfiguredHandler(this, msg);
+                    return new NotConfiguredHandler(this, (ModelCommand) msg);
                 }
             }
             C command = (C) msg;
@@ -243,7 +262,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         } else if (msg instanceof ModelResponse) {
             if (tenant == null) {
                 // We cannot handle responses if we have not been properly initialized.
-                return new NotConfiguredHandler(this, msg);
+                return new NotConfiguredHandler(this, (ModelResponse) msg);
             }
             return createResponseHandler((ModelResponse) msg);
         } else {
@@ -404,7 +423,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param response
      */
     public void reply(ModelResponse response) {
-        logger.debug("Sending response of type " + response.getClass().getSimpleName() + " from " + this);
+        if (logger.isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+            String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
+            logger.debug(msg);
+            currentMessageHandler.debugIndentedConsoleLogging(msg);
+        }
         sender().tell(response, self());
     }
 
@@ -416,25 +439,30 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param <T>
      */
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
-        StringBuilder msg = new StringBuilder();
-        events.forEach(e -> {
-            msg.append("\n\t");
-            if (e instanceof PlanItemEvent) {
-                msg.append(e.toString());
-            } else if (e instanceof CaseFileEvent) {
-                msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
-            } else {
-                msg.append(e.getClass().getSimpleName() + ", ");
-            }
-        });
-        logger.debug("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this + msg + "\n");
+        if (logger.isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+            StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
+            events.forEach(e -> {
+                msg.append("\n\t");
+                if (e instanceof PlanItemEvent) {
+                    msg.append(e.toString());
+                } else if (e instanceof CaseFileEvent) {
+                    msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
+                } else {
+                    msg.append(e.getClass().getSimpleName() + ", ");
+                }
+            });
+            logger.debug(msg + "\n");
+            currentMessageHandler.debugIndentedConsoleLogging(msg + "\n");
+        }
         if (events.isEmpty()) {
             return;
         }
         T lastEvent = events.get(events.size() - 1);
         persistAll(events, e -> {
             CaseSystem.health().writeJournal().isOK();
-            logger.debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
+            }
             if (e == lastEvent && response != null) {
                 reply(response);
             }

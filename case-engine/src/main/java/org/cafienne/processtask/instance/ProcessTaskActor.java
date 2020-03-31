@@ -52,7 +52,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
 
     public void updateState(ProcessStarted event) {
         this.setEngineVersion(event.engineVersion);
-        this.debugMode = event.debugMode;
+        this.setDebugMode(event.debugMode);
         this.definition = event.definition;
         this.taskImplementation = definition.getImplementation().createInstance(this);
         this.name = event.name;

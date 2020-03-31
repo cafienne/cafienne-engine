@@ -44,33 +44,17 @@
         </sentry>
         <humanTask id="pid_cm_csdZm_17" name="HumanTask" isBlocking="true">
             <inputs id="inTP_cm_csTql_4_3" name="HumanTaskInput" bindingRef="cfi_csdZm_0"/>
-            <inputs id="inTP_cm_csTql_4_4" name="Assignee"/>
-            <inputs id="inTP_cm_csTql_4_5" name="DueDate"/>
             <outputs id="outTP_cm_csTql_4_3" name="TaskOutput" bindingRef="cfi_csY4k_2"/>
             <outputs id="outTP_cm_csTql_4_4" name="TaskName" bindingRef="cfi_csvwt_4"/>
             <outputs id="outTP_cm_csTql_4_5" name="CaseID" bindingRef="cfi_csvwt_2"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="expression/spelexpressionstask.humantask">
                     <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
-                    <parameterMapping id="inPM_cm_csTql_4_1" sourceRef="inTP_cm_csTql_4_4" targetRef="_yDoJ_Assignee">
-                        <transformation language="spel">
-                            <body>
-                                <![CDATA[user.id]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
-                    <parameterMapping id="inPM_cm_csTql_4_2" sourceRef="inTP_cm_csTql_4_5" targetRef="_n8NU_DueDate">
-                        <transformation language="spel">
-                            <body>
-                                <![CDATA[T(java.time.Instant).now()]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
                     <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
                     <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
                         <transformation language="spel">
                             <body>
-                                <![CDATA[task.planItem.name]]>
+                                <![CDATA[task.name]]>
                             </body>
                         </transformation>
                     </parameterMapping>
@@ -81,6 +65,20 @@
                             </body>
                         </transformation>
                     </parameterMapping>
+                    <assignment id="_lRFiK_5">
+                        <condition id="_lRFiK_6" language="spel">
+                            <body>
+                                <![CDATA[user.id]]>
+                            </body>
+                        </condition>
+                    </assignment>
+                    <duedate id="_lRFiK_7">
+                        <condition id="_lRFiK_8" language="spel">
+                            <body>
+                                <![CDATA[T(java.time.Instant).now()]]>
+                            </body>
+                        </condition>
+                    </duedate>
                 </cafienne:implementation>
             </extensionElements>
         </humanTask>

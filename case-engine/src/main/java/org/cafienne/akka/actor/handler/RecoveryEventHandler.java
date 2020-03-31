@@ -4,7 +4,6 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.event.ModelEvent;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +38,4 @@ public class RecoveryEventHandler<C extends ModelCommand, E extends ModelEvent, 
     protected void complete() {
     }
 
-    @Override
-    protected TenantUser getUser() {
-        return msg.getUser();
-    }
 }

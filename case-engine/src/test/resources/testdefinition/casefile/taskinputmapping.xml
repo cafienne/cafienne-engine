@@ -38,21 +38,22 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="pid_cm_casefile/testcontext.case_141" name="Task.AddChild" isBlocking="true">
-                <inputs id="_36T61" name="Assignee"/>
+                <inputs id="_ilffQ_2" name="Input"/>
                 <outputs id="_3X9aF" name="Child" bindingRef="cfi_casefile/testcontext.case_4"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <assignment id="_nTPPc_3" name="Assignment_0">
-                            <condition id="_nTPPc_4" name="Expression_0" language="spel">
+                        <assignment id="_ilffQ_7">
+                            <condition id="_ilffQ_8" language="spel">
                                 <body>
                                     <![CDATA[user.id]]>
                                 </body>
                             </condition>
                         </assignment>
                         <parameterMapping id="_kHJ0j" sourceRef="_SkQG_Result" targetRef="_3X9aF"/>
+                        <parameterMapping id="_ilffQ_3" sourceRef="_ilffQ_2" targetRef="_Hun3_Input"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
@@ -60,10 +61,9 @@
                 <inputs id="_v9FEK" name="inputChildren" bindingRef="cfi_casefile/testcontext.case_3"/>
                 <outputs id="_NXDUT" name="Result"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
-                        <input id="_bpa7_Assignee" name="Assignee"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
                         <parameterMapping id="_W00cE" sourceRef="_v9FEK" targetRef="_Hun3_Input">
                             <transformation language="spel">
@@ -80,10 +80,9 @@
                 <inputs id="_axaLd" name="inputChild" bindingRef="cfi_casefile/testcontext.case_4"/>
                 <outputs id="_dDqEH" name="Result"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
-                        <input id="_bpa7_Assignee" name="Assignee"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
                         <parameterMapping id="_B4VdN" sourceRef="_axaLd" targetRef="_Hun3_Input"/>
                         <parameterMapping id="_RMhmR" sourceRef="_SkQG_Result" targetRef="_dDqEH"/>

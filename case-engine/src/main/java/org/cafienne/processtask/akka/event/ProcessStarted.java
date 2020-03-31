@@ -53,7 +53,7 @@ public class ProcessStarted extends ProcessInstanceEvent {
     }
 
     @Override
-    public void runBehavior() {
+    public void runImmediateBehavior() {
         actor.start();
     }
 

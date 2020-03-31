@@ -208,8 +208,8 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     }
 
     @Override
-    protected void dumpMemoryStateToXML(Element planItemXML) {
-        super.dumpMemoryStateToXML(planItemXML);
+    protected void dumpImplementationToXML(Element planItemXML) {
+        super.dumpImplementationToXML(planItemXML);
         taskInput.fieldNames().forEachRemaining(fieldName -> appendParameter(fieldName, taskInput.get(fieldName), planItemXML, "inputs"));
         taskOutput.fieldNames().forEachRemaining(fieldName -> appendParameter(fieldName, taskOutput.get(fieldName), planItemXML, "outputs"));
     }

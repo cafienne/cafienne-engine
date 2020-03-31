@@ -2,11 +2,11 @@ package org.cafienne.akka.actor.handler;
 
 import org.cafienne.akka.actor.MessageHandler;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(NotConfiguredHandler.class);
 
-    public NotConfiguredHandler(A actor, Object msg) {
-        super(actor, msg);
+    public NotConfiguredHandler(A actor, TenantUserMessage msg) {
+        super(actor, msg, msg.getUser());
     }
 
     @Override
@@ -48,8 +48,4 @@ public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, 
         actor.persistEvents(events);
     }
 
-    @Override
-    final protected TenantUser getUser() {
-        return null;
-    }
 }

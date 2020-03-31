@@ -149,15 +149,6 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         }
     }
 
-    /**
-     * Returns the user context of the command processed in this handler
-     *
-     * @return
-     */
-    public TenantUser getUser() {
-        return user;
-    }
-
     protected void setNextResponse(ModelResponse response) {
         this.response = response;
     }

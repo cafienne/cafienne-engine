@@ -153,25 +153,26 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         if (this.array != null) { // Update the array we belong too as well
             this.array.childChanged(this);
         }
-    }
 
-    public void runBehavior(CaseFileEvent event) {
-        addDebugInfo(() -> "CaseFile["+getName()+"]: Run behavior for transition " + event.getTransition());
-
+        // Now propagate our new value into our parent.
         Value<?> valueToPropagate = this.value;
-
         if (array != null) { // Update the array we belong too as well
             array.childChanged(this);
             valueToPropagate = array.getValue();
         }
-        propagateValueChange(getName(), valueToPropagate);
+        propagateValueChangeToParent(getName(), valueToPropagate);
+    }
 
+    public void informConnectedEntryCriteria(CaseFileEvent event) {
+        addDebugInfo(() -> "CaseFile[" + getName() + "]: Inform " + connectedEntryCriteria.size() + " connected entry criteria about transition " + event.getTransition());
         // Then inform the activating sentries
         connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
+    }
 
+    public void informConnectedExitCriteria(CaseFileEvent event) {
+        addDebugInfo(() -> "CaseFile[" + getName() + "]: Inform " + connectedExitCriteria.size() + " connected exit criteria about transition " + event.getTransition());
         // Finally iterate the terminating sentries and inform them
         connectedExitCriteria.forEach(onPart -> onPart.inform(this));
-
         addDebugInfo(() -> "CaseFile["+getName()+"]: Completed behavior for transition " + event.getTransition());
     }
 
@@ -237,7 +238,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param childName
      * @param childValue
      */
-    private void propagateValueChange(String childName, Value<?> childValue) {
+    private void propagateValueChangeToParent(String childName, Value<?> childValue) {
         if (parent != null) {
             if (parent.value==null || parent.value == Value.NULL) {
                 addDebugInfo(() -> "Creating a location in parent "+parent.getPath()+" to store the newly changed child "+getName());
@@ -246,7 +247,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             if (parent.value instanceof ValueMap) {
                 ((ValueMap) parent.value).put(childName, childValue);
                 // And ... recurse
-                parent.propagateValueChange(parent.getName(), parent.value);
+                parent.propagateValueChangeToParent(parent.getName(), parent.value);
             } else {
                 addDebugInfo(() -> "Cannot propagate change in " + getPath()+" into parent, because it's value is not a ValueMap but a " + parent.value.getClass().getName());
             }

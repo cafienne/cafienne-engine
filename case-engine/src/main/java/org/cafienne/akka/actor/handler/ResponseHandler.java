@@ -29,11 +29,6 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
         this.user = msg.getUser();
     }
 
-    @Override
-    protected TenantUser getUser() {
-        return msg.getUser();
-    }
-
     /**
      * Runs the case security checks on user context and case tenant.
      */

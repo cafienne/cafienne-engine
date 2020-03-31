@@ -20,7 +20,7 @@ public class ProcessResumed extends ProcessInstanceEvent {
     }
 
     @Override
-    public void runBehavior() {
+    public void runImmediateBehavior() {
         actor.resume();
     }
 }

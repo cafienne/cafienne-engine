@@ -190,14 +190,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Starts the plan item's lifecycle (basically triggers Transition.Create)
-     */
-    public void beginLifecycle() {
-        addDebugInfo(() -> this + ": starting lifecycle");
-        makeTransition(Transition.Create);
-    }
-
-    /**
      * Tries to set a lock for the next transition
      *
      * @param transition
@@ -374,7 +366,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             String repeatItemId = new Guid().toString();
             // Create a new plan item
             addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
-            getCaseInstance().addEvent(new PlanItemCreated(stage, itemDefinition, repeatItemId, index + 1));
+            PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
+            getCaseInstance().addEvent(pic);
+            getCaseInstance().addEvent(pic.createStartEvent());
         }
     }
 
@@ -426,23 +420,38 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.lastTransition = event.getTransition();
     }
 
-    public void runBehavior(PlanItemTransitioned pit) {
-        Transition transition = pit.getTransition();
-        State newState = pit.getCurrentState();
-        State oldState = pit.getHistoryState();
-        addDebugInfo(() -> this + ": handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
+    public void runStateMachineAction(PlanItemTransitioned event) {
+        Transition transition = event.getTransition();
+        State newState = event.getCurrentState();
+        State oldState = event.getHistoryState();
+        addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
 
         // First execute the related state machine action (e.g., activating a timer, releasing a subprocess, suspending, etc.etc.)
         StateMachine.Action action = stateMachine.getAction(newState);
         action.execute(this, transition);
+    }
 
+    public void informConnectedEntryCriteria(PlanItemTransitioned event) {
         // Then inform the activating sentries
         connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
+    }
+
+    public void runStageCompletionCheck(PlanItemTransitioned event) {
+        Transition transition = event.getTransition();
+        State newState = event.getCurrentState();
+        State oldState = event.getHistoryState();
+        addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
 
         // Now check stage completion; but only if we're in semi terminal state (and of course if we are in a stage).
         if (stage != null && state.isSemiTerminal()) {
             stage.tryCompletion(this, transition);
         }
+    }
+
+    public void informConnectedExitCriteria(PlanItemTransitioned event) {
+        Transition transition = event.getTransition();
+        State newState = event.getCurrentState();
+        State oldState = event.getHistoryState();
 
         // Finally iterate the terminating sentries and inform them
         connectedExitCriteria.forEach(onPart -> onPart.inform(this));
@@ -507,6 +516,54 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         return type + "[" + getName() + "." + index + "]";
     }
 
+    protected void dumpImplementationToXML(Element planItemXML) {
+    }
+
+    protected void dumpMemoryStateToXML(Element parentElement) {
+        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
+        parentElement.appendChild(planItemXML);
+        planItemXML.setAttribute("_id", this.getId());
+        planItemXML.setAttribute("name", this.getName());
+        if (repeats() || index > 0) {
+            planItemXML.setAttribute("index", "" + index);
+        }
+
+        // Print the repeat attribute if there is a repetition rule defined for this plan item.
+        if (! (this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+            planItemXML.setAttribute("repeat", "" + repeats());
+        }
+
+        planItemXML.setAttribute("state", "" + this.getState());
+        planItemXML.setAttribute("transition", "" + this.getLastTransition());
+        planItemXML.setAttribute("history", "" + this.getHistoryState());
+
+        // Let instance append it's information.
+        dumpImplementationToXML(planItemXML);
+
+        if (!getEntryCriteria().isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
+            for (EntryCriterion criterion : getEntryCriteria()) {
+                criterion.dumpMemoryStateToXML(planItemXML, true);
+            }
+        }
+        if (!getExitCriteria().isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
+            for (ExitCriterion criterion : getExitCriteria()) {
+                criterion.dumpMemoryStateToXML(planItemXML, true);
+            }
+        }
+
+        if (!connectedEntryCriteria.isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed before stage completion check "));
+            connectedEntryCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
+        }
+
+        if (!connectedExitCriteria.isEmpty()) {
+            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed after stage completion check "));
+            connectedExitCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
+        }
+    }
+
     /**
      * Default Guard implementation for an intended transition on the plan item. Typical implementation inside a Stage to check whether completion is allowed, or in HumanTask to check whether the
      * current user has sufficient roles to e.g. complete a task.
@@ -540,9 +597,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void failInstance() {
-    }
-
-    protected void dumpMemoryStateToXML(Element planItemXML) {
     }
 
     protected void retrieveDiscretionaryItems(Collection<DiscretionaryItem> items) {

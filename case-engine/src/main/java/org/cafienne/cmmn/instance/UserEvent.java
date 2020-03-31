@@ -8,7 +8,6 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
-import org.cafienne.cmmn.definition.CaseTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
 import org.cafienne.cmmn.user.CaseTeamMember;
@@ -54,8 +53,8 @@ public class UserEvent extends PlanItem<UserEventDefinition> {
     }
 
     @Override
-    protected void dumpMemoryStateToXML(Element planItemXML) {
-        super.dumpMemoryStateToXML(planItemXML);
+    protected void dumpImplementationToXML(Element planItemXML) {
+        super.dumpImplementationToXML(planItemXML);
         Collection<CaseRoleDefinition> roles = getAuthorizedRoles();
         for (CaseRoleDefinition role : roles) {
             String roleName = role.getName();

@@ -9,80 +9,83 @@
             <planItem id="cm_csNY8_49" name="TaskWithOutputNotRequired" definitionRef="pid_cm_csNY8_49"/>
             <planItem id="cm_csa4I_58" name="TaskWithOutputNotRequiredAndBinding" definitionRef="pid_cm_csa4I_58"/>
             <humanTask id="pid_cm_cssni_41" name="TaskRequiredOutput" isBlocking="true">
-                <inputs id="_TV6Mb" name="x"/>
+                <inputs id="_p5SZA_1" name="Input"/>
                 <outputs id="_6xePv" name="Result">
                     <extensionElements mustUnderstand="false">
                         <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
                     </extensionElements>
                 </outputs>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <assignment id="_nTPPc_3" name="Assignment_0">
-                            <condition id="_nTPPc_4" name="Expression_0" language="spel">
+                        <assignment id="_p5SZA_22">
+                            <condition id="_p5SZA_23" language="spel">
                                 <body>
                                     <![CDATA[user.id]]>
                                 </body>
                             </condition>
                         </assignment>
                         <parameterMapping id="_6oZPT" sourceRef="_SkQG_Result" targetRef="_6xePv"/>
+                        <parameterMapping id="_p5SZA_2" sourceRef="_p5SZA_1" targetRef="_Hun3_Input"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="pid_cm_csNY8_47" name="TaskRequiredOutputWithBinding" isBlocking="true">
-                <inputs id="_XHL7D" name="y"/>
+                <inputs id="_p5SZA_4" name="Input"/>
                 <outputs id="_epnJX" name="Result" bindingRef="cfi_csNY8_0">
                     <extensionElements mustUnderstand="false">
                         <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
                     </extensionElements>
                 </outputs>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <assignment id="_i1JKn" name="Assignment_0">
-                            <condition id="_i1JKn_3" name="Expression_0" language="spel">
+                        <assignment id="_p5SZA_20">
+                            <condition id="_p5SZA_21" language="spel">
                                 <body>
                                     <![CDATA[user.id]]>
                                 </body>
                             </condition>
                         </assignment>
                         <parameterMapping id="_9RcDI" sourceRef="_SkQG_Result" targetRef="_epnJX"/>
+                        <parameterMapping id="_p5SZA_5" sourceRef="_p5SZA_4" targetRef="_Hun3_Input"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="pid_cm_csNY8_49" name="TaskWithOutputNotRequired" isBlocking="true">
-                <inputs id="_AsW9q" name="z"/>
+                <inputs id="_p5SZA_7" name="Input"/>
                 <outputs id="_VsVwA" name="Result"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <assignment id="_i1JKn_1" name="Assignment_0">
-                            <condition id="_i1JKn_2" name="Expression_0" language="spel">
+                        <assignment id="_p5SZA_18">
+                            <condition id="_p5SZA_19" language="spel">
                                 <body>
                                     <![CDATA[user.id]]>
                                 </body>
                             </condition>
                         </assignment>
                         <parameterMapping id="_bW3g9" sourceRef="_SkQG_Result" targetRef="_VsVwA"/>
+                        <parameterMapping id="_p5SZA_8" sourceRef="_p5SZA_7" targetRef="_Hun3_Input"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="pid_cm_csa4I_58" name="TaskWithOutputNotRequiredAndBinding" isBlocking="true">
-                <inputs id="_hthm8" name="Assignee"/>
+                <inputs id="_p5SZA_10" name="Input"/>
                 <outputs id="_75v4Z" name="Result" bindingRef="cfi_csNY8_0"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <assignment id="_nNaJ0" name="Assignment_0">
-                            <condition id="_nNaJ0_2" name="Expression_0" language="spel">
+                        <assignment id="_p5SZA_16">
+                            <condition id="_p5SZA_17" language="spel">
                                 <body>
                                     <![CDATA[user.id]]>
                                 </body>
@@ -95,6 +98,7 @@
                                 </body>
                             </transformation>
                         </parameterMapping>
+                        <parameterMapping id="_p5SZA_11" sourceRef="_p5SZA_10" targetRef="_Hun3_Input"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>

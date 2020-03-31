@@ -12,35 +12,32 @@
             <planItem id="pi_ht__AqPiG_1" name="HumanTask_0" definitionRef="ht__AqPiG_1">
                 <entryCriterion id="_AqPiG_6" name="EntryCriterion_1" sentryRef="crit__AqPiG_1"/>
             </planItem>
-            <sentry id="crit__AqPiG_0" name="Sentry_0">
-                <planItemOnPart id="_AqPiG_4" name="PlanItemOnPart_0" sourceRef="pi_tmr__AqPiG_0">
+            <sentry id="crit__AqPiG_0">
+                <planItemOnPart id="_AqPiG_4" sourceRef="pi_tmr__AqPiG_0">
                     <standardEvent>occur</standardEvent>
                 </planItemOnPart>
             </sentry>
-            <sentry id="crit__AqPiG_1" name="Sentry_1">
-                <ifPart id="_AqPiG_8" name="IfPart_0">
-                    <condition id="_AqPiG_16" name="Expression_0" language="spel">
+            <sentry id="crit__AqPiG_1">
+                <ifPart id="_AqPiG_8">
+                    <condition id="_AqPiG_16" language="spel">
                         <body>
                             <![CDATA[caseInstance.nullpointerException]]>
                         </body>
                     </condition>
                 </ifPart>
-                <planItemOnPart id="_AqPiG_7" name="PlanItemOnPart_1" sourceRef="pi_ht__AqPiG_2">
+                <planItemOnPart id="_AqPiG_7" sourceRef="pi_ht__AqPiG_2">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
             <humanTask id="ht__AqPiG_0" name="Task1" isBlocking="true"/>
             <humanTask id="ht__AqPiG_2" name="simplehumantask" isBlocking="true">
-                <inputs id="_AqPiG_10" name="Assignee"/>
                 <inputs id="_AqPiG_12" name="Input"/>
                 <outputs id="_AqPiG_14" name="Result" bindingRef="_AqPiG_2"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" name="simplehumantask" description="" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
-                        <output id="_SkQG_Result" name="Result"/>
-                        <input id="_bpa7_Assignee" name="Assignee"/>
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <parameterMapping id="_AqPiG_11" sourceRef="_AqPiG_10" targetRef="_bpa7_Assignee"/>
                         <parameterMapping id="_AqPiG_13" sourceRef="_AqPiG_12" targetRef="_Hun3_Input"/>
                         <parameterMapping id="_AqPiG_15" sourceRef="_SkQG_Result" targetRef="_AqPiG_14"/>
                     </cafienne:implementation>
@@ -53,7 +50,7 @@
                         <![CDATA[caseInstance.caseFile.timer.period]]>
                     </body>
                 </timerExpression>
-                <planItemStartTrigger id="_AqPiG_0" name="PlanItemStartTrigger_0">
+                <planItemStartTrigger id="_AqPiG_0">
                     <standardEvent/>
                 </planItemStartTrigger>
             </timerEvent>
