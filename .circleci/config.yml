@@ -6,6 +6,16 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Updating Java and sbt versions
+          command: |
+            sudo apt-get update
+            sudo apt install openjdk-11-jdk
+            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+            java -version
+            wget https://dl.bintray.com/sbt/debian/sbt-1.3.4.deb
+            sudo dpkg -i sbt-1.3.4.deb
+            sbt sbtVersion
+      - run:
           name: Compile code
           command: sbt compile
       - run:
@@ -151,6 +161,16 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run:
+          name: Updating Java and sbt versions
+          command: |
+            sudo apt-get update
+            sudo apt install openjdk-11-jdk
+            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+            java -version
+            wget https://dl.bintray.com/sbt/debian/sbt-1.3.4.deb
+            sudo dpkg -i sbt-1.3.4.deb
+            sbt sbtVersion
       - run:
           name: Check for version TAG
           command: |
