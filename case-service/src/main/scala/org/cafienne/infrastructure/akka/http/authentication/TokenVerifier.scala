@@ -91,7 +91,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
             }
             if (exceptionMessage.contains(invalidIssuerMsg)) {
               val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
-              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'")
+              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'. Issuers supported: " + CaseSystem.config.OIDC.issuer)
             }
             throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
           case e: BadJOSEException =>
