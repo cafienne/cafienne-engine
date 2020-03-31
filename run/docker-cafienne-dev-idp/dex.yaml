@@ -1,0 +1,74 @@
+issuer: "http://localhost:5556/dex"
+storage:
+  type: sqlite3
+  config:
+    file: /var/dex/dex.db
+web:
+  http: 0.0.0.0:5556
+  allowedOrigins: ["*"]
+
+telemetry:
+  http: 0.0.0.0:5558
+
+oauth2:
+    # use ["code", "token", "id_token"] to enable implicit flow for web-only clients
+  responseTypes: [ "code", "token", "id_token" ] # also allowed are "token" and "id_token"
+    # By default, Dex will ask for approval to share data with application
+    # (approval for sharing data from connected IdP to Dex is separate process on IdP)
+  skipApprovalScreen: true
+    # If only one authentication method is enabled, the default behavior is to
+    # go directly to it. For connected IdPs, this redirects the browser away
+    # from application to upstream provider such as the Google login page
+#   alwaysShowLoginScreen: false
+logger:
+  level: "debug"
+  format: "json"
+
+staticClients:
+- id: swagger-ui
+  redirectURIs:
+    - 'http://localhost:2027/oauth2-redirect.html'
+  name: 'Cafienne Swagger UI'
+  secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+- id: cafienne-ui 
+  redirectURIs:
+    - 'http://localhost:28080/#/oidcresponse'
+  name: 'Cafienne Generic UI'
+  secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+
+connectors:
+- type: mockCallback
+  id: mock
+  name: Example
+
+# Let dex keep a list of passwords which can be used to login to dex.
+enablePasswordDB: true
+
+# A static list of passwords to login the end user. By identifying here, dex
+# won't look in its underlying storage for passwords.
+#
+# If this option isn't chosen users may be added through the gRPC API.
+staticPasswords:
+- email: "admin@example.com"
+  # bcrypt hash of the string "password"
+  hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+  username: "admin"
+  userID: "admin"
+
+- email: "lana@example.com"
+  # bcrypt hash of the string "lana"
+  hash: "$2a$10$ZrEQl/enxrc1bhDWrwhKSePYkqCEf.2X3wXeat/hI0ULOptDUpyCS"
+  username: "lana"
+  userID: "lana"
+
+- email: "suzy@example.com"
+  # bcrypt hash of the string "suzy"
+  hash: "$2a$10$3pTi1m5yR.tBcZMV/dJi.O1NlMPN/ZH03eSmNfJFuTOOTm82T03lK"
+  username: "suzy"
+  userID: "suzy"
+
+- email: "hank@example.com"
+  # bcrypt hash of the string "hank"
+  hash: "$2a$10$osTMgQ8GxoeWghmYcrBXB.0nV9XsoQkAMUcNlL0/wT7qYoJSnbJzS"
+  username: "hank"
+  userID: "hank"

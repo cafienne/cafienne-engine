@@ -1,0 +1,67 @@
+# This compose will work with docker 1.13.1+
+#
+# To run, call:
+#   $ docker-compose up
+#
+version: '3.1'
+services:
+  # supporting containers
+  mail:
+    image: schickling/mailcatcher:latest
+    labels:
+      component: mta
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - dev
+    expose:
+      - 1025
+      - 1080
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    hostname: mailcatcher
+    container_name: mail
+
+  dex-dev-idp:
+    image: quay.io/dexidp/dex:v2.23.0
+    command: ["serve", "/dex.yaml"]
+    networks:
+      - dev
+    expose:
+      - 5556
+      - 5558
+    ports:
+      - "5556:5556"
+      - "5558:5558"
+    hostname: dex-dev-idp
+    container_name: dex-dev-idp
+    volumes:
+      - ./dex.yaml:/dex.yaml
+      - ./:/var/dex/
+
+  fake-idp:
+    image: spectare/oidc-token-test-service:latest
+    labels:
+      component: fake-idp
+    networks: 
+      - dev
+    expose:
+      - 2377
+    ports:
+      - "2377:2377"
+    environment:
+      BIND: 0.0.0.0
+      PORT: 2377
+    hostname: fake-idp
+    container_name: fake-idp
+
+volumes:
+  dexW:
+    driver: local
+networks:
+  dev:
+    driver: bridge
