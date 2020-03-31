@@ -153,11 +153,6 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         this.response = response;
     }
 
-    protected boolean hasOnlyDebugEvents() {
-        boolean hasOnlyDebugEvents = ! events.stream().anyMatch(e -> ! (e instanceof DebugEvent));
-        return hasOnlyDebugEvents;
-    }
-
     protected boolean hasFailures() {
         return response != null && response instanceof CommandFailure;
     }

@@ -69,16 +69,17 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
     }
 
     protected void complete() {
+        // First check the engine version.
+        checkEngineVersion();
+
+        // If there are only debug events, then were done, otherwise add a last modified event.
         if (!events.isEmpty()) {
-            // We have events to persist.
 
-            // First check the engine version.
-            checkEngineVersion();
-
-            //  Add a "transaction" event at the last moment
-
-            // Change the last modified moment of this actor and publish an event about it
-            addEvent(actor.createLastModifiedEvent(Instant.now()));
+            // We have events to persist, but let's check if it is only debug events or more.
+            if (! hasOnlyDebugEvents()) {
+                // Change the last modified moment of this actor and publish an event about it
+                addEvent(actor.createLastModifiedEvent(Instant.now()));
+            }
 
             // Now persist the events in one shot
             actor.persistEvents(events);

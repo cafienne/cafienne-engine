@@ -215,4 +215,15 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
             System.out.println(indent + logMessage);
         }
     }
+
+    /**
+     * Returns true if the list of events generated has only debug events.
+     * This is used in e.g. command handlers to determine whether or not the state of the actor has
+     * actually changed during handling of the message. (DebugEvents are not supposed to change state...)
+     * @return
+     */
+    protected boolean hasOnlyDebugEvents() {
+        boolean hasOnlyDebugEvents = ! events.stream().anyMatch(e -> ! (e instanceof DebugEvent));
+        return hasOnlyDebugEvents;
+    }
 }

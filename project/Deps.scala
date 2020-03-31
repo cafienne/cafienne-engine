@@ -88,7 +88,7 @@ object Deps {
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
   val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.23.2"
   val commonsIO             = "commons-io"              %  "commons-io"                           % "2.4"
-  val apacheCommonsLang     = "org.apache.commons"      % "commons-lang3"                         % "3.4"
+  val apacheCommonsText     = "org.apache.commons"      % "commons-text"                          % "1.8"
   val jsonJava              = "com.fasterxml.jackson.core"   % "jackson-core"					            % V.jackson
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
   val jacksonScala          = "com.fasterxml.jackson.module" %% "jackson-module-scala"            % V.jackson
@@ -96,8 +96,7 @@ object Deps {
   val spel                  = "org.springframework"     %  "spring-expression"                    % "4.2.5.RELEASE"
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
-  val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.5.5"
-  val javaMailApi           = "javax.mail"              % "javax.mail-api"                        % "1.5.5"
+  val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
   val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % "6.7.0" excludeAll ExclusionRule(organization = "org.apache.lucene")
   val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % "6.0.0"
 
