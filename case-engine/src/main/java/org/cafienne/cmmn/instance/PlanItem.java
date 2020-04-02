@@ -167,7 +167,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         } else {
             insertOnPart(onPart, connectedExitCriteria);
         }
-        onPart.inform(this);
+        onPart.inform(this, getLastTransition());
     }
 
     /**
@@ -350,12 +350,12 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         if (getStage().getState() != State.Active) {
             // The stage that contains us is no longer active. So we will not prepare any repeat item.
             // This code is typically invoked if the the stage terminates or completes, causing the repeating element to terminate.
-            addDebugInfo(() -> this + ": not repeating because stage is not active " + getName());
+            addDebugInfo(() -> this + ": not repeating because stage is not active");
             return;
         }
 
         // Re-evaluate the repetition rule, and if the outcome is true, the start the repeat item (but only if it is not a discretionary).
-        addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat() ");
+        addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat()");
         evaluateRepetitionRule();
         if (repeats()) {
             if (itemDefinition.isDiscretionary()) {
@@ -433,7 +433,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     public void informConnectedEntryCriteria(PlanItemTransitioned event) {
         // Then inform the activating sentries
-        connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
+        connectedEntryCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
     }
 
     public void runStageCompletionCheck(PlanItemTransitioned event) {
@@ -454,7 +454,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         State oldState = event.getHistoryState();
 
         // Finally iterate the terminating sentries and inform them
-        connectedExitCriteria.forEach(onPart -> onPart.inform(this));
+        connectedExitCriteria.forEach(onPart -> onPart.inform(this, transition));
 
         addDebugInfo(() -> this + ": completed handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
     }

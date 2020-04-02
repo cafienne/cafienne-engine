@@ -96,7 +96,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         } else {
             insertOnPart(onPart, connectedExitCriteria);
         }
-        onPart.inform(this);
+        onPart.inform(this, getLastTransition());
     }
 
     /**
@@ -166,13 +166,13 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void informConnectedEntryCriteria(CaseFileEvent event) {
         addDebugInfo(() -> "CaseFile[" + getName() + "]: Inform " + connectedEntryCriteria.size() + " connected entry criteria about transition " + event.getTransition());
         // Then inform the activating sentries
-        connectedEntryCriteria.forEach(onPart -> onPart.inform(this));
+        connectedEntryCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
     }
 
     public void informConnectedExitCriteria(CaseFileEvent event) {
         addDebugInfo(() -> "CaseFile[" + getName() + "]: Inform " + connectedExitCriteria.size() + " connected exit criteria about transition " + event.getTransition());
         // Finally iterate the terminating sentries and inform them
-        connectedExitCriteria.forEach(onPart -> onPart.inform(this));
+        connectedExitCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
         addDebugInfo(() -> "CaseFile["+getName()+"]: Completed behavior for transition " + event.getTransition());
     }
 

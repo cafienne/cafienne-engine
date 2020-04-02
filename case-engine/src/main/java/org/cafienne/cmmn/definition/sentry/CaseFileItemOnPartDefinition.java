@@ -46,7 +46,8 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
         return standardEvent;
     }
 
-    public CaseFileItemDefinition getSource() {
+    @Override
+    public CaseFileItemDefinition getSourceDefinition() {
         return source;
     }
 

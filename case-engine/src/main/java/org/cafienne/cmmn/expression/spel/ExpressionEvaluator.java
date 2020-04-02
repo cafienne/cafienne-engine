@@ -143,7 +143,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public boolean evaluateIfPart(Sentry sentry, IfPartDefinition ifPartDefinition) {
-        Object outcome = evaluateConstraint(sentry.getCaseInstance(), new IfPartContext(ifPartDefinition, sentry), "ifPart for sentry " + ifPartDefinition.getParentElement().getName());
+        Object outcome = evaluateConstraint(sentry.getCaseInstance(), new IfPartContext(ifPartDefinition, sentry), "ifPart in sentry");
         if (outcome instanceof Boolean) {
             return (boolean) outcome;
         } else {

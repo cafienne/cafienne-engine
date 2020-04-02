@@ -9,11 +9,16 @@ package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?>> extends CMMNElement<T> {
     protected final Sentry sentry;
+    protected Collection<I> connectedItems = new ArrayList<>();
 
     protected OnPart(Sentry sentry, T definition) {
         super(sentry, definition);
@@ -29,19 +34,7 @@ public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?
         return sentry;
     }
 
-    /**
-     * Connect the on part to a case file item or plan item
-     *
-     * @param item
-     */
-    abstract void connect(I item);
-
-    /**
-     * Inform the on part about activity inside I
-     *
-     * @param item
-     */
-    public abstract void inform(I item);
+    abstract void connectToCase();
 
     abstract ValueMap toJson();
 
