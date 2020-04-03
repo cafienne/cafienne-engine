@@ -1,0 +1,79 @@
+version: '3.1'
+services:
+
+  cafienne-event-db:
+    image: postgres:12.1-alpine
+    networks:
+      - dev
+    expose:
+      - 5432
+    ports:
+      - "5431:5432"
+    hostname: cafienne-event-db
+    container_name: cafienne-event-db
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-eventstore
+
+  cafienne-query-db:
+    image: postgres:12.1-alpine
+    networks:
+      - dev
+    expose:
+      - 5432
+    ports:
+      - "5430:5432"
+    hostname: cafienne-query-db
+    container_name: cafienne-query-db
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-query
+
+  cafienne-test-token-service:
+    image: spectare/oidc-token-test-service:latest
+    labels:
+      component: idp-test-service-for-cafienne
+    network_mode: host
+    expose:
+      - 2377
+    ports:
+      - "2377:2377"
+    hostname: cafienne-test-token-service
+    container_name: cafienne-test-token-service
+    environment:
+      BIND: 0.0.0.0
+      PORT: 2377
+
+  cafienne:
+    image: cafienne/engine:latest
+    labels:
+      component: cafienne-engine
+    network_mode: host
+    expose:
+      - 2027
+    ports:
+      - "2027:2027"
+    hostname: cafienne
+    container_name: cafienne
+    environment:
+      PROJECTION_DB_URL: ${PROJECTION_DB_URL:-jdbc:postgresql://localhost:5430/cafienne-query?reWriteBatchedInserts=true}
+      EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:postgresql://localhost:5431/cafienne-eventstore?reWriteBatchedInserts=true}
+    healthcheck:
+      test: ["CMD", "wget", "-s", "http://localhost:2027/api-docs/swagger.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
+      - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/cafienne/definitions
+      - /home/circleci/cafienne-engine/.circleci/src/postgresql-conf:/opt/cafienne/conf
+      - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/cafienne/bootstrap
+    depends_on:
+      - cafienne-event-db
+      - cafienne-query-db
+      - cafienne-test-token-service
+networks:
+  dev:
+    driver: bridge

@@ -249,7 +249,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
     validUser { user =>
       parameters('tenant ?) { optionalTenant =>
         val tenant = optionalTenant match {
-          case Some(value) => if (value.trim.isEmpty) {
+          case Some(value) => if (value.isBlank) {
             user.defaultTenant
           } else value
           case None => user.defaultTenant

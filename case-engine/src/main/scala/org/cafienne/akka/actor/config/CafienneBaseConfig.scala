@@ -77,7 +77,7 @@ trait CafienneBaseConfig extends LazyLogging {
 
   def readDuration(name: String, default: FiniteDuration): FiniteDuration = {
     if (config != null && config.hasPath(name)) {
-      FiniteDuration(config.getDuration(name).toMillis, TimeUnit.MILLISECONDS)
+      FiniteDuration(config.getDuration(name).toSeconds, TimeUnit.SECONDS)
     } else {
       default
     }

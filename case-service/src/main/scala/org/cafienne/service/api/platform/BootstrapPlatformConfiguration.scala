@@ -32,7 +32,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
   private def findConfigFile(): Option[File] = {
     logger.warn("Checking presence of bootstrap configuration for the case system")
     val bootstrapTenantConfFileName = CaseSystem.config.platform.bootstrapFile
-    if (!bootstrapTenantConfFileName.trim.isEmpty) {
+    if (!bootstrapTenantConfFileName.isBlank) {
       val configFile = new File(bootstrapTenantConfFileName)
       if (! configFile.exists()) {
         logger.warn("Sleeping a bit, becuase file " + bootstrapTenantConfFileName+" seems to not (yet) exist")
@@ -46,7 +46,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     }
 
     val defaultTenant = CaseSystem.config.platform.defaultTenant
-    if (defaultTenant.trim.isEmpty) {
+    if (defaultTenant.isBlank) {
       logger.warn("Default tenant is empty and bootstrap-file is not filled. Skipping bootstrap attempts")
       return None
     }
