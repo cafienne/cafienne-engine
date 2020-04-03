@@ -11,6 +11,8 @@ import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.event.DebugEvent;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +126,12 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             // If we have created events (other than debug events) from the failure, then we are in inconsistent state and need to restart the actor.
             if (events.size() > debugEvents.length) {
                 Throwable exception = ((CommandFailure) response).internalException();
+                addDebugInfo(() -> {
+                    StringBuilder msg = new StringBuilder("\n------------------------ SKIPPING PERSISTENCE OF " + events.size() + " EVENTS IN " + this);
+                    events.forEach(e -> msg.append("\n\t"+e.getDescription()));
+                    return msg + "\n";
+                }, logger);
+                addDebugInfo(() -> exception, logger);
                 actor.failedWithInvalidState(this, exception);
             }
         } else if (hasOnlyDebugEvents()) { // Nothing to persist, just respond to the client if there is something to say
