@@ -72,7 +72,8 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
         return standardEvent;
     }
 
-    public PlanItemDefinition getSource() {
+    @Override
+    public PlanItemDefinition getSourceDefinition() {
         return source;
     }
 

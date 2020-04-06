@@ -13,14 +13,4 @@ public class ProcessSuspended extends ProcessInstanceEvent {
     public ProcessSuspended(ValueMap json) {
         super(json);
     }
-
-    @Override
-    public void updateState(ProcessTaskActor actor) {
-        // Nothing to update
-    }
-
-    @Override
-    public void runImmediateBehavior() {
-        actor.suspend();
-    }
 }

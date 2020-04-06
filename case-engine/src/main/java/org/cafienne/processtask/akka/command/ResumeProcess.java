@@ -26,7 +26,6 @@ public class ResumeProcess extends ProcessCommand {
 
     @Override
     public ProcessResponse process(ProcessTaskActor process) {
-        process.addEvent(new ProcessResumed(process));
-        return new ProcessResponse(this);
+        return process.resume(this);
     }
 }

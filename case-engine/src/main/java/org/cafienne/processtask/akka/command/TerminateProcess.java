@@ -26,7 +26,6 @@ public class TerminateProcess extends ProcessCommand {
 
     @Override
     public ProcessResponse process(ProcessTaskActor process) {
-        process.addEvent(new ProcessTerminated(process));
-        return new ProcessResponse(this);
+        return process.terminate(this);
     }
 }

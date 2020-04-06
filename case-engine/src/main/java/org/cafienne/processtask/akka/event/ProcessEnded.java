@@ -24,11 +24,6 @@ public abstract class ProcessEnded extends ProcessInstanceEvent {
     }
 
     @Override
-    public void updateState(ProcessTaskActor actor) {
-        // Nothing to update here. (as of now)
-    }
-
-    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.output, output);

@@ -53,11 +53,6 @@ public class ProcessStarted extends ProcessInstanceEvent {
     }
 
     @Override
-    public void runImmediateBehavior() {
-        actor.start();
-    }
-
-    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.input, inputParameters);

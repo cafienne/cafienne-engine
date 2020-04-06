@@ -27,7 +27,7 @@ public class SentryNetwork {
      */
     public void connect(CaseFileItem item) {
         for (Sentry sentry : sentries) {
-            sentry.connect(item);
+            sentry.establishPotentialConnection(item);
         }
     }
 
@@ -37,7 +37,7 @@ public class SentryNetwork {
      */
     public void connect(PlanItem item) {
         for (Sentry sentry : sentries) {
-            sentry.connect(item);
+            sentry.establishPotentialConnection(item);
         }
     }
 
@@ -45,7 +45,7 @@ public class SentryNetwork {
      * Add a sentry to the network
      * @param sentry
      */
-    public void add(Sentry sentry) {
+    void add(Sentry sentry) {
         sentries.add(sentry);
     }
 }

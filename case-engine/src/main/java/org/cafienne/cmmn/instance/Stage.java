@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
 import org.cafienne.cmmn.definition.StageDefinition;
@@ -72,14 +73,23 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     /**
      * If a child item of this stage has reached semi-terminal state, then it may try to auto complete the surrounding stage.
      *
-     * @param child
-     * @param transition
+     * @param event
      */
-    void tryCompletion(PlanItem child, Transition transition) {
-        addDebugInfo(() -> this + ": checking completion because of semi-terminal child '" + child.getName() + "'->" + transition);
+    void tryCompletion(PlanItemTransitioned event) {
+        // Stage completion check is only done for transitions into semi terminal state, so if not we can immediately return.
+        if (! event.getCurrentState().isSemiTerminal()) {
+            return;
+        }
+
+        // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
+        if (this.getState().isSemiTerminal()) {
+            addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
+            return;
+        }
+        addDebugInfo(() -> "*** " + this + ": checking completion because of " + event);
         this.isManualCompletion = false; // Now switch this flag. It is set back in
         if (this.isCompletionAllowed()) {
-            addDebugInfo(() -> this + ": completing because of source transition " + child + "." + transition);
+            addDebugInfo(() -> "*** " + this + ": triggering stage completion");
             makeTransition(Transition.Complete);
         }
         this.isManualCompletion = true; // Now switch the flag back. Is only required if isCompletionAllowed returns false.
@@ -101,24 +111,24 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         // BOTTOMLINE interpretation: the stage will try to complete each time a child reaches semiterminal state, or if the transition to complete is manually invoked
         // Here we check both.
         addDebugInfo(() -> {
-            String msg = getPlanItems().stream().map(p -> "\n" + p.getName() + "[index=" + p.getIndex()+", state="+p.getState()+", required="+p.isRequired()+"]").collect(Collectors.toList()).toString();
-            return this + ": checking " + planItems.size() +" plan items for completion:" + msg;
+            String msg = getPlanItems().stream().map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
+            return "*   checking " + planItems.size() +" plan items for completion:" + msg;
         });
         for (PlanItem childItem : planItems) {
             // There shouldn't be any active item.
             if (childItem.getState() == State.Active) {
-                addDebugInfo(() -> this + " cannot auto complete, because '" + childItem.getName() + "' is still Active");
+                addDebugInfo(() -> "*** " + this + " cannot auto complete, because '" + childItem.toDescription() + "' is still Active");
                 return false;
             }
             if (!childItem.getState().isSemiTerminal()) {
                 if (autoCompletes || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
                     if (childItem.isRequired()) { // Stage cannot complete if required items are not in semi-terminal state
-                        addDebugInfo(() -> this + " cannot complete, because " + childItem.getName() + " is required and has state " + childItem.getState());
+                        addDebugInfo(() -> "*** " + this + " cannot auto complete, because " + childItem.toDescription() + " is required and has state " + childItem.getState());
                         return false;
                     }
                 } else {
                     // Stage cannot complete if not all children are semi-terminal
-                    addDebugInfo(() -> this + " cannot complete, because " + childItem.getName() + " has state " + childItem.getState());
+                    addDebugInfo(() -> "*** " + this + " cannot auto complete, because " + childItem.toDescription() + " has state " + childItem.getState());
                     return false;
                 }
             }
@@ -127,7 +137,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         // And, finally, check if there are no discretionary items, but only if we're not completing manually and autoCompletion is false
         if (!autoCompletes && !isManualCompletion) {
             if (hasDiscretionaryItems()) {
-                addDebugInfo(() -> this + " cannot complete, because there are still discretionary items");
+                addDebugInfo(() -> "*** " + this + " cannot auto complete, because there are still discretionary items");
                 return false;
             }
         }

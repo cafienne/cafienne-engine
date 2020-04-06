@@ -18,5 +18,7 @@ public abstract class OnPartDefinition extends CMMNElementDefinition {
         super(element, definition, parentElement);
     }
 
+    public abstract CMMNElementDefinition getSourceDefinition();
+
     public abstract OnPart<?, ?> createInstance(Sentry sentry);
 }

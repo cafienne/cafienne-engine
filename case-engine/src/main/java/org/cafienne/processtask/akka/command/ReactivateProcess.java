@@ -37,8 +37,7 @@ public class ReactivateProcess extends ProcessCommand {
 
     @Override
     public ProcessResponse process(ProcessTaskActor process) {
-        process.addEvent(new ProcessReactivated(process, this));
-        return new ProcessResponse(this);
+        return process.reactivate(this);
     }
 
     @Override

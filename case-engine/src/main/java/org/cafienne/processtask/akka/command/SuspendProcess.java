@@ -27,7 +27,6 @@ public class SuspendProcess extends ProcessCommand {
 
     @Override
     public ProcessResponse process(ProcessTaskActor process) {
-        process.addEvent(new ProcessSuspended(process));
-        return new ProcessResponse(this);
+        return process.suspend(this);
     }
 }

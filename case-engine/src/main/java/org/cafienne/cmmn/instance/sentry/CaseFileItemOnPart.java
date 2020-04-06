@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
+import org.cafienne.cmmn.instance.CaseFile;
 import org.cafienne.cmmn.instance.CaseFileItem;
 import org.cafienne.cmmn.instance.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItem> {
-    private Collection<CaseFileItem> connectedCaseFileItems = new ArrayList<CaseFileItem>();
     private final Object standardEvent;
     private final String sourceName;
     private boolean isActive;
@@ -26,22 +26,28 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     public CaseFileItemOnPart(Sentry sentry, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(sentry, caseFileItemOnPartDefinition);
         this.standardEvent = caseFileItemOnPartDefinition.getStandardEvent();
-        this.sourceName = caseFileItemOnPartDefinition.getSource().getName();
+        this.sourceName = caseFileItemOnPartDefinition.getSourceDefinition().getName();
     }
 
     @Override
+    void connectToCase() {
+        CaseFile caseFile = getCaseInstance().getCaseFile();
+        CaseFileItem item = caseFile.getItem(getDefinition().getSourceDefinition().getPath());
+        if (item != null) {
+            item.iterator().forEachRemaining(innerItem -> connect(innerItem));
+        }
+    }
+
     void connect(CaseFileItem caseFileItem) {
+        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + sentry.criterion);
         addDebugInfo(() -> "Connecting on part " + getDefinition().getId() + " to case file item " + caseFileItem);
-        connectedCaseFileItems.add(caseFileItem);
+        connectedItems.add(caseFileItem);
         caseFileItem.connectOnPart(this);
     }
 
-    // NOTE: this is basic, first implementation!
-    //  yet to build up the experience with proper use case!! Especially update moments and the like.
-    @Override
-    public void inform(CaseFileItem caseFileItem) {
-        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + sentry.criterion +" about transition " + caseFileItem.getLastTransition() + ".");
-        lastTransition = caseFileItem.getLastTransition();
+    public void inform(CaseFileItem caseFileItem, CaseFileItemTransition transition) {
+        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + sentry.criterion +" about transition " + transition + ".");
+        lastTransition = transition;
         boolean newActive = standardEvent.equals(lastTransition);
         if (isActive != newActive) {
             // Change in state...
@@ -77,7 +83,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         onPartXML.setAttribute("last", sourceName + "." + lastTransition);
 
         if (showConnectedPlanItems) {
-            for (CaseFileItem caseFileItem : connectedCaseFileItems) {
+            for (CaseFileItem caseFileItem : connectedItems) {
                 String lastTransition = caseFileItem.getName() + "." + caseFileItem.getLastTransition();
                 Element caseFileItemXML = parentElement.getOwnerDocument().createElement("caseFileItem");
                 caseFileItemXML.setAttribute("last", lastTransition);

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
-    private Collection<PlanItem> connectedPlanItems = new ArrayList<>();
     private final Object standardEvent;
     private final String sourceName;
     private boolean isActive;
@@ -27,23 +26,52 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     public PlanItemOnPart(Sentry sentry, PlanItemOnPartDefinition definition) {
         super(sentry, definition);
         this.standardEvent = definition.getStandardEvent();
-        this.sourceName = definition.getSource().getName();
+        this.sourceName = definition.getSourceDefinition().getName();
+    }
+
+    /**
+     * Determines whether the plan item belongs to the stage of this sentry or
+     * to one of it's parents or descendants. If the plan item belongs to a
+     * sibling stage, then it should not be connected to this sentry
+     *
+     * @param planItem
+     * @return
+     */
+    private boolean doesNotBelongToSiblingStage(PlanItem planItem) {
+        if (sentry.getStage().contains(planItem)) {
+            return true;
+        }
+        if (planItem.getStage().contains(sentry.getStage())) {
+            return true;
+        }
+        return false;
     }
 
     @Override
-    void connect(PlanItem planItem) {
-        addDebugInfo(() -> "Connecting " + sentry.criterion + " to plan item " + planItem);
-        connectedPlanItems.add(planItem);
-        planItem.connectOnPart(this);
-        if (getDefinition().getRelatedExitCriterion() != null) {
-            relatedExitCriterion = planItem.getStage().getExitCriterion(getDefinition().getRelatedExitCriterion());
+    void connectToCase() {
+        for (PlanItem planItem : getCaseInstance().getPlanItems()) {
+            if (getDefinition().getSourceDefinition().equals(planItem.getItemDefinition())) {
+                connect(planItem);
+            }
         }
     }
 
-    @Override
-    public void inform(PlanItem planItem) {
-        addDebugInfo(() -> "Plan item " + planItem + " informs " + sentry.criterion + " about transition " + planItem.getLastTransition());
-        lastTransition = planItem.getLastTransition();
+    void connect(PlanItem planItem) {
+        if (doesNotBelongToSiblingStage(planItem)) {
+            addDebugInfo(() -> "Connecting " + planItem + " to " + sentry.criterion);
+            connectedItems.add(planItem);
+            planItem.connectOnPart(this);
+            if (getDefinition().getRelatedExitCriterion() != null) {
+                relatedExitCriterion = planItem.getStage().getExitCriterion(getDefinition().getRelatedExitCriterion());
+            }
+        } else {
+            addDebugInfo(() -> "Not connecting plan item " + planItem + " to " + sentry.criterion + " because it belongs to a sibling stage");
+        }
+    }
+
+    public void inform(PlanItem planItem, Transition transition) {
+        addDebugInfo(() -> "Plan item " + planItem + " informs " + sentry.criterion + " about transition " + transition);
+        lastTransition = transition;
         isActive = standardEvent.equals(lastTransition);
         if (isActive) {
             if (relatedExitCriterion != null) { // The exitCriterion must also be active
@@ -84,7 +112,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         onPartXML.setAttribute("last", sourceName + "." + lastTransition);
 
         if (showConnectedPlanItems) {
-            for (PlanItem planItem : connectedPlanItems) {
+            for (PlanItem planItem : connectedItems) {
                 String lastTransition = planItem.getName() + "." + planItem.getLastTransition();
                 Element planItemXML = parentElement.getOwnerDocument().createElement("planitem");
                 planItemXML.setAttribute("last", lastTransition);

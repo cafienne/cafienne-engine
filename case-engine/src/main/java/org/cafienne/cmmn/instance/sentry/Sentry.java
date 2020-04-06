@@ -27,12 +27,12 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     // The source can only be a PlanItemDefinition or a CaseFileItemDefinition. We have taken the first
     // level parent class (CMMNElementDefinition) for this. So, technically we might also store on parts
     // with a different type of key ... but the logic prevents this from happening.
-    private final Map<CMMNElementDefinition, OnPart<?, ?>> onParts = new LinkedHashMap<CMMNElementDefinition, OnPart<?, ?>>();
+    private final Map<CMMNElementDefinition, OnPart> onParts = new LinkedHashMap();
 
     /**
      * Simple set to be able to quickly check whether the sentry may become active
      */
-    private final Set<OnPart<?, ?>> inactiveOnParts = new HashSet<OnPart<?, ?>>();
+    private final Set<OnPart> inactiveOnParts = new HashSet();
 
     /**
      * Stage that holds this sentry.
@@ -54,122 +54,36 @@ public class Sentry extends CMMNElement<SentryDefinition> {
         this.stage = stage;
         this.criterion = criterion;
         for (OnPartDefinition onPartDefinition : getDefinition().getOnParts()) {
-            if (onPartDefinition instanceof PlanItemOnPartDefinition) {
-                createOnPart((PlanItemOnPartDefinition) onPartDefinition);
-            } else {
-                createOnPart((CaseFileItemOnPartDefinition) onPartDefinition);
-            }
+            OnPart onPart = onPartDefinition.createInstance(this);
+            onParts.put(onPartDefinition.getSourceDefinition(), onPart);
+            inactiveOnParts.add(onPart);
+            onPart.connectToCase();
         }
         // Make ourselves known to the global case so that other plan items can start informing us.
         getCaseInstance().getSentryNetwork().add(this);
     }
 
     /**
-     * Create a new on part, and connect it with the existing plan items in the
-     * case.
-     *
-     * @param onPartDefinition
-     */
-    private void createOnPart(PlanItemOnPartDefinition onPartDefinition) {
-        // A sentry that refers to us!
-        PlanItemOnPart onPart = onPartDefinition.createInstance(this);
-        onParts.put(onPartDefinition.getSource(), onPart);
-        inactiveOnParts.add(onPart);
-
-        for (PlanItem planItem : getCaseInstance().getPlanItems()) {
-            if (onPartDefinition.getSource().equals(planItem.getItemDefinition())) {
-                connect(planItem, onPart);
-            }
-        }
-    }
-
-    /**
-     * Create a new on part, and connect it with the existing plan items in the
-     * case.
-     *
-     * @param onPartDefinition
-     */
-    private void createOnPart(CaseFileItemOnPartDefinition onPartDefinition) {
-        // A sentry that refers to us!
-        CaseFileItemOnPart onPart = onPartDefinition.createInstance(this);
-        onParts.put(onPartDefinition.getSource(), onPart);
-        inactiveOnParts.add(onPart);
-
-        CaseFile caseFile = getCaseInstance().getCaseFile();
-
-        CaseFileItem item = caseFile.getItem(onPartDefinition.getSource().getPath());
-        if (item != null) {
-            item.iterator().forEachRemaining(innerItem -> connect(innerItem, onPart));
-        }
-    }
-
-    /**
-     * Connects the plan item to the on part that refers to it (if at all).
+     * Connects to the plan item if there is an on part in the sentry that matches the plan item definition.
      * Skips plan items that belong to sibling stages.
      *
      * @param planItem
      */
-    public void connect(PlanItem planItem) {
+    void establishPotentialConnection(PlanItem planItem) {
         PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getItemDefinition());
         if (onPart != null) {
-            connect(planItem, onPart);
+            onPart.connect(planItem);
         }
     }
 
     /**
-     * Connect the case file item to this sentry (if there is
-     * an on part within this sentry referring to it).
+     * Connects to the case file item if there is an on part in the sentry that matches the case file item definition.
      */
-    public void connect(CaseFileItem caseFileItem) {
+    void establishPotentialConnection(CaseFileItem caseFileItem) {
         CaseFileItemOnPart onPart = (CaseFileItemOnPart) onParts.get(caseFileItem.getDefinition());
         if (onPart != null) {
-            connect(caseFileItem, onPart);
+            onPart.connect(caseFileItem);
         }
-    }
-
-    /**
-     * Connect the case file item with the on part
-     *
-     * @param caseFileItem
-     * @param onPart
-     */
-    private void connect(CaseFileItem caseFileItem, CaseFileItemOnPart onPart) {
-        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + criterion);
-        onPart.connect(caseFileItem);
-    }
-
-    /**
-     * Connect the plan item with the on part if the plan item does not belong
-     * to a sibling stage
-     *
-     * @param planItem
-     * @param onPart
-     */
-    private void connect(PlanItem planItem, PlanItemOnPart onPart) {
-        if (doesNotBelongToSiblingStage(planItem)) {
-            addDebugInfo(() -> "Connecting plan item " + planItem + " to " + criterion);
-            onPart.connect(planItem);
-        } else {
-            addDebugInfo(() -> "Not connecting plan item " + planItem + " to " + criterion + " because it belongs to a sibling stage");
-        }
-    }
-
-    /**
-     * Determines whether the plan item belongs to the stage of this sentry or
-     * to one of it's parents or descendants. If the plan item belongs to a
-     * sibling stage, then it should not be connected to this sentry
-     *
-     * @param planItem
-     * @return
-     */
-    private boolean doesNotBelongToSiblingStage(PlanItem planItem) {
-        if (stage.contains(planItem)) {
-            return true;
-        }
-        if (planItem.getStage().contains(stage)) {
-            return true;
-        }
-        return false;
     }
 
     public boolean isSatisfied() {
@@ -186,9 +100,8 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     }
 
     private boolean evaluateIfPart() {
-        addDebugInfo(() -> "Evaluating if part '"+getDefinition().getIfPart().getExpressionDefinition().getBody()+"'");
+        addDebugInfo(() -> "Evaluating if part in " + criterion);
         boolean ifPartOutcome = getDefinition().getIfPart().evaluate(this);
-        addDebugInfo(() -> "If part evaluation results in: " + ifPartOutcome);
         // TODO: make sure to store the outcome of the ifpart evaluation?
         return ifPartOutcome;
     }

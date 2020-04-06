@@ -13,14 +13,4 @@ public class ProcessResumed extends ProcessInstanceEvent {
     public ProcessResumed(ValueMap json) {
         super(json);
     }
-
-    @Override
-    public void updateState(ProcessTaskActor actor) {
-        // Nothing to update
-    }
-
-    @Override
-    public void runImmediateBehavior() {
-        actor.resume();
-    }
 }
