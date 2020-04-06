@@ -4,7 +4,8 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.task.FailTask;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.processtask.akka.command.ProcessCommand;
+import org.cafienne.processtask.akka.command.*;
+import org.cafienne.processtask.akka.command.response.ProcessResponse;
 import org.cafienne.processtask.akka.event.*;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
@@ -65,18 +66,18 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         this.inputParameters = event.inputParameters;
     }
 
-    public SubProcess<?> getImplementation() {
-        return this.taskImplementation;
-    }
-
-    public void start() {
+    public ProcessResponse start(StartProcess command) {
+        addEvent(new ProcessStarted(this, command));
         addDebugInfo(() -> "Starting process task " + name + " with input parameters", inputParameters);
         taskImplementation.start();
+        return new ProcessResponse(command);
     }
 
-    public void reactivate() {
+    public ProcessResponse reactivate(ReactivateProcess command) {
+        addEvent(new ProcessReactivated(this, command));
         addDebugInfo(() -> "Reactivating process " + getName());
         taskImplementation.reactivate();
+        return new ProcessResponse(command);
     }
 
     public Logger getLogger() {
@@ -107,18 +108,24 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         });
     }
 
-    public void suspend() {
+    public ProcessResponse suspend(SuspendProcess command) {
+        addEvent(new ProcessSuspended(this));
         addDebugInfo(() -> "Suspending process " + getName());
         taskImplementation.suspend();
+        return new ProcessResponse(command);
     }
 
-    public void resume() {
+    public ProcessResponse resume(ResumeProcess command) {
+        addEvent(new ProcessResumed(this));
         addDebugInfo(() -> "Resuming process " + getName());
         taskImplementation.resume();
+        return new ProcessResponse(command);
     }
 
-    public void terminate() {
+    public ProcessResponse terminate(TerminateProcess command) {
+        addEvent(new ProcessTerminated(this));
         addDebugInfo(() -> "Terminating process " + getName());
         taskImplementation.terminate();
+        return new ProcessResponse(command);
     }
 }

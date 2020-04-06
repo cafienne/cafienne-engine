@@ -32,11 +32,6 @@ public class ProcessReactivated extends ProcessInstanceEvent {
     }
 
     @Override
-    public void runImmediateBehavior() {
-        actor.reactivate();
-    }
-
-    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.input, inputParameters);

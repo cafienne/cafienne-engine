@@ -14,9 +14,4 @@ public class ProcessTerminated extends ProcessEnded {
     public ProcessTerminated(ValueMap json) {
         super(json);
     }
-
-    @Override
-    public void runImmediateBehavior() {
-        actor.terminate();
-    }
 }

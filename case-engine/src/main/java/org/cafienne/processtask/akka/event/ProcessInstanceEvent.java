@@ -19,8 +19,8 @@ public abstract class ProcessInstanceEvent extends ModelEvent<ProcessTaskActor> 
     }
 
     @Override
-    public boolean hasBehavior() {
-        return true;
+    public void updateState(ProcessTaskActor actor) {
+        // Nothing to update here. (as of now)
     }
 
     @Override
