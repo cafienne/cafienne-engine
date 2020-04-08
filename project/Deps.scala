@@ -19,7 +19,7 @@ object Deps {
   def container (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "container")
 
   object V {
-    val scala       = "2.12.10"
+    val scala       = "2.12.11"
     val spray       = "1.3.5"
     val akkaHttp    = "10.1.11"
     val slf4j       = "1.7.12"
@@ -27,7 +27,7 @@ object Deps {
     val jackson     = "2.10.0"
     val lucene      = "6.6.1"
     val enumeratum  = "1.5.12"
-    val swagger     = "2.0.9"
+    val swagger     = "2.1.1"
   }
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
@@ -47,11 +47,10 @@ object Deps {
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
   val slf4j                 = akkaSlf4j
-//  val slf4j                 = "org.slf4j"               % "slf4j-simple"                          % "1.7.28"
-  val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "3.1"
+  val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.1"
   val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.0.13"
   val config                = "com.typesafe"            %  "config"                               % "1.4.0"
-  val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.0"
+  val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.2"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
   val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.2.1"
 
@@ -71,11 +70,11 @@ object Deps {
   val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "0.4.2"
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
-  val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.0.1"
+  val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
   val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.0.4"
-  val swaggerAkkaHttpFix    = "io.swagger"              % "swagger-jaxrs"                         % "1.5.24"
+  val swaggerAkkaHttpFix    = "io.swagger"              % "swagger-jaxrs"                         % "1.6.0"
   val swaggerAkkaHttpFix2   = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
-  val swaggerAkkaHttpScala  = "com.github.swagger-akka-http" %% "swagger-scala-module"            % "2.0.5"
+  val swaggerAkkaHttpScala  = "com.github.swagger-akka-http" %% "swagger-scala-module"            % "2.0.6"
   val swaggerCore           = "io.swagger.core.v3"      % "swagger-core"                          % V.swagger
   val swaggerAnnotations    = "io.swagger.core.v3"      % "swagger-annotations"                   % V.swagger
   val swaggerModels         = "io.swagger.core.v3"      % "swagger-models"                        % V.swagger
@@ -93,7 +92,7 @@ object Deps {
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
   val jacksonScala          = "com.fasterxml.jackson.module" %% "jackson-module-scala"            % V.jackson
 
-  val spel                  = "org.springframework"     %  "spring-expression"                    % "4.2.5.RELEASE"
+  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.2.5.RELEASE"
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
@@ -111,7 +110,7 @@ object Deps {
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.7.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.6.0"
 
-  val javaXmlJDK9Compat     = "javax.xml.bind" % "jaxb-api" % "2.3.0"
+  val javaXmlJDK9Compat     = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
 
   object gatling {
     private val v   = "2.0.0.20130628"
