@@ -24,9 +24,9 @@ object Deps {
     val akkaHttp    = "10.1.11"
     val slf4j       = "1.7.12"
     val akka        = "2.6.4"
-    val jackson     = "2.10.0"
-    val lucene      = "6.6.1"
-    val enumeratum  = "1.5.12"
+    val jackson     = "2.10.3"
+    val lucene      = "8.5.0"
+    val enumeratum  = "1.5.15"
     val swagger     = "2.1.1"
   }
 
@@ -38,9 +38,9 @@ object Deps {
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
   val akkaClusterSharding   = "com.typesafe.akka"       %% "akka-cluster-sharding"                % V.akka
   val akkaKryo              = "com.github.romix.akka"   %% "akka-kryo-serialization"              % "1.1.3"
-  val levelDbFixed          = "org.iq80.leveldb"        %  "leveldb"                              % "0.9"
+  val levelDbFixed          = "org.iq80.leveldb"        %  "leveldb"                              % "0.12"
   val levelDbJNI            = "org.fusesource.leveldbjni" % "leveldbjni-all"                      % "1.8"
-  val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.102"
+  val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.103"
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
   val akkaPersistenceJDBC   = "com.github.dnvriend"     %% "akka-persistence-jdbc"                % "3.5.3"
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka
@@ -48,15 +48,15 @@ object Deps {
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
   val slf4j                 = akkaSlf4j
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.1"
-  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.0.13"
+  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.3.0-alpha5"
   val config                = "com.typesafe"            %  "config"                               % "1.4.0"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.2"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
-  val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.2.1"
+  val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.11"
 
 
   // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-  val joda = "org.apache.httpcomponents" % "httpclient" % "4.5.3"
+  val joda = "org.apache.httpcomponents" % "httpclient" % "4.5.12"
 
   // https://mvnrepository.com/artifact/org.apache.lucene/lucene-core
   val lucene = "org.apache.lucene" % "lucene-core" % V.lucene
@@ -85,8 +85,8 @@ object Deps {
   val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.0.1"
   val junit                 = "junit"                   %  "junit"                                % "4.12"
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
-  val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.23.2"
-  val commonsIO             = "commons-io"              %  "commons-io"                           % "2.4"
+  val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.26.3"
+  val commonsIO             = "commons-io"              %  "commons-io"                           % "2.6"
   val apacheCommonsText     = "org.apache.commons"      % "commons-text"                          % "1.8"
   val jsonJava              = "com.fasterxml.jackson.core"   % "jackson-core"					            % V.jackson
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
@@ -96,27 +96,27 @@ object Deps {
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
-  val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % "6.7.0" excludeAll ExclusionRule(organization = "org.apache.lucene")
-  val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % "6.0.0"
+  val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % "6.12.2" excludeAll ExclusionRule(organization = "org.apache.lucene")
+  val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % "6.12.2"
 
   val sw4jj                 = "com.github.j5ik2o"       % "sw4jj_2.11"                            % "1.0.2"
   val slick                 = "com.typesafe.slick"      %% "slick"                                % "3.3.2"
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % "3.3.2"
-  val postgres              = "org.postgresql"          % "postgresql"                            % "9.4-1206-jdbc42"
+  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.12"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
   val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.0"
-  val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "7.4.1.jre11"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.1.4"
+  val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.2.2.jre11"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.2.4"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.7.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.6.0"
 
   val javaXmlJDK9Compat     = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
 
   object gatling {
-    private val v   = "2.0.0.20130628"
-    val app         = "io.gatling"              %  "gatling-app"               % v
-    val recorder    = "io.gatling"              %  "gatling-recorder"          % v
-    val charts      = "io.gatling.highcharts"   %  "gatling-charts-highcharts" % v
+    private val v   = "3.4.0-M1"
+    val app                 = "io.gatling"              %  "gatling-app"                          % v
+    val recorder            = "io.gatling"              %  "gatling-recorder"                     % v
+    val charts              = "io.gatling.highcharts"   %  "gatling-charts-highcharts"            % v
   }
 
 }
