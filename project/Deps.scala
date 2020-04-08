@@ -23,7 +23,7 @@ object Deps {
     val spray       = "1.3.5"
     val akkaHttp    = "10.1.11"
     val slf4j       = "1.7.12"
-    val akka        = "2.6.1"
+    val akka        = "2.6.4"
     val jackson     = "2.10.0"
     val lucene      = "6.6.1"
     val enumeratum  = "1.5.12"
@@ -32,7 +32,7 @@ object Deps {
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
   val akkaStream            = "com.typesafe.akka"       %% "akka-stream"                          % V.akka
-  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % "2.5.27"
+  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % "2.5.31"
   val akkaClusterTools      = "com.typesafe.akka"       %% "akka-cluster-tools"                   % V.akka
   val akkaPersistence       = "com.typesafe.akka"       %% "akka-persistence"                     % V.akka    // exclude("org.iq80.leveldb","leveldb")
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
@@ -42,7 +42,7 @@ object Deps {
   val levelDbJNI            = "org.fusesource.leveldbjni" % "leveldbjni-all"                      % "1.8"
   val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.102"
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  val akkaPersistenceJDBC   = "com.github.dnvriend"     %% "akka-persistence-jdbc"                % "3.5.2"
+  val akkaPersistenceJDBC   = "com.github.dnvriend"     %% "akka-persistence-jdbc"                % "3.5.3"
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
