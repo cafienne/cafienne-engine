@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  master-build:
     working_directory: ~/cafienne-engine
     machine: true
     steps:
@@ -12,8 +12,9 @@ jobs:
             sudo apt install openjdk-11-jdk
             sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
             java -version
-            wget https://dl.bintray.com/sbt/debian/sbt-1.3.4.deb
-            sudo dpkg -i sbt-1.3.4.deb
+            SBT_VERSION=$(awk -F"=" '/sbt.version/{print $NF}' project/build.properties)
+            wget https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
+            sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
       - run:
           name: Compile code
@@ -38,8 +39,8 @@ jobs:
       - run:
           name: Pull docker images
           command: |
-            # docker-compose -f .circleci/docker-test-inmemory.yml pull
-            # docker-compose -f .circleci/docker-test-postgresql.yml pull
+            docker-compose -f .circleci/docker-test-inmemory.yml pull
+            docker-compose -f .circleci/docker-test-postgresql.yml pull
             docker-compose -f .circleci/docker-test-sqlserver.yml pull
             docker-compose -f .circleci/docker-test-cassandra.yml pull
       - run:
@@ -156,7 +157,7 @@ jobs:
               echo "Not pushing image to docker hub"
             fi
 
-  build for release:
+  branch-build:
     working_directory: ~/cafienne-engine
     machine: true
     steps:
@@ -168,8 +169,77 @@ jobs:
             sudo apt install openjdk-11-jdk
             sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
             java -version
-            wget https://dl.bintray.com/sbt/debian/sbt-1.3.4.deb
-            sudo dpkg -i sbt-1.3.4.deb
+            SBT_VERSION=$(awk -F"=" '/sbt.version/{print $NF}' project/build.properties)
+            wget https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
+            sudo dpkg -i sbt-$SBT_VERSION.deb
+            sbt sbtVersion
+      - run:
+          name: Compile code
+          command: sbt compile
+      - run:
+          name: Unit tests
+          command: sbt test
+      - run:
+          name: Clone CMMN-test framework
+          command: |
+            cd ..
+            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+      - run:
+          name: Install dependencies
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm install
+      - run:
+          name: Docker login
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Pull docker images
+          command: |
+            docker-compose -f .circleci/docker-test-inmemory.yml pull
+      - run:
+          name: Build docker image
+          command: sbt docker:publishLocal
+
+      # Starting docker environment for In-memory testing
+      - run:
+          name: Up the containers for In-memory testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-inmemory.yml up -d
+            sleep 15
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev 8000
+      - run:
+          name: Stop the containers
+          command: |
+            docker-compose -f .circleci/docker-test-inmemory.yml stop
+            docker rm $(docker ps -a -q)
+
+  release-build:
+    working_directory: ~/cafienne-engine
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Updating Java and sbt versions
+          command: |
+            sudo apt-get update
+            sudo apt install openjdk-11-jdk
+            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+            java -version
+            SBT_VERSION=$(awk -F"=" '/sbt.version/{print $NF}' project/build.properties)
+            wget https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
+            sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
       - run:
           name: Check for version TAG
@@ -177,7 +247,6 @@ jobs:
             echo `git describe --tags --exact-match` > ./version.txt
             cat ./version.txt
             TAG=$(cat ./version.txt)
-            printenv
       - run:
           name: Compile code
           command: sbt compile
@@ -320,8 +389,19 @@ workflows:
   version: 2
   ci:
     jobs:
-      - build
-      - build for release:
+      - master-build:
+          filters:
+            branches:
+              only:
+                - master
+                - dependency-updates
+      - branch-build:
+          filters:
+            branches:
+              ignore:
+                - master
+                - dependency-updates
+      - release-build:
           filters:
             tags:
               only: /.*/
