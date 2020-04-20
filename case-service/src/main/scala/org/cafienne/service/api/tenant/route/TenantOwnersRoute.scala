@@ -23,7 +23,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenantUserRoles, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
+import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success}
@@ -235,7 +235,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
         //            System.err.println("New roles for user " + userId + " in tenant " + tenant + ": " + roles)
         val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new AddTenantUserRoles(user, tenant, userId, role))
+        askTenant(new AddTenantUserRole(user, tenant, userId, role))
       }
     }
   }
