@@ -44,31 +44,33 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
   }
 
   def handleHumanTaskEvent(event: HumanTaskEvent) = {
-    val fTask = event match {
-      case evt: HumanTaskInputSaved => fetchTask(event.taskId).map(t => Some(TaskMerger(evt, t)))
-      case evt: HumanTaskOutputSaved => fetchTask(event.taskId).map(t => Some(TaskMerger(evt, t)))
-      case evt: HumanTaskOwnerChanged => fetchTask(event.taskId).map(t => Some(TaskMerger(evt, t)))
-      case evt: HumanTaskDueDateFilled => fetchTask(event.taskId).map(t => Some(TaskMerger(evt, t)))
-      case evt: HumanTaskTransitioned => fetchTask(event.taskId).map(t => {
-        Some({
-          val copy = TaskMerger(evt, t)
-          evt match {
-            case evt: HumanTaskAssigned => TaskMerger(evt, copy)
-            case evt: HumanTaskActivated => TaskMerger(evt, copy)
-            case evt: HumanTaskRevoked => TaskMerger(evt, copy)
-            case evt: HumanTaskCompleted => TaskMerger(evt, copy)
-            case evt: HumanTaskTerminated => TaskMerger(evt, copy)
-            case other => {
-              System.err.println("We missed out on HumanTaskTransition event of type " + other.getClass.getName)
-              copy
+    val fTask: Future[Option[Task]] = {
+      event match {
+        case evt: HumanTaskInputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskOutputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskOwnerChanged => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskDueDateFilled => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskTransitioned => fetchTask(event.taskId).map(task => task.map(t => {
+            val copy = TaskMerger(evt, t)
+            evt match {
+              case evt: HumanTaskAssigned => TaskMerger(evt, copy)
+              case evt: HumanTaskActivated => TaskMerger(evt, copy)
+              case evt: HumanTaskRevoked => TaskMerger(evt, copy)
+              case evt: HumanTaskCompleted => TaskMerger(evt, copy)
+              case evt: HumanTaskTerminated => TaskMerger(evt, copy)
+              case other => {
+                System.err.println("We missed out on HumanTaskTransition event of type " + other.getClass.getName)
+                copy
+              }
             }
-          }
-        })
-      })
+        }))
+      }
     }
+
+
     fTask.map {
       case Some(task) => this.tasks.put(task.id, task)
-      case _ => logger.error("Could not find task with id " + event.taskId + " in the current database. This may lead to problems")
+      case _ => logger.error("Could not find task with id " + event.taskId + " in the current database. This may lead to problems. Ignoring event of type " + event.getClass.getName)
     }.flatMap(_ => Future.successful(Done))
 
   }
@@ -89,7 +91,7 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
       case None =>
         logger.debug("Retrieving task " + taskId + " from database")
         persistence.getTask(taskId)
-      case Some(task) => Future.successful(task)
+      case Some(task) => Future.successful(Some(task))
     }
   }
 }
