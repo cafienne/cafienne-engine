@@ -81,9 +81,9 @@ object Deps {
   val swaggerjaxrs2         = "io.swagger.core.v3"      % "swagger-jaxrs2"                        % V.swagger
 
   // The test scope will be added in the build so we don't need to declare it in here
-  val scalaMock             = "org.scalamock"           %% "scalamock"                            % "4.1.0"
-  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.0.1"
-  val junit                 = "junit"                   %  "junit"                                % "4.12"
+  val scalaMock             = "org.scalamock"           %% "scalamock"                            % "4.4.0"
+  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.1.1"
+  val junit                 = "junit"                   %  "junit"                                % "4.13"
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
   val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.26.3"
   val commonsIO             = "commons-io"              %  "commons-io"                           % "2.6"

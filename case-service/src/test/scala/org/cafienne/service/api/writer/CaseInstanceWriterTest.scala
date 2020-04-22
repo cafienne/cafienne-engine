@@ -11,13 +11,15 @@ import org.cafienne.service.api.cases.CaseInstance
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
 class CaseInstanceWriterTest
     extends TestKit(ActorSystem("testsystem", TestConfig.config))
-    with WordSpecLike
+    with AnyWordSpecLike
     with Matchers
     with BeforeAndAfterAll
     with Eventually {

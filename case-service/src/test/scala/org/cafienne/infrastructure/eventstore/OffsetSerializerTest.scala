@@ -1,9 +1,10 @@
 package org.cafienne.infrastructure.eventstore
 
 import org.cafienne.infrastructure.eventstore.OffsetType.{NoOffsetType, SequenceType, TimeBasedUUIDType}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class OffsetSerializerTest extends FlatSpec with Matchers {
+class OffsetSerializerTest extends AnyFlatSpec with Matchers {
 
   val offsetSerializer = new OffsetSerializer
 

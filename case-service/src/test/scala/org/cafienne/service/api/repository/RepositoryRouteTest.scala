@@ -8,9 +8,10 @@ import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.ValueMarshallers
 import org.cafienne.service.api.tenant.TenantQueriesImpl
-import org.scalatest.{FlatSpec, MustMatchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
 
-class RepositoryRouteTest extends FlatSpec with MustMatchers with ScalatestRouteTest {
+class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteTest {
 
   val logger = Logging(system, getClass)
 
