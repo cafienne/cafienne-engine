@@ -165,7 +165,7 @@
       bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml"""",
       bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",
       dockerExposedPorts := Seq(2027, 9999),
-      dockerBaseImage := "cafienne/base:openjdk-11",
+      dockerBaseImage := "cafienne/base:openjdk-11-buster",
       name in Universal := "cafienne",
       packageName in Universal := "cafienne"
     )

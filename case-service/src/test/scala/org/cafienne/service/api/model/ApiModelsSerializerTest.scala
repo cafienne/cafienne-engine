@@ -3,11 +3,12 @@ package org.cafienne.service.api.model
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember}
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.infrastructure.akka.http.JsonUtil
-import org.scalatest.{FlatSpec, MustMatchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
 
 import scala.collection.JavaConverters._ // for roles to set conversion
 
-class ApiModelsSerializerTest extends FlatSpec with MustMatchers  {
+class ApiModelsSerializerTest extends AnyFlatSpec with Matchers  {
 
   val tenant = ""
   val minimalJson = "{\"definition\":\"startcase\",\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"

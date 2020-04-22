@@ -7,12 +7,15 @@ import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.db.migration.Migrate
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, MustMatchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
+
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class TaskQueriesImplTest extends FlatSpec with MustMatchers with BeforeAndAfterAll with QueryDbConfig {
+class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDbConfig {
 
   val taskQueries = new TaskQueriesImpl
   val updater = new SlickRecordsPersistence

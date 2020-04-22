@@ -19,12 +19,13 @@ import net.minidev.json.JSONArray
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticationDirectiveSpec extends WordSpec with Matchers with ScalaFutures with SprayJsonSupport with ScalatestRouteTest {
+class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with SprayJsonSupport with ScalatestRouteTest {
   //TODO add a test with a non UUID subject
   final val tokenWithRole    = generateTokenAndSource("subject1", List("USER", "ADMIN"))
   final val tokenWithoutRole = generateTokenAndSource("subject2", List.empty[String])
