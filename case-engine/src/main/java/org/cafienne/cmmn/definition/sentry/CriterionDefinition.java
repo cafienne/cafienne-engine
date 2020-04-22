@@ -15,6 +15,10 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
     }
 
     public SentryDefinition getSentryDefinition() {
+        if (sentry == null) {
+            // Sometimes this is invoked too early. Then try to resolve first
+            this.resolveReferences();
+        }
         return sentry;
     }
 

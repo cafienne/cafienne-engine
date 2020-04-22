@@ -37,6 +37,15 @@ public class EntryCriterionDefinition extends CriterionDefinition {
         }
     }
 
+    /**
+     * Returns true if there is at least one on part in this definition
+     * @return
+     */
+    public boolean hasOnParts() {
+        // Check whether sentry definition exists at all, and if so, check whether it has on parts.
+        return this.getSentryDefinition() != null && !getSentryDefinition().getOnParts().isEmpty();
+    }
+
     @Override
     public Transition getTransition() {
         return entryTransition;

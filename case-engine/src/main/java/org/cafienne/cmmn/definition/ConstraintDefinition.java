@@ -41,8 +41,6 @@ public class ConstraintDefinition extends CMMNElementDefinition {
         }
         context = getCaseDefinition().findCaseFileItem(contextRef);
         if (context == null) {
-            String parentType = getParentElement().getType();
-            String parentId = getParentElement().getId();
             getCaseDefinition().addReferenceError(getContextDescription()+" refers to a Case File item with id '" + contextRef + "', but the corresponding Case File item cannot be found.");
         } else {
             pathToContext = context.getPath();
