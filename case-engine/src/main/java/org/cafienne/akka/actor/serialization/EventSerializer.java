@@ -1,6 +1,7 @@
 package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.akka.actor.event.EngineVersionChanged;
+import org.cafienne.akka.actor.event.SentryEvent;
 import org.cafienne.cmmn.akka.event.*;
 import org.cafienne.cmmn.akka.event.DebugDisabled;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
@@ -34,6 +35,7 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
 
     private static void registerBaseEvents() {
         addManifestWrapper(DebugEvent.class, DebugEvent::new);
+        addManifestWrapper(SentryEvent.class, SentryEvent::new);
         addManifestWrapper(DebugDisabled.class, DebugDisabled::new);
         addManifestWrapper(DebugEnabled.class, DebugEnabled::new);
     }

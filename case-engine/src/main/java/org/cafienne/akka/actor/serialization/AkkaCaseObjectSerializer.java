@@ -49,6 +49,7 @@ public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
             ManifestWrapper manifest = getManifest(manifestString);
             if (manifest == null) {
                 // This is an unrecognized event.
+                logger.warn("Manifest " + manifestString +" cannot be converted to one of the registered event types. Generating 'UnrecognizedManifest' object instead");
                 return new UnrecognizedManifest(manifestString, eventBlob);
             }
             try {
