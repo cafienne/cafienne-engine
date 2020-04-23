@@ -12,13 +12,20 @@
         <CMMNShape cmmnElementRef="_4kpJj_5">
             <Bounds x="134" y="190" width="12" height="20"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="_4kpJj_6">
-            <Bounds x="204" y="220" width="12" height="20"/>
+        <CMMNShape cmmnElementRef="pi_ms__4kpJj_0">
+            <Bounds x="290" y="200" width="160" height="60"/>
         </CMMNShape>
-        <textbox cmmnElementRef="_4kpJj_shape_5" parentId="cm__4kpJj_0" content="Item2.complete">
-            <Bounds x="270" y="200" width="100" height="60"/>
-        </textbox>
+        <CMMNShape cmmnElementRef="_4kpJj_6">
+            <Bounds x="284" y="220" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_4kpJj_12">
+            <Bounds x="154" y="250" width="12" height="20"/>
+        </CMMNShape>
         <CMMNEdge sourceCMMNElementRef="pi_ht__4kpJj_0" targetCMMNElementRef="_4kpJj_5"/>
-        <CMMNEdge sourceCMMNElementRef="_4kpJj_6" targetCMMNElementRef="_4kpJj_shape_5"/>
+        <CMMNEdge sourceCMMNElementRef="pi_ht__4kpJj_1" targetCMMNElementRef="_4kpJj_6"/>
+        <CMMNEdge sourceCMMNElementRef="pi_ms__4kpJj_0" targetCMMNElementRef="_4kpJj_12">
+            <waypoint x="340" y="360"/>
+            <waypoint x="160" y="360"/>
+        </CMMNEdge>
     </CMMNDiagram>
 </CMMNDI>
