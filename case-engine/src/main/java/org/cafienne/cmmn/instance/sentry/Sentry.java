@@ -49,7 +49,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      */
     private boolean isActive;
 
-    Sentry(Stage stage, Criterion criterion) {
+    Sentry(Stage stage, Criterion<?> criterion) {
         super(stage, criterion.getDefinition().getSentryDefinition());
         this.stage = stage;
         this.criterion = criterion;
@@ -113,7 +113,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     void activate(OnPart<?, ?> activator) {
         inactiveOnParts.remove(activator);
         if (inactiveOnParts.isEmpty()) {
-            addDebugInfo(() -> criterion + " has become active.", this);
+            addDebugInfo(() -> criterion + " has become active");
         } else {
             addDebugInfo(() -> criterion + " has "+inactiveOnParts.size()+" remaining inactive on parts", this);
         }

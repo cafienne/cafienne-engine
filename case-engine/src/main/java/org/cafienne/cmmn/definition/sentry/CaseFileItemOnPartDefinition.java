@@ -42,6 +42,11 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
         }
     }
 
+    @Override
+    public String getContextDescription() {
+        return source.getType() +"["+ source.getPath()+"]." + standardEvent;
+    }
+
     public CaseFileItemTransition getStandardEvent() {
         return standardEvent;
     }

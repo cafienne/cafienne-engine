@@ -8,9 +8,10 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.plan.*;
-import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
-import org.cafienne.cmmn.instance.sentry.ExitCriterion;
+import org.cafienne.cmmn.definition.CasePlanDefinition;
+import org.cafienne.cmmn.definition.ItemDefinition;
+import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
 import org.cafienne.util.Guid;
 import org.slf4j.Logger;
@@ -61,8 +62,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Our entry and exit criteria (i.e., to plan items and case file items of interest to us)
      */
-    private final Collection<EntryCriterion> entryCriteria = new ArrayList<>();
-    private final Collection<ExitCriterion> exitCriteria = new ArrayList<>();
+    private final Collection<Criterion> entryCriteria = new ArrayList<>();
+    private final Collection<Criterion> exitCriteria = new ArrayList<>();
     /**
      * Whether we repeat or not
      */
@@ -156,8 +157,21 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
             // Create new sentries within the case to which we will react;
             // Case Plan has to do this himself.
-            itemDefinition.getEntryCriteria().forEach(c -> entryCriteria.add(stage.getEntryCriterion(c)));
-            itemDefinition.getExitCriteria().forEach(c -> exitCriteria.add(stage.getExitCriterion(c)));
+            itemDefinition.getEntryCriteria().forEach(c -> entryCriteria.add(stage.getCriterion(c, this)));
+            itemDefinition.getExitCriteria().forEach(c -> exitCriteria.add(stage.getCriterion(c, this)));
+        }
+    }
+
+    public void trigger(Transition transition) {
+        if (this.index == 0 && (state == State.Null || state == State.Available)) {
+            // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
+            //  and also for the very first time. Therefore we should not yet repeat, but only make the
+            //  entry transition.
+            makeTransition(transition);
+        } else {
+            // In all other cases we have to check whether or not to create a repeat item, and, if so,
+            //  initiate that with the entry transition
+            repeat(transition);
         }
     }
 
@@ -235,15 +249,15 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public void makeTransition(Transition transition) {
         if (!hasLock(transition)) { // First check to determine whether we are allowed to make this transition.
-            addDebugInfo(() -> this + ": cannot acquire lock for transition " + transition + " since currently transitioning " + nextTransition);
+            addDebugInfo(() -> "StateMachine-"+this+": cannot acquire lock for transition " + transition + " since currently transitioning " + nextTransition);
             return;
         }
         PlanItemTransitioned event = stateMachine.transition(this, transition);
         if (event != null) { // means, a transition happened.
-            addDebugInfo(() -> this + ".StateMachine allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
+            addDebugInfo(() -> "StateMachine-"+this+": allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
             getCaseInstance().addEvent(event);
         } else {
-            addDebugInfo(() -> this + ".StateMachine: transition " + transition + " has no effect, current state remains " + getState());
+            addDebugInfo(() -> "StateMachine-"+this+": transition " + transition + " has no effect, current state remains " + getState());
         }
     }
 
@@ -292,7 +306,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public Collection<EntryCriterion> getEntryCriteria() {
+    public Collection<Criterion> getEntryCriteria() {
         return entryCriteria;
     }
 
@@ -301,7 +315,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public Collection<ExitCriterion> getExitCriteria() {
+    public Collection<Criterion> getExitCriteria() {
         return exitCriteria;
     }
 
@@ -343,7 +357,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Repeats the plan item upon it's Completion or Termination, and only if there are no entry criteria.
      * Additionally checks that the containing stage is still active.
      */
-    public void repeat() {
+    public void repeat(Transition transition) {
         addDebugInfo(() -> this + ": initiating repeat logic for next item");
 
         // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
@@ -369,6 +383,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
             getCaseInstance().addEvent(pic);
             getCaseInstance().addEvent(pic.createStartEvent());
+            getCaseInstance().getPlanItemById(pic.planItemId).makeTransition(transition);
         }
     }
 
@@ -395,7 +410,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
                 return;
             }
             // Evaluate sentries to see whether one is already active, and, if so, make the transition
-            for (EntryCriterion criterion : getEntryCriteria()) {
+            for (Criterion criterion : getEntryCriteria()) {
                 if (criterion.isSatisfied()) {
                     addDebugInfo(() -> this + ": an EntryCriterion is satisfied, making transition " + transition);
                     makeTransition(transition);
@@ -428,6 +443,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
         // First execute the related state machine action (e.g., activating a timer, releasing a subprocess, suspending, etc.etc.)
         StateMachine.Action action = stateMachine.getAction(newState);
+        addDebugInfo(() -> "StateMachine-"+this+": running action for state '"+newState+"'");
         action.execute(this, transition);
     }
 
@@ -546,13 +562,13 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
         if (!getEntryCriteria().isEmpty()) {
             planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
-            for (EntryCriterion criterion : getEntryCriteria()) {
+            for (Criterion criterion : getEntryCriteria()) {
                 criterion.dumpMemoryStateToXML(planItemXML, true);
             }
         }
         if (!getExitCriteria().isEmpty()) {
             planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
-            for (ExitCriterion criterion : getExitCriteria()) {
+            for (Criterion criterion : getExitCriteria()) {
                 criterion.dumpMemoryStateToXML(planItemXML, true);
             }
         }

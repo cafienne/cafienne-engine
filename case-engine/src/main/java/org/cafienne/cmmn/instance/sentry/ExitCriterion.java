@@ -5,17 +5,24 @@ import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExitCriterion extends Criterion {
+public class ExitCriterion extends Criterion<ExitCriterionDefinition> {
     private final String targetPlanItemName;
     private final Transition targetTransition;
+    private final List<PlanItem> listeners = new ArrayList<>();
 
     public ExitCriterion(Stage stage, ExitCriterionDefinition definition) {
         super(stage, definition);
         targetPlanItemName = definition.getTarget();
         targetTransition = Transition.Exit;
+    }
+
+    @Override
+    public void addPlanItem(PlanItem planItem) {
+        listeners.add(planItem);
     }
 
     @Override
@@ -27,11 +34,19 @@ public class ExitCriterion extends Criterion {
         // Of course, if 2 threads simultaneously execute an activity on the case instance, this can also result
         // in the ConcurrentModificationException, however, we do not want to solve that problem inside the engine,
         // but rather outside of it.
-        List<PlanItem> planItemsCurrentlyEligible = stage.getPlanItems().stream().filter(p -> p.getName().equals(targetPlanItemName)).collect(Collectors.toList());
-        for (PlanItem planItem : planItemsCurrentlyEligible) {
-            addDebugInfo(() -> "Exit criterion of '" + planItem + "' is satisfied and will trigger "+targetTransition, this.sentry);
-            planItem.makeTransition(targetTransition);
+//        List<PlanItem> planItemsCurrentlyEligible = stage.getPlanItems().stream().filter(p -> p.getName().equals(targetPlanItemName)).collect(Collectors.toList());
+//        for (PlanItem planItem : planItemsCurrentlyEligible) {
+//            addDebugInfo(() -> "Exit criterion of '" + planItem + "' is satisfied and will trigger "+targetTransition, this.sentry);
+//            planItem.makeTransition(targetTransition);
+//        }
+
+        if (listeners == null) {
+            return;
         }
+
+        List<PlanItem> killThese = listeners.stream().collect(Collectors.toList());
+
+        killThese.forEach(planItem -> planItem.makeTransition(targetTransition));
     }
     
     @Override

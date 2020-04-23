@@ -182,7 +182,6 @@ class StateMachine {
         TaskStage.addTransition(Transition.ParentResume, null, State.Suspended);
 
         TaskStage.setAction(State.Available, (PlanItem p, Transition t) -> {
-            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Available' action for plan item " + p.getName());
             p.createInstance();
             p.evaluateRepetitionRule();
             p.evaluateRequiredRule();
@@ -192,7 +191,6 @@ class StateMachine {
             p.checkEntryCriteria(transition);
         });
         TaskStage.setAction(State.Active, (PlanItem p, Transition t) -> {
-            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Active' action for plan item " + p.getName());
             if (t == Transition.Start || t == Transition.ManualStart) {
                 p.startInstance();
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
@@ -207,17 +205,15 @@ class StateMachine {
         TaskStage.setAction(State.Enabled, (PlanItem p, Transition t) -> p.makeTransition(Transition.Start));
         TaskStage.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
         TaskStage.setAction(State.Completed, (PlanItem p, Transition t) -> {
-            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Completed' action for plan item " + p.getName());
             p.completeInstance();
             if (p.getEntryCriteria().isEmpty()) {
-                p.repeat();
+                p.repeat(Transition.Start);
             }
         });
         TaskStage.setAction(State.Terminated, (PlanItem p, Transition t) -> {
-            p.getCaseInstance().addDebugInfo(() -> "StateMachine: running 'Terminated' action for plan item " + p.getName());
             p.terminateInstance();
             if (p.getEntryCriteria().isEmpty()) {
-                p.repeat();
+                p.repeat(Transition.Start);
             }
         });
         TaskStage.setAction(State.Failed, (PlanItem p, Transition t) -> p.failInstance());

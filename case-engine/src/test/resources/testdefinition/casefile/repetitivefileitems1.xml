@@ -23,7 +23,7 @@
 						<condition language="spel">
 							<body>
 								<!-- Can add as many items as we like ?-->
-								<![CDATA[TopCase.items.size() < 2]]>
+								<![CDATA[TopCase.items.size() < 3]]>
 							</body>
 						</condition>
 					</repetitionRule>

@@ -44,22 +44,33 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         this.autoCompletes = definition.autoCompletes();
     }
 
-    public EntryCriterion getEntryCriterion(EntryCriterionDefinition definition) {
-        Criterion criterion = sentries.get(definition);
-        if (criterion == null) {
-            criterion = definition.createInstance(this);
-            sentries.put(definition, criterion);
-        }
-        return (EntryCriterion) criterion;
+    /**
+     * Some entry criteria may listen not only to plan items, but also to a specific exit criterion of a plan item.
+     * They can retrieve it through this method. Note this method will not create the criterion...
+     * @param definition
+     * @return
+     */
+    public ExitCriterion getExitCriterion(ExitCriterionDefinition definition) {
+        return (ExitCriterion) sentries.get(definition);
     }
 
-    public ExitCriterion getExitCriterion(ExitCriterionDefinition definition) {
+    /**
+     * Entry- an exit-criteria live at Stage instance level.
+     * Individual plan items can ask the stage for their defined criteria. The stage will then register the
+     * plan item with the criterion (and create the criterion if not yet available)
+     * @param definition
+     * @param planItem
+     * @param <C>
+     * @return
+     */
+    <C extends Criterion> C getCriterion(CriterionDefinition definition, PlanItem planItem) {
         Criterion criterion = sentries.get(definition);
         if (criterion == null) {
             criterion = definition.createInstance(this);
             sentries.put(definition, criterion);
         }
-        return (ExitCriterion) criterion;
+        criterion.addPlanItem(planItem);
+        return (C) criterion;
     }
 
     void register(PlanItem child) {

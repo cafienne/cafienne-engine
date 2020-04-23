@@ -72,7 +72,7 @@ public class RepetitiveFileItems {
         itemObject.putRaw("role", "expert");
         itemArray.add(itemObject); // Also add it to the test object
 
-        // We're adding a clone of the item object into the case, so that we properly compare arrays
+        // We're adding a clone of the item object into the case, so that we properly compare arrays. There must be 1 Review task.
         testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
             CaseAssertion casePlan = new CaseAssertion(action);
             TestScript.debugMessage("CasePlan: " + casePlan);
@@ -82,9 +82,8 @@ public class RepetitiveFileItems {
             action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
 
             // The entry criterion for the first review task must have been satisfied, so the Review task should be
-            // in state active. Additionally the outcome of the repeat rule gave another Review instance in state available. Also this task must be
-            // repeatable,
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active, State.Available).assertRepeats();
+            // in state active.
+            casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Active).assertRepeats();
 
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
@@ -92,7 +91,7 @@ public class RepetitiveFileItems {
             action.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
-        // And add another item, causing changes in the plan (if it all works out)
+        // And add another item, causing changes in the plan (if it all works out). There now must be 2 Review tasks
         testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
             CaseAssertion casePlan = new CaseAssertion(action);
             TestScript.debugMessage(casePlan);
@@ -104,21 +103,21 @@ public class RepetitiveFileItems {
 //            });
 //            System.out.println("Done.");
 
-            // Now there must be 3 review tasks, but the last task should not be repeating any more.
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
-
             // One more item ...
             action.getEvents().assertCaseFileEvent("TopCase/items[1]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
             action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
             action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            // Now there must be one more review task
+            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
+
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             //  ... but there should not be any new events on it that come out of the action.
             action.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
-        // And add another item, causing changes in the plan (if it all works out)
+        // And add another item, causing changes in the plan (if it all works out). There should not be any new Review tasks.
         testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
             CaseAssertion casePlan = new CaseAssertion(action);
 
@@ -204,11 +203,12 @@ public class RepetitiveFileItems {
         itemArray.add(itemObject.cloneValueNode()); // [0]
         itemArray.add(itemObject.cloneValueNode()); // [1]
 
+        // Creating 2 items in the array should trigger 2 new Review tasks
         testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), "TopCase"), action -> {
             CaseAssertion casePlan = new CaseAssertion(action);
             TestScript.debugMessage(casePlan);
-            // There must be 1 review task in state available, and it should be repeating
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
+            // There must be 2 review tasks
+            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
 
             casePlan.assertCaseFileItem("TopCase/items[1]").assertValue(itemObject);
 
@@ -223,7 +223,7 @@ public class RepetitiveFileItems {
             action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
         });
 
-        // Add another item
+        // Add another item. There should not be a new Review task, and the repetition of the second Review task must be false.
         testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
             CaseAssertion casePlan = new CaseAssertion(action);
 
@@ -248,7 +248,7 @@ public class RepetitiveFileItems {
 
 
             // There must be 2 review tasks, one active and one available.
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
+            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
 
             // One more item ...
             action.getEvents().assertCaseFileEvent("TopCase/items[3]", e -> e.getValue().equals(itemObject));
