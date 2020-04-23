@@ -42,7 +42,6 @@ public class RepeatRule {
             TestScript.debugMessage(casePlan);
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         // Now complete Item2 multiple times. It is not supposed to repeat more than 10 times, it says in the definition
@@ -52,7 +51,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(1);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -61,7 +59,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(2);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -70,7 +67,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(3);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -79,7 +75,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(4);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -88,7 +83,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(5);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -97,7 +91,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(6);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -106,7 +99,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(7);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -115,7 +107,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(8);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
@@ -124,7 +115,6 @@ public class RepeatRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(9);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         // It should stop repeating after the 10th item is put inside
