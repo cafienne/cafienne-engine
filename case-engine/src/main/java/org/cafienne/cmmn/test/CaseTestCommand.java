@@ -14,6 +14,7 @@ import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.slf4j.Logger;
@@ -182,5 +183,10 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
             return ((BootstrapCommand) actualCommand).tenant();
         }
         throw new RuntimeException("This is not a BootstrapCommand");
+    }
+
+    @Override
+    public Value<?> toJson() {
+        return actualCommand.toJson();
     }
 }
