@@ -2,7 +2,7 @@ package org.cafienne.service.api.tenant
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
-import org.cafienne.service.api.tasks.SearchFailure
+import org.cafienne.service.api.projection.UserSearchFailure
 
 import scala.collection.mutable
 import scala.concurrent.Future
@@ -103,7 +103,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
       val roleNames = roleRecords.filter(role => role.enabled).map(role => role.role_name).filter(roleName => !roleName.isBlank)
       // Filter out user
       val userIdentifyingRole = roleRecords.find(role => role.role_name == "").getOrElse({
-        throw new SearchFailure(s"User '${userId}' cannot be found")
+        throw UserSearchFailure(userId)
       })
       TenantUser(userIdentifyingRole.userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
     })

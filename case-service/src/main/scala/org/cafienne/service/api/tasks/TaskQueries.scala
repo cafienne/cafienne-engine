@@ -5,6 +5,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.cases.table.CaseTables
+import org.cafienne.service.api.projection.TaskSearchFailure
 import org.cafienne.service.api.tenant.TenantTables
 
 import scala.concurrent.Future
@@ -65,7 +66,7 @@ class TaskQueriesImpl extends TaskQueries
     val query = TableQuery[TaskTable]
       .filter(_.id === taskId)
       .filter(_.tenant.inSet(user.tenants))
-    db.run(query.result).map(t => if (t.isEmpty) throw SearchFailure("Task " + taskId + " not found.") else t.head)
+    db.run(query.result).map(t => if (t.isEmpty) throw TaskSearchFailure(taskId) else t.head)
   }
 
   override def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[Task]] = {
@@ -120,8 +121,7 @@ class TaskQueriesImpl extends TaskQueries
         }
       }
       case None => {
-//        System.err.println("Task cannot be found")
-        throw new SearchFailure("Task not found")
+        throw TaskSearchFailure(taskId)
       }
     })
 

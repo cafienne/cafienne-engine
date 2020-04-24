@@ -67,9 +67,9 @@ trait CaseServiceRoute extends LazyLogging {
       extractMethod { method =>
         // Simply print headline of the exception
         if (logger.underlying.isDebugEnabled()) {
-          logger.debug(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri :\n" + t, t)
+          logger.debug(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t, t)
         } else {
-          logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri :\n" + t)
+          logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t)
         }
         complete(HttpResponse(StatusCodes.InternalServerError))
       }

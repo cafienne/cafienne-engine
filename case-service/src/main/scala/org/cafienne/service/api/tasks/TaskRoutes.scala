@@ -30,6 +30,7 @@ import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.service.api
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.model.Examples
+import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
 
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success}
@@ -136,10 +137,9 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
                 complete(StatusCodes.OK, tasks)
                 complete(StatusCodes.OK, tasks)
               case Failure(err) =>
-                logger.error("Could not find the task, but got an error " + err.getLocalizedMessage, err)
                 err match {
-                  case e: SearchFailure => complete(StatusCodes.NotFound, err)
-                  case _ => complete(StatusCodes.InternalServerError, err)
+                  case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+                  case _ => throw err
                 }
             }
           }
@@ -177,8 +177,8 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
             case Failure(err) =>
               logger.error("Could not find the task, but got an error " + err.getLocalizedMessage, err)
               err match {
-                case e: SearchFailure => complete(StatusCodes.NotFound, err)
-                case _ => complete(StatusCodes.InternalServerError, err)
+                case c: CaseSearchFailure => complete(StatusCodes.NotFound, c.getLocalizedMessage)
+                case _ => throw err
               }
           }
         }
@@ -208,14 +208,11 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
       path(Segment) { taskId =>
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
           onComplete(handleSyncedQuery(() => taskQueries.getTask(taskId, user), caseLastModified)) {
-            case Success(value) =>
-              logger.debug("Returning the task " + value)
-              complete(StatusCodes.OK, value.toValueMap)
+            case Success(value) => complete(StatusCodes.OK, value.toValueMap)
             case Failure(err) =>
-              logger.error("Could not find the task, but got an error " + err.getLocalizedMessage, err)
               err match {
-                case e: SearchFailure => complete(StatusCodes.NotFound, err)
-                case _ => complete(StatusCodes.InternalServerError, err)
+                case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+                case other => throw other
               }
           }
         }
@@ -473,7 +470,12 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
           case None => complete(StatusCodes.NotFound, "A task with id " + taskId + " cannot be found in the system")
         }
       }
-      case Failure(error) => complete(StatusCodes.InternalServerError, error)
+      case Failure(error) => {
+        error match {
+          case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+          case _ => throw error
+        }
+      }
     }
   }
 

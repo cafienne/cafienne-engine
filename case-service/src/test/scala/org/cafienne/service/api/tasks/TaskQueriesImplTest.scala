@@ -5,12 +5,12 @@ import java.time.Instant
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.Sort
+import org.cafienne.service.api.projection.TaskSearchFailure
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.db.migration.Migrate
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -43,7 +43,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   "A query" should "give a search failure when task not found" in {
-    assertThrows[SearchFailure] {
+    assertThrows[TaskSearchFailure] {
       Await.result(taskQueries.getTask("123", testUser), 3.seconds)
     }
   }
@@ -59,7 +59,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "retrieve nothing by unknown taskId" in {
-    assertThrows[SearchFailure] {
+    assertThrows[TaskSearchFailure] {
       Await.result(taskQueries.getCaseAndTenantInformation("10", testUser), 1.second)
     }
   }
