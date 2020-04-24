@@ -7,8 +7,10 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
@@ -37,20 +39,59 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
      * @param planItem
      * @return
      */
-    private boolean doesNotBelongToSiblingStage(PlanItem planItem) {
+    boolean doesNotBelongToSiblingStage(PlanItem planItem) {
+
+        if (belongsToSiblingStage(planItem, sentry.getStage())) {
+//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ sentry.getStage());
+            return false;
+        }
+        if (belongsToSiblingStage(sentry.getStage(), findStage(planItem))) {
+//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ sentry.getStage());
+            return false;
+        }
+
         if (sentry.getStage().contains(planItem)) {
+//            System.out.println("\tnot a sibling, because " + planItem +" is contained in " + sentry.getStage());
             return true;
         }
         if (planItem.getStage().contains(sentry.getStage())) {
             return true;
         }
-        return false;
+
+        return true;
     }
+
+    private boolean belongsToSiblingStage(PlanItem source, Stage target) {
+        if (source == null) {
+            return false;
+        }
+        if (source.getStage() == target) {
+            return false;
+        }
+        ItemDefinition sourceDefinition = source.getItemDefinition();
+        ItemDefinition targetStageDefinition = target.getItemDefinition();
+        if (sourceDefinition.equals(targetStageDefinition) && source != target) {
+            return true;
+        }
+
+        return belongsToSiblingStage(source.getStage(), target);
+    }
+
+    private Stage findStage(PlanItem target) {
+        if (target instanceof Stage) return (Stage) target;
+        return target.getStage();
+    }
+
+
 
     @Override
     void connectToCase() {
         for (PlanItem planItem : getCaseInstance().getPlanItems()) {
             if (getDefinition().getSourceDefinition().equals(planItem.getItemDefinition())) {
+//                System.out.println("\n\nConnecting criterion: " + getSentry().getCriterion());
+//                System.out.println("Plan Item Stage: " + planItem.getStage());
+//                System.out.println("My stage: " + getSentry().getStage());
+//                System.out.println("So we try to connect");
                 connect(planItem);
             }
         }
@@ -69,9 +110,20 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         }
     }
 
+    public PlanItem getSource() {
+        return source;
+    }
+
+    public Transition getTransition() {
+        return lastTransition;
+    }
+
+    private PlanItem source;
+
     public void inform(PlanItem planItem, Transition transition) {
-        addDebugInfo(() -> "Plan item " + planItem + " informs " + sentry.criterion + " about transition " + transition);
+        addDebugInfo(() -> planItem + " informs " + sentry.criterion + " about transition " + transition);
         lastTransition = transition;
+        source = planItem;
         isActive = standardEvent.equals(lastTransition);
         if (isActive) {
             if (relatedExitCriterion != null) { // The exitCriterion must also be active

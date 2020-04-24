@@ -72,6 +72,10 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     void establishPotentialConnection(PlanItem planItem) {
         PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getItemDefinition());
         if (onPart != null) {
+//            System.out.println("\n\nConnecting criterion: " + getCriterion());
+//            System.out.println("Plan Item Stage: " + planItem.getStage());
+//            System.out.println("My stage: " + getStage());
+//            System.out.println("So we try to connect");
             onPart.connect(planItem);
         }
     }
@@ -119,7 +123,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
         }
         if (isSatisfied()) {
             isActive = true;
-            criterion.satisfy();
+            criterion.satisfy(activator);
             // isActive = false;
         }
     }

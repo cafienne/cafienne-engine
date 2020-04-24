@@ -16,7 +16,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         this.sentry = new Sentry(stage, this);
     }
 
-    protected abstract void satisfy();
+    protected abstract void satisfy(OnPart<?, ?> activator);
 
     public abstract void addPlanItem(PlanItem planItem);
 

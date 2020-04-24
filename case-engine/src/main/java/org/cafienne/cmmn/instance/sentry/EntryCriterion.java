@@ -23,7 +23,7 @@ public class EntryCriterion extends Criterion<EntryCriterionDefinition> {
     }
 
     @Override
-    protected void satisfy() {
+    protected void satisfy(OnPart<?, ?> activator) {
         satisfied = true;
         trigger();
     }
