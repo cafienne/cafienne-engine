@@ -59,18 +59,21 @@ trait CaseServiceRoute extends LazyLogging {
       .result()
 
   def exceptionHandler = ExceptionHandler {
-    case exception: Throwable => {
-      extractUri { uri =>
-        defaultExceptionHandler(exception, uri)
-      }
-    }
+    case exception: Throwable => defaultExceptionHandler(exception)
   }
 
-  def defaultExceptionHandler(t: Throwable, uri: Uri) = {
-    // Simply print headline of the exception
-    logger.info("Bumped into an exception in " + this.getClass().getSimpleName() + " on uri " + uri + ":\n" + t)
-    logger.debug("Bumped into an exception in " + this.getClass().getSimpleName() + " on uri " + uri + ":\n" + t, t)
-    complete(HttpResponse(StatusCodes.InternalServerError))
+  def defaultExceptionHandler(t: Throwable): Route = {
+    extractUri { uri =>
+      extractMethod { method =>
+        // Simply print headline of the exception
+        if (logger.underlying.isDebugEnabled()) {
+          logger.debug(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri :\n" + t, t)
+        } else {
+          logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri :\n" + t)
+        }
+        complete(HttpResponse(StatusCodes.InternalServerError))
+      }
+    }
   }
 
   def routes: Route
