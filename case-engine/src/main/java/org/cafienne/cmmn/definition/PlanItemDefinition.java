@@ -61,7 +61,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         super.resolveReferences();
         resolvePlanItemDefinition();
         if (this.definition == null) {
-            getCaseDefinition().addReferenceError(getContextDescription()  + getName() +" refers to a definition named " + planItemDefinitionRefValue + ", but that definition is not found");
+            getCaseDefinition().addReferenceError(getContextDescription() + " refers to a definition named " + planItemDefinitionRefValue + ", but that definition is not found");
             return; // Avoid further checking on this element
         }
         // If the plan item has no name, it has to be taken from the definition
@@ -104,7 +104,8 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
 
     @Override
     public String getContextDescription() {
-        return this.definition.getType() + " " + getName();
+        String type = this.definition != null ? this.definition.getType() : "Plan item";
+        return type + " " + getName();
     }
 
     private void resolvePlanItemDefinition() {
