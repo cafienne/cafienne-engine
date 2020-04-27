@@ -8,7 +8,7 @@ import org.cafienne.humantask.instance.TaskState;
 
 import java.time.Instant;
 
-public class HumanTaskAssertion extends ModelTestCommandAssertion<CaseTestCommand> {
+public class HumanTaskAssertion extends CaseAssertion {
 //    private final String identifier;
 //
 //    public HumanTaskAssertion(CaseTestCommand testCommand, PlanItemCreated pic) {

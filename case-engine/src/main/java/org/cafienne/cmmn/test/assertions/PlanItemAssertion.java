@@ -157,6 +157,24 @@ public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand
     }
 
     /**
+     * Assertion on the outcome of the evaluation of the repetition rule to be true
+     *
+     * @return
+     */
+    public PlanItemAssertion assertRepeats() {
+        return assertRepeats(true);
+    }
+
+    /**
+     * Assertion on the outcome of the evaluation of the repetition rule to be false
+     *
+     * @return
+     */
+    public PlanItemAssertion assertNoRepetition() {
+        return assertRepeats(false);
+    }
+
+    /**
      * Assertion on the outcome of the evaluation of the required rule
      *
      * @param expectedOutcome

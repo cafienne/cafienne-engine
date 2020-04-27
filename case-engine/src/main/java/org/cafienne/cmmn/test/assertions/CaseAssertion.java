@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.cmmn.test.assertions.file.CaseFileItemAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
@@ -33,6 +34,10 @@ public class CaseAssertion extends StageAssertion {
         return pea.filter(filter).getEvents().stream().findFirst().orElse(null);
     }
 
+    public void print() {
+        TestScript.debugMessage("Result of step " + testCommand.getActionNumber() +": " + testCommand.caseInstanceString());
+    }
+
     @Override
     public String toString() {
         return testCommand.caseInstanceString();
@@ -52,6 +57,10 @@ public class CaseAssertion extends StageAssertion {
         PublishedEventsAssertion<PlanItemCreated> pea = new PublishedEventsAssertion(testCommand.getEventListener().getEvents()).filter(caseId).filter(PlanItemCreated.class);
         EventFilter<PlanItemCreated> filter = e -> e.getPlanItemId().equals(identifier) || e.getPlanItemName().equals(identifier);
         return pea.filter(filter).getEvents().stream();
+    }
+
+    public CaseFileAssertion assertCaseFile() {
+        return caseFileAssertion;
     }
 
     /**

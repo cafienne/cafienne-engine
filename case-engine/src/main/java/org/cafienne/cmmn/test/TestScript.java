@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,6 +18,8 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
+import org.cafienne.cmmn.test.assertions.CaseAssertion;
+import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Await;
@@ -60,9 +62,10 @@ public class TestScript {
      * Listener for CaseInstanceEvent that ought to be published by the Akka system
      */
     private final CaseEventListener eventListener;
-    
-    /** 
+
+    /**
      * Simple helper to retrieve and parse a definitions file containing one or more case definitions
+     *
      * @param fileName The name of the file to be read (e.g., testdefinition/basic.case)
      * @return
      */
@@ -76,6 +79,7 @@ public class TestScript {
 
     /**
      * Returns the first case definition in the definitions file
+     *
      * @param fileName
      * @return
      */
@@ -85,6 +89,7 @@ public class TestScript {
 
     /**
      * Returns the case definition with the specified identifier from the definitions file
+     *
      * @param fileName
      * @return
      */
@@ -95,6 +100,7 @@ public class TestScript {
     /**
      * Helper method to retrieve an invalid definitions document.
      * Throws an assertion if the Definition is missing instead of invalid.
+     *
      * @param fileName
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
@@ -105,8 +111,10 @@ public class TestScript {
         }
 
     }
+
     /**
      * Returns a user context for the specified user name and optional roles
+     *
      * @param user
      * @param roles
      * @return
@@ -117,6 +125,7 @@ public class TestScript {
 
     /**
      * Creates a CaseTeam that can be used in StartCase command based upon a list of user contexts
+     *
      * @param users
      * @return
      */
@@ -129,7 +138,7 @@ public class TestScript {
         });
         return team;
     }
-    
+
     /**
      * Create a new {@link TestScript} with the specified name
      *
@@ -143,9 +152,10 @@ public class TestScript {
         this.eventListener = new CaseEventListener(this);
         logger.info("Ready to receive responses from the case system for test '" + testName + "'");
     }
-    
+
     /**
      * Prints a log message to the debug logger
+     *
      * @param msg
      */
     public static void debugMessage(Object msg) {
@@ -157,26 +167,75 @@ public class TestScript {
      * the case, and the test script has received a response back from the case.
      *
      * @param command
-     * @param validators
+     * @param validator
      */
-    public void addTestStep(CaseCommand command, CaseResponseValidator... validators) {
-        commands.addLast(new CaseTestCommand(this, command, validators));
+    public void addTestStep(CaseCommand command, CaseResponseValidator validator) {
+        commands.addLast(new CaseTestCommand(this, command, validator));
     }
 
     /**
      * Insert a new test command right after the current test step. Can be used inside validators to
      * add new commands when a response to the command is received.
+     *
      * @param command
      * @param validators
      */
-    public void insertTestStep(CaseCommand command, CaseResponseValidator... validators) {
+    public void insertTestStep(CaseCommand command, CaseResponseValidator validators) {
         commands.addFirst(new CaseTestCommand(this, command, validators));
     }
-    
+
+    /**
+     * Add a command that is expected to fail, and then invoke the validator with the failure to
+     * do more assertions.
+     * @param command
+     * @param validator
+     */
+    public void assertStepFails(CaseCommand command, FailureValidator validator) {
+        addTestStep(command, e -> validator.validate(new FailureAssertion(e)));
+    }
+
+    /**
+     * Check that command fails, without any further validations.
+     * @param command
+     */
+    public void assertStepFails(CaseCommand command) {
+        addTestStep(command, e -> new FailureAssertion(e));
+    }
+
+    /**
+     * Check that command fails, without any further validations.
+     * @param command
+     */
+    public void insertStepFails(CaseCommand command, FailureValidator validator) {
+        insertTestStep(command, e -> validator.validate(new FailureAssertion(e)));
+    }
+
+    /**
+     * Add a command, and use the validator to check the result.
+     * Command is expected to succeed (should not return with CommandFailure)
+     * @param command
+     * @param validator
+     */
+    public void addStep(CaseCommand command, CaseValidator validator) {
+        addTestStep(command, e -> validator.validate(new CaseAssertion(e)));
+    }
+
+    /**
+     * Add a command that should return without failure.
+     * @param command
+     */
+    public void addStep(CaseCommand command) {
+        addTestStep(command, e -> new CaseAssertion(e));
+    }
+
+    public void insertStep(CaseCommand command, CaseValidator validator) {
+        insertTestStep(command, e -> validator.validate(new CaseAssertion(e)));
+    }
+
     public int getActionNumber() {
         return actionNumber;
     }
-    
+
     /**
      * Executes the next test command.
      */
@@ -186,7 +245,6 @@ public class TestScript {
             return;
         }
 
-        
         // Set the current command and action number.
         current = commands.removeFirst();
         actionNumber++;
@@ -204,7 +262,7 @@ public class TestScript {
         eventListener.sendCommand(current);
 
     }
-    
+
     /**
      * Override this method to have a callback upon completion of the test script
      */
@@ -252,15 +310,15 @@ public class TestScript {
                 } catch (InterruptedException e) {
 
                 }
-                if (! testCompleted  && maximumDuration<10000) // Only print if 10 seconds left
-                    logger.warn("Waiting another "+(maximumDuration/1000)+" seconds for completion of test '" + testName + "'");
+                if (!testCompleted && maximumDuration < 10000) // Only print if 10 seconds left
+                    logger.warn("Waiting another " + (maximumDuration / 1000) + " seconds for completion of test '" + testName + "'");
             }
         }
-        
+
         closeDown();
-        
-        if (! testCompleted) {
-            throw new AssertionError("Test '" + testName + "' was not completed; got stuck at action " + actionNumber + " (command "+current+")");
+
+        if (!testCompleted) {
+            throw new AssertionError("Test '" + testName + "' was not completed; got stuck at action " + actionNumber + " (command " + current + ")");
         }
 
         if (exceptionFromTest != null) {
@@ -271,7 +329,7 @@ public class TestScript {
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-            
+
             // Try to throw the exception as "unwrapped" as possible, without adding a throws clause
             if (exceptionFromTest instanceof RuntimeException) {
                 throw (RuntimeException) exceptionFromTest;
@@ -282,14 +340,14 @@ public class TestScript {
             }
         }
     }
-    
+
     private File getNextErrorFile() {
         int index = 0;
-        String fileName = testName + "_" + index +"_error.txt";
+        String fileName = testName + "_" + index + "_error.txt";
         File nextErrorFile = new File(fileName);
         while (nextErrorFile.exists()) {
-            index ++;
-            fileName = testName + "_" + index +"_error.txt";
+            index++;
+            fileName = testName + "_" + index + "_error.txt";
             nextErrorFile = new File(fileName);
             if (index > 1000) {
                 System.err.println("Clean up your error files");
@@ -325,6 +383,7 @@ public class TestScript {
 
     /**
      * Returns the event listener for this TestScript.
+     *
      * @return
      */
     public CaseEventListener getEventListener() {
@@ -334,6 +393,7 @@ public class TestScript {
     /**
      * Method used by {@link ResponseHandlingActor} to notify incoming messages from the case system (i.e., response to
      * the commands sent by the test script to the case instances).
+     *
      * @param response
      */
     void handleResponse(Object response) {
@@ -342,7 +402,7 @@ public class TestScript {
             finish(new AssertionError("Received an unexpected message while executing test script; message:\n:" + response));
             return;
         }
-        
+
         if (current == null) {
             // quite strange; apparently we never sent a command and still got a response, let's just quit right here right now.
             finish(new AssertionError("Received an unexpected message while executing test script; message:\n:" + response));

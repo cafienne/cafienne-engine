@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,6 +10,7 @@ package org.cafienne.cmmn.test.assertions;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.instance.CasePlan;
 import org.cafienne.cmmn.instance.Stage;
+import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.filter.EventFilter;
 
@@ -65,7 +66,18 @@ public class StageAssertion extends PlanItemAssertion {
     }
 
     /**
+     * Asserts that the stage has a plan item with the expected identifier
+     *
+     * @param identifier
+     * @return
+     */
+    public PlanItemAssertion assertPlanItem(String identifier, State expectedState) {
+        return assertPlanItems(identifier, expectedState).assertSize(1).first();
+    }
+
+    /**
      * Returns a {@link PlanItemSetAssertion} for all plan items with the identifier.
+     *
      * @param identifier
      * @return
      */
@@ -78,10 +90,14 @@ public class StageAssertion extends PlanItemAssertion {
         return pisa;
     }
 
+    public PlanItemSetAssertion assertPlanItems(String identifier, State expectedState) {
+        return assertPlanItems(identifier).filter(expectedState);
+    }
+
     private PlanItemCreated getPlanItem(String errorMsg, String identifier) {
         PlanItemCreated planItem = getPlanItems(identifier).findFirst().orElse(null);
         if (planItem == null) {
-            throw new AssertionError("The "+errorMsg+" '" + identifier + "' cannot be found in " + getName());
+            throw new AssertionError("The " + errorMsg + " '" + identifier + "' cannot be found in " + getName());
         }
 //        System.out.println("Foudn planitem for identifier "+identifier +" with name "+planItem.getPlanItemName()+", and id: "+planItem.getPlanItemId());
         return planItem;
@@ -90,6 +106,7 @@ public class StageAssertion extends PlanItemAssertion {
     /**
      * This method is protected, so that it can be overridden in CaseAssertion, fetching ALL planitems of the case,
      * rather than just from the current stage.
+     *
      * @param identifier
      * @return
      */
