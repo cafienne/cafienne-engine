@@ -15,5 +15,5 @@ trait RecordsPersistence {
 
   def getCaseInstance(caseInstanceId: String): Future[Option[CaseInstance]]
 
-  def getTask(taskId: String): Future[Task]
+  def getTask(taskId: String): Future[Option[Task]]
 }

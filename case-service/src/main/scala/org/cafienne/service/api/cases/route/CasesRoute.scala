@@ -13,6 +13,7 @@ import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.akka.command._
 import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.service.api.cases.CaseQueries
+import org.cafienne.service.api.projection.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 
@@ -24,10 +25,15 @@ trait CasesRoute extends CommandRoute {
       case Success(retrieval) => {
         retrieval match {
           case Some(tenant) => askModelActor(createCaseCommand.apply(platformUser.getTenantUser(tenant)))
-          case None => complete(StatusCodes.NotFound, "A case with id " + caseInstanceId + " cannot be found in the system")
+          case None => complete(StatusCodes.NotFound, s"A case with id '$caseInstanceId cannot be found.")
         }
       }
-      case Failure(error) => complete(StatusCodes.InternalServerError, error)
+      case Failure(error) => {
+        error match {
+          case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+          case _ => throw error
+        }
+      }
     }
   }
 

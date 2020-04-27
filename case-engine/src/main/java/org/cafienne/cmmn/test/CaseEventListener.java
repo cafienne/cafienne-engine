@@ -95,8 +95,8 @@ public class CaseEventListener {
      *
      * @return
      */
-    public List<ModelEvent> getEvents() {
-        return new ArrayList<>(publishedEvents);
+    public PublishedEventsAssertion getEvents() {
+        return new PublishedEventsAssertion(new ArrayList(publishedEvents));
     }
 
     /**
@@ -149,10 +149,10 @@ public class CaseEventListener {
     }
 
     public boolean hasPlanItemName(String id, String name) {
-        long count = this.getEvents().stream()
+        long count = this.getEvents()
                 .filter(evt -> evt instanceof PlanItemCreated) // Only plan item created
                 .filter(evt -> ((PlanItemCreated) evt).getPlanItemId().equals(id)) // With this id
-                .filter(evt -> ((PlanItemCreated) evt).getPlanItemName().equals(name)).count(); // having this name
+                .filter(evt -> ((PlanItemCreated) evt).getPlanItemName().equals(name)).getEvents().size(); // having this name
         return count > 0;
     }
 

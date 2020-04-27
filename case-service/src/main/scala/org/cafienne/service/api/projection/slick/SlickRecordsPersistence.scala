@@ -68,7 +68,7 @@ class SlickRecordsPersistence
     db.run(TableQuery[CaseFileTable].filter(_.caseInstanceId === caseInstanceId).result.headOption)
   }
 
-  override def getTask(taskId: String): Future[Task] = {
-    db.run(TableQuery[TaskTable].filter(_.id === taskId).result.head)
+  override def getTask(taskId: String): Future[Option[Task]] = {
+    db.run(TableQuery[TaskTable].filter(_.id === taskId).result.headOption)
   }
 }

@@ -30,8 +30,7 @@ public class Simple {
         TestScript testCase = new TestScript(caseInstanceId);
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Start, State.Active, State.Available);
@@ -42,8 +41,7 @@ public class Simple {
         });
 
         // Completing Item1 should make it go to state Completed, others remain in same state
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Start, State.Active, State.Available);
@@ -54,8 +52,7 @@ public class Simple {
         });
         
         // Completing Item1 again should not change state.
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Start, State.Active, State.Available);
@@ -66,8 +63,7 @@ public class Simple {
         });
         
         // Suspend the whole case.
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), casePlan -> {
             casePlan.assertLastTransition(Transition.Suspend, State.Suspended, State.Active);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.ParentSuspend, State.Suspended, State.Active);
@@ -79,8 +75,7 @@ public class Simple {
         
         
         // And re-activate it again
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), casePlan -> {
             casePlan.assertLastTransition(Transition.Reactivate, State.Active, State.Suspended);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.ParentResume, State.Active, State.Suspended);
@@ -91,8 +86,7 @@ public class Simple {
         });        
 
         // Completing Item1.1 should make it go to state Completed, others remain in same state, causing completion check of surrounding stage
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1.1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Complete, State.Completed, State.Active);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Complete, State.Completed, State.Active);
@@ -103,8 +97,7 @@ public class Simple {
         });
         
         // Complete the whole case
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Complete), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Complete, State.Completed, State.Active);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Complete, State.Completed, State.Active);

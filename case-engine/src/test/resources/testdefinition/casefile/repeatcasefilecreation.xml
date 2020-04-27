@@ -1,0 +1,59 @@
+<definitions>
+	<case id="casefile/repeatcasefilecreation.case" name="casefile/repeatcasefilecreation">
+		<caseFileModel>
+			<caseFileItem id="_vr0Df_0" name="TopCase" multiplicity="ZeroOrOne" definitionRef="unspecified.cfid">
+				<children>
+					<caseFileItem id="_vr0Df_1" name="items" multiplicity="ZeroOrMore" definitionRef="unspecified.cfid">
+						<children>
+							<caseFileItem id="_vr0Df_2" name="item" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
+							<caseFileItem id="_vr0Df_3" name="role" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
+						</children>
+					</caseFileItem>
+				</children>
+			</caseFileItem>
+		</caseFileModel>
+		<casePlanModel id="cm__vr0Df_0" name="casefile/repeatcasefilecreation" autoComplete="true">
+			<planItem id="pi_ht__vr0Df_0" name="Review" definitionRef="ht__vr0Df_0">
+				<entryCriterion id="_vr0Df_5" name="EntryCriterion_0" sentryRef="crit__vr0Df_0"/>
+				<itemControl id="_vr0Df_4">
+					<repetitionRule id="_vr0Df_7" contextRef="_vr0Df_0">
+						<condition id="_vr0Df_8" language="spel">
+							<body>
+								<![CDATA[TopCase.items.size() < 3]]>
+							</body>
+						</condition>
+					</repetitionRule>
+				</itemControl>
+			</planItem>
+			<sentry id="crit__vr0Df_0">
+				<caseFileItemOnPart id="_vr0Df_6" sourceRef="_vr0Df_1">
+					<standardEvent>create</standardEvent>
+				</caseFileItemOnPart>
+			</sentry>
+			<humanTask id="ht__vr0Df_0" name="Review" isBlocking="true"/>
+		</casePlanModel>
+	</case>
+	<caseFileItemDefinition name="unspecified" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="unspecified.cfid"/>
+	<CMMNDI>
+		<CMMNDiagram>
+			<CMMNShape cmmnElementRef="cm__vr0Df_0">
+				<Bounds x="20" y="20" width="570" height="340"/>
+			</CMMNShape>
+			<CMMNShape cmmnElementRef="pi_ht__vr0Df_0">
+				<Bounds x="110" y="90" width="140" height="80"/>
+			</CMMNShape>
+			<casefileitem cmmnElementRef="_vr0Df_shape_2" parentId="cm__vr0Df_0" contextRef="_vr0Df_1">
+				<Bounds x="409.9573974609375" y="100.36931610107422" width="25" height="40"/>
+			</casefileitem>
+			<CMMNShape cmmnElementRef="_vr0Df_5">
+				<Bounds x="244" y="120" width="12" height="20"/>
+			</CMMNShape>
+			<textbox cmmnElementRef="_vr0Df_shape_4" parentId="cm__vr0Df_0" content="Repeat the ReviewTask as long as
+there are not more than 2 'Items'
+created in the case file">
+				<Bounds x="280" y="180" width="100" height="60"/>
+			</textbox>
+			<CMMNEdge sourceCMMNElementRef="_vr0Df_shape_2" targetCMMNElementRef="_vr0Df_5"/>
+		</CMMNDiagram>
+	</CMMNDI>
+</definitions>

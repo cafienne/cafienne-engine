@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Basic event allowing listeners that are interested only in team events to do initial filtering.
  */
-abstract class CaseTeamEvent extends CaseEvent {
+public abstract class CaseTeamEvent extends CaseEvent {
     protected enum Fields {
         userId, roles
     }

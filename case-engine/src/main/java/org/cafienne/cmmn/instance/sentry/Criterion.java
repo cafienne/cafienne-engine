@@ -2,20 +2,23 @@ package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
 import org.w3c.dom.Element;
 
-public abstract class Criterion extends CMMNElement<CriterionDefinition> {
+public abstract class Criterion<D extends CriterionDefinition> extends CMMNElement<D> {
     protected final Stage<?> stage;
     protected final Sentry sentry;
 
-    protected Criterion(Stage stage, CriterionDefinition definition) {
+    protected Criterion(Stage stage, D definition) {
         super(stage, definition);
         this.stage = stage;
         this.sentry = new Sentry(stage, this);
     }
 
-    protected abstract void satisfy();
+    protected abstract void satisfy(OnPart<?, ?> activator);
+
+    public abstract void addPlanItem(PlanItem planItem);
 
     public boolean isActive() {
         return sentry.isActive();
@@ -23,6 +26,11 @@ public abstract class Criterion extends CMMNElement<CriterionDefinition> {
 
     public boolean isSatisfied() {
         return sentry.isSatisfied();
+    }
+
+    @Override
+    public D getDefinition() {
+        return super.getDefinition();
     }
 
     /**

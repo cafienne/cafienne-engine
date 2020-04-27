@@ -1,0 +1,20 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm__vr0Df_0">
+            <Bounds x="20" y="20" width="570" height="340"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__vr0Df_0">
+            <Bounds x="110" y="90" width="140" height="80"/>
+        </CMMNShape>
+        <casefileitem cmmnElementRef="_vr0Df_shape_2" parentId="cm__vr0Df_0" contextRef="_vr0Df_1">
+            <Bounds x="409.9573974609375" y="100.36931610107422" width="25" height="40"/>
+        </casefileitem>
+        <CMMNShape cmmnElementRef="_vr0Df_5">
+            <Bounds x="244" y="120" width="12" height="20"/>
+        </CMMNShape>
+        <textbox cmmnElementRef="_vr0Df_shape_4" parentId="cm__vr0Df_0" content="Repeat the ReviewTask as long as &#10;there are not more than 2 'Items' &#10;created in the case file">
+            <Bounds x="280" y="180" width="100" height="60"/>
+        </textbox>
+        <CMMNEdge sourceCMMNElementRef="_vr0Df_shape_2" targetCMMNElementRef="_vr0Df_5"/>
+    </CMMNDiagram>
+</CMMNDI>

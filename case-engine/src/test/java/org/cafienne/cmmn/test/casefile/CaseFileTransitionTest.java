@@ -62,9 +62,8 @@ public class CaseFileTransitionTest {
         inputs.put(inputParameterName, content);
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
             casePlan.assertCaseFileItem("Request").assertValue(content).assertCaseFileItem("/Customer").assertState(State.Null);
         });
 
@@ -73,9 +72,8 @@ public class CaseFileTransitionTest {
         helper.putRaw("Name", "Piet");
         helper.putRaw("Description", "Piet is a nice guy");
 
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, "Request/Helper"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, "Request/Helper"), casePlan -> {
+            casePlan.print();
             casePlan.assertCaseFileItem("Request/Helper").assertValue(helper);
 
 
@@ -86,9 +84,8 @@ public class CaseFileTransitionTest {
         });
 
         // Completing the task ReviewRequest
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), casePlan -> {
+            casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             // 3 repeating ReviewRequest task in state Completed,Active and Available.
@@ -97,9 +94,8 @@ public class CaseFileTransitionTest {
         });
 
         // Completing the task ReviewRequest
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), casePlan -> {
+            casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             // 4 repeating ReviewRequest task in state Completed,Completed,Active and Available.
@@ -108,9 +104,8 @@ public class CaseFileTransitionTest {
         });
 
         // Suspend the case
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), casePlan -> {
+            casePlan.print();
             casePlan.assertLastTransition(Transition.Suspend, State.Suspended, State.Active);
 
             TaskAssertion item1 = casePlan.assertStage(REVIEW_STAGE).assertTask(REVIEW_REQUEST);
@@ -122,9 +117,8 @@ public class CaseFileTransitionTest {
         });
 
         // Reactivate the case
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), casePlan -> {
+            casePlan.print();
             casePlan.assertLastTransition(Transition.Reactivate, State.Active, State.Suspended);
 
             // After reactivating it should return to the previous state
@@ -133,25 +127,22 @@ public class CaseFileTransitionTest {
         });
 
         StringValue piet = getCustomer("Piet");
-        testCase.addTestStep(new ReplaceCaseFileItem(testUser, caseInstanceId, piet, "Request/Customer[0]"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, piet, "Request/Customer[0]"), casePlan -> {
+            casePlan.print();
             // After changing customer, task should still be repeating, although value is now different.
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed, State.Active).assertRepeats();
         });
 
         // Completing the task ReviewRequest; now the task should no longer be repeating
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), casePlan -> {
+            casePlan.print();
 
             // All tasks should be completed, and no more repetition.
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed).assertNoMoreRepetition();
         });
 
         // Complete the case, by completing JustAnotherTask
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "JustAnotherTask"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "JustAnotherTask"), casePlan -> {
             casePlan.assertLastTransition(Transition.Complete, State.Completed, State.Active);
 
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed);
@@ -162,15 +153,13 @@ public class CaseFileTransitionTest {
         //  which is captured through the negative test
         ValueList customers = getCustomers("Piet", "Joop");
         ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, "Request/Customer");
-        testCase.addTestStep(customerReplace, action ->
-                new FailureAssertion(action).assertException(TransitionDeniedException.class, "Cannot replace the content of the case file item container. Have to address an individual child"));
+        testCase.assertStepFails(customerReplace, action -> action.assertException(TransitionDeniedException.class, "Cannot replace the content of the case file item container. Have to address an individual child"));
 
         // TODO: we're now updating the Request object with the new customers, but merge feature does not work 'as expected' in the engine, resulting in an exception
         //  which is captured through the negative test
         ValueMap newRequestContent = new ValueMap();
         newRequestContent.put("Customer", getCustomers("Klaas", "Henk"));
-        testCase.addTestStep(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action ->
-                new FailureAssertion(action).assertException(TransitionDeniedException.class, "Cannot create case file item Description because it is in state Available and should be in state Null"));
+        testCase.assertStepFails(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action -> action.assertException(TransitionDeniedException.class, "Cannot create case file item Description because it is in state Available and should be in state Null"));
 
         testCase.runTest();
 

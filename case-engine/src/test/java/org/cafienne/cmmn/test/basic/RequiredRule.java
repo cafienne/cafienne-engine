@@ -29,18 +29,16 @@ public class RequiredRule {
         CaseDefinition definitionsDocument = TestScript.getCaseDefinition("testdefinition/requiredrule.xml");
         TenantUser user = TestScript.getTestUser("Anonymous");
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitionsDocument, inputs, null), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new StartCase(user, caseInstanceId, definitionsDocument, inputs, null), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.2").assertState(State.Available);
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Active);
@@ -49,36 +47,32 @@ public class RequiredRule {
         });
 
         // Now complete Item2 multiple times. It is not supposed to repeat more than 10 times, it says in the definition
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Suspend, "Item1.2"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Suspend, "Item1.2"), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Suspended);
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Resume, "Item1.2"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Resume, "Item1.2"), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Active).assertLastTransition(Transition.Resume);
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.2"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.2"), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.3").assertState(State.Terminated);
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Completed);

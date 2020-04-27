@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
+import org.cafienne.cmmn.instance.Milestone;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         super.resolveReferences();
         resolvePlanItemDefinition();
         if (this.definition == null) {
-            getCaseDefinition().addReferenceError("The plan item " + getName() +" refers to a definition named " + planItemDefinitionRefValue + ", but that definition is not found");
+            getCaseDefinition().addReferenceError(getContextDescription() + " refers to a definition named " + planItemDefinitionRefValue + ", but that definition is not found");
             return; // Avoid further checking on this element
         }
         // If the plan item has no name, it has to be taken from the definition
@@ -77,15 +78,37 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         if (this.definition instanceof TaskDefinition) {
             if (!((TaskDefinition<?>) this.definition).isBlocking()) {
                 if (!this.exitCriteria.isEmpty()) {
-                    getCaseDefinition().addDefinitionError("The plan item " + getName() + " has exit sentries, but these are not allowed for a non blocking task");
+                    getCaseDefinition().addDefinitionError(getContextDescription()  + " has exit sentries, but these are not allowed for a non blocking task");
                     return;
+                }
+            }
+        }
+
+        // CMMN 1.1 spec 5.4.11 page 53 says:
+        //  A PlanItem that has a PlanItemControl that contains a RepetitionRule, MUST have either an entry criterion
+        //   that refers to a Sentry that has at least one OnPart or no entry criteria at all.
+        if (! this.planItemControl.getRepetitionRule().isDefault()) {
+            if (this.entryCriteria.isEmpty()) {
+                // Stages and Tasks are ok without entry criteria. But milestones must have entry criteria if they have a repetition rule
+                if (this.definition instanceof MilestoneDefinition) {
+                    getCaseDefinition().addDefinitionError(getContextDescription() + " has a repetition rule defined, but no entry criteria. This is mandatory.");
+                }
+            } else {
+                // Check whether there is at least one entry criterion having an on part.
+                if (this.getEntryCriteria().stream().filter(e -> e.hasOnParts()).count() == 0) {
+                    getCaseDefinition().addDefinitionError( getContextDescription() + " has a repetition rule defined, but no entry criteria with at least one on part. This is mandatory.");
                 }
             }
         }
     }
 
+    @Override
+    public String getContextDescription() {
+        String type = this.definition != null ? this.definition.getType() : "Plan item";
+        return type + " " + getName();
+    }
+
     private void resolvePlanItemDefinition() {
         this.definition = getCaseDefinition().findPlanItemDefinition(planItemDefinitionRefValue);
     }
-
 }

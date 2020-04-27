@@ -29,22 +29,19 @@ public class Timer {
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertPlanItem("PeriodWaiter").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
 
         // Waiting 1 second should not have changed anything; timer is still running
-        testCase.addTestStep(new PingCommand(testUser, caseInstanceId, 1000), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new PingCommand(testUser, caseInstanceId, 1000), casePlan -> {
             casePlan.assertPlanItem("PeriodWaiter").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
     
         // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addTestStep(new PingCommand(testUser, caseInstanceId, 5000), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new PingCommand(testUser, caseInstanceId, 5000), casePlan -> {
             casePlan.assertPlanItem("PeriodWaiter").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });

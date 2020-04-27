@@ -40,7 +40,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand
         this.type = pic.getType();
         this.description = type + " '" + name + "' with id "+id;
 
-        PublishedEventsAssertion<PlanItemEvent> allPlanItemEvents = new PublishedEventsAssertion(command.getEventListener().getEvents()).filter(PlanItemEvent.class);
+        PublishedEventsAssertion<PlanItemEvent> allPlanItemEvents = command.getEventListener().getEvents().filter(PlanItemEvent.class);
         this.events = allPlanItemEvents.filter(pie -> pie.getPlanItemId().equals(this.id)).getEvents();
         Collections.reverse(this.events);// Reverse order the events, such that last one comes first.
     }
@@ -154,6 +154,24 @@ public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand
             }
         }
         return this;
+    }
+
+    /**
+     * Assertion on the outcome of the evaluation of the repetition rule to be true
+     *
+     * @return
+     */
+    public PlanItemAssertion assertRepeats() {
+        return assertRepeats(true);
+    }
+
+    /**
+     * Assertion on the outcome of the evaluation of the repetition rule to be false
+     *
+     * @return
+     */
+    public PlanItemAssertion assertNoRepetition() {
+        return assertRepeats(false);
     }
 
     /**

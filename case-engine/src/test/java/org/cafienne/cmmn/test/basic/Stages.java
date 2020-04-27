@@ -30,9 +30,8 @@ public class Stages {
         CaseDefinition definitionsDocument = TestScript.getCaseDefinition("testdefinition/stages.xml");
         TenantUser user = TestScript.getTestUser("Anonymous");
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitionsDocument, inputs, null), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new StartCase(user, caseInstanceId, definitionsDocument, inputs, null), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Available);
             StageAssertion item4 = casePlan.assertStage("Item4");
             item4.assertState(State.Active);
@@ -46,9 +45,8 @@ public class Stages {
             item4.assertHumanTask("Task1.1").assertState(State.Active);
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Task1.1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Task1.1"), casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             StageAssertion item4 = casePlan.assertStage("Item4");
             item4.assertState(State.Active);

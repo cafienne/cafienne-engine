@@ -11,7 +11,11 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.definition.CasePlanDefinition;
+import org.cafienne.cmmn.definition.ItemDefinition;
+import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
@@ -236,6 +240,40 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public CasePlan getCasePlan() {
         return casePlan;
+    }
+
+    /**
+     * Creates a PlanItem within the Case based on the information in the event.
+     * @param event
+     * @return
+     */
+    public PlanItem add(PlanItemCreated event) {
+        String stageId = event.getStageId();
+        if (stageId.isEmpty()) {
+            CasePlanDefinition definition = this.getDefinition().getCasePlanModel();
+            return definition.createInstance(event.planItemId, 0, definition, null, this);
+        } else {
+            // Lookup the stage to which the plan item belongs,
+            // then lookup the definition for the plan item
+            // and then instantiate it.
+            Stage<?> stage = this.getPlanItemById(stageId);
+            if (stage == null) {
+                logger.error("MAJOR ERROR: we cannot find the stage with id " + stageId + ", and therefore cannot recover plan item " + event);
+                return null;
+            }
+
+            ItemDefinition itemDefinition = stage.getDefinition().getPlanItem(event.planItemName);
+            // If definition == null, try to see if it's a discretionaryItem
+            if (itemDefinition == null) {
+                itemDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
+                if (itemDefinition == null) {
+                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.getStageId() + ", and therefore cannot recover plan item " + event);
+                }
+            }
+
+            PlanItemDefinitionDefinition reference = itemDefinition.getPlanItemDefinition();
+            return reference.createInstance(event.getPlanItemId(), event.getIndex(), itemDefinition, stage, this);
+        }
     }
 
     /**

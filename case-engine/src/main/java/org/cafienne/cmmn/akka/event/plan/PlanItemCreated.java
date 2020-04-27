@@ -73,7 +73,7 @@ public class PlanItemCreated extends PlanItemEvent {
 
     @Override
     public void updateState(Case actor) {
-        planItem = PlanItem.create(actor, this);
+        planItem = actor.add(this);
     }
 
     @Override

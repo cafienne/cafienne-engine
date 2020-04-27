@@ -30,31 +30,29 @@ public class Planning {
         TestScript testCase = new TestScript(caseInstanceId);
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertTask("T2").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertTask("T3").assertLastTransition(Transition.Create, State.Available, State.Null);
 
-            testCase.insertTestStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
                 PlanningTableAssertion pta = new PlanningTableAssertion(items);
                 pta.assertItem("Opnieuw T1");
                 pta.assertItem("T4").assertType("HumanTask");
             });
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
             casePlan.assertTask("T2").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertTask("T3").assertLastTransition(Transition.Create, State.Available, State.Null);
 
-            testCase.insertTestStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
-                PlanningTableAssertion pta = new PlanningTableAssertion(items);
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), case1 -> {
+                PlanningTableAssertion pta = new PlanningTableAssertion(case1);
                 pta.assertItem("Opnieuw T1");
                 pta.assertItem("T4");
 
@@ -62,16 +60,15 @@ public class Planning {
                 DiscretionaryItemAssertion t4 = pta.assertItem("T4");
                 String t4stageId = t4.getParentId();
                 String definitionId = t4.getDefinitionId();
-                testCase.insertTestStep(new AddDiscretionaryItem(testUser, caseInstanceId, "T4", definitionId, t4stageId, "t4item"), action2 -> {
-                    CaseAssertion casePlan2 = new CaseAssertion(action2);
-                    casePlan2.assertLastTransition(Transition.Create, State.Active, State.Null);
+                testCase.insertStep(new AddDiscretionaryItem(testUser, caseInstanceId, "T4", definitionId, t4stageId, "t4item"), case2 -> {
+                    case2.assertLastTransition(Transition.Create, State.Active, State.Null);
 
-                    casePlan2.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
-                    casePlan2.assertTask("T2").assertLastTransition(Transition.Start, State.Active, State.Available);
-                    casePlan2.assertTask("T3").assertLastTransition(Transition.Create, State.Available, State.Null);
-                    casePlan2.assertTask("T4").assertLastTransition(Transition.Start, State.Active, State.Available);
+                    case2.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
+                    case2.assertTask("T2").assertLastTransition(Transition.Start, State.Active, State.Available);
+                    case2.assertTask("T3").assertLastTransition(Transition.Create, State.Available, State.Null);
+                    case2.assertTask("T4").assertLastTransition(Transition.Start, State.Active, State.Available);
 
-                    testCase.insertTestStep(new GetDiscretionaryItems(testUser, caseInstanceId), items2 -> {
+                    testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items2 -> {
                         PlanningTableAssertion pta2 = new PlanningTableAssertion(items2);
                         pta2.assertItem("Opnieuw T1");
                         pta2.assertItem("T4");
@@ -82,12 +79,11 @@ public class Planning {
                 DiscretionaryItemAssertion t5 = pta.assertItem("T5");
                 String t5stageId = t5.getParentId();
                 String t5DefinitionId = t5.getDefinitionId();
-                testCase.insertTestStep(new AddDiscretionaryItem(testUser, caseInstanceId, "T5", t5DefinitionId, t5stageId, "t5item"), action2 -> {
-                    CaseAssertion casePlan2 = new CaseAssertion(action2);
-                    TestScript.debugMessage(casePlan2);
-                    casePlan2.assertLastTransition(Transition.Create, State.Active, State.Null);
+                testCase.insertStep(new AddDiscretionaryItem(testUser, caseInstanceId, "T5", t5DefinitionId, t5stageId, "t5item"), case3 -> {
+                    case3.print();
+                    case3.assertLastTransition(Transition.Create, State.Active, State.Null);
 
-                    StageAssertion stage = casePlan2.assertStage("Stage");
+                    StageAssertion stage = case3.assertStage("Stage");
                     stage.assertLastTransition(Transition.Create, State.Available, State.Null);
                     stage.assertPlanItem("T5").assertState(State.Null);
                 });
@@ -95,9 +91,8 @@ public class Planning {
             });
         });
 
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T2"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T2"), casePlan -> {
+            casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
@@ -105,15 +100,14 @@ public class Planning {
             casePlan.assertTask("T3").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertTask("T4").assertLastTransition(Transition.Start, State.Active, State.Available);
 
-            testCase.insertTestStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
                 PlanningTableAssertion pta = new PlanningTableAssertion(items);
                 pta.assertItem("Opnieuw T1");
                 pta.assertNoItem("T4");
             });
         });
         
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T3"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T3"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
@@ -125,15 +119,14 @@ public class Planning {
             stage.assertLastTransition(Transition.Start, State.Active, State.Available);
             stage.assertPlanItem("T5").assertState(State.Active);
 
-            testCase.insertTestStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
                 PlanningTableAssertion pta = new PlanningTableAssertion(items);
                 pta.assertItem("Opnieuw T1");
                 pta.assertNoItem("T4");
             });
         });
         
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Terminate), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Terminate), casePlan -> {
             casePlan.assertLastTransition(Transition.Terminate, State.Terminated, State.Active);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
@@ -141,7 +134,7 @@ public class Planning {
             casePlan.assertTask("T3").assertLastTransition(Transition.Complete, State.Completed, State.Active);
             casePlan.assertTask("T4").assertLastTransition(Transition.Exit, State.Terminated, State.Active);
 
-            testCase.insertTestStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
+            testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
                 PlanningTableAssertion pta = new PlanningTableAssertion(items);
                 pta.assertItem("Opnieuw T1");
                 pta.assertNoItem("T4");

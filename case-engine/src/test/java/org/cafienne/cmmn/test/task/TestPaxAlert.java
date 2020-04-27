@@ -61,10 +61,9 @@ public class TestPaxAlert {
         
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
-        testCase.addTestStep(startCase, action -> {
+        testCase.addStep(startCase, caseStarted -> {
             testCase.getEventListener().awaitPlanItemState("Execute background check", State.Completed);
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+            caseStarted.print();
         });
 
         testCase.runTest();

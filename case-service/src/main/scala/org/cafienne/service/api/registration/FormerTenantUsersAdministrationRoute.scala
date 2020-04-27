@@ -78,7 +78,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
 //            System.err.println("New roles for user " + userId + " in tenant " + tenant + ": " + roles)
         val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new AddTenantUserRoles(user, tenant, userId, role))
+        askTenant(new AddTenantUserRole(user, tenant, userId, role))
       }
     }
   }

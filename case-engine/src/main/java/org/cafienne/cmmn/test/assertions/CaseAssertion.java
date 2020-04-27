@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.cmmn.test.assertions.file.CaseFileItemAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
@@ -27,10 +28,27 @@ public class CaseAssertion extends StageAssertion {
         this.caseFileAssertion = new CaseFileAssertion(testCommand);
     }
 
+    /**
+     * Temporary method to quicker convert code
+     * @param assertion
+     */
+    @Deprecated
+    public CaseAssertion(CaseAssertion assertion) {
+        this(assertion.getTestCommand());
+    }
+
+    public PublishedEventsAssertion<?> getEvents() {
+        return getTestCommand().getEvents();
+    }
+
     private static PlanItemCreated getCasePlan(CaseTestCommand testCommand) {
-        PublishedEventsAssertion<PlanItemCreated> pea = new PublishedEventsAssertion(testCommand.getEventListener().getEvents()).filter(PlanItemCreated.class);
+        PublishedEventsAssertion<PlanItemCreated> pea = testCommand.getEventListener().getEvents().filter(PlanItemCreated.class);
         EventFilter<PlanItemCreated> filter = e -> e.getType().equals("CasePlan");
         return pea.filter(filter).getEvents().stream().findFirst().orElse(null);
+    }
+
+    public void print() {
+        TestScript.debugMessage("Result of step " + testCommand.getActionNumber() +": " + testCommand.caseInstanceString());
     }
 
     @Override
@@ -49,9 +67,13 @@ public class CaseAssertion extends StageAssertion {
      */
     @Override
     protected Stream<PlanItemCreated> getPlanItems(String identifier) {
-        PublishedEventsAssertion<PlanItemCreated> pea = new PublishedEventsAssertion(testCommand.getEventListener().getEvents()).filter(caseId).filter(PlanItemCreated.class);
+        PublishedEventsAssertion<PlanItemCreated> pea = testCommand.getEventListener().getEvents().filter(caseId).filter(PlanItemCreated.class);
         EventFilter<PlanItemCreated> filter = e -> e.getPlanItemId().equals(identifier) || e.getPlanItemName().equals(identifier);
         return pea.filter(filter).getEvents().stream();
+    }
+
+    public CaseFileAssertion assertCaseFile() {
+        return caseFileAssertion;
     }
 
     /**

@@ -133,7 +133,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
 
     protected void addDebugInfo(DebugStringAppender appender, Value json, Logger logger) {
         addDebugInfo(appender, logger);
-        addDebugInfo(() -> json, logger);
+        addDebugInfo(() -> json.cloneValueNode(), logger);
     }
 
     protected void addDebugInfo(DebugStringAppender appender, Exception exception, Logger logger) {

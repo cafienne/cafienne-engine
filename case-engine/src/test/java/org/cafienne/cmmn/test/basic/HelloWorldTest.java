@@ -26,18 +26,15 @@ public class HelloWorldTest {
         ValueMap greeting = new ValueMap("Greeting", new ValueMap("Message", "hello", "To", testUser.id(), "From", testUser.id()));
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, greeting, null);
-        testCase.addTestStep(startCase, action -> {
-            TestScript.debugMessage("Case: " + action);
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
             String taskId = casePlan.assertHumanTask("Receive Greeting and Send response").getId();
-            action.getEvents().filter(HumanTaskDueDateFilled.class).assertSize(1);
-            action.getEvents().filter(HumanTaskAssigned.class).assertSize(1);
+            casePlan.getEvents().filter(HumanTaskDueDateFilled.class).assertSize(1);
+            casePlan.getEvents().filter(HumanTaskAssigned.class).assertSize(1);
 
             CompleteHumanTask completeTask1 = new CompleteHumanTask(testUser, caseInstanceId, taskId, new ValueMap());
-            testCase.insertTestStep(completeTask1, action2 ->
-            {
-                TestScript.debugMessage("Case: " + action2);
-                CaseAssertion casePlan2 = new CaseAssertion(action2);
+            testCase.insertStep(completeTask1, casePlan2 -> {
+                casePlan2.print();
                 casePlan2.assertLastTransition(Transition.Create, State.Active, State.Null);
                 casePlan2.assertPlanItem("Receive Greeting and Send response").assertState(State.Completed);
                 casePlan2.assertPlanItem("Read response").assertState(State.Active);
@@ -55,8 +52,8 @@ public class HelloWorldTest {
         ValueMap greeting = new ValueMap("Greeting", new ValueMap("Message", "hello", "To", "", "From", testUser.id()));
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, greeting, null);
-        testCase.addTestStep(startCase, action -> {
-            TestScript.debugMessage("Events: " + action.toString());
+        testCase.addStep(startCase, action -> {
+            TestScript.debugMessage("Events: " + action.getTestCommand());
             action.getEvents().filter(HumanTaskDueDateFilled.class).assertSize(1);
             action.getEvents().filter(HumanTaskAssigned.class).assertSize(0);
         });

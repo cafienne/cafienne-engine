@@ -23,7 +23,7 @@ public class RepetitiveFileItems {
     // Simple test for repetitive casefile structure
     private final String caseName = "repetitiveFileItems";
     private final TestScript testCase = new TestScript(caseName);
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repetitivefileitems1.xml");
+    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repeatcasefilecreation.xml");
     private final TenantUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
@@ -32,9 +32,8 @@ public class RepetitiveFileItems {
         String caseInstanceId = "CaseFileDefinitionTest";
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
 
             // There must be 1 review task in state available and it must repeat.
             casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Available).assertRepeats();
@@ -42,28 +41,26 @@ public class RepetitiveFileItems {
 
         // This test sets individual CaseFileItems
         ValueMap topCaseObject = new ValueMap();
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), "TopCase"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), "TopCase"), casePlan -> {
+            casePlan.print();
 
             // There still must be 1 repeating review task in state available.
             casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Available).assertRepeats();
 
-            action.getEvents().assertCaseFileEvent("TopCase", e -> e.getValue().equals(topCaseObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase", e -> e.getValue().equals(topCaseObject));
             // There should be no items yet
-            action.getEvents().assertNoCaseFileEvent("TopCase/items");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items");
         });
 
         // Create the CaseFileItem 'items' under the 'TopCase'; this is just an empty array
         ValueList itemArray = new ValueList();
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemArray.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemArray.cloneValueNode(), "TopCase/items"), casePlan -> {
+            casePlan.print();
 
             // Sending empty array contents should not result in new events;
             //   yes, i know, yes, this is little weird, but it is current engine behavior :(
-            action.getEvents().assertSize(0);
-            action.getEvents().assertNoCaseFileEvent("TopCase/items");
+            casePlan.getEvents().assertSize(0);
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items");
         });
 
         // And add a first item to 'items'
@@ -72,30 +69,26 @@ public class RepetitiveFileItems {
         itemObject.putRaw("role", "expert");
         itemArray.add(itemObject); // Also add it to the test object
 
-        // We're adding a clone of the item object into the case, so that we properly compare arrays
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage("CasePlan: " + casePlan);
-
+        // We're adding a clone of the item object into the case, so that we properly compare arrays. There must be 1 Review task.
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
+            casePlan.print();
             // There should be only 1 item in the case file, and it's value should be equal to the itemObject passed into it
-            action.getEvents().assertCaseFileEvent("TopCase/items[0]", e -> e.getValue().equals(itemObject));
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[0]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
 
             // The entry criterion for the first review task must have been satisfied, so the Review task should be
-            // in state active. Additionally the outcome of the repeat rule gave another Review instance in state available. Also this task must be
-            // repeatable,
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active, State.Available).assertRepeats();
+            // in state active.
+            casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Active).assertRepeats();
 
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             //  ... but there should not be any new events on it that come out of the action.
-            action.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
-        // And add another item, causing changes in the plan (if it all works out)
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        // And add another item, causing changes in the plan (if it all works out). There now must be 2 Review tasks
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
+            casePlan.print();
 //
 //            i = 0;
 //            System.out.println("New events: ");
@@ -104,79 +97,76 @@ public class RepetitiveFileItems {
 //            });
 //            System.out.println("Done.");
 
-            // Now there must be 3 review tasks, but the last task should not be repeating any more.
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
-
             // One more item ...
-            action.getEvents().assertCaseFileEvent("TopCase/items[1]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[1]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            // Now there must be one more review task
+            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
+
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             //  ... but there should not be any new events on it that come out of the action.
-            action.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
-        // And add another item, causing changes in the plan (if it all works out)
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        // And add another item, causing changes in the plan (if it all works out). There should not be any new Review tasks.
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
 
             // Now the entry criterion of the last task has been met, and no more repetition, so no new tasks
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
 
             // One more item ...
-            action.getEvents().assertCaseFileEvent("TopCase/items[2]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[2]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[3]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[3]");
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             //  ... but there should not be any new events on it that come out of the action.
-            action.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
         // And add another item, should not lead to new changes
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
 
             // Now there must be still 3 active review tasks
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
 
             // One more item ...
-            action.getEvents().assertCaseFileEvent("TopCase/items[3]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[3]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[4]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[4]");
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             //  ... but there should not be any new events on it that come out of the action.
-            action.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
         // And add another item, causing changes in the plan (if it all works out)
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
+            casePlan.print();
 
             // Now there must be still 3 active review tasks
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
 
             // One more item ...
-            action.getEvents().assertCaseFileEvent("TopCase/items[4]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[4]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[3]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[5]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[3]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[5]");
             // We should still have the former "TopCase" based CaseFileEvent ...
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             //  ... but there should not be any new events on it that come out of the action.
-            action.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
         });
 
         testCase.runTest();
@@ -188,8 +178,7 @@ public class RepetitiveFileItems {
         String caseInstanceId = "CaseFileDefinitionTest23";
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             // There must be 1 review task in state available, and it must repeat because there are less than 2 item objects in the case file
             casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Available).assertRepeats();
         });
@@ -204,11 +193,11 @@ public class RepetitiveFileItems {
         itemArray.add(itemObject.cloneValueNode()); // [0]
         itemArray.add(itemObject.cloneValueNode()); // [1]
 
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), "TopCase"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-            // There must be 1 review task in state available, and it should be repeating
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
+        // Creating 2 items in the array should trigger 2 new Review tasks
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, topCaseObject.cloneValueNode(), "TopCase"), casePlan -> {
+            casePlan.print();
+            // There must be 2 review tasks
+            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
 
             casePlan.assertCaseFileItem("TopCase/items[1]").assertValue(itemObject);
 
@@ -216,48 +205,43 @@ public class RepetitiveFileItems {
             casePlan.assertCaseFileItem("TopCase").assertValue(topCaseObject);
             casePlan.assertCaseFileItem("TopCase/items[0]").assertValue(itemObject);
             casePlan.assertCaseFileItem("TopCase/items[1]").assertValue(itemObject);
-            action.getEvents().assertCaseFileEvent("TopCase", e -> e.getValue().equals(topCaseObject));
-            action.getEvents().assertCaseFileEvent("TopCase/items[0]", e -> e.getValue().equals(itemObject));
-            action.getEvents().assertCaseFileEvent("TopCase/items[1]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase", e -> e.getValue().equals(topCaseObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[0]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[1]", e -> e.getValue().equals(itemObject));
             // But nothing yet on the next item
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
         });
 
-        // Add another item
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-
-            TestScript.debugMessage(casePlan);
+        // Add another item. There should not be a new Review task, and the repetition of the second Review task must be false.
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
+            casePlan.print();
 
             // One more item ...
-            action.getEvents().assertCaseFileEvent("TopCase/items[2]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[2]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
-            action.getEvents().assertNoCaseFileEvent("TopCase");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[3]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[3]");
 
             // There must be 2 review tasks, one active and one available, both repeating.
             casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
         });
 
         // And yet another item
-        testCase.addTestStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-
-
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, itemObject.cloneValueNode(), "TopCase/items"), casePlan -> {
+            casePlan.print();
             // There must be 2 review tasks, one active and one available.
-            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active);
+            casePlan.assertPlanItems("Review").assertSize(2).assertStates(State.Active).assertNoMoreRepetition();
 
             // One more item ...
-            action.getEvents().assertCaseFileEvent("TopCase/items[3]", e -> e.getValue().equals(itemObject));
+            casePlan.getEvents().assertCaseFileEvent("TopCase/items[3]", e -> e.getValue().equals(itemObject));
             // But nothing on the previous, and not yet the next
-            action.getEvents().assertNoCaseFileEvent("TopCase");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
-            action.getEvents().assertNoCaseFileEvent("TopCase/items[4]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[0]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[1]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[2]");
+            casePlan.getEvents().assertNoCaseFileEvent("TopCase/items[4]");
 
             // There should be total of 0 .. 3 events
             casePlan.assertCaseFileItem("TopCase/items[0]").assertValue(itemObject);

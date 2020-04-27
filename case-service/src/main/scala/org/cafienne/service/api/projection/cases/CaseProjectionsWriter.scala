@@ -20,12 +20,12 @@ class CaseProjectionsWriter(persistence: RecordsPersistence, offsetStorageProvid
   override val tag: String = CaseEvent.TAG
 
   private val transactionCache = new scala.collection.mutable.HashMap[String, CaseTransaction]
-  private def getTransaction(caseInstanceId: String) = transactionCache.getOrElseUpdate(caseInstanceId, new CaseTransaction(caseInstanceId, persistence))
+  private def getTransaction(caseInstanceId: String, tenant: String) = transactionCache.getOrElseUpdate(caseInstanceId, new CaseTransaction(caseInstanceId, tenant, persistence))
 
   def consumeModelEvent(newOffset: Offset, persistenceId: String, sequenceNr: Long, modelEvent: ModelEvent[_]): Future[Done] = {
     modelEvent match {
       case evt: CaseEvent => {
-        val transaction = getTransaction(evt.getActorId)
+        val transaction = getTransaction(evt.getActorId, evt.tenant)
         transaction.handleEvent(evt).flatMap(_ => {
           evt match {
             case cm: CaseModified => {

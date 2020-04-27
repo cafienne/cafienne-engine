@@ -36,9 +36,8 @@ public class TestHumanTask {
         TenantUser pete = TestScript.getTestUser("pete");
         TenantUser gimy = TestScript.getTestUser("gimy");
 
-        testCase.addTestStep(new StartCase(pete, caseInstanceId, xml, inputs, null), act -> {
-            CaseAssertion cp = new CaseAssertion(act);
-            TestScript.debugMessage("Current case: " + cp);
+        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, null), caseStarted -> {
+            caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
             TestScript.debugMessage("Task ID: " + taskId);
 
@@ -49,7 +48,7 @@ public class TestHumanTask {
              * FillTaskDueDate - User should be able to set task due date using FillTaskDueDate command
              */
             Instant taskDueDate = Instant.now();
-            testCase.addTestStep(new FillTaskDueDate(pete, caseInstanceId, taskId, taskDueDate), action -> {
+            testCase.addStep(new FillTaskDueDate(pete, caseInstanceId, taskId, taskDueDate), action -> {
 
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
@@ -61,25 +60,25 @@ public class TestHumanTask {
             /**
              * SaveTaskOutput - User should not be able to save the task output for Unassigned task
              */
-            testCase.addTestStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("Output can be saved only for Assigned or Delegated task"));
+            testCase.assertStepFails(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("Output can be saved only for Assigned or Delegated task"));
 
             /**
              * DelegateTask - Only Assigned task can be delegated
              */
-            testCase.addTestStep(new DelegateTask(gimy, caseInstanceId, taskId, "pete"), action ->
-                    new FailureAssertion(action).assertException("Only Assigned task can be delegated"));
+            testCase.assertStepFails(new DelegateTask(gimy, caseInstanceId, taskId, "pete"),
+                    failure -> failure.assertException("Only Assigned task can be delegated"));
 
             /**
              * CompleteTask - Only Assigned or Delegated task can be completed
              */
-            testCase.addTestStep(new CompleteHumanTask(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("Only Assigned or Delegated task can be completed"));
+            testCase.assertStepFails(new CompleteHumanTask(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("Only Assigned or Delegated task can be completed"));
 
             /**
              * ClaimTask - User should be able to claim the task
              */
-            testCase.addTestStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
+            testCase.addStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -90,31 +89,31 @@ public class TestHumanTask {
             /**
              * ClaimTask - User should not be able to claim already Assigned task
              */
-            testCase.addTestStep(new ClaimTask(pete, caseInstanceId, taskId), action ->
-                    new FailureAssertion(action).assertException("ClaimTask cannot be done because task (" + taskId + ") is in Assigned state"));
+            testCase.assertStepFails(new ClaimTask(pete, caseInstanceId, taskId),
+                    failure -> failure.assertException("ClaimTask cannot be done because task (" + taskId + ") is in Assigned state"));
 
             /**
              * AssignTask - Only Unassigned task can be assigned to a user
              */
-            testCase.addTestStep(new AssignTask(pete, caseInstanceId, taskId, "gimy"), action ->
-                    new FailureAssertion(action).assertException("AssignTask cannot be done because task (" + taskId + ") is in Assigned state"));
+            testCase.assertStepFails(new AssignTask(pete, caseInstanceId, taskId, "gimy"),
+                    failure -> failure.assertException("AssignTask cannot be done because task (" + taskId + ") is in Assigned state"));
 
             /**
              * ValidateTaskOutput - Only the current assignee should be able to validate task output
              */
-            testCase.addTestStep(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("Only the current task assignee (pete) can validate output of task"));
+            testCase.assertStepFails(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("Only the current task assignee (pete) can validate output of task"));
 
             /**
              * SaveTaskOutput - Only the current assignee should be able to save task data
              */
-            testCase.addTestStep(new SaveTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("Only the current task assignee (pete) can save the task"));
+            testCase.assertStepFails(new SaveTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("Only the current task assignee (pete) can save the task"));
 
             /**
              * SaveTaskOutput - User should be able to save the task
              */
-            testCase.addTestStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 taskAssertion.assertTaskOutput(taskOutputDecisionCanceled);
@@ -123,13 +122,13 @@ public class TestHumanTask {
             /**
              * RevokeTask - Only the current assignee can revoke the task
              */
-            testCase.addTestStep(new RevokeTask(gimy, caseInstanceId, taskId), action ->
-                    new FailureAssertion(action).assertException("Only the current task assignee (pete) can revoke the task"));
+            testCase.assertStepFails(new RevokeTask(gimy, caseInstanceId, taskId),
+                    failure -> failure.assertException("Only the current task assignee (pete) can revoke the task"));
 
             /**
              * RevokeTask - User should be able to revoke the task from Assigned state
              */
-            testCase.addTestStep(new RevokeTask(pete, caseInstanceId, taskId), action -> {
+            testCase.addStep(new RevokeTask(pete, caseInstanceId, taskId), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -140,13 +139,13 @@ public class TestHumanTask {
             /**
              * RevokeTask - Only Assigned or Delegated task can be revoked
              */
-            testCase.addTestStep(new RevokeTask(gimy, caseInstanceId, taskId), action ->
-                    new FailureAssertion(action).assertException("Only Assigned or Delegated task can be revoked"));
+            testCase.assertStepFails(new RevokeTask(gimy, caseInstanceId, taskId),
+                    failure -> failure.assertException("Only Assigned or Delegated task can be revoked"));
 
             /**
              * AssignTask - User should be able to assign the task to another user
              */
-            testCase.addTestStep(new AssignTask(pete, caseInstanceId, taskId, "gimy"), action -> {
+            testCase.addStep(new AssignTask(pete, caseInstanceId, taskId, "gimy"), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -157,13 +156,13 @@ public class TestHumanTask {
             /**
              * DelegateTask - Only the current task assignee can delegate the task to another user
              */
-            testCase.addTestStep(new DelegateTask(pete, caseInstanceId, taskId, "pete"), action ->
-                    new FailureAssertion(action).assertException("Only the current task assignee (gimy) can delegate the task"));
+            testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, "pete"),
+                    failure -> failure.assertException("Only the current task assignee (gimy) can delegate the task"));
 
             /**
              * DelegateTask - User should be able to delegate the task
              */
-            testCase.addTestStep(new DelegateTask(gimy, caseInstanceId, taskId, "pete"), action -> {
+            testCase.addStep(new DelegateTask(gimy, caseInstanceId, taskId, "pete"), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -175,13 +174,13 @@ public class TestHumanTask {
             /**
              * DelegateTask - Already delegated task can not be further delegated
              */
-            testCase.addTestStep(new DelegateTask(pete, caseInstanceId, taskId, "pete"), action ->
-                    new FailureAssertion(action).assertException("DelegateTask cannot be done because task (" + taskId + ") is in Delegated state"));
+            testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, "pete"),
+                    failure -> failure.assertException("DelegateTask cannot be done because task (" + taskId + ") is in Delegated state"));
 
             /**
              * RevokeTask - User should be able to revoke a task from Delegated state
              */
-            testCase.addTestStep(new RevokeTask(pete, caseInstanceId, taskId), action -> {
+            testCase.addStep(new RevokeTask(pete, caseInstanceId, taskId), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -193,13 +192,13 @@ public class TestHumanTask {
             /**
              * CompleteTask - Only the current task assignee should be able to complete the task
              */
-            testCase.addTestStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("Only the current task assignee (gimy) can complete the task"));
+            testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()),
+                    failure -> failure.assertException("Only the current task assignee (gimy) can complete the task"));
 
             /**
              * CompleteTask - User should be able to complete the task
              */
-            testCase.addTestStep(new CompleteHumanTask(gimy, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(gimy, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 

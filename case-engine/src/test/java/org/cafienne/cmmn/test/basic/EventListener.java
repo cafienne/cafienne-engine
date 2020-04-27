@@ -31,8 +31,7 @@ public class EventListener {
         TestScript testCase = new TestScript(caseInstanceId);
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
@@ -49,8 +48,7 @@ public class EventListener {
         });
 
         // Having the user event occur should activate T1
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "UserEvent"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "UserEvent"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
@@ -67,8 +65,7 @@ public class EventListener {
         });
 
         // Completing Task1 should just complete it
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
@@ -85,8 +82,7 @@ public class EventListener {
         });   
         
         // Completing Task1 again should not change anything
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
@@ -104,8 +100,7 @@ public class EventListener {
         
 
         // Terminating the case should destroy the waiter event and remaining task
-        testCase.addTestStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Terminate), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Terminate), casePlan -> {
             casePlan.assertLastTransition(Transition.Terminate, State.Terminated, State.Active);
 
             TaskAssertion item1 = casePlan.assertTask("T1");

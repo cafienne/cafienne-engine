@@ -7,7 +7,7 @@
             <planItem id="pi_ht__4kpJj_0" name="Item1" definitionRef="ht__4kpJj_0"/>
             <planItem id="pi_ht__4kpJj_1" name="Item2" definitionRef="ht__4kpJj_1">
                 <entryCriterion id="_4kpJj_5" name="S1" sentryRef="crit__4kpJj_0"/>
-                <entryCriterion id="_4kpJj_6" name="S2" sentryRef="crit__4kpJj_1"/>
+                <entryCriterion id="_4kpJj_12" name="EntryCriterion_1" sentryRef="crit__4kpJj_2"/>
                 <itemControl id="_4kpJj_2" name="ItemControl_1">
                     <repetitionRule id="_4kpJj_3" name="Constraint_0">
                         <condition id="_4kpJj_4" name="Expression_0" language="spel">
@@ -18,18 +18,36 @@
                     </repetitionRule>
                 </itemControl>
             </planItem>
+            <planItem id="pi_ms__4kpJj_0" name="RepeatUponCompletion" definitionRef="ms__4kpJj_0">
+                <entryCriterion id="_4kpJj_6" name="EntryCriterion_0" sentryRef="crit__4kpJj_1"/>
+                <itemControl id="_4kpJj_9">
+                    <repetitionRule id="_4kpJj_10">
+                        <condition id="_4kpJj_11" language="spel">
+                            <body>
+                                <![CDATA[true]]>
+                            </body>
+                        </condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
             <sentry id="crit__4kpJj_0" name="Sentry_0">
                 <planItemOnPart id="_4kpJj_7" name="PlanItemOnPart_0" sourceRef="pi_ht__4kpJj_0">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
-            <sentry id="crit__4kpJj_1" name="Sentry_1">
-                <planItemOnPart id="_4kpJj_8" name="PlanItemOnPart_1" sourceRef="pi_ht__4kpJj_1">
+            <sentry id="crit__4kpJj_1">
+                <planItemOnPart id="_4kpJj_8" sourceRef="pi_ht__4kpJj_1">
                     <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__4kpJj_2">
+                <planItemOnPart id="_4kpJj_13" sourceRef="pi_ms__4kpJj_0">
+                    <standardEvent>occur</standardEvent>
                 </planItemOnPart>
             </sentry>
             <humanTask id="ht__4kpJj_0" name="Item1" isBlocking="true"/>
             <humanTask id="ht__4kpJj_1" name="Item2" isBlocking="true"/>
+            <milestone id="ms__4kpJj_0" name="RepeatUponCompletion"/>
         </casePlanModel>
     </case>
     <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
@@ -49,14 +67,21 @@
             <CMMNShape cmmnElementRef="_4kpJj_5">
                 <Bounds x="134" y="190" width="12" height="20"/>
             </CMMNShape>
-            <CMMNShape cmmnElementRef="_4kpJj_6">
-                <Bounds x="204" y="220" width="12" height="20"/>
+            <CMMNShape cmmnElementRef="pi_ms__4kpJj_0">
+                <Bounds x="290" y="200" width="160" height="60"/>
             </CMMNShape>
-            <textbox cmmnElementRef="_4kpJj_shape_5" parentId="cm__4kpJj_0" content="Item2.complete">
-                <Bounds x="270" y="200" width="100" height="60"/>
-            </textbox>
+            <CMMNShape cmmnElementRef="_4kpJj_6">
+                <Bounds x="284" y="220" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_4kpJj_12">
+                <Bounds x="154" y="250" width="12" height="20"/>
+            </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="pi_ht__4kpJj_0" targetCMMNElementRef="_4kpJj_5"/>
-            <CMMNEdge sourceCMMNElementRef="_4kpJj_6" targetCMMNElementRef="_4kpJj_shape_5"/>
+            <CMMNEdge sourceCMMNElementRef="pi_ht__4kpJj_1" targetCMMNElementRef="_4kpJj_6"/>
+            <CMMNEdge sourceCMMNElementRef="pi_ms__4kpJj_0" targetCMMNElementRef="_4kpJj_12">
+                <waypoint x="340" y="360"/>
+                <waypoint x="160" y="360"/>
+            </CMMNEdge>
         </CMMNDiagram>
     </CMMNDI>
 </definitions>

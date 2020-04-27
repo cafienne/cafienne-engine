@@ -38,7 +38,7 @@ public class TestPDFReport {
         request.putRaw("jsonData", customerData);
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
-        testCase.addTestStep(startCase, action -> {
+        testCase.addStep(startCase, action -> {
             String reportTaskId = testCase.getEventListener().awaitPlanItemState("Generate Report", State.Available).getPlanItemId();
 
             // TTD: should we also get events from the ProcessActor? Then we can use reportTaskId to figure out of the actor has thrown them.

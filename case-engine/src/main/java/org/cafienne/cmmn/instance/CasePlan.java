@@ -23,7 +23,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
         // We are the case plan, so make sure we connect the exit criteria
         //  can be done only here, because collection is created in constructor of stage, and hence
         //  not available in constructor of PlanItem
-        definition.getExitCriteria().forEach(c -> getExitCriteria().add(getExitCriterion(c)));
+        definition.getExitCriteria().forEach(c -> getExitCriteria().add(getCriterion(c, this)));
         caseInstance.setCasePlan(this);
     }
 

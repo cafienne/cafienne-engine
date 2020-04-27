@@ -38,9 +38,15 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
     map.toString
   }
 
-  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("Tenant " + tenant +" does not exist, or user "+userId+" is not registered in it"))
+  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("Tenant '" + tenant +"' does not exist, or user '"+userId+"' is not registered in it"))
 
   final def isPlatformOwner: Boolean = CaseSystem.isPlatformOwner(userId)
 
-  final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("User '" + userId+"' is not registered in tenant "+tenant+"; tenants are: "+tenants))
+  final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse({
+    val message = tenants.isEmpty match {
+      case true => s"User '$userId' is not registered in tenant '$tenant' (nor in any other tenant)"
+      case false => "User '" + userId+"' is not registered in tenant '"+tenant+"'; tenants are: "+tenants.map(tenant => s"'$tenant'").mkString(",")
+    }
+    throw new SecurityException(message)
+  })
 }

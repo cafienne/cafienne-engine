@@ -2,8 +2,14 @@ package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.w3c.dom.Element;
+
+import java.util.stream.Collectors;
 
 public abstract class CriterionDefinition extends CMMNElementDefinition {
     private final String sentryRef;
@@ -15,14 +21,21 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
     }
 
     public SentryDefinition getSentryDefinition() {
+        if (sentry == null) {
+            // Sometimes this is invoked too early. Then try to resolve first
+            this.resolveReferences();
+        }
         return sentry;
     }
 
     public abstract Transition getTransition();
 
+    public abstract Criterion createInstance(Stage stage);
+
     @Override
     public String toString() {
-        return getType() + " for " + getParentElement();
+        String onParts = getSentryDefinition().getOnParts().stream().map(part -> part.getContextDescription()).collect(Collectors.joining(","));
+        return getType() + " for " + getParentElement() + " on " + onParts;
     }
 
     /**

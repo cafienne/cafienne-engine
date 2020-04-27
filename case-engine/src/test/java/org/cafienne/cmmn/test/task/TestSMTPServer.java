@@ -47,9 +47,8 @@ public class TestSMTPServer {
         request.putRaw("filename", "abc.txt");
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
 
             // Wait until sending the email has failed (as there is no mail server running, the task must fail...)
             testCase.getEventListener().awaitPlanItemState("Send test email", State.Failed);

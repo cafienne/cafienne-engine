@@ -49,7 +49,7 @@ public class Sentry extends CMMNElement<SentryDefinition> {
      */
     private boolean isActive;
 
-    Sentry(Stage stage, Criterion criterion) {
+    Sentry(Stage stage, Criterion<?> criterion) {
         super(stage, criterion.getDefinition().getSentryDefinition());
         this.stage = stage;
         this.criterion = criterion;
@@ -72,6 +72,10 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     void establishPotentialConnection(PlanItem planItem) {
         PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getItemDefinition());
         if (onPart != null) {
+//            System.out.println("\n\nConnecting criterion: " + getCriterion());
+//            System.out.println("Plan Item Stage: " + planItem.getStage());
+//            System.out.println("My stage: " + getStage());
+//            System.out.println("So we try to connect");
             onPart.connect(planItem);
         }
     }
@@ -113,13 +117,13 @@ public class Sentry extends CMMNElement<SentryDefinition> {
     void activate(OnPart<?, ?> activator) {
         inactiveOnParts.remove(activator);
         if (inactiveOnParts.isEmpty()) {
-            addDebugInfo(() -> criterion + " has become active.", this);
+            addDebugInfo(() -> criterion + " has become active");
         } else {
             addDebugInfo(() -> criterion + " has "+inactiveOnParts.size()+" remaining inactive on parts", this);
         }
         if (isSatisfied()) {
             isActive = true;
-            criterion.satisfy();
+            criterion.satisfy(activator);
             // isActive = false;
         }
     }

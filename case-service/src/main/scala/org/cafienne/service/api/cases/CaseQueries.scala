@@ -3,7 +3,8 @@ package org.cafienne.service.api.cases
 import akka.actor.{ActorRefFactory, ActorSystem}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.api.cases.table.CaseTables
-import org.cafienne.service.api.tasks.{SearchFailure, TaskTables}
+import org.cafienne.service.api.projection.CaseSearchFailure
+import org.cafienne.service.api.tasks.TaskTables
 import org.cafienne.service.api.tenant.TenantTables
 
 import scala.concurrent.Future
@@ -84,8 +85,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
         }
       }
       case None => {
-//        System.err.println("Case cannot be found")
-        throw new SearchFailure("Case not found")
+        throw CaseSearchFailure(caseInstanceId)
       }
     }
   }

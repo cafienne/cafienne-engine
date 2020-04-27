@@ -48,7 +48,7 @@ object Deps {
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
   val slf4j                 = akkaSlf4j
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.1"
-  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.3.0-alpha5"
+  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.3"
   val config                = "com.typesafe"            %  "config"                               % "1.4.0"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.2"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum

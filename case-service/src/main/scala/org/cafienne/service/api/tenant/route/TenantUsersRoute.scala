@@ -18,10 +18,9 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
-import org.cafienne.service.api.tasks.SearchFailure
+import org.cafienne.service.api.projection.UserSearchFailure
 import org.cafienne.service.api.tenant.model._
 import org.cafienne.service.api.tenant.UserQueries
-
 
 import scala.util.{Failure, Success}
 
@@ -99,10 +98,10 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
             }
           case Failure(failure) =>
             failure match {
-              case _: SearchFailure => complete(StatusCodes.NotFound)
+              case u: UserSearchFailure => complete(StatusCodes.NotFound, u.getLocalizedMessage)
               case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
               case _ => {
-                logger.warn(s"Ran into an exception while getting user '${userId}' in tenant '${tenant}'", failure)
+                logger.warn(s"Ran into an exception while getting user '$userId' in tenant '$tenant'", failure)
                 complete(StatusCodes.InternalServerError)
               }
             }

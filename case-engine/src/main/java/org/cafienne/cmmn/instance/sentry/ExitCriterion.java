@@ -1,37 +1,80 @@
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
+import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExitCriterion extends Criterion {
-    private final String targetPlanItemName;
-    private final Transition targetTransition;
+public class ExitCriterion extends Criterion<ExitCriterionDefinition> {
+    private final List<PlanItem> targets = new ArrayList<>();
 
     public ExitCriterion(Stage stage, ExitCriterionDefinition definition) {
         super(stage, definition);
-        targetPlanItemName = definition.getTarget();
-        targetTransition = Transition.Exit;
     }
 
     @Override
-    protected void satisfy() {
-        // Make a list of the current plan items eligible for the transition.
-        // Note: making the copy avoids a ConcurrentModificationException on the stages' plan item collection.
-        // Alternatively this collection could have been made CopyOnWriteArrayList, but this is more expensive,
-        // and sentry activation is the only place that can cause the modification in a proper way.
-        // Of course, if 2 threads simultaneously execute an activity on the case instance, this can also result
-        // in the ConcurrentModificationException, however, we do not want to solve that problem inside the engine,
-        // but rather outside of it.
-        List<PlanItem> planItemsCurrentlyEligible = stage.getPlanItems().stream().filter(p -> p.getName().equals(targetPlanItemName)).collect(Collectors.toList());
-        for (PlanItem planItem : planItemsCurrentlyEligible) {
-            addDebugInfo(() -> "Exit criterion of '" + planItem + "' is satisfied and will trigger "+targetTransition, this.sentry);
-            planItem.makeTransition(targetTransition);
+    public void addPlanItem(PlanItem planItem) {
+        targets.add(planItem);
+    }
+
+    @Override
+    protected void satisfy(OnPart<?, ?> activator) {
+        if (targets == null) {
+            // Although the list 'targets' is a final member, it may still happen to have a null value.
+            //  This is because the super-constructor creates a sentry, and that sentry
+            //  connects to the sentrynetwork, which in turn adds plan items to this exit criterion,
+            //  be it a bit too early. Later on the connection is again established.
+            return;
         }
+
+        final PlanItemOnPart piop = activator instanceof PlanItemOnPart ? (PlanItemOnPart) activator : null;
+        final PlanItem source = piop != null?piop.getSource() : null;
+
+        List<PlanItem> killThese = targets.stream().filter(p -> p.getState() == State.Active).collect(Collectors.toList());
+        killThese.forEach(planItem -> {
+            // This checks whether the activating element does not accidentally belong to a sibling stage.
+            //  Note: this is a slightly performance intensive operation, which is not necessary if the
+            //  sentry network management does a better job.
+            if (belongsToSiblingStage(source, findStage(planItem))) {
+//                System.out.println("\n\nBELONGS TO SIBLING STAGE ...");
+            } else {
+                addDebugInfo(() -> "Exit criterion of '" + planItem + "' is satisfied", this.sentry);
+                targets.remove(planItem);
+                planItem.makeTransition(Transition.Exit);
+            }
+        });
+    }
+
+    private boolean belongsToSiblingStage(PlanItem source, Stage target) {
+//        System.out.println("Checking whether " + source + " belongs to " + target);
+        if (source == null) {
+            return false;
+        }
+        if (source.getStage() == target) {
+//            System.out.println("Well. Source is CHILD of target. That's a clear to go!");
+            return false;
+        }
+        ItemDefinition sourceDefinition = source.getItemDefinition();
+        ItemDefinition targetStageDefinition = target.getItemDefinition();
+        if (sourceDefinition.equals(targetStageDefinition) && source != target) {
+//            System.out.println("Well. Equal definitions, different instances. Must be from a sibling!!");
+            return true;
+        }
+
+//        System.out.println("Not sure. checking parent");
+        return belongsToSiblingStage(source.getStage(), target);
+
+    }
+
+    private Stage findStage(PlanItem target) {
+        if (target instanceof Stage) return (Stage) target;
+        return target.getStage();
     }
     
     @Override

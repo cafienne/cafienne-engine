@@ -16,7 +16,7 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
 
     public CaseFileAssertion(ModelTestCommand command) {
         super(command);
-        PublishedEventsAssertion<CaseFileEvent> allCaseFileEvents = new PublishedEventsAssertion(command.getEventListener().getEvents()).filter(CaseFileEvent.class);
+        PublishedEventsAssertion<CaseFileEvent> allCaseFileEvents = command.getEventListener().getEvents().filter(CaseFileEvent.class);
         allCaseFileEvents.getEvents().forEach(e -> {
             CaseFileItemAssertion cfia = assertions.getOrDefault(e.getPath(), new CaseFileItemAssertion(this, command, e.getPath()));
             assertions.put(e.getPath(), cfia);

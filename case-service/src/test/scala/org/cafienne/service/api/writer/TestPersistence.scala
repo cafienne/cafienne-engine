@@ -18,7 +18,7 @@ class TestPersistence() extends RecordsPersistence {
   }
 
   override def getPlanItem(planItemId: String): Future[Option[PlanItem]] = Future.successful(None)
-  override def getTask(taskId: String): Future[Task] = Future.successful(Task(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now))
+  override def getTask(taskId: String): Future[Option[Task]] = Future.successful(Some(Task(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now)))
   override def getCaseInstance(id: String): Future[Option[CaseInstance]] =  Future.successful(None)
   override def getCaseFile(caseInstanceId: String): Future[Option[CaseFile]] = Future.successful(None)
 }

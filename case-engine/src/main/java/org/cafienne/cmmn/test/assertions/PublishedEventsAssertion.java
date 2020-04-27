@@ -24,6 +24,10 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
         this.events = publishedEvents;
     }
 
+    public PublishedEventsAssertion(PublishedEventsAssertion events) {
+        this.events = new ArrayList<>(events.getEvents());
+    }
+
     /**
      * Asserts the number of events that have been published
      *

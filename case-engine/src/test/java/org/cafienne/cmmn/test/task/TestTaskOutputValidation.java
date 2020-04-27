@@ -8,6 +8,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
@@ -64,10 +65,8 @@ public class TestTaskOutputValidation {
                 "HTTPConfig", new ValueMap("port", port)
         );
 
-        testCase.addTestStep(new StartCase(pete, caseInstanceId, xml, inputs, null), act -> {
-            CaseAssertion cp = new CaseAssertion(act);
-//            String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
-
+        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, null), cp -> {
+            // Depending on how fast the first (process) task starts, the "HumanTask" is either Active or still Available
             String taskId = cp.assertPlanItem("HumanTask").getId();
 
             TaskOutputFilled tof = testCase.getEventListener().awaitTaskOutputFilled("AssertMockServiceIsRunning", e -> true);
@@ -77,13 +76,13 @@ public class TestTaskOutputValidation {
             /**
              * SaveTaskOutput - User should not be able to save the task output for Unassigned task
              */
-            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("ValidateTaskOutput: Output can be validated only for Assigned or Delegated task"));
+            testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("ValidateTaskOutput: Output can be validated only for Assigned or Delegated task"));
 
             /**
              * ClaimTask - User should be able to claim the task
              */
-            testCase.addTestStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
+            testCase.addStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 taskAssertion.assertAssignee("pete");
             });
@@ -91,19 +90,19 @@ public class TestTaskOutputValidation {
             /**
              * ValidateTaskOutput - Task output validation fails on wrong user
              */
-            testCase.addTestStep(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("ValidateTaskOutput: Only the current task assignee (pete) can validate output of task"));
+            testCase.assertStepFails(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("ValidateTaskOutput: Only the current task assignee (pete) can validate output of task"));
 
             /**
              * ValidateTaskOutput - Task output validation should result in a failure when we send "KILLSWITCH"
              */
-            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputFailingValidation.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException("Unexpected http response code 500"));
+            testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputFailingValidation.cloneValueNode()),
+                    failure -> failure.assertException("Unexpected http response code 500"));
 
             /**
              * ValidateTaskOutput - Task output validation fails on wrong output
              */
-            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 Object object = taskAssertion.getValidationResponse().value();
                 if (!(object instanceof ValueMap)) {
@@ -119,13 +118,13 @@ public class TestTaskOutputValidation {
 
 //                taskAssertion.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
                 // Task Output Validation should not lead to new events in the event log.
-                action.getEvents().assertSize(0);
+                action.getTestCommand().getEvents().assertSize(0);
             });
 
             /**
              * ValidateTaskOutput - Task output validation should be ok with decision canceled
              */
-            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 Object object = taskAssertion.getValidationResponse().value();
                 if (!(object instanceof ValueMap)) {
@@ -142,17 +141,14 @@ public class TestTaskOutputValidation {
             /**
              * ValidateTaskOutput - Task output validation should be ok with decision approved
              */
-            testCase.addTestStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
-                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
                 testCase.getEventListener().getNewEvents().assertSize(0);
             });
 
             /**
              * SaveTaskOutput - User should be able to save the task with invalid output
              */
-            testCase.addTestStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
-                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
-
+            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
 //                casePlan.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
                 testCase.getEventListener().getNewEvents().assertNotEmpty();
             });
@@ -160,13 +156,13 @@ public class TestTaskOutputValidation {
             /**
              * CompleteTaskOutput - User should not be able to complete the task with invalid output
              */
-            testCase.addTestStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action ->
-                    new FailureAssertion(action).assertException(InvalidCommandException.class, "Output for task HumanTask is invalid"));
+            testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()),
+                    failure -> failure.assertException(InvalidCommandException.class, "Output for task HumanTask is invalid"));
 
             /**
              * CompleteTask - Only the current task assignee should be able to complete the task
              */
-            testCase.addTestStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 testCase.getEventListener().awaitTaskOutputFilled(taskId, taskEvent -> {
                     ValueMap taskOutput = taskEvent.getTaskOutputParameters();

@@ -14,6 +14,7 @@ import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.slf4j.Logger;
@@ -30,22 +31,22 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
     private final static Logger logger = LoggerFactory.getLogger(CaseTestCommand.class);
 
     private transient final TestScript testScript;
-    private transient final CaseResponseValidator[] validators;
+    private transient final CaseResponseValidator validator;
     private final CaseCommand actualCommand;
     private CaseResponse actualResponse;
     private CommandFailure actualFailure;
 
-    CaseTestCommand(TestScript testScript, CaseCommand command, CaseResponseValidator[] validators) {
+    CaseTestCommand(TestScript testScript, CaseCommand command, CaseResponseValidator validator) {
         super(command.getUser(), command.getCaseInstanceId());
         this.testScript = testScript;
         this.actualCommand = command;
-        this.validators = validators;
+        this.validator = validator;
     }
 
     public CaseTestCommand(ValueMap json) {
         super(json);
         this.testScript = null;
-        this.validators = null;
+        this.validator = null;
         // OOPS: this should actually be done properly...
         this.actualCommand = null;
     }
@@ -141,8 +142,8 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
 
         logger.debug("Validating response for test command " + getActionNumber() + ": " + this.getActualCommand());
         // Run the validators. Validators raise an exception for the test script to stop. Typically an assertion error.
-        for (int i = 0; i < validators.length; i++) {
-            validators[i].validate(this);
+        if (validator != null) {
+            validator.validate(this);
         }
     }
 
@@ -153,8 +154,8 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
 
         logger.debug("Validating response for test command " + getActionNumber() + ": " + this.getActualCommand());
         // Run the validators. Validators raise an exception for the test script to stop. Typically an assertion error.
-        for (int i = 0; i < validators.length; i++) {
-            validators[i].validate(this);
+        if (validator != null) {
+            validator.validate(this);
         }
     }
 
@@ -182,5 +183,10 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
             return ((BootstrapCommand) actualCommand).tenant();
         }
         throw new RuntimeException("This is not a BootstrapCommand");
+    }
+
+    @Override
+    public Value<?> toJson() {
+        return actualCommand.toJson();
     }
 }

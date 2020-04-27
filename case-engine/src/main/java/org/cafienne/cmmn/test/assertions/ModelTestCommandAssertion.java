@@ -18,6 +18,10 @@ public class ModelTestCommandAssertion<T extends ModelTestCommand> {
         }
     }
 
+    public T getTestCommand() {
+        return testCommand;
+    }
+
     private void expectNoCommandFailure() {
         if (testCommand.getActualFailure() != null) {
             throw new AssertionError("Unexpected failure in test step " + testCommand.getActionNumber() + " [" + testCommand.getActualCommand().getClass().getSimpleName() + "]\n" + testCommand.getActualFailure().exception());
