@@ -1,4 +1,5 @@
 # Cafienne Engine for CMMN 1.1
+[![codecov](https://codecov.io/gh/cafienne/cafienne-engine/branch/master/graph/badge.svg?token=syqscQ9dEA)](https://codecov.io/gh/cafienne/cafienne-engine)
 
 Cafienne hosts an open source Case Management Engine which natively executes the CMMN 1.1 standard.
 The engine is written in Java and Scala co-operated with the Akka toolkit, backed by Cassandra and Postgres.

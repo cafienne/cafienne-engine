@@ -3,6 +3,8 @@ jobs:
   master-build:
     working_directory: ~/cafienne-engine
     machine: true
+    environment:
+      CODECOV_TOKEN: 4a5fe937-93b9-4ab3-aa50-48e204575a53
     steps:
       - checkout
       - run:
@@ -17,11 +19,11 @@ jobs:
             sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
       - run:
-          name: Compile code
-          command: sbt compile
-      - run:
           name: Unit tests
-          command: sbt test
+          command: sbt clean coverage test coverageReport
+      - run:
+          name: Store Coverage Report
+          command: bash <(curl -s https://codecov.io/bash)
       - run:
           name: Clone CMMN-test framework
           command: |
@@ -160,6 +162,8 @@ jobs:
   branch-build:
     working_directory: ~/cafienne-engine
     machine: true
+    environment:
+      CODECOV_TOKEN: 4a5fe937-93b9-4ab3-aa50-48e204575a53
     steps:
       - checkout
       - run:
@@ -174,11 +178,11 @@ jobs:
             sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
       - run:
-          name: Compile code
-          command: sbt compile
-      - run:
           name: Unit tests
-          command: sbt test
+          command: sbt clean coverage test coverageReport
+      - run:
+          name: Store Coverage Report
+          command: bash <(curl -s https://codecov.io/bash)
       - run:
           name: Clone CMMN-test framework
           command: |
@@ -228,6 +232,8 @@ jobs:
   release-build:
     working_directory: ~/cafienne-engine
     machine: true
+    environment:
+      CODECOV_TOKEN: 4a5fe937-93b9-4ab3-aa50-48e204575a53
     steps:
       - checkout
       - run:
@@ -248,11 +254,11 @@ jobs:
             cat ./version.txt
             TAG=$(cat ./version.txt)
       - run:
-          name: Compile code
-          command: sbt compile
-      - run:
           name: Unit tests
-          command: sbt test
+          command: sbt clean coverage test coverageReport
+      - run:
+          name: Store Coverage Report
+          command: bash <(curl -s https://codecov.io/bash)
       - run:
           name: Clone CMMN-test framework
           command: |
