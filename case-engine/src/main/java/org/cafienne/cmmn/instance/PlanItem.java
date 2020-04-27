@@ -83,41 +83,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     private int planItemEventCounter = 0; // Akka event sequence number
 
-    /**
-     * Creates a PlanItem within the Case based on the information in the event.
-     * @param caseInstance
-     * @param event
-     * @return
-     */
-    public static PlanItem create(Case caseInstance, PlanItemCreated event) {
-        String stageId = event.getStageId();
-        if (stageId.isEmpty()) {
-            CasePlanDefinition definition = caseInstance.getDefinition().getCasePlanModel();
-            return definition.createInstance(event.planItemId, 0, definition, null, caseInstance);
-        } else {
-            // Lookup the stage to which the plan item belongs,
-            // then lookup the definition for the plan item
-            // and then instantiate it.
-            Stage<?> stage = caseInstance.getPlanItemById(stageId);
-            if (stage == null) {
-                logger.error("MAJOR ERROR: we cannot find the stage with id " + stageId + ", and therefore cannot recover plan item " + event);
-                return null;
-            }
-
-            ItemDefinition itemDefinition = stage.getDefinition().getPlanItem(event.planItemName);
-            // If definition == null, try to see if it's a discretionaryItem
-            if (itemDefinition == null) {
-                itemDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
-                if (itemDefinition == null) {
-                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.getStageId() + ", and therefore cannot recover plan item " + event);
-                }
-            }
-
-            PlanItemDefinitionDefinition reference = itemDefinition.getPlanItemDefinition();
-            return reference.createInstance(event.getPlanItemId(), event.getIndex(), itemDefinition, stage, caseInstance);
-        }
-    }
-
     protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, StateMachine stateMachine) {
         this(id, index, itemDefinition, definition, parent.getCaseInstance(), parent, stateMachine);
     }
