@@ -39,17 +39,13 @@ public class VariousSpelExpressions2 {
     @Test
     public void testHumanTaskExpressions() {
         TestScript testCase = new TestScript("expressions");
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitions, basicInput, null), caseStarted -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, definitions, basicInput, null), caseStarted -> {
+            caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
 
-            CaseAssertion cp = new CaseAssertion(caseStarted);
-            TestScript.debugMessage("Start of case: " + cp);
-
             // Now complete the HumanTask with the default output, and validate the task output filled event
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), taskCompleted -> {
-                HumanTaskAssertion casePlan = new HumanTaskAssertion(taskCompleted);
-                TestScript.debugMessage("Current case: " + casePlan);
-
+            testCase.addStep(new CompleteHumanTask(user, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), taskCompleted -> {
+                taskCompleted.print();
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
                     toa.assertValue("CaseID", caseInstanceId);
@@ -69,9 +65,8 @@ public class VariousSpelExpressions2 {
     public void testMilestoneTerminationOnDifferentInput() {
         TestScript testCase = new TestScript("expressions");
         // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitions, otherInput, null), caseStarted -> {
-            CaseAssertion cp = new CaseAssertion(caseStarted);
-            TestScript.debugMessage("Start of case: " + cp);
+        testCase.addStep(new StartCase(user, caseInstanceId, definitions, otherInput, null), caseStarted -> {
+            caseStarted.print();
 
             // Milestone must have occured, causing stage and task to be terminated;
             //  But they must also have been active
@@ -124,9 +119,8 @@ public class VariousSpelExpressions2 {
 
         TestScript testCase = new TestScript("expressions");
         // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitionsWithDifferentPlanOrder, otherInput, null), caseStarted -> {
-            CaseAssertion cp = new CaseAssertion(caseStarted);
-            TestScript.debugMessage("Start of case: " + cp);
+        testCase.addStep(new StartCase(user, caseInstanceId, definitionsWithDifferentPlanOrder, otherInput, null), caseStarted -> {
+            caseStarted.print();
 
             // Milestone must have occured, causing stage and task to be terminated;
             //  But they must also have been active
@@ -166,14 +160,13 @@ public class VariousSpelExpressions2 {
     @Test
     public void testMilestoneDrivenTerminationOnTaskInstanceLimit() {
         TestScript testCase = new TestScript("expressions");
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitions, basicInput, null), act -> {
-            CaseAssertion cp = new CaseAssertion(act);
-            TestScript.debugMessage("Current case: " + cp);
+        testCase.addStep(new StartCase(user, caseInstanceId, definitions, basicInput, null), caseStarted -> {
+            caseStarted.print();
 
             // Now await the first HumanTask to become active, and then complete it, with the default task output;
             //  This ought to result in a new HumanTask, which we will also complete.
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(user, caseInstanceId, taskId, defaultTaskOutput.cloneValueNode()), action -> {
                 // Validate output again. Does not add too much value, as this is also done in the test above
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -189,7 +182,7 @@ public class VariousSpelExpressions2 {
                 // Print the case...
 //                TestScript.debugMessage("Current case: " + new CaseAssertion(action));
 
-                testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), result -> {
+                testCase.addStep(new CompleteHumanTask(user, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), result -> {
 //                    TestScript.debugMessage("Current case: " + new CaseAssertion(result));
                     // Await completion of 'nextTaskId'
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Completed);
@@ -208,12 +201,12 @@ public class VariousSpelExpressions2 {
     @Test
     public void testMilestoneDrivenTerminationOnTaskOutputContent() {
         TestScript testCase = new TestScript("expressions");
-        testCase.addTestStep(new StartCase(user, caseInstanceId, definitions, basicInput, null), act -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, definitions, basicInput, null), caseStarted -> {
+            caseStarted.print();
             // Get the id of the first "HumanTask" in the case. It must be in state Active
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
-            TestScript.debugMessage("Current case: " + new CaseAssertion(act));
             // Now complete that task with the "stop now" output; this should make the milestone Occur, which must Terminate the Stage.
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, taskId, stopNowTaskOutput.cloneValueNode()), action -> {
+            testCase.addStep(new CompleteHumanTask(user, caseInstanceId, taskId, stopNowTaskOutput.cloneValueNode()), action -> {
                 // Validate the output; it must be 'stop now'
                 testCase.getEventListener().awaitTaskOutputFilled(taskName, taskEvent -> {
                     TaskOutputAssertion toa = new TaskOutputAssertion(taskEvent);
@@ -233,8 +226,8 @@ public class VariousSpelExpressions2 {
 //                TestScript.debugMessage("Current case: " + casePlan);
 
 
-                testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), result -> {
-                    TestScript.debugMessage("Current case: " + new FailureAssertion(result));
+                testCase.assertStepFails(new CompleteHumanTask(user, caseInstanceId, nextTaskId, defaultTaskOutput.cloneValueNode()), failure -> {
+                    failure.print();
                     // Last HumanTask must be terminated
                     testCase.getEventListener().awaitPlanItemState(nextTaskId, State.Terminated);
                 });

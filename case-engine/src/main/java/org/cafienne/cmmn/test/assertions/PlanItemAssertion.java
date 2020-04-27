@@ -40,7 +40,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand
         this.type = pic.getType();
         this.description = type + " '" + name + "' with id "+id;
 
-        PublishedEventsAssertion<PlanItemEvent> allPlanItemEvents = new PublishedEventsAssertion(command.getEventListener().getEvents()).filter(PlanItemEvent.class);
+        PublishedEventsAssertion<PlanItemEvent> allPlanItemEvents = command.getEventListener().getEvents().filter(PlanItemEvent.class);
         this.events = allPlanItemEvents.filter(pie -> pie.getPlanItemId().equals(this.id)).getEvents();
         Collections.reverse(this.events);// Reverse order the events, such that last one comes first.
     }

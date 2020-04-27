@@ -3,6 +3,7 @@ package org.cafienne.cmmn.test.assertions;
 import org.cafienne.akka.actor.command.exception.SerializedException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.cmmn.test.ModelTestCommand;
+import org.cafienne.cmmn.test.TestScript;
 
 /**
  * Some assertions for failures coming back from the case.
@@ -14,6 +15,10 @@ public class FailureAssertion extends ModelTestCommandAssertion {
         if (testCommand.getActualFailure() == null) {
             throw new AssertionError("Test script expected a failure from the engine in step " + testCommand.getActionNumber() + " [" + testCommand.getActualCommand().getClass().getSimpleName() + "]");
         }
+    }
+
+    public void print() {
+        TestScript.debugMessage("Result of step " + testCommand.getActionNumber() +": " + testCommand.getActualFailure().toJson());
     }
 
     /**

@@ -13,13 +13,13 @@
             <Bounds x="430" y="170" width="132" height="40"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_1">
-            <Bounds x="489" y="160" width="12" height="20"/>
+            <Bounds x="484" y="160" width="12" height="20"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_2">
             <Bounds x="464" y="200" width="12" height="20"/>
         </CMMNShape>
         <CMMNShape cmmnElementRef="_p61kw_3">
-            <Bounds x="519" y="200" width="12" height="20"/>
+            <Bounds x="514" y="200" width="12" height="20"/>
         </CMMNShape>
         <textbox cmmnElementRef="cm_csdZm_19" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="This case shows various SPEL&#10;expressions that can be used">
             <Bounds x="99" y="49" width="245" height="84"/>
@@ -28,7 +28,7 @@
             <Bounds x="49" y="329" width="630" height="200"/>
         </textbox>
         <casefileitem cmmnElementRef="cm_csvwt_45" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_csdZm_0">
-            <Bounds x="479" y="82" width="25" height="40"/>
+            <Bounds x="480" y="70" width="25" height="40"/>
         </casefileitem>
         <casefileitem cmmnElementRef="cm_cs9mu_49" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_cstko_5">
             <Bounds x="510" y="240" width="25" height="40"/>
@@ -37,7 +37,7 @@
         <CMMNEdge sourceCMMNElementRef="_p61kw_1" targetCMMNElementRef="cm_csvwt_45"/>
         <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_p61kw_2">
             <waypoint x="274" y="251"/>
-            <waypoint x="480" y="250"/>
+            <waypoint x="470" y="250"/>
         </CMMNEdge>
         <CMMNEdge sourceCMMNElementRef="cm_cs9mu_49" targetCMMNElementRef="_p61kw_3"/>
     </CMMNDiagram>

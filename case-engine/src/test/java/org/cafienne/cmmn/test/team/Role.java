@@ -34,47 +34,26 @@ public class Role {
         TestScript testCase = new TestScript(testName);
         CaseTeam caseTeam = TestScript.getCaseTeam(anonymous, admin, employee);
 
-        testCase.addTestStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, caseTeam), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, caseTeam), casePlan -> casePlan.print());
 
         // With Role admin
-        testCase.addTestStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Occur, "UserEvent1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Occur, "UserEvent1"), casePlan -> casePlan.print());
 
         // With Role admin
-        testCase.addTestStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Complete, "Item1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> casePlan.print());
 
         // With anonymous
-        testCase.addTestStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Suspend), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Suspend), casePlan -> casePlan.print());
 
-        testCase.addTestStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Reactivate), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Reactivate), casePlan -> casePlan.print());
 
-        testCase.addTestStep(new MakePlanItemTransition(employee, caseInstanceId, null, Transition.Complete, "Item1.1"), action ->
-                new FailureAssertion(action).assertException(TransitionDeniedException.class, "You do not have the permission to perform the task"));
+        testCase.assertStepFails(new MakePlanItemTransition(employee, caseInstanceId, null, Transition.Complete, "Item1.1"),
+                failure -> failure.assertException(TransitionDeniedException.class, "You do not have the permission to perform the task"));
 
         // With admin user
-        testCase.addTestStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Complete, "Item1.1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> casePlan.print());
 
-        testCase.addTestStep(new MakeCaseTransition(admin, caseInstanceId, Transition.Complete), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new MakeCaseTransition(admin, caseInstanceId, Transition.Complete), casePlan -> casePlan.print());
 
         testCase.runTest();
     }
@@ -85,45 +64,33 @@ public class Role {
         TestScript testCase = new TestScript(testName);
 
         // Start a case without a team;
-        testCase.addTestStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, null), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, null), casePlan -> casePlan.print());
 
         // Now create a team;
         CaseTeamMember user1 = new CaseTeamMember("user1", "Admin", "Employee");
         CaseTeamMember user2 = new CaseTeamMember("user2", "Manager");
         CaseTeam caseTeam = new CaseTeam(user1, user2);
-        testCase.addTestStep(new SetCaseTeam(admin, caseInstanceId, caseTeam), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new SetCaseTeam(admin, caseInstanceId, caseTeam), casePlan -> casePlan.print());
 
         // Fail to add a user with conflicting roles.
         CaseTeamMember user3a = new CaseTeamMember("user3", "Admin", "Manager");
-        testCase.addTestStep(new PutTeamMember(admin, caseInstanceId, user3a), action ->
-                new FailureAssertion(action).assertException(CaseTeamError.class, "Role Manager is not allowed for user3 since user3 also has role Admin"));
+        testCase.assertStepFails(new PutTeamMember(admin, caseInstanceId, user3a), failure -> failure.assertException(CaseTeamError.class, "Role Manager is not allowed for user3 since user3 also has role Admin"));
 
         // Remove the Admin role, and show that the user still cannot be added because we can only have one manager
         CaseTeamMember user3b = new CaseTeamMember("user3", "Manager");
-        testCase.addTestStep(new PutTeamMember(admin, caseInstanceId, user3b), action ->
-                new FailureAssertion(action).assertException(CaseTeamError.class, "Role Manager is already assigned to another user"));
+        testCase.assertStepFails(new PutTeamMember(admin, caseInstanceId, user3b), failure -> failure.assertException(CaseTeamError.class, "Role Manager is already assigned to another user"));
 
         // Remove the Manager role as well, and show that now the user can be added, though roleless
         CaseTeamMember user3c = new CaseTeamMember("user3");
-        testCase.addTestStep(new PutTeamMember(admin, caseInstanceId, user3c), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
-        });
+        testCase.addStep(new PutTeamMember(admin, caseInstanceId, user3c), casePlan -> casePlan.print());
 
         // Fail to remove a member from the team that is not inside.
-        testCase.addTestStep(new RemoveTeamMember(admin, caseInstanceId, "I am not a user in the team"), action ->
-                new FailureAssertion(action).assertException(InvalidCommandException.class, "User I am not a user in the team cannot be removed from the case team"));
+        testCase.assertStepFails(new RemoveTeamMember(admin, caseInstanceId, "I am not a user in the team"),
+                failure -> failure.assertException(InvalidCommandException.class, "User I am not a user in the team cannot be removed from the case team"));
 
         // Successfully remove a member that is inside.
-        testCase.addTestStep(new RemoveTeamMember(admin, caseInstanceId, "user1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new RemoveTeamMember(admin, caseInstanceId, "user1"), casePlan -> {
+            casePlan.print();
             // TODO: Add validation that the member is actually remove from the team.
         });
 

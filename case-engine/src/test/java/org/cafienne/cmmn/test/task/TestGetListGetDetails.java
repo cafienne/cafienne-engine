@@ -61,9 +61,8 @@ public class TestGetListGetDetails {
         /**
          *  When the case starts, GetCasesList & GetFirstCase tasks will be in available state
          */
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
             casePlan.assertPlanItem("GetList").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("GetDetails").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
@@ -76,18 +75,16 @@ public class TestGetListGetDetails {
         ValueMap requestObject = new ValueMap();
         requestObject.putRaw("port", PORT_NUMBER);
         CreateCaseFileItem createChild = new CreateCaseFileItem(user, caseInstanceId, requestObject.cloneValueNode(), "HTTP-Configuration");
-        testCase.addTestStep(createChild, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(createChild, casePlan -> {
+            casePlan.print();
 
             // Now wait for the first failure event
             testCase.getEventListener().awaitPlanItemTransitioned("GetList", filterForGetListFailures);
         });
 
         // Reactivate the GetCasesList task; but since the backend is not yet up, it should again lead to failure of GetList
-        testCase.addTestStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Reactivate, "GetList"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Reactivate, "GetList"), casePlan -> {
+            casePlan.print();
 
             // Wait for the second failure event
             testCase.getEventListener().awaitPlanItemTransitioned("GetList", filterForGetListFailures);
@@ -102,9 +99,8 @@ public class TestGetListGetDetails {
         // Now reactive GetList, since stubs have started.
         // This should also lead to 3 times GetDetails task being activated and completed.
         MakePlanItemTransition reactivateCase = new MakePlanItemTransition(user, caseInstanceId, null, Transition.Reactivate, "GetList");
-        testCase.addTestStep(reactivateCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage(casePlan);
+        testCase.addStep(reactivateCase, casePlan -> {
+            casePlan.print();
 
             // First wait until the GetList task has become completed
             testCase.getEventListener().awaitPlanItemState("GetList", State.Completed);

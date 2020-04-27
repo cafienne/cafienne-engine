@@ -27,7 +27,7 @@ public class AddRemoveChildTest {
 
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
+        testCase.addStep(startCase, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test").assertValue(Value.NULL);
         });
@@ -36,7 +36,7 @@ public class AddRemoveChildTest {
         item.putRaw("effe", "root-string");
         item.putRaw("effe2", "root-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, item.cloneValueNode(), "test");
-        testCase.addTestStep(createChild, action -> {
+        testCase.addStep(createChild, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test").assertValue(item);
             caseFile.assertCaseFileItem("test").assertState(State.Available);
@@ -47,7 +47,7 @@ public class AddRemoveChildTest {
         ValueMap childItem = new ValueMap();
         childItem.putRaw("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "test/testChild");
-        testCase.addTestStep(createChild2, action -> {
+        testCase.addStep(createChild2, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test/testChild").assertValue(childItem);
             caseFile.assertCaseFileItem("test/testChild").assertState(State.Available);
@@ -55,7 +55,7 @@ public class AddRemoveChildTest {
 
         // Now delete the child item.
         DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, "test/testChild");
-        testCase.addTestStep(deleteChild, action -> {
+        testCase.addStep(deleteChild, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test/testChild").assertValue(Value.NULL);
             caseFile.assertCaseFileItem("test/testChild").assertState(State.Discarded);
@@ -70,7 +70,7 @@ public class AddRemoveChildTest {
 
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
+        testCase.addStep(startCase, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test").assertValue(Value.NULL);
         });
@@ -79,7 +79,7 @@ public class AddRemoveChildTest {
         item.putRaw("effe", "root-string");
         item.putRaw("effe2", "root-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, item.cloneValueNode(), "test");
-        testCase.addTestStep(createChild, action -> {
+        testCase.addStep(createChild, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test").assertValue(item);
         });
@@ -89,16 +89,14 @@ public class AddRemoveChildTest {
         ValueMap childItem = new ValueMap();
         childItem.putRaw("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "test/testChild");
-        testCase.addTestStep(createChild2, action -> {
+        testCase.addStep(createChild2, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test/testChild").assertValue(childItem);
         });
 
         // Now delete the parent item.
         DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, "test");
-        testCase.addTestStep(deleteChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-        });
+        testCase.addStep(deleteChild);
 
         testCase.runTest();
     }
@@ -109,7 +107,7 @@ public class AddRemoveChildTest {
 
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
+        testCase.addStep(startCase, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             caseFile.assertCaseFileItem("test").assertValue(Value.NULL);
         });
@@ -118,7 +116,7 @@ public class AddRemoveChildTest {
         ValueMap childItem = new ValueMap();
         childItem.putRaw("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "test/testChild");
-        testCase.addTestStep(createChild2, action -> {
+        testCase.addStep(createChild2, action -> {
             CaseAssertion caseFile = new CaseAssertion(action);
             // In case the parent does not have state == Active, CaseFileItemChildAdded should not be triggered
             caseFile.assertCaseFileItem("test").assertState(State.Null);

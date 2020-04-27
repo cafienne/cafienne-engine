@@ -29,11 +29,8 @@ public class CaseFileContextExpressions {
 
         ValueMap caseInput = new ValueMap("Container", new ValueMap("Child", new ValueList(child1, child2)));
 
-        testCase.addTestStep(new StartCase(testUser, caseInstanceId, definitions, caseInput.cloneValueNode(), null), action -> {
-            CaseAssertion startPlan = new CaseAssertion(action);
-            TestScript.debugMessage("Case: " + startPlan);
-
-
+        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, caseInput.cloneValueNode(), null), casePlan -> {
+            casePlan.print();
             testCase.getEventListener().awaitTaskInputFilled("TaskWithExpression", taskEvent -> {
                 ValueMap taskInput = taskEvent.getMappedInputParameters();
                 TestScript.debugMessage("Mapped input: " + taskInput);

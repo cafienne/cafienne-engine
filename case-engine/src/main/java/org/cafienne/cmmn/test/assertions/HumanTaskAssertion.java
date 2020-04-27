@@ -31,6 +31,10 @@ public class HumanTaskAssertion extends CaseAssertion {
 //        });
 //    }
 
+    public HumanTaskAssertion(CaseAssertion assertion) {
+        this(assertion.getTestCommand());
+    }
+
     public HumanTaskAssertion(CaseTestCommand testCommand) {
         super(testCommand);
     }

@@ -27,8 +27,7 @@ public class TestTimerExpression {
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, timerInput, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
@@ -36,29 +35,21 @@ public class TestTimerExpression {
         // Suspending and resuming is a means to validate that the Case scheduler actually cleans up the jobs and keeps the registration proper.
         //  Note: to validate that logic requires enabling of additional logging in the case scheduler and then checking in the debugger.
         //        or to run a code coverage tool and see we're touching that code.
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Suspend, "AfterPeriod"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-        });
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Suspend, "AfterPeriod"));
 
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Resume, "AfterPeriod"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-        });
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Resume, "AfterPeriod"));
 
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "simplehumantask"), action -> {
-            FailureAssertion failure = new FailureAssertion(action);
-//            System.out.println("Executed second test step should lead to recovery\n" + action2.getActualResponse().value());
-        });
+        // second test step should lead to recovery
+        testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "simplehumantask"));
 
         // Waiting 1 second should not have changed anything; timer is still running
-        testCase.addTestStep(new PingCommand(testUser, caseInstanceId, 1000), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new PingCommand(testUser, caseInstanceId, 1000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Resume, State.Available, State.Suspended);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
 
         // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addTestStep(new PingCommand(testUser, caseInstanceId, 5000), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new PingCommand(testUser, caseInstanceId, 5000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });
@@ -75,8 +66,7 @@ public class TestTimerExpression {
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, timerInput, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
@@ -86,34 +76,26 @@ public class TestTimerExpression {
         //        or to run a code coverage tool and see we're touching that code.
         //  Also, this test case was added because it shows that recovery does not take the Suspend into account, and therefore after recovery still 2 timers are set...
         //   Second timer does not do any state changes to the case though.
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Suspend, "AfterPeriod"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Suspend, State.Suspended, State.Available);
-        });
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Suspend, "AfterPeriod"),
+                casePlan -> casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Suspend, State.Suspended, State.Available));
 
         // Waiting 1 second should not have changed anything; timer is still running
-        testCase.addTestStep(new PingCommand(testUser, caseInstanceId, 1000), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new PingCommand(testUser, caseInstanceId, 1000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Suspend, State.Suspended, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
 
 
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "simplehumantask"), action -> {
-            FailureAssertion failure = new FailureAssertion(action);
-//            System.out.println("Executed second test step should lead to recovery\n" + action2.getActualResponse().value());
-            // This step leads to failure and recovery. It should suspend the schedule
-        });
+        // This step leads to failure and recovery. It should suspend the schedule
+        testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "simplehumantask"));
 
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Resume, "AfterPeriod"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Resume, "AfterPeriod"), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Resume, State.Available, State.Suspended);
             TestScript.debugMessage("CasePLan after resume: \n\n" + casePlan + "\n\n\n");
         });
 
         // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addTestStep(new PingCommand(testUser, caseInstanceId, 5000), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new PingCommand(testUser, caseInstanceId, 5000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });

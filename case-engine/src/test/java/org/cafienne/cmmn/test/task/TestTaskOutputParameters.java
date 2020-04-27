@@ -27,17 +27,17 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskOutputParameters";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
             PlanItemTransitioned taskWithRequiredOutput = testCase.getEventListener().awaitPlanItemState("TaskRequiredOutput", State.Active);
             String requiredTaskId = taskWithRequiredOutput.getPlanItemId();
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskId, emptyTaskOutput.cloneValueNode()), failure1 -> {
-                new FailureAssertion(failure1).assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
+            testCase.assertStepFails(new CompleteHumanTask(user, caseInstanceId, requiredTaskId, emptyTaskOutput.cloneValueNode()), failure1 -> {
+                failure1.assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
                 // Now test with invalid output
-                testCase.insertTestStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskId, invalidTaskOutput.cloneValueNode()), failure2 -> {
-                    new FailureAssertion(failure2).assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
+                testCase.insertStepFails(new CompleteHumanTask(user, caseInstanceId, requiredTaskId, invalidTaskOutput.cloneValueNode()), failure2 -> {
+                    failure2.assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
 
                     // Now test the same with proper output
-                    testCase.insertTestStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskId, properTaskOutput.cloneValueNode()), response -> {
+                    testCase.insertStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskId, properTaskOutput.cloneValueNode()), response -> {
                         testCase.getEventListener().awaitPlanItemState(requiredTaskId, State.Completed);
                     });
                 });
@@ -52,23 +52,23 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskOutputParametersWithCaseFileBinding";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
             PlanItemTransitioned taskRequiredOutputWithBinding = testCase.getEventListener().awaitPlanItemState("TaskRequiredOutputWithBinding", State.Active);
             String requiredTaskWithBindingId = taskRequiredOutputWithBinding.getPlanItemId();
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskWithBindingId, emptyTaskOutput.cloneValueNode()), failure1 -> {
-                new FailureAssertion(failure1).assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
+            testCase.assertStepFails(new CompleteHumanTask(user, caseInstanceId, requiredTaskWithBindingId, emptyTaskOutput.cloneValueNode()), failure1 -> {
+                failure1.assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
 
                 // Now test with invalid output
-                testCase.insertTestStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskWithBindingId, invalidTaskOutput.cloneValueNode()), failure2 -> {
-                    new FailureAssertion(failure2).assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
+                testCase.insertStepFails(new CompleteHumanTask(user, caseInstanceId, requiredTaskWithBindingId, invalidTaskOutput.cloneValueNode()), failure2 -> {
+                    failure2.assertException("Task output parameter Result does not have a value, but that is required in order to complete the task");
                     // Now test the same with proper output
-                    testCase.insertTestStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskWithBindingId, properTaskOutput.cloneValueNode()), response -> {
+                    testCase.insertStep(new CompleteHumanTask(user, caseInstanceId, requiredTaskWithBindingId, properTaskOutput.cloneValueNode()), response -> {
                         testCase.getEventListener().awaitPlanItemState(requiredTaskWithBindingId, State.Completed);
 
                         // TTD - test step below should test on whole set of events; requires refactoring of / addition to whole structure?
 
                         // "Outcome" inside "Root" must have value 6 (2 * 3)
-                        new CaseFileAssertion(response).awaitCaseFileEvent("Root", e -> e.getValue().equals(new ValueMap("Outcome", 6)));
+                        response.assertCaseFile().awaitCaseFileEvent("Root", e -> e.getValue().equals(new ValueMap("Outcome", 6)));
                     });
                 });
             });
@@ -83,9 +83,9 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskWithoutRequiredOutput";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
             PlanItemTransitioned taskWithOutputNotRequired = testCase.getEventListener().awaitPlanItemState("TaskWithOutputNotRequired", State.Active);
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, taskWithOutputNotRequired.getPlanItemId(), emptyTaskOutput), response -> {
+            testCase.addStep(new CompleteHumanTask(user, caseInstanceId, taskWithOutputNotRequired.getPlanItemId(), emptyTaskOutput), response -> {
                 testCase.getEventListener().awaitPlanItemState(taskWithOutputNotRequired.getPlanItemId(), State.Completed);
             });
         });
@@ -99,9 +99,9 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskWithoutRequiredOutput2";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
             PlanItemTransitioned taskWithOutputNotRequired = testCase.getEventListener().awaitPlanItemState("TaskWithOutputNotRequired", State.Active);
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, taskWithOutputNotRequired.getPlanItemId(), invalidTaskOutput), response -> {
+            testCase.addStep(new CompleteHumanTask(user, caseInstanceId, taskWithOutputNotRequired.getPlanItemId(), invalidTaskOutput), response -> {
                 testCase.getEventListener().awaitPlanItemState(taskWithOutputNotRequired.getPlanItemId(), State.Completed);
             });
         });
@@ -116,14 +116,14 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskWithoutRequiredOutputButWithCaseFileBinding";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        testCase.addTestStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
+        testCase.addStep(new StartCase(user, caseInstanceId, xml, inputs, null), act -> {
             PlanItemTransitioned taskWithoutOutputWithBinding = testCase.getEventListener().awaitPlanItemState("TaskWithOutputNotRequiredAndBinding", State.Active);
             String taskWithoutOutputWithBindingId = taskWithoutOutputWithBinding.getPlanItemId();
-            testCase.addTestStep(new CompleteHumanTask(user, caseInstanceId, taskWithoutOutputWithBindingId, emptyTaskOutput.cloneValueNode()), failure1 -> {
-                TestScript.debugMessage(failure1);
-                new FailureAssertion(failure1).assertException(InvalidExpressionException.class, "Could not evaluate");
+            testCase.assertStepFails(new CompleteHumanTask(user, caseInstanceId, taskWithoutOutputWithBindingId, emptyTaskOutput.cloneValueNode()), failure1 -> {
+                failure1.print();
+                failure1.assertException(InvalidExpressionException.class, "Could not evaluate");
                 // Now test the same with proper output
-                testCase.insertTestStep(new CompleteHumanTask(user, caseInstanceId, taskWithoutOutputWithBindingId, properTaskOutput.cloneValueNode()), response -> {
+                testCase.insertStep(new CompleteHumanTask(user, caseInstanceId, taskWithoutOutputWithBindingId, properTaskOutput.cloneValueNode()), response -> {
                     testCase.getEventListener().awaitPlanItemState(taskWithoutOutputWithBindingId, State.Completed);
                 });
             });

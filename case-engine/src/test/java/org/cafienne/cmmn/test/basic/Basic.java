@@ -30,8 +30,7 @@ public class Basic {
 
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/basic.xml");
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("Item1");
@@ -58,7 +57,7 @@ public class Basic {
             PlanItemAssertion listener = casePlan.assertPlanItem("Listener");
             listener.assertLastTransition(Transition.Create, State.Available, State.Null);
 
-            PublishedEventsAssertion startCaseEvents = action.getEvents().filter(caseInstanceId);
+            PublishedEventsAssertion startCaseEvents = casePlan.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
             if (startCaseEvents.getEvents().size() != 56) {
                 TestScript.debugMessage("Expected these events:\nCaseDefinitionApplied: 1\n" +
@@ -77,8 +76,7 @@ public class Basic {
         });
         
         // Completing Item1 should activate sentries S3 and S3.2
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("Item1");
@@ -107,8 +105,7 @@ public class Basic {
         });
 
         // Completing Item2 should also activate exit criterion of stage Item4, which ought to terminate it's children
-        testCase.addTestStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item2"), action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item2"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("Item1");

@@ -38,10 +38,8 @@ public class CaseFileTest {
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, rootValue.cloneValueNode(), null);
 
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage("Case: " + casePlan);
-
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
             // First and second task should be active, because their ifParts are filled. Third task not.
             casePlan.assertTask("FirstTask").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertTask("SecondTask").assertLastTransition(Transition.Start, State.Active, State.Available);
@@ -70,10 +68,8 @@ public class CaseFileTest {
         
         
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, rootValue.cloneValueNode(), null);
-        testCase.addTestStep(startCase, action -> {
-            CaseAssertion casePlan = new CaseAssertion(action);
-            TestScript.debugMessage("Case: " + casePlan);
-
+        testCase.addStep(startCase, casePlan -> {
+            casePlan.print();
             casePlan.assertTask("FirstTask").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertTask("SecondTask").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertTask("ThirdTask").assertLastTransition(Transition.Start, State.Active, State.Available);

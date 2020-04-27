@@ -169,7 +169,7 @@ public class TestScript {
      * @param command
      * @param validator
      */
-    public void addTestStep(CaseCommand command, CaseResponseValidator validator) {
+    private void addTestStep(CaseCommand command, CaseResponseValidator validator) {
         commands.addLast(new CaseTestCommand(this, command, validator));
     }
 
@@ -180,7 +180,7 @@ public class TestScript {
      * @param command
      * @param validators
      */
-    public void insertTestStep(CaseCommand command, CaseResponseValidator validators) {
+    private void insertTestStep(CaseCommand command, CaseResponseValidator validators) {
         commands.addFirst(new CaseTestCommand(this, command, validators));
     }
 

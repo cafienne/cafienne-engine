@@ -28,16 +28,11 @@ public class SentryRef {
         TestScript testCase = new TestScript("sentryRef");
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addTestStep(startCase, action ->
-        {
-            TestScript.debugMessage("Case: " + action);
-        });
+        testCase.addStep(startCase, action -> action.print());
 
         MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Task_1");
-        testCase.addTestStep(completeTask1, action ->
-        {
-            TestScript.debugMessage("Case: " + action);
-            CaseAssertion casePlan = new CaseAssertion(action);
+        testCase.addStep(completeTask1, casePlan -> {
+            casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             PlanItemAssertion stage2 = casePlan.assertStage("Stage_2");
