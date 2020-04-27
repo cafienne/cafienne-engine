@@ -1,0 +1,34 @@
+<case id="casefile/repeatcasefilecreation.case" name="casefile/repeatcasefilecreation" guid="_vr0Df">
+    <caseFileModel>
+        <caseFileItem id="_vr0Df_0" name="TopCase" multiplicity="ZeroOrOne" definitionRef="unspecified.cfid">
+            <children>
+                <caseFileItem id="_vr0Df_1" name="items" multiplicity="ZeroOrMore" definitionRef="unspecified.cfid">
+                    <children>
+                        <caseFileItem id="_vr0Df_2" name="item" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
+                        <caseFileItem id="_vr0Df_3" name="role" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
+                    </children>
+                </caseFileItem>
+            </children>
+        </caseFileItem>
+    </caseFileModel>
+    <casePlanModel id="cm__vr0Df_0" name="casefile/repeatcasefilecreation" autoComplete="true">
+        <planItem id="pi_ht__vr0Df_0" name="Review" definitionRef="ht__vr0Df_0">
+            <entryCriterion id="_vr0Df_5" name="EntryCriterion_0" sentryRef="crit__vr0Df_0"/>
+            <itemControl id="_vr0Df_4">
+                <repetitionRule id="_vr0Df_7" contextRef="_vr0Df_0">
+                    <condition id="_vr0Df_8" language="spel">
+                        <body>
+                            <![CDATA[TopCase.items.size() < 3]]>
+                        </body>
+                    </condition>
+                </repetitionRule>
+            </itemControl>
+        </planItem>
+        <sentry id="crit__vr0Df_0">
+            <caseFileItemOnPart id="_vr0Df_6" sourceRef="_vr0Df_1">
+                <standardEvent>create</standardEvent>
+            </caseFileItemOnPart>
+        </sentry>
+        <humanTask id="ht__vr0Df_0" name="Review" isBlocking="true"/>
+    </casePlanModel>
+</case>

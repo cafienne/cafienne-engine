@@ -23,7 +23,7 @@ public class RepetitiveFileItems {
     // Simple test for repetitive casefile structure
     private final String caseName = "repetitiveFileItems";
     private final TestScript testCase = new TestScript(caseName);
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repetitivefileitems1.xml");
+    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repeatcasefilecreation.xml");
     private final TenantUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
