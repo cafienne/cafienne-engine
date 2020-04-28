@@ -54,6 +54,14 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         return (ExitCriterion) sentries.get(definition);
     }
 
+    EntryCriterion getEntryCriterion(EntryCriterionDefinition definition, PlanItem planItem) {
+        return getCriterion(definition, planItem);
+    }
+
+    ExitCriterion getExitCriterion(ExitCriterionDefinition definition, PlanItem planItem) {
+        return getCriterion(definition, planItem);
+    }
+
     /**
      * Entry- an exit-criteria live at Stage instance level.
      * Individual plan items can ask the stage for their defined criteria. The stage will then register the
@@ -67,6 +75,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         Criterion criterion = sentries.get(definition);
         if (criterion == null) {
             criterion = definition.createInstance(this);
+            criterion.getSentry().getConnected();
             sentries.put(definition, criterion);
         }
         criterion.addPlanItem(planItem);

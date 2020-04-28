@@ -25,16 +25,8 @@ public class ExitCriterion extends Criterion<ExitCriterionDefinition> {
 
     @Override
     protected void satisfy(OnPart<?, ?> activator) {
-        if (targets == null) {
-            // Although the list 'targets' is a final member, it may still happen to have a null value.
-            //  This is because the super-constructor creates a sentry, and that sentry
-            //  connects to the sentrynetwork, which in turn adds plan items to this exit criterion,
-            //  be it a bit too early. Later on the connection is again established.
-            return;
-        }
-
         final PlanItemOnPart piop = activator instanceof PlanItemOnPart ? (PlanItemOnPart) activator : null;
-        final PlanItem source = piop != null?piop.getSource() : null;
+        final PlanItem source = piop != null ? piop.getSource() : null;
 
         List<PlanItem> killThese = targets.stream().filter(p -> p.getState() == State.Active).collect(Collectors.toList());
         killThese.forEach(planItem -> {
@@ -76,7 +68,7 @@ public class ExitCriterion extends Criterion<ExitCriterionDefinition> {
         if (target instanceof Stage) return (Stage) target;
         return target.getStage();
     }
-    
+
     @Override
     public boolean isEntryCriterion() {
         return false;

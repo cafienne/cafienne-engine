@@ -57,9 +57,12 @@ public class Sentry extends CMMNElement<SentryDefinition> {
             OnPart onPart = onPartDefinition.createInstance(this);
             onParts.put(onPartDefinition.getSourceDefinition(), onPart);
             inactiveOnParts.add(onPart);
-            onPart.connectToCase();
         }
+    }
+
+    public void getConnected() {
         // Make ourselves known to the global case so that other plan items can start informing us.
+        onParts.values().forEach(onPart -> onPart.connectToCase());
         getCaseInstance().getSentryNetwork().add(this);
     }
 
