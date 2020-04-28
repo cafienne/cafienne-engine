@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,55 +14,55 @@ import org.cafienne.cmmn.instance.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItem> {
-    private final Object standardEvent;
+    private final CaseFileItemTransition standardEvent;
     private final String sourceName;
     private boolean isActive;
     private CaseFileItemTransition lastTransition;
 
-    public CaseFileItemOnPart(Sentry sentry, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
-        super(sentry, caseFileItemOnPartDefinition);
+    public CaseFileItemOnPart(Criterion criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
+        super(criterion, caseFileItemOnPartDefinition);
         this.standardEvent = caseFileItemOnPartDefinition.getStandardEvent();
         this.sourceName = caseFileItemOnPartDefinition.getSourceDefinition().getName();
     }
 
     @Override
     void connectToCase() {
+        // Try to connect with the case file item that is referenced from our definition
         CaseFile caseFile = getCaseInstance().getCaseFile();
         CaseFileItem item = caseFile.getItem(getDefinition().getSourceDefinition().getPath());
         if (item != null) {
-            item.iterator().forEachRemaining(innerItem -> connect(innerItem));
+            item.iterator().forEachRemaining(innerItem -> criterion.establishPotentialConnection(item));
         }
     }
 
     void connect(CaseFileItem caseFileItem) {
-        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + sentry.criterion);
-        addDebugInfo(() -> "Connecting on part " + getDefinition().getId() + " to case file item " + caseFileItem);
+        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + criterion);
         connectedItems.add(caseFileItem);
         caseFileItem.connectOnPart(this);
     }
 
     public void inform(CaseFileItem caseFileItem, CaseFileItemTransition transition) {
-        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + sentry.criterion +" about transition " + transition + ".");
+        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + criterion + " about transition " + transition + ".");
         lastTransition = transition;
         boolean newActive = standardEvent.equals(lastTransition);
         if (isActive != newActive) {
             // Change in state...
             isActive = newActive;
             if (isActive) {
-                sentry.activate(this);
+                criterion.activate(this);
             } else {
-                sentry.deactivate(this);
+                criterion.deactivate(this);
             }
         }
     }
 
     @Override
     public String toString() {
-        return sentry.toString() + ".on." + sourceName + "" + standardEvent;
+        String printedItems = connectedItems.isEmpty() ? "No items '" + sourceName + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
+        return standardEvent + " of " + printedItems;
     }
 
     @Override

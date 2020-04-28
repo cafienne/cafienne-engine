@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,46 +15,45 @@ import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
-    private final Object standardEvent;
+    private final Transition standardEvent;
     private final String sourceName;
     private boolean isActive;
     private Transition lastTransition;
     private ExitCriterion relatedExitCriterion;
 
-    public PlanItemOnPart(Sentry sentry, PlanItemOnPartDefinition definition) {
-        super(sentry, definition);
+    public PlanItemOnPart(Criterion criterion, PlanItemOnPartDefinition definition) {
+        super(criterion, definition);
         this.standardEvent = definition.getStandardEvent();
         this.sourceName = definition.getSourceDefinition().getName();
     }
 
     /**
-     * Determines whether the plan item belongs to the stage of this sentry or
+     * Determines whether the plan item belongs to the stage of this criterion or
      * to one of it's parents or descendants. If the plan item belongs to a
-     * sibling stage, then it should not be connected to this sentry
+     * sibling stage, then it should not be connected to this criterion
      *
      * @param planItem
      * @return
      */
     boolean doesNotBelongToSiblingStage(PlanItem planItem) {
 
-        if (belongsToSiblingStage(planItem, sentry.getStage())) {
-//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ sentry.getStage());
+        if (belongsToSiblingStage(planItem, criterion.getStage())) {
+//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ getStage());
             return false;
         }
-        if (belongsToSiblingStage(sentry.getStage(), findStage(planItem))) {
-//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ sentry.getStage());
+        if (belongsToSiblingStage(criterion.getStage(), findStage(planItem))) {
+//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ getStage());
             return false;
         }
 
-        if (sentry.getStage().contains(planItem)) {
-//            System.out.println("\tnot a sibling, because " + planItem +" is contained in " + sentry.getStage());
+        if (criterion.getStage().contains(planItem)) {
+//            System.out.println("\tnot a sibling, because " + planItem +" is contained in " + getStage());
             return true;
         }
-        if (planItem.getStage().contains(sentry.getStage())) {
+        if (planItem.getStage().contains(criterion.getStage())) {
             return true;
         }
 
@@ -82,36 +81,25 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         return target.getStage();
     }
 
-
-
     @Override
     void connectToCase() {
-        for (PlanItem planItem : getCaseInstance().getPlanItems()) {
-            if (getDefinition().getSourceDefinition().equals(planItem.getItemDefinition())) {
-//                System.out.println("\n\nConnecting criterion: " + getSentry().getCriterion());
-//                System.out.println("Plan Item Stage: " + planItem.getStage());
-//                System.out.println("My stage: " + getSentry().getStage());
-//                System.out.println("So we try to connect");
-                connect(planItem);
-            }
+        // Try to connect with all plan items in the case
+        for (PlanItem item : getCaseInstance().getPlanItems()) {
+            criterion.establishPotentialConnection(item);
         }
     }
 
     void connect(PlanItem planItem) {
         if (doesNotBelongToSiblingStage(planItem)) {
-            addDebugInfo(() -> "Connecting " + planItem + " to " + sentry.criterion);
+            addDebugInfo(() -> "Connecting " + planItem + " to " + criterion);
             connectedItems.add(planItem);
             planItem.connectOnPart(this);
             if (getDefinition().getRelatedExitCriterion() != null) {
                 relatedExitCriterion = planItem.getStage().getExitCriterion(getDefinition().getRelatedExitCriterion());
             }
         } else {
-            addDebugInfo(() -> "Not connecting plan item " + planItem + " to " + sentry.criterion + " because it belongs to a sibling stage");
+            addDebugInfo(() -> "Not connecting plan item " + planItem + " to " + criterion + " because it belongs to a sibling stage");
         }
-    }
-
-    public PlanItem getSource() {
-        return source;
     }
 
     public Transition getTransition() {
@@ -120,30 +108,34 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
 
     private PlanItem source;
 
+    public PlanItem getSource() {
+        return source;
+    }
     public void inform(PlanItem planItem, Transition transition) {
-        addDebugInfo(() -> planItem + " informs " + sentry.criterion + " about transition " + transition);
+        addDebugInfo(() -> planItem + " informs " + criterion + " about transition " + transition);
         lastTransition = transition;
         source = planItem;
         isActive = standardEvent.equals(lastTransition);
         if (isActive) {
             if (relatedExitCriterion != null) { // The exitCriterion must also be active
                 if (relatedExitCriterion.isActive()) {
-                    sentry.activate(this);
+                    criterion.activate(this);
                 } else {
-                    addDebugInfo(() -> sentry.criterion + ": onPart '" + sourceName + "=>" + lastTransition + "' is not activated, because related exit criterion is not active", this.sentry);
+                    addDebugInfo(() -> criterion + ": onPart '" + sourceName + "=>" + transition + "' is not activated, because related exit criterion is not active", this.criterion);
                 }
             } else {
                 // Bingo, we have a hit
-                sentry.activate(this);
+                criterion.activate(this);
             }
         } else {
-            sentry.deactivate(this);
+            criterion.deactivate(this);
         }
     }
 
     @Override
     public String toString() {
-        return sentry.toString() + ".on." + sourceName + "" + standardEvent;
+        String printedItems = connectedItems.isEmpty() ? "No items '" + sourceName+"' connected" : connectedItems.stream().map(item -> item.getPath()).collect(Collectors.joining(","));
+        return standardEvent +" of " + printedItems;
     }
 
     @Override

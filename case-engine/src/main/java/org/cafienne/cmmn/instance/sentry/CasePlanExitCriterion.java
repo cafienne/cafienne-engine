@@ -15,7 +15,7 @@ public class CasePlanExitCriterion extends ExitCriterion {
     
     @Override
     protected void satisfy(OnPart<?, ?> activator) {
-        addDebugInfo(() -> "Case plan exit criterion is satisfied and will terminate the plan", this.sentry);
-        casePlan.makeTransition(Transition.Terminate);
+        addDebugInfo(() -> "Case plan exit criterion is satisfied and will terminate the plan", this);
+        casePlan.satisfiedExitCriterion(this);
     }
 }

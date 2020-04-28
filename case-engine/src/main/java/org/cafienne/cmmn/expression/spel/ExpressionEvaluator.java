@@ -19,8 +19,8 @@ import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.LongValue;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.cafienne.cmmn.definition.*;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -142,8 +142,8 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateIfPart(Sentry sentry, IfPartDefinition ifPartDefinition) {
-        Object outcome = evaluateConstraint(sentry.getCaseInstance(), new IfPartContext(ifPartDefinition, sentry), "ifPart in sentry");
+    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
+        Object outcome = evaluateConstraint(criterion.getCaseInstance(), new IfPartContext(ifPartDefinition, criterion), "ifPart in sentry");
         if (outcome instanceof Boolean) {
             return (boolean) outcome;
         } else {

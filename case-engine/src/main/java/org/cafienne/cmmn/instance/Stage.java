@@ -75,7 +75,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         Criterion criterion = sentries.get(definition);
         if (criterion == null) {
             criterion = definition.createInstance(this);
-            criterion.getSentry().getConnected();
+            criterion.connectToSentryNetwork();
             sentries.put(definition, criterion);
         }
         criterion.addPlanItem(planItem);

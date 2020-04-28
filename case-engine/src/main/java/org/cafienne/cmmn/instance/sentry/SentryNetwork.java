@@ -15,7 +15,7 @@ public class SentryNetwork {
     /**
      * List of sentries active within the case.
      */
-    private Collection<Sentry> sentries = new ArrayList<>();
+    private Collection<Criterion> criteria = new ArrayList<>();
 
     public SentryNetwork(Case caseInstance) {
         this.caseInstance = caseInstance;
@@ -26,8 +26,8 @@ public class SentryNetwork {
      * @param item
      */
     public void connect(CaseFileItem item) {
-        for (Sentry sentry : sentries) {
-            sentry.establishPotentialConnection(item);
+        for (Criterion criterion : criteria) {
+            criterion.establishPotentialConnection(item);
         }
     }
 
@@ -36,16 +36,16 @@ public class SentryNetwork {
      * @param item
      */
     public void connect(PlanItem item) {
-        for (Sentry sentry : sentries) {
-            sentry.establishPotentialConnection(item);
+        for (Criterion criterion : criteria) {
+            criterion.establishPotentialConnection(item);
         }
     }
 
     /**
-     * Add a sentry to the network
-     * @param sentry
+     * Add a criterion to the network
+     * @param criterion
      */
-    void add(Sentry sentry) {
-        sentries.add(sentry);
+    void add(Criterion criterion) {
+        criteria.add(criterion);
     }
 }

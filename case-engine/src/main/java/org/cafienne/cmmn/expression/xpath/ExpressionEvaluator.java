@@ -29,7 +29,7 @@ import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.BooleanValue;
 import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.sentry.Sentry;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.util.XMLHelper;
 import org.cafienne.cmmn.definition.*;
 import org.slf4j.Logger;
@@ -148,7 +148,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateIfPart(Sentry sentry, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
         // TODO Auto-generated method stub
         return false;
     }

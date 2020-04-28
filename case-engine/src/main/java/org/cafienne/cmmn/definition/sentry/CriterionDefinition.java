@@ -39,7 +39,7 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
     }
 
     /**
-     * Returns the name of the plan item on which a transition has to be invoked when the sentry is satisfied
+     * Returns the name of the plan item on which a transition has to be invoked when the criterion is satisfied
      *
      * @return
      */
@@ -47,7 +47,7 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
         return this.getPlanItemName();
     }
 
-    protected String getPlanItemName() {
+    public String getPlanItemName() {
         return this.getParentElement().getName();
     }
 

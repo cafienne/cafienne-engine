@@ -86,12 +86,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     /**
-     * Links the on part to this case file item. Is used by the case file item to connect the connected sentry whenever a transition happens.
+     * Links the on part to this case file item. Is used by the case file item to connect the connected criterion whenever a transition happens.
      * 
      * @param onPart
      */
     public void connectOnPart(CaseFileItemOnPart onPart) {
-        if (onPart.getSentry().isEntryCriterion()) {
+        if (onPart.getCriterion().isEntryCriterion()) {
             insertOnPart(onPart, connectedEntryCriteria);
         } else {
             insertOnPart(onPart, connectedExitCriteria);
@@ -109,11 +109,11 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         if (list.contains(onPart)) {
             return; // do not connect more than once
         }
-        Stage onPartStage = onPart.getSentry().getStage();
+        Stage onPartStage = onPart.getCriterion().getStage();
         int i = 0;
         // Iterate the list until we encounter an onPart that does not contain the new sentry.
         // TODO: examine this logic as it is copied from PlanItemOnPart. Can we do without?
-        while (i < list.size() && list.get(i).getSentry().getStage().contains(onPartStage)) {
+        while (i < list.size() && list.get(i).getCriterion().getStage().contains(onPartStage)) {
             i++;
         }
         list.add(i, onPart);

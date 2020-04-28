@@ -10,7 +10,7 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
-import org.cafienne.cmmn.instance.sentry.Sentry;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 
 public class CMMNElement<T extends CMMNElementDefinition> {
     private final Case caseInstance;
@@ -32,8 +32,8 @@ public class CMMNElement<T extends CMMNElementDefinition> {
         this.definition = definition;
     }
 
-    protected void addDebugInfo(DebugStringAppender appender, Sentry sentry) {
-        addDebugInfo(appender, sentry.toJson());
+    protected void addDebugInfo(DebugStringAppender appender, Criterion criterion) {
+        addDebugInfo(appender, criterion.toJson());
     }
 
     protected void addDebugInfo(DebugStringAppender appender, Exception e) {

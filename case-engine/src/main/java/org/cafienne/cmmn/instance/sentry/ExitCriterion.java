@@ -5,7 +5,6 @@ import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.Transition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +27,16 @@ public class ExitCriterion extends Criterion<ExitCriterionDefinition> {
         final PlanItemOnPart piop = activator instanceof PlanItemOnPart ? (PlanItemOnPart) activator : null;
         final PlanItem source = piop != null ? piop.getSource() : null;
 
-        List<PlanItem> killThese = targets.stream().filter(p -> p.getState() == State.Active).collect(Collectors.toList());
-        killThese.forEach(planItem -> {
+        List<PlanItem> exitCandidates = targets.stream().filter(p -> p.getState() == State.Active).collect(Collectors.toList());
+        exitCandidates.forEach(planItem -> {
             // This checks whether the activating element does not accidentally belong to a sibling stage.
             //  Note: this is a slightly performance intensive operation, which is not necessary if the
             //  sentry network management does a better job.
             if (belongsToSiblingStage(source, findStage(planItem))) {
 //                System.out.println("\n\nBELONGS TO SIBLING STAGE ...");
             } else {
-                addDebugInfo(() -> "Exit criterion of '" + planItem + "' is satisfied", this.sentry);
                 targets.remove(planItem);
-                planItem.makeTransition(Transition.Exit);
+                planItem.satisfiedExitCriterion(this);
             }
         });
     }

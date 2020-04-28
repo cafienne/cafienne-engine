@@ -16,7 +16,7 @@ import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.sentry.Sentry;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 
 import java.time.Duration;
@@ -49,12 +49,12 @@ public interface CMMNExpressionEvaluator {
 
     /**
      * Evaluate an if part expression
-     * @param sentry Sentry instance providing the context for the expression
+     * @param criterion Entry or exit criterion context for the expression
      * @param ifPartDefinition Definition context for the evaluation
      * @return
      * @throws InvalidExpressionException
      */
-    boolean evaluateIfPart(Sentry sentry, IfPartDefinition ifPartDefinition) throws InvalidExpressionException;
+    boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) throws InvalidExpressionException;
 
     /**
      * Evaluate an applicability rule expression - whether or not the discretionary item can be planned inside the containing plan item.

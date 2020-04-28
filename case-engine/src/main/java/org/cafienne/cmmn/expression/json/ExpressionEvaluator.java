@@ -15,13 +15,13 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.definition.*;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +130,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateIfPart(Sentry sentry, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
         // TODO Auto-generated method stub
         return false;
     }
