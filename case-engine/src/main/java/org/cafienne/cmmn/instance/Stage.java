@@ -193,7 +193,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
             String childItemId = new Guid().toString();
             PlanItemCreated pic = new PlanItemCreated(this, itemDefinition, childItemId, index);
             getCaseInstance().addEvent(pic);
-            getCaseInstance().addEvent(pic.createStartEvent());
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
         });
     }
 
@@ -299,7 +299,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         if (this.getState() == State.Active) {
             // Only generate a start transition for the new discretionary item if this stage is active.
             //  Otherwise the start transition will be generated when this stage becomes active.
-            getCaseInstance().addEvent(pic.createStartEvent());
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
         }
     }
 }

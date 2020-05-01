@@ -204,8 +204,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
             PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
             getCaseInstance().addEvent(pic);
-            getCaseInstance().addEvent(pic.createStartEvent());
-            getCaseInstance().getPlanItemById(pic.planItemId).makeTransition(getEntryTransition());
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
+            pic.getCreatedPlanItem().makeTransition(getEntryTransition());
         }
     }
 
