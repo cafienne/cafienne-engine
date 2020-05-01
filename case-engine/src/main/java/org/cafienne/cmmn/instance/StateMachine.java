@@ -158,7 +158,7 @@ class StateMachine {
                 if (p instanceof Milestone) {
                     p.evaluateRepetitionRule();
                     p.evaluateRequiredRule();
-                    p.checkEntryCriteria(Transition.Occur);
+                    p.getEntryCriteria().beginLifeCycle(Transition.Occur);
                 }
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
                 p.resumeInstance();
@@ -193,7 +193,7 @@ class StateMachine {
 
             // Now evaluate manual activation and trigger the associated transition on the plan item
             Transition transition = p.evaluateManualActivationRule();
-            p.checkEntryCriteria(transition);
+            p.getEntryCriteria().beginLifeCycle(transition);
         });
         TaskStage.setAction(State.Active, (PlanItem p, Transition t) -> {
             if (t == Transition.Start || t == Transition.ManualStart) {

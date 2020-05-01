@@ -63,8 +63,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Our entry and exit criteria (i.e., to plan items and case file items of interest to us)
      */
-    private final Collection<EntryCriterion> entryCriteria = new ArrayList<>();
-    private final Collection<ExitCriterion> exitCriteria = new ArrayList<>();
+    private final PlanItemEntry entryCriteria = new PlanItemEntry(this);
+    private final PlanItemExit exitCriteria = new PlanItemExit(this);
     /**
      * Whether we repeat or not
      */
@@ -117,15 +117,18 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         if (stage != null) {
             // Register with parent stage
             stage.register(this);
-
-            // Link ourselves to any existing sentries in the case
-            getCaseInstance().getSentryNetwork().connect(this);
-
-            // Create new sentries within the case to which we will react;
-            // Case Plan has to do this himself.
-            itemDefinition.getEntryCriteria().forEach(c -> entryCriteria.add(stage.getEntryCriterion(c, this)));
-            itemDefinition.getExitCriteria().forEach(c -> exitCriteria.add(stage.getExitCriterion(c, this)));
+            connectToCaseNetwork();
         }
+    }
+
+    protected void connectToCaseNetwork() {
+        // Link ourselves to any existing sentries in the case
+        getCaseInstance().getSentryNetwork().connect(this);
+
+        // Create new sentries within the case to which we will react;
+        // Case Plan has to do this himself.
+        entryCriteria.connect();
+        exitCriteria.connect();
     }
 
     public void connectOnPart(PlanItemOnPart onPart) {
@@ -157,23 +160,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void satisfiedEntryCriterion(EntryCriterion criterion) {
-        if (this.index == 0 && (state == State.Null || state == State.Available)) {
-            // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
-            //  and also for the very first time. Therefore we should not yet repeat, but only make the
-            //  entry transition.
-            addDebugInfo(() -> criterion + " is satisfied and will trigger "+getEntryTransition());
-            makeTransition(getEntryTransition());
-        } else {
-            // In all other cases we have to check whether or not to create a repeat item, and, if so,
-            //  initiate that with the entry transition
-            addDebugInfo(() -> criterion + " is satisfied and will repeat " + this);
-            repeat();
-        }
+        entryCriteria.satisfy(criterion);
     }
 
     public void satisfiedExitCriterion(ExitCriterion criterion) {
-        addDebugInfo(() -> "Exit criterion of '" + this + "' is satisfied", criterion);
-        this.makeTransition(getExitTransition());
+        exitCriteria.satisfy(criterion);
     }
 
     /**
@@ -206,30 +197,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             getCaseInstance().addEvent(pic);
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
             pic.getCreatedPlanItem().makeTransition(getEntryTransition());
-        }
-    }
-
-    /**
-     * Method invoked by the various state machines upon creation of the plan item;
-     * typically determines whether it must be started or should wait for entry criteria to become active
-     *
-     * @param transition
-     */
-    void checkEntryCriteria(Transition transition) {
-        addDebugInfo(() -> this + ": checking EntryCriteria in " + getName() + " with transition " + transition);
-        if (getEntryCriteria().size() == 0) { // No entry criteria means get started immediately
-            addDebugInfo(() -> this + ": no EntryCriteria found, making transition " + transition);
-            makeTransition(transition);
-        } else {
-            // Evaluate sentries to see whether one is already active, and, if so, make the transition
-            for (EntryCriterion criterion : getEntryCriteria()) {
-                if (criterion.isSatisfied()) {
-                    addDebugInfo(() -> this + ": an EntryCriterion is satisfied, making transition " + transition);
-                    makeTransition(transition);
-                    return;
-                }
-            }
-            addDebugInfo(() -> this + ": Not making transition because no entry criteria are satisfied");
         }
     }
 
@@ -336,20 +303,20 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Returns the collection of instantiated sentries that form the entry criteria for this plan item
+     * Returns the collection of entry criteria for this plan item
      *
      * @return
      */
-    public Collection<EntryCriterion> getEntryCriteria() {
+    public PlanItemEntry getEntryCriteria() {
         return entryCriteria;
     }
 
     /**
-     * Returns the collection of instantiated sentries that form the exit criteria of this plan item
+     * Returns the collection of exit criteria for this plan item
      *
      * @return
      */
-    public Collection<ExitCriterion> getExitCriteria() {
+    public PlanItemExit getExitCriteria() {
         return exitCriteria;
     }
 
@@ -534,18 +501,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         // Let instance append it's information.
         dumpImplementationToXML(planItemXML);
 
-        if (!getEntryCriteria().isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
-            for (Criterion criterion : getEntryCriteria()) {
-                criterion.dumpMemoryStateToXML(planItemXML, true);
-            }
-        }
-        if (!getExitCriteria().isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
-            for (Criterion criterion : getExitCriteria()) {
-                criterion.dumpMemoryStateToXML(planItemXML, true);
-            }
-        }
+        entryCriteria.dumpMemoryStateToXML(planItemXML);
+        exitCriteria.dumpMemoryStateToXML(planItemXML);
 
         if (!connectedEntryCriteria.isEmpty()) {
             planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed before stage completion check "));

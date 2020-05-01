@@ -7,8 +7,6 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.definition.sentry.CasePlanExitCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.CasePlan;
@@ -23,7 +21,7 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
 
     public CasePlanDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
-        super.parse("exitCriterion", CasePlanExitCriterionDefinition.class, this.exitCriteria);
+        super.parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
     }
 
     @Override
