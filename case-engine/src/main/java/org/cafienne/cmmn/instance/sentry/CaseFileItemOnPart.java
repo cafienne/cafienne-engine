@@ -33,9 +33,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         // Try to connect with the case file item that is referenced from our definition
         CaseFile caseFile = getCaseInstance().getCaseFile();
         CaseFileItem item = caseFile.getItem(getDefinition().getSourceDefinition().getPath());
-        if (item != null) {
-            item.iterator().forEachRemaining(innerItem -> criterion.establishPotentialConnection(item));
-        }
+        criterion.establishPotentialConnection(item);
     }
 
     void connect(CaseFileItem caseFileItem) {
@@ -51,15 +49,12 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     public void inform(CaseFileItem caseFileItem, CaseFileItemTransition transition) {
         addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + criterion + " about transition " + transition + ".");
         lastTransition = transition;
-        boolean newActive = standardEvent.equals(lastTransition);
-        if (isActive != newActive) {
-            // Change in state...
-            isActive = newActive;
-            if (isActive) {
-                criterion.activate(this);
-            } else {
-                criterion.deactivate(this);
-            }
+        isActive = standardEvent.equals(lastTransition);
+        // Change in state...
+        if (isActive) {
+            criterion.activate(this);
+        } else {
+            criterion.deactivate(this);
         }
     }
 

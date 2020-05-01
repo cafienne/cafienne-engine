@@ -58,8 +58,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     /**
-     * Constructor to be used only from CaseFileItemArray. Case file items created through this constructor do NOT connect
-     * to the sentry network, see {@link CaseFileItem#iterator()}.
+     * Constructor for {@link CaseFileItemArray}.
      * @param caseInstance
      * @param definition
      * @param parent
@@ -321,31 +320,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     /**
-     * Iterator on "this". Returns <code>this</code> by default. CaseFileItemArray overwrites it and returns it's elements.
-     * Sentry uses this method to transparently connect all items with this definition, regardless whether they are
-     * hold within an array or directly under the parent. This additionally avoids that the CaseFileItemArray itself gets 
-     * connected to the sentry.
-     * @return
-     */
-    public Iterator<CaseFileItem> iterator() {
-        final CaseFileItem self = this;
-        return new Iterator<CaseFileItem>() {
-            boolean hasNext = true;
-
-            @Override
-            public CaseFileItem next() {
-                hasNext = false;
-                return self;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return hasNext;
-            }
-        };
-    }
-    
-    /**
      * Reference to most recently updated case file item. Returns <code>this</code> by default. CaseFileItemArray overwrites it
      * and returns the most recently changed / updated case file item in it's array
      * @return
@@ -420,11 +394,5 @@ class EmptyCaseFileItem extends CaseFileItem {
     @Override
     void bindParameter(Parameter<?> p, Value<?> parameterValue) {
         logger.warn("Binding parameter to EmptyCaseFileItem");
-    }
-
-    @Override
-    public Iterator<CaseFileItem> iterator() {
-        logger.warn("Iterating EmptyCaseFileItem");
-        return new ArrayList<CaseFileItem>().iterator();
     }
 }
