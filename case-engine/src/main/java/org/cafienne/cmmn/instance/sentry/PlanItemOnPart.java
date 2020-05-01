@@ -9,9 +9,7 @@ package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
@@ -21,8 +19,8 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     private final Transition standardEvent;
     private final String sourceName;
     private boolean isActive;
-    private Transition lastTransition;
     private ExitCriterion relatedExitCriterion;
+    private StandardEvent lastEvent;
 
     public PlanItemOnPart(Criterion criterion, PlanItemOnPartDefinition definition) {
         super(criterion, definition);
@@ -106,26 +104,22 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         }
     }
 
-    public Transition getTransition() {
-        return lastTransition;
-    }
-
-    private PlanItem source;
-
     public PlanItem getSource() {
         return source;
     }
-    public void inform(PlanItem planItem, Transition transition) {
-        addDebugInfo(() -> planItem + " informs " + criterion + " about transition " + transition);
-        lastTransition = transition;
-        source = planItem;
-        isActive = standardEvent.equals(lastTransition);
+    private PlanItem source;
+
+    public void inform(PlanItem item, StandardEvent event) {
+        addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
+        lastEvent = event;
+        source = item;
+        isActive = standardEvent.equals(event.getTransition());
         if (isActive) {
             if (relatedExitCriterion != null) { // The exitCriterion must also be active
                 if (relatedExitCriterion.isActive()) {
                     criterion.activate(this);
                 } else {
-                    addDebugInfo(() -> criterion + ": onPart '" + sourceName + "=>" + transition + "' is not activated, because related exit criterion is not active", this.criterion);
+                    addDebugInfo(() -> criterion + ": onPart '" + sourceName + "=>" + event.getTransition() + "' is not activated, because related exit criterion is not active", this.criterion);
                 }
             } else {
                 // Bingo, we have a hit
@@ -147,7 +141,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         return new ValueMap("planitem", sourceName,
             "active", isActive,
             "awaiting-transition", standardEvent,
-            "last-found-transition", lastTransition
+            "last-found-transition", "" + lastEvent
         );
     }
 
@@ -157,7 +151,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
         onPartXML.setAttribute("source", sourceName + "." + standardEvent);
-        onPartXML.setAttribute("last", sourceName + "." + lastTransition);
+        onPartXML.setAttribute("last", "" + lastEvent);
 
         if (showConnectedPlanItems) {
             for (PlanItem planItem : connectedItems) {

@@ -13,6 +13,7 @@ import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.instance.sentry.StandardEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import java.io.IOException;
  * Event caused by a transition on a CaseFileItem
  */
 @Manifest
-public class CaseFileEvent extends CaseEvent {
+public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition> {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
     private final String name;

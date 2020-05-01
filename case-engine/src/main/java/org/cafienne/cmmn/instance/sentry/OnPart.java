@@ -30,6 +30,8 @@ public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?
 
     abstract void connectToCase();
 
+    public abstract void inform(I item, StandardEvent event);
+
     abstract ValueMap toJson();
 
     abstract Element dumpMemoryStateToXML(Element sentryXML, boolean showConnectedPlanItems);

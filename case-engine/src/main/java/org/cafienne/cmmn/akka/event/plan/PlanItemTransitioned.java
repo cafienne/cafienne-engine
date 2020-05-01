@@ -13,11 +13,12 @@ import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.instance.sentry.StandardEvent;
 
 import java.io.IOException;
 
 @Manifest
-public class PlanItemTransitioned extends PlanItemEvent {
+public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent<Transition> {
     private final State currentState;
     private final State historyState;
     private final Transition transition;

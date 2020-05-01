@@ -20,7 +20,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     private final CaseFileItemTransition standardEvent;
     private final String sourceName;
     private boolean isActive;
-    private CaseFileItemTransition lastTransition;
+    private StandardEvent lastEvent;
 
     public CaseFileItemOnPart(Criterion criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(criterion, caseFileItemOnPartDefinition);
@@ -46,10 +46,10 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         caseFileItem.connectOnPart(this);
     }
 
-    public void inform(CaseFileItem caseFileItem, CaseFileItemTransition transition) {
-        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + criterion + " about transition " + transition + ".");
-        lastTransition = transition;
-        isActive = standardEvent.equals(lastTransition);
+    public void inform(CaseFileItem item, StandardEvent event) {
+        addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
+        lastEvent = event;
+        isActive = standardEvent.equals(event.getTransition());
         // Change in state...
         if (isActive) {
             criterion.activate(this);
@@ -69,7 +69,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         return new ValueMap("casefile-item", sourceName,
             "active", isActive,
             "awaiting-transition", standardEvent,
-            "last-found-transition", lastTransition
+            "last-found-transition", "" + lastEvent
         );
     }
 
@@ -79,7 +79,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
         onPartXML.setAttribute("source", sourceName + "." + standardEvent);
-        onPartXML.setAttribute("last", sourceName + "." + lastTransition);
+        onPartXML.setAttribute("last", "" + lastEvent);
 
         if (showConnectedPlanItems) {
             for (CaseFileItem caseFileItem : connectedItems) {

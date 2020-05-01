@@ -10,18 +10,13 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.cmmn.akka.event.plan.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
-import org.cafienne.cmmn.instance.sentry.ExitCriterion;
-import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
+import org.cafienne.cmmn.instance.sentry.*;
 import org.cafienne.util.Guid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> {
     private final static Logger logger = LoggerFactory.getLogger(PlanItem.class);
@@ -56,11 +51,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     private final StateMachine stateMachine;
 
     /**
-     * Outgoing criteria (i.e., for plan items interested in our transitions)
-     */
-    private final List<PlanItemOnPart> connectedEntryCriteria = new ArrayList<>();
-    private final List<PlanItemOnPart> connectedExitCriteria = new ArrayList<>();
-    /**
      * Our entry and exit criteria (i.e., to plan items and case file items of interest to us)
      */
     private final PlanItemEntry entryCriteria = new PlanItemEntry(this);
@@ -76,6 +66,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Current state machine state and last transition and history state.
      */
+    private final TransitionPublisher transitionPublisher = new TransitionPublisher(this);
     private Transition lastTransition = Transition.None;
     private State state = State.Null;
     private State historyState = State.Null;
@@ -132,31 +123,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void connectOnPart(PlanItemOnPart onPart) {
-        if (onPart.getCriterion().isEntryCriterion()) {
-            insertOnPart(onPart, connectedEntryCriteria);
-        } else {
-            insertOnPart(onPart, connectedExitCriteria);
-        }
-        onPart.inform(this, getLastTransition());
-    }
-
-    /**
-     * Inserts the onPart in the right location of the plan item hierarchy
-     *
-     * @param onPart
-     * @param list
-     */
-    private void insertOnPart(PlanItemOnPart onPart, List<PlanItemOnPart> list) {
-        if (list.contains(onPart)) {
-            return; // do not connect more than once
-        }
-        Stage onPartStage = onPart.getCriterion().getStage();
-        int i = 0;
-        // Iterate the list until we encounter an onPart that does not contain the new sentry.
-        while (i < list.size() && list.get(i).getCriterion().getStage().contains(onPartStage)) {
-            i++;
-        }
-        list.add(i, onPart);
+        transitionPublisher.connectOnPart(onPart);
     }
 
     public void satisfiedEntryCriterion(EntryCriterion criterion) {
@@ -363,6 +330,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void updateState(PlanItemTransitioned event) {
+        this.transitionPublisher.addEvent(event);
         this.state = event.getCurrentState();
         this.historyState = event.getHistoryState();
         this.lastTransition = event.getTransition();
@@ -381,8 +349,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void informConnectedEntryCriteria(PlanItemTransitioned event) {
-        // Then inform the activating sentries
-        connectedEntryCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
+        transitionPublisher.informEntryCriteria(event);
     }
 
     public void runStageCompletionCheck(PlanItemTransitioned event) {
@@ -398,14 +365,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void informConnectedExitCriteria(PlanItemTransitioned event) {
-        Transition transition = event.getTransition();
-        State newState = event.getCurrentState();
-        State oldState = event.getHistoryState();
-
         // Finally iterate the terminating sentries and inform them
-        connectedExitCriteria.forEach(onPart -> onPart.inform(this, transition));
+        transitionPublisher.informExitCriteria(event);
 
-        addDebugInfo(() -> this + ": completed handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
+        addDebugInfo(() -> this + ": completed handling transition '"+event.getTransition().getValue()+"' from " + event.getHistoryState() + " to " + event.getCurrentState());
     }
 
     /**
@@ -503,16 +466,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
         entryCriteria.dumpMemoryStateToXML(planItemXML);
         exitCriteria.dumpMemoryStateToXML(planItemXML);
-
-        if (!connectedEntryCriteria.isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed before stage completion check "));
-            connectedEntryCriteria.forEach(onPart -> onPart.getCriterion().dumpMemoryStateToXML(planItemXML, false));
-        }
-
-        if (!connectedExitCriteria.isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed after stage completion check "));
-            connectedExitCriteria.forEach(onPart -> onPart.getCriterion().dumpMemoryStateToXML(planItemXML, false));
-        }
     }
 
     /**

@@ -27,6 +27,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     private final List<CaseFileItemOnPart> connectedEntryCriteria = new ArrayList<>();
     private final List<CaseFileItemOnPart> connectedExitCriteria = new ArrayList<>();
 
+    /**
+     * History of events on this item
+     */
+    private final TransitionPublisher transitionPublisher = new TransitionPublisher(this);
     private State state = State.Null; // Current state of the item
     private CaseFileItemTransition lastTransition; // Last transition
 
@@ -90,32 +94,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param onPart
      */
     public void connectOnPart(CaseFileItemOnPart onPart) {
-        if (onPart.getCriterion().isEntryCriterion()) {
-            insertOnPart(onPart, connectedEntryCriteria);
-        } else {
-            insertOnPart(onPart, connectedExitCriteria);
-        }
-        onPart.inform(this, getLastTransition());
-    }
-
-    /**
-     * Inserts the onPart in the right location of the plan item hierarchy
-     * 
-     * @param onPart
-     * @param list
-     */
-    private void insertOnPart(CaseFileItemOnPart onPart, List<CaseFileItemOnPart> list) {
-        if (list.contains(onPart)) {
-            return; // do not connect more than once
-        }
-        Stage onPartStage = onPart.getCriterion().getStage();
-        int i = 0;
-        // Iterate the list until we encounter an onPart that does not contain the new sentry.
-        // TODO: examine this logic as it is copied from PlanItemOnPart. Can we do without?
-        while (i < list.size() && list.get(i).getCriterion().getStage().contains(onPartStage)) {
-            i++;
-        }
-        list.add(i, onPart);
+        transitionPublisher.connectOnPart(onPart);
     }
 
     /**
@@ -145,6 +124,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void updateState(CaseFileEvent event) {
         addDebugInfo(() -> "CaseFile["+getName()+"]: updating CaseFileItem state based on CaseFileEvent");
+        this.transitionPublisher.addEvent(event);
         this.state = event.getState();
         this.indexInArray = event.getIndex();
         this.lastTransition = event.getTransition();
@@ -163,15 +143,13 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
-        addDebugInfo(() -> "CaseFile[" + getName() + "]: Inform " + connectedEntryCriteria.size() + " connected entry criteria about transition " + event.getTransition());
         // Then inform the activating sentries
-        connectedEntryCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
+        transitionPublisher.informEntryCriteria(event);
     }
 
     public void informConnectedExitCriteria(CaseFileEvent event) {
-        addDebugInfo(() -> "CaseFile[" + getName() + "]: Inform " + connectedExitCriteria.size() + " connected exit criteria about transition " + event.getTransition());
         // Finally iterate the terminating sentries and inform them
-        connectedExitCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
+        transitionPublisher.informExitCriteria(event);
         addDebugInfo(() -> "CaseFile["+getName()+"]: Completed behavior for transition " + event.getTransition());
     }
 
@@ -344,6 +322,14 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     public int getIndex() {
         return indexInArray;
+    }
+
+    public List<CaseFileItemOnPart> getConnectedEntryCriteria() {
+        return connectedEntryCriteria;
+    }
+
+    public List<CaseFileItemOnPart> getConnectedExitCriteria() {
+        return connectedExitCriteria;
     }
 }
 
