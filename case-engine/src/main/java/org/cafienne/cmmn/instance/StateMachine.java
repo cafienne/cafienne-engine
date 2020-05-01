@@ -149,6 +149,7 @@ class StateMachine {
         EventMilestone.addTransition(Transition.ParentResume, State.Available, State.Suspended);
         EventMilestone.addTransition(Transition.ParentTerminate, State.Terminated, new State[] { State.Available, State.Suspended });
 
+        EventMilestone.setAction(State.Completed, (PlanItem p, Transition t) -> p.completeInstance());
         EventMilestone.setAction(State.Terminated, (PlanItem p, Transition t) -> p.terminateInstance());
         EventMilestone.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
         EventMilestone.setAction(State.Available, (PlanItem p, Transition t) -> {
