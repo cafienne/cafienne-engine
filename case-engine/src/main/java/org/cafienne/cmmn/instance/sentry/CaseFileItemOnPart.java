@@ -36,6 +36,11 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         criterion.establishPotentialConnection(item);
     }
 
+    @Override
+    public void releaseFromCase() {
+        connectedItems.forEach(caseFileItem -> caseFileItem.releaseOnPart(this));
+    }
+
     void connect(CaseFileItem caseFileItem) {
         if (connectedItems.contains(caseFileItem)) {
             // Avoid repeated additions

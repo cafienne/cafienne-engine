@@ -108,22 +108,17 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         if (stage != null) {
             // Register with parent stage
             stage.register(this);
-            connectToCaseNetwork();
         }
-    }
-
-    protected void connectToCaseNetwork() {
         // Link ourselves to any existing sentries in the case
         getCaseInstance().getSentryNetwork().connect(this);
-
-        // Create new sentries within the case to which we will react;
-        // Case Plan has to do this himself.
-        entryCriteria.connect();
-        exitCriteria.connect();
     }
 
     public void connectOnPart(PlanItemOnPart onPart) {
         transitionPublisher.connectOnPart(onPart);
+    }
+
+    public void releaseOnPart(PlanItemOnPart onPart) {
+        transitionPublisher.releaseOnPart(onPart);
     }
 
     public void satisfiedEntryCriterion(EntryCriterion criterion) {

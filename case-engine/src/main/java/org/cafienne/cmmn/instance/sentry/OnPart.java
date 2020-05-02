@@ -30,6 +30,8 @@ public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?
 
     abstract void connectToCase();
 
+    abstract void releaseFromCase();
+
     public abstract void inform(I item, StandardEvent event);
 
     abstract ValueMap toJson();

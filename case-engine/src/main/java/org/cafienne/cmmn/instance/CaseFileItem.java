@@ -97,6 +97,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         transitionPublisher.connectOnPart(onPart);
     }
 
+    public void releaseOnPart(CaseFileItemOnPart onPart) {
+        transitionPublisher.releaseOnPart(onPart);
+    }
+
     /**
      * Framework method that allows parameters to be bound back to the case file
      * @param p

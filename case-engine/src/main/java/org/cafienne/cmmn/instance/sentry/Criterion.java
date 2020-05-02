@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class Criterion<D extends CriterionDefinition> extends CMMNElement<D> {
-    protected final Stage<?> stage;
+    protected final PlanItem target;
 
     // On parts are stored by their source for easy lookup.
     // The source can only be a PlanItemDefinition or a CaseFileItemDefinition. We have taken the first
@@ -30,19 +30,28 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
 
     boolean isActive;
 
-    protected Criterion(Stage stage, D definition) {
-        super(stage, definition);
-        this.stage = stage;
+    protected Criterion(PlanItem target, D definition) {
+        super(target, definition);
+        this.target = target;
         for (OnPartDefinition onPartDefinition : getDefinition().getSentryDefinition().getOnParts()) {
             OnPart onPart = onPartDefinition.createInstance(this);
             onParts.put(onPartDefinition.getSourceDefinition(), onPart);
             inactiveOnParts.add(onPart);
         }
+        // Add ourselves to the sentry network
+        getCaseInstance().getSentryNetwork().add(this);
+        // Tell our onparts to connect to the case network
+        onParts.values().forEach(onPart -> onPart.connectToCase());
+    }
+
+    public PlanItem getTarget() {
+        return target;
     }
 
     public Stage getStage() {
-        return stage;
+        return target instanceof CasePlan ? (CasePlan) target : target.getStage();
     }
+
     private boolean evaluateIfPart() {
         addDebugInfo(() -> "Evaluating if part in " + this);
         boolean ifPartOutcome = getDefinition().getSentryDefinition().getIfPart().evaluate(this);
@@ -63,7 +72,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         }
         if (isSatisfied()) {
             isActive = true;
-            satisfy(activator);
+            satisfy();
             // isActive = false;
         }
     }
@@ -78,9 +87,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         addDebugInfo(() -> this + " now has "+inactiveOnParts.size()+" inactive on parts", this);
     }
 
-    protected abstract void satisfy(OnPart<?, ?> activator);
-
-    public abstract void addPlanItem(PlanItem planItem);
+    protected abstract void satisfy();
 
     public boolean isActive() {
         return isActive;
@@ -116,14 +123,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         boolean activated = isActive();
 
         String listeners = onParts.values().stream().map(part -> part.toString()).collect(Collectors.joining(","));
-        return getDefinition().getType() + " for " + getDefinition().getPlanItemName() + " on " + "[" + listeners + "] - " + (activated ? "active" : "inactive");
-    }
-
-    public void connectToSentryNetwork() {
-        // Make ourselves known to the global case so that other plan items can start informing us.
-        getCaseInstance().getSentryNetwork().add(this);
-        // Tell our onparts to connect to the case network
-        onParts.values().forEach(onPart -> onPart.connectToCase());
+        return getDefinition().getType() + " for " + target + " on " + "[" + listeners + "] - " + (activated ? "active" : "inactive");
     }
 
     /**
@@ -157,15 +157,9 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         sentryXML.setAttribute("id", getDefinition().getId());
         sentryXML.setAttribute("active", "" + inactiveOnParts.isEmpty());
         if (!showConnectedPlanItems) {
-            String targetPlanItemName = getDefinition().getTarget();
-            Transition targetTransition = getDefinition().getTransition();
-            if (targetPlanItemName == null) {
-                sentryXML.setAttribute("target", stage.getItemDefinition().getName() + "." + targetTransition);
-            } else {
-                sentryXML.setAttribute("target", targetPlanItemName + "." + targetTransition);
-            }
+            sentryXML.setAttribute("target", target.getPath() + "." + getDefinition().getTransition());
         } else {
-            sentryXML.setAttribute("stage", this.stage.getItemDefinition().getName());
+            sentryXML.setAttribute("stage", getStage().getItemDefinition().getName());
         }
 
         this.onParts.forEach((d, onPart) -> {
@@ -186,4 +180,8 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
                 "on-parts", onPartsJson);
     }
 
+    public void release() {
+        getCaseInstance().getSentryNetwork().remove(this);
+        onParts.values().forEach(onPart -> onPart.releaseFromCase());
+    }
 }

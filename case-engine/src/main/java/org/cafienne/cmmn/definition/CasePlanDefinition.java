@@ -31,7 +31,7 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
 
     @Override
     public ItemControlDefinition getPlanItemControl() {
-        throw new NullPointerException("CasePlanDefinition does not have item control; it should not be asked for...");
+        return getDefaultControl();
     }
 
     @Override

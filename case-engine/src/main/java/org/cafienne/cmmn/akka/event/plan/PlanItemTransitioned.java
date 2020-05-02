@@ -74,6 +74,11 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
     }
 
     @Override
+    public String toString() {
+        return getDescription();
+    }
+
+    @Override
     public String getDescription() {
         return this.getClass().getSimpleName() + "[" + getName() + "/" + getPlanItemId() + "]: " + getHistoryState() + "." + getTransition().toString().toLowerCase() + "() ===> " + getCurrentState();
     }

@@ -1,8 +1,6 @@
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.instance.sentry.OnPart;
-import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
 
 import java.util.ArrayList;
@@ -32,7 +30,10 @@ class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
         } else {
             insertOnPart(onPart, connectedExitCriteria);
         }
-        if (! transitions.isEmpty()) {
+
+        // We only inform the first item of a transition that happened "in the past".
+        //  Repetition items only need to react to new events. This check avoids potential endless recursion.
+        if (onPart.getCriterion().getTarget().getIndex() == 0 && !transitions.isEmpty()) {
             onPart.inform(item, transitions.get(0));
         }
     }
@@ -64,5 +65,13 @@ class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
     void informExitCriteria(StandardEvent transition) {
         // Then inform the activating sentries
         new ArrayList<>(connectedExitCriteria).forEach(onPart -> onPart.inform(item, transition));
+    }
+
+    public void releaseOnPart(P onPart) {
+        if (onPart.getCriterion().isEntryCriterion()) {
+            connectedEntryCriteria.remove(onPart);
+        } else {
+            connectedExitCriteria.remove(onPart);
+        }
     }
 }

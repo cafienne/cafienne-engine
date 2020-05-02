@@ -7,19 +7,20 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
-import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
     private final Transition standardEvent;
     private final String sourceName;
     private boolean isActive;
-    private ExitCriterion relatedExitCriterion;
+    private Criterion relatedExitCriterion;
     private StandardEvent lastEvent;
 
     public PlanItemOnPart(Criterion criterion, PlanItemOnPartDefinition definition) {
@@ -29,90 +30,64 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     }
 
     /**
-     * Determines whether the plan item belongs to the stage of this criterion or
-     * to one of it's parents or descendants. If the plan item belongs to a
-     * sibling stage, then it should not be connected to this criterion
+     * Determines whether the two plan item belongs to the stage or any
+     * of their ancestors are sibling to each other
      *
-     * @param planItem
+     * @param left
+     * @param right
      * @return
      */
-    boolean doesNotBelongToSiblingStage(PlanItem planItem) {
-
-        if (belongsToSiblingStage(planItem, criterion.getStage())) {
-//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ getStage());
-            return false;
-        }
-        if (belongsToSiblingStage(criterion.getStage(), findStage(planItem))) {
-//            System.out.println("\t" + planItem +" is part of a sibling stage of "+ getStage());
-            return false;
-        }
-
-        if (criterion.getStage().contains(planItem)) {
-//            System.out.println("\tnot a sibling, because " + planItem +" is contained in " + getStage());
-            return true;
-        }
-        if (planItem.getStage().contains(criterion.getStage())) {
+    private boolean isNotSomewhereSibling(PlanItem left, PlanItem right) {
+        if (right == null) {
             return true;
         }
 
-        return true;
-    }
-
-    private boolean belongsToSiblingStage(PlanItem source, Stage target) {
-        if (source == null) {
-            return false;
+        PlanItem leftOrAnAncestorOfLeft = left;
+        while (leftOrAnAncestorOfLeft != null) {
+            if (leftOrAnAncestorOfLeft.getItemDefinition().equals(right.getItemDefinition()) && leftOrAnAncestorOfLeft != right) {
+                // If the definitions match and the instances mis-match, then we found somewhere a sibling
+                return false;
+            }
+            leftOrAnAncestorOfLeft = leftOrAnAncestorOfLeft.getStage();
         }
-        if (source.getStage() == target) {
-            return false;
-        }
-        ItemDefinition sourceDefinition = source.getItemDefinition();
-        ItemDefinition targetStageDefinition = target.getItemDefinition();
-        if (sourceDefinition.equals(targetStageDefinition) && source != target) {
-            return true;
-        }
-
-        return belongsToSiblingStage(source.getStage(), target);
-    }
-
-    private Stage findStage(PlanItem target) {
-        if (target instanceof Stage) return (Stage) target;
-        return target.getStage();
+        return isNotSomewhereSibling(left, right.getStage());
     }
 
     @Override
     void connectToCase() {
         // Try to connect with all plan items in the case
-        for (PlanItem item : getCaseInstance().getPlanItems()) {
+        for (PlanItem item : new ArrayList<>(getCaseInstance().getPlanItems())) {
             criterion.establishPotentialConnection(item);
         }
     }
 
-    void connect(PlanItem planItem) {
-        if (connectedItems.contains(planItem)) {
+    void connect(PlanItem potentialNewSource) {
+        if (connectedItems.contains(potentialNewSource)) {
             // Avoid repeated additions
             return;
         }
-        if (doesNotBelongToSiblingStage(planItem)) {
-            addDebugInfo(() -> "Connecting " + planItem + " to " + criterion);
-            connectedItems.add(planItem);
-            planItem.connectOnPart(this);
+
+        // Only connect plan items that are in "our" hierarchy
+        if (isNotSomewhereSibling(potentialNewSource, getCriterion().getTarget())) {
+            addDebugInfo(() -> "Connecting " + potentialNewSource + " to " + criterion);
+            connectedItems.add(potentialNewSource);
+            potentialNewSource.connectOnPart(this);
             if (getDefinition().getRelatedExitCriterion() != null) {
-                relatedExitCriterion = planItem.getStage().getExitCriterion(getDefinition().getRelatedExitCriterion());
+                relatedExitCriterion = getCaseInstance().getSentryNetwork().findRelatedExitCriterion(potentialNewSource, getDefinition().getRelatedExitCriterion());
             }
         } else {
-            addDebugInfo(() -> "Not connecting plan item " + planItem + " to " + criterion + " because it belongs to a sibling stage");
+            addDebugInfo(() -> "Not connecting plan item " + potentialNewSource + " to " + criterion + " because it belongs to a sibling stage");
         }
     }
 
-    public PlanItem getSource() {
-        return source;
+    @Override
+    public void releaseFromCase() {
+        connectedItems.forEach(planItem -> planItem.releaseOnPart(this));
     }
-    private PlanItem source;
 
     public void inform(PlanItem item, StandardEvent event) {
-        addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
+        addDebugInfo(() -> item + " informs " + criterion + " about transition " + event.getTransition());
         lastEvent = event;
-        source = item;
         isActive = standardEvent.equals(event.getTransition());
         if (isActive) {
             if (relatedExitCriterion != null) { // The exitCriterion must also be active
@@ -132,7 +107,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
 
     @Override
     public String toString() {
-        String printedItems = connectedItems.isEmpty() ? "No items '" + sourceName+"' connected" : connectedItems.stream().map(item -> item.getPath()).collect(Collectors.joining(","));
+        String printedItems = connectedItems.isEmpty() ? "'" + sourceName+"'" : connectedItems.stream().map(item -> item.getPath()).collect(Collectors.joining(","));
         return standardEvent +" of " + printedItems;
     }
 

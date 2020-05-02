@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     private final Collection<PlanItem> planItems = new ArrayList<PlanItem>();
-    private final Map<CriterionDefinition, Criterion> sentries = new LinkedHashMap<>();
 
     // Below are two flags that are required for the checking of stage completion
     private final boolean autoCompletes; // This is the flag set in the definition.
@@ -42,44 +41,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance, StateMachine stateMachine) {
         super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
         this.autoCompletes = definition.autoCompletes();
-    }
-
-    /**
-     * Some entry criteria may listen not only to plan items, but also to a specific exit criterion of a plan item.
-     * They can retrieve it through this method. Note this method will not create the criterion...
-     * @param definition
-     * @return
-     */
-    public ExitCriterion getExitCriterion(ExitCriterionDefinition definition) {
-        return (ExitCriterion) sentries.get(definition);
-    }
-
-    EntryCriterion getEntryCriterion(EntryCriterionDefinition definition, PlanItem planItem) {
-        return getCriterion(definition, planItem);
-    }
-
-    ExitCriterion getExitCriterion(ExitCriterionDefinition definition, PlanItem planItem) {
-        return getCriterion(definition, planItem);
-    }
-
-    /**
-     * Entry- an exit-criteria live at Stage instance level.
-     * Individual plan items can ask the stage for their defined criteria. The stage will then register the
-     * plan item with the criterion (and create the criterion if not yet available)
-     * @param definition
-     * @param planItem
-     * @param <C>
-     * @return
-     */
-    <C extends Criterion> C getCriterion(CriterionDefinition definition, PlanItem planItem) {
-        Criterion criterion = sentries.get(definition);
-        if (criterion == null) {
-            criterion = definition.createInstance(this);
-            criterion.connectToSentryNetwork();
-            sentries.put(definition, criterion);
-        }
-        criterion.addPlanItem(planItem);
-        return (C) criterion;
     }
 
     void register(PlanItem child) {

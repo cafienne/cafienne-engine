@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class PlanItemExit {
+public class PlanItemExit {
     private final Collection<ExitCriterion> exitCriteria = new ArrayList<>();
     private final PlanItem planItem;
 
@@ -16,9 +16,18 @@ class PlanItemExit {
         this.planItem = planItem;
     }
 
-    void connect() {
-        Stage stage = planItem instanceof CasePlan ? (CasePlan) planItem : planItem.getStage();
-        planItem.getItemDefinition().getExitCriteria().forEach(c -> exitCriteria.add(stage.getExitCriterion(c, planItem)));
+    public void connect() {
+        planItem.getItemDefinition().getExitCriteria().forEach(c -> exitCriteria.add(new ExitCriterion(planItem, c)));
+    }
+
+    void release() {
+        exitCriteria.forEach(c -> c.release());
+    }
+
+    public void satisfy(ExitCriterion criterion) {
+        planItem.addDebugInfo(() -> criterion + " is satisfied, triggering exit on " + planItem);
+        release();
+        planItem.makeTransition(planItem.getExitTransition());
     }
 
     void dumpMemoryStateToXML(Element planItemXML) {
@@ -30,10 +39,5 @@ class PlanItemExit {
         for (Criterion criterion : exitCriteria) {
             criterion.dumpMemoryStateToXML(planItemXML, true);
         }
-    }
-
-    public void satisfy(ExitCriterion criterion) {
-        planItem.addDebugInfo(() -> criterion + " is satisfied, triggering exit on " + planItem);
-        planItem.makeTransition(planItem.getExitTransition());
     }
 }

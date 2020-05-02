@@ -59,7 +59,7 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
 
     @Override
     public String toString() {
-        return path + "->" + transition + " with value\n" + getValue() + "\n";
+        return getDescription();
     }
 
     @Override
