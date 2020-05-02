@@ -90,6 +90,10 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     }
 
     void connect(PlanItem planItem) {
+        if (connectedItems.contains(planItem)) {
+            // Avoid repeated additions
+            return;
+        }
         if (doesNotBelongToSiblingStage(planItem)) {
             addDebugInfo(() -> "Connecting " + planItem + " to " + criterion);
             connectedItems.add(planItem);

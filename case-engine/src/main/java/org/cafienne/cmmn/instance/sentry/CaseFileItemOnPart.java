@@ -39,6 +39,10 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     }
 
     void connect(CaseFileItem caseFileItem) {
+        if (connectedItems.contains(caseFileItem)) {
+            // Avoid repeated additions
+            return;
+        }
         addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + criterion);
         connectedItems.add(caseFileItem);
         caseFileItem.connectOnPart(this);
