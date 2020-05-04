@@ -42,6 +42,8 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Active);
+            // Auto completion for Stage1 must have triggered, but since Item1.2 is required, stage should still be Active
+            casePlan.assertPlanItem("Stage1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
 
         });
@@ -60,6 +62,7 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Active).assertLastTransition(Transition.Resume);
+            casePlan.assertPlanItem("Stage1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
@@ -68,7 +71,9 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Completed);
-            casePlan.assertPlanItem("Item1.3").assertState(State.Terminated);
+            // Auto completion for Stage1 must be triggered and complete the stage. Item1.3 should still be Available
+            casePlan.assertPlanItem("Stage1").assertState(State.Completed);
+            casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
         testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
@@ -76,7 +81,9 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.2").assertState(State.Completed);
-            casePlan.assertPlanItem("Item1.3").assertState(State.Terminated);
+            casePlan.assertPlanItem("Stage1").assertState(State.Completed);
+            // It should be possible to complete Item1, but Item1.3 should not longer listen to it.
+            casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
         testCase.runTest();

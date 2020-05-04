@@ -21,10 +21,12 @@ class StateMachine {
     private final Map<State, Target> states = new HashMap<State, Target>();
     final Transition entryTransition;
     final Transition exitTransition;
+    final Transition terminationTransition;
 
-    private StateMachine(Transition entryTransition, Transition exitTransition) {
+    private StateMachine(Transition entryTransition, Transition exitTransition, Transition terminationTransition) {
         this.entryTransition = entryTransition;
         this.exitTransition = exitTransition;
+        this.terminationTransition = terminationTransition;
         // Register all states by default.
         for (State state : State.values()) {
             getTarget(state);
@@ -137,7 +139,7 @@ class StateMachine {
     }
 
     // State machine configuration for events and milestones
-    static final StateMachine EventMilestone = new StateMachine(Transition.Occur, Transition.Exit);
+    static final StateMachine EventMilestone = new StateMachine(Transition.Occur, Transition.Exit, Transition.ParentTerminate);
 
     static {
         EventMilestone.addTransition(Transition.Create, State.Available, State.Null);
@@ -167,7 +169,7 @@ class StateMachine {
     }
 
     // State machine configuration for tasks and stages
-    static final StateMachine TaskStage = new StateMachine(Transition.Start, Transition.Exit);
+    static final StateMachine TaskStage = new StateMachine(Transition.Start, Transition.Exit, Transition.Exit);
 
     static {
         TaskStage.addTransition(Transition.Create, State.Available, State.Null);
@@ -225,7 +227,7 @@ class StateMachine {
     }
 
     // State machine configuration for the case plan
-    static final StateMachine CasePlan = new StateMachine(Transition.Start, Transition.Terminate);
+    static final StateMachine CasePlan = new StateMachine(Transition.Start, Transition.Terminate, Transition.Exit);
 
     static {
         CasePlan.addTransition(Transition.Create, State.Active, State.Null);

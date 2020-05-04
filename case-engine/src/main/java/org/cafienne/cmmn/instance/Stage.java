@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,19 +12,11 @@ import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
 import org.cafienne.cmmn.definition.StageDefinition;
-import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
-import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends PlanFragment<T> {
@@ -195,17 +187,22 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
     @Override
     protected void terminateInstance() {
-        // TODO: distinguish between tasks/stages and eventlisteners/milestones
-        propagateTransition(Transition.Exit); // for tasks and substages
-        propagateTransition(Transition.ParentTerminate); // for eventlisteners and milestones
+        disconnectChildren(true);
     }
 
     @Override
     protected void completeInstance() {
-        // For compatibility in tests. Although it is wrong.
-        //  That is to say, the spec says that upon stage completion nothing should happen to items in Available state. But that is confusing. We choose to make them terminated
-        propagateTransition(Transition.Exit); // for tasks and substages
-        propagateTransition(Transition.ParentTerminate); // for eventlisteners and milestones
+        disconnectChildren(false);
+    }
+
+    private void disconnectChildren(boolean makeTerminationTransition) {
+        for (PlanItem child : planItems) {
+            if (makeTerminationTransition ) {
+                child.makeTransition(child.getTerminationTransition());
+            }
+            child.getEntryCriteria().release();
+            child.getExitCriteria().release();
+        }
     }
 
     /**

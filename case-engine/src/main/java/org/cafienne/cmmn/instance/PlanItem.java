@@ -526,4 +526,12 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     final Transition getExitTransition() {
         return stateMachine.exitTransition;
     }
+
+    /**
+     * Transition to be made when parent stage terminates
+     * @return
+     */
+    final Transition getTerminationTransition() {
+        return stateMachine.terminationTransition;
+    }
 }
