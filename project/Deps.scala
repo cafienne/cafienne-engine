@@ -21,9 +21,9 @@ object Deps {
   object V {
     val scala       = "2.12.11"
     val spray       = "1.3.5"
-    val akkaHttp    = "10.1.11"
+    val akkaHttp    = "10.1.12"
     val slf4j       = "1.7.12"
-    val akka        = "2.6.4"
+    val akka        = "2.6.5"
     val jackson     = "2.10.3"
     val lucene      = "8.5.0"
     val enumeratum  = "1.5.15"
@@ -37,7 +37,7 @@ object Deps {
   val akkaPersistence       = "com.typesafe.akka"       %% "akka-persistence"                     % V.akka    // exclude("org.iq80.leveldb","leveldb")
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
   val akkaClusterSharding   = "com.typesafe.akka"       %% "akka-cluster-sharding"                % V.akka
-  val akkaKryo              = "com.github.romix.akka"   %% "akka-kryo-serialization"              % "1.1.3"
+  val akkaKryo              = "io.altoo"                %% "akka-kryo-serialization"              % "1.1.5"
   val levelDbFixed          = "org.iq80.leveldb"        %  "leveldb"                              % "0.12"
   val levelDbJNI            = "org.fusesource.leveldbjni" % "leveldbjni-all"                      % "1.8"
   val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.103"
@@ -67,7 +67,7 @@ object Deps {
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
   val akkaHtppJackson       = "com.typesafe.akka"       %% "akka-http-jackson"                    % V.akkaHttp
-  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "0.4.2"
+  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "1.0.0"
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
   val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
