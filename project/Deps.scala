@@ -5,11 +5,7 @@ object Deps {
     "maven repo"          at "https://repo.maven.apache.org/maven2",
     "typesafe releases"   at "https://repo.typesafe.com/typesafe/releases",
     "typesafe snapshots"  at "https://repo.typesafe.com/typesafe/snapshots",
-    "akka repo"           at "https://repo.akka.io/",
-//    "spray repo"          at "http://repo.spray.io",
-//    "untyped"             at "http://ivy.untyped.com",
-    "jasper reports repo" at "http://jasperreports.sourceforge.net/maven2",
-    "jasper artifacts"    at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
+    "akka repo"           at "https://repo.akka.io/"
   )
 
   def compile   (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "compile")
@@ -24,10 +20,10 @@ object Deps {
     val akkaHttp    = "10.1.12"
     val slf4j       = "1.7.12"
     val akka        = "2.6.5"
-    val jackson     = "2.10.3"
-    val lucene      = "8.5.0"
-    val enumeratum  = "1.5.15"
-    val swagger     = "2.1.1"
+    val jackson     = "2.11.0"
+    val enumeratum  = "1.6.1"
+    val swagger     = "2.1.2"
+    val slick       = "3.3.2"
   }
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
@@ -52,14 +48,7 @@ object Deps {
   val config                = "com.typesafe"            %  "config"                               % "1.4.0"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.2"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
-  val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.11"
-
-
-  // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-  val joda = "org.apache.httpcomponents" % "httpclient" % "4.5.12"
-
-  // https://mvnrepository.com/artifact/org.apache.lucene/lucene-core
-  val lucene = "org.apache.lucene" % "lucene-core" % V.lucene
+  val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.19"
 
   val akkaHttp              = "com.typesafe.akka"       %% "akka-http"                            % V.akkaHttp
   val akkHttpXml            = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
@@ -82,11 +71,11 @@ object Deps {
 
   // The test scope will be added in the build so we don't need to declare it in here
   val scalaMock             = "org.scalamock"           %% "scalamock"                            % "4.4.0"
-  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.1.1"
-  val junit                 = "junit"                   %  "junit"                                % "4.13"
+  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.1.2"
+  val junit                 = "org.junit.jupiter"       % "junit-jupiter-api"                     % "5.6.2"
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
   val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.26.3"
-  val commonsIO             = "commons-io"              %  "commons-io"                           % "2.6"
+  val commonsIO             = "commons-io"              %  "commons-io"                           % "2.7"
   val apacheCommonsText     = "org.apache.commons"      % "commons-text"                          % "1.8"
   val jsonJava              = "com.fasterxml.jackson.core"   % "jackson-core"					            % V.jackson
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
@@ -96,12 +85,14 @@ object Deps {
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
-  val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % "6.12.2" excludeAll ExclusionRule(organization = "org.apache.lucene")
+  val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % "6.12.2"
   val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % "6.12.2"
+  // Lowagie is for PDF document generation with Jasper. It must remain fixed on 2.1.7, because that is what Jasper needs.
+  val lowagie               = "com.lowagie"             % "itext"                                 % "2.1.7" // DO NOT CHANGE THIS VALUE
 
   val sw4jj                 = "com.github.j5ik2o"       % "sw4jj_2.11"                            % "1.0.2"
-  val slick                 = "com.typesafe.slick"      %% "slick"                                % "3.3.2"
-  val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % "3.3.2"
+  val slick                 = "com.typesafe.slick"      %% "slick"                                % V.slick
+  val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % V.slick
   val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.12"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
   val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.0"
