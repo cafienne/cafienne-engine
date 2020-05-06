@@ -161,7 +161,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
     }
   }
 
-  @Path("{tenant}/deploy/{fileName}")
+  @Path("deploy/{fileName}")
   @POST
   @Operation(
     summary = "Deploy a case model",
