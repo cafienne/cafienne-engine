@@ -1,3 +1,10 @@
+  lazy val jacocoSettings = jacocoReportSettings in Test := JacocoReportSettings(
+    "Code Coverage Report",
+    None,
+    JacocoThresholds(),
+    Seq(JacocoReportFormats.ScalaHTML, JacocoReportFormats.XML),
+    "utf-8")
+
   lazy val basicSettings = {
     val currentScalaVersion = "2.12.7"
     val scala211Version     = "2.11.11"
@@ -7,6 +14,7 @@
       organization := "org.cafienne",
       description := "Case Engine",
       scalaVersion := Deps.V.scala,
+      jacocoSettings,
       resolvers ++= Deps.depsRepos,
       resolvers += Resolver.jcenterRepo,
       resolvers += Resolver.sonatypeRepo("releases"),

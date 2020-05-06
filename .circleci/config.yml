@@ -20,7 +20,7 @@ jobs:
             sbt sbtVersion
       - run:
           name: Unit tests
-          command: sbt clean coverage test coverageReport
+          command: sbt clean jacoco
       - run:
           name: Store Coverage Report
           command: bash <(curl -s https://codecov.io/bash)
@@ -179,7 +179,7 @@ jobs:
             sbt sbtVersion
       - run:
           name: Unit tests
-          command: sbt clean coverage test coverageReport
+          command: sbt clean jacoco
       - run:
           name: Store Coverage Report
           command: bash <(curl -s https://codecov.io/bash)
@@ -255,7 +255,7 @@ jobs:
             TAG=$(cat ./version.txt)
       - run:
           name: Unit tests
-          command: sbt clean coverage test coverageReport
+          command: sbt clean jacoco
       - run:
           name: Store Coverage Report
           command: bash <(curl -s https://codecov.io/bash)
