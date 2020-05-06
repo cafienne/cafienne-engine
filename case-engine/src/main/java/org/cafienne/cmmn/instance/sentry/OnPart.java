@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,7 +9,6 @@ package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
@@ -17,24 +16,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?>> extends CMMNElement<T> {
-    protected final Sentry sentry;
+    protected final Criterion criterion;
     protected Collection<I> connectedItems = new ArrayList<>();
 
-    protected OnPart(Sentry sentry, T definition) {
-        super(sentry, definition);
-        this.sentry = sentry;
+    protected OnPart(Criterion criterion, T definition) {
+        super(criterion, definition);
+        this.criterion = criterion;
     }
 
-    /**
-     * Returns the sentry to which this on part belongs.
-     *
-     * @return
-     */
-    public Sentry getSentry() {
-        return sentry;
+    public Criterion getCriterion() {
+        return criterion;
     }
 
     abstract void connectToCase();
+
+    abstract void releaseFromCase();
+
+    public abstract void inform(I item, StandardEvent event);
 
     abstract ValueMap toJson();
 

@@ -12,7 +12,7 @@ import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.CaseFileItemTransition;
-import org.cafienne.cmmn.instance.sentry.Sentry;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 public class CaseFileItemOnPartDefinition extends OnPartDefinition {
@@ -57,7 +57,7 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
     }
 
     @Override
-    public CaseFileItemOnPart createInstance(Sentry sentry) {
-        return new CaseFileItemOnPart(sentry, this);
+    public CaseFileItemOnPart createInstance(Criterion criterion) {
+        return new CaseFileItemOnPart(criterion, this);
     }
 }

@@ -11,12 +11,9 @@ import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.definition.task.AssignmentDefinition;
-import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.sentry.Sentry;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 
 /**
  * A ConstraintContext provides named context to expressions that are executed
@@ -134,23 +131,23 @@ class ApplicabilityRuleContext extends PlanItemContext<ApplicabilityRuleDefiniti
 }
 
 /**
- * Context for evaluation of an if part in a sentry.
+ * Context for evaluation of an if part in a criterion.
  */
 class IfPartContext extends ConstraintContext<IfPartDefinition> {
     /**
-     * The sentry for which the if part is being evaluated.
+     * The criterion for which the if part is being evaluated.
      */
-    public final Sentry sentry;
+    public final Criterion criterion;
 
-    protected IfPartContext(IfPartDefinition ifPartDefinition, Sentry sentry) {
-        super(ifPartDefinition, sentry.getCaseInstance());
-        this.sentry = sentry;
+    protected IfPartContext(IfPartDefinition ifPartDefinition, Criterion criterion) {
+        super(ifPartDefinition, criterion.getCaseInstance());
+        this.criterion = criterion;
     }
 
     @Override
     public Value<?> read(String propertyName) {
-        if (propertyName.equals("sentry"))
-            return Value.convert(sentry);
+        if (propertyName.equals("criterion") || propertyName.equals("sentry"))
+            return Value.convert(criterion);
         return super.read(propertyName);
     }
 }

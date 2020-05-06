@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,55 +14,59 @@ import org.cafienne.cmmn.instance.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItem> {
-    private final Object standardEvent;
+    private final CaseFileItemTransition standardEvent;
     private final String sourceName;
     private boolean isActive;
-    private CaseFileItemTransition lastTransition;
+    private StandardEvent lastEvent;
 
-    public CaseFileItemOnPart(Sentry sentry, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
-        super(sentry, caseFileItemOnPartDefinition);
+    public CaseFileItemOnPart(Criterion criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
+        super(criterion, caseFileItemOnPartDefinition);
         this.standardEvent = caseFileItemOnPartDefinition.getStandardEvent();
         this.sourceName = caseFileItemOnPartDefinition.getSourceDefinition().getName();
     }
 
     @Override
     void connectToCase() {
+        // Try to connect with the case file item that is referenced from our definition
         CaseFile caseFile = getCaseInstance().getCaseFile();
         CaseFileItem item = caseFile.getItem(getDefinition().getSourceDefinition().getPath());
-        if (item != null) {
-            item.iterator().forEachRemaining(innerItem -> connect(innerItem));
-        }
+        criterion.establishPotentialConnection(item);
+    }
+
+    @Override
+    public void releaseFromCase() {
+        connectedItems.forEach(caseFileItem -> caseFileItem.releaseOnPart(this));
     }
 
     void connect(CaseFileItem caseFileItem) {
-        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + sentry.criterion);
-        addDebugInfo(() -> "Connecting on part " + getDefinition().getId() + " to case file item " + caseFileItem);
+        if (connectedItems.contains(caseFileItem)) {
+            // Avoid repeated additions
+            return;
+        }
+        addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + criterion);
         connectedItems.add(caseFileItem);
         caseFileItem.connectOnPart(this);
     }
 
-    public void inform(CaseFileItem caseFileItem, CaseFileItemTransition transition) {
-        addDebugInfo(() -> "Case file item " + caseFileItem.getPath() + " informs " + sentry.criterion +" about transition " + transition + ".");
-        lastTransition = transition;
-        boolean newActive = standardEvent.equals(lastTransition);
-        if (isActive != newActive) {
-            // Change in state...
-            isActive = newActive;
-            if (isActive) {
-                sentry.activate(this);
-            } else {
-                sentry.deactivate(this);
-            }
+    public void inform(CaseFileItem item, StandardEvent event) {
+        addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
+        lastEvent = event;
+        isActive = standardEvent.equals(event.getTransition());
+        // Change in state...
+        if (isActive) {
+            criterion.activate(this);
+        } else {
+            criterion.deactivate(this);
         }
     }
 
     @Override
     public String toString() {
-        return sentry.toString() + ".on." + sourceName + "" + standardEvent;
+        String printedItems = connectedItems.isEmpty() ? "No items '" + sourceName + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
+        return standardEvent + " of " + printedItems;
     }
 
     @Override
@@ -70,7 +74,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         return new ValueMap("casefile-item", sourceName,
             "active", isActive,
             "awaiting-transition", standardEvent,
-            "last-found-transition", lastTransition
+            "last-found-transition", "" + lastEvent
         );
     }
 
@@ -80,7 +84,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
         onPartXML.setAttribute("source", sourceName + "." + standardEvent);
-        onPartXML.setAttribute("last", sourceName + "." + lastTransition);
+        onPartXML.setAttribute("last", "" + lastEvent);
 
         if (showConnectedPlanItems) {
             for (CaseFileItem caseFileItem : connectedItems) {

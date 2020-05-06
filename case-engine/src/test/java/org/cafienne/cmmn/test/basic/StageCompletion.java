@@ -62,7 +62,7 @@ public class StageCompletion {
             casePlan.print();
             casePlan.assertStage("Stage1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
             casePlan.assertStage("Stage1").assertPlanItem("Task1").assertState(State.Completed);
-            casePlan.assertStage("Stage1").assertPlanItem("Task2").assertState(State.Terminated);
+            casePlan.assertStage("Stage1").assertPlanItem("Task2").assertState(State.Available);
         });
 
         testCase.runTest();
@@ -133,7 +133,10 @@ public class StageCompletion {
             casePlan.assertStage(mainStageName).assertLastTransition(Transition.Complete, State.Completed, State.Active);
             casePlan.assertStage(mainStageName).assertPlanItem("Task5").assertState(State.Completed);
             // As a matter of fact, even the case itself must be in completed stage, since the case plan has autoComplete==true
+            //  Stage1 and Stage2 then should still be in Available stage.
             casePlan.assertState(State.Completed);
+            casePlan.assertStage("Stage1").assertState(State.Available);
+            casePlan.assertStage("Stage2").assertState(State.Available);
         });
 
         testCase.runTest();

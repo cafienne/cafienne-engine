@@ -10,7 +10,7 @@ package org.cafienne.cmmn.definition.sentry;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.Definition;
-import org.cafienne.cmmn.instance.sentry.Sentry;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 public class IfPartDefinition extends ConstraintDefinition {
@@ -22,7 +22,7 @@ public class IfPartDefinition extends ConstraintDefinition {
         super(definition, parentElement, true); // Default ifPart: evaluates always to true
     }
 
-    public boolean evaluate(Sentry sentry) {
-        return getExpressionDefinition().getEvaluator().evaluateIfPart(sentry, this);
+    public boolean evaluate(Criterion criterion) {
+        return getExpressionDefinition().getEvaluator().evaluateIfPart(criterion, this);
     }
 }

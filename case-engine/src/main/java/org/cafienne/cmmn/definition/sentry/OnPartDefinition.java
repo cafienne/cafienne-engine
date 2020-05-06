@@ -9,8 +9,8 @@ package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.OnPart;
-import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.w3c.dom.Element;
 
 public abstract class OnPartDefinition extends CMMNElementDefinition {
@@ -20,5 +20,5 @@ public abstract class OnPartDefinition extends CMMNElementDefinition {
 
     public abstract CMMNElementDefinition getSourceDefinition();
 
-    public abstract OnPart<?, ?> createInstance(Sentry sentry);
+    public abstract OnPart<?, ?> createInstance(Criterion criterion);
 }

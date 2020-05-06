@@ -12,11 +12,11 @@ import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.TimerEventDefinition;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
@@ -58,7 +58,7 @@ public class DefaultValueEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateIfPart(Sentry sentry, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
         return defaultValue;
     }
 

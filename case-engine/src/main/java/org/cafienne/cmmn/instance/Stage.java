@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,24 +12,15 @@ import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
 import org.cafienne.cmmn.definition.StageDefinition;
-import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
-import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
-import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     private final Collection<PlanItem> planItems = new ArrayList<PlanItem>();
-    private final Map<CriterionDefinition, Criterion> sentries = new LinkedHashMap<>();
 
     // Below are two flags that are required for the checking of stage completion
     private final boolean autoCompletes; // This is the flag set in the definition.
@@ -42,35 +33,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance, StateMachine stateMachine) {
         super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
         this.autoCompletes = definition.autoCompletes();
-    }
-
-    /**
-     * Some entry criteria may listen not only to plan items, but also to a specific exit criterion of a plan item.
-     * They can retrieve it through this method. Note this method will not create the criterion...
-     * @param definition
-     * @return
-     */
-    public ExitCriterion getExitCriterion(ExitCriterionDefinition definition) {
-        return (ExitCriterion) sentries.get(definition);
-    }
-
-    /**
-     * Entry- an exit-criteria live at Stage instance level.
-     * Individual plan items can ask the stage for their defined criteria. The stage will then register the
-     * plan item with the criterion (and create the criterion if not yet available)
-     * @param definition
-     * @param planItem
-     * @param <C>
-     * @return
-     */
-    <C extends Criterion> C getCriterion(CriterionDefinition definition, PlanItem planItem) {
-        Criterion criterion = sentries.get(definition);
-        if (criterion == null) {
-            criterion = definition.createInstance(this);
-            sentries.put(definition, criterion);
-        }
-        criterion.addPlanItem(planItem);
-        return (C) criterion;
     }
 
     void register(PlanItem child) {
@@ -184,7 +146,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
             String childItemId = new Guid().toString();
             PlanItemCreated pic = new PlanItemCreated(this, itemDefinition, childItemId, index);
             getCaseInstance().addEvent(pic);
-            getCaseInstance().addEvent(pic.createStartEvent());
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
         });
     }
 
@@ -225,17 +187,22 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
     @Override
     protected void terminateInstance() {
-        // TODO: distinguish between tasks/stages and eventlisteners/milestones
-        propagateTransition(Transition.Exit); // for tasks and substages
-        propagateTransition(Transition.ParentTerminate); // for eventlisteners and milestones
+        disconnectChildren(true);
     }
 
     @Override
     protected void completeInstance() {
-        // For compatibility in tests. Although it is wrong.
-        //  That is to say, the spec says that upon stage completion nothing should happen to items in Available state. But that is confusing. We choose to make them terminated
-        propagateTransition(Transition.Exit); // for tasks and substages
-        propagateTransition(Transition.ParentTerminate); // for eventlisteners and milestones
+        disconnectChildren(false);
+    }
+
+    private void disconnectChildren(boolean makeTerminationTransition) {
+        for (PlanItem child : planItems) {
+            if (makeTerminationTransition ) {
+                child.makeTransition(child.getTerminationTransition());
+            }
+            child.getEntryCriteria().release();
+            child.getExitCriteria().release();
+        }
     }
 
     /**
@@ -290,7 +257,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         if (this.getState() == State.Active) {
             // Only generate a start transition for the new discretionary item if this stage is active.
             //  Otherwise the start transition will be generated when this stage becomes active.
-            getCaseInstance().addEvent(pic.createStartEvent());
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
         }
     }
 }

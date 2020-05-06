@@ -28,10 +28,6 @@ public class PlanItemCreated extends PlanItemEvent {
         name, stageId, createdOn, createdBy
     }
 
-    public PlanItemTransitioned createStartEvent() {
-        return new PlanItemTransitioned(this.planItem, stageId.isEmpty() ? State.Active : State.Available, State.Null, Transition.Create);
-    }
-
     public PlanItemCreated(Case caseInstance) {
         this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);
     }
@@ -70,6 +66,10 @@ public class PlanItemCreated extends PlanItemEvent {
     }
 
     private transient PlanItem planItem;
+
+    public PlanItem getCreatedPlanItem() {
+        return planItem;
+    }
 
     @Override
     public void updateState(Case actor) {

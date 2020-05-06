@@ -10,8 +10,8 @@ package org.cafienne.cmmn.definition.sentry;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.PlanItemDefinition;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
-import org.cafienne.cmmn.instance.sentry.Sentry;
 import org.cafienne.cmmn.instance.Transition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +87,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
     }
 
     @Override
-    public PlanItemOnPart createInstance(Sentry sentry) {
-        return new PlanItemOnPart(sentry, this);
+    public PlanItemOnPart createInstance(Criterion criterion) {
+        return new PlanItemOnPart(criterion, this);
     }
 }

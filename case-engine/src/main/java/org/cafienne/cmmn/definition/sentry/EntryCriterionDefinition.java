@@ -4,8 +4,8 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinition;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.sentry.EntryCriterion;
-import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
 
@@ -49,9 +49,5 @@ public class EntryCriterionDefinition extends CriterionDefinition {
     @Override
     public Transition getTransition() {
         return entryTransition;
-    }
-
-    public EntryCriterion createInstance(Stage stage) {
-        return new EntryCriterion(stage, this);
     }
 }

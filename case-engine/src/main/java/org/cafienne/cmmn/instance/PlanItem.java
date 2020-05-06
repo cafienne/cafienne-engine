@@ -8,19 +8,15 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.plan.*;
-import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
+import org.cafienne.cmmn.instance.sentry.*;
 import org.cafienne.util.Guid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> {
     private final static Logger logger = LoggerFactory.getLogger(PlanItem.class);
@@ -55,15 +51,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     private final StateMachine stateMachine;
 
     /**
-     * Outgoing criteria (i.e., for plan items interested in our transitions)
-     */
-    private final List<PlanItemOnPart> connectedEntryCriteria = new ArrayList<PlanItemOnPart>();
-    private final List<PlanItemOnPart> connectedExitCriteria = new ArrayList<PlanItemOnPart>();
-    /**
      * Our entry and exit criteria (i.e., to plan items and case file items of interest to us)
      */
-    private final Collection<Criterion> entryCriteria = new ArrayList<>();
-    private final Collection<Criterion> exitCriteria = new ArrayList<>();
+    private final PlanItemEntry entryCriteria = new PlanItemEntry(this);
+    private final PlanItemExit exitCriteria = new PlanItemExit(this);
     /**
      * Whether we repeat or not
      */
@@ -75,6 +66,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Current state machine state and last transition and history state.
      */
+    private final TransitionPublisher transitionPublisher = new TransitionPublisher(this);
     private Transition lastTransition = Transition.None;
     private State state = State.Null;
     private State historyState = State.Null;
@@ -116,56 +108,58 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         if (stage != null) {
             // Register with parent stage
             stage.register(this);
-
-            // Link ourselves to any existing sentries in the case
-            getCaseInstance().getSentryNetwork().connect(this);
-
-            // Create new sentries within the case to which we will react;
-            // Case Plan has to do this himself.
-            itemDefinition.getEntryCriteria().forEach(c -> entryCriteria.add(stage.getCriterion(c, this)));
-            itemDefinition.getExitCriteria().forEach(c -> exitCriteria.add(stage.getCriterion(c, this)));
         }
-    }
-
-    public void trigger(Transition transition) {
-        if (this.index == 0 && (state == State.Null || state == State.Available)) {
-            // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
-            //  and also for the very first time. Therefore we should not yet repeat, but only make the
-            //  entry transition.
-            makeTransition(transition);
-        } else {
-            // In all other cases we have to check whether or not to create a repeat item, and, if so,
-            //  initiate that with the entry transition
-            repeat(transition);
-        }
+        // Link ourselves to any existing sentries in the case
+        getCaseInstance().getSentryNetwork().connect(this);
     }
 
     public void connectOnPart(PlanItemOnPart onPart) {
-        if (onPart.getSentry().isEntryCriterion()) {
-            insertOnPart(onPart, connectedEntryCriteria);
-        } else {
-            insertOnPart(onPart, connectedExitCriteria);
-        }
-        onPart.inform(this, getLastTransition());
+        transitionPublisher.connectOnPart(onPart);
+    }
+
+    public void releaseOnPart(PlanItemOnPart onPart) {
+        transitionPublisher.releaseOnPart(onPart);
+    }
+
+    public void satisfiedEntryCriterion(EntryCriterion criterion) {
+        entryCriteria.satisfy(criterion);
+    }
+
+    public void satisfiedExitCriterion(ExitCriterion criterion) {
+        exitCriteria.satisfy(criterion);
     }
 
     /**
-     * Inserts the onPart in the right location of the plan item hierarchy
-     *
-     * @param onPart
-     * @param list
+     * Repeats the plan item upon it's Completion or Termination, and only if there are no entry criteria.
+     * Additionally checks that the containing stage is still active.
      */
-    private void insertOnPart(PlanItemOnPart onPart, List<PlanItemOnPart> list) {
-        if (list.contains(onPart)) {
-            return; // do not connect more than once
+    void repeat() {
+        addDebugInfo(() -> this + ": initiating repeat logic for next item. First releasing entry criteria");
+        // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
+        if (getStage().getState() != State.Active) {
+            // The stage that contains us is no longer active. So we will not prepare any repeat item.
+            // This code is typically invoked if the the stage terminates or completes, causing the repeating element to terminate.
+            addDebugInfo(() -> this + ": not repeating because stage is not active");
+            return;
         }
-        Stage onPartStage = onPart.getSentry().getStage();
-        int i = 0;
-        // Iterate the list until we encounter an onPart that does not contain the new sentry.
-        while (i < list.size() && list.get(i).getSentry().getStage().contains(onPartStage)) {
-            i++;
+
+        // Re-evaluate the repetition rule, and if the outcome is true, the start the repeat item (but only if it is not a discretionary).
+        addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat()");
+        evaluateRepetitionRule();
+        if (repeats()) {
+            if (itemDefinition.isDiscretionary()) {
+                // Means we are discretionary, and adding to the plan must be done manually
+                return;
+            }
+            // Generate an id for the repeat item
+            String repeatItemId = new Guid().toString();
+            // Create a new plan item
+            addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
+            PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
+            getCaseInstance().addEvent(pic);
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
+            pic.getCreatedPlanItem().makeTransition(getEntryTransition());
         }
-        list.add(i, onPart);
     }
 
     /**
@@ -188,10 +182,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Determine whether the transition is allowed;
      * Typically: when a task completes with output parameters,
      * these get reflected back into the casefile. This in itself may trigger
-     * a sentry, which may e.g. invoke a Terminate transition on the completing task, which then
+     * a criterion, which may e.g. invoke a Terminate transition on the completing task, which then
      * coincides with the Complete transition. First the output parameter is set in the case file,
      * then the Task.complete transition is invoked. Completion of the task now invokes prepareTransition,
-     * and thereby acquires a "transition lock", which then makes the terminating sentry on that task
+     * and thereby acquires a "transition lock", which then makes the terminating criterion on that task
      * await the completion. Or better: it does not await completion, but is simply ignored.
      *
      * @param transition
@@ -224,6 +218,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         } else {
             addDebugInfo(() -> "StateMachine-"+this+": transition " + transition + " has no effect, current state remains " + getState());
         }
+    }
+
+    public ItemDefinition getItemDefinition() {
+        return itemDefinition;
     }
 
     /**
@@ -267,20 +265,20 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Returns the collection of instantiated sentries that form the entry criteria for this plan item
+     * Returns the collection of entry criteria for this plan item
      *
      * @return
      */
-    public Collection<Criterion> getEntryCriteria() {
+    public PlanItemEntry getEntryCriteria() {
         return entryCriteria;
     }
 
     /**
-     * Returns the collection of instantiated sentries that form the exit criteria of this plan item
+     * Returns the collection of exit criteria for this plan item
      *
      * @return
      */
-    public Collection<Criterion> getExitCriteria() {
+    public PlanItemExit getExitCriteria() {
         return exitCriteria;
     }
 
@@ -318,74 +316,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         return requiredRuleOutcome == true;
     }
 
-    /**
-     * Repeats the plan item upon it's Completion or Termination, and only if there are no entry criteria.
-     * Additionally checks that the containing stage is still active.
-     */
-    public void repeat(Transition transition) {
-        addDebugInfo(() -> this + ": initiating repeat logic for next item");
-
-        // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
-        if (getStage().getState() != State.Active) {
-            // The stage that contains us is no longer active. So we will not prepare any repeat item.
-            // This code is typically invoked if the the stage terminates or completes, causing the repeating element to terminate.
-            addDebugInfo(() -> this + ": not repeating because stage is not active");
-            return;
-        }
-
-        // Re-evaluate the repetition rule, and if the outcome is true, the start the repeat item (but only if it is not a discretionary).
-        addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat()");
-        evaluateRepetitionRule();
-        if (repeats()) {
-            if (itemDefinition.isDiscretionary()) {
-                // Means we are discretionary, and adding to the plan must be done manually
-                return;
-            }
-            // Generate an id for the repeat item
-            String repeatItemId = new Guid().toString();
-            // Create a new plan item
-            addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
-            PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
-            getCaseInstance().addEvent(pic);
-            getCaseInstance().addEvent(pic.createStartEvent());
-            getCaseInstance().getPlanItemById(pic.planItemId).makeTransition(transition);
-        }
-    }
-
-    public ItemDefinition getItemDefinition() {
-        return itemDefinition;
-    }
-
-    /**
-     * Method invoked by the various state machines upon creation of the plan item;
-     * typically determines whether it must be started or should wait for entry criteria to become active
-     *
-     * @param transition
-     */
-    void checkEntryCriteria(Transition transition) {
-        addDebugInfo(() -> this + ": checking EntryCriteria in " + getName() + " with transition " + transition);
-        if (getEntryCriteria().size() == 0) { // No entry criteria means get started immediately
-            addDebugInfo(() -> this + ": no EntryCriteria found, making transition " + transition);
-            makeTransition(transition);
-        } else {
-            // If the plan item is being repeated, then the entry criteria have been satisfied already;
-            // avoid keep repeating ourselves
-            if (index > 0) {
-                addDebugInfo(() -> this + ": Not making transition because this is a repeat item");
-                return;
-            }
-            // Evaluate sentries to see whether one is already active, and, if so, make the transition
-            for (Criterion criterion : getEntryCriteria()) {
-                if (criterion.isSatisfied()) {
-                    addDebugInfo(() -> this + ": an EntryCriterion is satisfied, making transition " + transition);
-                    makeTransition(transition);
-                    return;
-                }
-            }
-            addDebugInfo(() -> this + ": Not making transition because no entry criteria are satisfied");
-        }
-    }
-
     public void updateState(RepetitionRuleEvaluated event) {
         this.repetitionRuleOutcome = event.isRepeating();
     }
@@ -395,6 +325,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void updateState(PlanItemTransitioned event) {
+        this.transitionPublisher.addEvent(event);
         this.state = event.getCurrentState();
         this.historyState = event.getHistoryState();
         this.lastTransition = event.getTransition();
@@ -413,8 +344,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void informConnectedEntryCriteria(PlanItemTransitioned event) {
-        // Then inform the activating sentries
-        connectedEntryCriteria.forEach(onPart -> onPart.inform(this, event.getTransition()));
+        transitionPublisher.informEntryCriteria(event);
     }
 
     public void runStageCompletionCheck(PlanItemTransitioned event) {
@@ -430,14 +360,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void informConnectedExitCriteria(PlanItemTransitioned event) {
-        Transition transition = event.getTransition();
-        State newState = event.getCurrentState();
-        State oldState = event.getHistoryState();
-
         // Finally iterate the terminating sentries and inform them
-        connectedExitCriteria.forEach(onPart -> onPart.inform(this, transition));
+        transitionPublisher.informExitCriteria(event);
 
-        addDebugInfo(() -> this + ": completed handling transition '"+transition.getValue()+"' from " + oldState + " to " + newState);
+        addDebugInfo(() -> this + ": completed handling transition '"+event.getTransition().getValue()+"' from " + event.getHistoryState() + " to " + event.getCurrentState());
     }
 
     /**
@@ -464,6 +390,14 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public String getName() {
         return name;
+    }
+
+    /**
+      * Returns getName() + dot + getIndex() in single quotes
+      * @return
+      */
+    public String getPath() {
+        return "'" + this.name +"." + this.index +"'";
     }
 
     /**
@@ -525,28 +459,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         // Let instance append it's information.
         dumpImplementationToXML(planItemXML);
 
-        if (!getEntryCriteria().isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
-            for (Criterion criterion : getEntryCriteria()) {
-                criterion.dumpMemoryStateToXML(planItemXML, true);
-            }
-        }
-        if (!getExitCriteria().isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
-            for (Criterion criterion : getExitCriteria()) {
-                criterion.dumpMemoryStateToXML(planItemXML, true);
-            }
-        }
-
-        if (!connectedEntryCriteria.isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed before stage completion check "));
-            connectedEntryCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
-        }
-
-        if (!connectedExitCriteria.isEmpty()) {
-            planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Listening sentries that will be informed after stage completion check "));
-            connectedExitCriteria.forEach(onPart -> onPart.getSentry().dumpMemoryStateToXML(planItemXML, false));
-        }
+        entryCriteria.dumpMemoryStateToXML(planItemXML);
+        exitCriteria.dumpMemoryStateToXML(planItemXML);
     }
 
     /**
@@ -593,5 +507,31 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     protected boolean hasDiscretionaryItems() {
         return false;
+    }
+
+    /**
+     * Returns the entry transition (trigger when EntryCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Start}, and
+     * Milestone overrides this by returning {@link Transition#Occur}
+     * @return
+     */
+    final Transition getEntryTransition() {
+        return stateMachine.entryTransition;
+    }
+
+    /**
+     * Returns the exit transition (trigger when ExitCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Exit}, and
+     * CasePlan overrides this by returning {@link Transition#Terminate}
+     * @return
+     */
+    final Transition getExitTransition() {
+        return stateMachine.exitTransition;
+    }
+
+    /**
+     * Transition to be made when parent stage terminates
+     * @return
+     */
+    final Transition getTerminationTransition() {
+        return stateMachine.terminationTransition;
     }
 }

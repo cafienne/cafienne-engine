@@ -9,8 +9,8 @@ package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.sentry.ExitCriterion;
-import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
 
@@ -22,9 +22,5 @@ public class ExitCriterionDefinition extends CriterionDefinition {
     @Override
     public Transition getTransition() {
         return Transition.Exit;
-    }
-
-    public ExitCriterion createInstance(Stage stage) {
-        return new ExitCriterion(stage, this);
     }
 }

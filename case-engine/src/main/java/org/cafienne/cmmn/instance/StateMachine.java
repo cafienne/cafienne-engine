@@ -19,8 +19,14 @@ import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 class StateMachine {
     private final Map<State, Map<Transition, Target>> transitions = new HashMap<State, Map<Transition, Target>>();
     private final Map<State, Target> states = new HashMap<State, Target>();
+    final Transition entryTransition;
+    final Transition exitTransition;
+    final Transition terminationTransition;
 
-    private StateMachine() {
+    private StateMachine(Transition entryTransition, Transition exitTransition, Transition terminationTransition) {
+        this.entryTransition = entryTransition;
+        this.exitTransition = exitTransition;
+        this.terminationTransition = terminationTransition;
         // Register all states by default.
         for (State state : State.values()) {
             getTarget(state);
@@ -133,7 +139,7 @@ class StateMachine {
     }
 
     // State machine configuration for events and milestones
-    static final StateMachine EventMilestone = new StateMachine();
+    static final StateMachine EventMilestone = new StateMachine(Transition.Occur, Transition.Exit, Transition.ParentTerminate);
 
     static {
         EventMilestone.addTransition(Transition.Create, State.Available, State.Null);
@@ -145,6 +151,7 @@ class StateMachine {
         EventMilestone.addTransition(Transition.ParentResume, State.Available, State.Suspended);
         EventMilestone.addTransition(Transition.ParentTerminate, State.Terminated, new State[] { State.Available, State.Suspended });
 
+        EventMilestone.setAction(State.Completed, (PlanItem p, Transition t) -> p.completeInstance());
         EventMilestone.setAction(State.Terminated, (PlanItem p, Transition t) -> p.terminateInstance());
         EventMilestone.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
         EventMilestone.setAction(State.Available, (PlanItem p, Transition t) -> {
@@ -153,7 +160,7 @@ class StateMachine {
                 if (p instanceof Milestone) {
                     p.evaluateRepetitionRule();
                     p.evaluateRequiredRule();
-                    p.checkEntryCriteria(Transition.Occur);
+                    p.getEntryCriteria().beginLifeCycle(Transition.Occur);
                 }
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
                 p.resumeInstance();
@@ -162,7 +169,7 @@ class StateMachine {
     }
 
     // State machine configuration for tasks and stages
-    static final StateMachine TaskStage = new StateMachine();
+    static final StateMachine TaskStage = new StateMachine(Transition.Start, Transition.Exit, Transition.Exit);
 
     static {
         TaskStage.addTransition(Transition.Create, State.Available, State.Null);
@@ -188,7 +195,7 @@ class StateMachine {
 
             // Now evaluate manual activation and trigger the associated transition on the plan item
             Transition transition = p.evaluateManualActivationRule();
-            p.checkEntryCriteria(transition);
+            p.getEntryCriteria().beginLifeCycle(transition);
         });
         TaskStage.setAction(State.Active, (PlanItem p, Transition t) -> {
             if (t == Transition.Start || t == Transition.ManualStart) {
@@ -207,20 +214,20 @@ class StateMachine {
         TaskStage.setAction(State.Completed, (PlanItem p, Transition t) -> {
             p.completeInstance();
             if (p.getEntryCriteria().isEmpty()) {
-                p.repeat(Transition.Start);
+                p.repeat();
             }
         });
         TaskStage.setAction(State.Terminated, (PlanItem p, Transition t) -> {
             p.terminateInstance();
             if (p.getEntryCriteria().isEmpty()) {
-                p.repeat(Transition.Start);
+                p.repeat();
             }
         });
         TaskStage.setAction(State.Failed, (PlanItem p, Transition t) -> p.failInstance());
     }
 
     // State machine configuration for the case plan
-    static final StateMachine CasePlan = new StateMachine();
+    static final StateMachine CasePlan = new StateMachine(Transition.Start, Transition.Terminate, Transition.Exit);
 
     static {
         CasePlan.addTransition(Transition.Create, State.Active, State.Null);
