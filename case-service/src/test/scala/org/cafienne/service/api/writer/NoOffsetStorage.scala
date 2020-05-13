@@ -9,9 +9,9 @@ import scala.concurrent.Future
   * Simple test offset storage. Always returns Offset.noOffset
   */
 object NoOffsetStorage extends OffsetStorageProvider() {
-  override def storage(name: String): OffsetStorage = {
+  override def storage(storageName: String): OffsetStorage = {
     new OffsetStorage {
-      override val name: String = name
+      override val name: String = storageName
       override def getOffset(): Future[Offset] = Future.successful(Offset.noOffset)
     }
   }

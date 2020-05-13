@@ -118,6 +118,7 @@ class TaskQueriesImpl extends TaskQueries
 //            System.out.println("Everythign just fine; go ahead with your task user "+id)
             Some(taskId, tenant)
           }
+          case (_, _) => throw new SecurityException("I should never reach this block of code")
         }
       }
       case None => {

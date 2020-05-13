@@ -28,26 +28,19 @@ public class MultiplicityTest {
 
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertValue(Value.NULL);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("parent").assertValue(Value.NULL));
 
 
         // Add parent item
         ValueMap parentItem = new ValueMap();
         CreateCaseFileItem createParent = new CreateCaseFileItem(testUser, caseInstanceId, parentItem.cloneValueNode(), "parent");
-        testCase.addStep(createParent, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertState(State.Available);
-        });
+        testCase.addStep(createParent, caseFile -> caseFile.assertCaseFileItem("parent").assertState(State.Available));
 
         // Add child item
         ValueMap childItem = new ValueMap();
         childItem.putRaw("myprop", "some parent value");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "parent/child");
-        testCase.addStep(createChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(createChild, caseFile -> {
             caseFile.assertCaseFileItem("parent/child").assertValue(childItem);
             caseFile.assertCaseFileItem("parent/child").assertState(State.Available);
         });
@@ -56,8 +49,7 @@ public class MultiplicityTest {
         ValueMap mchildItem2 = new ValueMap();
         mchildItem2.putRaw("mprop", "some value");
         CreateCaseFileItem mcreateChild2 = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem2.cloneValueNode(), "parent/mchild");
-        testCase.addStep(mcreateChild2, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(mcreateChild2, caseFile -> {
             caseFile.assertCaseFileItem("parent/mchild[0]").assertValue(mchildItem2);
             caseFile.assertCaseFileItem("parent/mchild[0]").assertState(State.Available);
         });
@@ -65,8 +57,7 @@ public class MultiplicityTest {
         ValueMap mchildItem = new ValueMap();
         mchildItem.putRaw("mprop", "some other value");
         CreateCaseFileItem mcreateChild = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem.cloneValueNode(), "parent/mchild");
-        testCase.addStep(mcreateChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(mcreateChild, caseFile -> {
             caseFile.assertCaseFileItem("parent/mchild[1]").assertValue(mchildItem);
             caseFile.assertCaseFileItem("parent/mchild[1]").assertState(State.Available);
         });
@@ -74,15 +65,9 @@ public class MultiplicityTest {
 
         // Now delete the item
         DeleteCaseFileItem deleteChild0 = new DeleteCaseFileItem(testUser, caseInstanceId, "parent/mchild[0]");
-        testCase.addStep(deleteChild0, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent/mchild[0]").assertState(State.Discarded);
-        });
+        testCase.addStep(deleteChild0, caseFile -> caseFile.assertCaseFileItem("parent/mchild[0]").assertState(State.Discarded));
         DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, "parent/mchild[1]");
-        testCase.addStep(deleteChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent/mchild[1]").assertState(State.Discarded);
-        });
+        testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem("parent/mchild[1]").assertState(State.Discarded));
 
 
         testCase.runTest();
@@ -94,34 +79,26 @@ public class MultiplicityTest {
 
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertValue(Value.NULL);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("parent").assertValue(Value.NULL));
 
 
         // Add parent item
         ValueMap parentItem = new ValueMap();
         CreateCaseFileItem createParent = new CreateCaseFileItem(testUser, caseInstanceId, parentItem.cloneValueNode(), "parent");
-        testCase.addStep(createParent, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertState(State.Available);
-        });
+        testCase.addStep(createParent, caseFile -> caseFile.assertCaseFileItem("parent").assertState(State.Available));
 
         // Add child item
         ValueMap childItem = new ValueMap();
         childItem.putRaw("myprop", "some parent value");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "parent/child");
-        testCase.addStep(createChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(createChild, caseFile -> {
             caseFile.assertCaseFileItem("parent/child").assertValue(childItem);
             caseFile.assertCaseFileItem("parent/child").assertState(State.Available);
         });
 
         // Now delete the parent item
         DeleteCaseFileItem deleteParent = new DeleteCaseFileItem(testUser, caseInstanceId, "parent");
-        testCase.addStep(deleteParent, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(deleteParent, caseFile -> {
             caseFile.assertCaseFileItem("parent").assertState(State.Discarded);
             caseFile.assertCaseFileItem("parent/child").assertState(State.Discarded);
         });
@@ -136,26 +113,19 @@ public class MultiplicityTest {
 
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertValue(Value.NULL);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("parent").assertValue(Value.NULL));
 
 
         // Add parent item
         ValueMap parentItem = new ValueMap();
         CreateCaseFileItem createParent = new CreateCaseFileItem(testUser, caseInstanceId, parentItem.cloneValueNode(), "parent");
-        testCase.addStep(createParent, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertState(State.Available);
-        });
+        testCase.addStep(createParent, caseFile -> caseFile.assertCaseFileItem("parent").assertState(State.Available));
 
 
         ValueMap mchildItem2 = new ValueMap();
         mchildItem2.putRaw("mprop", "some value");
         CreateCaseFileItem mcreateChild2 = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem2.cloneValueNode(), "parent/mchild");
-        testCase.addStep(mcreateChild2, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(mcreateChild2, caseFile -> {
             caseFile.assertCaseFileItem("parent/mchild[0]").assertValue(mchildItem2);
             caseFile.assertCaseFileItem("parent/mchild[0]").assertState(State.Available);
         });
@@ -163,8 +133,7 @@ public class MultiplicityTest {
         ValueMap mchildItem = new ValueMap();
         mchildItem.putRaw("mprop", "some other value");
         CreateCaseFileItem mcreateChild = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem.cloneValueNode(), "parent/mchild");
-        testCase.addStep(mcreateChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(mcreateChild, caseFile -> {
             caseFile.assertCaseFileItem("parent/mchild[1]").assertValue(mchildItem);
             caseFile.assertCaseFileItem("parent/mchild[1]").assertState(State.Available);
         });
@@ -172,10 +141,7 @@ public class MultiplicityTest {
 
         // Now delete the parent item
         DeleteCaseFileItem deleteParent = new DeleteCaseFileItem(testUser, caseInstanceId, "parent");
-        testCase.addStep(deleteParent, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("parent").assertState(State.Discarded);
-        });
+        testCase.addStep(deleteParent, caseFile -> caseFile.assertCaseFileItem("parent").assertState(State.Discarded));
 
 
         testCase.runTest();

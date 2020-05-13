@@ -27,7 +27,6 @@ public class CaseAssertion extends StageAssertion {
         super(testCommand, getCasePlan(testCommand));
         this.caseFileAssertion = new CaseFileAssertion(testCommand);
     }
-
     /**
      * Temporary method to quicker convert code
      * @param assertion
@@ -37,9 +36,6 @@ public class CaseAssertion extends StageAssertion {
         this(assertion.getTestCommand());
     }
 
-    public PublishedEventsAssertion<?> getEvents() {
-        return getTestCommand().getEvents();
-    }
 
     private static PlanItemCreated getCasePlan(CaseTestCommand testCommand) {
         PublishedEventsAssertion<PlanItemCreated> pea = testCommand.getEventListener().getEvents().filter(PlanItemCreated.class);
@@ -54,6 +50,14 @@ public class CaseAssertion extends StageAssertion {
     @Override
     public String toString() {
         return testCommand.caseInstanceString();
+    }
+
+    /**
+     * Returns the set of events that resulted from executing the command
+     * @return
+     */
+    public PublishedEventsAssertion<?> getEvents() {
+        return getTestCommand().getEvents();
     }
 
     /**

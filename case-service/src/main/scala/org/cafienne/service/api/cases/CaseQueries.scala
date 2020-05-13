@@ -81,7 +81,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
 //            System.out.println("Everythign just fine; go ahead with your case, user "+id)
             Some(tenant)
           }
-          case (Some(_), None) => throw new SecurityException("I should never reach this block of code")
+          case (_, _) => throw new SecurityException("I should never reach this block of code")
         }
       }
       case None => {

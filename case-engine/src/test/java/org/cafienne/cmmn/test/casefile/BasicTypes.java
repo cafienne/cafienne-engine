@@ -75,10 +75,7 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes").assertValue(getContents(inputs));
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes").assertValue(getContents(inputs)));
 
         testCase.runTest();
     }
@@ -154,10 +151,7 @@ public class BasicTypes {
         contents.put("ChildItem", childItem);
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(childItem);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(childItem));
 
         testCase.runTest();
     }
@@ -169,21 +163,14 @@ public class BasicTypes {
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
         childItem.putRaw("aChildString", "child-string");
         childItem.putRaw("aSecondChildString", "child-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "AllPropertyTypes/ChildItem");
-        testCase.addStep(createChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(childItem);
-        });
+        testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(childItem));
 
         // Now update the child item with new content: one property has a new value, another property is not updated, and a third property is newly
         // inserted
@@ -197,26 +184,17 @@ public class BasicTypes {
         final ValueMap expectedChildContent = (ValueMap) childItemClone.merge(updatedContent);
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), "AllPropertyTypes/ChildItem");
-        testCase.addStep(updateChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(expectedChildContent);
-        });
+        testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(expectedChildContent));
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.putRaw("aChildInteger", 3);
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), "AllPropertyTypes/ChildItem");
-        testCase.addStep(replaceChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(replacedChildItem);
-        });
+        testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(replacedChildItem));
 
         // Now delete the child item.
         DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, "AllPropertyTypes/ChildItem");
-        testCase.addStep(deleteChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL);
-        });
+        testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL));
 
         testCase.runTest();
     }
@@ -228,10 +206,7 @@ public class BasicTypes {
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL));
 
         // Create a child item; child item contains an invalid value, so it should reject the operation, and child should still be null
         ValueMap childItem = new ValueMap();
@@ -264,10 +239,7 @@ public class BasicTypes {
         childItem.putRaw("aChildString", "child-string");
         childItem.putRaw("aChildInteger", 9);
         createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "AllPropertyTypes/ChildItem");
-        testCase.addStep(createChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(childItem);
-        });
+        testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(childItem));
 
         // Again try to update the child item; Should fail because command has invalid content
         updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), "AllPropertyTypes/ChildItem");
@@ -290,10 +262,7 @@ public class BasicTypes {
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL);
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
@@ -304,10 +273,7 @@ public class BasicTypes {
         arrayOfChildItem.add(childItem.cloneValueNode());
 
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem");
-        testCase.addStep(createChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem").assertValue(arrayOfChildItem).assertCaseFileItem("[0]").assertValue(childItem);
-        });
+        testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem").assertValue(arrayOfChildItem).assertCaseFileItem("[0]").assertValue(childItem));
 
         // Now update the child item with new content: one property has a new value, another property is not updated, and a third property is newly
         // inserted
@@ -321,26 +287,17 @@ public class BasicTypes {
         final ValueMap expectedChildContent = (ValueMap) childItemClone.merge(updatedContent);
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem[0]");
-        testCase.addStep(updateChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(expectedChildContent);
-        });
+        testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(expectedChildContent));
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.putRaw("aChildInteger", 3);
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem[0]");
-        testCase.addStep(replaceChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(replacedChildItem);
-        });
+        testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(replacedChildItem));
 
         // Now delete the child item.
         DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, "AllPropertyTypes/ArrayOfChildItem[0]");
-        testCase.addStep(deleteChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(Value.NULL);
-        });
+        testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(Value.NULL));
 
         testCase.runTest();
     }
@@ -352,11 +309,7 @@ public class BasicTypes {
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
-        testCase.addStep(startCase, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL);
-
-        });
+        testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ChildItem").assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
@@ -367,17 +320,13 @@ public class BasicTypes {
         arrayOfChildItem.add(childItem.cloneValueNode());
 
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem");
-        testCase.addStep(createChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem").assertValue(arrayOfChildItem).assertCaseFileItem("[0]").assertValue(childItem);
-        });
+        testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem").assertValue(arrayOfChildItem).assertCaseFileItem("[0]").assertValue(childItem));
 
         ValueList secondArray = arrayOfChildItem.cloneValueNode();
         secondArray.add(childItem.cloneValueNode());
 
         // add another child
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem"), action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem"), caseFile -> {
             caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem").assertSize(2).assertValue(secondArray);
             caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(childItem);
             caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[1]").assertValue(childItem);
@@ -398,26 +347,17 @@ public class BasicTypes {
         final ValueMap expectedChildContent = (ValueMap) childItemClone.merge(updatedContent);
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem[0]");
-        testCase.addStep(updateChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(expectedChildContent);
-        });
+        testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(expectedChildContent));
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
         replacedChildItem.putRaw("aChildInteger", 3);
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), "AllPropertyTypes/ArrayOfChildItem[0]");
-        testCase.addStep(replaceChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(replacedChildItem);
-        });
+        testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(replacedChildItem));
 
         // Now delete the child item.
         DeleteCaseFileItem deleteChild = new DeleteCaseFileItem(testUser, caseInstanceId, "AllPropertyTypes/ArrayOfChildItem[0]");
-        testCase.addStep(deleteChild, action -> {
-            CaseAssertion caseFile = new CaseAssertion(action);
-            caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(Value.NULL);
-        });
+        testCase.addStep(deleteChild, caseFile -> caseFile.assertCaseFileItem("AllPropertyTypes/ArrayOfChildItem[0]").assertValue(Value.NULL));
 
         testCase.runTest();
     }

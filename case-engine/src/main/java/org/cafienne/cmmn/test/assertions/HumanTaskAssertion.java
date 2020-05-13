@@ -49,7 +49,7 @@ public class HumanTaskAssertion extends CaseAssertion {
      * @return
      */
     public HumanTaskAssertion assertTaskOutput(ValueMap expectedOutput) {
-        testCommand.getEvents().filter(HumanTaskOutputSaved.class).filter(e -> e.getTaskOutput().equals(expectedOutput));
+        getEvents().filter(HumanTaskOutputSaved.class).filter(e -> e.getTaskOutput().equals(expectedOutput));
         return this;
     }
 
@@ -60,7 +60,7 @@ public class HumanTaskAssertion extends CaseAssertion {
      * @return
      */
     public HumanTaskAssertion assertTaskState(TaskState expectedState) {
-        testCommand.getEvents().filter(HumanTaskTransitioned.class).filter(e -> e.getCurrentState().equals(expectedState));
+        getEvents().filter(HumanTaskTransitioned.class).filter(e -> e.getCurrentState().equals(expectedState));
         return this;
     }
 
@@ -71,7 +71,7 @@ public class HumanTaskAssertion extends CaseAssertion {
      * @return
      */
     public HumanTaskAssertion assertAssignee(String expectedAssignee) {
-        testCommand.getEvents().filter(HumanTaskAssigned.class).filter(e -> e.assignee.equals(expectedAssignee));
+        getEvents().filter(HumanTaskAssigned.class).filter(e -> e.assignee.equals(expectedAssignee));
         return this;
     }
 
@@ -82,7 +82,7 @@ public class HumanTaskAssertion extends CaseAssertion {
      * @return
      */
     public HumanTaskAssertion assertOwner(String expectedOwner) {
-        testCommand.getEvents().filter(HumanTaskOwnerChanged.class).filter(e -> e.owner.equals(expectedOwner));
+        getEvents().filter(HumanTaskOwnerChanged.class).filter(e -> e.owner.equals(expectedOwner));
         return this;
     }
 
@@ -93,12 +93,12 @@ public class HumanTaskAssertion extends CaseAssertion {
      * @return
      */
     public HumanTaskAssertion assertDueDate(Instant expectedDueDate) {
-        testCommand.getEvents().filter(HumanTaskDueDateFilled.class).filter(e -> e.dueDate.equals(expectedDueDate));
+        getEvents().filter(HumanTaskDueDateFilled.class).filter(e -> e.dueDate.equals(expectedDueDate));
         return this;
     }
 
     public HumanTaskAssertion assertTaskCompleted() {
-        testCommand.getEvents().filter(HumanTaskCompleted.class).assertNotEmpty();
+        getEvents().filter(HumanTaskCompleted.class).assertNotEmpty();
         return this;
     }
 }

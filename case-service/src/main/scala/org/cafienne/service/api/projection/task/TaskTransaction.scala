@@ -55,7 +55,6 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
             evt match {
               case evt: HumanTaskAssigned => TaskMerger(evt, copy)
               case evt: HumanTaskActivated => TaskMerger(evt, copy)
-              case evt: HumanTaskRevoked => TaskMerger(evt, copy)
               case evt: HumanTaskCompleted => TaskMerger(evt, copy)
               case evt: HumanTaskTerminated => TaskMerger(evt, copy)
               case other => {
