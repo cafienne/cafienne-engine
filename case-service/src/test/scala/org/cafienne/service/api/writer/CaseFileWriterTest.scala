@@ -81,7 +81,7 @@ class CaseFileWriterTest
       Thread.sleep(2000)
 
       eventually {
-        persistence.records.length shouldBe 5
+        persistence.records.length shouldBe 6
         persistence.records.head shouldBe a[CaseInstance]
         persistence.records(2) match {
           case cs: CaseFile =>

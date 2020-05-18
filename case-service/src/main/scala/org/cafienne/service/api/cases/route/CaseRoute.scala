@@ -235,7 +235,10 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     caseTeam.foreach(member => {
       val json = team.`with`(member.userId)
       json.putRaw("user", member.userId)
-      json.withArray("roles").add(new StringValue(member.role))
+      // Always create a roles[] array
+      val roleList = json.withArray("roles")
+      // but only add "real" roles
+      if (member.role != "") roleList.add(new StringValue(member.role))
     })
     val usersList = new ValueList
     team.getValue.forEach((userId, value) => usersList.add(value))

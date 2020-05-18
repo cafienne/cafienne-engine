@@ -62,7 +62,7 @@ class CaseInstanceWriterTest
       sendEvent(caseModifiedEvent)
 
       eventually {
-        persistence.records.length shouldBe 4
+        persistence.records.length shouldBe 5
         persistence.records.head shouldBe a[CaseInstance]
       }
     }
