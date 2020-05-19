@@ -3,6 +3,7 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHeader}
+import akka.http.scaladsl.server.Route
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
@@ -21,7 +22,7 @@ trait CommandRoute extends AuthenticatedRoute {
   import akka.pattern.ask
   implicit val timeout = Main.caseSystemTimeout
 
-  def askModelActor(command: ModelCommand[_]) = {
+  def askModelActor(command: ModelCommand[_]): Route = {
     onComplete(CaseSystem.router ? command) {
       case Success(value) =>
         value match {
