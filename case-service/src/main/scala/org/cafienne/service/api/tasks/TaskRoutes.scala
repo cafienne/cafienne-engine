@@ -461,7 +461,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     }
 
   def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
-    val retrieveCaseIdAndTenant = taskQueries.getCaseAndTenantInformation(taskId, platformUser)
+    val retrieveCaseIdAndTenant = taskQueries.authorizeTaskAccess(taskId, platformUser)
 
     onComplete(retrieveCaseIdAndTenant) {
       case Success(retrieval) => {

@@ -10,7 +10,7 @@ import org.cafienne.service.api.tenant.TenantTables
 import scala.concurrent.Future
 
 trait CaseQueries {
-  def getTenantInformation(caseInstanceId: String, user: PlatformUser): Future[Option[String]] = ???
+  def authorizeCaseAccess(caseInstanceId: String, user: PlatformUser): Future[String] = ???
 
   def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseInstance]] = ???
 
@@ -59,7 +59,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     }
   }
 
-  override def getTenantInformation(caseInstanceId: String, user: PlatformUser): Future[Option[String]] = {
+  override def authorizeCaseAccess(caseInstanceId: String, user: PlatformUser): Future[String] = {
 
     // LEFT JOIN on task and user; left join so that we know if the task exists and/or if the user exists and is enabled/disabled
     val query = for {
@@ -79,7 +79,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
           }
           case (Some(id), Some(true)) => {
 //            System.out.println("Everythign just fine; go ahead with your case, user "+id)
-            Some(tenant)
+            tenant
           }
           case (_, _) => throw new SecurityException("I should never reach this block of code")
         }

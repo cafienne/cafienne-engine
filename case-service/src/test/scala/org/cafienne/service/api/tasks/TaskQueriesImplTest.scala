@@ -54,13 +54,13 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "retrieve a caseinstanceId by taskId" in {
-    val res = Await.result(taskQueries.getCaseAndTenantInformation("1", testUser), 1.second)
+    val res = Await.result(taskQueries.authorizeTaskAccess("1", testUser), 1.second)
     res must be (Some("33", tenant))
   }
 
   it should "retrieve nothing by unknown taskId" in {
     assertThrows[TaskSearchFailure] {
-      Await.result(taskQueries.getCaseAndTenantInformation("10", testUser), 1.second)
+      Await.result(taskQueries.authorizeTaskAccess("10", testUser), 1.second)
     }
   }
 

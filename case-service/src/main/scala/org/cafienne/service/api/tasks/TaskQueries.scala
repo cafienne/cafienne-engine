@@ -23,7 +23,7 @@ trait TaskQueries {
 
   def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[Task]] = ???
 
-  def getCaseAndTenantInformation(taskId: String, user: PlatformUser): Future[Option[(String, String)]] = ???
+  def authorizeTaskAccess(taskId: String, user: PlatformUser): Future[Option[(String, String)]] = ???
 
   def getAllTasks(tenant: Option[String],
                   caseDefinition: Option[String],
@@ -87,7 +87,7 @@ class TaskQueriesImpl extends TaskQueries
     db.run(task.result)
   }
 
-  override def getCaseAndTenantInformation(taskId: String, user: PlatformUser): Future[Option[(String, String)]] = {
+  override def authorizeTaskAccess(taskId: String, user: PlatformUser): Future[Option[(String, String)]] = {
 
     // SIMPLE test query to fetch all tenants in which the current user is enabled.
     //    val tenantsQ = usersTable.filter(_.id === user.id).filter(_.enabled === true).map(_.tenant)
@@ -104,7 +104,7 @@ class TaskQueriesImpl extends TaskQueries
     } yield (c.caseInstanceId, c.tenant, s.map(_.userId), s.map(_.enabled))
 
     db.run(taskUserInfo.result).map(r => r.headOption).map(u => u match {
-      case Some((taskId: String, tenant: String, userId: Option[String], enabled: Option[Boolean])) => {
+      case Some((caseInstanceId: String, tenant: String, userId: Option[String], enabled: Option[Boolean])) => {
         (userId, enabled) match {
           case (None, None) => {
 //            System.out.println("User does not even exist or not in this tenant")
@@ -116,7 +116,7 @@ class TaskQueriesImpl extends TaskQueries
           }
           case (Some(id), Some(true)) => {
 //            System.out.println("Everythign just fine; go ahead with your task user "+id)
-            Some(taskId, tenant)
+            Some(caseInstanceId, tenant)
           }
           case (_, _) => throw new SecurityException("I should never reach this block of code")
         }
@@ -125,63 +125,6 @@ class TaskQueriesImpl extends TaskQueries
         throw TaskSearchFailure(taskId)
       }
     })
-
-
-//    val taskPlusUserInfo = TableQuery[TaskTable]
-//      .join(TableQuery[UserTable])
-//      .on(_.tenant === _.tenant)
-//      .filter(_._1.id === taskId)
-//      .filter(_._2.id === user.id)
-//      .map(r => {
-//        (r._1.caseInstanceId, r._2.id, r._2.enabled)
-//
-//      })
-//    //      .filter(_._1.tenant.inSet(tenants))
-//    //      .map((_._1.caseInstanceId, _._2.enabled)
-//    //    val taskWithUser =
-//    db.run(taskPlusUserInfo.result).map(records => records.headOption).map(u => u match {
-//      case Some((taskId: String, userId: String, true)) => {
-//        System.err.println("User "+userId+" is allowed to take action on task " +taskId)
-//        Some(taskId)
-//      }
-//      case Some((taskId: String, userId: String, false)) => {
-//        System.err.println("Not allowed since user "+userId+" is not allowed currently")
-//        throw new SecurityException("Not allowed")
-//      }
-//      case None => {
-//        System.err.println("Task cannot be found")
-//        throw new SearchFailure("Task not found")
-//      }
-//    });
-
-    //    val q = for {
-    //      tenants <- usersTable.filter(_.id === user.id).filter(_.enabled === true).map(_.tenant).result
-    //      tasks = TableQuery[TaskTable]
-    //        .filter(_.id === taskId)
-    //        .filter(_.tenant.inSet(tenants))
-    //        .map(_.caseInstanceId)
-    //    } yield (tenants, tasks)
-    //
-    //    db.run(q).map(x => {
-    //      val f = x._1
-    //      val t = x._2
-    ////      System.err.println("We got an x: "+x)
-    ////      System.err.println("We got an t: "+t.result)
-    //      db.run(t.result).map(tResult => {
-    //        val h = tResult.head
-    ////        println("Katsjing katsjong: "+h)
-    //      })
-    //      x
-    //    })
-    //
-    //    val caseInstanceId = TableQuery[TaskTable]
-    //      .filter(_.id === taskId)
-    //      .filter(_.tenant === user.tenant)
-    //      .map(_.caseInstanceId)
-    //    db.run(caseInstanceId.result).map(r => {
-    //      System.out.println("R: "+r)
-    //      r.headOption
-    //    })
   }
 
   override def getAllTasks(tenant: Option[String],
