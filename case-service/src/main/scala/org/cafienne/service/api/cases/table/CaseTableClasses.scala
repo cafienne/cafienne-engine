@@ -34,7 +34,6 @@ final case class CaseRecord(id: String,
     v.putRaw("modifiedBy", modifiedBy)
     v.putRaw("caseInput", "")
     v.putRaw("caseOutput", "")
-    v.putRaw("lastModifiedBy", modifiedBy) // Temporary compatibility
     v
   }
 }
