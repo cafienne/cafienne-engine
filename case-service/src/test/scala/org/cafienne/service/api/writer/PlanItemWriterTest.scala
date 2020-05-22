@@ -70,7 +70,7 @@ class PlanItemWriterTest
 
       Thread.sleep(1000)
       eventually {
-        persistence.records.length shouldBe 7
+        persistence.records.length shouldBe 8
         assert(persistence.records.exists(x => x.isInstanceOf[CaseInstance]))
         assert(persistence.records.exists(x => x.isInstanceOf[PlanItem]))
       }

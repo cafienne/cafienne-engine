@@ -58,11 +58,10 @@ class CaseInstanceWriterTest
   "CaseProjectionsWriter" must {
     "add a case instance" in {
       sendEvent(caseDefinitionApplied)
-
       sendEvent(caseModifiedEvent)
 
       eventually {
-        persistence.records.length shouldBe 5
+        persistence.records.length shouldBe 6
         persistence.records.head shouldBe a[CaseInstance]
       }
     }

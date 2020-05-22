@@ -42,6 +42,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   private def createCaseInstance(event: CaseDefinitionApplied): Future[Done] = {
     this.caseInstance = Some(CaseInstanceMerger.merge(event))
     this.caseDefinition = CaseInstanceDefinition(event.getActorId, event.getCaseName, event.getDefinition.getDescription, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.createdOn, event.createdBy)
+    this.caseFile = Some(new ValueMap()) // Always create an empty case file
     CaseInstanceRoleMerger.merge(event).map(role => caseInstanceRoles.put(role.roleName, role))
     Future.successful(Done)
   }
