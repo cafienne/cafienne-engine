@@ -8,7 +8,7 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Member;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -20,7 +20,7 @@ public class TeamMemberRemoved extends CaseTeamEvent {
     private final String userId;
     private final Set<String> roles = new HashSet();
 
-    public TeamMemberRemoved(Case caseInstance, CaseTeamMember member) {
+    public TeamMemberRemoved(Case caseInstance, Member member) {
         super(caseInstance);
         this.userId = member.getUserId();
         for (CaseRoleDefinition role : member.getRoles()) {

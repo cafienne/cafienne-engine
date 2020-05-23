@@ -5,7 +5,7 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Member;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -19,7 +19,7 @@ public class TeamMemberAdded extends CaseTeamEvent {
     private final String userId;
     private final Set<String> roles = new HashSet();
 
-    public TeamMemberAdded(Case caseInstance, CaseTeamMember member) {
+    public TeamMemberAdded(Case caseInstance, Member member) {
         super(caseInstance);
         this.userId = member.getUserId();
         for (CaseRoleDefinition role : member.getRoles()) {

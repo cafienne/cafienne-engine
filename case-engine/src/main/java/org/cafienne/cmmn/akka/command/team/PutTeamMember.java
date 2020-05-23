@@ -7,7 +7,8 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.user.CaseTeam;
+import org.cafienne.cmmn.instance.team.Member;
+import org.cafienne.cmmn.instance.team.Team;
 
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ import java.io.IOException;
 @Manifest
 public class PutTeamMember extends CaseCommand {
     private final CaseTeamMember jsonNewMember;
-    private org.cafienne.cmmn.user.CaseTeamMember newCaseTeamMember;
+    private Member newCaseTeamMember;
 
     private enum Fields {
         member
@@ -57,12 +58,12 @@ public class PutTeamMember extends CaseCommand {
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
         // Parse the new member. This will also validate the new member against the case team
-        newCaseTeamMember = new org.cafienne.cmmn.user.CaseTeamMember(caseInstance.getCaseTeam(), jsonNewMember, caseInstance);
+        newCaseTeamMember = new Member(caseInstance.getCaseTeam(), jsonNewMember, caseInstance);
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        CaseTeam caseTeam = caseInstance.getCaseTeam();
+        Team caseTeam = caseInstance.getCaseTeam();
         caseTeam.addMember(newCaseTeamMember);
         return new CaseResponse(this);
     }

@@ -16,9 +16,7 @@ import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
-import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.junit.Test;
 

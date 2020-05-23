@@ -10,7 +10,7 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Member;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class UserEvent extends PlanItem<UserEventDefinition> {
             return true;
         }
 
-        CaseTeamMember currentUser = getCaseInstance().getCurrentTeamMember();
+        Member currentUser = getCaseInstance().getCurrentTeamMember();
         if (currentUser == null) { // No user found, but there must be one with a role
             throw new TransitionDeniedException("You do not have the permission to raise the event " + getName());
         }

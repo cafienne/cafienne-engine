@@ -17,9 +17,7 @@ import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
-import org.cafienne.cmmn.test.assertions.FailureAssertion;
-import org.cafienne.cmmn.user.CaseTeamError;
+import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.junit.Test;
 
 public class Role {

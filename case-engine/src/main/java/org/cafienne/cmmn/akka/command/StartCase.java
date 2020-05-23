@@ -25,6 +25,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.instance.team.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     private final ValueMap inputParameters;
     private transient CaseDefinition definition;
     private final CaseTeam caseTeamInput;
-    private org.cafienne.cmmn.user.CaseTeam caseTeam;
+    private Team caseTeam;
     private final boolean debugMode;
 
     private enum Fields {
@@ -136,7 +137,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         }
 
         // Validates the member and roles
-        caseTeam = new org.cafienne.cmmn.user.CaseTeam(caseTeamInput, caseInstance, definition);
+        caseTeam = new Team(caseTeamInput, caseInstance, definition);
 
         // Should we also check whether all parameters have been made available in the input list? Not sure ...
     }

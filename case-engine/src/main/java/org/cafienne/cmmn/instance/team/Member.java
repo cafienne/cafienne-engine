@@ -1,7 +1,9 @@
-package org.cafienne.cmmn.user;
+package org.cafienne.cmmn.instance.team;
 
+import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
 import org.w3c.dom.Element;
 
@@ -11,8 +13,8 @@ import java.util.Set;
 /**
  * A member in the case team. Consists of a user id and associated roles (that have been defined in the {@link CaseDefinition#getCaseRoles()})
  */
-public class CaseTeamMember {
-    private final CaseTeam team;
+public class Member extends CMMNElement<CaseDefinition> {
+    private final Team team;
     private final String userId;
     private final Set<CaseRoleDefinition> roles = new HashSet();
 
@@ -24,7 +26,8 @@ public class CaseTeamMember {
      * @param roles
      * @param caseInstance 
      */
-    CaseTeamMember(CaseTeam team, String userId, Set<String> roles, Case caseInstance) {
+    Member(Team team, String userId, Set<String> roles, Case caseInstance) {
+        super(team, team.getDefinition());
         this.team = team;
         this.userId = userId;
         roles.add("");// Always add empty role for members
@@ -43,7 +46,7 @@ public class CaseTeamMember {
      * @param caseInstance
      * @throws CaseTeamError
      */
-    public CaseTeamMember(CaseTeam team, org.cafienne.cmmn.akka.command.team.CaseTeamMember member, Case caseInstance) throws CaseTeamError {
+    public Member(Team team, CaseTeamMember member, Case caseInstance) throws CaseTeamError {
         this(team, member, caseInstance.getDefinition());
     }
 
@@ -56,7 +59,8 @@ public class CaseTeamMember {
      * @param caseDefinition
      * @throws CaseTeamError
      */
-    public CaseTeamMember(CaseTeam team, org.cafienne.cmmn.akka.command.team.CaseTeamMember member, CaseDefinition caseDefinition) throws CaseTeamError {
+    public Member(Team team, CaseTeamMember member, CaseDefinition caseDefinition) throws CaseTeamError {
+        super(team, caseDefinition);
         this.team = team;
         this.userId = parseName(member.getUser());
         member.getRoles().forEach(roleName -> addRole(getCaseRole(caseDefinition, roleName)));
@@ -121,7 +125,7 @@ public class CaseTeamMember {
 
         // Check that a singleton role is not yet assigned to one of the other team members
         if (role.isSingleton()) {
-            for (CaseTeamMember member : team.getMembers()) {
+            for (Member member : getTeam().getMembers()) {
                 if (member.getRoles().contains(role)) {
                     throw new CaseTeamError("Role " + role + " is already assigned to another user");
                 }
@@ -145,7 +149,7 @@ public class CaseTeamMember {
      *
      * @return
      */
-    public CaseTeam getTeam() {
+    public Team getTeam() {
         return team;
     }
 

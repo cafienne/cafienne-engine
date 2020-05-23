@@ -21,8 +21,8 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
-import org.cafienne.cmmn.user.CaseTeam;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * Workers in the case team
      */
-    private final CaseTeam caseTeam = new CaseTeam(this);
+    private final Team caseTeam = new Team(this);
 
     public Case() {
         super(CaseCommand.class, CaseEvent.class);
@@ -112,7 +112,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public CaseTeamMember getCurrentTeamMember() {
+    public Member getCurrentTeamMember() {
         return getCaseTeam().getTeamMember(getCurrentUser());
     }
 
@@ -373,7 +373,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public CaseTeam getCaseTeam() {
+    public Team getCaseTeam() {
         return caseTeam;
     }
 }

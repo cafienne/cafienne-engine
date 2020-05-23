@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.user;
+package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 

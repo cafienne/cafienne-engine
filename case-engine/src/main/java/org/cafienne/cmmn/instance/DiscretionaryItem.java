@@ -9,7 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Member;
 
 import java.util.Collection;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
             return true;
         }
 
-        CaseTeamMember currentUser = getCaseInstance().getCurrentTeamMember();
+        Member currentUser = getCaseInstance().getCurrentTeamMember();
         if (currentUser == null) { // No user found, but there must be one with a role
             return false;
         }

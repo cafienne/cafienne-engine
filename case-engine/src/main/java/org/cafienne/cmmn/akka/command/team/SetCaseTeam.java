@@ -9,7 +9,7 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.user.CaseTeam;
+import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 
 /**
@@ -40,14 +40,14 @@ import org.cafienne.cmmn.akka.command.CaseCommand;
 @Manifest
 public class SetCaseTeam extends CaseCommand {
 
-    private final org.cafienne.cmmn.akka.command.team.CaseTeam caseTeam;
-    private CaseTeam newCaseTeam;
+    private final CaseTeam caseTeam;
+    private Team newCaseTeam;
 
     private enum Fields {
         team
     }
 
-    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, org.cafienne.cmmn.akka.command.team.CaseTeam caseTeam) {
+    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam caseTeam) {
         // TODO: determine how to do authorization on this command.
         super(tenantUser, caseInstanceId);
         this.caseTeam = caseTeam;
@@ -55,7 +55,7 @@ public class SetCaseTeam extends CaseCommand {
 
     public SetCaseTeam(ValueMap json) {
         super(json);
-        this.caseTeam = new org.cafienne.cmmn.akka.command.team.CaseTeam(readArray(json, Fields.team));
+        this.caseTeam = new CaseTeam(readArray(json, Fields.team));
     }
 
     @Override
@@ -68,12 +68,12 @@ public class SetCaseTeam extends CaseCommand {
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
         // Parse the new case team. This will also validate the team
-        newCaseTeam = new CaseTeam(caseTeam, caseInstance, caseInstance.getDefinition());
+        newCaseTeam = new Team(caseTeam, caseInstance, caseInstance.getDefinition());
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        CaseTeam caseTeam = caseInstance.getCaseTeam();
+        Team caseTeam = caseInstance.getCaseTeam();
         // Clear the existing members
         new ArrayList<>(caseTeam.getMembers()).forEach(caseTeam::removeMember);
         // Add new members

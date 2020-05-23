@@ -10,8 +10,8 @@ import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.user.CaseTeam;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.akka.actor.identity.TenantUser;
 
 /**
@@ -22,7 +22,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 public class RemoveTeamMember extends CaseCommand {
 
     private final String userId;
-    private CaseTeamMember memberToRemove;
+    private Member memberToRemove;
 
     private enum Fields {
         userId
@@ -43,8 +43,8 @@ public class RemoveTeamMember extends CaseCommand {
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
 
-        Collection<CaseTeamMember> currentMembers = caseInstance.getCaseTeam().getMembers();
-        for (CaseTeamMember caseTeamMember : currentMembers) {
+        Collection<Member> currentMembers = caseInstance.getCaseTeam().getMembers();
+        for (Member caseTeamMember : currentMembers) {
             if (caseTeamMember.getUserId().equals(userId)) {
                 memberToRemove = caseTeamMember; // Gotcha!
                 return;
@@ -55,7 +55,7 @@ public class RemoveTeamMember extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        CaseTeam caseTeam = caseInstance.getCaseTeam();
+        Team caseTeam = caseInstance.getCaseTeam();
         caseTeam.removeMember(memberToRemove);
         return new CaseResponse(this);
     }

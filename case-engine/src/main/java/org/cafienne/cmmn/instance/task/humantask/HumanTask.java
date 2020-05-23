@@ -13,7 +13,7 @@ import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.humantask.akka.event.*;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.w3c.dom.Element;
@@ -161,7 +161,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
             return true;
         }
 
-        CaseTeamMember currentUser = getCaseInstance().getCurrentTeamMember();
+        Member currentUser = getCaseInstance().getCurrentTeamMember();
         if (currentUser == null) { // Well, there MUST be a user...
             throw new SecurityException("You do not have the permission to perform the task " + getName());
         }

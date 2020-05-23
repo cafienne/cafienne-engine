@@ -1,11 +1,14 @@
-package org.cafienne.cmmn.user;
+package org.cafienne.cmmn.instance.team;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.akka.event.team.TeamMemberAdded;
 import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
@@ -15,17 +18,16 @@ import org.w3c.dom.Element;
  * The team of users with their roles that can work on a Case instance.
  * This is an engine extension to CMMN.
  */
-public class CaseTeam {
+public class Team extends CMMNElement<CaseDefinition> {
 
-    private final Case caseInstance;
-    private final Collection<CaseTeamMember> members = new ArrayList();
+    private final Collection<Member> members = new ArrayList();
 
     /**
      * Create a new, empty case team.
      * @param caseInstance
      */
-    public CaseTeam(Case caseInstance) {
-        this.caseInstance = caseInstance;
+    public Team(Case caseInstance) {
+        super(caseInstance, caseInstance.getDefinition());
     }
 
     /**
@@ -33,34 +35,34 @@ public class CaseTeam {
      * @param caseTeam
      * @param caseDefinition
      */
-    public CaseTeam(org.cafienne.cmmn.akka.command.team.CaseTeam caseTeam, Case caseInstance, CaseDefinition caseDefinition) throws CaseTeamError {
+    public Team(CaseTeam caseTeam, Case caseInstance, CaseDefinition caseDefinition) throws CaseTeamError {
         this(caseInstance);
-        caseTeam.getMembers().forEach(caseTeamMember -> members.add(new CaseTeamMember(this, caseTeamMember, caseDefinition)));
+        caseTeam.getMembers().forEach(caseTeamMember -> members.add(new Member(this, caseTeamMember, caseDefinition)));
     }
 
     @Deprecated
-    public CaseTeamMember addCurrentUser(TenantUser tenantUser) throws CaseTeamError {
+    public Member addCurrentUser(TenantUser tenantUser) throws CaseTeamError {
         if (tenantUser == null) {
             return null;
         }
         String userId = tenantUser.id();
-        for (CaseTeamMember caseTeamMember : members) {
+        for (Member caseTeamMember : members) {
             if (caseTeamMember.getUserId().equals(userId)) {
                 return caseTeamMember;
             }
         }
 
         // TODO MUST be removed => WK: I agree, but apparently demo's will fail when we do.
-        org.cafienne.cmmn.akka.command.team.CaseTeamMember newMember = new org.cafienne.cmmn.akka.command.team.CaseTeamMember(tenantUser.id());
+        CaseTeamMember newMember = new CaseTeamMember(tenantUser.id());
         tenantUser.roles().forall(roleName -> {
             // Only add those roles that also have been defined within the case (otherwise new CaseTeamMember constructor will fail)
-            if (this.caseInstance.getDefinition().getCaseRole(roleName) != null) {
+            if (getCaseInstance().getDefinition().getCaseRole(roleName) != null) {
                 newMember.getRoles().add(roleName);
             }
             return true;
         });
 
-        CaseTeamMember member = new CaseTeamMember(this, newMember, this.caseInstance);
+        Member member = new Member(this, newMember, getCaseInstance());
         addMember(member);
         return member;
     }
@@ -69,23 +71,23 @@ public class CaseTeam {
      * Adds a member to the team
      * @param member
      */
-    public void addMember(CaseTeamMember member) {
-        caseInstance.addEvent(new TeamMemberAdded(caseInstance, member));
+    public void addMember(Member member) {
+        getCaseInstance().addEvent(new TeamMemberAdded(getCaseInstance(), member));
     }
 
     /**
      * Removes a member from the team
      * @param member
      */
-    public void removeMember(CaseTeamMember member) {
-        caseInstance.addEvent(new TeamMemberRemoved(caseInstance, member));
+    public void removeMember(Member member) {
+        getCaseInstance().addEvent(new TeamMemberRemoved(getCaseInstance(), member));
     }
 
     /**
      * Returns the collection of team members
      * @return
      */
-    public Collection<CaseTeamMember> getMembers() {
+    public Collection<Member> getMembers() {
         return members;
     }
 
@@ -94,8 +96,8 @@ public class CaseTeam {
      * @param user
      * @return
      */
-    public CaseTeamMember getMember(String user) {
-        for (CaseTeamMember member : members) {
+    public Member getMember(String user) {
+        for (Member member : members) {
             if (member.getUserId().equals(user)) {
                 return member;
             }
@@ -104,12 +106,12 @@ public class CaseTeam {
     }
 
     public void updateState(TeamMemberAdded event) {
-        CaseTeamMember newMember = new CaseTeamMember(this, event.getUserId(), event.getRoles(), caseInstance);
+        Member newMember = new Member(this, event.getUserId(), event.getRoles(), getCaseInstance());
         members.add(newMember);
     }
 
     public void updateState(TeamMemberRemoved event) {
-        CaseTeamMember member = this.getMember(event.getUserId());
+        Member member = this.getMember(event.getUserId());
         members.remove(member);
     }
 
@@ -126,9 +128,9 @@ public class CaseTeam {
     }
 
     @Deprecated
-    public CaseTeamMember getTeamMember(TenantUser currentTenantUser) {
+    public Member getTeamMember(TenantUser currentTenantUser) {
         String userId = currentTenantUser.id();
-        for (CaseTeamMember caseTeamMember : members) {
+        for (Member caseTeamMember : members) {
             if (caseTeamMember.getUserId().equals(userId)) {
                 return caseTeamMember;
             }
@@ -143,7 +145,7 @@ public class CaseTeam {
      * @return
      */
     public String getMemberWithRole(String role) {
-        for (CaseTeamMember caseTeamMember : members) {
+        for (Member caseTeamMember : members) {
             Set<CaseRoleDefinition> roles = caseTeamMember.getRoles();
             for (CaseRoleDefinition roleDefinition : roles) {
                 if (roleDefinition.getName().equals(role)) {
@@ -154,9 +156,9 @@ public class CaseTeam {
         return null;
     }
 
-    public org.cafienne.cmmn.akka.command.team.CaseTeam toCaseTeamTO() {
-        List<org.cafienne.cmmn.akka.command.team.CaseTeamMember> members = new ArrayList();
-        this.getMembers().forEach(teamMember -> members.add(new org.cafienne.cmmn.akka.command.team.CaseTeamMember(teamMember.getUserId(), teamMember.getRoles().stream().map(CaseRoleDefinition::getName).collect(Collectors.toSet()))));
-        return new org.cafienne.cmmn.akka.command.team.CaseTeam(members);
+    public CaseTeam toCaseTeamTO() {
+        List<CaseTeamMember> members = new ArrayList();
+        this.getMembers().forEach(teamMember -> members.add(new CaseTeamMember(teamMember.getUserId(), teamMember.getRoles().stream().map(CaseRoleDefinition::getName).collect(Collectors.toSet()))));
+        return new CaseTeam(members);
     }
 }
