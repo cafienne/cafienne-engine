@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CaseTeam implements AkkaSerializable {
-    private List<CaseTeamMember> members = new ArrayList<>();
+    private List<CaseTeamMember> members = new ArrayList();
 
     public CaseTeam() {
     }

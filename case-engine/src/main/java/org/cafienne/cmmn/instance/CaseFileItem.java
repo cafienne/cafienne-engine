@@ -24,8 +24,8 @@ import java.util.Map.Entry;
 
 public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> {
 
-    private final List<CaseFileItemOnPart> connectedEntryCriteria = new ArrayList<>();
-    private final List<CaseFileItemOnPart> connectedExitCriteria = new ArrayList<>();
+    private final List<CaseFileItemOnPart> connectedEntryCriteria = new ArrayList();
+    private final List<CaseFileItemOnPart> connectedExitCriteria = new ArrayList();
 
     /**
      * History of events on this item

@@ -14,7 +14,7 @@ import java.util.Set;
 public class CaseTeamMember {
     private final CaseTeam team;
     private final String userId;
-    private final Set<CaseRoleDefinition> roles = new HashSet<>();
+    private final Set<CaseRoleDefinition> roles = new HashSet();
 
     /**
      * Shortcut constructor for akka recovery

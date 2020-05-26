@@ -20,8 +20,8 @@ import java.util.Set;
  */
 public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     private TenantCreated creationEvent;
-    private Set<String> owners = new HashSet<>();
-    private Map<String, InternalTenantUserRepresentation> users = new HashMap<>();
+    private Set<String> owners = new HashSet();
+    private Map<String, InternalTenantUserRepresentation> users = new HashMap();
     private boolean disabled = false; // TODO: we can add some behavior behind this...
 
     public TenantActor() {
@@ -111,7 +111,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
 
 class InternalTenantUserRepresentation {
     final String userId;
-    final Set<String> roles = new HashSet<>();
+    final Set<String> roles = new HashSet();
     boolean enabled = true;
     String name;
     String email;

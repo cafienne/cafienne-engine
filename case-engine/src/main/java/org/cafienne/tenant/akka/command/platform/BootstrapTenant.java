@@ -35,7 +35,7 @@ public class BootstrapTenant extends CreateTenant {
 
     public BootstrapTenant(ValueMap json) {
         super(json);
-        this.users = new HashSet<>();
+        this.users = new HashSet();
         ValueList jsonUsers = json.withArray(Fields.users);
         jsonUsers.forEach(value -> {
             ValueMap userJson = (ValueMap) value;

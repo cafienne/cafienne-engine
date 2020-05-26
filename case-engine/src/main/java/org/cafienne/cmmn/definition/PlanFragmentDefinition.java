@@ -22,8 +22,8 @@ import org.w3c.dom.Element;
 public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     private final static Logger logger = LoggerFactory.getLogger(PlanFragmentDefinition.class);
 
-    private final Collection<PlanItemDefinition> planItems = new ArrayList<PlanItemDefinition>();
-    private final Collection<SentryDefinition> sentries = new ArrayList<SentryDefinition>();
+    private final Collection<PlanItemDefinition> planItems = new ArrayList();
+    private final Collection<SentryDefinition> sentries = new ArrayList();
 
     public PlanFragmentDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);

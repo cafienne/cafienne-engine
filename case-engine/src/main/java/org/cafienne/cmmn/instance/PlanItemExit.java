@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class PlanItemExit {
-    private final Collection<ExitCriterion> exitCriteria = new ArrayList<>();
+    private final Collection<ExitCriterion> exitCriteria = new ArrayList();
     private final PlanItem planItem;
 
     PlanItemExit(PlanItem planItem) {

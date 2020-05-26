@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class PlanningTableDefinition extends TableItemDefinition {
-    private final Collection<TableItemDefinition> tableItems = new ArrayList<TableItemDefinition>();
-    private final Collection<ApplicabilityRuleDefinition> ruleDefinitions = new ArrayList<ApplicabilityRuleDefinition>();
+    private final Collection<TableItemDefinition> tableItems = new ArrayList();
+    private final Collection<ApplicabilityRuleDefinition> ruleDefinitions = new ArrayList();
 
     public PlanningTableDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
@@ -96,8 +96,8 @@ public class PlanningTableDefinition extends TableItemDefinition {
 abstract class TableItemDefinition extends CMMNElementDefinition {
     private final String applicabilityRuleRefs;
     private final String authorizedRoleRefs;
-    private final List<ApplicabilityRuleDefinition> applicabilityRules = new ArrayList<ApplicabilityRuleDefinition>();
-    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList<CaseRoleDefinition>();
+    private final List<ApplicabilityRuleDefinition> applicabilityRules = new ArrayList();
+    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList();
 
     protected TableItemDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);

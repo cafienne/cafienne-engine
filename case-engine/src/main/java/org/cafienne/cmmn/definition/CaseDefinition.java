@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
  * Parsed structure of a case definition (a top-level &lt;case&gt; element within a &lt;definitions&gt; document).
  */
 public class CaseDefinition extends Definition implements TaskImplementationContract {
-    private final Collection<CaseRoleDefinition> caseRoles = new ArrayList<>();
+    private final Collection<CaseRoleDefinition> caseRoles = new ArrayList();
     private CaseFileDefinition caseFileModel;
     private CasePlanDefinition casePlanModel;
 

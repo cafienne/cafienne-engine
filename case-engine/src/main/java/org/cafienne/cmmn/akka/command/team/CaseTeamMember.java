@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class CaseTeamMember implements AkkaSerializable {
 
     private String userId;
-    private Set<String> roles = new HashSet<>();
+    private Set<String> roles = new HashSet();
 
     private enum Fields {
         userId, roles

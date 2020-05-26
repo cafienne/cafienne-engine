@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends PlanFragment<T> {
-    private final Collection<PlanItem> planItems = new ArrayList<PlanItem>();
+    private final Collection<PlanItem> planItems = new ArrayList();
 
     // Below are two flags that are required for the checking of stage completion
     private final boolean autoCompletes; // This is the flag set in the definition.

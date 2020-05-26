@@ -15,7 +15,7 @@ import org.cafienne.cmmn.definition.Definition;
 import org.w3c.dom.Element;
 
 public class SentryDefinition extends CMMNElementDefinition {
-    private final Collection<OnPartDefinition> onParts = new ArrayList<OnPartDefinition>();
+    private final Collection<OnPartDefinition> onParts = new ArrayList();
     private IfPartDefinition ifPart;
 
     public SentryDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {

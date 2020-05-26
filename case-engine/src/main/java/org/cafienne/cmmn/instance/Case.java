@@ -46,7 +46,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * List of plan items in the case.
      */
-    private Collection<PlanItem> planItems = new ArrayList<>();
+    private Collection<PlanItem> planItems = new ArrayList();
     /**
      * Pointer to the case file instance of the case.
      */
@@ -296,7 +296,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public Collection<DiscretionaryItem> getDiscretionaryItems() {
         addDebugInfo(() -> "Retrieving discretionary items of " + this);
-        Collection<DiscretionaryItem> items = new ArrayList<DiscretionaryItem>();
+        Collection<DiscretionaryItem> items = new ArrayList();
         getCasePlan().retrieveDiscretionaryItems(items);
         addDebugInfo(() -> {
             StringBuilder itemsString = new StringBuilder();

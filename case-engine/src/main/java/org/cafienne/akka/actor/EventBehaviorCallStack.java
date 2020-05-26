@@ -31,7 +31,7 @@ class EventBehaviorCallStack {
     private class Frame {
         private final ModelEvent event;
         private final Frame parent;
-        private final List<Frame> children = new ArrayList<>();
+        private final List<Frame> children = new ArrayList();
         private final int depth;
         private String mainIndent;
         private String subIndent;

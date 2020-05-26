@@ -17,7 +17,7 @@ import java.util.Set;
 @Manifest
 public class TeamMemberAdded extends CaseTeamEvent {
     private final String userId;
-    private final Set<String> roles = new HashSet<String>();
+    private final Set<String> roles = new HashSet();
 
     public TeamMemberAdded(Case caseInstance, CaseTeamMember member) {
         super(caseInstance);

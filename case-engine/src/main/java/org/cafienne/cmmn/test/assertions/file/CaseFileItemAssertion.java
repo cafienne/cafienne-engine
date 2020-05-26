@@ -13,7 +13,7 @@ import java.util.List;
 
 public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     private final String path;
-    private final PublishedEventsAssertion<CaseFileEvent> events = new PublishedEventsAssertion<>(new ArrayList<>());
+    private final PublishedEventsAssertion<CaseFileEvent> events = new PublishedEventsAssertion(new ArrayList());
     private final CaseFileAssertion caseFileAssertion;
     private final boolean isArrayElement;
     private int indexInArray = -1;

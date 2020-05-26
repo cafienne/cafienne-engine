@@ -30,8 +30,8 @@ public class SMTPCallDefinition extends SubProcessDefinition {
     private final String bodyTemplate;
     private final String sender;
     private final String replyTo;
-    private final List<Recipient> recipients = new ArrayList<>();
-    private final List<Attachment> attachments = new ArrayList<>();
+    private final List<Recipient> recipients = new ArrayList();
+    private final List<Attachment> attachments = new ArrayList();
     private final String bodyType;
 
     public SMTPCallDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {

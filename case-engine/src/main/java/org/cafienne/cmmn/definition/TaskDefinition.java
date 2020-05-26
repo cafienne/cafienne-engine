@@ -21,9 +21,9 @@ import org.w3c.dom.Element;
 
 public abstract class TaskDefinition<T extends TaskImplementationContract> extends PlanItemDefinitionDefinition {
     private final boolean isBlocking;
-    private final Map<String, TaskInputParameterDefinition> inputs = new LinkedHashMap<String, TaskInputParameterDefinition>();
-    private final Map<String, TaskOutputParameterDefinition> outputs = new LinkedHashMap<String, TaskOutputParameterDefinition>();
-    private final Collection<ParameterMappingDefinition> mappings = new ArrayList<ParameterMappingDefinition>();
+    private final Map<String, TaskInputParameterDefinition> inputs = new LinkedHashMap();
+    private final Map<String, TaskOutputParameterDefinition> outputs = new LinkedHashMap();
+    private final Collection<ParameterMappingDefinition> mappings = new ArrayList();
 
     protected TaskDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);

@@ -17,8 +17,8 @@ import org.w3c.dom.Element;
  */
 public class CaseTeam {
 
-    private final Collection<CaseTeamMember> members = new ArrayList<>();
     private final Case caseInstance;
+    private final Collection<CaseTeamMember> members = new ArrayList();
 
     /**
      * Create a new, empty case team.
@@ -155,7 +155,7 @@ public class CaseTeam {
     }
 
     public org.cafienne.cmmn.akka.command.team.CaseTeam toCaseTeamTO() {
-        List<org.cafienne.cmmn.akka.command.team.CaseTeamMember> members = new ArrayList<>();
+        List<org.cafienne.cmmn.akka.command.team.CaseTeamMember> members = new ArrayList();
         this.getMembers().forEach(teamMember -> members.add(new org.cafienne.cmmn.akka.command.team.CaseTeamMember(teamMember.getUserId(), teamMember.getRoles().stream().map(CaseRoleDefinition::getName).collect(Collectors.toSet()))));
         return new org.cafienne.cmmn.akka.command.team.CaseTeam(members);
     }

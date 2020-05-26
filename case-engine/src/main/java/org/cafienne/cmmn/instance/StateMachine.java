@@ -17,8 +17,8 @@ import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
  * Simple state machine logic, with an indirection to figure out where we are and where we go
  */
 class StateMachine {
-    private final Map<State, Map<Transition, Target>> transitions = new HashMap<State, Map<Transition, Target>>();
-    private final Map<State, Target> states = new HashMap<State, Target>();
+    private final Map<State, Map<Transition, Target>> transitions = new HashMap();
+    private final Map<State, Target> states = new HashMap();
     final Transition entryTransition;
     final Transition exitTransition;
     final Transition terminationTransition;
@@ -75,7 +75,7 @@ class StateMachine {
     private Map<Transition, Target> getTransitions(State state) {
         Map<Transition, Target> stateTransitions = transitions.get(state);
         if (stateTransitions == null) {
-            stateTransitions = new HashMap<>();
+            stateTransitions = new HashMap();
             transitions.put(state, stateTransitions);
         }
         return stateTransitions;

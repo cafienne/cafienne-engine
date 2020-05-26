@@ -29,8 +29,8 @@ import java.util.Map;
 public class WorkflowTaskDefinition extends CMMNElementDefinition implements TaskImplementationContract {
     private final static Logger logger = LoggerFactory.getLogger(WorkflowTaskDefinition.class);
 
-    private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap<>();
-    private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap<>();
+    private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap();
+    private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap();
     private final ValueMap taskModel;
     private final DueDateDefinition dueDate;
     private final AssignmentDefinition assignment;

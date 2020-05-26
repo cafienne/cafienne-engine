@@ -106,7 +106,7 @@ public class TestGetListGetDetails {
             testCase.getEventListener().awaitPlanItemState("GetList", State.Completed);
 
             // Now wait until we have the 3 GetDetails tasks getting completed; we keep track of them in a Set
-            final Set<PlanItemTransitioned> completedGetDetailsTasks = new HashSet<>();
+            final Set<PlanItemTransitioned> completedGetDetailsTasks = new HashSet();
             testCase.getEventListener().awaitPlanItemTransitioned("GetDetails", event -> {
                 if (event.getCurrentState().equals(State.Completed)) {
                     // Found a new one! Register it in the Set ...

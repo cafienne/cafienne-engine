@@ -91,7 +91,7 @@ public class MakePlanItemTransition extends CaseCommand {
             }
             caseInstance.makePlanItemTransition(planItem, transition);
         } else {
-            List<PlanItem> planItemsByName = new ArrayList<PlanItem>();
+            List<PlanItem> planItemsByName = new ArrayList();
             caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(planItemName)).forEach(p -> {
                 // System.out.println("Preparing plan item " + p + " with state " + p.getState() + " for transition " + transition);
                 planItemsByName.add(p);

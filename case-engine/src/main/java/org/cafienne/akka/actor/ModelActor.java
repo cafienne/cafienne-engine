@@ -71,7 +71,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Registration of listeners that are interacting with (other) models through this case.
      */
-    private final Map<String, Responder> responseListeners = new HashMap<>();
+    private final Map<String, Responder> responseListeners = new HashMap();
 
     /**
      * CaseScheduler is a lightweight manager to schedule asynchronous works for this Case instance.

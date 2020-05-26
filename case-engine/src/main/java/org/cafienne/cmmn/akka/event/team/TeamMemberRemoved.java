@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 @Manifest
 public class TeamMemberRemoved extends CaseTeamEvent {
     private final String userId;
-    private final Set<String> roles = new HashSet<String>();
+    private final Set<String> roles = new HashSet();
 
     public TeamMemberRemoved(Case caseInstance, CaseTeamMember member) {
         super(caseInstance);

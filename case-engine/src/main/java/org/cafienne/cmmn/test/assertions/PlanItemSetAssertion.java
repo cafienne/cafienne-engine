@@ -9,7 +9,7 @@ import org.cafienne.cmmn.instance.State;
  * Some assertions for collections of plan items with the same name in a stage (typically used when a plan item is repeatable)
  */
 public class PlanItemSetAssertion {
-    private final List<PlanItemAssertion> planItems = new ArrayList<PlanItemAssertion>();
+    private final List<PlanItemAssertion> planItems = new ArrayList();
     private final String identifier;
 
     PlanItemSetAssertion(String identifier) {

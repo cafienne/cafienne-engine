@@ -17,7 +17,7 @@ import java.util.Collection;
 
 public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?>> extends CMMNElement<T> {
     protected final Criterion criterion;
-    protected Collection<I> connectedItems = new ArrayList<>();
+    protected Collection<I> connectedItems = new ArrayList();
 
     protected OnPart(Criterion criterion, T definition) {
         super(criterion, definition);

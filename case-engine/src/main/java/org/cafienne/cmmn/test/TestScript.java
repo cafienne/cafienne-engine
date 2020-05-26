@@ -54,7 +54,7 @@ public class TestScript {
 
     private boolean testCompleted;
 
-    private Deque<ModelTestCommand> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
+    private Deque<ModelTestCommand> commands = new ArrayDeque(); // We need to be able to add elements both at front and end; and execute always the front element
     private ModelTestCommand current; // current test step
     private int actionNumber = 0; // current action number
 
@@ -132,7 +132,7 @@ public class TestScript {
     public static CaseTeam getCaseTeam(TenantUser... users) {
         CaseTeam team = new CaseTeam();
         Arrays.asList(users).forEach(user -> {
-            Set<String> roles = new HashSet<>();
+            Set<String> roles = new HashSet();
             user.roles().forall(role -> roles.add(role));
             team.getMembers().add(new CaseTeamMember(user.id(), roles));
         });

@@ -8,7 +8,7 @@ import java.util.List;
 
 class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
     private final I item;
-    private final List<StandardEvent> transitions = new ArrayList<>();
+    private final List<StandardEvent> transitions = new ArrayList();
 
     TransitionPublisher(I item) {
         this.item = item;
@@ -21,8 +21,8 @@ class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
     /**
      * Outgoing criteria (i.e., for plan items interested in our transitions)
      */
-    private final List<P> connectedEntryCriteria = new ArrayList<>();
-    private final List<P> connectedExitCriteria = new ArrayList<>();
+    private final List<P> connectedEntryCriteria = new ArrayList();
+    private final List<P> connectedExitCriteria = new ArrayList();
 
     public void connectOnPart(P onPart) {
         if (onPart.getCriterion().isEntryCriterion()) {

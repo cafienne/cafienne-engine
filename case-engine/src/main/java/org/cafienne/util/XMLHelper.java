@@ -134,7 +134,7 @@ public class XMLHelper {
      */
     public static List<Element> getChildrenWithTagName(Element element, String tagName) {
         NodeList nList = element.getElementsByTagName(tagName);
-        List<Element> list = new ArrayList<Element>();
+        List<Element> list = new ArrayList();
         int listLength = nList.getLength();
         for (int i = 0; i < listLength; i++) {
             Element listElement = (Element) nList.item(i);

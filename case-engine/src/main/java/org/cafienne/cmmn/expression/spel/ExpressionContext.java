@@ -44,7 +44,7 @@ class UserWrapper {
     UserWrapper(TenantUser user) {
         this.id = user.id();
         this.name = user.name();
-        this.roles = new HashSet<>(scala.collection.JavaConverters.seqAsJavaList(user.roles()));
+        this.roles = new HashSet(scala.collection.JavaConverters.seqAsJavaList(user.roles()));
         this.email = user.email();
     }
 }

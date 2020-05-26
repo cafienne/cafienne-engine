@@ -137,7 +137,7 @@ public class StringValue extends PrimitiveValue<String> {
             @Override
             public Iterator<String> getPrefixes(String namespaceURI) {
                 // TODO Auto-generated method stub
-                return new Vector<String>().iterator();
+                return new Vector().iterator();
             }
 
             @Override

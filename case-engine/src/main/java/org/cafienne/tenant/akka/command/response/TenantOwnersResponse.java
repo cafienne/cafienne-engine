@@ -27,7 +27,7 @@ public class TenantOwnersResponse extends TenantResponse {
     public TenantOwnersResponse(ValueMap json) {
         super(json);
         this.name = readField(json, Fields.name);
-        this.owners = new HashSet<>();
+        this.owners = new HashSet();
         readArray(json, Fields.owners).getValue().forEach(v -> owners.add(String.valueOf(v.getValue())));
     }
 

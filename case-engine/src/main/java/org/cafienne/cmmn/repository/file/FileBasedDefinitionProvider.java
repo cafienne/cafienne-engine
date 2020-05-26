@@ -132,7 +132,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      * @return
      */
     public List<String> listDefinitions() {
-        List<String> fileNames = new ArrayList<>();
+        List<String> fileNames = new ArrayList();
         try {
             File[] files = new File(getDeployDirectory()).listFiles();
             for (int i = 0; i < files.length; i++) {
