@@ -353,8 +353,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         State oldState = event.getHistoryState();
         addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
 
-        // Check stage completion
-        if (stage != null) {
+        // Check stage completion (only done for transitions into semi terminal state)
+        if (stage != null && newState.isSemiTerminal()) {
             stage.tryCompletion(event);
         }
     }
