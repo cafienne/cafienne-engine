@@ -127,15 +127,15 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   @Path("/{tenant}/users")
   @POST
   @Operation(
-    summary = "Register the user as a case participant",
+    summary = "Register a tenant user",
     description = "Add a user to the tenant, with the specified roles",
     tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "tenant", description = "The tenant to add the user to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Participant registered successfully", responseCode = "204"),
-      new ApiResponse(description = "Participant information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Tenant user registered successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
@@ -162,16 +162,16 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   @Path("/{tenant}/users/{userId}/disable")
   @PUT
   @Operation(
-    summary = "Disable the user as a case participant",
-    description = "Disable the user as a case participant",
+    summary = "Disable the tenant user",
+    description = "Disable the tenant user",
     tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "userId", description = "Id of user to disable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "tenant", description = "The tenant in which to disable the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Participant disabled successfully", responseCode = "204"),
-      new ApiResponse(description = "Participant information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Tenant user disabled successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
@@ -188,16 +188,16 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   @Path("/{tenant}/users/{userId}/enable")
   @PUT
   @Operation(
-    summary = "Enable the user as a case participant",
-    description = "Enable the user as a case participant",
+    summary = "Enable the tenant user",
+    description = "Enable the tenant user",
     tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "userId", description = "Id of user to enable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "tenant", description = "The tenant in which to enable the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Participant enabled successfully", responseCode = "204"),
-      new ApiResponse(description = "Participant information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Tenant user enabled successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )

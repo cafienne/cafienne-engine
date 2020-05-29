@@ -1,4 +1,4 @@
-package org.cafienne.service.api.projection.participants
+package org.cafienne.service.api.projection.tenant
 
 import akka.Done
 import akka.persistence.query.Offset

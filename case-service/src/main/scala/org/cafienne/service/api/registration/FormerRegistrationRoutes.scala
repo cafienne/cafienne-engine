@@ -17,14 +17,14 @@ import org.cafienne.service.api.tenant.route.TenantRoute
 @Api(tags = Array("registration"))
 @Path("/registration")
 class FormerRegistrationRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
-  val tenantAdministrationRoute = new FormerTenantAdministrationRoute()(userCache)
-  val participants = new FormerTenantUsersAdministrationRoute(userQueries)(userCache)
+  val tenantOwnersRoute = new FormerTenantAdministrationRoute()(userCache)
+  val tenantUsersRoute = new FormerTenantUsersAdministrationRoute(userQueries)(userCache)
   val platform = new FormerPlatformAdministrationRoute()(userCache)
 
   override def routes = pathPrefix("registration") {
     platform.routes ~
-    tenantAdministrationRoute.routes ~
-    participants.routes
+    tenantOwnersRoute.routes ~
+    tenantUsersRoute.routes
   }
 
 }
