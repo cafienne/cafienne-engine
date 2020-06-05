@@ -7,10 +7,11 @@
  */
 package org.cafienne.akka.actor.router
 
-import akka.actor.{Actor, ActorPath, InvalidActorNameException, Terminated}
+import akka.actor.{Actor, ActorPath, ActorRef, InvalidActorNameException, Props, Terminated}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.akka.actor.command.response.CommandFailure
+import org.cafienne.timerservice.TimerService
 
 /**
   * Base class for routing model commands into the case system
@@ -48,7 +49,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
         val deepInfo = t match {
           case i: InvalidActorNameException => "Invalid identifier in message of type " + m.getClass.getSimpleName + "\n" + i.message
           case other => {
-            // This is a pretty weird situation; right now no idea why this would happend, but still logging.
+            // This is a pretty weird situation; right now no idea why this would happened, but still logging.
             logger.error("Unexpected routing failure in handling command of type " + m.getClass.getName + ": " + m.toJson, other)
             "Could not send message of type " + m.getClass.getSimpleName + " into the case system. An exception of type " + other.getClass.getName + " happened. Check the engine logs for more information."
           }

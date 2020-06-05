@@ -7,18 +7,15 @@
  */
 package org.cafienne.cmmn.instance;
 
-import akka.actor.Cancellable;
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.TimerEventDefinition;
+import org.cafienne.timerservice.akka.command.CancelTimer;
+import org.cafienne.timerservice.akka.command.SetTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 
 public class TimerEvent extends PlanItem<TimerEventDefinition> {
     private final static Logger logger = LoggerFactory.getLogger(TimerEvent.class);
@@ -27,44 +24,27 @@ public class TimerEvent extends PlanItem<TimerEventDefinition> {
         super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
 
-    private Cancellable schedule;
     private Instant targetMoment = null;
-
-    private Cancellable scheduleWork(Instant moment, MakePlanItemTransition command) {
-        // Note: this code needs some refactoring
-        // - We should not use the system scheduler (dispatcher), but create our own (?)
-        // - We should leverage more of java.time (i.e., not rely on System.currentTimeMillis, but get a java.time.Duration instead)
-        long millis = moment.toEpochMilli();
-        long delay = millis - System.currentTimeMillis();
-
-        FiniteDuration duration = Duration.create(delay, TimeUnit.MILLISECONDS);
-        Runnable job = () -> {
-            addDebugInfo(() -> "Raising timer event " + getName() + "/" + getId());
-            getCaseInstance().askCase(command, failure -> // Is logging an error sufficient? Or should we go Fault?!
-                logger.error("Could not make event " + getId() + " occur\n" + failure));
-        };
-
-        Cancellable schedule = getCaseInstance().getScheduler().schedule(duration, job);
-        return schedule;
-    }
 
     public void updateState(TimerSet event) {
         this.targetMoment = event.getTargetMoment();
-        if (schedule == null) {
-            setSchedule();
-        }
+        setSchedule();
     }
 
     private void setSchedule() {
-//        System.out.println("\n\n\n setting schedule\n\n");
-        MakePlanItemTransition command = new MakePlanItemTransition(getCaseInstance().getCurrentUser(), getCaseInstance().getId(), this.getId(), Transition.Occur, this.getName());
-        schedule = scheduleWork(targetMoment, command);
+        getCaseInstance().askTimerService(new SetTimer(getCaseInstance().getCurrentUser(), this, targetMoment), left -> {
+            logger.error("Failed to set timer", left.exception());
+            addDebugInfo(() -> "Failed to set timer", left.toJson());
+            makeTransition(Transition.Fault);
+        });
     }
 
     private void removeSchedule() {
-        if (schedule != null) {
-            schedule.cancel();
-        }
+        getCaseInstance().askTimerService(new CancelTimer(getCaseInstance().getCurrentUser(), this), left -> {
+            logger.error("Failed to cancel timer", left.exception());
+            addDebugInfo(() -> "Failed to cancel timer", left.toJson());
+            makeTransition(Transition.Fault);
+        });
     }
 
     @Override
@@ -74,12 +54,10 @@ public class TimerEvent extends PlanItem<TimerEventDefinition> {
 
     @Override
     protected void completeInstance() {
-        removeSchedule();
     }
 
     @Override
     protected void suspendInstance() {
-//        System.out.println("SUSPENDING SCHEDULE");
         // Suspending is done by simply removing the schedule. If we are resumed, we simply create a new schedule.
         removeSchedule();
     }

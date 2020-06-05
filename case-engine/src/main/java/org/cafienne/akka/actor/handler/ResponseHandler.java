@@ -78,7 +78,8 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
             // We have events to persist, but let's check if it is only debug events or more.
             if (! hasOnlyDebugEvents()) {
                 // Change the last modified moment of this actor and publish an event about it
-                addEvent(actor.createLastModifiedEvent(Instant.now()));
+                E lastModifiedEvent = actor.createLastModifiedEvent(Instant.now());
+                if (lastModifiedEvent != null) addEvent(lastModifiedEvent);
             }
 
             // Now persist the events in one shot

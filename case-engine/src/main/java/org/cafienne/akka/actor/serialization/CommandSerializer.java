@@ -18,7 +18,9 @@ import org.cafienne.tenant.akka.command.platform.BootstrapTenant;
 import org.cafienne.tenant.akka.command.platform.CreateTenant;
 import org.cafienne.tenant.akka.command.platform.DisableTenant;
 import org.cafienne.tenant.akka.command.platform.EnableTenant;
-import org.cafienne.tenant.akka.command.EnableTenantUser;
+import org.cafienne.timerservice.akka.command.CancelTimer;
+import org.cafienne.timerservice.akka.command.SetTimer;
+import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 
 public class CommandSerializer extends AkkaCaseObjectSerializer {
     static {
@@ -27,6 +29,7 @@ public class CommandSerializer extends AkkaCaseObjectSerializer {
         addProcessActorCommands();
         addTenantCommands();
         addPlatformCommands();
+        addTimerCommands();
     }
 
     private static void addCaseCommands() {
@@ -82,5 +85,11 @@ public class CommandSerializer extends AkkaCaseObjectSerializer {
         addManifestWrapper(CreateTenant.class, CreateTenant::new);
         addManifestWrapper(DisableTenant.class, DisableTenant::new);
         addManifestWrapper(EnableTenant.class, EnableTenant::new);
+    }
+
+    private static void addTimerCommands() {
+        addManifestWrapper(SetTimer.class, SetTimer::new);
+        addManifestWrapper(CancelTimer.class, CancelTimer::new);
+        addManifestWrapper(TimerServiceResponse.class, TimerServiceResponse::new);
     }
 }

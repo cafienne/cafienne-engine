@@ -45,7 +45,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
      * Runs the case security checks on user context and case tenant.
      */
     @Override
-    final protected InvalidCommandException runSecurityChecks() {
+    protected InvalidCommandException runSecurityChecks() {
         InvalidCommandException issue = null;
         // Security checks:
         // - need a proper user.
@@ -149,7 +149,10 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
             // Change the last modified moment of this case; update it in the response, and publish an event about it
             Instant lastModified = Instant.now();
-            addEvent(actor.createLastModifiedEvent(lastModified));
+            E lastModifiedEvent = actor.createLastModifiedEvent(lastModified);
+            if (lastModifiedEvent != null) {
+                addEvent(lastModifiedEvent);
+            }
             if (response != null) {
                 response.setLastModified(lastModified);
             }
