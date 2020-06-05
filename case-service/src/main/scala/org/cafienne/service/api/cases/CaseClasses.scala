@@ -32,8 +32,8 @@ final case class CaseInstance(id: String,
     v.putRaw("createdBy", createdBy)
     v.putRaw("lastModified", lastModified)
     v.putRaw("modifiedBy", modifiedBy)
-    v.putRaw("caseInput", modifiedBy)
-    v.putRaw("caseOutput", modifiedBy)
+    v.putRaw("caseInput", "")
+    v.putRaw("caseOutput", "")
     v.putRaw("lastModifiedBy", modifiedBy) // Temporary compatibility
     v
   }

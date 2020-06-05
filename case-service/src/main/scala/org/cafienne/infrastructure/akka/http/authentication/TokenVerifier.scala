@@ -71,7 +71,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
         CaseSystem.health.idp.hasFailed(failure)
         throw  failure
       }
-      case other => {
+      case other: Throwable => {
         CaseSystem.health.idp.isOK
         other match {
           case nje: BadJWTException =>

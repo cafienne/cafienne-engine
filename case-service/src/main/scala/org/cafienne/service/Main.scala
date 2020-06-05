@@ -148,7 +148,9 @@ object Main extends App {
     import org.h2.tools.Server
 
     if (CaseSystem.config.queryDB.debug) {
-      Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start()
+      val port = "8082"
+      system.log.warning("Starting H2 Web Client on port " + port)
+      Server.createWebServer("-web", "-webAllowOthers", "-webPort", port).start()
     }
   }
 }

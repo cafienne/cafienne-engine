@@ -32,7 +32,6 @@ public abstract class PlanItemEvent extends CaseEvent {
         planItemId, type, planitem, seqNo, index
     }
 
-    @Deprecated
     protected PlanItemEvent(PlanItem planItem) {
         this(planItem.getCaseInstance(), planItem.getId(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
     }

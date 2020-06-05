@@ -49,11 +49,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
      * @param event
      */
     void tryCompletion(PlanItemTransitioned event) {
-        // Stage completion check is only done for transitions into semi terminal state, so if not we can immediately return.
-        if (! event.getCurrentState().isSemiTerminal()) {
-            return;
-        }
-
         // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
         if (this.getState().isSemiTerminal()) {
             addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);

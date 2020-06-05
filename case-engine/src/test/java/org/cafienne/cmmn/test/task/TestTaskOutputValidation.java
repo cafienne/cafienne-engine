@@ -18,6 +18,7 @@ import org.cafienne.humantask.akka.command.ClaimTask;
 import org.cafienne.humantask.akka.command.CompleteHumanTask;
 import org.cafienne.humantask.akka.command.SaveTaskOutput;
 import org.cafienne.humantask.akka.command.ValidateTaskOutput;
+import org.cafienne.humantask.akka.event.HumanTaskOutputSaved;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -139,18 +140,17 @@ public class TestTaskOutputValidation {
             });
 
             /**
-             * ValidateTaskOutput - Task output validation should be ok with decision approved
+             * ValidateTaskOutput - Task output validation should be ok with decision approved, and it should not lead to new events
              */
-            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
-                testCase.getEventListener().getNewEvents().assertSize(0);
-            });
+            testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> action.getEvents().assertSize(0));
 
             /**
-             * SaveTaskOutput - User should be able to save the task with invalid output
+             * SaveTaskOutput - User should be able to save the task with invalid output, and it should lead to new events
              */
             testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
 //                casePlan.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
-                testCase.getEventListener().getNewEvents().assertNotEmpty();
+                action.getEvents().assertEventType(HumanTaskOutputSaved.class, 1);
+                action.getEvents().assertNotEmpty();
             });
 
             /**

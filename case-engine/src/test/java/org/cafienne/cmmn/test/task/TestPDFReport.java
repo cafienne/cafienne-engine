@@ -12,8 +12,11 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
+import org.cafienne.processtask.akka.event.ProcessCompleted;
+import org.cafienne.processtask.akka.event.ProcessStarted;
 import org.junit.Test;
 
 import java.io.*;
@@ -23,7 +26,7 @@ public class TestPDFReport {
     private final TenantUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
-    public void testReportGeneration() throws UnsupportedEncodingException, FileNotFoundException, IOException, JsonProcessingException {
+    public void testReportGeneration() throws IOException {
         String caseInstanceId = "PDFReport";
         TestScript testCase = new TestScript("PDFReport");
 
@@ -47,13 +50,16 @@ public class TestPDFReport {
             testCase.getEventListener().awaitPlanItemState(reportTaskId, State.Completed);
 
             // TODO: perhaps this test should test the actual PDF report contents???
-            new CaseAssertion(action).assertCaseFileItem("Request/pdfReportData").assertValueType(StringValue.class);
+            testCase.insertStep(new PingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem("Request/pdfReportData").assertValueType(StringValue.class));
+
+            // Assert that the ProcessActor has published events
+            testCase.getEventListener().getEvents().assertEventType(ProcessStarted.class, 1).assertEventType(ProcessCompleted.class, 1);
         });
 
         testCase.runTest();
     }
 
-    private static String getCustomerOrders() throws UnsupportedEncodingException, FileNotFoundException {
+    private static String getCustomerOrders() {
         byte[] customerBytes = getFileContent("testdefinition/task/report/Customers.json");
         byte[] orderBytes = getFileContent("testdefinition/task/report/Orders.json");
 
@@ -108,7 +114,7 @@ public class TestPDFReport {
      * @return
      * @throws FileNotFoundException
      */
-    private static byte[] getFileContent(String fileName) throws FileNotFoundException {
+    private static byte[] getFileContent(String fileName) {
         InputStream inputStream = TestPDFReport.class.getClassLoader().getResourceAsStream(fileName);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

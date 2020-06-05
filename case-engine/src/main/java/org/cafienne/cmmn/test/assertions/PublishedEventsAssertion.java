@@ -99,8 +99,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      */
     public CaseFileEvent assertCaseFileEvent(String path, EventFilter<CaseFileEvent> filter) {
 //        logger.debug("Searching for case file event on path "+path);
-        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, e -> {
-            CaseFileEvent event = (CaseFileEvent) e;
+        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, event -> {
             boolean pathMatches = path.equals(event.getPath()) || path.matches(cleanPath(event.getPath()));
             return (! (!pathMatches || !filter.matches(event)));
         });

@@ -13,6 +13,7 @@ import org.cafienne.cmmn.akka.command.MakeCaseTransition;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.team.*;
+import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.test.TestScript;
@@ -91,7 +92,7 @@ public class Role {
         // Successfully remove a member that is inside.
         testCase.addStep(new RemoveTeamMember(admin, caseInstanceId, "user1"), casePlan -> {
             casePlan.print();
-            // TODO: Add validation that the member is actually remove from the team.
+            casePlan.getEvents().assertEvent("Expecting TeamMemberRemoved event for 'user1'", TeamMemberRemoved.class, e -> e.getUserId().equals("user1"));
         });
 
         testCase.runTest();
