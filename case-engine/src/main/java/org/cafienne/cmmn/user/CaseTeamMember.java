@@ -27,6 +27,7 @@ public class CaseTeamMember {
     CaseTeamMember(CaseTeam team, String userId, Set<String> roles, Case caseInstance) {
         this.team = team;
         this.userId = userId;
+        roles.add("");// Always add empty role for members
         for (String roleName : roles) {
             CaseRoleDefinition role = caseInstance.getDefinition().getCaseRole(roleName);
             this.roles.add(role);

@@ -4,6 +4,7 @@ import akka.actor.Cancellable;
 import akka.actor.PoisonPill;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.RecoveryCompleted;
+import akka.persistence.SnapshotMetadata;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
@@ -22,6 +23,7 @@ import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
+import org.cafienne.timerservice.akka.command.TimerServiceCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
@@ -179,42 +181,51 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     @Override
-    public final Receive createReceiveRecover() {
-        return receiveBuilder().match(Object.class, event -> {
-            // Steps:
-            // 1. Set tenant if not yet available
-            // 2. Check whether this is a valid type of ModelEvent for this type of ModelActor
-            //    a. If so, run the recovery handler for it
-            //    b. Ignore DebugEvents and RecoveryCompleted message
-            //    c. In all other cases print warn statements, with a special check for other ModelEvents
+    public Receive createReceiveRecover() {
+        return receiveBuilder().match(Object.class, this::handleRecovery).build();
+    }
 
-            // Step 1
-            if (tenant == null && event instanceof ModelEvent) {
-                tenant = ((ModelEvent) event).tenant;
-            }
-            // Step 2
-            if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
-                // Step 2a.
-                runHandler(createRecoveryHandler((E) event));
-            } else if (event instanceof DebugEvent) {
-                // Step 2b.
-                // No recovery from debug events ...
-            } else if (event instanceof RecoveryCompleted) {
-                // Step 2b.
-                logger.info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
-            } else if (event instanceof ModelEvent) {
-                // Step 2c. Weird: ModelEvents in recovery of other models??
-                logger.warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
-            } else {
-                // Step 2c.
-                logger.warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
-            }
-        }).build();
+    protected void handleRecovery(Object event) {
+        // Steps:
+        // 1. Set tenant if not yet available
+        // 2. Check whether this is a valid type of ModelEvent for this type of ModelActor
+        //    a. If so, run the recovery handler for it
+        //    b. Ignore DebugEvents and RecoveryCompleted message
+        //    c. In all other cases print warn statements, with a special check for other ModelEvents
+
+        // Step 1
+        if (tenant == null && event instanceof ModelEvent) {
+            tenant = ((ModelEvent) event).tenant;
+        }
+        // Step 2
+        if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
+            // Step 2a.
+            runHandler(createRecoveryHandler((E) event));
+        } else if (event instanceof DebugEvent) {
+            // Step 2b.
+            // No recovery from debug events ...
+        } else if (event instanceof RecoveryCompleted) {
+            // Step 2b.
+            recoveryCompleted();
+        } else if (event instanceof ModelEvent) {
+            // Step 2c. Weird: ModelEvents in recovery of other models??
+            logger.warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
+        } else {
+            // Step 2c.
+            logger.warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
+        }
+    }
+
+    protected void recoveryCompleted() {
+        logger.info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
     }
 
     @Override
     public final Receive createReceive() {
         return receiveBuilder().match(Object.class, msg -> {
+
+//            System.out.println(this.getClass().getSimpleName() + ": Received a msg of type " + msg.getClass().getSimpleName());
+
             // Steps:
             // 1. Remove self cleaner
             // 2. Handle message
@@ -230,12 +241,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     private Cancellable selfCleaner = null;
 
-    private void clearSelfCleaner() {
+    protected void clearSelfCleaner() {
         // Receiving message should reset the self-cleaning timer
         if (selfCleaner != null) selfCleaner.cancel();
     }
 
-    private void enableSelfCleaner() {
+    protected void enableSelfCleaner() {
         // Now set the new selfCleaner
         long idlePeriod = CaseSystem.config().actor().idlePeriod();
         FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
@@ -265,6 +276,8 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                 return new NotConfiguredHandler(this, (ModelResponse) msg);
             }
             return createResponseHandler((ModelResponse) msg);
+        } else if (msg.getClass().getPackage().equals(SnapshotMetadata.class.getPackage())) {
+            return createAkkaSystemMessageHandler(msg);
         } else {
             return createInvalidMessageHandler(msg);
         }
@@ -332,6 +345,15 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     /**
+     * Handler for akka system messages (e.g. SnapshotOffer, SnapshotSaveSuccess, RecoveryCompleted, etc)
+     * @param message
+     * @return
+     */
+    protected AkkaSystemMessageHandler createAkkaSystemMessageHandler(Object message) {
+        return new AkkaSystemMessageHandler(this, message);
+    }
+
+    /**
      * Basic handler of events upon recovery of this ModelActor.
      * Be careful in overriding it.
      *
@@ -391,6 +413,14 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     public void askProcess(ProcessCommand command, CommandFailureListener left, CommandResponseListener... right) {
+        if (recoveryRunning()) {
+            return;
+        }
+        responseListeners.put(command.getMessageId(), new Responder(left, right));
+        CaseSystem.router().tell(command, self());
+    }
+
+    public void askTimerService(TimerServiceCommand command, CommandFailureListener left, CommandResponseListener... right) {
         if (recoveryRunning()) {
             return;
         }

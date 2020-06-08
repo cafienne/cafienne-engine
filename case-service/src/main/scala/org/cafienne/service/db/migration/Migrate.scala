@@ -1,7 +1,7 @@
 package org.cafienne.service.db.migration
 
 import com.typesafe.scalalogging.Logger
-import org.cafienne.service.db.migration.versions.V1Migration
+import org.cafienne.service.db.migration.versions.{V1Migration, V1_1_5Migration}
 import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
 import org.slf4j.LoggerFactory
 import slick.migration.api.Migration
@@ -42,7 +42,7 @@ object Migrate extends QueryDbMigrationConfig {
 
   def migrateDatabase(): Unit = {
     try {
-      val flyway = SlickFlyway(db)(V1Migration.getMigrations).load()
+      val flyway = SlickFlyway(db)(V1Migration.getMigrations ++ V1_1_5Migration.getMigrations).load()
       flyway.migrate()
     } catch {
       case e: Exception => {

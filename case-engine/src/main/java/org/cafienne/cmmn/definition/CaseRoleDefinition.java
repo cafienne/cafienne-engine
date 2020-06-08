@@ -68,4 +68,12 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
     public boolean isSingleton() {
         return isSingleton;
     }
+
+    static void createEmptyDefinition(CaseDefinition caseDefinition) {
+        Element emptyXMLRole = caseDefinition.getElement().getOwnerDocument().createElement("caseRole");
+        caseDefinition.getElement().appendChild(emptyXMLRole);
+        emptyXMLRole.setAttribute("id", "all_across_empty_role");
+        emptyXMLRole.setAttribute("name", "");
+        emptyXMLRole.setAttribute("description", "");
+    }
 }

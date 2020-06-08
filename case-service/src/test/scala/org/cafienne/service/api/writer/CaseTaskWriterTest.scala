@@ -67,7 +67,7 @@ class CaseTaskWriterTest
 
       Thread.sleep(2000)
       eventually {
-        persistence.records.length shouldBe 5
+        persistence.records.length shouldBe 7
         persistence.records.exists(x => x.isInstanceOf[CaseInstance]) shouldBe (true)
       }
     }
