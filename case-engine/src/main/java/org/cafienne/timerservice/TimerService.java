@@ -86,23 +86,30 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         timers.put(job.timerId, new ScheduledTimer(job));
     }
 
-    private void removeTimer(String timerId) {
-        timers.get(timerId).cancel();
+    private void removeTimer(String timerId, boolean externalRequest) {
+        ScheduledTimer timer = timers.get(timerId);
+        if (externalRequest) {
+            logger.debug("Canceling timer " + timerId +" from case " + timer.request.caseInstanceId);
+        }
         storage.removeTimer(timerId);
-        storageChanged = true;
+        if (timer != null) {
+            timer.cancel();
+        } else {
+            logger.debug("Timer " + timerId + " is removed, but was not found in the schedule");
+        }
     }
 
     public TimerServiceResponse handle(SetTimer command) {
         TimerJob job = new TimerJob(command);
         setTimer(job);
         storage.addTimer(job);
-        saveSnapshot(storage);
+        saveTimerStorage("because new timer is set");
 
         return new TimerServiceResponse(command);
     }
 
     public TimerServiceResponse handle(CancelTimer command) {
-        removeTimer(command.timerId);
+        removeTimer(command.timerId, true);
         return new TimerServiceResponse(command);
     }
 
@@ -124,7 +131,15 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         }
     }
 
-    private boolean storageChanged = false;
+    void saveTimerStorage(String msg) {
+        if (storage.changed()) {
+            logger.debug("Storage changed, saving snapshot " + msg);
+            saveSnapshot(storage);
+            storage.saved();
+        } else {
+            logger.debug("Store was not changed and will not be saved " + msg);
+        }
+    }
 
     /**
      * Adds a thread that will check every now and then whether the timers have changed, and if so stores the snapshot.
@@ -133,56 +148,59 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         Runnable saveJob = () -> {
             try {
                 while (true) {
-                    FiniteDuration duration = Duration.create(10, TimeUnit.SECONDS);
+                    FiniteDuration duration = Duration.create(CaseSystem.config().timerService().persistDelay(), TimeUnit.SECONDS);
                     Thread.sleep(duration.toMillis());
-                    if (logger.isDebugEnabled()) {
-                        storage.getTimers().forEach(job -> {
-                            long waitAnother = job.moment.toEpochMilli() - Instant.now().toEpochMilli();
-                            logger.debug("Job[" + job.timerId + "] scheduled at " + job.moment +" (" + (waitAnother/1000) +" seconds)");
-                        });
-                    }
-                    if (storageChanged) {
-                        saveSnapshot(storage);
-                        storageChanged = false;
-                    } else {
-                        logger.debug("Storage did not change; checking again in " + duration);
-                    }
+                    saveTimerStorage("after period of " + duration);
+//                    if (logger.isDebugEnabled())
+//                    {
+//                        storage.getTimers().forEach(job -> {
+//                            long waitAnother = job.moment.toEpochMilli() - Instant.now().toEpochMilli();
+//                            logger.warn("Job[" + job.timerId + "] scheduled at " + job.moment +" (" + (waitAnother/1000) +" seconds)");
+//                        });
+//                    }
+//                    if (storageChanged) {
+//                    } else {
+//                        logger.warn("Storage did not change; checking again in " + duration);
+//                    }
                 }
             } catch (InterruptedException e) {
                 // Got interrupted. return
+                logger.debug("Received an interrupt; returning");
             }
         };
         new Thread(saveJob).start();
     }
 
     class ScheduledTimer {
-        final TimerJob event;
+        final TimerJob request;
         final Cancellable schedule;
 
-        ScheduledTimer(TimerJob event) {
-            this.event = event;
-            MakePlanItemTransition command = new MakePlanItemTransition(event.user, event.caseInstanceId, event.timerId, Transition.Occur, "");
+        ScheduledTimer(TimerJob request) {
+            this.request = request;
+            MakePlanItemTransition command = new MakePlanItemTransition(request.user, request.caseInstanceId, request.timerId, Transition.Occur, "");
 
             // Note: this code needs some refactoring
             // - We should not use the system scheduler (dispatcher), but create our own (?)
             // - We should leverage more of java.time (i.e., not rely on System.currentTimeMillis, but get a java.time.Duration instead)
-            long millis = event.moment.toEpochMilli();
+            long millis = request.moment.toEpochMilli();
             long delay = millis - System.currentTimeMillis();
 
             FiniteDuration duration = Duration.create(delay, TimeUnit.MILLISECONDS);
-//            System.out.println("Scheduling to run timer event " + event.timerId + " in " + (duration.length() / 1000) + " seconds from now");
+            if (logger.isDebugEnabled()) {
+//            System.out.println("Scheduling to run timer request " + request.timerId + " in " + (duration.length() / 1000) + " seconds from now");
+                logger.debug("Scheduling to run timer request " + request.timerId + " in " + (duration.length() / 1000) + " seconds from now");
+            }
             Runnable job = () -> {
-//                System.out.println("Raising timer event " + event.timerId);
-//                addDebugInfo(() -> "Raising timer event " + event.caseInstanceId + "/" + event.timerId);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Raising timer in case " + request.caseInstanceId+" for timer " + request.timerId + " on behalf of user " + request.user.id());
+                }
                 askCase(command, failure -> {
                     // Is logging an error sufficient? Or should we go Fault?!
-//                    System.out.println("Called back failure");
                     logger.error("Could not make event " + getId() + " occur\n" + failure);
                 }, success -> {
 //                    System.out.println("Called back ok");
                 });
-//                System.out.println("Removing timer");
-                removeTimer(event.timerId);
+                removeTimer(request.timerId, false);
             };
 
             schedule = getScheduler().schedule(duration, job);

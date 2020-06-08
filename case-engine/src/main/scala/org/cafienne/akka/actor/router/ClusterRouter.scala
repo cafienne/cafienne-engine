@@ -2,6 +2,7 @@ package org.cafienne.akka.actor.router
 
 import akka.actor.{ActorRef, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.cmmn.akka.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
@@ -9,6 +10,7 @@ import org.cafienne.processtask.akka.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.tenant.TenantActor
 import org.cafienne.tenant.akka.command.TenantCommand
+import org.cafienne.timerservice.akka.command.TimerServiceCommand
 
 /**
   * Clustered representation, router as singleton actor
@@ -34,6 +36,7 @@ class ClusterRouter extends CaseMessageRouter {
       case _: CaseCommand => caseShardRouter
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
+      case _: TimerServiceCommand => CaseSystem.timerService
     }
     shardRouter.forward(m)
   }

@@ -33,12 +33,24 @@ public class TimerStorage implements ModelActorSnapshot {
         return new ArrayList<>(timers.values());
     }
 
+    private boolean changed = false;
+
+    boolean changed() {
+        return changed;
+    }
+
     void addTimer(TimerJob job) {
         timers.put(job.timerId, job);
+        changed = true;
     }
 
     void removeTimer(String timerId) {
         timers.remove(timerId);
+        changed = true;
+    }
+
+    void saved() {
+        changed = false;
     }
 
     @Override

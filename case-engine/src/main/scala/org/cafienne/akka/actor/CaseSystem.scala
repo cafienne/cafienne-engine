@@ -52,6 +52,7 @@ object CaseSystem extends LazyLogging {
     */
   val health = new HealthMonitor
   var messageRouterService: ActorRef = _
+  var timerService: ActorRef = _
   var system: ActorSystem = null
 
   def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
@@ -75,7 +76,7 @@ object CaseSystem extends LazyLogging {
     }
 
     // Always immediately create a TimerService
-    system.actorOf(Props.create(classOf[TimerService]), TimerService.CAFIENNE_TIMER_SERVICE);
+    timerService = system.actorOf(Props.create(classOf[TimerService]), TimerService.CAFIENNE_TIMER_SERVICE);
 
     messageRouterService = system.actorOf(Props.create(routerClazz))
   }
