@@ -93,13 +93,13 @@ object Deps {
   val sw4jj                 = "com.github.j5ik2o"       % "sw4jj_2.11"                            % "1.0.2"
   val slick                 = "com.typesafe.slick"      %% "slick"                                % V.slick
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % V.slick
-  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.12"
+  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.13"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
   val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.0"
   val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.2.2.jre11"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.2.4"
-  val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.7.0"
-  val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.6.0"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.4.3"
+  val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
+  val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
 
   val javaXmlJDK9Compat     = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
 
