@@ -23,6 +23,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.projection.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 
@@ -60,8 +61,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
       path(Segment / "casefile") { caseInstanceId => {
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
           onComplete(handleSyncedQuery(() => caseQueries.getCaseFile(caseInstanceId, user), caseLastModified)) {
-            case Success(Some(caseFile)) => complete(StatusCodes.OK, new ValueMap("file", caseFile.toValueMap))
-            case Success(None) => complete(StatusCodes.NotFound)
+            case Success(caseFile) => complete(StatusCodes.OK, caseFile.toString)
+            case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
             case Failure(err) => complete(StatusCodes.InternalServerError, err)
           }
         }

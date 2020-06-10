@@ -238,16 +238,19 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   def getCurrentUserAssignedTasks = get {
     validUser { user =>
       parameters('tenant ?) { tenant =>
-      path("user" / "count") {
-        onComplete(taskQueries.getCountForUser(user, tenant)) {
-          case Success(value) =>
-            import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-            import spray.json.DefaultJsonProtocol._
-            implicit val format = jsonFormat2(TaskCount)
-            complete(StatusCodes.OK, value)
-          case Failure(ex) => complete(StatusCodes.InternalServerError)
+        path("user" / "count") {
+          optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
+            onComplete(handleSyncedQuery(() => taskQueries.getCountForUser(user, tenant), caseLastModified)) {
+              case Success(value) =>
+                import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+                import spray.json.DefaultJsonProtocol._
+                implicit val format = jsonFormat2(TaskCount)
+                complete(StatusCodes.OK, value)
+              case Failure(ex) => complete(StatusCodes.InternalServerError)
+            }
+          }
         }
-      }}
+      }
     }
   }
 

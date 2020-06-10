@@ -2,8 +2,8 @@ package org.cafienne.service.api.cases
 
 import akka.actor.{ActorRefFactory, ActorSystem}
 import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.service.api.cases.table.CaseTables
-import org.cafienne.service.api.projection.CaseSearchFailure
+import org.cafienne.service.api.cases.table.{CaseRecord, CaseTables}
+import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure}
 import org.cafienne.service.api.tasks.TaskTables
 import org.cafienne.service.api.tenant.TenantTables
 
@@ -12,23 +12,23 @@ import scala.concurrent.Future
 trait CaseQueries {
   def authorizeCaseAccess(caseInstanceId: String, user: PlatformUser): Future[String] = ???
 
-  def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseInstance]] = ???
+  def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = ???
 
-  def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[Option[CaseFile]] = ???
+  def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseRecord]] = ???
 
-  def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[Seq[CaseInstanceTeamMember]] = ???
+  def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = ???
+
+  def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = ???
+
+  def getPlanItem(planItemId: String, user: PlatformUser): Future[PlanItem] = ???
+
+  def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[PlanItemHistory] = ???
 
   def getCasesStats(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
 
-  def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseInstance]] = ???
+  def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
 
-  def getCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseInstance]] = ???
-
-  def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[Seq[PlanItem]] = ???
-
-  def getPlanItem(planItemId: String, user: PlatformUser): Future[Option[PlanItem]] = ???
-
-  def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[Seq[PlanItemHistory]] = ???
+  def getCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
 }
 
 class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory)
@@ -90,26 +90,66 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     }
   }
 
-  override def getCaseInstance(id: String, user: PlatformUser): Future[Option[CaseInstance]] = {
+  override def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = {
+    val result = for {
+      caseInstance <- getCaseInstance(caseInstanceId, user)
+      caseTeam <- db.run(caseInstanceTeamMemberQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map{CaseTeam}
+      caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.getOrElse(null)))
+      casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map{CasePlan}
+    } yield (caseInstance, caseTeam, caseFile, casePlan)
+
+    result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4)))
+  }
+
+  override def getCaseInstance(id: String, user: PlatformUser): Future[Option[CaseRecord]] = {
     val query = caseInstanceQuery
       .filter(_.id === id)
       .filter(_.tenant.inSet(user.tenants))
     db.run(query.result.headOption)
   }
 
-  override def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[Option[CaseFile]] = {
+  override def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = {
     val query = caseFileQuery
       .filter(_.caseInstanceId === caseInstanceId)
       .filter(_.tenant.inSet(user.tenants))
-    db.run(query.result.headOption)
+    db.run(query.result.headOption).map {
+      case Some(result) => CaseFile(result)
+      case None => throw CaseSearchFailure(caseInstanceId)
+    }
   }
 
-  override def getCaseTeam(caseInstanceId: String, user: PlatformUser) : Future[Seq[CaseInstanceTeamMember]] = {
-    val query = caseInstanceTeamMemberQuery
+  override def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = {
+    val query = planItemTableQuery
       .filter(_.caseInstanceId === caseInstanceId)
       .filter(_.tenant.inSet(user.tenants))
-      .filter(_.active === true)
-    db.run(query.result)
+
+    db.run(query.result).map(records => {
+      if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
+      CasePlan(records)
+    })
+  }
+
+  override def getPlanItem(planItemId: String, user: PlatformUser): Future[PlanItem] = {
+    val query = planItemTableQuery
+      .filter(_.id === planItemId)
+      .filter(_.tenant.inSet(user.tenants))
+
+    db.run(query.result.headOption).map{
+      case None => throw PlanItemSearchFailure(planItemId)
+      case Some(record) => PlanItem(record)
+    }
+  }
+
+  override def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[PlanItemHistory] = {
+    val planItemHistoryTableQuery = TableQuery[PlanItemHistoryTable]
+    val query = planItemHistoryTableQuery
+      .filter(_.tenant.inSet(user.tenants))
+      .filter(_.planItemId === planItemId)
+
+    db.run(query.distinct.result).map(records => {
+      if (records.isEmpty) throw PlanItemSearchFailure(planItemId)
+      PlanItemHistory(records)
+    })
   }
 
   override def getCasesStats(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
@@ -159,7 +199,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     newCaseList
   }
 
-  override def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseInstance]] = {
+  override def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
     val tenantSet = tenants(tenant, user)
     val query = caseInstanceQuery
       .filter(_.tenant.inSet(tenantSet))
@@ -170,7 +210,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     db.run(query.result)
   }
 
-  override def getCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseInstance]] = {
+  override def getCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
     // Depending on the value of the "status" filter, we have 3 different queries.
     // Reason is that admin-ui uses status=Failed for both Failed and "cases with Failures"
     //  Better approach is to simply add a failure count to the case instance and align the UI for that.
@@ -181,7 +221,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
         case Some(state) => {
           state match {
             case "Failed" => {
-//              println("Filtering on failures")
+              //              println("Filtering on failures")
               caseInstanceQuery
                 .filter(_.tenant.inSet(tenantSet))
                 .optionFilter(definition)((t, value) => t.definition.toLowerCase like s"%${value.toLowerCase}%")
@@ -190,7 +230,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
                 .drop(from).take(numOfResults)
             }
             case s => {
-//              println("Filtering on another status: " + s)
+              //              println("Filtering on another status: " + s)
               caseInstanceQuery
                 .filter(_.tenant.inSet(tenantSet))
                 .optionFilter(definition)((t, value) => t.definition.toLowerCase like s"%${value.toLowerCase}%")
@@ -209,28 +249,6 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
         }
       }
 
-    db.run(query.result)
-  }
-
-  override def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[Seq[PlanItem]] = {
-    val query = planItemTableQuery
-      .filter(_.caseInstanceId === caseInstanceId)
-      .filter(_.tenant.inSet(user.tenants))
-    db.run(query.result)
-  }
-
-  override def getPlanItem(planItemId: String, user: PlatformUser): Future[Option[PlanItem]] = {
-    val query = planItemTableQuery
-      .filter(_.id === planItemId)
-      .filter(_.tenant.inSet(user.tenants))
-    db.run(query.result.headOption)
-  }
-
-  override def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[Seq[PlanItemHistory]] = {
-    val planItemHistoryTableQuery = TableQuery[PlanItemHistoryTable]
-    val query = planItemHistoryTableQuery
-      .filter(_.tenant.inSet(user.tenants))
-      .filter(_.planItemId === planItemId)
     db.run(query.result)
   }
 

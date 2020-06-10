@@ -30,9 +30,9 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Migrate.migrateDatabase()
 
     def freshData = Seq(
-      Task( "1", "33", tenant = tenant, role = "A", owner = "Piet", taskState = "Unassigned", createdOn = Instant.now, lastModified = Instant.now),
-      Task( "2", "33", tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now),
-      Task( "3", "44", tenant = tenant, role = "B", owner = "Aart", createdOn = Instant.now, lastModified = Instant.now)
+      TaskRecord( "1", "33", tenant = tenant, role = "A", owner = "Piet", taskState = "Unassigned", createdOn = Instant.now, lastModified = Instant.now),
+      TaskRecord( "2", "33", tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now),
+      TaskRecord( "3", "44", tenant = tenant, role = "B", owner = "Aart", createdOn = Instant.now, lastModified = Instant.now)
     ) ++ TestIdentityFactory.asDatabaseRecords(Seq(testUser, userWithAandB, userWithBandC))
 
     Await.ready(updater.bulkUpdate(freshData), 2.seconds)

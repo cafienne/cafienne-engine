@@ -17,11 +17,11 @@ trait TaskQueries {
 
   // TODO: incorporate the casedefinition info, case parent id and case root id. For all queries. By joining.
 
-  def getTask(taskId: String, user: PlatformUser): Future[Task] = ???
+  def getTask(taskId: String, user: PlatformUser): Future[TaskRecord] = ???
 
-  def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[Task]] = ???
+  def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = ???
 
-  def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[Task]] = ???
+  def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[TaskRecord]] = ???
 
   def authorizeTaskAccess(taskId: String, user: PlatformUser): Future[Option[(String, String)]] = ???
 
@@ -37,7 +37,7 @@ trait TaskQueries {
                   from: Int = 0,
                   numOfResults: Int = 100,
                   user: PlatformUser,
-                  timeZone: Option[String]): Future[Seq[Task]] = ???
+                  timeZone: Option[String]): Future[Seq[TaskRecord]] = ???
 
   def getCountForUser(user: PlatformUser, tenant: Option[String]): Future[TaskCount] = ???
 }
@@ -62,14 +62,14 @@ class TaskQueriesImpl extends TaskQueries
     }
   }
 
-  override def getTask(taskId: String, user: PlatformUser): Future[Task] = {
+  override def getTask(taskId: String, user: PlatformUser): Future[TaskRecord] = {
     val query = TableQuery[TaskTable]
       .filter(_.id === taskId)
       .filter(_.tenant.inSet(user.tenants))
     db.run(query.result).map(t => if (t.isEmpty) throw TaskSearchFailure(taskId) else t.head)
   }
 
-  override def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[Task]] = {
+  override def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = {
     val tenantSet = tenants(tenant, user)
 
     val task = TableQuery[TaskTable]
@@ -80,7 +80,7 @@ class TaskQueriesImpl extends TaskQueries
     tasks
   }
 
-  override def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[Task]] = {
+  override def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[TaskRecord]] = {
     val task = TableQuery[TaskTable]
       .filter(_.caseInstanceId === caseInstanceId)
       .filter(_.tenant.inSet(user.tenants))
@@ -139,7 +139,7 @@ class TaskQueriesImpl extends TaskQueries
                            from: Int,
                            numOfResults: Int,
                            user: PlatformUser,
-                           timeZone: Option[String]): Future[Seq[(Task)]] = {
+                           timeZone: Option[String]): Future[Seq[(TaskRecord)]] = {
 
 
     // First determine the set of tenants to query in (either the tenant passed into the method call, or all tenants that the user is member of)

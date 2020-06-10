@@ -4,13 +4,13 @@ import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.cmmn.akka.event.team.{CaseTeamEvent, TeamMemberAdded, TeamMemberRemoved}
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent
-import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
+import org.cafienne.cmmn.akka.event.plan._
+import org.cafienne.cmmn.akka.event.team.{CaseTeamEvent, TeamMemberAdded, TeamMemberRemoved}
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
-import org.cafienne.infrastructure.cqrs.NamedOffset
-import org.cafienne.service.api.cases._
+import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.service.api.cases.table._
 import org.cafienne.service.api.projection.RecordsPersistence
 
 import scala.collection.mutable.ListBuffer
@@ -18,13 +18,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CaseTransaction(caseInstanceId: String, tenant: String, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
 
-  val planItems = scala.collection.mutable.HashMap[String, PlanItem]()
-  val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistory]()
-  val caseInstanceRoles = scala.collection.mutable.HashMap[String, CaseInstanceRole]()
-  val caseInstanceTeamMembers = scala.collection.mutable.HashMap[String, CaseInstanceTeamMember]() // key = <role>:<userid>
+  val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
+  val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
+  val caseInstanceRoles = scala.collection.mutable.HashMap[String, CaseRoleRecord]()
+  val caseInstanceTeamMembers = scala.collection.mutable.HashMap[String, CaseTeamMemberRecord]() // key = <role>:<userid>
   // TODO: we need always a caseinstance (for casemodified); so no need to have it as an option?
-  var caseInstance: Option[CaseInstance] = None
-  var caseDefinition: CaseInstanceDefinition = null
+  var caseInstance: Option[CaseRecord] = None
+  var caseDefinition: CaseDefinitionRecord = null
   var caseFile: Option[ValueMap] = None
 
   def handleEvent(evt: CaseEvent): Future[Done] = {
@@ -41,7 +41,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   private def createCaseInstance(event: CaseDefinitionApplied): Future[Done] = {
     this.caseInstance = Some(CaseInstanceMerger.merge(event))
-    this.caseDefinition = CaseInstanceDefinition(event.getActorId, event.getCaseName, event.getDefinition.getDescription, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.createdOn, event.createdBy)
+    this.caseDefinition = CaseDefinitionRecord(event.getActorId, event.getCaseName, event.getDefinition.getDescription, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.createdOn, event.createdBy)
     this.caseFile = Some(new ValueMap()) // Always create an empty case file
     CaseInstanceRoleMerger.merge(event).map(role => caseInstanceRoles.put(role.roleName, role))
     Future.successful(Done)
@@ -77,7 +77,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
-  private def getPlanItem(caseInstanceId: String, planItemId: String, user: TenantUser): Future[Option[PlanItem]] = {
+  private def getPlanItem(caseInstanceId: String, planItemId: String, user: TenantUser): Future[Option[PlanItemRecord]] = {
     planItems.get(planItemId) match {
       case Some(value) =>
         logger.debug("Retrieved planitem caseinstanceid={} id={} from current transaction cache", caseInstanceId, planItemId)
@@ -130,7 +130,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
-  private def getCaseInstance(caseInstanceId: String, user: TenantUser): Future[Option[CaseInstance]] = {
+  private def getCaseInstance(caseInstanceId: String, user: TenantUser): Future[Option[CaseRecord]] = {
     caseInstance match {
       case None =>
         logger.debug("Retrieving caseinstance caseInstanceId={} from database", caseInstanceId)
@@ -148,7 +148,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     this.caseInstance.foreach(instance => records += instance)
     records += this.caseDefinition
     this.caseFile.foreach { caseFile =>
-      records += CaseFile(caseInstanceId, tenant, caseFile.toString)
+      records += CaseFileRecord(caseInstanceId, tenant, caseFile.toString)
     }
     records ++= this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item))
     records ++= this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item))
@@ -157,7 +157,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
     // If we reach this point, we have real events handled and content added,
     // so also update the offset of the last event handled in this projection
-    records += NamedOffset(offsetName, offset)
+    records += OffsetRecord(offsetName, offset)
 
     //    println("Committing "+records.size+" records into the database for "+offset)
 

@@ -51,12 +51,12 @@ object TenantUser {
 
     val rolesSet: Seq[String] = roles.toSeq
 
-    new TenantUser(id, rolesSet, tenant, name, email, true)
+    TenantUser(id, rolesSet, tenant, name, email)
   }
 
   final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {
     if (!CaseSystem.isPlatformOwner(user.userId)) throw new SecurityException("Only platform owners can execute this type of command")
-    TenantUser(user.userId, Seq(), tenantId, "", "", true)
+    TenantUser(user.userId, Seq(), tenantId, "")
   }
 
   /**

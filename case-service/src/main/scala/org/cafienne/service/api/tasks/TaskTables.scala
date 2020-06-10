@@ -10,7 +10,7 @@ trait TaskTables extends QueryDbConfig {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:
-  final class TaskTable(tag: Tag) extends CafienneTable[Task](tag, "task") {
+  final class TaskTable(tag: Tag) extends CafienneTable[TaskRecord](tag, "task") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -44,6 +44,6 @@ trait TaskTables extends QueryDbConfig {
 
     def taskModel = jsonColumn[String]("task_model", O.Default(""))
 
-    def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[Task]
+    def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[TaskRecord]
   }
 }

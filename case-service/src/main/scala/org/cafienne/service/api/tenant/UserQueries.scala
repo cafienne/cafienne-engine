@@ -31,18 +31,18 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     val query = TableQuery[UserRoleTable].filter(_.userId === userId).filter(_.enabled === true)
 
     db.run(query.result).map(records => {
-        val rolesPerTenant = mutable.Map[String, Seq[UserRole]]()
+        val rolesPerTenant = mutable.Map[String, Seq[UserRoleRecord]]()
         val tenantUsers = mutable.Map[String, User]()
         records.map(r => {
-          val currentRoles: Seq[UserRole] = rolesPerTenant.get(r.tenant).getOrElse(Seq())
-          val role: UserRole = r
+          val currentRoles: Seq[UserRoleRecord] = rolesPerTenant.get(r.tenant).getOrElse(Seq())
+          val role: UserRoleRecord = r
           val newRoles = currentRoles :+ role
           rolesPerTenant.put(r.tenant, newRoles)
           tenantUsers.put(r.tenant, User(userId, r.tenant, r.name, r.email, r.enabled))
         })
         val allUsersWitRoles = tenantUsers.keys.map(tenant => (tenantUsers.get(tenant).get, rolesPerTenant.get(tenant).get)).toIndexedSeq
 
-        def from(userId: String, usersWithRoles: Seq[(User, Seq[UserRole])]): PlatformUser = {
+        def from(userId: String, usersWithRoles: Seq[(User, Seq[UserRoleRecord])]): PlatformUser = {
           val users = usersWithRoles.map(userWithRoles => {
             val user = userWithRoles._1
             val emptyRole = userWithRoles._2.find(p => p.role_name == "")
@@ -53,7 +53,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
             val roles = userWithRoles._2.filter(role => role.role_name != "").map(role => role.role_name)
             TenantUser(user.id, roles, user.tenant, user.name, user.email, enabled)
           })
-          new PlatformUser(userId, users)
+          PlatformUser(userId, users)
         }
 
         from(userId, allUsersWitRoles)
@@ -67,7 +67,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     val users = TableQuery[UserRoleTable].filter(_.tenant === tenant)
     db.run(users.result).map(roleRecords => {
       // First sort and store all roles by user-id
-      val users = mutable.Map[String, Seq[UserRole]]()
+      val users = mutable.Map[String, Seq[UserRoleRecord]]()
       roleRecords.map(role => {
         val knownRoles = users.getOrElse(role.userId, Seq())
         users.put(role.userId, knownRoles :+ role)
@@ -78,7 +78,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
         val userId = entry._1
         val roles = entry._2
         val roleNames = roles.map(role => role.role_name).filter(roleName => !roleName.isBlank)
-        val userIdentifyingRole = roles.find(role => role.role_name == "").getOrElse(UserRole(userId, "", tenant, "", "", false))
+        val userIdentifyingRole = roles.find(role => role.role_name == "").getOrElse(UserRoleRecord(userId, "", tenant, "", "", false))
         TenantUser(userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
       })
       tenantUsers.toSeq

@@ -5,16 +5,16 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.akka.event.CaseModified
 import org.cafienne.humantask.akka.event._
-import org.cafienne.infrastructure.cqrs.NamedOffset
+import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.Task
+import org.cafienne.service.api.tasks.TaskRecord
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
 
-  val tasks = scala.collection.mutable.HashMap[String, Task]()
+  val tasks = scala.collection.mutable.HashMap[String, TaskRecord]()
 
   def handleEvent(evt: HumanTaskEvent): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " on task " + taskId)
@@ -27,7 +27,7 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
   }
 
   def createTask(evt: HumanTaskCreated): Future[Done] = {
-    this.tasks.put(evt.taskId, Task(id = evt.taskId,
+    this.tasks.put(evt.taskId, TaskRecord(id = evt.taskId,
       caseInstanceId = evt.getActorId,
       tenant = evt.tenant,
       taskName = evt.getTaskName,
@@ -44,7 +44,7 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
   }
 
   def handleHumanTaskEvent(event: HumanTaskEvent) = {
-    val fTask: Future[Option[Task]] = {
+    val fTask: Future[Option[TaskRecord]] = {
       event match {
         case evt: HumanTaskInputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
         case evt: HumanTaskOutputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
@@ -80,7 +80,7 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
     records ++= this.tasks.values
 
     // Even if there are no new records, we will still update the offset store
-    records += NamedOffset(offsetName, offset)
+    records += OffsetRecord(offsetName, offset)
 
     persistence.bulkUpdate(records.filter(r => r != null))
   }

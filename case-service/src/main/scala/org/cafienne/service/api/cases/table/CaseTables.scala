@@ -12,7 +12,7 @@ trait CaseTables extends QueryDbConfig {
 
   //TODO: add lowercase index on definition in Postgresql to allow case insensitive searching
 
-  final class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseInstance](tag, "case_instance") {
+  final class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseRecord](tag, "case_instance") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -40,10 +40,10 @@ trait CaseTables extends QueryDbConfig {
 
     def caseOutput = jsonColumn[String]("case_output")
 
-    def * = (id, tenant, definition, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseInstance.tupled, CaseInstance.unapply)
+    def * = (id, tenant, definition, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
   }
 
-  final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTable[CaseInstanceDefinition](tag, "case_instance_definition") {
+  final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTable[CaseDefinitionRecord](tag, "case_instance_definition") {
 
     def caseInstanceId = idColumn[String]("caseInstanceId", O.PrimaryKey)
 
@@ -61,10 +61,10 @@ trait CaseTables extends QueryDbConfig {
 
     def modifiedBy = idColumn[String]("modified_by")
 
-    def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseInstanceDefinition.tupled, CaseInstanceDefinition.unapply)
+    def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseDefinitionRecord.tupled, CaseDefinitionRecord.unapply)
   }
 
-  final class PlanItemTable(tag: Tag) extends CafienneTable[PlanItem](tag, "plan_item") {
+  final class PlanItemTable(tag: Tag) extends CafienneTable[PlanItemRecord](tag, "plan_item") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -106,7 +106,7 @@ trait CaseTables extends QueryDbConfig {
 
     def rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItem.tupled, PlanItem.unapply)
+    def * = (id, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemRecord.tupled, PlanItemRecord.unapply)
 
     val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
 
@@ -114,7 +114,7 @@ trait CaseTables extends QueryDbConfig {
 
   }
 
-  final class PlanItemHistoryTable(tag: Tag) extends CafienneTable[PlanItemHistory](tag, "plan_item_history") {
+  final class PlanItemHistoryTable(tag: Tag) extends CafienneTable[PlanItemHistoryRecord](tag, "plan_item_history") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -158,7 +158,7 @@ trait CaseTables extends QueryDbConfig {
 
     def rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemHistory.tupled, PlanItemHistory.unapply)
+    def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemHistoryRecord.tupled, PlanItemHistoryRecord.unapply)
 
     val planItemHistoryTable = lifted.TableQuery[PlanItemHistoryTable]
 
@@ -168,7 +168,7 @@ trait CaseTables extends QueryDbConfig {
 
   }
 
-  final class CaseFileTable(tag: Tag) extends CafienneTable[CaseFile](tag, "case_file") {
+  final class CaseFileTable(tag: Tag) extends CafienneTable[CaseFileRecord](tag, "case_file") {
 
     def caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
 
@@ -176,14 +176,14 @@ trait CaseTables extends QueryDbConfig {
 
     def data = jsonColumn[String]("data")
 
-    def * = (caseInstanceId, tenant, data) <> (CaseFile.tupled, CaseFile.unapply)
+    def * = (caseInstanceId, tenant, data) <> (CaseFileRecord.tupled, CaseFileRecord.unapply)
 
     val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
 
     def caseInstance = foreignKey("fk_case_file__case_instance", caseInstanceId, caseInstanceTable)(_.id)
   }
 
-  final class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseInstanceRole](tag, "case_instance_role") {
+  final class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseRoleRecord](tag, "case_instance_role") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -195,14 +195,14 @@ trait CaseTables extends QueryDbConfig {
 
     def pk = primaryKey("pk_case_instance_role", (caseInstanceId, roleName))
 
-    def * = (caseInstanceId, tenant, roleName, assigned) <> (CaseInstanceRole.tupled, CaseInstanceRole.unapply)
+    def * = (caseInstanceId, tenant, roleName, assigned) <> (CaseRoleRecord.tupled, CaseRoleRecord.unapply)
 
     val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
 
     def caseInstance = foreignKey("fk_case_instance_role__case_instance", caseInstanceId, caseInstanceTable)(_.id)
   }
 
-  final class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTable[CaseInstanceTeamMember](tag, "case_instance_team_member") {
+  final class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -216,7 +216,7 @@ trait CaseTables extends QueryDbConfig {
 
     def pk = primaryKey("pk_case_instance_team_member", (caseInstanceId, role, userId))
 
-    def * = (caseInstanceId, tenant, userId, role, active) <> (CaseInstanceTeamMember.tupled, CaseInstanceTeamMember.unapply)
+    def * = (caseInstanceId, tenant, userId, role, active) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
 
     val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
 

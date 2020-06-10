@@ -7,9 +7,9 @@ trait TenantTables extends QueryDbConfig {
   import dbConfig.profile.api._
 
   // Schema for the "tenant-owner" table:
-  final class TenantOwnersTable(tag: Tag) extends CafienneTable[TenantOwner](tag, "tenant_owners") {
+  final class TenantOwnersTable(tag: Tag) extends CafienneTable[TenantOwnerRecord](tag, "tenant_owners") {
 
-    def * = (tenant, userId, enabled) <> (TenantOwner.tupled, TenantOwner.unapply)
+    def * = (tenant, userId, enabled) <> (TenantOwnerRecord.tupled, TenantOwnerRecord.unapply)
 
     def enabled = column[Boolean]("enabled", O.Default(true))
 
@@ -21,7 +21,7 @@ trait TenantTables extends QueryDbConfig {
   }
 
   // Schema for the "tenant" table:
-  final class TenantTable(tag: Tag) extends CafienneTable[Tenant](tag, "tenant") {
+  final class TenantTable(tag: Tag) extends CafienneTable[TenantRecord](tag, "tenant") {
 
     // Columsn
     def name = idColumn[String]("name", O.PrimaryKey)
@@ -29,13 +29,13 @@ trait TenantTables extends QueryDbConfig {
 
     // Constraints
     def pk = primaryKey("pk_tenant", (name))
-    def * = (name, enabled) <> (Tenant.tupled, Tenant.unapply)
+    def * = (name, enabled) <> (TenantRecord.tupled, TenantRecord.unapply)
   }
 
-  final class UserRoleTable(tag: Tag) extends CafienneTable[UserRole](tag, "user_role") {
+  final class UserRoleTable(tag: Tag) extends CafienneTable[UserRoleRecord](tag, "user_role") {
     def pk = primaryKey("pk_userrole", (userId, tenant, role_name))
 
-    def * = (userId, tenant, role_name, name, email, enabled) <> (UserRole.tupled, UserRole.unapply)
+    def * = (userId, tenant, role_name, name, email, enabled) <> (UserRoleRecord.tupled, UserRoleRecord.unapply)
 
     def userId = idColumn[String]("user_id")
 

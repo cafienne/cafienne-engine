@@ -18,11 +18,10 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
-import org.cafienne.cmmn.instance.casefile._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader, PlanItem, PlanItemHistory}
+import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.projection.SearchFailure
 
 import scala.util.{Failure, Success}
 
@@ -66,18 +65,13 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
           //          parameters(planItemType ?, 'status ?) { (planItemType, status) =>
           // planItemType and status are removed!!
           onComplete(handleSyncedQuery(() => caseQueries.getPlanItems(caseInstanceId, user), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, planItemToValueList(value))
-            case Failure(err) => complete(StatusCodes.InternalServerError, err)
+            case Success(value) => complete(StatusCodes.OK, value.toString)
+            case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
+            case Failure(err) => throw err
           }
         }
       }
     }
-  }
-
-  private def planItemToValueList(items: Seq[PlanItem]): ValueList = {
-    val responseValues = new ValueList
-    items.foreach(item => responseValues.add(item.toValueMap))
-    responseValues
   }
 
   @Path("/{caseInstanceId}/planitems/{planItemId}")
@@ -102,9 +96,9 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
       path(Segment / "planitems" / Segment) { (_, planItemId) =>
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
           onComplete(handleSyncedQuery(() => caseQueries.getPlanItem(planItemId, user), caseLastModified)) {
-            case Success(Some(value)) => complete(StatusCodes.OK, value.toValueMap)
-            case Success(None) => complete(StatusCodes.NotFound)
-            case Failure(err) => complete(StatusCodes.InternalServerError, err)
+            case Success(value) => complete(StatusCodes.OK, value.toString)
+            case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
+            case Failure(err) => throw err
           }
         }
       }
@@ -159,16 +153,11 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { user =>
       path(Segment / "planitems" / Segment / "history") { (caseInstanceId, planItemId) =>
         onComplete(caseQueries.getPlanItemHistory(planItemId, user)) {
-          case Success(value) => complete(StatusCodes.OK, planItemHistoryToValueList(value))
-          case Failure(err) => complete(StatusCodes.NotFound, err)
+          case Success(value) => complete(StatusCodes.OK, value.toString)
+          case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
+          case Failure(err) => throw err
         }
       }
     }
-  }
-
-  private def planItemHistoryToValueList(items: Seq[PlanItemHistory]): ValueList = {
-    val responseValues = new ValueList
-    items.foreach(item => responseValues.add(item.toValueMap))
-    responseValues
   }
 }

@@ -85,7 +85,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         val roles = readStringList(user, "roles")
         val userName = readStringOr(user, "name", "")
         val email = readStringOr(user, "email", "")
-        new TenantUser(userId, roles, tenantName, userName, email, true)
+        TenantUser(userId, roles, tenantName, userName, email)
       })
 
       val undefinedOwners = ownerIds.filter(id => !users.map(u => u.id).contains(id))
@@ -96,7 +96,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
       val owners = users.filter(user => ownerIds.contains(user.id)).toSet.asJava
       val plainTenantUsers = users.filter(user => !ownerIds.contains(user.id)).toSet.asJava
 
-      val aPlatformOwner = new PlatformUser(CaseSystem.config.platform.platformOwners.get(0), Seq())
+      val aPlatformOwner = PlatformUser(CaseSystem.config.platform.platformOwners.get(0), Seq())
 
       new BootstrapTenant(aPlatformOwner, tenantName, tenantName, owners, plainTenantUsers)
 

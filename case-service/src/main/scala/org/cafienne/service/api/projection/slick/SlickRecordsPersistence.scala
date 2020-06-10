@@ -1,13 +1,12 @@
 package org.cafienne.service.api.projection.slick
 
 import akka.Done
-import org.cafienne.infrastructure.cqrs.NamedOffset
+import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
-import org.cafienne.service.api.cases.table.CaseTables
-import org.cafienne.service.api.cases.{CaseFile, CaseInstance, CaseInstanceDefinition, CaseInstanceRole, CaseInstanceTeamMember, PlanItem, PlanItemHistory}
-import org.cafienne.service.api.tenant.{Tenant, TenantOwner, TenantTables, User, UserRole}
+import org.cafienne.service.api.cases.table._
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.{Task, TaskTables}
+import org.cafienne.service.api.tasks.{TaskRecord, TaskTables}
+import org.cafienne.service.api.tenant.{TenantRecord, TenantOwnerRecord, TenantTables, UserRoleRecord}
 
 import scala.concurrent.Future
 
@@ -39,36 +38,36 @@ class SlickRecordsPersistence
 
   override def bulkUpdate(records: Seq[AnyRef]) = {
     val actions = records.collect {
-      case value: Task => taskQuery.insertOrUpdate(value)
-      case value: PlanItem => planItemTableQuery.insertOrUpdate(value)
-      case value: PlanItemHistory => planItemHistoryTableQuery.insertOrUpdate(value) // Enable restarting with noOffset
-      case value: CaseInstance => caseInstanceQuery.insertOrUpdate(value)
-      case value: CaseInstanceDefinition => caseInstanceDefinitionQuery.insertOrUpdate(value)
-      case value: CaseFile => caseFileQuery.insertOrUpdate(value)
-      case value: CaseInstanceRole => caseInstanceRoleQuery.insertOrUpdate(value)
-      case value: CaseInstanceTeamMember => caseInstanceTeamMemberQuery.insertOrUpdate(value)
-      case value: NamedOffset => offsetQuery.insertOrUpdate(value)
-      case value: UserRole => rolesQuery.insertOrUpdate(value)
-      case value: Tenant => tenantsQuery.insertOrUpdate(value)
-      case value: TenantOwner => tenantOwnersQuery.insertOrUpdate(value)
+      case value: TaskRecord => taskQuery.insertOrUpdate(value)
+      case value: PlanItemRecord => planItemTableQuery.insertOrUpdate(value)
+      case value: PlanItemHistoryRecord => planItemHistoryTableQuery.insertOrUpdate(value) // Enable restarting with noOffset
+      case value: CaseRecord => caseInstanceQuery.insertOrUpdate(value)
+      case value: CaseDefinitionRecord => caseInstanceDefinitionQuery.insertOrUpdate(value)
+      case value: CaseFileRecord => caseFileQuery.insertOrUpdate(value)
+      case value: CaseRoleRecord => caseInstanceRoleQuery.insertOrUpdate(value)
+      case value: CaseTeamMemberRecord => caseInstanceTeamMemberQuery.insertOrUpdate(value)
+      case value: OffsetRecord => offsetQuery.insertOrUpdate(value)
+      case value: UserRoleRecord => rolesQuery.insertOrUpdate(value)
+      case value: TenantRecord => tenantsQuery.insertOrUpdate(value)
+      case value: TenantOwnerRecord => tenantOwnersQuery.insertOrUpdate(value)
       case other => throw new IllegalArgumentException("Bulk update not supported for objects of type " + other.getClass.getName)
     }
     db.run(DBIO.sequence(actions).transactionally).map { _ => Done }
   }
 
-  override def getPlanItem(planItemId: String): Future[Option[PlanItem]] = {
+  override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = {
     db.run(TableQuery[PlanItemTable].filter(_.id === planItemId).result.headOption)
   }
 
-  override def getCaseInstance(id: String): Future[Option[CaseInstance]] = {
+  override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {
     db.run(TableQuery[CaseInstanceTable].filter(_.id === id).result.headOption)
   }
 
-  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFile]] = {
+  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = {
     db.run(TableQuery[CaseFileTable].filter(_.caseInstanceId === caseInstanceId).result.headOption)
   }
 
-  override def getTask(taskId: String): Future[Option[Task]] = {
+  override def getTask(taskId: String): Future[Option[TaskRecord]] = {
     db.run(TableQuery[TaskTable].filter(_.id === taskId).result.headOption)
   }
 }
