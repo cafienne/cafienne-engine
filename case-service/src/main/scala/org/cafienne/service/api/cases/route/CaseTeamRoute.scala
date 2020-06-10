@@ -10,7 +10,7 @@ package org.cafienne.service.api.cases.route
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{Content, Schema}
+import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -20,6 +20,7 @@ import org.cafienne.cmmn.akka.command.team._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember, Examples}
 
 @Api(tags = Array("case team"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -31,8 +32,8 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Path("/{caseInstanceId}/caseteam")
   @POST
   @Operation(
-    summary = "Sets a new case team",
-    description = "Sets a new case team for a case instance",
+    summary = "Replace the case team",
+    description = "Removes existing cae team, and replaces it with the new team. The new team must have an owner. Changes to the team can only be done by case owners.",
     tags = Array("case team"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -43,13 +44,13 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
-  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeam]))))
+  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[Examples.StartCaseTeamMember])))))
   @Consumes(Array("application/json"))
   def setCaseTeam = post {
     validUser { user =>
       path(Segment / "caseteam") { caseInstanceId =>
-        entity(as[CaseTeam]) { caseTeam =>
-          askCase(user, caseInstanceId, user => new SetCaseTeam(user, caseInstanceId, caseTeam))
+        entity(as[BackwardCompatibleTeam]) { caseTeam =>
+          askCase(user, caseInstanceId, user => new SetCaseTeam(user, caseInstanceId, teamConverter(caseTeam)))
         }
       }
     }
@@ -59,7 +60,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @PUT
   @Operation(
     summary = "Add or update a case team member",
-    description = "Add a new case team member or change the roles of an existing member",
+    description = "Add a new member to the case team or change roles or ownership rights of an existing member. Changes to the team can only be done by case owners.",
     tags = Array("case team"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -70,27 +71,40 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
-  @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamMember]))))
+  @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMember]))))
   @Consumes(Array("application/json"))
   def addCaseTeamMember = put {
     validUser { user =>
       path(Segment / "caseteam") { caseInstanceId =>
-        entity(as[CaseTeamMember]) { caseTeamMember =>
-          askCase(user, caseInstanceId, user => new PutTeamMember(user, caseInstanceId, caseTeamMember))
+        entity(as[BackwardCompatibleTeamMember]) { caseTeamMember =>
+          askCase(user, caseInstanceId, user => new PutTeamMember(user, caseInstanceId, memberConverter(caseTeamMember)))
         }
       }
     }
   }
 
-  @Path("/{caseInstanceId}/caseteam/{userId}")
+  @Path("/{caseInstanceId}/caseteam/{memberId}?type={memberType}")
   @DELETE
   @Operation(
-    summary = "Delete a case team member",
-    description = "Delete a case team member",
+    summary = "Remove a member from the case team",
+    description = "Remove a member from the case team. Can be a member of type user as well as role. Changes to the team can only be done by case owners.",
     tags = Array("case team"),
     parameters = Array(
-      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "userId", description = "Unique id of the case team member", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "caseInstanceId",
+        description = "Unique id of the case instance",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+      new Parameter(name = "memberId",
+        description = "Id of the case team member to remove",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+      new Parameter(name = "type",
+        description = "Type of member (either 'user' or 'role'). If omitted both types apply",
+        in = ParameterIn.QUERY,
+        schema = new Schema(implementation = classOf[String], allowableValues = Array("user", "role")),
+        required = true),
     ),
     responses = Array(
       new ApiResponse(description = "Your request to delete a case team member has been accepted", responseCode = "202"),
@@ -101,8 +115,11 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def deleteCaseTeamMember = delete {
     validUser { user =>
-      path(Segment / "caseteam" / Segment) { (caseInstanceId, userId) =>
-        askCase(user, caseInstanceId, user => new RemoveTeamMember(user, caseInstanceId, userId))
+      path(Segment / "caseteam" / Segment) { (caseInstanceId, memberId) =>
+        parameters('type ?) {
+          (memberType) => // Todo: use member id and also member type
+            askCase(user, caseInstanceId, user => new RemoveTeamMember(user, caseInstanceId, memberId))
+        }
       }
     }
   }

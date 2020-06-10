@@ -30,8 +30,8 @@ import java.io.IOException;
  */
 @Manifest
 public class PutTeamMember extends CaseCommand {
-    private final CaseTeamMember jsonNewMember;
-    private Member newCaseTeamMember;
+    private final CaseTeamMember caseTeamMember;
+    private Member newMember;
 
     private enum Fields {
         member
@@ -40,31 +40,31 @@ public class PutTeamMember extends CaseCommand {
     public PutTeamMember(TenantUser tenantUser, String caseInstanceId, CaseTeamMember newMember) {
         // TODO: determine how to do authorization on this command.
         super(tenantUser, caseInstanceId);
-        this.jsonNewMember = newMember;
+        this.caseTeamMember = newMember;
     }
 
     public PutTeamMember(ValueMap json) {
         super(json);
-        jsonNewMember = new CaseTeamMember(readMap(json, Fields.member));
+        caseTeamMember = CaseTeamMember.deserialize(readMap(json, Fields.member));
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.member, jsonNewMember);
+        writeField(generator, Fields.member, caseTeamMember.toValue());
     }
 
     @Override
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
         // Parse the new member. This will also validate the new member against the case team
-        newCaseTeamMember = new Member(caseInstance.getCaseTeam(), jsonNewMember, caseInstance);
+        newMember = new Member(caseInstance.getCaseTeam(), caseTeamMember, caseInstance);
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
         Team caseTeam = caseInstance.getCaseTeam();
-        caseTeam.addMember(newCaseTeamMember);
+        caseTeam.addMember(newMember);
         return new CaseResponse(this);
     }
 

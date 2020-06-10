@@ -40,35 +40,35 @@ import org.cafienne.cmmn.akka.command.CaseCommand;
 @Manifest
 public class SetCaseTeam extends CaseCommand {
 
-    private final CaseTeam caseTeam;
-    private Team newCaseTeam;
+    private final CaseTeam newCaseTeam;
+    private Team newTeam;
 
     private enum Fields {
         team
     }
 
-    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam caseTeam) {
+    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam newCaseTeam) {
         // TODO: determine how to do authorization on this command.
         super(tenantUser, caseInstanceId);
-        this.caseTeam = caseTeam;
+        this.newCaseTeam = newCaseTeam;
     }
 
     public SetCaseTeam(ValueMap json) {
         super(json);
-        this.caseTeam = new CaseTeam(readArray(json, Fields.team));
+        this.newCaseTeam = CaseTeam.deserialize(json.withArray(Fields.team));
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.team, caseTeam);
+        writeField(generator, Fields.team, newCaseTeam.toValue());
     }
 
     @Override
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
         // Parse the new case team. This will also validate the team
-        newCaseTeam = new Team(caseTeam, caseInstance, caseInstance.getDefinition());
+        newTeam = new Team(newCaseTeam, caseInstance, caseInstance.getDefinition());
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SetCaseTeam extends CaseCommand {
         // Clear the existing members
         new ArrayList<>(caseTeam.getMembers()).forEach(caseTeam::removeMember);
         // Add new members
-        newCaseTeam.getMembers().forEach(caseTeam::addMember);
+        newTeam.getMembers().forEach(caseTeam::addMember);
         return new CaseResponse(this);
     }
 

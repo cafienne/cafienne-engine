@@ -1,11 +1,12 @@
 package org.cafienne.service.api.cases
 
-import org.cafienne.cmmn.instance.casefile.{StringValue, ValueList, ValueMap}
-import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.cmmn.akka.command.team.CaseTeam
+import org.cafienne.cmmn.instance.casefile.{ValueList, ValueMap}
+import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan) {
   override def toString: String = {
-    caseInstance.toValueMap.merge(new ValueMap("team", team.toJson(), "file", file.toJson(), "planitems", planitems.toJson)).toString
+    caseInstance.toValueMap.merge(new ValueMap("team", team.toValue(), "file", file.toJson(), "planitems", planitems.toJson)).toString
   }
 }
 
@@ -32,25 +33,6 @@ final case class CaseFile(record: CaseFileRecord) {
 
   override def toString: String = {
     toJson.toString
-  }
-}
-
-final case class CaseTeam(records: Seq[CaseTeamMemberRecord]) {
-  val team = new ValueMap
-  records.foreach(member => {
-    val json = team.`with`(member.memberId)
-    json.putRaw("user", member.memberId)
-    json.withArray("roles").add(new StringValue(member.caseRole))
-  })
-
-  def toJson(): ValueMap = {
-    val usersList = new ValueList
-    team.getValue.forEach((_, value) => usersList.add(value))
-    new ValueMap("members", usersList)
-  }
-
-  override def toString: String = {
-    toJson().toString
   }
 }
 

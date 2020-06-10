@@ -66,21 +66,22 @@ public class Role {
         testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, null), casePlan -> casePlan.print());
 
         // Now create a team;
-        CaseTeamMember user1 = new CaseTeamMember("user1", "Admin", "Employee");
-        CaseTeamMember user2 = new CaseTeamMember("user2", "Manager");
-        CaseTeam caseTeam = new CaseTeam(user1, user2);
+        TenantUser user1 = TestScript.getTestUser("user1", "Admin", "Employee");
+        TenantUser user2 = TestScript.getTestUser("user2", "Manager");
+
+        CaseTeam caseTeam = TestScript.getCaseTeam(user1, user2);
         testCase.addStep(new SetCaseTeam(admin, caseInstanceId, caseTeam), casePlan -> casePlan.print());
 
         // Fail to add a user with conflicting roles.
-        CaseTeamMember user3a = new CaseTeamMember("user3", "Admin", "Manager");
+        CaseTeamMember user3a = TestScript.getMember(TestScript.getTestUser("user3", "Admin", "Manager"));
         testCase.assertStepFails(new PutTeamMember(admin, caseInstanceId, user3a), failure -> failure.assertException(CaseTeamError.class, "Role Manager is not allowed for user3 since user3 also has role Admin"));
 
         // Remove the Admin role, and show that the user still cannot be added because we can only have one manager
-        CaseTeamMember user3b = new CaseTeamMember("user3", "Manager");
+        CaseTeamMember user3b = TestScript.getMember(TestScript.getTestUser("user3", "Manager"));
         testCase.assertStepFails(new PutTeamMember(admin, caseInstanceId, user3b), failure -> failure.assertException(CaseTeamError.class, "Role Manager is already assigned to another user"));
 
         // Remove the Manager role as well, and show that now the user can be added, though roleless
-        CaseTeamMember user3c = new CaseTeamMember("user3");
+        CaseTeamMember user3c = TestScript.getMember(TestScript.getTestUser("user3"));
         testCase.addStep(new PutTeamMember(admin, caseInstanceId, user3c), casePlan -> casePlan.print());
 
         // Fail to remove a member from the team that is not inside.

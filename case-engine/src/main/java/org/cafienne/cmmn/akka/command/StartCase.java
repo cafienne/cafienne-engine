@@ -95,7 +95,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;
         this.inputParameters = caseInputParameters == null ? new ValueMap() : caseInputParameters;
-        this.caseTeamInput = caseTeamInput == null ? new CaseTeam() : caseTeamInput;
+        this.caseTeamInput = caseTeamInput == null ? CaseTeam.apply() : caseTeamInput;
         this.debugMode = debugMode;
     }
 
@@ -107,7 +107,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
         this.inputParameters = readMap(json, Fields.inputParameters);
         this.debugMode = readField(json, Fields.debugMode);
-        this.caseTeamInput = new CaseTeam(readArray(json, Fields.caseTeam));
+        this.caseTeamInput = CaseTeam.deserialize(json.withArray(Fields.caseTeam));
     }
 
     @Override
@@ -179,7 +179,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
         writeField(generator, Fields.tenant, tenant);
-        writeField(generator, Fields.caseTeam, caseTeamInput);
+        writeField(generator, Fields.caseTeam, caseTeamInput.toValue());
         writeField(generator, Fields.inputParameters, inputParameters);
         writeField(generator, Fields.rootActorId, rootCaseId);
         writeField(generator, Fields.parentActorId, parentCaseId);

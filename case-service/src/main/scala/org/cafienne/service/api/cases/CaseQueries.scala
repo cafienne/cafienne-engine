@@ -2,7 +2,8 @@ package org.cafienne.service.api.cases
 
 import akka.actor.{ActorRefFactory, ActorSystem}
 import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.service.api.cases.table.{CaseRecord, CaseTables}
+import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
+import org.cafienne.service.api.cases.table.{CaseRecord, CaseTables, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.api.tasks.TaskTables
 import org.cafienne.service.api.tenant.TenantTables
@@ -90,10 +91,35 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     }
   }
 
+  private def fillCaseTeam(records: Seq[CaseTeamMemberRecord]): CaseTeam = {
+    def updateMember(member: CaseTeamMember, record: CaseTeamMemberRecord): CaseTeamMember = {
+      record.caseRole.isBlank match {
+        // If role is blank we check primary fields such as member type and ownership
+        case true => member.copy(key = member.key, isOwner = Some(record.isOwner))
+        // Otherwise we simply copy the roles
+        case false => member.copy(caseRoles = member.caseRoles ++ Seq(record.caseRole))
+      }
+    }
+
+    def key(record: CaseTeamMemberRecord): MemberKey = record.isTenantUser match {
+      case true => MemberKey(record.memberId, "user")
+      case false => MemberKey(record.memberId, "role")
+    }
+
+    val members = scala.collection.mutable.HashMap[MemberKey, CaseTeamMember]()
+    records.map(record => {
+      val memberKey = key(record)
+      val memberToUpdate = members.getOrElse(memberKey, CaseTeamMember(memberKey))
+      members.put(memberKey, updateMember(memberToUpdate, record))
+    })
+
+    CaseTeam(members.map(m => m._2).toSeq)
+  }
+
   override def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = {
     val result = for {
       caseInstance <- getCaseInstance(caseInstanceId, user)
-      caseTeam <- db.run(caseInstanceTeamMemberQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map{CaseTeam}
+      caseTeam <- db.run(caseInstanceTeamMemberQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map{fillCaseTeam}
       caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.getOrElse(null)))
       casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map{CasePlan}
     } yield (caseInstance, caseTeam, caseFile, casePlan)

@@ -23,6 +23,7 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.cmmn.akka
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
+import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.cmmn.repository.MissingDefinitionException
@@ -238,7 +239,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
               val inputParameters = payload.inputs
-              val caseTeam = payload.caseTeam
+              val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
               askModelActor(new akka.command.StartCase(tenant, user.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {

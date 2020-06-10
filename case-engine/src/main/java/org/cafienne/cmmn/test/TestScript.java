@@ -126,17 +126,38 @@ public class TestScript {
     /**
      * Creates a CaseTeam that can be used in StartCase command based upon a list of user contexts
      *
-     * @param users
+     * @param users The users array can hold case team members, tenant users. Tenant users will be become
+     *              members, with the tenant roles that they have passed to them
      * @return
      */
-    public static CaseTeam getCaseTeam(TenantUser... users) {
-        CaseTeam team = new CaseTeam();
-        Arrays.asList(users).forEach(user -> {
-            Set<String> roles = new HashSet();
-            user.roles().forall(role -> roles.add(role));
-            team.getMembers().add(new CaseTeamMember(user.id(), roles));
-        });
-        return team;
+    public static CaseTeam getCaseTeam(Object... users) {
+        List<CaseTeamMember> members = new ArrayList();
+        for (Object user : users) {
+            if (user instanceof TenantUser) {
+                members.add(getMember((TenantUser)user));
+            } else if (user instanceof CaseTeamMember) {
+                members.add((CaseTeamMember) user);
+            } else {
+                throw new IllegalArgumentException("Cannot accept users of type " + user.getClass().getName());
+            }
+        }
+        return CaseTeam.apply(members);
+    }
+
+    /**
+     * Create a simple member with roles, copies tenant roles, adds additional roles
+     * @param user
+     * @param roles
+     * @return
+     */
+    public static CaseTeamMember getMember(TenantUser user, String... roles) {
+        Set<String> caseRoles = new HashSet();
+        user.roles().forall(role -> caseRoles.add(role));
+        // Add and possibly overwrite any existing TenantUser roles
+        for (String role : roles) {
+            caseRoles.add(role);
+        }
+        return CaseTeamMember.apply(user.id(), caseRoles.toArray(new String[]{}), false);
     }
 
     /**

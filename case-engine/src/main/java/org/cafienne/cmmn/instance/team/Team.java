@@ -32,12 +32,12 @@ public class Team extends CMMNElement<CaseDefinition> {
 
     /**
      * Create a case team based on the members inside the value map, validated against the case definition.
-     * @param caseTeam
+     * @param newCaseTeam
      * @param caseDefinition
      */
-    public Team(CaseTeam caseTeam, Case caseInstance, CaseDefinition caseDefinition) throws CaseTeamError {
+    public Team(CaseTeam newCaseTeam, Case caseInstance, CaseDefinition caseDefinition) throws CaseTeamError {
         this(caseInstance);
-        caseTeam.getMembers().forEach(caseTeamMember -> members.add(new Member(this, caseTeamMember, caseDefinition)));
+        newCaseTeam.getMembers().forEach(caseTeamMember -> members.add(new Member(this, caseTeamMember, caseDefinition)));
     }
 
     @Deprecated
@@ -53,14 +53,15 @@ public class Team extends CMMNElement<CaseDefinition> {
         }
 
         // TODO MUST be removed => WK: I agree, but apparently demo's will fail when we do.
-        CaseTeamMember newMember = new CaseTeamMember(tenantUser.id());
+        List<String> roles = new ArrayList();
         tenantUser.roles().forall(roleName -> {
             // Only add those roles that also have been defined within the case (otherwise new CaseTeamMember constructor will fail)
             if (getCaseInstance().getDefinition().getCaseRole(roleName) != null) {
-                newMember.getRoles().add(roleName);
+                roles.add(roleName);
             }
             return true;
         });
+        CaseTeamMember newMember = CaseTeamMember.apply(tenantUser.id(), roles.toArray(new String[]{}), true);
 
         Member member = new Member(this, newMember, getCaseInstance());
         addMember(member);
@@ -157,8 +158,15 @@ public class Team extends CMMNElement<CaseDefinition> {
     }
 
     public CaseTeam toCaseTeamTO() {
+        // TODO: this code is invoked for passing caseteam into subcase (from CaseTask). It should also
+        //  check whether the roles exist in the subecase, otherwise a failure will happen when starting the subcase
         List<CaseTeamMember> members = new ArrayList();
-        this.getMembers().forEach(teamMember -> members.add(new CaseTeamMember(teamMember.getUserId(), teamMember.getRoles().stream().map(CaseRoleDefinition::getName).collect(Collectors.toSet()))));
-        return new CaseTeam(members);
+        this.getMembers().forEach(teamMember -> {
+            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).collect(Collectors.toList()).toArray(new String[]{});
+            CaseTeamMember member = CaseTeamMember.apply(teamMember.getUserId(), roleNames, true);
+            members.add(member);
+        });
+        return CaseTeam.apply(members);
     }
+
 }

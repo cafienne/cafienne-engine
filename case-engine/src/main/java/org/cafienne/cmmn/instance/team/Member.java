@@ -62,8 +62,8 @@ public class Member extends CMMNElement<CaseDefinition> {
     public Member(Team team, CaseTeamMember member, CaseDefinition caseDefinition) throws CaseTeamError {
         super(team, caseDefinition);
         this.team = team;
-        this.userId = parseName(member.getUser());
-        member.getRoles().forEach(roleName -> addRole(getCaseRole(caseDefinition, roleName)));
+        this.userId = parseName(member.key().id());
+        member.getCaseRoles().forEach(roleName -> addRole(getCaseRole(caseDefinition, roleName)));
     }
 
 

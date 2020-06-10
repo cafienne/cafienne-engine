@@ -7,7 +7,7 @@ import org.cafienne.akka.actor.command.exception.InvalidCommandException;
  *
  */
 public class CaseTeamError extends InvalidCommandException {
-    CaseTeamError(String string) {
+    public CaseTeamError(String string) {
         super(string);
     }
 }
