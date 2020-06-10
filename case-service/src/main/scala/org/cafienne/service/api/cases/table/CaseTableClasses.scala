@@ -46,7 +46,8 @@ final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: St
 
 final case class CaseRoleRecord(caseInstanceId: String, tenant: String, roleName: String, assigned: Boolean = true)
 
-final case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, userId: String, role: String, active: Boolean)
+final case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)
+//final case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, userId: String, role: String, active: Boolean)
 
 final case class PlanItemRecord(id: String,
                                 stageId: String,

@@ -208,20 +208,23 @@ trait CaseTables extends QueryDbConfig {
 
     def tenant = idColumn[String]("tenant")
 
-    def role = idColumn[String]("role")
+    def caseRole = idColumn[String]("case_role")
 
-    def userId = idColumn[String]("user_id")
+    def memberId = idColumn[String]("member_id")
+
+    def isTenantUser = column[Boolean]("isTenantUser")
+
+    def isOwner = column[Boolean]("isOwner")
 
     def active = column[Boolean]("active")
 
-    def pk = primaryKey("pk_case_instance_team_member", (caseInstanceId, role, userId))
+    def pk = primaryKey("pk_case_instance_team_member", (caseInstanceId, caseRole, memberId, isTenantUser))
 
-    def * = (caseInstanceId, tenant, userId, role, active) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
+    def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
 
     val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
 
     def caseInstance =
       foreignKey("fk_case_instance_team_member__case_instance", caseInstanceId, caseInstanceTable)(_.id)
   }
-
 }

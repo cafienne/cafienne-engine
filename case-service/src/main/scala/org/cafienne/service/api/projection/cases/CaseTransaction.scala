@@ -113,8 +113,8 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   private def handleCaseTeamEvent(event: CaseTeamEvent): Future[Done] = {
     event match {
-      case event: TeamMemberAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(member => caseInstanceTeamMembers.put(s"${member.role}:${member.userId}", member))
-      case event: TeamMemberRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(member => caseInstanceTeamMembers.put(s"${member.role}:${member.userId}", member))
+      case event: TeamMemberAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(member => caseInstanceTeamMembers.put(s"${member.caseRole}:${member.memberId}", member))
+      case event: TeamMemberRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(member => caseInstanceTeamMembers.put(s"${member.caseRole}:${member.memberId}", member))
     }
     Future.successful(Done)
   }

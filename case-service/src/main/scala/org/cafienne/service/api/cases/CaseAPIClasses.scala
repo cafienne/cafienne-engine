@@ -38,9 +38,9 @@ final case class CaseFile(record: CaseFileRecord) {
 final case class CaseTeam(records: Seq[CaseTeamMemberRecord]) {
   val team = new ValueMap
   records.foreach(member => {
-    val json = team.`with`(member.userId)
-    json.putRaw("user", member.userId)
-    json.withArray("roles").add(new StringValue(member.role))
+    val json = team.`with`(member.memberId)
+    json.putRaw("user", member.memberId)
+    json.withArray("roles").add(new StringValue(member.caseRole))
   })
 
   def toJson(): ValueMap = {

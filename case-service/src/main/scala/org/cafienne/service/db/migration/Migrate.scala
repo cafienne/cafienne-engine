@@ -1,7 +1,7 @@
 package org.cafienne.service.db.migration
 
 import com.typesafe.scalalogging.Logger
-import org.cafienne.service.db.migration.versions.{V1Migration, V1_1_5Migration}
+import org.cafienne.service.db.migration.versions.{CafienneQueryDatabaseSchema, V1Migration, V1_1_5Migration}
 import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
 import org.slf4j.LoggerFactory
 import slick.migration.api.Migration
@@ -9,7 +9,6 @@ import slick.migration.api.flyway.MigrationInfo.Provider
 import slick.migration.api.flyway.MigrationInfo.Provider.{crc32, sql}
 
 import scala.concurrent.Await
-import scala.util.{Failure, Success}
 
 /**
   * This is a hack to prevent comparison of migration.toString in the description field of the flyway table
@@ -34,7 +33,7 @@ object Migrate extends QueryDbMigrationConfig {
   import scala.concurrent.duration._
   import dbConfig.profile.api._
   implicit val infoProvider: MigrationInfo.Provider[Migration] = MigrationInfoHack.hack
-//  implicit val infoProvider: MigrationInfo.Provider[Migration] = MigrationInfo.Provider.strict
+  //  implicit val infoProvider: MigrationInfo.Provider[Migration] = MigrationInfo.Provider.strict
 
   val logger: Logger = Logger(LoggerFactory.getLogger(getClass.getName))
 
@@ -42,7 +41,7 @@ object Migrate extends QueryDbMigrationConfig {
 
   def migrateDatabase(): Unit = {
     try {
-      val flyway = SlickFlyway(db)(V1Migration.getMigrations ++ V1_1_5Migration.getMigrations).load()
+      val flyway = SlickFlyway(db)(CafienneQueryDatabaseSchema.schema).load()
       flyway.migrate()
     } catch {
       case e: Exception => {

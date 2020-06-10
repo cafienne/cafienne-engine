@@ -9,13 +9,13 @@ object CaseInstanceTeamMemberMerger {
 
   def merge(event: TeamMemberAdded): Seq[CaseTeamMemberRecord] = {
     (event.getRoles.asScala ++ Seq("")).map {
-      role => CaseTeamMemberRecord(caseInstanceId = event.getCaseInstanceId, event.tenant, role = role, userId = event.getUserId, active = true)
+      role => CaseTeamMemberRecord(caseInstanceId = event.getCaseInstanceId, event.tenant, caseRole = role, memberId = event.getUserId, isTenantUser = true, isOwner = false, active = true)
     }.toSeq
   }
 
   def merge(event: TeamMemberRemoved): Seq[CaseTeamMemberRecord] = {
     (event.getRoles.asScala ++ Seq("")).map {
-      role => CaseTeamMemberRecord(caseInstanceId = event.getCaseInstanceId, event.tenant, role = role, userId = event.getUserId, active = false)
+      role => CaseTeamMemberRecord(caseInstanceId = event.getCaseInstanceId, event.tenant, caseRole = role, memberId = event.getUserId, isTenantUser = true, isOwner = false, active = false)
     }.toSeq
   }
 
