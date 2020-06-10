@@ -26,7 +26,7 @@ trait CasesRoute extends CommandRoute with CaseReader {
 
   def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
     optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-      onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccess(caseInstanceId, platformUser), caseLastModified)) {
+      onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
         case Success(tenant) => askModelActor(createCaseCommand.apply(platformUser.getTenantUser(tenant)))
         case Failure(error) => {
           error match {

@@ -45,10 +45,10 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   }
 
   override def routes = pathPrefix("tasks") {
-    getTasksRoute ~
+    getAllTasks ~
       getCaseTasks ~
       getTask ~
-      getCurrentUserAssignedTasks ~
+      getTaskCount ~
       validateTaskOutput ~
       saveTaskOutput ~
       claimTaskRoute ~
@@ -85,7 +85,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     )
   )
   @Produces(Array("application/json"))
-  def getTasksRoute = get {
+  def getAllTasks = get {
     validUser { user =>
       pathEndOrSingleSlash {
         parameters('tenant ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
@@ -175,7 +175,6 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
               value.foreach(v => tasks.add(v.toValueMap))
               complete(StatusCodes.OK, tasks)
             case Failure(err) =>
-              logger.error("Could not find the task, but got an error " + err.getLocalizedMessage, err)
               err match {
                 case c: CaseSearchFailure => complete(StatusCodes.NotFound, c.getLocalizedMessage)
                 case _ => throw err
@@ -235,7 +234,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     )
   )
   @Produces(Array("application/json"))
-  def getCurrentUserAssignedTasks = get {
+  def getTaskCount = get {
     validUser { user =>
       parameters('tenant ?) { tenant =>
         path("user" / "count") {
@@ -464,15 +463,8 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     }
 
   def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
-    val retrieveCaseIdAndTenant = taskQueries.authorizeTaskAccess(taskId, platformUser)
-
-    onComplete(retrieveCaseIdAndTenant) {
-      case Success(retrieval) => {
-        retrieval match {
-          case Some(caseInstanceId) => askModelActor(createTaskCommand.apply(caseInstanceId._1, platformUser.getTenantUser(caseInstanceId._2)))
-          case None => complete(StatusCodes.NotFound, "A task with id " + taskId + " cannot be found in the system")
-        }
-      }
+    onComplete(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId(taskId, platformUser)) {
+      case Success((caseInstanceId, tenant)) => askModelActor(createTaskCommand.apply(caseInstanceId, platformUser.getTenantUser(tenant)))
       case Failure(error) => {
         error match {
           case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
