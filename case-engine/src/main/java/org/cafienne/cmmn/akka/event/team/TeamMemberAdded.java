@@ -12,6 +12,7 @@ import org.cafienne.cmmn.instance.team.Member;
 public class TeamMemberAdded extends DeprecatedCaseTeamEvent {
     public TeamMemberAdded(Case caseInstance, Member member) {
         super(caseInstance, member);
+        throw new IllegalArgumentException("This API is no longer supported; only for backwards compatibility");
     }
 
     public TeamMemberAdded(ValueMap json) {

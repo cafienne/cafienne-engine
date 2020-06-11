@@ -14,10 +14,11 @@ import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.team.*;
 import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
+import org.cafienne.cmmn.akka.event.team.TeamRoleCleared;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
-import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
+import org.cafienne.cmmn.test.TestScript;
 import org.junit.Test;
 
 public class Role {
@@ -31,7 +32,7 @@ public class Role {
     @Test
     public void testRolesBasedAuthorization() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(anonymous, admin, employee);
+        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), admin, employee);
 
         testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, caseTeam), casePlan -> casePlan.print());
 
@@ -65,33 +66,45 @@ public class Role {
         // Start a case without a team;
         testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, null), casePlan -> casePlan.print());
 
-        // Now create a team;
+        // Try to set a team with 2 captains should fail.
+        TenantUser captain1 = TestScript.getTestUser("c1", "Manager");
+        TenantUser captain2 = TestScript.getTestUser("c2", "Manager");
+        CaseTeam teamWithTwoCaptainsAlwaysFails = TestScript.getCaseTeam(TestScript.getOwner(captain1), TestScript.getOwner(captain2));
+        testCase.assertStepFails(new SetCaseTeam(anonymous, caseInstanceId, teamWithTwoCaptainsAlwaysFails), failure -> failure.assertException(CaseTeamError.class, "Role 'Manager' cannot be assigned to more than one team member"));
+
+        // Try to set a team with a corrupt member.
+        TenantUser corruptOfficer = TestScript.getTestUser("c1", "Manager", "Admin");
+        CaseTeam corruptedTeam = TestScript.getCaseTeam(TestScript.getOwner(corruptOfficer));
+        testCase.assertStepFails(new SetCaseTeam(anonymous, caseInstanceId, corruptedTeam), failure -> failure.assertException(CaseTeamError.class, "A team member cannot have both roles 'Admin' and 'Manager'"));
+
+        // Now create a valid team;
         TenantUser user1 = TestScript.getTestUser("user1", "Admin", "Employee");
         TenantUser user2 = TestScript.getTestUser("user2", "Manager");
+        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(user1), user2);
 
-        CaseTeam caseTeam = TestScript.getCaseTeam(user1, user2);
-        testCase.addStep(new SetCaseTeam(admin, caseInstanceId, caseTeam), casePlan -> casePlan.print());
+        testCase.addStep(new SetCaseTeam(anonymous, caseInstanceId, caseTeam), casePlan -> casePlan.print());
 
         // Fail to add a user with conflicting roles.
         CaseTeamMember user3a = TestScript.getMember(TestScript.getTestUser("user3", "Admin", "Manager"));
-        testCase.assertStepFails(new PutTeamMember(admin, caseInstanceId, user3a), failure -> failure.assertException(CaseTeamError.class, "Role Manager is not allowed for user3 since user3 also has role Admin"));
+        testCase.assertStepFails(new PutTeamMember(user1, caseInstanceId, user3a), failure -> failure.assertException(CaseTeamError.class, "Role Admin is not allowed for user 'user3' since this member also has role Manager"));
 
         // Remove the Admin role, and show that the user still cannot be added because we can only have one manager
         CaseTeamMember user3b = TestScript.getMember(TestScript.getTestUser("user3", "Manager"));
-        testCase.assertStepFails(new PutTeamMember(admin, caseInstanceId, user3b), failure -> failure.assertException(CaseTeamError.class, "Role Manager is already assigned to another user"));
+        testCase.assertStepFails(new PutTeamMember(user1, caseInstanceId, user3b), failure -> failure.assertException(CaseTeamError.class, "Role Manager is already assigned to another user"));
 
         // Remove the Manager role as well, and show that now the user can be added, though roleless
         CaseTeamMember user3c = TestScript.getMember(TestScript.getTestUser("user3"));
-        testCase.addStep(new PutTeamMember(admin, caseInstanceId, user3c), casePlan -> casePlan.print());
+        testCase.addStep(new PutTeamMember(user1, caseInstanceId, user3c), casePlan -> casePlan.print());
 
         // Fail to remove a member from the team that is not inside.
-        testCase.assertStepFails(new RemoveTeamMember(admin, caseInstanceId, "I am not a user in the team"),
-                failure -> failure.assertException(InvalidCommandException.class, "User I am not a user in the team cannot be removed from the case team"));
+        testCase.assertStepFails(new RemoveTeamMember(user1, caseInstanceId, new MemberKey("I am not a user in the team", "user")),
+                failure -> failure.assertException(InvalidCommandException.class, "The case team does not have a member with id user 'I am not a user in the team'"));
 
         // Successfully remove a member that is inside.
-        testCase.addStep(new RemoveTeamMember(admin, caseInstanceId, "user1"), casePlan -> {
+        testCase.addStep(new RemoveTeamMember(user1, caseInstanceId, new MemberKey("user2", "user")), casePlan -> {
             casePlan.print();
-            casePlan.getEvents().assertEvent("Expecting TeamMemberRemoved event for 'user1'", TeamMemberRemoved.class, e -> e.getUserId().equals("user1"));
+            TestScript.debugMessage("Start case generated these events:\n" + casePlan.getEvents().enumerateEventsByType());
+            casePlan.getEvents().assertEvent("Expecting TeamRoleCleared event for 'user2'", TeamRoleCleared.class, e -> e.key.id().equals("user2") && e.isMemberItself());
         });
 
         testCase.runTest();

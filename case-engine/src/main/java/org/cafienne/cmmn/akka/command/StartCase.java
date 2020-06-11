@@ -8,24 +8,25 @@
 package org.cafienne.cmmn.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
-import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +42,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     private final String parentCaseId;
     private final ValueMap inputParameters;
     private transient CaseDefinition definition;
-    private final CaseTeam caseTeamInput;
-    private Team caseTeam;
+    private CaseTeam caseTeamInput;
     private final boolean debugMode;
 
     private enum Fields {
@@ -136,8 +136,19 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
             }
         }
 
+        // If the case team is empty, add current user both as member and as owner,
+        //  including default mapping of tenant roles to case team roles
+        if (caseTeamInput.getMembers().isEmpty()) {
+            caseInstance.addDebugInfo(() -> "Adding user '" + getUser().id() + "' to the case team (as owner) because new team is empty");
+            caseTeamInput = CaseTeam.apply(CaseTeamMember.createBootstrapMember(getUser()));
+        }
+
+        if (caseTeamInput.owners().isEmpty()) {
+            throw new CaseTeamError("The case team needs to have at least one owner");
+        }
+
         // Validates the member and roles
-        caseTeam = new Team(caseTeamInput, caseInstance, definition);
+        caseTeamInput.validate(definition);
 
         // Should we also check whether all parameters have been made available in the input list? Not sure ...
     }
@@ -155,9 +166,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName()));
 
         // First setup the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
-        caseTeam.getMembers().forEach(newMember -> caseInstance.getCaseTeam().addMember(newMember));
-        // By default add the current user to the case team; this will be ignored if the user is already in the case team
-        caseInstance.getCaseTeam().addCurrentUser(caseInstance.getCurrentUser());
+        caseInstance.getCaseTeam().fillFrom(caseTeamInput);
 
         // Apply input parameters. This may also fill the CaseFile
         caseInstance.addDebugInfo(() -> "Input parameters for new case of type "+ definition.getName(), inputParameters);

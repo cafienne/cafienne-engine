@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.akka.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.team.Member;
 
 import java.io.IOException;
 
@@ -13,26 +13,28 @@ import java.io.IOException;
 public abstract class CaseTeamMemberEvent extends CaseTeamEvent {
     public final String memberId;
     public final boolean isTenantUser;
+    public final transient MemberKey key;
 
     protected enum Fields {
         memberId, isTenantUser
     }
 
-    protected CaseTeamMemberEvent(Case caseInstance, Member member) {
+    protected CaseTeamMemberEvent(Case caseInstance, MemberKey key) {
         super(caseInstance);
-        this.memberId = member.getUserId();
-        this.isTenantUser = true;
+        this.key = key;
+        this.memberId = key.id();
+        this.isTenantUser = key.type().equals("user");
     }
 
     protected CaseTeamMemberEvent(ValueMap json) {
         super(json);
         this.memberId = json.raw(Fields.memberId);
         this.isTenantUser = json.raw(Fields.isTenantUser);
+        this.key = new MemberKey(memberId, isTenantUser ? "user" : "role");
     }
 
     protected String getMemberDescription() {
-        String type = isTenantUser ? "Tenant user " : "Tenant role ";
-        return type + "'" + memberId + "'";
+        return "Tenant " + key;
     }
 
     @Override

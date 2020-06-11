@@ -32,7 +32,7 @@ import scala.util.{Failure, Success}
 @Path("/cases")
 class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
 
-  override def routes = getCaseTeam ~ setCaseTeam ~ addCaseTeamMember ~ deleteCaseTeamMember
+  override def routes = getCaseTeam ~ setCaseTeam ~ putCaseTeamMember ~ deleteCaseTeamMember
 
   @Path("/{caseInstanceId}/caseteam")
   @GET
@@ -109,7 +109,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMember]))))
   @Consumes(Array("application/json"))
-  def addCaseTeamMember = put {
+  def putCaseTeamMember = put {
     validUser { user =>
       path(Segment / "caseteam") { caseInstanceId =>
         entity(as[BackwardCompatibleTeamMember]) { caseTeamMember =>
@@ -137,7 +137,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
         schema = new Schema(implementation = classOf[String]),
         required = true),
       new Parameter(name = "type",
-        description = "Type of member (either 'user' or 'role'). If omitted both types apply",
+        description = "Type of member (either 'user' or 'role'). If omitted both 'user' is taken",
         in = ParameterIn.QUERY,
         schema = new Schema(implementation = classOf[String], allowableValues = Array("user", "role")),
         required = true),
@@ -152,9 +152,8 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   def deleteCaseTeamMember = delete {
     validUser { user =>
       path(Segment / "caseteam" / Segment) { (caseInstanceId, memberId) =>
-        parameters('type ?) {
-          (memberType) => // Todo: use member id and also member type
-            askCase(user, caseInstanceId, user => new RemoveTeamMember(user, caseInstanceId, memberId))
+        parameters('type ?) { memberType =>
+          askCase(user, caseInstanceId, user => new RemoveTeamMember(user, caseInstanceId, MemberKey(memberId, memberType.getOrElse("user"))))
         }
       }
     }

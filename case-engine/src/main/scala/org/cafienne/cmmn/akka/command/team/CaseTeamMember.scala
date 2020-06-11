@@ -39,7 +39,8 @@ case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwne
 }
 
 object CaseTeamMember {
-  def apply(id: String, caseRoles: Array[String], isOwner: Boolean) = new CaseTeamMember(MemberKey(id, "user"), caseRoles = caseRoles.toSeq, isOwner = Some(isOwner))
+
+  def apply(key: MemberKey, caseRoles: Array[String], isOwner: Boolean) = new CaseTeamMember(key, caseRoles = caseRoles.toSeq, isOwner = Some(isOwner))
 
   def createBootstrapMember(user: TenantUser) = new CaseTeamMember(MemberKey(user.id, "user"), isOwner = Some(true))
 

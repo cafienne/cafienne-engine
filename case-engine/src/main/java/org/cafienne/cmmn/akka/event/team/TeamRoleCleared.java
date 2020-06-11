@@ -1,16 +1,16 @@
 package org.cafienne.cmmn.akka.event.team;
 
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.team.Member;
 
 /**
  * Event caused when a role is removed from a case team member
  */
 @Manifest
 public class TeamRoleCleared extends CaseTeamRoleEvent {
-    public TeamRoleCleared(Case caseInstance, Member member, String roleName) {
+    public TeamRoleCleared(Case caseInstance, MemberKey member, String roleName) {
         super(caseInstance, member, roleName);
     }
 
@@ -20,7 +20,7 @@ public class TeamRoleCleared extends CaseTeamRoleEvent {
 
     @Override
     public String getDescription() {
-        if (roleName.isBlank()) {
+        if (isMemberItself()) {
             // The event that removes the member to the team; in practice this one cannot be invoked
             //  since that can only be done through removing the member explicitly, resulting in TeamMemberRemoved event
             return getClass().getSimpleName() + "[" + getMemberDescription()+" is removed from the case team]";

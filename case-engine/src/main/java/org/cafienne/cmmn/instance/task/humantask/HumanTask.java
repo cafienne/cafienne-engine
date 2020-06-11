@@ -161,13 +161,8 @@ public class HumanTask extends Task<HumanTaskDefinition> {
             return true;
         }
 
-        Member currentUser = getCaseInstance().getCurrentTeamMember();
-        if (currentUser == null) { // Well, there MUST be a user...
-            throw new SecurityException("You do not have the permission to perform the task " + getName());
-        }
-
         // Now check if the user has the performer role.
-        return currentUser.getRoles().contains(getPerformer());
+        return getCaseInstance().getCurrentTeamMember().getRoles().contains(getPerformer());
     }
 
     @Override

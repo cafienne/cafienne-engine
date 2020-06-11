@@ -63,18 +63,16 @@ public abstract class CaseCommand extends ModelCommand<Case> {
      * @throws InvalidCommandException If the command is invalid
      */
     public void validate(Case caseInstance) throws InvalidCommandException {
-        // TODO: this check is probably no longer needed, because the BootstrapCommand is supposed to handle this logic.
-        //  And the ModelActor will refuse messages if the BootstrapCommand is not yet handled.
-        if (caseInstance.getDefinition() == null) {
-            throw new InvalidCommandException("Cannot handle command of type " + getClass().getName() + "; StartCase not yet sent, or not in this user context");
-        }
+        // Validate case team membership
+        validateCaseTeamMembership(caseInstance);
+    }
 
-        /*
-         * TODO Temporary code for demo. Adding current user to the case team. This will be removed => WK: when?
-         */
-
-        // By default add the current user to the case team (will be ignored if user is already in the team)
-        caseInstance.getCaseTeam().addCurrentUser(caseInstance.getCurrentUser());
+    /**
+     * This method validates the case team membership of the tenant user that sent this command
+     * @param caseInstance
+     */
+    protected void validateCaseTeamMembership(Case caseInstance) {
+        caseInstance.getCaseTeam().validateMembership(getUser());
     }
 
     /**

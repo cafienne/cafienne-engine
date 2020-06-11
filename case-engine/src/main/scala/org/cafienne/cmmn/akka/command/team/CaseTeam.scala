@@ -3,6 +3,7 @@ package org.cafienne.cmmn.akka.command.team
 import org.cafienne.cmmn.akka.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
+import org.cafienne.cmmn.instance.team.CaseTeamError
 
 import scala.collection.JavaConverters._
 
@@ -15,6 +16,26 @@ case class CaseTeam(members: Seq[CaseTeamMember] = Seq()) {
     */
   def validate(caseDefinition: CaseDefinition): Unit = {
     members.map(m => m.validateRolesExist(caseDefinition))
+
+    // Go through all defined case roles
+    // and check that new team does not have conflicting interests.
+    caseDefinition.getCaseRoles.forEach(role => {
+      val roleName = role.getName
+      if (role.isSingleton) {
+        // Only one user can have a singleton role assigned
+        if (members.filter(p => p.caseRoles.contains(roleName)).size > 1) {
+          throw new CaseTeamError(s"Role '$roleName' cannot be assigned to more than one team member")
+        }
+      }
+      // Users can not have multiple mutexing roles assigned to them
+      val mutexRoles = role.getMutexRoles
+      mutexRoles.forEach(mutexedRole => {
+        val mutexRole = mutexedRole.getName
+        if (members.filter(member => member.getCaseRoles.contains(mutexRole) && member.getCaseRoles.contains(roleName)).size > 0) {
+          throw new CaseTeamError(s"A team member cannot have both roles '$roleName' and '$mutexRole'")
+        }
+      })
+    })
   }
 
   def owners(): Seq[CaseTeamMember] = {

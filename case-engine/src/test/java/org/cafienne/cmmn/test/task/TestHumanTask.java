@@ -2,6 +2,7 @@ package org.cafienne.cmmn.test.task;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.StartCase;
+import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.StringValue;
@@ -35,8 +36,9 @@ public class TestHumanTask {
 
         TenantUser pete = TestScript.getTestUser("pete");
         TenantUser gimy = TestScript.getTestUser("gimy");
+        CaseTeam team = TestScript.getCaseTeam(TestScript.getOwner(pete), gimy);
 
-        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, null), caseStarted -> {
+        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), caseStarted -> {
             caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
             TestScript.debugMessage("Task ID: " + taskId);

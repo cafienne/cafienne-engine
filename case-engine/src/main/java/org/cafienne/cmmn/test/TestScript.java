@@ -7,13 +7,14 @@
  */
 package org.cafienne.cmmn.test;
 
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
+import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -22,6 +23,8 @@ import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.None;
+import scala.Some;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -145,19 +148,21 @@ public class TestScript {
     }
 
     /**
-     * Create a simple member with roles, copies tenant roles, adds additional roles
+     * Create a case owner with roles, copies tenant roles, adds additional roles
      * @param user
-     * @param roles
      * @return
      */
-    public static CaseTeamMember getMember(TenantUser user, String... roles) {
-        Set<String> caseRoles = new HashSet();
-        user.roles().forall(role -> caseRoles.add(role));
-        // Add and possibly overwrite any existing TenantUser roles
-        for (String role : roles) {
-            caseRoles.add(role);
-        }
-        return CaseTeamMember.apply(user.id(), caseRoles.toArray(new String[]{}), false);
+    public static CaseTeamMember getOwner(TenantUser user) {
+        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(true), new scala.collection.immutable.Vector(0, 0, 0));
+    }
+
+    /**
+     * Create a simple member with roles, copies tenant roles, adds additional roles
+     * @param user
+     * @return
+     */
+    public static CaseTeamMember getMember(TenantUser user) {
+        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(false), new scala.collection.immutable.Vector(0, 0, 0));
     }
 
     /**

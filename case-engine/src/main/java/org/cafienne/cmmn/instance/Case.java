@@ -21,8 +21,8 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
+import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public Member getCurrentTeamMember() {
+    public CurrentMember getCurrentTeamMember() {
         return getCaseTeam().getTeamMember(getCurrentUser());
     }
 

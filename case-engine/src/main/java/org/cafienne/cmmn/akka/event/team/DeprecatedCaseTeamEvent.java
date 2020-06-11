@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.akka.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -17,6 +18,27 @@ import java.util.stream.Collectors;
 public abstract class DeprecatedCaseTeamEvent extends CaseTeamEvent {
     protected final String userId;
     protected final Set<String> roles = new HashSet();
+    public final transient MemberKey key;
+
+    protected enum Fields {
+        userId, roles
+    }
+
+    protected DeprecatedCaseTeamEvent(Case caseInstance, Member member) {
+        super(caseInstance);
+        this.key = member.key;
+        this.userId = member.getMemberId();
+        for (CaseRoleDefinition role : member.getRoles()) {
+            roles.add(role.getName());
+        }
+    }
+
+    protected DeprecatedCaseTeamEvent(ValueMap json) {
+        super(json);
+        this.userId = json.raw(Fields.userId);
+        json.withArray(Fields.roles).getValue().forEach(role -> roles.add((String) role.getValue()));
+        this.key = new MemberKey(userId, "user");
+    }
 
     /**
      * Name/id of user that is added or removed. Isolating logic in a single place
@@ -41,24 +63,6 @@ public abstract class DeprecatedCaseTeamEvent extends CaseTeamEvent {
             String rolesString = (roles.stream().filter(role -> !role.isBlank()).map(role -> "'" + role + "'").collect(Collectors.joining(", ")));
             return getClass().getSimpleName() + "['" +userId + "' with roles " + rolesString + " left the team]";
         }
-    }
-
-    protected enum Fields {
-        userId, roles
-    }
-
-    protected DeprecatedCaseTeamEvent(Case caseInstance, Member member) {
-        super(caseInstance);
-        this.userId = member.getUserId();
-        for (CaseRoleDefinition role : member.getRoles()) {
-            roles.add(role.getName());
-        }
-    }
-
-    protected DeprecatedCaseTeamEvent(ValueMap json) {
-        super(json);
-        this.userId = json.raw(Fields.userId);
-        json.withArray(Fields.roles).getValue().forEach(role -> roles.add((String) role.getValue()));
     }
 
     @Override
