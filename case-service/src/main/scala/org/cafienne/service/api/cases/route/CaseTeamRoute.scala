@@ -7,6 +7,7 @@
  */
 package org.cafienne.service.api.cases.route
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -19,15 +20,50 @@ import javax.ws.rs._
 import org.cafienne.cmmn.akka.command.team._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
+import org.cafienne.service.api
 import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
 import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember, Examples}
+import org.cafienne.service.api.projection.CaseSearchFailure
+
+import scala.util.{Failure, Success}
 
 @Api(tags = Array("case team"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
 
-  override def routes = setCaseTeam ~ addCaseTeamMember ~ deleteCaseTeamMember
+  override def routes = getCaseTeam ~ setCaseTeam ~ addCaseTeamMember ~ deleteCaseTeamMember
+
+  @Path("/{caseInstanceId}/caseteam")
+  @GET
+  @Operation(
+    summary = "Get a case team",
+    description = "Get the case team of a case instance",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+    ),
+    responses = Array(
+      new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeam])))),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+      new ApiResponse(description = "Internal server error", responseCode = "500")
+    )
+  )
+  @Produces(Array("application/json"))
+  def getCaseTeam = get {
+    validUser { user =>
+      path(Segment / "caseteam") { caseInstanceId =>
+        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
+          onComplete(handleSyncedQuery(() => caseQueries.getCaseTeam(caseInstanceId, user), caseLastModified)) {
+            case Success(value) => complete(StatusCodes.OK, value.toString)
+            case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
+            case Failure(_) => complete(StatusCodes.InternalServerError)
+          }
+        }
+      }
+    }
+  }
 
   @Path("/{caseInstanceId}/caseteam")
   @POST
