@@ -6,12 +6,11 @@ import java.util.stream.Collectors;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
+import org.cafienne.cmmn.akka.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.akka.event.team.TeamMemberAdded;
-import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
 import org.w3c.dom.Element;
 
 /**
@@ -104,6 +103,18 @@ public class Team extends CMMNElement<CaseDefinition> {
             }
         }
         return null;
+    }
+
+    public void updateState(CaseOwnerAdded event) {
+    }
+
+    public void updateState(CaseOwnerRemoved event) {
+    }
+
+    public void updateState(TeamRoleCleared event) {
+    }
+
+    public void updateState(TeamRoleFilled event) {
     }
 
     public void updateState(TeamMemberAdded event) {

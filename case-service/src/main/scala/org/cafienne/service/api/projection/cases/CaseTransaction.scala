@@ -7,7 +7,7 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent
 import org.cafienne.cmmn.akka.event.plan._
-import org.cafienne.cmmn.akka.event.team.{CaseTeamEvent, TeamMemberAdded, TeamMemberRemoved}
+import org.cafienne.cmmn.akka.event.team._
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.api.cases.table._
@@ -21,7 +21,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
   val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
   val caseInstanceRoles = scala.collection.mutable.HashMap[String, CaseRoleRecord]()
-  val caseInstanceTeamMembers = scala.collection.mutable.HashMap[String, CaseTeamMemberRecord]() // key = <role>:<userid>
+  val caseInstanceTeamMembers = scala.collection.mutable.HashMap[(String, String, Boolean), CaseTeamMemberRecord]() // key = <role>:<userid>
   // TODO: we need always a caseinstance (for casemodified); so no need to have it as an option?
   var caseInstance: Option[CaseRecord] = None
   var caseDefinition: CaseDefinitionRecord = null
@@ -112,9 +112,15 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   }
 
   private def handleCaseTeamEvent(event: CaseTeamEvent): Future[Done] = {
+    def updateMember(member: CaseTeamMemberRecord) = caseInstanceTeamMembers.put((member.caseRole, member.memberId, member.isTenantUser), member)
+
     event match {
-      case event: TeamMemberAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(member => caseInstanceTeamMembers.put(s"${member.caseRole}:${member.memberId}", member))
-      case event: TeamMemberRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(member => caseInstanceTeamMembers.put(s"${member.caseRole}:${member.memberId}", member))
+      case event: TeamMemberAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: TeamMemberRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: TeamRoleFilled => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: TeamRoleCleared => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: CaseOwnerAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: CaseOwnerRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
     }
     Future.successful(Done)
   }

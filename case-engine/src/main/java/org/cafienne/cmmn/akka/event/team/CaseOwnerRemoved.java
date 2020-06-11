@@ -6,16 +6,22 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;
 
 /**
- * Event caused when a member is removed from the case team.
+ * Event caused when a team member is no longer owner
  */
 @Manifest
-public class TeamMemberRemoved extends DeprecatedCaseTeamEvent {
-    public TeamMemberRemoved(Case caseInstance, Member member) {
+public class CaseOwnerRemoved extends CaseTeamMemberEvent {
+
+    public CaseOwnerRemoved(Case caseInstance, Member member) {
         super(caseInstance, member);
     }
 
-    public TeamMemberRemoved(ValueMap json) {
+    public CaseOwnerRemoved(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + "[" + getMemberDescription()+" is no longer owner]";
     }
 
     @Override
