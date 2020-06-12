@@ -27,7 +27,7 @@ import java.io.IOException;
  * This command must be used to complete a human task with additional task output parameters.
  */
 @Manifest
-public class CompleteHumanTask extends WorkflowCommand {
+public class CompleteHumanTask extends HumanTaskCommand {
     protected final ValueMap taskOutput;
     protected Task<?> task;
 
@@ -57,28 +57,8 @@ public class CompleteHumanTask extends WorkflowCommand {
 
     @Override
     public void validate(HumanTask task) throws InvalidCommandException {
-
-        // HTD: basically, below tests that state is Active; but below is check on Delegated or Assigned, and those can only be achieved when in State==Active
-        //   also: HumanTask in Case will only instantiate the HumanTask when it has become active...
-        //   But todo: task can also be suspended from parent, in that case we have to invaliate this command as well....
-
-//        super.validate(modelActor);
-        State currentState = task.getState();
-        if (currentState != State.Active) {
-            throw new InvalidCommandException("CompleteTask: Action can not be completed as the task (" + getTaskId() + ") is not in Active but in " + currentState + " state");
-        }
-
-        String currentTaskAssignee = task.getImplementation().getAssignee();
-        if (currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty()) {
-            throw new InvalidCommandException("CompleteHumanTask: Only Assigned or Delegated task can be completed");
-        }
-
-        String userId = getUser().id();
-        if (!userId.equals(currentTaskAssignee)) {
-            throw new InvalidCommandException("CompleteTask: Only the current task assignee (" + currentTaskAssignee + ") can complete the task (" + task.getId() + ")");
-        }
-
-        validateState(task, TaskState.Assigned, TaskState.Delegated);
+        super.validateTaskOwnership(task);
+        super.validateState(task, TaskState.Assigned, TaskState.Delegated);
     }
 
     public ValueMap getTaskOutput() {

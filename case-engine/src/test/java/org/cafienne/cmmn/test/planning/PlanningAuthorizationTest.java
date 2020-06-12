@@ -31,7 +31,7 @@ public class PlanningAuthorizationTest {
     @Test
     public void testPlanningAuthorization() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(anonymous, planner);
+        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), planner);
 
         testCase.addStep(new StartCase(anonymous, caseInstanceId, definitions, null, caseTeam), casePlan -> {
             casePlan.print();
@@ -61,7 +61,7 @@ public class PlanningAuthorizationTest {
     @Test
     public void testGetDiscretionaryItems() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(anonymous, planner);
+        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), planner);
 
         testCase.addStep(new StartCase(anonymous, caseInstanceId, definitions, null, caseTeam), casePlan -> casePlan.print());
 

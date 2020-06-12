@@ -20,7 +20,7 @@ import org.cafienne.humantask.instance.TaskState;
 import java.io.IOException;
 
 @Manifest
-public class DelegateTask extends WorkflowCommand {
+public class DelegateTask extends HumanTaskCommand {
     private final String assignee;
 
     private enum Fields {
@@ -29,6 +29,9 @@ public class DelegateTask extends WorkflowCommand {
 
     public DelegateTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
         super(tenantUser, caseInstanceId, taskId);
+        if (assignee == null || assignee.trim().isEmpty()) {
+            throw new InvalidCommandException("DelegateTask: The delegate should not be null or empty");
+        }
         this.assignee = assignee;
     }
 
@@ -39,22 +42,11 @@ public class DelegateTask extends WorkflowCommand {
 
     @Override
     public void validate(HumanTask task) {
-        if (assignee == null || assignee.trim().isEmpty()) {
-            throw new InvalidCommandException("DelegateTask: The delegate should not be null or empty");
-        }
-        // TODO: 1. Validate whether delegate is a valid user in the system
-        // TODO: 2. Check whether the current user has the privilege to delegate the task to delegate
-        // TODO: 3. Check whether the delegate is part of CaseTeam. If not what to do?
-        String currentTaskAssignee = task.getImplementation().getAssignee();
-        if (currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty()) {
-            throw new InvalidCommandException("DelegateTask: Only Assigned task can be delegated");
-        }
+        super.validateTaskOwnership(task);
+        super.validateState(task, TaskState.Assigned);
 
-        String currentUserId = getUser().id();
-        if (!currentUserId.equals(currentTaskAssignee)) {
-            throw new InvalidCommandException("DelegateTask: Only the current task assignee (" + currentTaskAssignee + ") can delegate the task (" + task.getId() + ")");
-        }
-        validateState(task, TaskState.Assigned);
+        // TODO: 1. Validate whether delegate is a valid user in the system
+        // TODO: 3. Check whether the delegate is part of CaseTeam. If not what to do?
     }
 
     @Override

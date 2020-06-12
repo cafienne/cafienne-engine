@@ -37,8 +37,9 @@ public class FillTaskDueDate extends HumanTaskCommand {
 	}
 
 	@Override
-    public void validate(HumanTask task) {
-         // TODO: 1. Validate whether the current user has the privilege to set the due date
+	public void validate(HumanTask task) {
+		// Only case owners can set the due date
+		super.validateCaseOwnership(task);
 	}
 
 	@Override

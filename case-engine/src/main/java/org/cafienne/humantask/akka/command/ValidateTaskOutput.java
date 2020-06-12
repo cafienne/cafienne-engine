@@ -8,7 +8,6 @@
 package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -25,7 +24,7 @@ import java.io.IOException;
  * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.
  */
 @Manifest
-public class ValidateTaskOutput extends WorkflowCommand {
+public class ValidateTaskOutput extends HumanTaskCommand {
 	private final ValueMap taskOutput;
 
 	private enum Fields {
@@ -41,32 +40,22 @@ public class ValidateTaskOutput extends WorkflowCommand {
 		super(json);
 		this.taskOutput = readMap(json, Fields.taskOutput);
 	}
-	
+
 	@Override
-    public void validate(HumanTask task) {
-		String currentTaskAssignee = task.getImplementation().getAssignee();
-		if( currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty() ) {
-		    throw new InvalidCommandException("ValidateTaskOutput: Output can be validated only for Assigned or Delegated task (" + task.getId() + ")");
-		}
-
-		String currentUserId = getUser().id();
-		if(! currentUserId.equals(currentTaskAssignee) ) {
-		    throw new InvalidCommandException("ValidateTaskOutput: Only the current task assignee (" + currentTaskAssignee + ") can validate output of task (" + task.getId() + ")");
-		}
-
-		// Task output can only be set if task is Assigned or Delegated
-		validateState(task, TaskState.Assigned, TaskState.Delegated);
+	public void validate(HumanTask task) {
+		super.validateTaskOwnership(task);
+		super.validateState(task, TaskState.Assigned, TaskState.Delegated);
 	}
 
-    @Override
-    public ModelResponse process(HumanTask task) {
-        ValidationResponse response = task.validateOutput(taskOutput);
-        if (response.isValid()) {
+	@Override
+	public ModelResponse process(HumanTask task) {
+		ValidationResponse response = task.validateOutput(taskOutput);
+		if (response.isValid()) {
 			return new HumanTaskValidationResponse(this, response.getContent());
 		} else {
-        	// HTD
+			// HTD
 //        	return null;
-        	return new CommandFailure(this, response.getException());
+			return new CommandFailure(this, response.getException());
 		}
 	}
 
