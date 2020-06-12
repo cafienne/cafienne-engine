@@ -3,7 +3,7 @@ package org.cafienne.service.api.cases
 import akka.actor.{ActorRefFactory, ActorSystem}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.api.cases.table.{CaseRecord, CaseTables}
-import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure}
+import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.api.tasks.TaskTables
 import org.cafienne.service.api.tenant.TenantTables
 
@@ -155,13 +155,28 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
   override def getCasesStats(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
     // TODO
     // Query must be converted to:
-    //   select count(*), definition, state, failures from case_instance group by definition, state, failures [where state == and definition == ]
+    //   select count(*), definition, state, failures from case_instance group by definition, state, failures [having state == and definition == ]
     val definitionFilter = definition.getOrElse("")
     val statusFilter = status.getOrElse("")
 
     val tenantSet = tenants(tenant, user)
     // NOTE: this uses a direct query. Fields must be escaped with quotes for the in-memory Hsql Database usage.
-    val action = sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" """.as[(Long, String, String, String, Int)]
+    val action = {
+      status match {
+//        case Some(s) => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
+        case Some(s) => s.toLowerCase() match {
+          case "active" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Active'""".as[(Long, String, String, String, Int)]
+          case "completed" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Completed'""".as[(Long, String, String, String, Int)]
+          case "terminated" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Terminated'""".as[(Long, String, String, String, Int)]
+          case "suspended" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Suspended'""".as[(Long, String, String, String, Int)]
+          case "failed" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Failed'""".as[(Long, String, String, String, Int)]
+          case "closed" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Closed'""".as[(Long, String, String, String, Int)]
+          case other => throw new SearchFailure(s"Status $other is invalid")
+        }
+        case None => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" """.as[(Long, String, String, String, Int)]
+      }
+
+    }
     db.run(action).map { value =>
       val r = collection.mutable.Map.empty[String, CaseList]
       value.filter(caseInstance => tenantSet.contains(caseInstance._2)).foreach { caseInstance =>
