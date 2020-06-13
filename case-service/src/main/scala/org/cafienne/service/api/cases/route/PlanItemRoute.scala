@@ -59,12 +59,12 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItems = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "planitems") { caseInstanceId =>
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
           //          parameters(planItemType ?, 'status ?) { (planItemType, status) =>
           // planItemType and status are removed!!
-          onComplete(handleSyncedQuery(() => caseQueries.getPlanItems(caseInstanceId, user), caseLastModified)) {
+          onComplete(handleSyncedQuery(() => caseQueries.getPlanItems(caseInstanceId, platformUser), caseLastModified)) {
             case Success(value) => complete(StatusCodes.OK, value.toString)
             case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
             case Failure(err) => throw err
@@ -92,10 +92,10 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItem = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "planitems" / Segment) { (_, planItemId) =>
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getPlanItem(planItemId, user), caseLastModified)) {
+          onComplete(handleSyncedQuery(() => caseQueries.getPlanItem(planItemId, platformUser), caseLastModified)) {
             case Success(value) => complete(StatusCodes.OK, value.toString)
             case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
             case Failure(err) => throw err
@@ -125,10 +125,10 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def planItemTransition = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "planitems" / Segment / Segment) { (caseInstanceId, planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)
-        askCase(user, caseInstanceId, user => new MakePlanItemTransition(user, caseInstanceId, planItemId, transition, ""))
+        askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition, ""))
       }
     }
   }
@@ -150,9 +150,9 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItemHistory = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "planitems" / Segment / "history") { (caseInstanceId, planItemId) =>
-        onComplete(caseQueries.getPlanItemHistory(planItemId, user)) {
+        onComplete(caseQueries.getPlanItemHistory(planItemId, platformUser)) {
           case Success(value) => complete(StatusCodes.OK, value.toString)
           case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
           case Failure(err) => throw err

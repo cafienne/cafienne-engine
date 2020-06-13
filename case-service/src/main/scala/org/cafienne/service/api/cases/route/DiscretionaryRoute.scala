@@ -48,9 +48,9 @@ class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val use
   )
   @Produces(Array("application/json"))
   def retrieveDiscretionaryItem = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "discretionaryitems") { caseInstanceId =>
-        askCase(user, caseInstanceId, user => new GetDiscretionaryItems(user, caseInstanceId))
+        askCase(platformUser, caseInstanceId, tenantUser => new GetDiscretionaryItems(tenantUser, caseInstanceId))
       }
     }
   }
@@ -73,10 +73,10 @@ class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val use
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
   def planDiscretionaryItem = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "discretionaryitems" / "plan") { caseInstanceId =>
         entity(as[CaseCommandModels.PlanDiscretionaryItem]) { payload =>
-          askCase(user, caseInstanceId, user => new AddDiscretionaryItem(user, caseInstanceId, payload.name, payload.definitionId, payload.parentId, payload.planItemId.orNull))
+          askCase(platformUser, caseInstanceId, tenantUser => new AddDiscretionaryItem(tenantUser, caseInstanceId, payload.name, payload.definitionId, payload.parentId, payload.planItemId.orNull))
         }
       }
     }

@@ -38,7 +38,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         logger.warn("Sleeping a bit, becuase file " + bootstrapTenantConfFileName+" seems to not (yet) exist")
         Thread.sleep(1000) // Sometimes in docker, volume is not mounted fast enough it seems. Therefore we put a wait statement of 1 second and then check again.
         if (! configFile.exists()) {
-          throw new BootstrapFailure(s"The configured bootstrap tenant file cannot be found at '${configFile.getAbsolutePath}' (conf value: '${bootstrapTenantConfFileName}')")
+          throw new BootstrapFailure(s"The configured bootstrap tenant file cannot be found at '${configFile.getAbsolutePath}' (conf value: '$bootstrapTenantConfFileName')")
         }
         logger.warn("Sleeping a bit helped, becuase file " + bootstrapTenantConfFileName+" now exists")
       }
@@ -60,7 +60,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     val yamlFile = new File(defaultTenant + ".yaml")
     if (yamlFile.exists()) return Some(yamlFile)
 
-    logger.warn(s"Skipping bootstrap tenant configuration for '$defaultTenant', because a file '${confFile}', '${jsonFile}', '${ymlFile}' or '${yamlFile}' cannot be found")
+    logger.warn(s"Skipping bootstrap tenant configuration for '$defaultTenant', because a file '$confFile', '$jsonFile', '$ymlFile' or '$yamlFile' cannot be found")
     None
    }
 

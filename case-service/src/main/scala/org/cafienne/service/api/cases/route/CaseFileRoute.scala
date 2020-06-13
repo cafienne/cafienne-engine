@@ -57,10 +57,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getCaseFile = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "casefile") { caseInstanceId => {
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getCaseFile(caseInstanceId, user), caseLastModified)) {
+          onComplete(handleSyncedQuery(() => caseQueries.getCaseFile(caseInstanceId, platformUser), caseLastModified)) {
             case Success(caseFile) => complete(StatusCodes.OK, caseFile.toString)
             case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
             case Failure(err) => complete(StatusCodes.InternalServerError, err)
@@ -89,10 +89,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def createCaseFileItem = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "casefile" / "create" / RemainingPath) { (caseInstanceId, path) =>
         entity(as[Value[_]]) { json =>
-          askCase(user, caseInstanceId, user => new CreateCaseFileItem(user, caseInstanceId, json, path.toString))
+          askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
         }
       }
     }
@@ -116,10 +116,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def replaceCaseFileItem = put {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "casefile" / "replace" / RemainingPath) { (caseInstanceId, path) =>
         entity(as[Value[_]]) { json =>
-          askCase(user, caseInstanceId, user => new ReplaceCaseFileItem(user, caseInstanceId, json, path.toString))
+          askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
         }
       }
     }
@@ -142,10 +142,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   def updateCaseFileItem = put {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "casefile" / "update" / RemainingPath) { (caseInstanceId, path) => {
         entity(as[Value[_]]) { json =>
-          askCase(user, caseInstanceId, user => new UpdateCaseFileItem(user, caseInstanceId, json, path.toString))
+          askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
         }
       }
       }
@@ -169,9 +169,9 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Consumes(Array("application/json"))
   def deleteCaseFileItem = delete {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "casefile" / "delete" / RemainingPath) { (caseInstanceId, path) =>
-        askCase(user, caseInstanceId, user => new DeleteCaseFileItem(user, caseInstanceId, path.toString))
+        askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path.toString))
       }
     }
   }

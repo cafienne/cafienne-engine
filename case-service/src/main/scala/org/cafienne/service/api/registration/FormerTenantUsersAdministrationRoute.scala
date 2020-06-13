@@ -35,19 +35,16 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
   }
 
   def addTenantUser = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "users") { tenant =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat4(TenantAPI.User)
-        entity(as[TenantAPI.User]) {
-          newUser =>
-//            System.err.println("New registration: " + newRegistration)
-            val tenantOwner = user.getTenantUser(tenant)
+        entity(as[TenantAPI.User]) { newUser =>
             val roles = newUser.roles.asJava
             val name = newUser.name.getOrElse("")
             val email = newUser.email.getOrElse("")
-            askTenant(new AddTenantUser(tenantOwner, tenant, newUser.userId, roles, name, email))
+            askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, newUser.userId, roles, name, email))
         }
       }
     }
@@ -56,9 +53,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
   def disableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "disable") { (tenant, userId) =>
-//        System.err.println("Disabling user " + userId + " in tenant " + tenant)
-        val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new DisableTenantUser(user, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new DisableTenantUser(tenantUser, tenant, userId))
       }
     }
   }
@@ -66,9 +61,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
   def enableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "enable") { (tenant, userId) =>
-//        System.err.println("Enabling user " + userId + " in tenant " + tenant)
-        val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new EnableTenantUser(user, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new EnableTenantUser(tenantUser, tenant, userId))
       }
     }
   }
@@ -76,19 +69,15 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
   def addTenantUserRoles = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-//            System.err.println("New roles for user " + userId + " in tenant " + tenant + ": " + roles)
-        val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new AddTenantUserRole(user, tenant, userId, role))
+        askTenant(tenantOwner, tenant, tenantUser => new AddTenantUserRole(tenantUser, tenant, userId, role))
       }
     }
   }
 
   def removeTenantUserRole = delete {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-//            System.err.println("Remove role for user " + userId + " in tenant " + tenant + ": " + role)
-        val tenantOwner = user.getTenantUser(tenant)
-        askTenant(new RemoveTenantUserRole(tenantOwner, tenant, userId, role))
+        askTenant(platformUser, tenant, tenantUser => new RemoveTenantUserRole(tenantUser, tenant, userId, role))
       }
     }
   }
@@ -140,8 +129,8 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
   def getUserInformation = get {
     pathPrefix("user-information") {
       pathEndOrSingleSlash {
-        validUser { user =>
-          val value = HttpEntity(ContentTypes.`application/json`, user.toJSON)
+        validUser { platformUser =>
+          val value = HttpEntity(ContentTypes.`application/json`, platformUser.toJSON)
           complete(StatusCodes.OK, value)
         }
       }

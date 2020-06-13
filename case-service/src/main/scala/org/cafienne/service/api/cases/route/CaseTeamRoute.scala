@@ -52,10 +52,10 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getCaseTeam = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getCaseTeam(caseInstanceId, user), caseLastModified)) {
+          onComplete(handleSyncedQuery(() => caseQueries.getCaseTeam(caseInstanceId, platformUser), caseLastModified)) {
             case Success(value) => complete(StatusCodes.OK, value.toString)
             case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
             case Failure(_) => complete(StatusCodes.InternalServerError)
@@ -83,10 +83,10 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[Examples.StartCaseTeamMember])))))
   @Consumes(Array("application/json"))
   def setCaseTeam = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
         entity(as[BackwardCompatibleTeam]) { caseTeam =>
-          askCase(user, caseInstanceId, user => new SetCaseTeam(user, caseInstanceId, teamConverter(caseTeam)))
+          askCase(platformUser, caseInstanceId, tenantUser => new SetCaseTeam(tenantUser, caseInstanceId, teamConverter(caseTeam)))
         }
       }
     }
@@ -110,10 +110,10 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMember]))))
   @Consumes(Array("application/json"))
   def putCaseTeamMember = put {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
         entity(as[BackwardCompatibleTeamMember]) { caseTeamMember =>
-          askCase(user, caseInstanceId, user => new PutTeamMember(user, caseInstanceId, memberConverter(caseTeamMember)))
+          askCase(platformUser, caseInstanceId, tenantUser => new PutTeamMember(tenantUser, caseInstanceId, memberConverter(caseTeamMember)))
         }
       }
     }
@@ -150,10 +150,10 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Consumes(Array("application/json"))
   def deleteCaseTeamMember = delete {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "caseteam" / Segment) { (caseInstanceId, memberId) =>
         parameters('type ?) { memberType =>
-          askCase(user, caseInstanceId, user => new RemoveTeamMember(user, caseInstanceId, MemberKey(memberId, memberType.getOrElse("user"))))
+          askCase(platformUser, caseInstanceId, tenantUser => new RemoveTeamMember(tenantUser, caseInstanceId, MemberKey(memberId, memberType.getOrElse("user"))))
         }
       }
     }

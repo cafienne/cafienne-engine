@@ -36,7 +36,7 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
         entity(as[TenantAPI.Tenant]) { newTenant =>
           val newTenantName = newTenant.name
           val owners = newTenant.owners.map(owner => TenantUser(owner.userId, owner.roles.toSeq, newTenantName, owner.name.getOrElse(""), owner.email.getOrElse(""), true))
-          askTenant(new CreateTenant(platformOwner, newTenantName, newTenantName, owners.asJava))
+          askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, owners.asJava))
         }
       }
     }
@@ -44,7 +44,7 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
   def disableTenant = put {
     validUser { platformOwner =>
       path(Segment / "disable") { tenant =>
-        askTenant(new DisableTenant(platformOwner, tenant.name))
+        askPlatform(new DisableTenant(platformOwner, tenant.name))
       }
     }
   }
@@ -52,7 +52,7 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
   def enableTenant = put {
     validUser { platformOwner =>
       path(Segment / "disable") { tenant =>
-        askTenant(new EnableTenant(platformOwner, tenant.name))
+        askPlatform(new EnableTenant(platformOwner, tenant.name))
       }
     }
   }

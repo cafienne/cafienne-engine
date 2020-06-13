@@ -23,8 +23,7 @@ class FormerTenantAdministrationRoute()(override implicit val userCache: Identit
   def addTenantOwner = put {
     validUser { tenantOwner =>
       path(Segment / "owners" / Segment) { (tenant, userId) =>
-        val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new AddTenantOwner(user, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new AddTenantOwner(tenantUser, tenant, userId))
       }
     }
   }
@@ -32,8 +31,7 @@ class FormerTenantAdministrationRoute()(override implicit val userCache: Identit
   def removeTenantOwner = delete {
     validUser { tenantOwner =>
       path(Segment / "owners" / Segment) { (tenant, userId) =>
-        val user = tenantOwner.getTenantUser(tenant)
-        askTenant(new RemoveTenantOwner(user, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new RemoveTenantOwner(tenantUser, tenant, userId))
       }
     }
   }
@@ -41,10 +39,7 @@ class FormerTenantAdministrationRoute()(override implicit val userCache: Identit
   def getTenantOwners = get {
     validUser { tenantOwner =>
       path(Segment / "owners") { tenant =>
-        if (tenantOwner.isPlatformOwner) {
-//          println("Cannot go there as platform owner")
-        }
-        askTenant(new GetTenantOwners(tenantOwner.getTenantUser(tenant), tenant))
+        askTenant(tenantOwner, tenant, tenantUser => new GetTenantOwners(tenantUser, tenant))
       }
     }
   }

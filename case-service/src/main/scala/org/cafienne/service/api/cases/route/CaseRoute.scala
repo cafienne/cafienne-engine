@@ -74,11 +74,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @Produces(Array("application/json"))
   def getCases = get {
     pathEndOrSingleSlash {
-      validUser { user =>
+      validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (optionalTenant, offset, numResults, definition, state, sortBy, sortOrder) =>
             optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-              onComplete(handleSyncedQuery(() => caseQueries.getCases(optionalTenant, offset, numResults, user, definition, status = state), caseLastModified)) {
+              onComplete(handleSyncedQuery(() => caseQueries.getCases(optionalTenant, offset, numResults, platformUser, definition, status = state), caseLastModified)) {
                 case Success(value) => complete(StatusCodes.OK, caseInstanceToValueList(value))
                 case Failure(err) => complete(StatusCodes.NotFound, err)
               }
@@ -111,11 +111,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @Produces(Array("application/json"))
   def getUserCases = get {
     path("user") {
-      validUser { user =>
+      validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (tenant, offset, numResults, definition, state, sortBy, sortOrder) =>
             optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-              onComplete(handleSyncedQuery(() => caseQueries.getMyCases(tenant, offset, numResults, user, definition, state), caseLastModified)) {
+              onComplete(handleSyncedQuery(() => caseQueries.getMyCases(tenant, offset, numResults, platformUser, definition, state), caseLastModified)) {
                 case Success(value) => complete(StatusCodes.OK, caseInstanceToValueList(value))
                 case Failure(err) => complete(StatusCodes.NotFound, err)
               }
@@ -156,11 +156,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @Produces(Array("application/json"))
   def stats = get {
     path("stats") {
-      validUser { user =>
+      validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?
         ) { (tenant, offset, numOfResults, definition, status) =>
           optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-            onComplete(handleSyncedQuery(() => caseQueries.getCasesStats(tenant, offset, numOfResults, user, definition, status), caseLastModified)) {
+            onComplete(handleSyncedQuery(() => caseQueries.getCasesStats(tenant, offset, numOfResults, platformUser, definition, status), caseLastModified)) {
               case Success(value) => complete(StatusCodes.OK, caseListToValueMap(value))
               case Failure(err) => complete(StatusCodes.InternalServerError)
             }
@@ -193,10 +193,10 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   )
   @Produces(Array("application/json"))
   def getCase = get {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment) { caseInstanceId => {
         optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getFullCaseInstance(caseInstanceId, user), caseLastModified)) {
+          onComplete(handleSyncedQuery(() => caseQueries.getFullCaseInstance(caseInstanceId, platformUser), caseLastModified)) {
             case Success(value) => complete(StatusCodes.OK, value.toString)
             case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
             case Failure(_) => complete(StatusCodes.InternalServerError)
@@ -223,25 +223,25 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @Produces(Array("application/json"))
   def startCase = post {
     pathEndOrSingleSlash {
-      validUser { user =>
+      validUser { platformUser =>
         post {
           entity(as[StartCase]) { payload =>
             try {
               val tenant = payload.tenant match {
-                case None => user.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
+                case None => platformUser.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
                 case Some(string) => string.isEmpty match {
-                  case true => user.defaultTenant
+                  case true => platformUser.defaultTenant
                   case false => payload.tenant.get
                 }
               }
-              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), payload.definition)
+              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser.getTenantUser(tenant), payload.definition)
               val caseDefinition = definitionsDocument.getFirstCase
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
-              askModelActor(new akka.command.StartCase(tenant, user.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              askModelActor(new akka.command.StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingTenantException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
@@ -271,9 +271,9 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   )
   @Produces(Array("application/json"))
   def debugCase = put {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "debug" / Segment) { (caseInstanceId, debugMode) =>
-        askCase(user, caseInstanceId, user => new SwitchDebugMode(user, caseInstanceId, debugMode == "true"))
+        askCase(platformUser, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
       }
     }
   }

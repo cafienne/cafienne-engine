@@ -7,12 +7,23 @@
  */
 package org.cafienne.service.api.tenant.route
 
+import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.tenant.akka.command.TenantCommand
+import org.cafienne.tenant.akka.command.platform.PlatformTenantCommand
 
 trait TenantRoute extends CommandRoute {
 
-  def askTenant(command: TenantCommand) = {
+  def askPlatform(command: PlatformTenantCommand) = {
     askModelActor(command)
   }
+
+  def askTenant(platformUser: PlatformUser, tenant: String, createTenantCommand: CreateTenantCommand) = {
+    askModelActor(createTenantCommand.apply(platformUser.getTenantUser(tenant)))
+  }
+
+  trait CreateTenantCommand {
+    def apply(tenantUser: TenantUser): TenantCommand
+  }
 }
+
