@@ -261,4 +261,27 @@ public class Team extends CMMNElement<CaseDefinition> {
     public CaseDefinition getDefinition() {
         return getCaseInstance().getDefinition();
     }
+
+    /**
+     * Adds a member to the case team upon request of a Task that has dynamic assignment.
+     * @param assignee
+     * @param performer
+     */
+    public void addDynamicMember(String assignee, CaseRoleDefinition performer) {
+        List<Member> existingMembers = getMembers().stream().filter(member -> member.isUser() && member.key.id().equals(assignee)).collect(Collectors.toList());
+        if (existingMembers.isEmpty()) {
+            // Add the member; as a member, and if a role is required also with the role
+            getCaseInstance().addDebugInfo(() -> "Adding team member '" + assignee +"' because of dynamic task assignment");
+            getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), ""));
+            if (performer != null) getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), performer.getName()));
+        } else {
+            // If a role is required, then check if one of the existing members has the role; if not, give the role.
+            if (performer != null) {
+                Member member = existingMembers.get(0);
+                if (! member.hasRole(performer.getName())) {
+                    getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), performer.getName()));
+                }
+            }
+        }
+    }
 }
