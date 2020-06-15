@@ -18,7 +18,6 @@ import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
-import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
@@ -155,11 +154,11 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
+        caseInstance.upsertDebugMode(debugMode);
         if (debugMode) {
-            caseInstance.addEvent(new DebugEnabled(caseInstance));
-            logger.debug("Starting case "+ actorId +" of type "+ definition.getName()+" in debug mode");
+            caseInstance.addDebugInfo(() -> "Starting case "+ actorId +" of type "+ definition.getName()+" in debug mode");
         } else {
-            logger.debug("Starting case "+ actorId +" of type "+ definition.getName());
+            caseInstance.addDebugInfo(() -> "Starting case "+ actorId +" of type "+ definition.getName());
         }
 
         // First set the definition

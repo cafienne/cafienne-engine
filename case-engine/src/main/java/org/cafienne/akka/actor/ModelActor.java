@@ -18,6 +18,8 @@ import org.cafienne.akka.actor.handler.*;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.event.DebugEvent;
+import org.cafienne.cmmn.akka.event.DebugDisabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
@@ -66,7 +68,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    private boolean debugMode = false;
+    private boolean debugMode = CaseSystem.config().actor().debugEnabled();
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.

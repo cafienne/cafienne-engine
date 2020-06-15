@@ -11,6 +11,8 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
+import org.cafienne.cmmn.akka.event.DebugDisabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
@@ -375,5 +377,13 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public Team getCaseTeam() {
         return caseTeam;
+    }
+
+    public void upsertDebugMode(boolean newDebugMode) {
+        // TODO: this belongs in ModelActor, but then the debugenabled/disabled events need to take ModelActor and should no longer extend CaseEvent
+        if (newDebugMode!=this.debugMode()) {
+            if (newDebugMode) addEvent(new DebugEnabled(this));
+            else addEvent(new DebugDisabled(this));
+        }
     }
 }
