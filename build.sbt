@@ -85,9 +85,7 @@
         Deps.akkaHttpSprayJson,
         Deps.akkaHttpCors,
         Deps.javaxws,
-        Deps.swaggerAkkaHttp, Deps.swaggerAkkaHttpFix, Deps.swaggerAkkaHttpFix2, Deps.swaggerAkkaHttpScala, Deps.swaggerCore, Deps.swaggerAnnotations, Deps.swaggerModels, Deps.swaggerjaxrs2
-
-        
+        Deps.swaggerAkkaHttp, Deps.swaggerCore, Deps.swaggerAnnotations, Deps.swaggerModels, Deps.swaggerjaxrs2
       ) ++
         Deps.test(
           Deps.junit,
@@ -148,7 +146,7 @@
           Deps.akkaHttpSprayJson,
           Deps.akkaHttpCors,
           Deps.javaxws,
-          Deps.swaggerAkkaHttp, Deps.swaggerAkkaHttpFix, Deps.swaggerAkkaHttpFix2, Deps.swaggerAkkaHttpScala, Deps.swaggerCore, Deps.swaggerAnnotations, Deps.swaggerModels, Deps.swaggerjaxrs2,
+          Deps.swaggerAkkaHttp, Deps.swaggerCore, Deps.swaggerAnnotations, Deps.swaggerModels, Deps.swaggerjaxrs2,
           Deps.akkaHttpCore,
           Deps.akkaHtppJackson,
           Deps.bcrypt,

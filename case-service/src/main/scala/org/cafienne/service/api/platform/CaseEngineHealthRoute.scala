@@ -9,7 +9,6 @@ package org.cafienne.service.api.platform
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -19,7 +18,6 @@ import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 
 import scala.collection.immutable.Seq
 
-@Api(tags = Array("platform"))
 @Path("/")
 class CaseEngineHealthRoute() extends CaseServiceRoute {
 

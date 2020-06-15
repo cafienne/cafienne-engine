@@ -8,7 +8,6 @@
 package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
@@ -16,7 +15,6 @@ import org.cafienne.service.api.projection.query.UserQueries
 import scala.collection.immutable.Seq
 
 
-@Api(tags = Array("tenant"))
 @Path("/tenant")
 class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
   val tenantOwnersRoute = new TenantOwnersRoute(userQueries)(userCache)

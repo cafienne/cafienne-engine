@@ -22,7 +22,7 @@ object Deps {
     val akka        = "2.6.5"
     val jackson     = "2.11.0"
     val enumeratum  = "1.6.1"
-    val swagger     = "2.1.2"
+    val swagger     = "2.1.5"
     val slick       = "3.3.2"
   }
 
@@ -60,10 +60,7 @@ object Deps {
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
   val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
-  val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.0.4"
-  val swaggerAkkaHttpFix    = "io.swagger"              % "swagger-jaxrs"                         % "1.6.0"
-  val swaggerAkkaHttpFix2   = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
-  val swaggerAkkaHttpScala  = "com.github.swagger-akka-http" %% "swagger-scala-module"            % "2.0.6"
+  val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.2.0"
   val swaggerCore           = "io.swagger.core.v3"      % "swagger-core"                          % V.swagger
   val swaggerAnnotations    = "io.swagger.core.v3"      % "swagger-annotations"                   % V.swagger
   val swaggerModels         = "io.swagger.core.v3"      % "swagger-models"                        % V.swagger

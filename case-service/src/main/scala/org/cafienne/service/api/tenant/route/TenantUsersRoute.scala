@@ -9,7 +9,6 @@ package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -25,7 +24,6 @@ import org.cafienne.service.api.tenant.model._
 import scala.util.{Failure, Success}
 
 
-@Api(tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {

@@ -8,7 +8,6 @@
 package org.cafienne.service.api.platform
 
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -22,7 +21,6 @@ import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command.platform.{DisableTenant, EnableTenant}
 
-@Api(tags = Array("platform"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
 class PlatformRoute()(override implicit val userCache: IdentityProvider) extends CommandRoute with TenantRoute {
