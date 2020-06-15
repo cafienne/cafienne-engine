@@ -4,10 +4,11 @@ import org.cafienne.cmmn.akka.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
 import org.cafienne.cmmn.instance.team.CaseTeamError
+import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.JavaConverters._
 
-case class CaseTeam(members: Seq[CaseTeamMember] = Seq()) {
+case class CaseTeam(members: Seq[CaseTeamMember] = Seq()) extends CafienneJson {
 
   /**
     * Validates whether the case team setup matches the case definition
@@ -44,9 +45,7 @@ case class CaseTeam(members: Seq[CaseTeamMember] = Seq()) {
 
   def getMembers() = members.asJava
 
-  override def toString: String = toValue.toString
-
-  def toValue(): ValueList = {
+  override def toValue(): ValueList = {
     Value.convert(members.map(member => member.toValue)).asInstanceOf[ValueList]
   }
 }

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.serialization.AkkaSerializable
 import org.cafienne.cmmn.instance.casefile.{Value, ValueMap}
+import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
 
-final case class TenantUser(id: String, roles: Seq[String], tenant: String, name: String, email: String = "", enabled: Boolean = true) extends AkkaSerializable {
+final case class TenantUser(id: String, roles: Seq[String], tenant: String, name: String, email: String = "", enabled: Boolean = true) extends AkkaSerializable with CafienneJson {
 
   import scala.collection.JavaConverters._
 
@@ -26,7 +27,7 @@ final case class TenantUser(id: String, roles: Seq[String], tenant: String, name
     generator.writeEndObject()
   }
 
-  def toJson = new ValueMap(
+  override def toValue = new ValueMap(
     Fields.userId, id,
     Fields.roles, roles.toArray,
     Fields.tenant, tenant,

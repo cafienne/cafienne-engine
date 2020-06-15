@@ -3,6 +3,7 @@ package org.cafienne.service.api.tasks
 import java.time.Instant
 
 import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
+import org.cafienne.infrastructure.json.CafienneJson
 
 final case class TaskRecord(id: String,
                             caseInstanceId: String,
@@ -20,11 +21,11 @@ final case class TaskRecord(id: String,
                             input: String = "",
                             output: String = "",
                             taskModel: String = ""
-                     ) {
+                     ) extends CafienneJson {
 
   def getJSON(value: String): Value[_] = if (value == "" || value == null) new ValueMap else JSONReader.parse(value)
 
-  def toValueMap: ValueMap = {
+  override def toValue: Value[_] = {
     val v = new ValueMap
     v.putRaw("id", id)
     v.putRaw("taskName", taskName)

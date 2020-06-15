@@ -4,6 +4,8 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.cmmn.instance.casefile.{LongValue, Value, ValueMap}
+import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.cases.table.{CaseTables, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
@@ -11,7 +13,9 @@ import org.cafienne.service.api.tenant.{TenantTables, UserRoleRecord}
 
 import scala.concurrent.Future
 
-case class TaskCount(claimed: Long, unclaimed: Long)
+case class TaskCount(claimed: Long, unclaimed: Long) extends CafienneJson {
+  override def toValue: Value[_] = new ValueMap("claimed", new LongValue(claimed), "unclaimed", new LongValue(unclaimed))
+}
 
 trait TaskQueries {
 

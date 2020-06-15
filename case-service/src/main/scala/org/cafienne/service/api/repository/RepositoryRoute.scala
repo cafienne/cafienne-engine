@@ -126,7 +126,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
           val model = new ValueMap("definitions", file, "description", description)
           models.withArray("models").add(model)
         }
-        complete(StatusCodes.OK, models)
+        completeJsonValue(models)
       }
       }
     }

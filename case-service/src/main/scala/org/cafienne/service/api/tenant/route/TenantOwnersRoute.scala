@@ -7,8 +7,6 @@
  */
 package org.cafienne.service.api.tenant.route
 
-import akka.http.scaladsl.marshalling.Marshaller
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -20,13 +18,11 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
 
 import scala.collection.JavaConverters._
-import scala.util.{Failure, Success}
 
 @Api(tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -270,18 +266,9 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   @Produces(Array("application/json"))
   def getDisabledUserAccounts = get {
     validUser { tenantOwner =>
-      path(Segment / "disabled-accounts") { tenant =>
-        onComplete(userQueries.getDisabledTenantUsers(tenantOwner, tenant)) {
-          case Success(users) =>
-            complete(StatusCodes.OK, users)
-          case Failure(err) =>
-            err match {
-              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
-              case _ => complete(StatusCodes.InternalServerError, err)
-            }
-        }
-
-    }
+      path(Segment / "disabled-accounts") {
+        tenant => runListQuery(userQueries.getDisabledTenantUsers(tenantOwner, tenant))
+      }
     }
   }
 }

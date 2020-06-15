@@ -20,12 +20,12 @@ import org.cafienne.cmmn.akka.command.{AddDiscretionaryItem, CaseCommandModels, 
 import org.cafienne.cmmn.akka.response.CaseResponseModels
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.cases.CaseQueries
 
 @Api(tags = Array("discretionary items"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
+class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
   override def routes = {
     retrieveDiscretionaryItem ~

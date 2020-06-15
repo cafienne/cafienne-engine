@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -20,15 +19,12 @@ import org.cafienne.cmmn.akka.command.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
-import org.cafienne.service.api.projection.SearchFailure
-
-import scala.util.{Failure, Success}
+import org.cafienne.service.api.cases.CaseQueries
 
 @Api(tags = Array("case plan"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
+class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
   val caseFileRoute = new CaseFileRoute(caseQueries)(userCache)
   val caseTeamRoute = new CaseTeamRoute(caseQueries)(userCache)
@@ -60,16 +56,8 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Produces(Array("application/json"))
   def getPlanItems = get {
     validUser { platformUser =>
-      path(Segment / "planitems") { caseInstanceId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          //          parameters(planItemType ?, 'status ?) { (planItemType, status) =>
-          // planItemType and status are removed!!
-          onComplete(handleSyncedQuery(() => caseQueries.getPlanItems(caseInstanceId, platformUser), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, value.toString)
-            case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
-            case Failure(err) => throw err
-          }
-        }
+      path(Segment / "planitems") {
+        caseInstanceId => runQuery(caseQueries.getPlanItems(caseInstanceId, platformUser))
       }
     }
   }
@@ -93,14 +81,8 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Produces(Array("application/json"))
   def getPlanItem = get {
     validUser { platformUser =>
-      path(Segment / "planitems" / Segment) { (_, planItemId) =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getPlanItem(planItemId, platformUser), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, value.toString)
-            case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
-            case Failure(err) => throw err
-          }
-        }
+      path(Segment / "planitems" / Segment) {
+        (_, planItemId) => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
       }
     }
   }
@@ -151,12 +133,8 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Produces(Array("application/json"))
   def getPlanItemHistory = get {
     validUser { platformUser =>
-      path(Segment / "planitems" / Segment / "history") { (caseInstanceId, planItemId) =>
-        onComplete(caseQueries.getPlanItemHistory(planItemId, platformUser)) {
-          case Success(value) => complete(StatusCodes.OK, value.toString)
-          case Failure(_: SearchFailure) => complete(StatusCodes.NotFound)
-          case Failure(err) => throw err
-        }
+      path(Segment / "planitems" / Segment / "history") {
+        (_, planItemId) => runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))
       }
     }
   }

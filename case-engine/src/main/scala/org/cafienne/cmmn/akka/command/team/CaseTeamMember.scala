@@ -4,8 +4,9 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.{BooleanValue, StringValue, Value, ValueMap}
 import org.cafienne.cmmn.instance.team.CaseTeamError
+import org.cafienne.infrastructure.json.CafienneJson
 
-case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwner: Option[Boolean] = None, removeRoles: Seq[String] = Seq()) {
+case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwner: Option[Boolean] = None, removeRoles: Seq[String] = Seq()) extends CafienneJson {
   def validateRolesExist(caseDefinition: CaseDefinition): Unit = {
     val unfoundRole = (caseRoles ++ removeRoles).find(roleName => caseDefinition.getCaseRole(roleName) == null || roleName.isBlank)
     unfoundRole match {
@@ -26,7 +27,7 @@ case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwne
     removeRoles.asJava
   }
 
-  def toValue(): ValueMap = {
+  override def toValue(): ValueMap = {
     val json = new ValueMap("memberId", key.id,
       "memberType", key.`type`,
       "isOwner", isOwner.fold(Value.NULL.asInstanceOf[Value[Any]])(b => new BooleanValue(b).asInstanceOf[Value[Any]]),

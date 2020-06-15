@@ -29,19 +29,17 @@ import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
-import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.cases.table.CaseRecord
 import org.cafienne.service.api.model.StartCase
-import org.cafienne.service.api.projection.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 
 @Api(tags = Array("case"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
+class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
   override def routes = {
     getCases ~
@@ -77,12 +75,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (optionalTenant, offset, numResults, definition, state, sortBy, sortOrder) =>
-            optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-              onComplete(handleSyncedQuery(() => caseQueries.getCases(optionalTenant, offset, numResults, platformUser, definition, status = state), caseLastModified)) {
-                case Success(value) => complete(StatusCodes.OK, caseInstanceToValueList(value))
-                case Failure(err) => complete(StatusCodes.NotFound, err)
-              }
-            }
+            runListQuery(caseQueries.getCases(optionalTenant, offset, numResults, platformUser, definition, status = state))
         }
       }
     }
@@ -114,25 +107,10 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (tenant, offset, numResults, definition, state, sortBy, sortOrder) =>
-            optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-              onComplete(handleSyncedQuery(() => caseQueries.getMyCases(tenant, offset, numResults, platformUser, definition, state), caseLastModified)) {
-                case Success(value) => complete(StatusCodes.OK, caseInstanceToValueList(value))
-                case Failure(err) => complete(StatusCodes.NotFound, err)
-              }
-            }
+            runListQuery(caseQueries.getMyCases(tenant, offset, numResults, platformUser, definition, status = state))
         }
       }
     }
-  }
-
-  private def caseInstanceToValueList(rows: Seq[CaseRecord]): ValueList = {
-    val responseValues = new ValueList
-    rows.foreach(row => {
-      val caseInstanceJSON = row.toValueMap
-      caseInstanceJSON.put("team", new ValueList())
-      responseValues.add(caseInstanceJSON)
-    })
-    responseValues
   }
 
   @Path("/stats")
@@ -159,21 +137,10 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?
         ) { (tenant, offset, numOfResults, definition, status) =>
-          optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-            onComplete(handleSyncedQuery(() => caseQueries.getCasesStats(tenant, offset, numOfResults, platformUser, definition, status), caseLastModified)) {
-              case Success(value) => complete(StatusCodes.OK, caseListToValueMap(value))
-              case Failure(err) => complete(StatusCodes.InternalServerError)
-            }
-          }
+          runListQuery(caseQueries.getCasesStats(tenant, offset, numOfResults, platformUser, definition, status))
         }
       }
     }
-  }
-
-  private def caseListToValueMap(caseList: Seq[CaseList]): ValueList = {
-    val responsValues = new ValueList
-    caseList.foreach(v => responsValues.add(v.toValueMap))
-    responsValues
   }
 
   @Path("/{caseInstanceId}")
@@ -194,15 +161,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @Produces(Array("application/json"))
   def getCase = get {
     validUser { platformUser =>
-      path(Segment) { caseInstanceId => {
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getFullCaseInstance(caseInstanceId, platformUser), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, value.toString)
-            case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
-            case Failure(_) => complete(StatusCodes.InternalServerError)
-          }
-        }
-      }
+      path(Segment) {
+        caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, platformUser))
       }
     }
   }

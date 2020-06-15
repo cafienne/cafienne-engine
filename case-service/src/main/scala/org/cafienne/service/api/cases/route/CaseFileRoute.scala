@@ -7,8 +7,9 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -22,18 +23,19 @@ import org.cafienne.cmmn.instance.casefile._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.cases.CaseQueries
 import org.cafienne.service.api.projection.CaseSearchFailure
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 @Api(tags = Array("case file"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
+class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
   override def routes = {
-      getCaseFile ~
+    getCaseFile ~
       createCaseFileItem ~
       replaceCaseFileItem ~
       updateCaseFileItem ~
@@ -58,15 +60,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Produces(Array("application/json"))
   def getCaseFile = get {
     validUser { platformUser =>
-      path(Segment / "casefile") { caseInstanceId => {
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getCaseFile(caseInstanceId, platformUser), caseLastModified)) {
-            case Success(caseFile) => complete(StatusCodes.OK, caseFile.toString)
-            case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
-            case Failure(err) => complete(StatusCodes.InternalServerError, err)
-          }
-        }
-      }
+      path(Segment / "casefile") {
+        caseInstanceId => runQuery(caseQueries.getCaseFile(caseInstanceId, platformUser))
       }
     }
   }

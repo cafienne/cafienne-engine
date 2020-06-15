@@ -8,10 +8,8 @@
 package org.cafienne.service.api.registration
 
 import akka.http.scaladsl.marshalling.Marshaller
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.model._
@@ -84,21 +82,8 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
 
   def getTenantUsers = get {
     validUser { platformUser =>
-      path(Segment / "users") { tenant =>
-        onComplete(userQueries.getTenantUsers(platformUser, tenant)) {
-          case Success(users) =>
-            implicit val usersMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { users: Seq[TenantUser] =>
-              val vList = new ValueList()
-              users.foreach(u => vList.add(u.toJson))
-              HttpEntity(ContentTypes.`application/json`, vList.toString)
-            }
-            complete(StatusCodes.OK, users)
-          case Failure(err) =>
-            err match {
-              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
-              case _ => complete(StatusCodes.InternalServerError, err)
-            }
-        }
+      path(Segment / "users") {
+        tenant => runListQuery(userQueries.getTenantUsers(platformUser, tenant))
       }
     }
   }
@@ -111,11 +96,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
         onComplete(userQueries.getPlatformUser(userId)) {
           case Success(requestedUser) =>
             val tenantUserInformation = requestedUser.getTenantUser(tenant)
-            implicit val tenantUserMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { user: TenantUser =>
-              HttpEntity(ContentTypes.`application/json`, user.toJson.toString)
-            }
-
-            complete(StatusCodes.OK, tenantUserInformation)
+            completeJsonValue(tenantUserInformation.toValue)
           case Failure(err) =>
             err match {
               case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
@@ -130,8 +111,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
     pathPrefix("user-information") {
       pathEndOrSingleSlash {
         validUser { platformUser =>
-          val value = HttpEntity(ContentTypes.`application/json`, platformUser.toJSON)
-          complete(StatusCodes.OK, value)
+          completeJsonValue(platformUser.toValue)
         }
       }
     }

@@ -25,11 +25,11 @@ class HealthMonitor() {
     measures.find(p => p.unhealthy).map(_ => false).getOrElse(true)
   }
 
-  def report: String = {
+  def report: ValueMap = {
     val json = new ValueMap("Status", health, "Description", description)
     val points = json.withArray("measure-points")
     measures.foreach(measure => points.add(new ValueMap(measure.key, measure.asJSON)))
-    json.toString
+    json
   }
 
   def addMeasure(key: String): HealthMeasurePoint = {

@@ -7,9 +7,13 @@ import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.cmmn.instance.casefile.Value
+import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 /**
   * Base class for Case Service APIs. All cors enabled
@@ -74,6 +78,14 @@ trait CaseServiceRoute extends LazyLogging {
         complete(HttpResponse(StatusCodes.InternalServerError))
       }
     }
+  }
+
+  def completeCafienneJSONSeq(seq: Seq[CafienneJson]) = {
+    completeJsonValue(Value.convert(seq.map(element => element.toValue)))
+  }
+
+  def completeJsonValue(v: Value[_]) = {
+    complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, v.toString))
   }
 
   def routes: Route

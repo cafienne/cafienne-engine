@@ -132,8 +132,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
     pathPrefix("user") {
       pathEndOrSingleSlash {
         validUser { platformUser =>
-          val value = HttpEntity(ContentTypes.`application/json`, platformUser.toJSON)
-          complete(StatusCodes.OK, value)
+          completeJsonValue(platformUser.toValue)
         }
       }
     }

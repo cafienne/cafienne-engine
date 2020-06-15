@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -21,16 +20,13 @@ import org.cafienne.cmmn.akka.command.team._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.cases.CaseQueries
 import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember, Examples}
-import org.cafienne.service.api.projection.CaseSearchFailure
-
-import scala.util.{Failure, Success}
 
 @Api(tags = Array("case team"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
+class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
   override def routes = getCaseTeam ~ setCaseTeam ~ putCaseTeamMember ~ deleteCaseTeamMember
 
@@ -53,14 +49,8 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Produces(Array("application/json"))
   def getCaseTeam = get {
     validUser { platformUser =>
-      path(Segment / "caseteam") { caseInstanceId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getCaseTeam(caseInstanceId, platformUser), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, value.toString)
-            case Failure(_: CaseSearchFailure) => complete(StatusCodes.NotFound)
-            case Failure(_) => complete(StatusCodes.InternalServerError)
-          }
-        }
+      path(Segment / "caseteam") {
+        caseInstanceId => runQuery(caseQueries.getCaseTeam(caseInstanceId, platformUser))
       }
     }
   }

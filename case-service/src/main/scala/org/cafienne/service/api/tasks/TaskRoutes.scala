@@ -26,7 +26,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.model.Examples
@@ -38,7 +38,8 @@ import scala.util.{Failure, Success}
 @Api(tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with TaskReader {
+class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with QueryRoute {
+  override val lastModifiedRegistration = TaskReader.lastModifiedRegistration
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[TaskRoutes])
@@ -90,17 +91,8 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
       pathEndOrSingleSlash {
         parameters('tenant ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
           (tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
-            optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
               optionalHeaderValueByName("timeZone") { timeZone =>
-                onComplete(handleSyncedQuery(() => taskQueries.getAllTasks(tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter,
-                  sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, platformUser, timeZone), caseLastModified)) {
-                  case Success(values) =>
-                    val tasks = new ValueList
-                    values.foreach(v => tasks.add(v.toValueMap))
-                    complete(StatusCodes.OK, tasks)
-                  case Failure(err) => complete(StatusCodes.InternalServerError, err)
-                }
-              }
+                runListQuery(taskQueries.getAllTasks(tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, platformUser, timeZone))
             }
         }
       }
@@ -128,21 +120,8 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   def getCaseDefinitionTasks = get {
     validUser { platformUser =>
       path("case-type" / Segment) { caseType =>
-        parameters('tenant ?) { optionalTenant =>
-          optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-            onComplete(handleSyncedQuery(() => taskQueries.getCaseTypeTasks(caseType, optionalTenant, platformUser), caseLastModified)) {
-              case Success(value) =>
-                val tasks = new ValueList
-                value.foreach(v => tasks.add(v.toValueMap))
-                complete(StatusCodes.OK, tasks)
-                complete(StatusCodes.OK, tasks)
-              case Failure(err) =>
-                err match {
-                  case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-                  case _ => throw err
-                }
-            }
-          }
+        parameters('tenant ?) {
+          optionalTenant => runListQuery(taskQueries.getCaseTypeTasks(caseType, optionalTenant, platformUser))
         }
       }
     }
@@ -167,20 +146,8 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def getCaseTasks = get {
     validUser { platformUser =>
-      path("case" / Segment) { caseInstanceId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => taskQueries.getCaseTasks(caseInstanceId, platformUser), caseLastModified)) {
-            case Success(value) =>
-              val tasks = new ValueList
-              value.foreach(v => tasks.add(v.toValueMap))
-              complete(StatusCodes.OK, tasks)
-            case Failure(err) =>
-              err match {
-                case c: CaseSearchFailure => complete(StatusCodes.NotFound, c.getLocalizedMessage)
-                case _ => throw err
-              }
-          }
-        }
+      path("case" / Segment) {
+        caseInstanceId => runListQuery(taskQueries.getCaseTasks(caseInstanceId, platformUser))
       }
     }
   }
@@ -204,17 +171,8 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def getTask = get {
     validUser { platformUser =>
-      path(Segment) { taskId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => taskQueries.getTask(taskId, platformUser), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, value.toValueMap)
-            case Failure(err) =>
-              err match {
-                case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-                case other => throw other
-              }
-          }
-        }
+      path(Segment) {
+        taskId => runQuery(taskQueries.getTask(taskId, platformUser))
       }
     }
   }
@@ -238,16 +196,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     validUser { platformUser =>
       parameters('tenant ?) { tenant =>
         path("user" / "count") {
-          optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-            onComplete(handleSyncedQuery(() => taskQueries.getCountForUser(platformUser, tenant), caseLastModified)) {
-              case Success(value) =>
-                import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-                import spray.json.DefaultJsonProtocol._
-                implicit val format = jsonFormat2(TaskCount)
-                complete(StatusCodes.OK, value)
-              case Failure(ex) => complete(StatusCodes.InternalServerError)
-            }
-          }
+          runQuery(taskQueries.getCountForUser(platformUser, tenant))
         }
       }
     }

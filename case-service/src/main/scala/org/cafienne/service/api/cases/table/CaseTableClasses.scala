@@ -2,7 +2,8 @@ package org.cafienne.service.api.cases.table
 
 import java.time.Instant
 
-import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
+import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
+import org.cafienne.infrastructure.json.CafienneJson
 
 final case class CaseRecord(id: String,
                             tenant: String,
@@ -16,9 +17,9 @@ final case class CaseRecord(id: String,
                             createdOn: Instant,
                             createdBy: String = "",
                             caseInput: String = "",
-                            caseOutput: String = "") {
+                            caseOutput: String = "") extends CafienneJson {
 
-  def toValueMap: ValueMap = {
+  override def toValue: Value[_] = {
     val v = new ValueMap
     v.putRaw("id", id)
     v.putRaw("tenant", tenant)
@@ -111,11 +112,9 @@ final case class PlanItemHistoryRecord(id: String,
                                        taskInput: String = "",
                                        taskOutput: String = "",
                                        mappedInput: String = "",
-                                       rawOutput: String = "") {
+                                       rawOutput: String = "") extends CafienneJson {
 
-
-
-  def toValueMap: ValueMap = {
+  override def toValue: ValueMap = {
     val v = new ValueMap
     v.putRaw("id", id)
     v.putRaw("planItemId", id)
