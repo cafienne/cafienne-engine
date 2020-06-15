@@ -23,7 +23,7 @@ object Deps {
     val jackson     = "2.11.0"
     val enumeratum  = "1.6.1"
     val swagger     = "2.1.5"
-    val slick       = "3.3.2"
+    val slick       = "3.3.3"
   }
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
@@ -90,11 +90,11 @@ object Deps {
   val sw4jj                 = "com.github.j5ik2o"       % "sw4jj_2.11"                            % "1.0.2"
   val slick                 = "com.typesafe.slick"      %% "slick"                                % V.slick
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % V.slick
-  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.13"
+  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.16"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
-  val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.0"
-  val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.2.2.jre11"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.4.3"
+  val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.1"
+  val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.4.1.jre11"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.0.0"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
 
