@@ -2,7 +2,7 @@ package org.cafienne.service.db.migration.versions
 
 import org.cafienne.service.api.cases.table.CaseTables
 import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.db.migration.DbSchemaVersion
+import org.cafienne.service.db.migration.{DbSchemaVersion, Projections}
 import slick.migration.api.TableMigration
 
 object QueryDB_1_1_6 extends DbSchemaVersion
@@ -11,7 +11,7 @@ object QueryDB_1_1_6 extends DbSchemaVersion
   with CaseTablesV1 {
 
   val version = "1.1.6"
-  val migrations = dropPK & enhanceCaseTeamTable & addPK
+  val migrations = dropPK & enhanceCaseTeamTable & addPK & createTaskTeamTable & Projections.resetTaskProjectionWriter
 
   import dbConfig.profile.api._
 
@@ -29,4 +29,16 @@ object QueryDB_1_1_6 extends DbSchemaVersion
 
   def addPK = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addPrimaryKeys(_.pk)
 
+  def createTaskTeamTable = TableMigration(TableQuery[TaskTeamMemberTable])
+    .create
+    .addColumns(
+      _.memberId,
+      _.caseInstanceId,
+      _.tenant,
+      _.caseRole,
+      _.isTenantUser,
+      _.isOwner,
+      _.active
+    )
+    .addPrimaryKeys(_.pk)
 }

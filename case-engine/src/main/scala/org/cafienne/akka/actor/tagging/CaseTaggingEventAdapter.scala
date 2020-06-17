@@ -9,6 +9,7 @@ package org.cafienne.akka.actor.tagging
 
 import akka.persistence.journal.{Tagged, WriteEventAdapter}
 import org.cafienne.akka.actor.event.ModelEvent
+import org.cafienne.cmmn.akka.event.team.CaseTeamEvent
 import org.cafienne.cmmn.akka.event.{CaseEvent, CaseModified}
 import org.cafienne.humantask.akka.event.HumanTaskEvent
 import org.cafienne.processtask.akka.event.ProcessInstanceEvent
@@ -21,6 +22,7 @@ class CaseTaggingEventAdapter extends WriteEventAdapter {
     // Also CaseModified needs HumanTask tag, such that human task projections get a transaction scope too.
     case event: CaseModified => Tagged(event, Set(HumanTaskEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
     case event: HumanTaskEvent => Tagged(event, Set(HumanTaskEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
+    case event: CaseTeamEvent => Tagged(event, Set(HumanTaskEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
     case event: CaseEvent => Tagged(event, Set(CaseEvent.TAG, ModelEvent.TAG))
     case event: ProcessInstanceEvent => Tagged(event, Set(ProcessInstanceEvent.TAG, ModelEvent.TAG))
     case event: TenantEvent => Tagged(event, Set(TenantEvent.TAG, ModelEvent.TAG))

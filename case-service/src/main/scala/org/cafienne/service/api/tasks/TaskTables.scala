@@ -2,7 +2,6 @@ package org.cafienne.service.api.tasks
 
 import java.time.Instant
 
-import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
 
 trait TaskTables extends QueryDbConfig {
@@ -45,5 +44,26 @@ trait TaskTables extends QueryDbConfig {
     def taskModel = jsonColumn[String]("task_model", O.Default(""))
 
     def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[TaskRecord]
+  }
+
+  final class TaskTeamMemberTable(tag: Tag) extends CafienneTable[TaskTeamMemberRecord](tag, "task_team_member") {
+
+    def caseInstanceId = idColumn[String]("case_instance_id")
+
+    def tenant = idColumn[String]("tenant")
+
+    def caseRole = idColumn[String]("case_role")
+
+    def memberId = idColumn[String]("member_id")
+
+    def isTenantUser = column[Boolean]("isTenantUser")
+
+    def isOwner = column[Boolean]("isOwner")
+
+    def active = column[Boolean]("active")
+
+    def pk = primaryKey("pk_task_team_member", (caseInstanceId, caseRole, memberId, isTenantUser))
+
+    def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active) <> (TaskTeamMemberRecord.tupled, TaskTeamMemberRecord.unapply)
   }
 }

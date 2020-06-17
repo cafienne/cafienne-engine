@@ -63,7 +63,18 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
         CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),
         CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true),
         CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true),
-        CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),
+        CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),        TaskTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = testUser.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = testUser.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = testUser.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = userWithAandB.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = userWithAandB.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = userWithAandB.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true),
+        TaskTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true),
       )
     }), 2.seconds)
 

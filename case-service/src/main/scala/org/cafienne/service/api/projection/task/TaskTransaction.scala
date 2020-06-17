@@ -3,11 +3,14 @@ package org.cafienne.service.api.projection.task
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.akka.event.CaseModified
+import org.cafienne.cmmn.akka.event.team.{CaseOwnerAdded, CaseOwnerRemoved, CaseTeamEvent, TeamMemberAdded, TeamMemberRemoved, TeamRoleCleared, TeamRoleFilled}
+import org.cafienne.cmmn.akka.event.{CaseEvent, CaseModified}
 import org.cafienne.humantask.akka.event._
 import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.service.api.cases.table.CaseTeamMemberRecord
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.TaskRecord
+import org.cafienne.service.api.projection.cases.CaseInstanceTeamMemberMerger
+import org.cafienne.service.api.tasks.{TaskRecord, TaskTeamMemberMerger, TaskTeamMemberRecord}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,13 +18,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
 
   val tasks = scala.collection.mutable.HashMap[String, TaskRecord]()
+  val taskTeamMembers = scala.collection.mutable.HashMap[(String, String, Boolean), TaskTeamMemberRecord]() // key = <role>:<userid>
 
-  def handleEvent(evt: HumanTaskEvent): Future[Done] = {
+  def handleEvent(evt: CaseEvent): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " on task " + taskId)
 
     evt match {
       case event: HumanTaskCreated => createTask(event)
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
+      case event: CaseTeamEvent => handleCaseTeamEvent(event)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -74,10 +79,25 @@ class TaskTransaction(taskId: String, persistence: RecordsPersistence)(implicit 
 
   }
 
+  private def handleCaseTeamEvent(event: CaseTeamEvent): Future[Done] = {
+    def updateMember(member: TaskTeamMemberRecord) = taskTeamMembers.put((member.caseRole, member.memberId, member.isTenantUser), member)
+
+    event match {
+      case event: TeamMemberAdded => TaskTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: TeamMemberRemoved => TaskTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: TeamRoleFilled => TaskTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: TeamRoleCleared => TaskTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: CaseOwnerAdded => TaskTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: CaseOwnerRemoved => TaskTeamMemberMerger.merge(event).foreach(updateMember)
+    }
+    Future.successful(Done)
+  }
+
   def commit(offsetName: String, offset: Offset): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
     var records = ListBuffer.empty[AnyRef]
     records ++= this.tasks.values
+    records ++= this.taskTeamMembers.values
 
     // Even if there are no new records, we will still update the offset store
     records += OffsetRecord(offsetName, offset)

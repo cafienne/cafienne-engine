@@ -110,12 +110,12 @@ class TaskQueriesImpl extends TaskQueries
     * @param tenant
     * @return
     */
-  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String]): Query[(UserRoleTable, CaseInstanceTeamMemberTable), (UserRoleRecord, CaseTeamMemberRecord), Seq] = {
+  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String]): Query[(UserRoleTable, TaskTeamMemberTable), (UserRoleRecord, TaskTeamMemberRecord), Seq] = {
     val query = for {
       // Validate tenant membership
       tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tenant)
       // Validate case team membership: either user is explicit member or has a matching tenant role
-      teamMembership <- TableQuery[CaseInstanceTeamMemberTable]
+      teamMembership <- TableQuery[TaskTeamMemberTable]
         .filter(_.caseInstanceId === caseInstanceId)
         .filter(_.active === true) // Only search in active team members
         .filter(_.caseRole === "") // Only search by base membership, not in certain roles
