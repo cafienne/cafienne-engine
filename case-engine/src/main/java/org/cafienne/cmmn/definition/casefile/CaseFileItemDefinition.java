@@ -17,6 +17,7 @@ import org.cafienne.cmmn.instance.CaseFileItem;
 import org.cafienne.cmmn.instance.CaseFileItemArray;
 import org.cafienne.cmmn.instance.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.Path;
+import org.cafienne.cmmn.instance.casefile.Value;
 import org.w3c.dom.Element;
 
 public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
@@ -76,18 +77,18 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
         return getItems();
     }
 
+    public CaseFileItemDefinition getChild(String identifier) {
+        return getChildren().stream().filter(i -> i.getName().equals(identifier) || i.getId().equals(identifier)).findFirst().orElse(null);
+    }
+
     /**
      * Recursively searches this level and all children until an item with the specified name is found.
      * 
-     * @param name
+     * @param identifier
      * @return
      */
     public CaseFileItemDefinition findCaseFileItem(String identifier) {
-        CaseFileItemDefinition item = getChildren().stream().filter(i -> {
-            String name = i.getName();
-            String id = i.getId();
-            return name.equals(identifier) || id.equals(identifier);
-        }).findFirst().orElse(null);
+        CaseFileItemDefinition item = getChild(identifier);
         if (item == null) {
             for (CaseFileItemDefinition caseFileItem : getChildren()) {
                 item = caseFileItem.findCaseFileItem(identifier);
@@ -122,5 +123,15 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
         } else {
             return new CaseFileItem(caseInstance, this, parent);
         }
+    }
+
+    /**
+     * Recursively validates the potential value against this definition;
+     * Checks whether the potential value matches the CaseFileItemDefinitionDefinition;
+     * and, if there are children in the value, then also matches those children against our children.
+     * @param value
+     */
+    public void validate(Value value) {
+        getCaseFileItemDefinition().getDefinitionType().validate(this, value);
     }
 }

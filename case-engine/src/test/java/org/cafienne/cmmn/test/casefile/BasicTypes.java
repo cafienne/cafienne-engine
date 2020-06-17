@@ -14,6 +14,7 @@ import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueList;
@@ -133,7 +134,7 @@ public class BasicTypes {
         String caseInstanceId = "TestingWrongProperty" + propertyName + "_" + new Guid(); // Make a new CaseInstanceId to overcome framework
         // limitation.
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, wrongInputs.cloneValueNode(), null);
-        testCase.assertStepFails(startCase, action -> action.assertException(TransitionDeniedException.class, "Property '" + propertyName + "' has wrong type"));
+        testCase.assertStepFails(startCase, action -> action.assertException(CaseFileError.class, "Property '" + propertyName + "' has wrong type"));
     }
 
     @Test

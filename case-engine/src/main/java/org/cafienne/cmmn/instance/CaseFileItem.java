@@ -163,19 +163,16 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
     public void createContent(Value<?> newContent) {
         validateState(State.Null, "create");
-        validateContents(newContent);
         makeTransition(CaseFileItemTransition.Create, State.Available, newContent);
     }
 
     public void replaceContent(Value<?> newContent) {
         validateState(State.Available, "replace");
-        validateContents(newContent);
         makeTransition(CaseFileItemTransition.Replace, State.Available, newContent);
     }
 
     public void updateContent(Value<?> newContent) {
         validateState(State.Available, "update");
-        validateContents(newContent);
         makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(newContent));
     }
 
@@ -197,15 +194,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         if (state != expectedState) {
             throw new TransitionDeniedException("Cannot " + operationName + " case file item " + getName() + " because it is in state " + state + " and should be in state " + expectedState + ".");
         }
-    }
-
-    /**
-     * Check if the new content matches our definition
-     *
-     * @param newContent
-     */
-    private void validateContents(Value<?> newContent) {
-        getDefinition().getCaseFileItemDefinition().getDefinitionType().validate(this, newContent);
     }
 
     /**

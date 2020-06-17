@@ -5,7 +5,6 @@ import org.cafienne.cmmn.definition.casefile.definitiontype.UnspecifiedType;
 import org.cafienne.cmmn.definition.casefile.definitiontype.XMLComplexType;
 import org.cafienne.cmmn.definition.casefile.definitiontype.XMLElementType;
 import org.cafienne.cmmn.definition.casefile.definitiontype.XMLSimpleType;
-import org.cafienne.cmmn.instance.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +48,6 @@ public class DefinitionType {
      * @param item
      * @param value
      */
-    public void validate(CaseFileItem item, Value<?> value) {
+    public void validate(CaseFileItemDefinition item, Value value) {
     }
 }

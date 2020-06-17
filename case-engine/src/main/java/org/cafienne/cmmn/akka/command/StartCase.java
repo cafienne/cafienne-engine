@@ -126,14 +126,13 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         }
 
         // Now validate the input parameters - especially whether they exist in the definition
-        Iterator<String> keys = inputParameters.fieldNames();
-        while (keys.hasNext()) {
-            String inputParameterName = keys.next();
-            InputParameterDefinition def = definition.getInputParameters().get(inputParameterName);
-            if (def == null) { // Validate whether this input parameter actually exists in the Case
+        inputParameters.getValue().forEach((inputParameterName, value) -> {
+            InputParameterDefinition inputParameterDefinition = definition.getInputParameters().get(inputParameterName);
+            if (inputParameterDefinition == null) { // Validate whether this input parameter actually exists in the Case
                 throw new InvalidCommandException("An input parameter with name " + inputParameterName + " is not defined in the case");
             }
-        }
+            inputParameterDefinition.validate(value);
+        });
 
         // If the case team is empty, add current user both as member and as owner,
         //  including default mapping of tenant roles to case team roles
