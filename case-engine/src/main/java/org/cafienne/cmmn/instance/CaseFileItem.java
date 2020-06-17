@@ -8,7 +8,10 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
+import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
@@ -124,9 +127,33 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
     }
 
-    private void makeTransition(CaseFileItemTransition transition, State newState, Value value) {
+    private void removeBusinessIdentifiers(Value value) {
+        getDefinition().getBusinessIdentifiers().forEach(property -> {
+            getCaseInstance().addEvent(new BusinessIdentifierCleared(this, property));
+        });
+    }
+
+    private void updateBusinessIdentifiers(Value newValue) {
+        getDefinition().getBusinessIdentifiers().forEach(property -> {
+            getCaseInstance().addEvent(new BusinessIdentifierSet(this, property, getBusinessIdentifierValue(newValue, property)));
+        });
+    }
+
+    private Value getBusinessIdentifierValue(Value value, PropertyDefinition identifier) {
+        if (value instanceof ValueMap) {
+            return ((ValueMap) value).get(identifier.getName());
+        }
+        return null;
+    }
+
+    private void makeTransition(CaseFileItemTransition transition, State newState, Value newValue) {
+        if (transition == CaseFileItemTransition.Delete) {
+            removeBusinessIdentifiers(newValue);
+        } else {
+            updateBusinessIdentifiers(newValue);
+        }
         // Now inform the sentry network of our change
-        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, value, getPath(), indexInArray));
+        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, newValue, getPath(), indexInArray));
     }
 
     public void updateState(CaseFileEvent event) {

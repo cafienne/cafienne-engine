@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.definition.casefile;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
@@ -133,5 +134,13 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
      */
     public void validate(Value value) {
         getCaseFileItemDefinition().getDefinitionType().validate(this, value);
+    }
+
+    /**
+     * Returns a collection with the business identifiers of this case file item. Can be empty.
+     * @return
+     */
+    public Collection<PropertyDefinition> getBusinessIdentifiers() {
+        return getCaseFileItemDefinition().getBusinessIdentifiers();
     }
 }

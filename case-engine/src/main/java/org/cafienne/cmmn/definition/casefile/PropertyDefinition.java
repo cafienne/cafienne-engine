@@ -56,15 +56,29 @@ public class PropertyDefinition extends CMMNElementDefinition {
         }
     }
     private final PropertyType type;
+    private final boolean isBusinessIdentifier;
 
     public PropertyDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
         String typeDescription = parseAttribute("type", false, "");
         type = PropertyType.getEnum(typeDescription);
-        if (type == null)
-        {
+        if (type == null) {
             getDefinition().addDefinitionError(getParentElement().getType()+" " + getParentElement().getName()+" is invalid, because property "+getName()+" has unrecognized type "+typeDescription);
         }
+        isBusinessIdentifier = readBusinessIdentifiership();
+    }
+
+    private boolean readBusinessIdentifiership() {
+        Element cafienneImplementation = getExtension("implementation", false);
+        if (cafienneImplementation == null) {
+            return false;
+        }
+        String value = cafienneImplementation.getAttribute("isBusinessIdentifier");
+        return value.equalsIgnoreCase("true");
+    }
+
+    public boolean isBusinessIdentifier() {
+        return isBusinessIdentifier;
     }
 
     /**

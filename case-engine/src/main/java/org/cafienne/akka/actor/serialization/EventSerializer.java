@@ -7,6 +7,8 @@ import org.cafienne.cmmn.akka.event.DebugDisabled;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
 import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
@@ -40,23 +42,37 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
     }
 
     private static void registerCaseEvents() {
-        addManifestWrapper(CaseFileEvent.class, CaseFileEvent::new);
         addManifestWrapper(CaseDefinitionApplied.class, CaseDefinitionApplied::new);
         addManifestWrapper(CaseModified.class, CaseModified::new);
         addManifestWrapper(EngineVersionChanged.class, EngineVersionChanged::new);
-        addManifestWrapper(PlanItemCreated.class, PlanItemCreated::new);
-        addManifestWrapper(PlanItemTransitioned.class, PlanItemTransitioned::new);
-        addManifestWrapper(RepetitionRuleEvaluated.class, RepetitionRuleEvaluated::new);
-        addManifestWrapper(RequiredRuleEvaluated.class, RequiredRuleEvaluated::new);
-        addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
-        addManifestWrapper(TaskOutputFilled.class, TaskOutputFilled::new);
+        registerCaseTeamEvents();
+        registerCasePlanEvents();
+        registerCaseFileEvents();
+    }
+
+    private static void registerCaseTeamEvents() {
         addManifestWrapper(TeamRoleFilled.class, TeamRoleFilled::new);
         addManifestWrapper(TeamRoleCleared.class, TeamRoleCleared::new);
         addManifestWrapper(CaseOwnerAdded.class, CaseOwnerAdded::new);
         addManifestWrapper(CaseOwnerRemoved.class, CaseOwnerRemoved::new);
         addManifestWrapper(TeamMemberAdded.class, TeamMemberAdded::new);
         addManifestWrapper(TeamMemberRemoved.class, TeamMemberRemoved::new);
+    }
+
+    private static void registerCasePlanEvents() {
+        addManifestWrapper(PlanItemCreated.class, PlanItemCreated::new);
+        addManifestWrapper(PlanItemTransitioned.class, PlanItemTransitioned::new);
+        addManifestWrapper(RepetitionRuleEvaluated.class, RepetitionRuleEvaluated::new);
+        addManifestWrapper(RequiredRuleEvaluated.class, RequiredRuleEvaluated::new);
+        addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
+        addManifestWrapper(TaskOutputFilled.class, TaskOutputFilled::new);
         addManifestWrapper(TimerSet.class, TimerSet::new);
+    }
+
+    private static void registerCaseFileEvents() {
+        addManifestWrapper(CaseFileEvent.class, CaseFileEvent::new);
+        addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
+        addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);
     }
 
     private static void registerHumanTaskEvents() {
