@@ -29,7 +29,7 @@ public class InvalidDefinitionException extends Exception {
         this.definitionErrors = definitionErrors;
     }
 
-    InvalidDefinitionException(String msg, Throwable t) {
+    public InvalidDefinitionException(String msg, Throwable t) {
         super(msg, t);
         this.definitionErrors = new ArrayList();
         definitionErrors.add(msg);

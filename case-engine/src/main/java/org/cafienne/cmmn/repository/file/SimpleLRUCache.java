@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  * Too simple SimpleLRUCache, that takes it's max size from a Config object, defaulting to 100.
  */
-class SimpleLRUCache extends LinkedHashMap<String, FileBasedDefinition> {
+public class SimpleLRUCache<K, T> extends LinkedHashMap<K, T> {
     private final static Logger logger = LoggerFactory.getLogger(FileBasedDefinitionProvider.class);
     private int maxSize = 100;
 
-    SimpleLRUCache() {
+    public SimpleLRUCache() {
         super(16, 0.75f, true);
         Config config = ConfigFactory.defaultApplication();
         if (config.hasPath("cafienne.definitions.cache.size")) {
@@ -24,7 +24,7 @@ class SimpleLRUCache extends LinkedHashMap<String, FileBasedDefinition> {
     }
 
     @Override
-    protected boolean removeEldestEntry(Map.Entry<String, FileBasedDefinition> eldest) {
+    protected boolean removeEldestEntry(Map.Entry<K, T> eldest) {
         boolean remove = size() > maxSize;
         if (remove) {
             // Printing that we remove from the cache, just to inform that the cache size may not be large enough.
