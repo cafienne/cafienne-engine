@@ -57,10 +57,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the cases from", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0")),
-      new Parameter(name = "numberOfResults", description = "Maximum number of cases to fetch", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
+      new Parameter(name = "identifiers", description = "Comma separated string of business identifiers with values", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "state", description = "Optional state of the cases to fetch (e.g. Active or Completed)", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "definition", description = "Optional definition name of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0")),
+      new Parameter(name = "numberOfResults", description = "Maximum number of cases to fetch", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
       new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "sortOrder", description = "Sort direction", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
     ),
@@ -73,9 +74,9 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def getCases = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
-        parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
-          (optionalTenant, offset, numResults, definition, state, sortBy, sortOrder) =>
-            runListQuery(caseQueries.getCases(optionalTenant, offset, numResults, platformUser, definition, status = state))
+        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
+          (optionalTenant, identifiers, offset, numResults, definition, state, sortBy, sortOrder) =>
+            runListQuery(caseQueries.getCases(optionalTenant, identifiers, offset, numResults, platformUser, definition, status = state))
         }
       }
     }

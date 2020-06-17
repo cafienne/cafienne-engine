@@ -7,7 +7,8 @@ import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.instance.casefile.{LongValue, Value, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.Sort
-import org.cafienne.service.api.cases.table.{CaseTables, CaseTeamMemberRecord}
+import org.cafienne.service.api.cases.table.{CaseBusinessIdentifierRecord, CaseTables, CaseTeamMemberRecord}
+import org.cafienne.service.api.projection.query.BaseQueryImpl
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
 import org.cafienne.service.api.tenant.{TenantTables, UserRoleRecord}
 
@@ -31,6 +32,7 @@ trait TaskQueries {
   def authorizeTaskAccessAndReturnCaseAndTenantId(taskId: String, user: PlatformUser): Future[(String, String)] = ???
 
   def getAllTasks(tenant: Option[String],
+                  identifiers: Option[String],
                   caseDefinition: Option[String],
                   taskState: Option[String],
                   assignee: Option[String],
@@ -49,14 +51,9 @@ trait TaskQueries {
 
 
 class TaskQueriesImpl extends TaskQueries
-  with TaskTables
-  with CaseTables
-  with TenantTables
-  with LazyLogging {
+  with BaseQueryImpl {
 
   import dbConfig.profile.api._
-
-  implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
   val tasksQuery = TableQuery[TaskTable]
 
@@ -65,7 +62,7 @@ class TaskQueriesImpl extends TaskQueries
       // Get the case
       baseQuery <- TableQuery[TaskTable].filter(_.id === taskId)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.result.headOption).map{
@@ -82,7 +79,7 @@ class TaskQueriesImpl extends TaskQueries
         .filter(_._2.definition === caseType)
         .optionFilter(tenant)(_._1.tenant === _)
       // Access control query
-      _ <- membershipQuery(user, baseQuery._1.caseInstanceId, baseQuery._1.tenant)
+      _ <- membershipQuery(user, baseQuery._1.caseInstanceId, baseQuery._1.tenant, None)
     } yield baseQuery._1
 
     db.run(query.distinct.result)
@@ -93,7 +90,7 @@ class TaskQueriesImpl extends TaskQueries
       // Get the case
       baseQuery <- TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -110,7 +107,7 @@ class TaskQueriesImpl extends TaskQueries
     * @param tenant
     * @return
     */
-  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String]): Query[(UserRoleTable, TaskTeamMemberTable), (UserRoleRecord, TaskTeamMemberRecord), Seq] = {
+  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String], identifiers: Option[String]) = {
     val query = for {
       // Validate tenant membership
       tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tenant)
@@ -123,6 +120,13 @@ class TaskQueriesImpl extends TaskQueries
           (member.isTenantUser === true && member.memberId === user.userId) ||
             (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
         })
+      _ <- {
+        val query = {
+          if (identifiers.isEmpty) TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
+          else addBusinessIdentifiersFilter(identifiers, caseInstanceId)
+        }
+        query
+      }
     } yield (tenantMembership, teamMembership)
 
     query
@@ -133,7 +137,7 @@ class TaskQueriesImpl extends TaskQueries
       // Get the case
       baseQuery <- TableQuery[TaskTable].filter(_.id === taskId)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
 
     } yield (baseQuery.caseInstanceId, baseQuery.tenant)
 
@@ -144,6 +148,7 @@ class TaskQueriesImpl extends TaskQueries
   }
 
   override def getAllTasks(tenant: Option[String],
+                           identifiers: Option[String],
                            caseDefinition: Option[String],
                            taskState: Option[String],
                            assignee: Option[String],
@@ -195,7 +200,7 @@ class TaskQueriesImpl extends TaskQueries
 
         .drop(from).take(numOfResults)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, identifiers)
 
     } yield baseQuery
 

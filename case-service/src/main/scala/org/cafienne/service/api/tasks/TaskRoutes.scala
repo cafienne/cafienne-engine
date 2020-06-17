@@ -89,10 +89,10 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   def getAllTasks = get {
     validUser { platformUser =>
       pathEndOrSingleSlash {
-        parameters('tenant ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
-          (tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
+        parameters('tenant ?, 'identifiers ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
+          (tenant, identifiers, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
               optionalHeaderValueByName("timeZone") { timeZone =>
-                runListQuery(taskQueries.getAllTasks(tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, platformUser, timeZone))
+                runListQuery(taskQueries.getAllTasks(tenant, identifiers, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, platformUser, timeZone))
             }
         }
       }
