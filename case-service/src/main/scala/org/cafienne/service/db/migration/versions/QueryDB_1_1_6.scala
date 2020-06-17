@@ -28,11 +28,13 @@ object QueryDB_1_1_6 extends DbSchemaVersion
     addTaskTableIndices &
 
     // Add ownership field to user role table for faster and simpler querying
-    addUserRoleOwnerColumn & Projections.resetTenantProjectionWriter & dropTenantOwnersTable
-    )
+    addUserRoleOwnerColumn & Projections.resetTenantProjectionWriter & dropTenantOwnersTable &
+
+    // Add a new table to store business identifiers
+    addBusinessIdentifierTable
+  )
 
   import dbConfig.profile.api._
-
 
   def dropCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).dropPrimaryKeys(_.pk_V1)
 
@@ -71,4 +73,17 @@ object QueryDB_1_1_6 extends DbSchemaVersion
   def addUserRoleOwnerColumn = TableMigration(TableQuery[UserRoleTable]).addColumns(_.isOwner)
 
   def dropTenantOwnersTable = TableMigration(TableQuery[TenantOwnersTable]).drop
+
+  def addBusinessIdentifierTable = TableMigration(TableQuery[CaseBusinessIdentifierTable])
+    .create
+    .addColumns(
+      _.caseInstanceId,
+      _.tenant,
+      _.name,
+      _.value,
+      _.active,
+      _.path
+    )
+    .addPrimaryKeys(_.pk)
+    .addIndexes(_.indexCaseInstanceId, _.indexName)
 }

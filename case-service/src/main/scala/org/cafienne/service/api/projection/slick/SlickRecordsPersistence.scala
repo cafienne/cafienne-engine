@@ -25,6 +25,7 @@ class SlickRecordsPersistence
   val caseInstanceQuery = TableQuery[CaseInstanceTable]
   val caseInstanceDefinitionQuery = TableQuery[CaseInstanceDefinitionTable]
   val caseFileQuery = TableQuery[CaseFileTable]
+  val identifierQuery = TableQuery[CaseBusinessIdentifierTable]
 
   val planItemTableQuery = TableQuery[PlanItemTable]
   val planItemHistoryTableQuery = TableQuery[PlanItemHistoryTable]
@@ -46,6 +47,7 @@ class SlickRecordsPersistence
       case value: CaseRecord => caseInstanceQuery.insertOrUpdate(value)
       case value: CaseDefinitionRecord => caseInstanceDefinitionQuery.insertOrUpdate(value)
       case value: CaseFileRecord => caseFileQuery.insertOrUpdate(value)
+      case value: CaseBusinessIdentifierRecord => identifierQuery.insertOrUpdate(value)
       case value: CaseRoleRecord => caseInstanceRoleQuery.insertOrUpdate(value)
       case value: CaseTeamMemberRecord => caseInstanceTeamMemberQuery.insertOrUpdate(value)
       case value: OffsetRecord => offsetQuery.insertOrUpdate(value)

@@ -178,6 +178,30 @@ trait CaseTables extends QueryDbConfig {
     val indexCaseInstanceId = index(caseInstanceId)
   }
 
+  final class CaseBusinessIdentifierTable(tag: Tag) extends CafienneTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
+
+    def caseInstanceId = idColumn[String]("case_instance_id")
+
+    def tenant = idColumn[String]("tenant")
+
+    def name = idColumn[String]("name")
+
+    def value = column[Option[String]]("value")
+
+    def active = column[Boolean]("active")
+
+    def path = column[String]("path")
+
+    def * = (caseInstanceId, tenant, name, value, active, path) <> (CaseBusinessIdentifierRecord.tupled, CaseBusinessIdentifierRecord.unapply)
+
+    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
+
+    def pk = primaryKey("pk_case_business_identifier", (caseInstanceId, name))
+
+    val indexCaseInstanceId = index(caseInstanceId)
+    val indexName = index(name)
+  }
+
   class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseRoleRecord](tag, "case_instance_role") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
