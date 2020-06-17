@@ -136,6 +136,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.indexInArray = event.getIndex();
         this.lastTransition = event.getTransition();
         this.setValue(event.getValue());
+//        propagateValueChangeToChildren(event.getValue());
         if (this.array != null) { // Update the array we belong too as well
             this.array.childChanged(this);
         }
@@ -150,6 +151,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
+        // Finally propagate the changes to children.
+        propagateValueChangeToChildren(event.getValue());
+
+
         // Then inform the activating sentries
         transitionPublisher.informEntryCriteria(event);
     }
@@ -158,6 +163,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // Finally iterate the terminating sentries and inform them
         transitionPublisher.informExitCriteria(event);
         addDebugInfo(() -> "CaseFile[" + getName() + "]: Completed behavior for transition " + event.getTransition());
+    }
+
+    protected void adoptContent(Value<?> newContentFromParent) {
+        createContent(newContentFromParent);
     }
 
     // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
@@ -206,7 +215,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
         this.value = newValue;
         if (newValue != null) newValue.setOwner(this);
-        propagateValueChangeToChildren(newValue);
     }
 
     private void propagateValueChangeToChildren(Value newValue) {
@@ -215,7 +223,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         v.getValue().forEach((name, childValue) -> {
             CaseFileItem child = getItem(name);
             if (child != null) {
-                child.createContent(childValue);
+                child.adoptContent(childValue);
             }
         });
     }
@@ -227,6 +235,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param childValue
      */
     private void propagateValueChangeToParent(String childName, Value<?> childValue) {
+        if (this.value == childValue) {
+            // We'll do our parents our self
+            return;
+        }
         if (parent != null) {
             if (parent.value == null || parent.value == Value.NULL) {
                 addDebugInfo(() -> "Creating a location in parent " + parent.getPath() + " to store the newly changed child " + getName());
@@ -359,6 +371,11 @@ class EmptyCaseFileItem extends CaseFileItem {
     EmptyCaseFileItem(CaseFileItem parent, String creationReason) {
         super(parent.getCaseInstance(), parent.getDefinition(), parent);
         logger.warn(creationReason);
+    }
+
+    @Override
+    protected void adoptContent(Value<?> newContentFromParent) {
+        logger.warn("Adopting content in EmptyCaseFileItem");
     }
 
     @Override
