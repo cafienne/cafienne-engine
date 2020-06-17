@@ -89,21 +89,6 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     @Override
-    public void setOwner(CaseFileItem caseFileItem) {
-        super.setOwner(caseFileItem);
-        Iterator<Entry<String, Value<?>>> fields = value.entrySet().iterator();
-        while (fields.hasNext()) {
-            Entry<String, Value<?>> childItem = fields.next();
-            CaseFileItem child = caseFileItem.getItem(childItem.getKey());
-            if (child == null) {
-                // I.e., there is no owner for this child, simply because there is no definition for it either
-                continue;
-            }
-            child.createContent(childItem.getValue());
-        }
-    }
-
-    @Override
     public void print(JsonGenerator generator) throws IOException {
         generator.writeStartObject();
         Iterator<Entry<String, Value<?>>> fields = value.entrySet().iterator();
