@@ -1,24 +1,31 @@
 package org.cafienne.service.db.migration
 
 import com.typesafe.scalalogging.Logger
-import org.cafienne.service.db.migration.versions.{CafienneQueryDatabaseSchema, V1Migration, V1_1_5Migration}
-import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
+import org.cafienne.service.db.migration.versions.CafienneQueryDatabaseSchema
 import org.slf4j.LoggerFactory
 import slick.migration.api.Migration
 import slick.migration.api.flyway.MigrationInfo.Provider
-import slick.migration.api.flyway.MigrationInfo.Provider.{crc32, sql}
+import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
 
 import scala.concurrent.Await
 
 /**
-  * This is a hack to prevent comparison of migration.toString in the description field of the flyway table
-  * as that comparison contains object references and may be longer than 200 chars (length of the description field)
-  * Ticket added: https://github.com/nafg/slick-migration-api-flyway/issues/26
+  * Due to an earlier bug in slick flyway migration library, description did not give repeated predictable outcome.
+  * Therefore in Cafienne we made a CustomMigrationInfo (called MigrationInfoHack) to overcome this problem.
+  *
+  * Original ticket: https://github.com/nafg/slick-migration-api-flyway/issues/26
+  *
+  * The bug has been fixed in the library; however, in the new version, the construction of the description is done
+  * in a different manner than in the Cafienne version. Hence we need to continue to use our own version.
+  * So we have renamed it to CustomMigrationInfo instead of MigrationInfoHack...
   */
-object MigrationInfoHack {
-  def hack: Provider[Migration] =
+object CustomMigrationInfo {
+  import slick.migration.api.flyway.MigrationInfo.Provider.{crc32, sql}
+
+  def provider: Provider[Migration] = {
     new Provider[Migration]({ migration =>
       val sqlStrings = sql(migration)
+
       MigrationInfo(
         description = migration.getClass.getSimpleName, // <- actual override
         script = sqlStrings.mkString("\n"),
@@ -26,14 +33,15 @@ object MigrationInfoHack {
         location = migration.getClass.getName
       )
     })
+  }
 }
 
 object Migrate extends QueryDbMigrationConfig {
+  import dbConfig.profile.api._
+
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration._
-  import dbConfig.profile.api._
-  implicit val infoProvider: MigrationInfo.Provider[Migration] = MigrationInfoHack.hack
-  //  implicit val infoProvider: MigrationInfo.Provider[Migration] = MigrationInfo.Provider.strict
+  implicit val infoProvider: MigrationInfo.Provider[Migration] = CustomMigrationInfo.provider
 
   val logger: Logger = Logger(LoggerFactory.getLogger(getClass.getName))
 
@@ -55,5 +63,4 @@ object Migrate extends QueryDbMigrationConfig {
       }
     }
   }
-
 }
