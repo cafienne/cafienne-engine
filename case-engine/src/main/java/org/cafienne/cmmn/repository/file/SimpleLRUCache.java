@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.repository.file;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import org.cafienne.akka.actor.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +17,9 @@ public class SimpleLRUCache<K, T> extends LinkedHashMap<K, T> {
 
     public SimpleLRUCache() {
         super(16, 0.75f, true);
-        Config config = ConfigFactory.defaultApplication();
-        if (config.hasPath("cafienne.definitions.cache.size")) {
-            maxSize = config.getInt("cafienne.definitions.cache.size");
+        Config config = CaseSystem.config().repository().config();
+        if (config.hasPath("cache.size")) {
+            maxSize = config.getInt("cache.size");
         }
     }
 

@@ -1,6 +1,5 @@
 package org.cafienne.akka.actor.config
 
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 import com.typesafe.config.Config
