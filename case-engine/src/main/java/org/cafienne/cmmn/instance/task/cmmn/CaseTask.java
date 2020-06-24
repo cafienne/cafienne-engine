@@ -69,7 +69,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
         String parentCaseId = mainCase.getId();
         String rootCaseId = mainCase.getRootCaseId();
         ValueMap caseInputParameters = getMappedInputParameters();
-        CaseTeam caseTeam = mainCase.getCaseTeam().toCaseTeamTO();
+        CaseTeam caseTeam = mainCase.getCaseTeam().createSubCaseTeam(subCaseDefinition);
 
         StartCase startCaseCommand = new StartCase(getCaseInstance().getTenant(), getCaseInstance().getCurrentUser(), subCaseId, subCaseDefinition, caseInputParameters, caseTeam, getCaseInstance().debugMode(), parentCaseId, rootCaseId);
 

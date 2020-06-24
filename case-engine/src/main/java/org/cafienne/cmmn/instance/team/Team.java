@@ -217,12 +217,10 @@ public class Team extends CMMNElement<CaseDefinition> {
         return null;
     }
 
-    public CaseTeam toCaseTeamTO() {
-        // TODO: this code is invoked for passing caseteam into subcase (from CaseTask). It should also
-        //  check whether the roles exist in the subecase, otherwise a failure will happen when starting the subcase
+    public CaseTeam createSubCaseTeam(CaseDefinition subCaseDefinition) {
         List<CaseTeamMember> members = new ArrayList();
         this.getMembers().forEach(teamMember -> {
-            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).collect(Collectors.toList()).toArray(new String[]{});
+            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).filter(name -> subCaseDefinition.getCaseRole(name)!=null).collect(Collectors.toList()).toArray(new String[]{});
             CaseTeamMember member = CaseTeamMember.apply(teamMember.key, roleNames, teamMember.isOwner());
             members.add(member);
         });
