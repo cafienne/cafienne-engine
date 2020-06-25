@@ -11,11 +11,27 @@ object QueryDB_1_1_6 extends DbSchemaVersion
   with CaseTablesV1 {
 
   val version = "1.1.6"
-  val migrations = dropPK & enhanceCaseTeamTable & addPK & createTaskTeamTable & Projections.resetTaskProjectionWriter
+  val migrations = (
+    // We need to change CaseTeam table to also have a column for member type, which is also part of the primary key
+    dropCaseTeamPK & enhanceCaseTeamTable & addUpdatedCaseTeamPK &
+
+    // We also need a task team table; but this requires that Task projection is rebuilt
+    createTaskTeamTable & Projections.resetTaskProjectionWriter &
+
+    // Now replace all foreign keys with indexes
+    convertFKtoIndexPlanItemTable &
+    convertFKtoIndexCaseTeamTable &
+    convertFKtoIndexCaseFileTable &
+    convertFKtoIndexCaseRolesTable &
+
+    // Add various indexes to improve performance of searching tasks
+    addTaskTableIndices
+    )
 
   import dbConfig.profile.api._
 
-  def dropPK = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).dropPrimaryKeys(_.pk)
+
+  def dropCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).dropPrimaryKeys(_.pk_V1)
 
   // Add 2 new columns for memberType ("user" or "role") and case ownership
   //  Existing members all get memberType "user" and also all of them get ownership.
@@ -27,7 +43,7 @@ object QueryDB_1_1_6 extends DbSchemaVersion
     .addColumnAndSet(_.isTenantUser, true)
     .addColumnAndSet(_.isOwner, true)
 
-  def addPK = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addPrimaryKeys(_.pk)
+  def addUpdatedCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addPrimaryKeys(_.pk)
 
   def createTaskTeamTable = TableMigration(TableQuery[TaskTeamMemberTable])
     .create
@@ -41,4 +57,11 @@ object QueryDB_1_1_6 extends DbSchemaVersion
       _.active
     )
     .addPrimaryKeys(_.pk)
+
+  def convertFKtoIndexPlanItemTable = TableMigration(TableQuery[PlanItemTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+  def convertFKtoIndexCaseTeamTable = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+  def convertFKtoIndexCaseRolesTable = TableMigration(TableQuery[CaseInstanceRoleTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+  def convertFKtoIndexCaseFileTable = TableMigration(TableQuery[CaseFileTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
+
+  def addTaskTableIndices = TableMigration(TableQuery[TaskTable]).addIndexes(_.indexAssignee, _.indexCaseInstanceId, _.indexDueDate, _.indexTaskState, _.indexTenant)
 }

@@ -43,6 +43,13 @@ trait TaskTables extends QueryDbConfig {
 
     def taskModel = jsonColumn[String]("task_model", O.Default(""))
 
+    // Various indices for optimizing getAllTasks queries
+    def indexCaseInstanceId = index(caseInstanceId)
+    def indexTaskState = index(taskState)
+    def indexAssignee = index(assignee)
+    def indexTenant = index(tenant)
+    def indexDueDate = index(generateIndexName(dueDate), dueDate)
+
     def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[TaskRecord]
   }
 

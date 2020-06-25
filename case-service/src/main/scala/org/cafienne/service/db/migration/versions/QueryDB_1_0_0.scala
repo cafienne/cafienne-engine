@@ -13,26 +13,27 @@ trait CaseTablesV1 extends QueryDbConfig with CaseTables {
 
   import dbConfig.profile.api._
 
-  final class CaseInstanceTeamMemberTableV1(tag: Tag) extends CafienneTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
+  final class CaseInstanceTeamMemberTableV1(tag: Tag) extends CaseInstanceTeamMemberTable(tag) {
 
-    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
-
-    def pk = primaryKey("pk_case_instance_team_member", (caseInstanceId, role, userId))
-
-    def * = (caseInstanceId, tenant, userId, role, active, false, false) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
-
-    def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
+    def pk_V1 = primaryKey("pk_case_instance_team_member", (caseInstanceId, role, userId))
 
     def role = idColumn[String]("role")
 
     def userId = idColumn[String]("user_id")
 
-    def active = column[Boolean]("active")
+    def fkCaseInstanceTable = foreignKey("fk_case_instance_team_member__case_instance", caseInstanceId, lifted.TableQuery[CaseInstanceTable])(_.id)
+  }
 
-    def caseInstance =
-      foreignKey("fk_case_instance_team_member__case_instance", caseInstanceId, caseInstanceTable)(_.id)
+  final class PlanItemTableV1(tag: Tag) extends PlanItemTable(tag) {
+    def fkCaseInstanceTable = foreignKey("fk_plan_item__case_instance", caseInstanceId, lifted.TableQuery[CaseInstanceTable])(_.id)
+  }
+
+  final class CaseInstanceRoleTableV1(tag: Tag) extends CaseInstanceRoleTable(tag) {
+    def fkCaseInstanceTable = foreignKey("fk_case_instance_role__case_instance", caseInstanceId, lifted.TableQuery[CaseInstanceTable])(_.id)
+  }
+
+  final class CaseFileTableV1(tag: Tag) extends CaseFileTable(tag) {
+    def fkCaseInstanceTable = foreignKey("fk_case_file__case_instance", caseInstanceId, lifted.TableQuery[CaseInstanceTable])(_.id)
   }
 
 }
@@ -139,7 +140,7 @@ object QueryDB_1_0_0 extends DbSchemaVersion
       _.modifiedBy
     )
 
-  def createCaseInstanceRoleTable = TableMigration(TableQuery[CaseInstanceRoleTable])
+  def createCaseInstanceRoleTable = TableMigration(TableQuery[CaseInstanceRoleTableV1])
     .create
     .addColumns(
       _.caseInstanceId,
@@ -148,7 +149,7 @@ object QueryDB_1_0_0 extends DbSchemaVersion
       _.assigned
     )
     .addPrimaryKeys(_.pk)
-    .addForeignKeys(_.caseInstance)
+    .addForeignKeys(_.fkCaseInstanceTable)
 
   def createCaseInstanceTeamMemberTable = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1])
     .create
@@ -159,10 +160,10 @@ object QueryDB_1_0_0 extends DbSchemaVersion
       _.role,
       _.active
     )
-    .addPrimaryKeys(_.pk)
-    .addForeignKeys(_.caseInstance)
+    .addPrimaryKeys(_.pk_V1)
+    .addForeignKeys(_.fkCaseInstanceTable)
 
-  def createPlanItemTable = TableMigration(TableQuery[PlanItemTable])
+  def createPlanItemTable = TableMigration(TableQuery[PlanItemTableV1])
     .create
     .addColumns(
       _.id,
@@ -186,7 +187,7 @@ object QueryDB_1_0_0 extends DbSchemaVersion
       _.mappedInput,
       _.rawOutput
     )
-    .addForeignKeys(_.caseInstance)
+    .addForeignKeys(_.fkCaseInstanceTable)
 
   def createPlanItemHistoryTable = TableMigration(TableQuery[PlanItemHistoryTable])
     .create
@@ -215,14 +216,14 @@ object QueryDB_1_0_0 extends DbSchemaVersion
     )
     .addIndexes(_.idx)
 
-  def createCaseFileTable = TableMigration(TableQuery[CaseFileTable])
+  def createCaseFileTable = TableMigration(TableQuery[CaseFileTableV1])
     .create
     .addColumns(
       _.caseInstanceId,
       _.tenant,
       _.data,
     )
-    .addForeignKeys(_.caseInstance)
+    .addForeignKeys(_.fkCaseInstanceTable)
 
   def createOffsetStoreTable = TableMigration(TableQuery[OffsetStoreTable])
     .create

@@ -40,6 +40,11 @@ trait CaseTables extends QueryDbConfig {
 
     def caseOutput = jsonColumn[String]("case_output")
 
+    // Some indexes to optimize GetCases queries
+    def indexState = index(state)
+    def indexTenant = index(tenant)
+    def indexRootCaseId = index(rootCaseId)
+
     def * = (id, tenant, definition, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
   }
 
@@ -64,7 +69,7 @@ trait CaseTables extends QueryDbConfig {
     def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseDefinitionRecord.tupled, CaseDefinitionRecord.unapply)
   }
 
-  final class PlanItemTable(tag: Tag) extends CafienneTable[PlanItemRecord](tag, "plan_item") {
+  class PlanItemTable(tag: Tag) extends CafienneTable[PlanItemRecord](tag, "plan_item") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -108,10 +113,7 @@ trait CaseTables extends QueryDbConfig {
 
     def * = (id, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemRecord.tupled, PlanItemRecord.unapply)
 
-    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
-
-    def caseInstance = foreignKey("fk_plan_item__case_instance", caseInstanceId, caseInstanceTable)(_.id)
-
+    def indexCaseInstanceId = index(caseInstanceId)
   }
 
   final class PlanItemHistoryTable(tag: Tag) extends CafienneTable[PlanItemHistoryRecord](tag, "plan_item_history") {
@@ -160,15 +162,10 @@ trait CaseTables extends QueryDbConfig {
 
     def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemHistoryRecord.tupled, PlanItemHistoryRecord.unapply)
 
-    val planItemHistoryTable = lifted.TableQuery[PlanItemHistoryTable]
-
-    def idx = index("idx_plan_item_history__plain_item_id", (planItemId), unique = false)
-
-    //    def caseInstance = foreignKey("fk_plan_item__case_instance", caseInstanceId, caseInstanceTable)(_.id)
-
+    def idx = index("idx_plan_item_history__plain_item_id", planItemId)
   }
 
-  final class CaseFileTable(tag: Tag) extends CafienneTable[CaseFileRecord](tag, "case_file") {
+  class CaseFileTable(tag: Tag) extends CafienneTable[CaseFileRecord](tag, "case_file") {
 
     def caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
 
@@ -178,12 +175,10 @@ trait CaseTables extends QueryDbConfig {
 
     def * = (caseInstanceId, tenant, data) <> (CaseFileRecord.tupled, CaseFileRecord.unapply)
 
-    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
-
-    def caseInstance = foreignKey("fk_case_file__case_instance", caseInstanceId, caseInstanceTable)(_.id)
+    val indexCaseInstanceId = index(caseInstanceId)
   }
 
-  final class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseRoleRecord](tag, "case_instance_role") {
+  class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseRoleRecord](tag, "case_instance_role") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -197,12 +192,10 @@ trait CaseTables extends QueryDbConfig {
 
     def * = (caseInstanceId, tenant, roleName, assigned) <> (CaseRoleRecord.tupled, CaseRoleRecord.unapply)
 
-    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
-
-    def caseInstance = foreignKey("fk_case_instance_role__case_instance", caseInstanceId, caseInstanceTable)(_.id)
+    val indexCaseInstanceId = index(caseInstanceId)
   }
 
-  final class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
+  class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
 
@@ -222,9 +215,6 @@ trait CaseTables extends QueryDbConfig {
 
     def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
 
-    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
-
-    def caseInstance =
-      foreignKey("fk_case_instance_team_member__case_instance", caseInstanceId, caseInstanceTable)(_.id)
+    val indexCaseInstanceId = index(caseInstanceId)
   }
 }

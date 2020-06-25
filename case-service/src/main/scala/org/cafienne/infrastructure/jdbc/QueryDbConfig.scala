@@ -4,7 +4,7 @@ import org.cafienne.akka.actor.CaseSystem
 import slick.ast.ColumnOption
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
-import slick.lifted.CanBeQueryCondition
+import slick.lifted.{AbstractTable, CanBeQueryCondition, Index}
 import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
@@ -45,6 +45,19 @@ trait QueryDbConfig {
         }
       }
       super.column[String](columnName, newOptions:_*)
+    }
+
+    /**
+      * Creates an index on the table on the column, with a standard generation of the index name.
+      * @param column
+      * @return
+      */
+    def index(column: Rep[String]): Index = {
+      index(generateIndexName(column), column)
+    }
+
+    def generateIndexName(column: Rep[_]): String = {
+      s"ix_${tableName}__$column"
     }
 
     /**
