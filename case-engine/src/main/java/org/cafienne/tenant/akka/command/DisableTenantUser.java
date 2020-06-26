@@ -4,6 +4,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.User;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 import org.cafienne.tenant.akka.event.TenantUserDisabled;
 
@@ -19,8 +20,7 @@ public class DisableTenantUser extends ExistingUserCommand {
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantUserDisabled(tenant, userId));
-        return new TenantResponse(this);
+    protected void updateUser(User user) {
+        user.disable();
     }
 }

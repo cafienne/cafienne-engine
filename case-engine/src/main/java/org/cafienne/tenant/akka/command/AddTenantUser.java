@@ -7,61 +7,46 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.TenantUserCreated;
-import org.cafienne.tenant.akka.event.TenantUserRoleAdded;
+import org.cafienne.tenant.akka.event.platform.TenantEnabled;
 
 import java.io.IOException;
 import java.util.Set;
 
 @Manifest
 public class AddTenantUser extends TenantCommand {
-    public final String userId;
-    public final Set<String> roles;
-    public final String name;
-    public final String email;
+    private final TenantUser newUser;
 
     private enum Fields {
-        userId, roles, name, email
+        newTenantUser
     }
 
-    public AddTenantUser(TenantUser tenantOwner, String tenantId, String userId, Set<String> roles, String name, String email) {
+    public AddTenantUser(TenantUser tenantOwner, String tenantId, TenantUser newUser) {
         super(tenantOwner, tenantId);
-        this.userId = userId;
-        this.roles = roles;
-        this.name = name;
-        this.email = email;
+        this.newUser = newUser;
     }
 
     public AddTenantUser(ValueMap json) {
         super(json);
-        this.userId = readField(json, Fields.userId);
-        this.roles = readSet(json, Fields.roles);
-        this.name = readField(json, Fields.name);
-        this.email = readField(json, Fields.email);
+        this.newUser = TenantUser.from(json.with(Fields.newTenantUser));
     }
 
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (tenant.isUser(userId)) {
-            throw new InvalidCommandException("User '" + userId + "' already exists in tenant " + tenant.getId());
+        if (tenant.getUser(newUser.id()) != null) {
+            throw new InvalidCommandException("User '" + newUser.id() + "' already exists in tenant " + tenant.getId());
         }
     }
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantUserCreated(tenant, userId, name, email));
-        // Add all the roles
-        roles.forEach(role -> tenant.addEvent(new TenantUserRoleAdded(tenant, userId, role)));
+        tenant.createUser(newUser);
         return new TenantResponse(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.userId, userId);
-        writeField(generator, Fields.roles, roles);
-        writeField(generator, Fields.name, name);
-        writeField(generator, Fields.email, email);
+        writeField(generator, Fields.newTenantUser, newUser.toValue());
     }
 }

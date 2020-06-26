@@ -10,6 +10,7 @@ package org.cafienne.service.api.registration
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
+import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.model._
@@ -39,10 +40,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat4(TenantAPI.User)
         entity(as[TenantAPI.User]) { newUser =>
-            val roles = newUser.roles.asJava
-            val name = newUser.name.getOrElse("")
-            val email = newUser.email.getOrElse("")
-            askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, newUser.userId, roles, name, email))
+          askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, TenantUser(newUser.userId, newUser.roles.toSeq, tenant, newUser.name.getOrElse(""), newUser.email.getOrElse(""))))
         }
       }
     }

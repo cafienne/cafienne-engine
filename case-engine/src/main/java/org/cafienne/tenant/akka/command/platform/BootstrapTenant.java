@@ -8,8 +8,6 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.TenantUserCreated;
-import org.cafienne.tenant.akka.event.TenantUserRoleAdded;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,12 +45,7 @@ public class BootstrapTenant extends CreateTenant {
     public TenantResponse process(TenantActor tenant) {
         super.process(tenant);
         // Register the users as TenantUsers with the specified roles
-        users.forEach(user -> {
-            tenant.addEvent(new TenantUserCreated(tenant, user.id(), user.name(), user.email()));
-            // Add all the roles
-            user.roles().foreach(role -> tenant.addEvent(new TenantUserRoleAdded(tenant, user.id(), role)));
-        });
-
+        users.forEach(user -> tenant.createUser(user));
         return new TenantResponse(this);
     }
 

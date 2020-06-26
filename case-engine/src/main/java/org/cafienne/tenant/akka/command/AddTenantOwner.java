@@ -3,9 +3,9 @@ package org.cafienne.tenant.akka.command;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.tenant.User;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.OwnerAdded;
 
 @Manifest
 public class AddTenantOwner extends ExistingUserCommand {
@@ -19,11 +19,10 @@ public class AddTenantOwner extends ExistingUserCommand {
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        // Check if user is already an owner
-        if (! tenant.isOwner(userId)) {
-            tenant.addEvent(new OwnerAdded(tenant, userId));
+    protected void updateUser(User user) {
+        // Check if user is already an owner; this command is idempotent
+        if (! user.isOwner()) {
+            user.makeOwner();
         }
-        return new TenantResponse(this);
     }
 }

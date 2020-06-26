@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 /**
- * Event that is published after an {@link org.cafienne.processtask.akka.command.ProcessCommand} has been fully handled by a {@link ProcessTaskActor} instance.
+ * Event that is published after an {@link org.cafienne.tenant.akka.command.TenantCommand} has been fully handled by a {@link TenantActor} instance.
  * Contains information about the last modified moment.
  *
  */

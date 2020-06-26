@@ -139,10 +139,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat4(TenantAPI.User)
         entity(as[TenantAPI.User]) { newUser =>
-            val roles = newUser.roles.asJava
-            val name = newUser.name.getOrElse("")
-            val email = newUser.email.getOrElse("")
-            askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, newUser.userId, roles, name, email))
+            askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, TenantUser(newUser.userId, newUser.roles.toSeq, tenant, newUser.name.getOrElse(""), newUser.email.getOrElse(""))))
         }
       }
     }
