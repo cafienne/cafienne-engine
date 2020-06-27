@@ -6,7 +6,7 @@ import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.cases.table._
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.tasks.{TaskRecord, TaskTables, TaskTeamMemberRecord}
-import org.cafienne.service.api.tenant.{TenantOwnerRecord, TenantRecord, TenantTables, UserRoleRecord}
+import org.cafienne.service.api.tenant.{TenantOwnerRecord, TenantRecord, TenantTables, UserRoleKey, UserRoleRecord}
 
 import scala.concurrent.Future
 
@@ -59,6 +59,10 @@ class SlickRecordsPersistence
 
   override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = {
     db.run(TableQuery[PlanItemTable].filter(_.id === planItemId).result.headOption)
+  }
+
+  override def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]] = {
+    db.run(TableQuery[UserRoleTable].filter(record => record.userId === key.userId && record.tenant === key.tenant && record.role_name === key.role_name).result.headOption)
   }
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {

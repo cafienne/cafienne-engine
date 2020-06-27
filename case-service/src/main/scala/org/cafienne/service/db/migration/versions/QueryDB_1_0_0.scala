@@ -9,7 +9,7 @@ import slick.lifted
 import slick.lifted.TableQuery
 import slick.migration.api.TableMigration
 
-trait CaseTablesV1 extends QueryDbConfig with CaseTables {
+trait CafienneTablesV1 extends QueryDbConfig with CaseTables with TenantTables {
 
   import dbConfig.profile.api._
 
@@ -36,11 +36,14 @@ trait CaseTablesV1 extends QueryDbConfig with CaseTables {
     def fkCaseInstanceTable = foreignKey("fk_case_file__case_instance", caseInstanceId, lifted.TableQuery[CaseInstanceTable])(_.id)
   }
 
+  final class UserRoleTableV1(tag: Tag) extends UserRoleTable(tag) {
+
+  }
 }
 
 object QueryDB_1_0_0 extends DbSchemaVersion
   with TaskTables
-  with CaseTablesV1
+  with CafienneTablesV1
   with TenantTables
   with OffsetStoreTables {
   val version = "1.0.0"

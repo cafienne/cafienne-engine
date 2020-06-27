@@ -15,7 +15,7 @@ object TestIdentityFactory {
 
   def asDatabaseRecords(user: TenantUser) : Seq[UserRoleRecord] = {
     var result:Seq[UserRoleRecord] = Seq()
-    user.roles.map(role => result = result :+ UserRoleRecord(user.id, user.tenant, user.name, user.email, role))
+    user.roles.map(role => result = result :+ UserRoleRecord(user.id, user.tenant, user.name, user.email, role, false, true))
     result
   }
 

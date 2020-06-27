@@ -32,10 +32,10 @@ trait TenantTables extends QueryDbConfig {
     def * = (name, enabled) <> (TenantRecord.tupled, TenantRecord.unapply)
   }
 
-  final class UserRoleTable(tag: Tag) extends CafienneTable[UserRoleRecord](tag, "user_role") {
+  class UserRoleTable(tag: Tag) extends CafienneTable[UserRoleRecord](tag, "user_role") {
     def pk = primaryKey("pk_userrole", (userId, tenant, role_name))
 
-    def * = (userId, tenant, role_name, name, email, enabled) <> (UserRoleRecord.tupled, UserRoleRecord.unapply)
+    def * = (userId, tenant, role_name, name, email, isOwner, enabled) <> (UserRoleRecord.tupled, UserRoleRecord.unapply)
 
     def userId = idColumn[String]("user_id")
 
@@ -46,6 +46,8 @@ trait TenantTables extends QueryDbConfig {
     def name = column[String]("name")
 
     def email = column[String]("email")
+
+    def isOwner = column[Boolean]("isOwner", O.Default(false))
 
     // By default when inserting a user or role, enabled is true;
     //  right now, it does not make sense to enter a user without enabling it

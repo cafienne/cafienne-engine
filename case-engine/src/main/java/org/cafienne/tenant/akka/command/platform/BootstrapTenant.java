@@ -86,7 +86,8 @@ public class BootstrapTenant extends CreateTenant {
             Seq<String> roles = JavaConverters.asScalaIteratorConverter(rolesList.iterator()).asScala().toSeq();
             String userName = user.raw("name");
             String email = user.raw("email");
-            return new TenantUser(userId, roles, tenantName, userName, email, true);
+            boolean isOwner = ownerIds.contains(userId);
+            return new TenantUser(userId, roles, tenantName, userName, email, true, isOwner);
         }).collect(Collectors.toList());
 
 

@@ -8,7 +8,7 @@ import slick.migration.api.TableMigration
 object QueryDB_1_1_6 extends DbSchemaVersion
   with CaseTables
   with TaskTables
-  with CaseTablesV1 {
+  with CafienneTablesV1 {
 
   val version = "1.1.6"
   val migrations = (
@@ -25,7 +25,10 @@ object QueryDB_1_1_6 extends DbSchemaVersion
     convertFKtoIndexCaseRolesTable &
 
     // Add various indexes to improve performance of searching tasks
-    addTaskTableIndices
+    addTaskTableIndices &
+
+    // Add ownership field to user role table for faster and simpler querying
+    addUserRoleOwnerColumn & Projections.resetTenantProjectionWriter & dropTenantOwnersTable
     )
 
   import dbConfig.profile.api._
@@ -64,4 +67,8 @@ object QueryDB_1_1_6 extends DbSchemaVersion
   def convertFKtoIndexCaseFileTable = TableMigration(TableQuery[CaseFileTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
 
   def addTaskTableIndices = TableMigration(TableQuery[TaskTable]).addIndexes(_.indexAssignee, _.indexCaseInstanceId, _.indexDueDate, _.indexTaskState, _.indexTenant)
+
+  def addUserRoleOwnerColumn = TableMigration(TableQuery[UserRoleTable]).addColumns(_.isOwner)
+
+  def dropTenantOwnersTable = TableMigration(TableQuery[TenantOwnersTable]).drop
 }

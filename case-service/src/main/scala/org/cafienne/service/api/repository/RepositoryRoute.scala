@@ -27,9 +27,6 @@ import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
-import org.cafienne.service.Main
-import org.cafienne.tenant.akka.command.GetTenantOwners
-import org.cafienne.tenant.akka.command.response.TenantOwnersResponse
 import org.w3c.dom.Document
 
 import scala.collection.immutable.Seq
@@ -185,25 +182,25 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
         entity(as[Document]) { xmlDocument =>
           try {
             logger.debug(s"Deploying '$modelName' to tenant '$tenant'")
+            // First check if we can parse the definition
             val definitions = new DefinitionsDocument(xmlDocument)
 
-            // Reaching this point means we have a valid definition, and can simply move on.
-            onComplete(deploy(platformUser, tenant, modelName, definitions)) {
-              case Success(_) => complete(StatusCodes.NoContent)
-              case Failure(error) => {
-                error match {
-                  case failure: WriteDefinitionException => {
-                    logger.debug("Deployment failure", failure)
-                    complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
-                  }
-                  case other => throw other
-                }
+            val tenantUser = platformUser.getTenantUser(tenant)
+            tenantUser.isOwner match {
+              case false => complete(StatusCodes.Unauthorized, "User '" + platformUser.userId + "' does not have the privileges to deploy a definition")
+              case true => {
+                CaseSystem.config.repository.DefinitionProvider.write(tenantUser, modelName, definitions)
+                complete(StatusCodes.NoContent)
               }
             }
           } catch {
             case idd: InvalidDefinitionException => {
               logger.debug("Deployment failure", idd)
               complete(StatusCodes.BadRequest, "Cannot deploy " + modelName + ": definition is invalid.")
+            }
+            case failure: WriteDefinitionException => {
+              logger.debug("Deployment failure", failure)
+              complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
             }
             case other: Throwable => {
               logger.debug("Unexpected deployment failure", other)
@@ -215,29 +212,6 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
       }
     }
   }
-
-  private def deploy(platformUser: PlatformUser, tenant: String, modelName: String, definitions: DefinitionsDocument): Future[Any] = {
-    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
-    isTenantOwner(platformUser, tenant).map(isOwner => isOwner match {
-      case true => CaseSystem.config.repository.DefinitionProvider.write(platformUser.getTenantUser(tenant), modelName, definitions)
-      case false => throw new SecurityException("User '" + platformUser.userId + "' does not have the privileges to deploy a definition")
-    })
-  }
-
-  private def isTenantOwner(platformUser: PlatformUser, tenant: String): Future[Boolean] = {
-
-    import akka.pattern.ask
-    implicit val timeout = Main.caseSystemTimeout
-    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
-
-    (CaseSystem.router ? new GetTenantOwners(platformUser.getTenantUser(tenant), tenant)).flatMap(response => {
-      response match {
-        case o: TenantOwnersResponse => Future.successful(o.owners.contains(platformUser.userId))
-        case other => Future.successful(false)
-      }
-    })
-  }
-
 
   /**
     * Reads validUser and resolves a tenant, based on either the optional tenant passed as a parameter,
