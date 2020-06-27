@@ -10,7 +10,6 @@ import org.cafienne.tenant.akka.event.platform.TenantEnabled;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +63,15 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
 
     public TenantUserCreated createUser(TenantUser user) {
         return createUser(user, false);
+    }
+
+    public void upsertUser(TenantUser user) {
+        User existingUser = users.get(user.id());
+        if (existingUser == null) {
+            createUser(user);
+        } else {
+            existingUser.updateFrom(user);
+        }
     }
 
     public void updateState(TenantDisabled event) {

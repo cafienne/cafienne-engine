@@ -12,7 +12,7 @@ import io.swagger.annotations._
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.UserQueries
-import org.cafienne.service.api.tenant.route.TenantRoute
+import org.cafienne.service.api.tenant.route.{FormerAddTenantUserRoute, TenantRoute}
 
 @Api(tags = Array("registration"))
 @Path("/registration")

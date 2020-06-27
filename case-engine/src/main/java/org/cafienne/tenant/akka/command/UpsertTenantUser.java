@@ -13,34 +13,26 @@ import java.io.IOException;
 import java.util.Set;
 
 @Manifest
-public class AddTenantUser extends TenantCommand {
+public class UpsertTenantUser extends TenantCommand {
     private final TenantUser newUser;
 
     private enum Fields {
         newTenantUser
     }
 
-    public AddTenantUser(TenantUser tenantOwner, String tenantId, TenantUser newUser) {
+    public UpsertTenantUser(TenantUser tenantOwner, String tenantId, TenantUser newUser) {
         super(tenantOwner, tenantId);
         this.newUser = newUser;
     }
 
-    public AddTenantUser(ValueMap json) {
+    public UpsertTenantUser(ValueMap json) {
         super(json);
         this.newUser = TenantUser.from(json.with(Fields.newTenantUser));
     }
 
     @Override
-    public void validate(TenantActor tenant) throws InvalidCommandException {
-        super.validate(tenant);
-        if (tenant.getUser(newUser.id()) != null) {
-            throw new InvalidCommandException("User '" + newUser.id() + "' already exists in tenant " + tenant.getId());
-        }
-    }
-
-    @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.createUser(newUser);
+        tenant.upsertUser(newUser);
         return new TenantResponse(this);
     }
 

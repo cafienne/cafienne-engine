@@ -70,7 +70,7 @@ public class CommandSerializer extends AkkaCaseObjectSerializer {
     }
 
     private static void addTenantCommands() {
-        addManifestWrapper(AddTenantUser.class, AddTenantUser::new);
+        addManifestWrapper(UpsertTenantUser.class, UpsertTenantUser::new);
         addManifestWrapper(AddTenantUserRole.class, AddTenantUserRole::new);
         addManifestWrapper(RemoveTenantUserRole.class, RemoveTenantUserRole::new);
         addManifestWrapper(EnableTenantUser.class, EnableTenantUser::new);

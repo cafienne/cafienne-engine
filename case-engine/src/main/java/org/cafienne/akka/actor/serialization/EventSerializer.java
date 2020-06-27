@@ -89,6 +89,7 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
 
     private static void registerTenantEvents() {
         addManifestWrapper(TenantUserCreated.class, TenantUserCreated::new);
+        addManifestWrapper(TenantUserUpdated.class, TenantUserUpdated::new);
         addManifestWrapper(TenantUserRoleAdded.class, TenantUserRoleAdded::new);
         addManifestWrapper(TenantUserRoleRemoved.class, TenantUserRoleRemoved::new);
         addManifestWrapper(TenantUserEnabled.class, TenantUserEnabled::new);

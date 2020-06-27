@@ -9,6 +9,7 @@ package org.cafienne.service.api.tenant.route
 
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
+import org.cafienne.service.api.tenant.model.TenantAPI.User
 import org.cafienne.tenant.akka.command.TenantCommand
 import org.cafienne.tenant.akka.command.platform.PlatformTenantCommand
 
@@ -20,6 +21,9 @@ trait TenantRoute extends CommandRoute with QueryRoute {
     query()
   }
 
+  def asTenantUser(user: User, tenant: String): TenantUser = {
+    TenantUser(user.userId, user.roles.toSeq, tenant, user.name.getOrElse(""), user.email.getOrElse(""), enabled = true, isOwner = false)
+  }
 
   def askPlatform(command: PlatformTenantCommand) = {
     askModelActor(command)

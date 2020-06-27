@@ -40,7 +40,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat4(TenantAPI.User)
         entity(as[TenantAPI.User]) { newUser =>
-          askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, TenantUser(newUser.userId, newUser.roles.toSeq, tenant, newUser.name.getOrElse(""), newUser.email.getOrElse(""))))
+          askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
         }
       }
     }

@@ -20,7 +20,7 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.tenant.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUser, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
+import org.cafienne.tenant.akka.command.{AddTenantOwner, UpsertTenantUser, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
 
 import scala.collection.JavaConverters._
 
@@ -33,7 +33,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     addTenantOwner ~
       removeTenantOwner ~
       getTenantOwners ~
-      addTenantUser ~
+      upsertTenantUser ~
       addTenantUserRoles ~
       removeTenantUserRole ~
       enableTenantUser ~
@@ -116,13 +116,13 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   }
 
   @Path("/{tenant}/users")
-  @POST
+  @PUT
   @Operation(
-    summary = "Register a tenant user",
-    description = "Add a user to the tenant, with the specified roles",
+    summary = "Add or update a tenant user",
+    description = "Add or replace a tenant user. If the user does not yet exist it will be created. Otherwise the name, email and roles will be replaced.",
     tags = Array("tenant"),
     parameters = Array(
-      new Parameter(name = "tenant", description = "The tenant to add the user to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant in which to add/update the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
       new ApiResponse(description = "Tenant user registered successfully", responseCode = "204"),
@@ -132,14 +132,14 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   )
   @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.User]))))
   @Consumes(Array("application/json"))
-  def addTenantUser = post {
+  def upsertTenantUser = put {
     validUser { platformUser =>
       path(Segment / "users") { tenant =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat4(TenantAPI.User)
         entity(as[TenantAPI.User]) { newUser =>
-            askTenant(platformUser, tenant, tenantOwner => new AddTenantUser(tenantOwner, tenant, TenantUser(newUser.userId, newUser.roles.toSeq, tenant, newUser.name.getOrElse(""), newUser.email.getOrElse(""))))
+          askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
         }
       }
     }

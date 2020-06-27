@@ -46,6 +46,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     getUserRoleRecord(key).map(user => {
       event match {
         case t: TenantUserCreated => users.put(key, user.copy(name = t.name, email = t.email, enabled = true))
+        case t: TenantUserUpdated => users.put(key, user.copy(name = t.name, email = t.email, enabled = true))
         case _: TenantUserRoleAdded => users.put(key, user.copy(enabled = true))
         case _: TenantUserRoleRemoved => users.put(key, user.copy(enabled = false))
         case _: OwnerAdded => users.put(key, user.copy(isOwner = true))
