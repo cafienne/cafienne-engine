@@ -1,19 +1,22 @@
 package org.cafienne.service.api.projection
 
 import akka.Done
-import org.cafienne.service.api.cases.{CaseFile, CaseInstance, PlanItem}
-import org.cafienne.service.api.tasks.Task
+import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord, PlanItemRecord}
+import org.cafienne.service.api.tasks.TaskRecord
+import org.cafienne.service.api.tenant.{UserRoleKey, UserRoleRecord}
 
 import scala.concurrent.Future
 
 trait RecordsPersistence {
   def bulkUpdate(records: Seq[AnyRef]): Future[Done]
 
-  def getPlanItem(planItemId: String): Future[Option[PlanItem]]
+  def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]]
 
-  def getCaseFile(caseInstanceId: String): Future[Option[CaseFile]]
+  def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]]
 
-  def getCaseInstance(caseInstanceId: String): Future[Option[CaseInstance]]
+  def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]]
 
-  def getTask(taskId: String): Future[Option[Task]]
+  def getCaseInstance(caseInstanceId: String): Future[Option[CaseRecord]]
+
+  def getTask(taskId: String): Future[Option[TaskRecord]]
 }

@@ -1,7 +1,7 @@
 package org.cafienne.infrastructure.jdbc
 
 import akka.persistence.query.Offset
-import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, NamedOffset}
+import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, OffsetRecord}
 
 import scala.concurrent.Future
 
@@ -43,7 +43,7 @@ trait OffsetStoreTables extends QueryDbConfig {
   import dbConfig.profile.api._
 
 
-  final class OffsetStoreTable(tag: Tag) extends CafienneTable[NamedOffset](tag, "offset_storage") {
+  final class OffsetStoreTable(tag: Tag) extends CafienneTable[OffsetRecord](tag, "offset_storage") {
     def name = idColumn[String]("name", O.PrimaryKey)
 
     def offsetType = column[String]("offset-type")
@@ -52,9 +52,9 @@ trait OffsetStoreTables extends QueryDbConfig {
 
     def timestamp = column[Timestamp]("timestamp")
 
-    def * = (name, offsetType, offsetValue, timestamp) <> (create, NamedOffset.unapply)
+    def * = (name, offsetType, offsetValue, timestamp) <> (create, OffsetRecord.unapply)
 
-    def create(t: (String, String, String, Timestamp)): NamedOffset = NamedOffset(t._1, t._2, t._3, t._4)
+    def create(t: (String, String, String, Timestamp)): OffsetRecord = OffsetRecord(t._1, t._2, t._3, t._4)
   }
 
 }

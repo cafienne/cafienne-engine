@@ -3,12 +3,13 @@ package org.cafienne.cmmn.test;
 import akka.serialization.JSerializer;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class TestSerializer extends JSerializer {
 
-    private Map<String, Object> cache = new HashMap<>();
+    private Map<String, Object> cache = new LinkedHashMap();
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {

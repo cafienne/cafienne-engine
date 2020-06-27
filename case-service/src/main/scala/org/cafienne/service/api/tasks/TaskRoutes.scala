@@ -26,7 +26,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.model.Examples
@@ -38,17 +38,18 @@ import scala.util.{Failure, Success}
 @Api(tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with TaskReader {
+class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with QueryRoute {
+  override val lastModifiedRegistration = TaskReader.lastModifiedRegistration
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[TaskRoutes])
   }
 
   override def routes = pathPrefix("tasks") {
-    getTasksRoute ~
+    getAllTasks ~
       getCaseTasks ~
       getTask ~
-      getCurrentUserAssignedTasks ~
+      getTaskCount ~
       validateTaskOutput ~
       saveTaskOutput ~
       claimTaskRoute ~
@@ -85,22 +86,13 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     )
   )
   @Produces(Array("application/json"))
-  def getTasksRoute = get {
-    validUser { user =>
+  def getAllTasks = get {
+    validUser { platformUser =>
       pathEndOrSingleSlash {
         parameters('tenant ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
           (tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
-            optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
               optionalHeaderValueByName("timeZone") { timeZone =>
-                onComplete(handleSyncedQuery(() => taskQueries.getAllTasks(tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter,
-                  sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, user, timeZone), caseLastModified)) {
-                  case Success(values) =>
-                    val tasks = new ValueList
-                    values.foreach(v => tasks.add(v.toValueMap))
-                    complete(StatusCodes.OK, tasks)
-                  case Failure(err) => complete(StatusCodes.InternalServerError, err)
-                }
-              }
+                runListQuery(taskQueries.getAllTasks(tenant, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, platformUser, timeZone))
             }
         }
       }
@@ -126,23 +118,10 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   )
   @Produces(Array("application/json"))
   def getCaseDefinitionTasks = get {
-    validUser { user =>
+    validUser { platformUser =>
       path("case-type" / Segment) { caseType =>
-        parameters('tenant ?) { optionalTenant =>
-          optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-            onComplete(handleSyncedQuery(() => taskQueries.getCaseTypeTasks(caseType, optionalTenant, user), caseLastModified)) {
-              case Success(value) =>
-                val tasks = new ValueList
-                value.foreach(v => tasks.add(v.toValueMap))
-                complete(StatusCodes.OK, tasks)
-                complete(StatusCodes.OK, tasks)
-              case Failure(err) =>
-                err match {
-                  case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-                  case _ => throw err
-                }
-            }
-          }
+        parameters('tenant ?) {
+          optionalTenant => runListQuery(taskQueries.getCaseTypeTasks(caseType, optionalTenant, platformUser))
         }
       }
     }
@@ -166,22 +145,9 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   )
   @Produces(Array("application/json"))
   def getCaseTasks = get {
-    validUser { user =>
-      path("case" / Segment) { caseInstanceId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => taskQueries.getCaseTasks(caseInstanceId, user), caseLastModified)) {
-            case Success(value) =>
-              val tasks = new ValueList
-              value.foreach(v => tasks.add(v.toValueMap))
-              complete(StatusCodes.OK, tasks)
-            case Failure(err) =>
-              logger.error("Could not find the task, but got an error " + err.getLocalizedMessage, err)
-              err match {
-                case c: CaseSearchFailure => complete(StatusCodes.NotFound, c.getLocalizedMessage)
-                case _ => throw err
-              }
-          }
-        }
+    validUser { platformUser =>
+      path("case" / Segment) {
+        caseInstanceId => runListQuery(taskQueries.getCaseTasks(caseInstanceId, platformUser))
       }
     }
   }
@@ -204,18 +170,9 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   )
   @Produces(Array("application/json"))
   def getTask = get {
-    validUser { user =>
-      path(Segment) { taskId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => taskQueries.getTask(taskId, user), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, value.toValueMap)
-            case Failure(err) =>
-              err match {
-                case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-                case other => throw other
-              }
-          }
-        }
+    validUser { platformUser =>
+      path(Segment) {
+        taskId => runQuery(taskQueries.getTask(taskId, platformUser))
       }
     }
   }
@@ -235,19 +192,13 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
     )
   )
   @Produces(Array("application/json"))
-  def getCurrentUserAssignedTasks = get {
-    validUser { user =>
+  def getTaskCount = get {
+    validUser { platformUser =>
       parameters('tenant ?) { tenant =>
-      path("user" / "count") {
-        onComplete(taskQueries.getCountForUser(user, tenant)) {
-          case Success(value) =>
-            import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-            import spray.json.DefaultJsonProtocol._
-            implicit val format = jsonFormat2(TaskCount)
-            complete(StatusCodes.OK, value)
-          case Failure(ex) => complete(StatusCodes.InternalServerError)
+        path("user" / "count") {
+          runQuery(taskQueries.getCountForUser(platformUser, tenant))
         }
-      }}
+      }
     }
   }
 
@@ -269,10 +220,10 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParameters]))))
   @Produces(Array("application/json"))
   def validateTaskOutput = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment) { taskId =>
         entity(as[ValueMap]) {
-          outputParams => askTask(user, taskId, (caseInstanceId, user) => new ValidateTaskOutput(user, caseInstanceId, taskId, outputParams))
+          outputParams => askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new ValidateTaskOutput(tenantUser, caseInstanceId, taskId, outputParams))
         }
       }
     }
@@ -296,10 +247,10 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParameters]))))
   @Produces(Array("application/json"))
   def saveTaskOutput = put {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment) { taskId =>
         entity(as[ValueMap]) { outputParams =>
-          askTask(user, taskId, (caseInstanceId, user) => new SaveTaskOutput(user, caseInstanceId, taskId, outputParams))
+          askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new SaveTaskOutput(tenantUser, caseInstanceId, taskId, outputParams))
         }
       }
     }
@@ -323,9 +274,9 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def claimTaskRoute =
     put {
-      validUser { user =>
+      validUser { platformUser =>
         path(Segment / "claim") {
-          taskId => askTask(user, taskId, (caseInstanceId, user) => new ClaimTask(user, caseInstanceId, taskId))
+          taskId => askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new ClaimTask(tenantUser, caseInstanceId, taskId))
         }
       }
     }
@@ -348,9 +299,9 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def revokeTaskRoute =
     put {
-      validUser { user =>
+      validUser { platformUser =>
         path(Segment / "revoke") {
-          taskId => askTask(user, taskId, (caseInstanceId, user) => new RevokeTask(user, caseInstanceId, taskId))
+          taskId => askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new RevokeTask(tenantUser, caseInstanceId, taskId))
         }
       }
     }
@@ -374,7 +325,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def assignTaskRoute =
     put {
-      validUser { user =>
+      validUser { platformUser =>
         path(Segment / "assign") {
           taskId =>
             requestEntityPresent {
@@ -383,7 +334,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
               implicit val format = jsonFormat1(CaseCommandModels.Assignee)
 
               entity(as[CaseCommandModels.Assignee]) { data =>
-                askTask(user, taskId, (caseInstanceId, user) => new AssignTask(user, caseInstanceId, taskId, data.assignee))
+                askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new AssignTask(tenantUser, caseInstanceId, taskId, data.assignee))
               }
             }
         }
@@ -409,7 +360,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def delegateTaskRoute =
     put {
-      validUser { user =>
+      validUser { platformUser =>
         path(Segment / "delegate") {
           taskId =>
             requestEntityPresent {
@@ -418,7 +369,7 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
               implicit val format = jsonFormat1(CaseCommandModels.Assignee)
 
               entity(as[CaseCommandModels.Assignee]) { data =>
-                askTask(user, taskId, (caseInstanceId, user) => new DelegateTask(user, caseInstanceId, taskId, data.assignee))
+                askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new DelegateTask(tenantUser, caseInstanceId, taskId, data.assignee))
               }
             }
         }
@@ -445,31 +396,24 @@ class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: Iden
   @Produces(Array("application/json"))
   def completeTaskRoute =
     post {
-      validUser { user =>
+      validUser { platformUser =>
         path(Segment / "complete") {
           taskId =>
             requestEntityPresent {
               entity(as[ValueMap]) { taskOutput =>
-                askTask(user, taskId, (caseInstanceId, user) => new CompleteHumanTask(user, caseInstanceId, taskId, taskOutput))
+                askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new CompleteHumanTask(tenantUser, caseInstanceId, taskId, taskOutput))
               }
             } ~ requestEntityEmpty {
               // Complete the task with empty output parameters
-              askTask(user, taskId, (caseInstanceId, user) => new CompleteHumanTask(user, caseInstanceId, taskId, new ValueMap))
+              askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new CompleteHumanTask(tenantUser, caseInstanceId, taskId, new ValueMap))
             }
         }
       }
     }
 
   def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
-    val retrieveCaseIdAndTenant = taskQueries.getCaseAndTenantInformation(taskId, platformUser)
-
-    onComplete(retrieveCaseIdAndTenant) {
-      case Success(retrieval) => {
-        retrieval match {
-          case Some(caseInstanceId) => askModelActor(createTaskCommand.apply(caseInstanceId._1, platformUser.getTenantUser(caseInstanceId._2)))
-          case None => complete(StatusCodes.NotFound, "A task with id " + taskId + " cannot be found in the system")
-        }
-      }
+    onComplete(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId(taskId, platformUser)) {
+      case Success((caseInstanceId, tenant)) => askModelActor(createTaskCommand.apply(caseInstanceId, platformUser.getTenantUser(tenant)))
       case Failure(error) => {
         error match {
           case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)

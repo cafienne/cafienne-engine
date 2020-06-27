@@ -7,7 +7,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.cases.CaseInstance
+import org.cafienne.service.api.cases.table.CaseRecord
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -62,7 +62,7 @@ class CaseInstanceWriterTest
 
       eventually {
         persistence.records.length shouldBe 6
-        persistence.records.head shouldBe a[CaseInstance]
+        persistence.records.head shouldBe a[CaseRecord]
       }
     }
   }

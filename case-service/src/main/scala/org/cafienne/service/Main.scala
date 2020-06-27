@@ -22,7 +22,7 @@ import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
-import org.cafienne.service.api.projection.participants.TenantProjectionsWriter
+import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.task.TaskProjectionsWriter
 import org.cafienne.service.api.registration.FormerRegistrationRoutes

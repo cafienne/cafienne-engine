@@ -11,6 +11,8 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
+import org.cafienne.cmmn.akka.event.DebugDisabled;
+import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
@@ -21,8 +23,8 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
-import org.cafienne.cmmn.user.CaseTeam;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.CurrentMember;
+import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +48,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * List of plan items in the case.
      */
-    private Collection<PlanItem> planItems = new ArrayList<>();
+    private Collection<PlanItem> planItems = new ArrayList();
     /**
      * Pointer to the case file instance of the case.
      */
@@ -77,7 +79,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * Workers in the case team
      */
-    private final CaseTeam caseTeam = new CaseTeam(this);
+    private final Team caseTeam = new Team(this);
 
     public Case() {
         super(CaseCommand.class, CaseEvent.class);
@@ -112,7 +114,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public CaseTeamMember getCurrentTeamMember() {
+    public CurrentMember getCurrentTeamMember() {
         return getCaseTeam().getTeamMember(getCurrentUser());
     }
 
@@ -296,7 +298,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public Collection<DiscretionaryItem> getDiscretionaryItems() {
         addDebugInfo(() -> "Retrieving discretionary items of " + this);
-        Collection<DiscretionaryItem> items = new ArrayList<DiscretionaryItem>();
+        Collection<DiscretionaryItem> items = new ArrayList();
         getCasePlan().retrieveDiscretionaryItems(items);
         addDebugInfo(() -> {
             StringBuilder itemsString = new StringBuilder();
@@ -373,7 +375,15 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public CaseTeam getCaseTeam() {
+    public Team getCaseTeam() {
         return caseTeam;
+    }
+
+    public void upsertDebugMode(boolean newDebugMode) {
+        // TODO: this belongs in ModelActor, but then the debugenabled/disabled events need to take ModelActor and should no longer extend CaseEvent
+        if (newDebugMode!=this.debugMode()) {
+            if (newDebugMode) addEvent(new DebugEnabled(this));
+            else addEvent(new DebugDisabled(this));
+        }
     }
 }

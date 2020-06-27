@@ -8,23 +8,24 @@
 package org.cafienne.cmmn.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.akka.event.DebugEnabled;
-import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +41,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     private final String parentCaseId;
     private final ValueMap inputParameters;
     private transient CaseDefinition definition;
-    private final CaseTeam caseTeamInput;
-    private org.cafienne.cmmn.user.CaseTeam caseTeam;
+    private CaseTeam caseTeamInput;
     private final boolean debugMode;
 
     private enum Fields {
@@ -94,7 +94,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;
         this.inputParameters = caseInputParameters == null ? new ValueMap() : caseInputParameters;
-        this.caseTeamInput = caseTeamInput == null ? new CaseTeam() : caseTeamInput;
+        this.caseTeamInput = caseTeamInput == null ? CaseTeam.apply() : caseTeamInput;
         this.debugMode = debugMode;
     }
 
@@ -106,7 +106,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
         this.inputParameters = readMap(json, Fields.inputParameters);
         this.debugMode = readField(json, Fields.debugMode);
-        this.caseTeamInput = new CaseTeam(readArray(json, Fields.caseTeam));
+        this.caseTeamInput = CaseTeam.deserialize(json.withArray(Fields.caseTeam));
     }
 
     @Override
@@ -135,28 +135,37 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
             }
         }
 
+        // If the case team is empty, add current user both as member and as owner,
+        //  including default mapping of tenant roles to case team roles
+        if (caseTeamInput.getMembers().isEmpty()) {
+            caseInstance.addDebugInfo(() -> "Adding user '" + getUser().id() + "' to the case team (as owner) because new team is empty");
+            caseTeamInput = CaseTeam.apply(CaseTeamMember.createBootstrapMember(getUser()));
+        }
+
+        if (caseTeamInput.owners().isEmpty()) {
+            throw new CaseTeamError("The case team needs to have at least one owner");
+        }
+
         // Validates the member and roles
-        caseTeam = new org.cafienne.cmmn.user.CaseTeam(caseTeamInput, caseInstance, definition);
+        caseTeamInput.validate(definition);
 
         // Should we also check whether all parameters have been made available in the input list? Not sure ...
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
+        caseInstance.upsertDebugMode(debugMode);
         if (debugMode) {
-            caseInstance.addEvent(new DebugEnabled(caseInstance));
-            logger.debug("Starting case "+ actorId +" of type "+ definition.getName()+" in debug mode");
+            caseInstance.addDebugInfo(() -> "Starting case "+ actorId +" of type "+ definition.getName()+" in debug mode");
         } else {
-            logger.debug("Starting case "+ actorId +" of type "+ definition.getName());
+            caseInstance.addDebugInfo(() -> "Starting case "+ actorId +" of type "+ definition.getName());
         }
 
         // First set the definition
         caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition, definition.getName()));
 
         // First setup the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
-        caseTeam.getMembers().forEach(newMember -> caseInstance.getCaseTeam().addMember(newMember));
-        // By default add the current user to the case team; this will be ignored if the user is already in the case team
-        caseInstance.getCaseTeam().addCurrentUser(caseInstance.getCurrentUser());
+        caseInstance.getCaseTeam().fillFrom(caseTeamInput);
 
         // Apply input parameters. This may also fill the CaseFile
         caseInstance.addDebugInfo(() -> "Input parameters for new case of type "+ definition.getName(), inputParameters);
@@ -178,7 +187,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
         writeField(generator, Fields.tenant, tenant);
-        writeField(generator, Fields.caseTeam, caseTeamInput);
+        writeField(generator, Fields.caseTeam, caseTeamInput.toValue());
         writeField(generator, Fields.inputParameters, inputParameters);
         writeField(generator, Fields.rootActorId, rootCaseId);
         writeField(generator, Fields.parentActorId, parentCaseId);

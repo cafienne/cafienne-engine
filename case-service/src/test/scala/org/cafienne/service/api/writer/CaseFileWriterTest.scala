@@ -9,13 +9,13 @@ import org.cafienne.cmmn.instance.CaseFileItemTransition
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.cases.{CaseFile, CaseInstance}
+import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
-import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 
@@ -82,9 +82,9 @@ class CaseFileWriterTest
 
       eventually {
         persistence.records.length shouldBe 6
-        persistence.records.head shouldBe a[CaseInstance]
+        persistence.records.head shouldBe a[CaseRecord]
         persistence.records(2) match {
-          case cs: CaseFile =>
+          case cs: CaseFileRecord =>
             cs.data should be(expectedCaseFileContent)
           case other => assert(false, "CaseFile object expected, found " + other.getClass.getName)
         }

@@ -27,8 +27,8 @@ import java.util.Map;
  */
 public class LastModifiedRegistration {
     private final static Logger logger = LoggerFactory.getLogger(LastModifiedRegistration.class);
-    private final Map<String, Instant> lastModifiedRegistration = new HashMap<String, Instant>();
-    private final Map<String, List<Waiter>> waiters = new HashMap<String, List<Waiter>>();
+    private final Map<String, Instant> lastModifiedRegistration = new HashMap();
+    private final Map<String, List<Waiter>> waiters = new HashMap();
     private final Instant startupMoment = CaseSystem.startupMoment();
     private final String name;
 
@@ -80,7 +80,7 @@ public class LastModifiedRegistration {
         // TODO: should this be synchronized code?? I think so... Or can we better use scala immutable maps?
         synchronized (waiters) {
             List<Waiter> waiterList = waiters.remove(id);
-            List<Waiter> newWaiters = new ArrayList<>();
+            List<Waiter> newWaiters = new ArrayList();
             if (waiterList == null) {
                 return;
             }
@@ -105,7 +105,7 @@ public class LastModifiedRegistration {
         synchronized (waiters) {
             List<Waiter> waiterList = waiters.get(waiter.id());
             if (waiterList == null) {
-                waiterList = new ArrayList<>();
+                waiterList = new ArrayList();
                 waiters.put(waiter.id(), waiterList);
             }
             waiterList.add(waiter);

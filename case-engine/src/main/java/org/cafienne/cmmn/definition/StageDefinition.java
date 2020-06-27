@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class StageDefinition extends PlanFragmentDefinition {
-    private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList<PlanItemDefinitionDefinition>(); // Only in the root stage
+    private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList(); // Only in the root stage
 
     private boolean autoComplete;
     private PlanningTableDefinition planningTable;

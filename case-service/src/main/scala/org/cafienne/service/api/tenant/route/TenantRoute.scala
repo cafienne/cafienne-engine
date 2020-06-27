@@ -7,12 +7,34 @@
  */
 package org.cafienne.service.api.tenant.route
 
-import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
+import org.cafienne.service.api.tenant.model.TenantAPI.User
 import org.cafienne.tenant.akka.command.TenantCommand
+import org.cafienne.tenant.akka.command.platform.PlatformTenantCommand
 
-trait TenantRoute extends CommandRoute {
+import scala.concurrent.Future
 
-  def askTenant(command: TenantCommand) = {
+trait TenantRoute extends CommandRoute with QueryRoute {
+  override val lastModifiedRegistration = null
+  override def handleSyncedQuery[A](query: () => Future[A], clm: Option[String]): Future[A] = {
+    query()
+  }
+
+  def asTenantUser(user: User, tenant: String): TenantUser = {
+    TenantUser(user.userId, user.roles.toSeq, tenant, user.name.getOrElse(""), user.email.getOrElse(""), enabled = true, isOwner = false)
+  }
+
+  def askPlatform(command: PlatformTenantCommand) = {
     askModelActor(command)
   }
+
+  def askTenant(platformUser: PlatformUser, tenant: String, createTenantCommand: CreateTenantCommand) = {
+    askModelActor(createTenantCommand.apply(platformUser.getTenantUser(tenant)))
+  }
+
+  trait CreateTenantCommand {
+    def apply(tenantUser: TenantUser): TenantCommand
+  }
 }
+

@@ -1,50 +1,24 @@
 package org.cafienne.tenant.akka.command;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.User;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.TenantUserRoleRemoved;
-
-import java.io.IOException;
 
 @Manifest
-public class RemoveTenantUserRole extends TenantCommand {
-    public final String userId;
-    public final String role;
-
-    private enum Fields {
-        userId, role
-    }
-
+public class RemoveTenantUserRole extends RoleCommand {
     public RemoveTenantUserRole(TenantUser tenantOwner, String tenantId, String userId, String role) {
-        super(tenantOwner, tenantId);
-        this.userId = userId;
-        this.role = role;
+        super(tenantOwner, tenantId, userId, role);
     }
 
     public RemoveTenantUserRole(ValueMap json) {
         super(json);
-        this.userId = readField(json, Fields.userId);
-        this.role = readField(json, Fields.role);
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        if (!tenant.isUser(userId)) {
-            throw new InvalidCommandException("User '" + userId + "' doesn't exist in tenant " + tenant.getId());
-        }
-        tenant.addEvent(new TenantUserRoleRemoved(tenant, userId, role));
-        return new TenantResponse(this);
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.userId, userId);
-        writeField(generator, Fields.role, role);
+    protected void updateUser(User user) {
+        user.removeRole(role);
     }
 }

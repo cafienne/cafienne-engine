@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class Path implements Serializable {
     private final String name;
-    private final Map<String, Object> identifiers = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> identifiers = new LinkedHashMap();
     private final transient CaseFileItemDefinition definition; // TODO: should this be transient. Unfortunately yes.
     private final Path parent;
     private int index = -1; // TODO: index should become final too. Additionally it should also support "last" and "current. Probably need an

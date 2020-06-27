@@ -78,10 +78,12 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            if (startCaseEvents.getEvents().size() != 33) {
+            int expectedNumberOfEvents = 34;
+            if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
-                        "TeamMemberAdded: 1\n" +
+                        "TeamRoleFilled: 1\n" +
+                        "CaseOwnerAdded: 1\n" +
                         "CaseFileEvent: 1\n" +
                         "PlanItemCreated: 4\n" +
                         "PlanItemTransitioned: 10\n" +
@@ -97,7 +99,7 @@ public class VariousSpelExpressions2 {
                         "HumanTaskTerminated: 1\n" +
                         "CaseModified: 1\n");
             }
-            caseStarted.getEvents().assertSize(33);
+            caseStarted.getEvents().assertSize(expectedNumberOfEvents);
         });
 
         testCase.runTest();
@@ -132,10 +134,12 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            if (startCaseEvents.getEvents().size() != 33) {
+            int expectedNumberOfEvents = 34;
+            if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
-                        "TeamMemberAdded: 1\n" +
+                        "TeamRoleFilled: 1\n" +
+                        "CaseOwnerAdded: 1\n" +
                         "CaseFileEvent: 1\n" +
                         "PlanItemCreated: 4\n" +
                         "PlanItemTransitioned: 10\n" +
@@ -151,7 +155,7 @@ public class VariousSpelExpressions2 {
                         "HumanTaskTerminated: 1\n" +
                         "CaseModified: 1\n");
             }
-            caseStarted.getEvents().assertSize(33);
+            caseStarted.getEvents().assertSize(expectedNumberOfEvents);
         });
 
         testCase.runTest();

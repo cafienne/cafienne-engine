@@ -63,7 +63,7 @@ public class ValueTests {
         }
 
         // Test basic map conversion
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap();
         map.put("a", "a");
         map.put("b", "b");
         ValueMap mappedMap = new ValueMap("map", map);

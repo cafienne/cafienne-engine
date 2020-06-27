@@ -62,7 +62,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
         implicit val tenantFormat = jsonFormat2(TenantAPI.Tenant)
         entity(as[TenantAPI.Tenant]) { newTenant =>
           val newTenantName = newTenant.name
-          val owners = newTenant.owners.map(owner => TenantUser(owner.userId, owner.roles.toSeq, newTenantName, owner.name.getOrElse(""), owner.email.getOrElse(""), true))
+          val owners = newTenant.owners.map(owner => TenantUser(owner.userId, owner.roles.toSeq, newTenantName, owner.name.getOrElse(""), owner.email.getOrElse(""), enabled = true, isOwner = true))
           askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, owners.asJava))
         }
       }
@@ -131,9 +131,8 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
   def getUserInformation = get {
     pathPrefix("user") {
       pathEndOrSingleSlash {
-        validUser { user =>
-          val value = HttpEntity(ContentTypes.`application/json`, user.toJSON)
-          complete(StatusCodes.OK, value)
+        validUser { platformUser =>
+          completeJsonValue(platformUser.toValue)
         }
       }
     }

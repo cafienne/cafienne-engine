@@ -8,7 +8,7 @@ import org.cafienne.cmmn.definition.Definition;
 import org.w3c.dom.Element;
 
 public class CaseFileItemCollectionDefinition extends CMMNElementDefinition {
-	private final Collection<CaseFileItemDefinition> items = new ArrayList<CaseFileItemDefinition>();
+	private final Collection<CaseFileItemDefinition> items = new ArrayList();
 
 	public CaseFileItemCollectionDefinition(Element element, Definition definition, CMMNElementDefinition parentElement)
 	{

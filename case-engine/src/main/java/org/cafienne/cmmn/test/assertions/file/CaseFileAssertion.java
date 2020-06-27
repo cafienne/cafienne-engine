@@ -12,7 +12,7 @@ import java.util.*;
 
 public class CaseFileAssertion extends ModelTestCommandAssertion {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileAssertion.class);
-    private final Map<String, CaseFileItemAssertion> assertions = new HashMap<>();
+    private final Map<String, CaseFileItemAssertion> assertions = new HashMap();
 
     public CaseFileAssertion(ModelTestCommand command) {
         super(command);
@@ -60,7 +60,7 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
     }
 
     List<CaseFileItemAssertion> getArrayElements(String path) {
-        List<CaseFileItemAssertion> children = new ArrayList<>();
+        List<CaseFileItemAssertion> children = new ArrayList();
         assertions.forEach((key, value) -> {
             if (key.startsWith(path)) {
                 String restOfKey = key.substring(path.length());

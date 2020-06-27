@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
-    private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap<CaseFileItemDefinition, CaseFileItem>();
+    private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap();
     private final String name;
     public final int instanceNumber;
     private static int instanceCounter = 0;

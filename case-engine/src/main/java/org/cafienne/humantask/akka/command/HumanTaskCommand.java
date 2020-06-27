@@ -10,8 +10,11 @@ import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.cmmn.instance.team.Member;
+import org.cafienne.humantask.instance.TaskState;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public abstract class HumanTaskCommand extends CaseCommand {
     private final String taskId;
@@ -68,14 +71,70 @@ public abstract class HumanTaskCommand extends CaseCommand {
 
     public ModelResponse process(Case caseInstance) {
         return process(task);
-
     }
 
-    public abstract ModelResponse process(HumanTask actor) ;
+    public abstract ModelResponse process(HumanTask task) ;
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.taskId, taskId);
+    }
+
+    /**
+     * Helper method that validates whether a task is in one of the expected states.
+     *
+     * @param task
+     * @param expectedStates
+     */
+    protected void validateState(HumanTask task, TaskState... expectedStates) {
+        TaskState currentTaskState = task.getImplementation().getCurrentState();
+        for (int i = 0; i < expectedStates.length; i++) {
+            if (expectedStates[i].equals(currentTaskState)) {
+                return;
+            }
+        }
+        raiseException("Cannot be done because the task is in " + currentTaskState + " state, but should be in any of " + Arrays.asList(expectedStates) + " state");
+    }
+
+    /**
+     * Validate that the current user is owner to the case
+     * @param task
+     */
+    protected void validateCaseOwnership(HumanTask task) {
+        if (! task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+            raiseException("You must be case owner to perform this operation");
+        }
+    }
+
+    /**
+     * Validate that the current user has the proper role in the case team to perform the task
+     * @param task
+     */
+    protected void validateProperCaseRole(HumanTask task) {
+        if (!task.currentUserIsAuthorized()) {
+            raiseException("You do not have permission to perform this operation");
+        }
+    }
+
+    /**
+     * Tasks are "owned" by the assignee and by the case owners
+     * @param task
+     */
+    protected void validateTaskOwnership(HumanTask task) {
+        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+            // case owners have the privilege to do this too....
+            return;
+        }
+
+        String currentTaskAssignee = task.getImplementation().getAssignee();
+        String currentUserId = getUser().id();
+        if (!currentUserId.equals(currentTaskAssignee)) {
+            raiseException("You do not have permission to perform this operation");
+        }
+    }
+
+    protected void raiseException(String msg) {
+        throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
     }
 }

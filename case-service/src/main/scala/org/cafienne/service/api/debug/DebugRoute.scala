@@ -54,12 +54,9 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
   @Produces(Array("application/json"))
   def getEvents = get {
     path(Segment) { caseInstanceId =>
-      optionalUser { user =>
-        implicit val valueListMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: ValueList =>
-          HttpEntity(ContentTypes.`application/json`, value.toString)
-        }
-        onComplete(caseEventReader.getEvents(user, caseInstanceId)) {
-          case Success(value) => complete(StatusCodes.OK, value)
+      optionalUser { platformUser =>
+        onComplete(caseEventReader.getEvents(platformUser, caseInstanceId)) {
+          case Success(value) => completeJsonValue(value)
           case Failure(err) => complete(StatusCodes.NotFound, err)
         }
       }

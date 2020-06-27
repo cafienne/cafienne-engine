@@ -3,9 +3,10 @@ package org.cafienne.service.api.writer
 import java.time.Instant
 
 import akka.Done
-import org.cafienne.service.api.cases.{CaseFile, CaseInstance, PlanItem}
+import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.Task
+import org.cafienne.service.api.tasks.TaskRecord
+import org.cafienne.service.api.tenant.{UserRoleKey, UserRoleRecord}
 
 import scala.concurrent.Future
 
@@ -17,8 +18,9 @@ class TestPersistence() extends RecordsPersistence {
     Future.successful(Done)
   }
 
-  override def getPlanItem(planItemId: String): Future[Option[PlanItem]] = Future.successful(None)
-  override def getTask(taskId: String): Future[Option[Task]] = Future.successful(Some(Task(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now)))
-  override def getCaseInstance(id: String): Future[Option[CaseInstance]] =  Future.successful(None)
-  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFile]] = Future.successful(None)
+  override def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]] = Future.successful(None)
+  override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = Future.successful(None)
+  override def getTask(taskId: String): Future[Option[TaskRecord]] = Future.successful(Some(TaskRecord(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now)))
+  override def getCaseInstance(id: String): Future[Option[CaseRecord]] =  Future.successful(None)
+  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = Future.successful(None)
 }

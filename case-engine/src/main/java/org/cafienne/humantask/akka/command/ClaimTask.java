@@ -17,7 +17,7 @@ import org.cafienne.humantask.akka.event.HumanTaskOwnerChanged;
 import org.cafienne.humantask.instance.TaskState;
 
 @Manifest
-public class ClaimTask extends WorkflowCommand {
+public class ClaimTask extends HumanTaskCommand {
     public ClaimTask(TenantUser tenantUser, String caseInstanceId, String taskId) {
         super(tenantUser, caseInstanceId, taskId);
     }
@@ -28,22 +28,13 @@ public class ClaimTask extends WorkflowCommand {
 
     @Override
     public void validate(HumanTask task) {
-        /*
-         * String currentUser = getUser().id();
-         * TODO: 1. Check whether the current user has the privilege to claim the task
-         * TODO: 2. Check whether the current user is part of CaseTeam. If not what to do?
-         */
-
-        if (!task.currentUserIsAuthorized()) {
-            throw new SecurityException("No permission to perform this task");
-        }
-
-        validateState(task, TaskState.Unassigned);
+        super.validateState(task, TaskState.Unassigned);
+        super.validateProperCaseRole(task);
     }
-    
+
     @Override
     public HumanTaskResponse process(HumanTask task) {
-        String claimer = this.user.id();
+        String claimer = this.getUser().id();
         task.addEvent(new HumanTaskClaimed(task, claimer));
         task.addEvent(new HumanTaskOwnerChanged(task, claimer));
         return new HumanTaskResponse(this);

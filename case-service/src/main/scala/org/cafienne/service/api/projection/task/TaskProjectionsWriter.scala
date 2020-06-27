@@ -5,7 +5,7 @@ import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
-import org.cafienne.cmmn.akka.event.CaseModified
+import org.cafienne.cmmn.akka.event.{CaseEvent, CaseModified}
 import org.cafienne.humantask.akka.event.HumanTaskEvent
 import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, TaggedEventConsumer}
 import org.cafienne.service.api.projection.RecordsPersistence
@@ -25,10 +25,6 @@ class TaskProjectionsWriter(updater: RecordsPersistence, offsetStorageProvider: 
 
   def consumeModelEvent(newOffset: Offset, persistenceId: String, sequenceNr: Long, modelEvent: ModelEvent[_]) : Future[Done] = {
     modelEvent match {
-      case evt: HumanTaskEvent => {
-        val transaction = getTransaction(evt.getActorId)
-        transaction.handleEvent(evt).flatMap(_ =>  Future.successful(Done))
-      }
       case evt: CaseModified => {
         val transaction = getTransaction(evt.getActorId)
         transactionCache.remove(evt.getActorId)
@@ -38,6 +34,10 @@ class TaskProjectionsWriter(updater: RecordsPersistence, offsetStorageProvider: 
           Future.successful(Done)
         })
       }
+      case evt: CaseEvent => {
+        val transaction = getTransaction(evt.getActorId)
+        transaction.handleEvent(evt).flatMap(_ =>  Future.successful(Done))
+      }
       case other => {
         logger.error("Ignoring unexpected model event of type '" + other.getClass.getName() + ". Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
         Future.successful(Done)
@@ -45,3 +45,5 @@ class TaskProjectionsWriter(updater: RecordsPersistence, offsetStorageProvider: 
     }
   }
 }
+
+object TaskProjectionsWriter

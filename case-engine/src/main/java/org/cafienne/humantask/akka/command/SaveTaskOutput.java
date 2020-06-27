@@ -8,7 +8,6 @@
 package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -23,7 +22,7 @@ import java.io.IOException;
  * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.
  */
 @Manifest
-public class SaveTaskOutput extends WorkflowCommand {
+public class SaveTaskOutput extends HumanTaskCommand {
 	private final ValueMap taskOutput;
 
 	private enum Fields {
@@ -45,23 +44,13 @@ public class SaveTaskOutput extends WorkflowCommand {
 	}
 
 	@Override
-    public void validate(HumanTask task) {
-		String currentTaskAssignee = task.getImplementation().getAssignee();
-		if( currentTaskAssignee == null || currentTaskAssignee.trim().isEmpty() ) {
-		    throw new InvalidCommandException("SaveTaskOutput: Output can be saved only for Assigned or Delegated task (" + task.getId() + ")");
-		}
-
-		String currentUserId = getUser().id();
-		if(! currentUserId.equals(currentTaskAssignee) ) {
-		    throw new InvalidCommandException("SaveTaskOutput: Only the current task assignee (" + currentTaskAssignee + ") can save the task (" + task.getId() + ")");
-		}
-
-		// Task output can only be set if task is Assigned or Delegated
-		validateState(task, TaskState.Assigned, TaskState.Delegated);
+	public void validate(HumanTask task) {
+		super.validateTaskOwnership(task);
+		super.validateState(task, TaskState.Assigned, TaskState.Delegated);
 	}
 
-    @Override
-    public HumanTaskResponse process(HumanTask task) {
+	@Override
+	public HumanTaskResponse process(HumanTask task) {
 		task.addEvent(new HumanTaskOutputSaved(task, this.taskOutput));
 		return new HumanTaskResponse(this);
 	}

@@ -3,8 +3,9 @@ package org.cafienne.akka.actor.identity
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.cmmn.instance.casefile.ValueMap
+import org.cafienne.infrastructure.json.CafienneJson
 
-final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
+final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends CafienneJson {
   final def tenants: Seq[String] = users.map(u => u.tenant)
   final def tenants(tenant: Option[String]): Seq[String] = {
     tenant match {
@@ -29,13 +30,13 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) {
     configuredDefaultTenant
   }
 
-  final def toJSON: String  = {
+  override def toValue  = {
     val map = new ValueMap(Fields.userId, userId)
     val userList = map.withArray("tenants")
     users.foreach(user => {
-      userList.add(user.toJson)
+      userList.add(user.toValue)
     })
-    map.toString
+    map
   }
 
   final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("Tenant '" + tenant +"' does not exist, or user '"+userId+"' is not registered in it"))

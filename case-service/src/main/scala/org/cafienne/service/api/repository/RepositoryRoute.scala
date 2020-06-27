@@ -27,9 +27,6 @@ import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
-import org.cafienne.service.Main
-import org.cafienne.tenant.akka.command.GetTenantOwners
-import org.cafienne.tenant.akka.command.response.TenantOwnersResponse
 import org.w3c.dom.Document
 
 import scala.collection.immutable.Seq
@@ -72,10 +69,10 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
   @Produces(Array("application/xml"))
   def loadModel: Route = get {
     path("load" / Segment) { modelName =>
-      userWithTenant { (user, tenant) => {
+      userWithTenant { (platformUser, tenant) => {
         try {
-          logger.debug(s"Loading definitions '${modelName}' from tenant '${tenant}'")
-          val model = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), modelName)
+          logger.debug(s"Loading definitions '$modelName' from tenant '$tenant'")
+          val model = CaseSystem.config.repository.DefinitionProvider.read(platformUser.getTenantUser(tenant), modelName)
           complete(StatusCodes.OK, model.getDocument)
         }
         catch {
@@ -110,14 +107,14 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
   @Produces(Array("application/json"))
   def listModels = get {
     path("list") {
-      userWithTenant { (user, tenant) => {
+      userWithTenant { (platformUser, tenant) => {
         import scala.collection.JavaConverters._
 
         val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
-        for (file <- CaseSystem.config.repository.DefinitionProvider.list(user.getTenantUser(tenant)).asScala) {
+        for (file <- CaseSystem.config.repository.DefinitionProvider.list(platformUser.getTenantUser(tenant)).asScala) {
           var description = "Description"
           try {
-            val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(user.getTenantUser(tenant), file)
+            val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser.getTenantUser(tenant), file)
             description = definitionsDocument.getFirstCase().getDescription();
           } catch {
             case i: InvalidDefinitionException => description = i.toString
@@ -126,7 +123,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
           val model = new ValueMap("definitions", file, "description", description)
           models.withArray("models").add(model)
         }
-        complete(StatusCodes.OK, models)
+        completeJsonValue(models)
       }
       }
     }
@@ -181,29 +178,29 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
   def deployModel = post {
     path("deploy" / Segment) { modelName =>
       // For deploying files through the network, authorization is mandatory
-      userWithTenant { (user, tenant) => {
+      userWithTenant { (platformUser, tenant) => {
         entity(as[Document]) { xmlDocument =>
           try {
-            logger.debug(s"Deploying '${modelName}' to tenant '${tenant}'")
+            logger.debug(s"Deploying '$modelName' to tenant '$tenant'")
+            // First check if we can parse the definition
             val definitions = new DefinitionsDocument(xmlDocument)
 
-            // Reaching this point means we have a valid definition, and can simply move on.
-            onComplete(deploy(user, tenant, modelName, definitions)) {
-              case Success(_) => complete(StatusCodes.NoContent)
-              case Failure(error) => {
-                error match {
-                  case failure: WriteDefinitionException => {
-                    logger.debug("Deployment failure", failure)
-                    complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
-                  }
-                  case other => throw other
-                }
+            val tenantUser = platformUser.getTenantUser(tenant)
+            tenantUser.isOwner match {
+              case false => complete(StatusCodes.Unauthorized, "User '" + platformUser.userId + "' does not have the privileges to deploy a definition")
+              case true => {
+                CaseSystem.config.repository.DefinitionProvider.write(tenantUser, modelName, definitions)
+                complete(StatusCodes.NoContent)
               }
             }
           } catch {
             case idd: InvalidDefinitionException => {
               logger.debug("Deployment failure", idd)
               complete(StatusCodes.BadRequest, "Cannot deploy " + modelName + ": definition is invalid.")
+            }
+            case failure: WriteDefinitionException => {
+              logger.debug("Deployment failure", failure)
+              complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
             }
             case other: Throwable => {
               logger.debug("Unexpected deployment failure", other)
@@ -216,29 +213,6 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
     }
   }
 
-  private def deploy(user: PlatformUser, tenant: String, modelName: String, definitions: DefinitionsDocument): Future[Any] = {
-    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
-    isTenantOwner(user, tenant).map(isOwner => isOwner match {
-      case true => CaseSystem.config.repository.DefinitionProvider.write(user.getTenantUser(tenant), modelName, definitions)
-      case false => throw new SecurityException("User '" + user.userId + "' does not have the privileges to deploy a definition")
-    })
-  }
-
-  private def isTenantOwner(user: PlatformUser, tenant: String): Future[Boolean] = {
-
-    import akka.pattern.ask
-    implicit val timeout = Main.caseSystemTimeout
-    implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
-
-    (CaseSystem.router ? new GetTenantOwners(user.getTenantUser(tenant), tenant)).flatMap(response => {
-      response match {
-        case o: TenantOwnersResponse => Future.successful(o.owners.contains(user.userId))
-        case other => Future.successful(false)
-      }
-    })
-  }
-
-
   /**
     * Reads validUser and resolves a tenant, based on either the optional tenant passed as a parameter,
     * or the default tenant of the user
@@ -246,15 +220,15 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
     * @return
     */
   private def userWithTenant(subRoute: (PlatformUser, String) => Route): Route = {
-    validUser { user =>
+    validUser { platformUser =>
       parameters('tenant ?) { optionalTenant =>
         val tenant = optionalTenant match {
           case Some(value) => if (value.isBlank) {
-            user.defaultTenant
+            platformUser.defaultTenant
           } else value
-          case None => user.defaultTenant
+          case None => platformUser.defaultTenant
         }
-        subRoute(user, tenant)
+        subRoute(platformUser, tenant)
       }
     }
   }

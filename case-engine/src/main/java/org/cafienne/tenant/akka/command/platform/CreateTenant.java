@@ -10,9 +10,6 @@ import org.cafienne.cmmn.instance.casefile.ValueList;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.OwnerAdded;
-import org.cafienne.tenant.akka.event.TenantUserCreated;
-import org.cafienne.tenant.akka.event.TenantUserRoleAdded;
 import org.cafienne.tenant.akka.event.platform.TenantCreated;
 
 import java.io.IOException;
@@ -42,7 +39,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     public CreateTenant(ValueMap json) {
         super(json);
         this.name = readField(json, Fields.name);
-        this.owners = new HashSet<>();
+        this.owners = new HashSet();
         ValueList jsonOwners = json.withArray(Fields.owners);
         jsonOwners.forEach(value -> {
             ValueMap ownerJson = (ValueMap) value;
@@ -66,15 +63,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     @Override
     public TenantResponse process(TenantActor tenant) {
         tenant.addEvent(new TenantCreated(tenant));
-        // Register the owners as TenantUsers with the specified roles
-        owners.forEach(owner -> {
-            tenant.addEvent(new TenantUserCreated(tenant, owner.id(), owner.name(), owner.email()));
-            // Add all the roles
-            owner.roles().foreach(role -> tenant.addEvent(new TenantUserRoleAdded(tenant, owner.id(), role)));
-        });
-
-        // Register the owners as TenantOwners
-        owners.forEach(owner -> tenant.addEvent(new OwnerAdded(tenant, owner.id())));
+        tenant.setInitialUsers(owners);
         return new TenantResponse(this);
     }
 

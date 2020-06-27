@@ -46,7 +46,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                     "caseInstanceId", task.getCaseInstance().getId()
                     ,"taskId", task.getId()
                     ,"taskName", task.getName()
-                    ,"user", task.getCaseInstance().getCurrentUser().toJson()
+                    ,"user", task.getCaseInstance().getCurrentUser().toValue()
                 )
 //                ,"caseFile", task.getCaseInstance().getCaseFile().toJson()
         );

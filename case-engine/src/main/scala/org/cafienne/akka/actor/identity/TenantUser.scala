@@ -3,11 +3,12 @@ package org.cafienne.akka.actor.identity
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.serialization.AkkaSerializable
-import org.cafienne.cmmn.instance.casefile.{Value, ValueMap}
+import org.cafienne.cmmn.instance.casefile.{BooleanValue, Value, ValueMap}
+import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
 
-final case class TenantUser(id: String, roles: Seq[String], tenant: String, name: String, email: String = "", enabled: Boolean = true) extends AkkaSerializable {
+final case class TenantUser(id: String, roles: Seq[String], tenant: String, name: String, email: String = "", enabled: Boolean = true, isOwner: Boolean = false) extends AkkaSerializable with CafienneJson {
 
   import scala.collection.JavaConverters._
 
@@ -23,15 +24,17 @@ final case class TenantUser(id: String, roles: Seq[String], tenant: String, name
     writeField(generator, Fields.tenant, tenant)
     writeField(generator, Fields.name, name)
     writeField(generator, Fields.email, email)
+    writeField(generator, Fields.isOwner, isOwner)
     generator.writeEndObject()
   }
 
-  def toJson = new ValueMap(
+  override def toValue = new ValueMap(
     Fields.userId, id,
     Fields.roles, roles.toArray,
     Fields.tenant, tenant,
     Fields.name, name,
-    Fields.email, email)
+    Fields.email, email,
+    Fields.isOwner, new BooleanValue(isOwner))
 }
 
 object TenantUser {
@@ -46,17 +49,21 @@ object TenantUser {
     val id: String = json.raw(Fields.userId)
     val email: String = json.raw(Fields.email)
     val tenant: String = json.raw(Fields.tenant)
+    val isOwner: Boolean = {
+      if (json.has(Fields.isOwner.toString)) json.raw(Fields.isOwner)
+      else false
+    }
     val roles = mutable.Set[String]()
     json.withArray(Fields.roles).forEach((value: Value[_]) => roles.add(value.getValue.toString))
 
     val rolesSet: Seq[String] = roles.toSeq
 
-    new TenantUser(id, rolesSet, tenant, name, email, true)
+    TenantUser(id, rolesSet, tenant, name, email, isOwner)
   }
 
   final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {
     if (!CaseSystem.isPlatformOwner(user.userId)) throw new SecurityException("Only platform owners can execute this type of command")
-    TenantUser(user.userId, Seq(), tenantId, "", "", true)
+    TenantUser(user.userId, Seq(), tenantId, "")
   }
 
   /**

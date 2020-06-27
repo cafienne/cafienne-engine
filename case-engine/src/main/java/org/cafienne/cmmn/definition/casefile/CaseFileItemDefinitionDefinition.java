@@ -23,7 +23,7 @@ public class CaseFileItemDefinitionDefinition extends Definition {
     private final String structureRef;
     private final String importRef;
     private ImportDefinition importDefinition;
-    private final Map<String, PropertyDefinition> properties = new LinkedHashMap<String, PropertyDefinition>();
+    private final Map<String, PropertyDefinition> properties = new LinkedHashMap();
 
     public CaseFileItemDefinitionDefinition(Element definitionElement, DefinitionsDocument document) {
         super(definitionElement, document);

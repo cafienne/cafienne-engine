@@ -48,6 +48,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                  * TODO: Validate assignee?! Against CaseTeam ???
                  */
                 if (assignee != null && !assignee.trim().isEmpty()) {
+                    getCaseInstance().getCaseTeam().addDynamicMember(assignee, task.getPerformer());
                     task.addEvent(new HumanTaskAssigned(task, assignee));
                     task.addEvent(new HumanTaskOwnerChanged(task, assignee));
                 }

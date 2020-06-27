@@ -37,7 +37,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * Construct a new, empty value map
      */
     public ValueMap() {
-        super(new LinkedHashMap<>());
+        super(new LinkedHashMap());
     }
 
     /**

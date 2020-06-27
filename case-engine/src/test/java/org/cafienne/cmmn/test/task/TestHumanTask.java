@@ -2,6 +2,8 @@ package org.cafienne.cmmn.test.task;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.StartCase;
+import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.StringValue;
@@ -35,8 +37,10 @@ public class TestHumanTask {
 
         TenantUser pete = TestScript.getTestUser("pete");
         TenantUser gimy = TestScript.getTestUser("gimy");
+        TenantUser tom = TestScript.getTestUser("tom");
+        CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
 
-        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, null), caseStarted -> {
+        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), caseStarted -> {
             caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
             TestScript.debugMessage("Task ID: " + taskId);
@@ -48,7 +52,7 @@ public class TestHumanTask {
              * FillTaskDueDate - User should be able to set task due date using FillTaskDueDate command
              */
             Instant taskDueDate = Instant.now();
-            testCase.addStep(new FillTaskDueDate(pete, caseInstanceId, taskId, taskDueDate), action -> {
+            testCase.addStep(new FillTaskDueDate(tom, caseInstanceId, taskId, taskDueDate), action -> {
 
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
@@ -61,19 +65,19 @@ public class TestHumanTask {
              * SaveTaskOutput - User should not be able to save the task output for Unassigned task
              */
             testCase.assertStepFails(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("Output can be saved only for Assigned or Delegated task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * DelegateTask - Only Assigned task can be delegated
              */
             testCase.assertStepFails(new DelegateTask(gimy, caseInstanceId, taskId, "pete"),
-                    failure -> failure.assertException("Only Assigned task can be delegated"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * CompleteTask - Only Assigned or Delegated task can be completed
              */
             testCase.assertStepFails(new CompleteHumanTask(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("Only Assigned or Delegated task can be completed"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * ClaimTask - User should be able to claim the task
@@ -90,25 +94,25 @@ public class TestHumanTask {
              * ClaimTask - User should not be able to claim already Assigned task
              */
             testCase.assertStepFails(new ClaimTask(pete, caseInstanceId, taskId),
-                    failure -> failure.assertException("ClaimTask cannot be done because task (" + taskId + ") is in Assigned state"));
+                    failure -> failure.assertException("Cannot be done because the task is in Assigned state, but should be in any of [Unassigned] state"));
 
             /**
              * AssignTask - Only Unassigned task can be assigned to a user
              */
             testCase.assertStepFails(new AssignTask(pete, caseInstanceId, taskId, "gimy"),
-                    failure -> failure.assertException("AssignTask cannot be done because task (" + taskId + ") is in Assigned state"));
+                    failure -> failure.assertException("You must be case owner to perform this operation"));
 
             /**
              * ValidateTaskOutput - Only the current assignee should be able to validate task output
              */
             testCase.assertStepFails(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("Only the current task assignee (pete) can validate output of task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * SaveTaskOutput - Only the current assignee should be able to save task data
              */
             testCase.assertStepFails(new SaveTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("Only the current task assignee (pete) can save the task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * SaveTaskOutput - User should be able to save the task
@@ -123,7 +127,7 @@ public class TestHumanTask {
              * RevokeTask - Only the current assignee can revoke the task
              */
             testCase.assertStepFails(new RevokeTask(gimy, caseInstanceId, taskId),
-                    failure -> failure.assertException("Only the current task assignee (pete) can revoke the task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * RevokeTask - User should be able to revoke the task from Assigned state
@@ -140,12 +144,12 @@ public class TestHumanTask {
              * RevokeTask - Only Assigned or Delegated task can be revoked
              */
             testCase.assertStepFails(new RevokeTask(gimy, caseInstanceId, taskId),
-                    failure -> failure.assertException("Only Assigned or Delegated task can be revoked"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * AssignTask - User should be able to assign the task to another user
              */
-            testCase.addStep(new AssignTask(pete, caseInstanceId, taskId, "gimy"), action -> {
+            testCase.addStep(new AssignTask(tom, caseInstanceId, taskId, "gimy"), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -157,7 +161,7 @@ public class TestHumanTask {
              * DelegateTask - Only the current task assignee can delegate the task to another user
              */
             testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, "pete"),
-                    failure -> failure.assertException("Only the current task assignee (gimy) can delegate the task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * DelegateTask - User should be able to delegate the task
@@ -175,7 +179,7 @@ public class TestHumanTask {
              * DelegateTask - Already delegated task can not be further delegated
              */
             testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, "pete"),
-                    failure -> failure.assertException("DelegateTask cannot be done because task (" + taskId + ") is in Delegated state"));
+                    failure -> failure.assertException("Cannot be done because the task is in Delegated state, but should be in any of [Assigned] state"));
 
             /**
              * RevokeTask - User should be able to revoke a task from Delegated state
@@ -193,7 +197,7 @@ public class TestHumanTask {
              * CompleteTask - Only the current task assignee should be able to complete the task
              */
             testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()),
-                    failure -> failure.assertException("Only the current task assignee (gimy) can complete the task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * CompleteTask - User should be able to complete the task

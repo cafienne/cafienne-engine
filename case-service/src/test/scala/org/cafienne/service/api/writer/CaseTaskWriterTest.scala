@@ -8,7 +8,7 @@ import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.instance.{State, Transition}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.cases.CaseInstance
+import org.cafienne.service.api.cases.table.CaseRecord
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -68,7 +68,7 @@ class CaseTaskWriterTest
       Thread.sleep(2000)
       eventually {
         persistence.records.length shouldBe 7
-        persistence.records.exists(x => x.isInstanceOf[CaseInstance]) shouldBe (true)
+        persistence.records.exists(x => x.isInstanceOf[CaseRecord]) shouldBe (true)
       }
     }
   }

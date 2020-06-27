@@ -2,12 +2,12 @@ package org.cafienne.tenant.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.tenant.User;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.OwnerRemoved;
 
 import java.io.IOException;
 
@@ -34,10 +34,19 @@ abstract class ExistingUserCommand extends TenantCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (! tenant.isUser(userId)) {
+        if (tenant.getUser(userId) == null) {
             throw new InvalidCommandException("User '" + userId + "' doesn't exist in tenant " + tenant.getId());
         }
     }
+
+    @Override
+    public ModelResponse process(TenantActor tenant) {
+        User user = tenant.getUser(userId);
+        updateUser(user);
+        return new TenantResponse(this);
+    }
+
+    protected abstract void updateUser(User user);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {

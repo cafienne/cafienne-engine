@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.api.projection.UserSearchFailure
 import org.cafienne.service.api.tenant.model._
 import org.cafienne.service.api.tenant.UserQueries
@@ -53,16 +52,8 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
   @Produces(Array("application/json"))
   def getTenantUsers = get {
     validUser { platformUser =>
-      path(Segment / "users") { tenant =>
-        onComplete(userQueries.getTenantUsers(platformUser, tenant)) {
-          case Success(users) =>
-            complete(StatusCodes.OK, users)
-          case Failure(err) =>
-            err match {
-              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
-              case _ => complete(StatusCodes.InternalServerError, err)
-            }
-        }
+      path(Segment / "users") {
+        tenant => runListQuery(userQueries.getTenantUsers(platformUser, tenant))
       }
     }
   }
@@ -90,10 +81,10 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
         onComplete(userQueries.getTenantUser(platformUser, tenant, userId)) {
           case Success(tenantUserInformation) =>
             if (tenantUserInformation.enabled) {
-              complete(StatusCodes.OK, tenantUserInformation)
+              completeJsonValue(tenantUserInformation.toValue)
             } else {
               // TODO: perhaps this should be allowed for tenant owners?
-              logger.warn(s"User with id '${platformUser.userId}' tries to fetch tenant user '${userId}' but that account has been disabled")
+              logger.warn(s"User with id '${platformUser.userId}' tries to fetch tenant user '$userId' but that account has been disabled")
               complete(StatusCodes.NotFound)
             }
           case Failure(failure) =>

@@ -14,8 +14,7 @@ import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
 import org.cafienne.cmmn.akka.event.plan.RequiredRuleEvaluated;
 import org.cafienne.cmmn.akka.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
-import org.cafienne.cmmn.akka.event.team.TeamMemberAdded;
-import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
+import org.cafienne.cmmn.akka.event.team.*;
 import org.cafienne.humantask.akka.event.*;
 import org.cafienne.processtask.akka.event.*;
 import org.cafienne.tenant.akka.event.*;
@@ -51,6 +50,10 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
         addManifestWrapper(RequiredRuleEvaluated.class, RequiredRuleEvaluated::new);
         addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
         addManifestWrapper(TaskOutputFilled.class, TaskOutputFilled::new);
+        addManifestWrapper(TeamRoleFilled.class, TeamRoleFilled::new);
+        addManifestWrapper(TeamRoleCleared.class, TeamRoleCleared::new);
+        addManifestWrapper(CaseOwnerAdded.class, CaseOwnerAdded::new);
+        addManifestWrapper(CaseOwnerRemoved.class, CaseOwnerRemoved::new);
         addManifestWrapper(TeamMemberAdded.class, TeamMemberAdded::new);
         addManifestWrapper(TeamMemberRemoved.class, TeamMemberRemoved::new);
         addManifestWrapper(TimerSet.class, TimerSet::new);
@@ -86,6 +89,7 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
 
     private static void registerTenantEvents() {
         addManifestWrapper(TenantUserCreated.class, TenantUserCreated::new);
+        addManifestWrapper(TenantUserUpdated.class, TenantUserUpdated::new);
         addManifestWrapper(TenantUserRoleAdded.class, TenantUserRoleAdded::new);
         addManifestWrapper(TenantUserRoleRemoved.class, TenantUserRoleRemoved::new);
         addManifestWrapper(TenantUserEnabled.class, TenantUserEnabled::new);

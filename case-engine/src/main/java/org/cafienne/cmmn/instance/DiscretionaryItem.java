@@ -9,7 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.user.CaseTeamMember;
+import org.cafienne.cmmn.instance.team.Member;
 
 import java.util.Collection;
 import java.util.Set;
@@ -50,17 +50,13 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
     public boolean isAuthorized() {
         Collection<CaseRoleDefinition> authorizedRoles = getAuthorizedRoles();
 
-        if (authorizedRoles.isEmpty()) { // No roles defined, so it is allowed.
+        // When no roles have been defined, it is allowed.
+        if (authorizedRoles.isEmpty()) {
             return true;
         }
 
-        CaseTeamMember currentUser = getCaseInstance().getCurrentTeamMember();
-        if (currentUser == null) { // No user found, but there must be one with a role
-            return false;
-        }
-
-        // Now fetch roles of current user within this case and see if there is one that matches one of the authorized roles
-        Set<CaseRoleDefinition> rolesOfCurrentUser = currentUser.getRoles();
+        // Otherwise the current user must have the role in the case team.
+        Set<CaseRoleDefinition> rolesOfCurrentUser = getCaseInstance().getCurrentTeamMember().getRoles();
         for (CaseRoleDefinition role : authorizedRoles) {
             if (rolesOfCurrentUser.contains(role)) {
                 return true; // You're free to go

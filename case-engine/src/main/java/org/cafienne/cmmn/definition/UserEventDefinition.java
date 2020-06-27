@@ -16,7 +16,7 @@ import java.util.Collection;
 
 public class UserEventDefinition extends PlanItemDefinitionDefinition {
     private final String authorizedRoleRefs;
-    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList<CaseRoleDefinition>();
+    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList();
 
     public UserEventDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);

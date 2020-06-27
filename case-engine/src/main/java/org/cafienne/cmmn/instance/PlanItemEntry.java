@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class PlanItemEntry {
-    private final Collection<EntryCriterion> entryCriteria = new ArrayList<>();
+    private final Collection<EntryCriterion> entryCriteria = new ArrayList();
     private final PlanItem planItem;
 
     PlanItemEntry(PlanItem planItem) {

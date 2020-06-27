@@ -1,6 +1,5 @@
 package org.cafienne.service.api.cases
 
-import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 
@@ -9,6 +8,7 @@ import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
+import org.cafienne.service.api.cases.table.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
 import org.cafienne.service.db.migration.Migrate
@@ -29,24 +29,22 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   val tenant = "tenant"
 
   val idOfActiveCase = "active"
-  val activeCase = CaseInstance(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, name = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-
-  val planItem1_1 = PlanItem(id = UUID.randomUUID().toString, caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
-    historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
-    modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
-
   val idOfTerminatedCase = "terminated"
-  val terminatedCase = CaseInstance(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, name = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-
   val idOfCompletedCase = "completed"
-  val completedCase = CaseInstance(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, name = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val activeCase = CaseRecord(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, name = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val terminatedCase = CaseRecord(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, name = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val completedCase = CaseRecord(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, name = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
 
-//  val planItemId1 = UUID.randomUUID().toString
-  val planItem2_1 = PlanItem(id = UUID.randomUUID().toString, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2-1", index = 0, currentState = "Completed",
+  val planItem1_1 = PlanItemRecord(id = UUID.randomUUID().toString, caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
     modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
-  val planItemHistory2_1 = PlanItemHistory(id = UUID.randomUUID().toString, planItemId = planItem2_1.id, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2",
+  //  val planItemId1 = UUID.randomUUID().toString
+  val planItem2_1 = PlanItemRecord(id = UUID.randomUUID().toString, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2-1", index = 0, currentState = "Completed",
+    historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
+    modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
+
+  val planItemHistory2_1 = PlanItemHistoryRecord(id = UUID.randomUUID().toString, planItemId = planItem2_1.id, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2",
     currentState = "", historyState = "", transition = "", index = 0, planItemType = "", required = false, repeating = false, lastModified = Instant.now,
     modifiedBy = "user1", eventType="?", sequenceNr = 1, taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
@@ -56,11 +54,17 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 
   val user = TestIdentityFactory.createPlatformUser("user1", tenant, List("A", "B"))
 
+  val caseTeamMemberRecords = Seq(
+    CaseTeamMemberRecord(caseInstanceId = idOfActiveCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
+    CaseTeamMemberRecord(caseInstanceId = idOfTerminatedCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
+    CaseTeamMemberRecord(caseInstanceId = idOfCompletedCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
+  )
+
   override def beforeAll {
     Migrate.migrateDatabase()
-    val records = Seq(activeCase, planItem1_1, terminatedCase, completedCase, planItem2_1, planItemHistory2_1) ++ TestIdentityFactory.asDatabaseRecords(user)
+    val records = Seq(activeCase, planItem1_1, terminatedCase, completedCase, planItem2_1, planItemHistory2_1) ++ caseTeamMemberRecords ++ TestIdentityFactory.asDatabaseRecords(user)
     updater.bulkUpdate(records)
-//    Await.ready(Future.sequence(caseQueries.bulkUpdate(records), 1.seconds)
+    //    Await.ready(Future.sequence(caseQueries.bulkUpdate(records), 1.seconds)
   }
 
   // *******************************************************************************************************************
@@ -83,7 +87,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     res must contain (completedCase)
 
     // TODO: the old test had only below line (instead of above three lines). Sometimes this would make the test fail for unclear reasons (perhaps timing issues causes by other tests running parallelly???)
-//    res must be (Seq(completedCase, terminatedCase, activeCase))
+    //    res must be (Seq(completedCase, terminatedCase, activeCase))
   }
 
   it should "retrieve cases filtered by definition" in {
@@ -131,20 +135,19 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 
   it should "retrieve all planItems" in {
     val res = Await.result(caseQueries.getPlanItems(planItem1_1.caseInstanceId, user), 1.second)
-    res.size must be (1)
-    res.head must be(planItem1_1)
+    res.items.size must be (1)
+    res.items.head must be(planItem1_1)
   }
 
   it should "retrieve a planItem" in {
     val res = Await.result(caseQueries.getPlanItem(planItem2_1.id, user), 1.second)
-    res.size must be (1)
-    res.head must be(planItem2_1)
+    res.record must be(planItem2_1)
   }
 
   it should "retrieve planItemHistory records" in {
     val res = Await.result(caseQueries.getPlanItemHistory(planItemHistory2_1.planItemId, user), 1.second)
-    res.size must be (1)
-    res.head must be(planItemHistory2_1)
+    res.records.size must be (1)
+    res.records.head must be(planItemHistory2_1)
   }
 
 }

@@ -44,7 +44,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     private final String xpathExpression;
     private final ExpressionDefinition definition;
-    private final Map<String, String> prefixes = new HashMap<String, String>();
+    private final Map<String, String> prefixes = new HashMap();
 
     public ExpressionEvaluator(ExpressionDefinition expressionDefinition) {
         xpathExpression = expressionDefinition.getBody();

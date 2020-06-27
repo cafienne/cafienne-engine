@@ -16,7 +16,7 @@ import java.util.Map;
 public class CaseScheduler {
     private final ModelActor actor;
     private final akka.actor.Scheduler akkaScheduler;
-    private final Map<String, Cancellable> jobs = new HashMap<>();
+    private final Map<String, Cancellable> jobs = new HashMap();
     private static int instanceCounter = 1;
     private final int instance = instanceCounter++;
 

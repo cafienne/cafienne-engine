@@ -14,6 +14,7 @@ import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.CaseFileItem;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import scala.collection.Seq;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -185,12 +186,17 @@ public abstract class Value<T> implements Serializable {
                 valueList.add(convert(element));
             }
             return valueList;
-       } else if (object instanceof List) {
+        } else if (object instanceof List) {
             List<?> list = (List<?>) object;
             ValueList valueList = new ValueList();
             for (Object element : list) {
                 valueList.add(convert(element));
             }
+            return valueList;
+       } else if (object instanceof Seq) {
+            Seq<?> list = (Seq<?>) object;
+            ValueList valueList = new ValueList();
+            list.foreach(item -> valueList.add(convert(item)));
             return valueList;
         } else if (object instanceof Object[] || object.getClass().isArray()) {
             // We first check with instanceof, and then with isArray, because isArray is slower, and instanceof does not recognize primitive types.

@@ -1,8 +1,10 @@
-package org.cafienne.cmmn.user;
+package org.cafienne.cmmn.instance.team;
 
+import org.cafienne.cmmn.akka.command.team.MemberKey;
+import org.cafienne.cmmn.akka.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.CMMNElement;
 import org.w3c.dom.Element;
 
 import java.util.HashSet;
@@ -11,57 +13,74 @@ import java.util.Set;
 /**
  * A member in the case team. Consists of a user id and associated roles (that have been defined in the {@link CaseDefinition#getCaseRoles()})
  */
-public class CaseTeamMember {
-    private final CaseTeam team;
-    private final String userId;
-    private final Set<CaseRoleDefinition> roles = new HashSet<>();
+public class Member extends CMMNElement<CaseDefinition> {
+    private final Team team;
+    private final Set<CaseRoleDefinition> roles = new HashSet();
+    private boolean isOwner = false;
+    public final MemberKey key;
 
     /**
-     * Shortcut constructor for akka recovery
+     * Creates a new team member and validates whether the member would fit in the team.
+     * Does NOT add the member to the team.
      *
      * @param team
-     * @param userId
-     * @param roles
-     * @param caseInstance 
+     * @param event
+     * @throws CaseTeamError
      */
-    CaseTeamMember(CaseTeam team, String userId, Set<String> roles, Case caseInstance) {
+    Member(Team team, TeamRoleFilled event) throws CaseTeamError {
+        this(team, event.key);
+    }
+
+    Member(Team team, TeamMemberAdded event) throws CaseTeamError {
+        this(team, event.key);
+        event.getRoles().forEach(roleName -> addRole(roleName));
+    }
+
+    protected Member(Team team, MemberKey key) {
+        super(team, team.getDefinition());
         this.team = team;
-        this.userId = userId;
-        roles.add("");// Always add empty role for members
-        for (String roleName : roles) {
-            CaseRoleDefinition role = caseInstance.getDefinition().getCaseRole(roleName);
-            this.roles.add(role);
+        this.key = key;
+    }
+
+    boolean isUser() {
+        return key.type().equals("user");
+    }
+
+    private void addRole(String roleName) {
+        CaseRoleDefinition role = getCaseInstance().getDefinition().getCaseRole(roleName);
+        roles.add(role);
+    }
+
+    void updateState(TeamRoleFilled event) {
+        addRole(event.roleName);
+    }
+
+    void updateState(CaseOwnerAdded event) {
+        this.isOwner = true;
+    }
+
+    void updateState(CaseOwnerRemoved event) {
+        this.isOwner = false;
+    }
+
+    void updateState(TeamRoleCleared event) {
+        CaseRoleDefinition role = findRole(event.roleName);
+        if (role != null) {
+            roles.remove(role);
         }
     }
 
-    /**
-     * Creates a new team member and validates whether the member would fit in the team.
-     * Does NOT add the member to the team.
-     *
-     * @param team
-     * @param member
-     * @param caseInstance
-     * @throws CaseTeamError
-     */
-    public CaseTeamMember(CaseTeam team, org.cafienne.cmmn.akka.command.team.CaseTeamMember member, Case caseInstance) throws CaseTeamError {
-        this(team, member, caseInstance.getDefinition());
+    public boolean isOwner() {
+        return isOwner;
     }
 
-    /**
-     * Creates a new team member and validates whether the member would fit in the team.
-     * Does NOT add the member to the team.
-     *
-     * @param team
-     * @param member
-     * @param caseDefinition
-     * @throws CaseTeamError
-     */
-    public CaseTeamMember(CaseTeam team, org.cafienne.cmmn.akka.command.team.CaseTeamMember member, CaseDefinition caseDefinition) throws CaseTeamError {
-        this.team = team;
-        this.userId = parseName(member.getUser());
-        member.getRoles().forEach(roleName -> addRole(getCaseRole(caseDefinition, roleName)));
+    public boolean hasRole(String roleName) {
+        return findRole(roleName) != null;
     }
 
+    private CaseRoleDefinition findRole(String roleName) {
+        return roles.stream().filter(role -> role.getName().equals(roleName)).findFirst().orElse(null);
+    }
 
     /**
      * Get the role after validating against case definition
@@ -97,8 +116,8 @@ public class CaseTeamMember {
      *
      * @return
      */
-    public String getUserId() {
-        return userId;
+    public String getMemberId() {
+        return key.id();
     }
 
     /**
@@ -115,13 +134,13 @@ public class CaseTeamMember {
         for (CaseRoleDefinition assignedRole : roles) {
             if (assignedRole.getMutexRoles().contains(role)) {
                 // not allowed
-                throw new CaseTeamError("Role " + role + " is not allowed for " + getUserId() + " since " + getUserId() + " also has role " + assignedRole);
+                throw new CaseTeamError("Role " + role + " is not allowed for " + getMemberId() + " since " + getMemberId() + " also has role " + assignedRole);
             }
         }
 
         // Check that a singleton role is not yet assigned to one of the other team members
         if (role.isSingleton()) {
-            for (CaseTeamMember member : team.getMembers()) {
+            for (Member member : getTeam().getMembers()) {
                 if (member.getRoles().contains(role)) {
                     throw new CaseTeamError("Role " + role + " is already assigned to another user");
                 }
@@ -145,19 +164,24 @@ public class CaseTeamMember {
      *
      * @return
      */
-    public CaseTeam getTeam() {
+    public Team getTeam() {
         return team;
     }
 
     public void dumpMemoryStateToXML(Element parentElement) {
         Element memberXML = parentElement.getOwnerDocument().createElement("Member");
         parentElement.appendChild(memberXML);
-        memberXML.setAttribute("name", getUserId());
+        memberXML.setAttribute("name", getMemberId());
         memberXML.setAttribute("roles", roles.toString());
         // roles.forEach(role -> {
         // Element roleXML = parentElement.getOwnerDocument().createElement("Role");
         // memberXML.appendChild(roleXML);
         // roleXML.appendChild(parentElement.getOwnerDocument().createTextNode(role.getName()));
         // });
+    }
+
+    @Override
+    public CaseDefinition getDefinition() {
+        return getCaseInstance().getDefinition();
     }
 }

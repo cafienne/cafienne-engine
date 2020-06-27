@@ -7,13 +7,14 @@
  */
 package org.cafienne.cmmn.test;
 
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
+import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -22,6 +23,8 @@ import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.None;
+import scala.Some;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -54,7 +57,7 @@ public class TestScript {
 
     private boolean testCompleted;
 
-    private Deque<ModelTestCommand> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
+    private Deque<ModelTestCommand> commands = new ArrayDeque(); // We need to be able to add elements both at front and end; and execute always the front element
     private ModelTestCommand current; // current test step
     private int actionNumber = 0; // current action number
 
@@ -120,23 +123,46 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", "", "", true);
+        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", "", "", true, false);
     }
 
     /**
      * Creates a CaseTeam that can be used in StartCase command based upon a list of user contexts
      *
-     * @param users
+     * @param users The users array can hold case team members, tenant users. Tenant users will be become
+     *              members, with the tenant roles that they have passed to them
      * @return
      */
-    public static CaseTeam getCaseTeam(TenantUser... users) {
-        CaseTeam team = new CaseTeam();
-        Arrays.asList(users).forEach(user -> {
-            Set<String> roles = new HashSet<>();
-            user.roles().forall(role -> roles.add(role));
-            team.getMembers().add(new CaseTeamMember(user.id(), roles));
-        });
-        return team;
+    public static CaseTeam getCaseTeam(Object... users) {
+        List<CaseTeamMember> members = new ArrayList();
+        for (Object user : users) {
+            if (user instanceof TenantUser) {
+                members.add(getMember((TenantUser)user));
+            } else if (user instanceof CaseTeamMember) {
+                members.add((CaseTeamMember) user);
+            } else {
+                throw new IllegalArgumentException("Cannot accept users of type " + user.getClass().getName());
+            }
+        }
+        return CaseTeam.apply(members);
+    }
+
+    /**
+     * Create a case owner with roles, copies tenant roles, adds additional roles
+     * @param user
+     * @return
+     */
+    public static CaseTeamMember getOwner(TenantUser user) {
+        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(true), new scala.collection.immutable.Vector(0, 0, 0));
+    }
+
+    /**
+     * Create a simple member with roles, copies tenant roles, adds additional roles
+     * @param user
+     * @return
+     */
+    public static CaseTeamMember getMember(TenantUser user) {
+        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(false), new scala.collection.immutable.Vector(0, 0, 0));
     }
 
     /**

@@ -79,7 +79,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         // Create maps to store the values that must be validated.
         ValueMap implementationOutput = potentialRawOutput == null ? new ValueMap() : potentialRawOutput;
         ValueMap potentialTaskOutput = new ValueMap();
-        Vector<String> validationErrors = new Vector<>();
+        Vector<String> validationErrors = new Vector();
 
         Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
         for (ParameterMappingDefinition mapping : mappings) {
@@ -134,7 +134,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         ValueMap mappedInputParameters = new ValueMap();
         ValueMap taskInputParameters = new ValueMap();
 
-        Map<String, TaskInputParameter> inputParameters = new LinkedHashMap<>();
+        Map<String, TaskInputParameter> inputParameters = new LinkedHashMap();
         getDefinition().getInputParameters().forEach((name, inputParameterDefinition) -> {
             TaskInputParameter inputParameter = new TaskInputParameter(inputParameterDefinition, getCaseInstance());
             inputParameters.put(name, inputParameter);

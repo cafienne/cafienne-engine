@@ -25,7 +25,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
     }
 
     public PublishedEventsAssertion(PublishedEventsAssertion events) {
-        this.events = new ArrayList<>(events.getEvents());
+        this.events = new ArrayList(events.getEvents());
     }
 
     /**
@@ -147,7 +147,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
     }
 
     public String enumerateEventsByType() {
-        Map<Class<?>, Integer> eventsByType = new LinkedHashMap<>();
+        Map<Class<?>, Integer> eventsByType = new LinkedHashMap();
         events.forEach(event -> eventsByType.put(event.getClass(), (eventsByType.getOrDefault(event.getClass(), Integer.valueOf(0)) + 1)));
         StringBuilder sb = new StringBuilder();
         eventsByType.forEach((eventClass, number) -> sb.append(eventClass.getSimpleName() +": " + number + "\n"));
@@ -191,7 +191,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @return
      */
     public PublishedEventsAssertion filter(Instant lastModified) {
-        List<ModelEvent> eventsSince = new ArrayList<>();
+        List<ModelEvent> eventsSince = new ArrayList();
         for (int i = 0; i < events.size(); i++) {
             ModelEvent e = events.get(i);
             eventsSince.add(e);
@@ -202,7 +202,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
                     return new PublishedEventsAssertion(eventsSince);
                 } else {
                     // Clear the current list, as these are the events from a previous lastModified moment
-                    eventsSince = new ArrayList<>();
+                    eventsSince = new ArrayList();
                 }
             }
         }

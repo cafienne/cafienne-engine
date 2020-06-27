@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,7 +50,7 @@ public class Basic {
 
             PlanItemAssertion item1dot2 = item4.assertPlanItem("Item1.2");
             item1dot2.assertLastTransition(Transition.Start, State.Active, State.Available);
-            
+
             PlanItemAssertion milestone = casePlan.assertPlanItem("Milestone");
             milestone.assertLastTransition(Transition.Create, State.Available, State.Null);
 
@@ -59,9 +59,11 @@ public class Basic {
 
             PublishedEventsAssertion startCaseEvents = casePlan.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            if (startCaseEvents.getEvents().size() != 56) {
+            int expectedNumberOfEvents = 57;
+            if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nCaseDefinitionApplied: 1\n" +
-                        "TeamMemberAdded: 1\n" +
+                        "TeamRoleFilled: 1\n" +
+                        "CaseOwnerAdded: 1\n" +
                         "PlanItemCreated: 9\n" +
                         "PlanItemTransitioned: 14\n" +
                         "RepetitionRuleEvaluated: 7\n" +
@@ -72,9 +74,9 @@ public class Basic {
                         "HumanTaskInputSaved: 4\n" +
                         "CaseModified: 1");
             }
-            startCaseEvents.assertSize(56);
+            startCaseEvents.assertSize(expectedNumberOfEvents);
         });
-        
+
         // Completing Item1 should activate sentries S3 and S3.2
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
@@ -96,7 +98,7 @@ public class Basic {
 
             PlanItemAssertion item1dot2 = item4.assertPlanItem("Item1.2");
             item1dot2.assertLastTransition(Transition.Start, State.Active, State.Available);
-            
+
             PlanItemAssertion milestone = casePlan.assertPlanItem("Milestone");
             milestone.assertLastTransition(Transition.Occur, State.Completed, State.Available);
 
@@ -125,14 +127,14 @@ public class Basic {
 
             PlanItemAssertion item1dot2 = item4.assertPlanItem("Item1.2");
             item1dot2.assertLastTransition(Transition.Exit, State.Terminated, State.Active);
-            
+
             PlanItemAssertion milestone = casePlan.assertPlanItem("Milestone");
             milestone.assertLastTransition(Transition.Occur, State.Completed, State.Available);
 
             PlanItemAssertion listener = casePlan.assertPlanItem("Listener");
             listener.assertLastTransition(Transition.Create, State.Available, State.Null);
         });
-        
+
         testCase.runTest();
 
     }

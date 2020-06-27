@@ -2,13 +2,13 @@ package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
-import org.cafienne.service.api.cases.PlanItemHistory
+import org.cafienne.service.api.cases.table.PlanItemHistoryRecord
 
 object PlanItemHistoryMerger {
-  def mapEventToHistory(evt: PlanItemEvent): PlanItemHistory = {
+  def mapEventToHistory(evt: PlanItemEvent): PlanItemHistoryRecord = {
     evt match {
       case event: PlanItemCreated =>
-        PlanItemHistory(
+        PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           stageId = event.stageId,
@@ -23,7 +23,7 @@ object PlanItemHistoryMerger {
           sequenceNr = event.getSequenceNumber
         )
       case event: PlanItemTransitioned =>
-        PlanItemHistory(
+        PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId(),
@@ -38,7 +38,7 @@ object PlanItemHistoryMerger {
           sequenceNr = evt.getSequenceNumber
         )
       case event: RepetitionRuleEvaluated =>
-        PlanItemHistory(
+        PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId(),
@@ -51,7 +51,7 @@ object PlanItemHistoryMerger {
           sequenceNr = evt.getSequenceNumber
         )
       case event: RequiredRuleEvaluated =>
-        PlanItemHistory(
+        PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId(),
@@ -65,6 +65,6 @@ object PlanItemHistoryMerger {
         )
     }
   }
-  def merge(modified: CaseModified, current: PlanItemHistory): PlanItemHistory =
+  def merge(modified: CaseModified, current: PlanItemHistoryRecord): PlanItemHistoryRecord =
     current.copy(lastModified = modified.lastModified(), modifiedBy = modified.getUser.id)
 }

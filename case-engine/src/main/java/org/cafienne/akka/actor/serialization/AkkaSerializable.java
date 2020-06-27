@@ -140,7 +140,7 @@ public interface AkkaSerializable {
     }
 
     default <T> Set<T> readSet(ValueMap json, Enum fieldName) {
-        return new HashSet<T>(readArray(json, fieldName).rawList());
+        return new HashSet(readArray(json, fieldName).rawList());
     }
 
     default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Enum fieldName, Class<T> tClass) {

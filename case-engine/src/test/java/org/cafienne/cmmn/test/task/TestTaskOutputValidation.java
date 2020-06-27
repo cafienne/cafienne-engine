@@ -6,6 +6,8 @@ import com.github.tomakehurst.wiremock.matching.MatchResult;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.StartCase;
+import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
@@ -38,8 +40,9 @@ public class TestTaskOutputValidation {
     private final ValueMap invalidDecisionResponse = new ValueMap("Status", "NOK", "details", "Field 'decision' has an improper value");
 
 
-    private final TenantUser pete = TestScript.getTestUser("pete", "role1", "role2");
-    private final TenantUser gimy = TestScript.getTestUser("gimy", "no-role");
+    private final TenantUser pete = TestScript.getTestUser("pete");
+    private final TenantUser gimy = TestScript.getTestUser("gimy");
+    private final TenantUser tom = TestScript.getTestUser("tom");
 
 
     private final int port = 17382;
@@ -66,7 +69,8 @@ public class TestTaskOutputValidation {
                 "HTTPConfig", new ValueMap("port", port)
         );
 
-        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, null), cp -> {
+        CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
+        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), cp -> {
             // Depending on how fast the first (process) task starts, the "HumanTask" is either Active or still Available
             String taskId = cp.assertPlanItem("HumanTask").getId();
 
@@ -78,7 +82,7 @@ public class TestTaskOutputValidation {
              * SaveTaskOutput - User should not be able to save the task output for Unassigned task
              */
             testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("ValidateTaskOutput: Output can be validated only for Assigned or Delegated task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * ClaimTask - User should be able to claim the task
@@ -92,7 +96,7 @@ public class TestTaskOutputValidation {
              * ValidateTaskOutput - Task output validation fails on wrong user
              */
             testCase.assertStepFails(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("ValidateTaskOutput: Only the current task assignee (pete) can validate output of task"));
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * ValidateTaskOutput - Task output validation should result in a failure when we send "KILLSWITCH"

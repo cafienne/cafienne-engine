@@ -21,7 +21,7 @@ import org.cafienne.humantask.instance.TaskState;
 import java.io.IOException;
 
 @Manifest
-public class AssignTask extends WorkflowCommand {
+public class AssignTask extends HumanTaskCommand {
     private final String assignee;
 
     private enum Fields {
@@ -31,6 +31,9 @@ public class AssignTask extends WorkflowCommand {
     public AssignTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
         super(tenantUser, caseInstanceId, taskId);
         this.assignee = assignee;
+        if (assignee == null || assignee.trim().isEmpty()) {
+            throw new InvalidCommandException("AssignTask: The assignee should not be null or empty");
+        }
     }
 
     public AssignTask(ValueMap json) {
@@ -40,12 +43,8 @@ public class AssignTask extends WorkflowCommand {
 
     @Override
     public void validate(HumanTask task) {
-        if (assignee == null || assignee.trim().isEmpty()) {
-            throw new InvalidCommandException("AssignTask: The assignee should not be null or empty");
-        }
-        validateState(task, TaskState.Unassigned);
-        // TODO: 1. Validate whether assignee is a valid user in the system
-        // TODO: 2. Check whether the current user has the privilege to assign the task to assignee
+        super.validateCaseOwnership(task);
+        super.validateState(task, TaskState.Unassigned);
     }
 
     @Override

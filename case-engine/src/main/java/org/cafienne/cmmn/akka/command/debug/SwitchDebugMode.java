@@ -54,10 +54,7 @@ public class SwitchDebugMode extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        if (debugMode!=caseInstance.debugMode()) {
-            if (debugMode) caseInstance.addEvent(new DebugEnabled(caseInstance));
-            else caseInstance.addEvent(new DebugDisabled(caseInstance));
-        }
+        caseInstance.upsertDebugMode(debugMode);
         return new CaseResponse(this);
     }
 

@@ -16,7 +16,7 @@ public class SentryNetwork {
     /**
      * List of sentries active within the case.
      */
-    private Collection<Criterion> criteria = new ArrayList<>();
+    private Collection<Criterion> criteria = new ArrayList();
 
     public SentryNetwork(Case caseInstance) {
         this.caseInstance = caseInstance;

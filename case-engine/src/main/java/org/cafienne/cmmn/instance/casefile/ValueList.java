@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
     public ValueList() {
-        super(new ArrayList<>());
+        super(new ArrayList());
     }
 
     /**
@@ -181,7 +181,7 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
      */
     public <T> List<T> rawList() {
         List<Value<?>> values = getValue();
-        List<T> list = new ArrayList<>();
+        List<T> list = new ArrayList();
         values.forEach(value -> list.add((T)value.getValue()));
         return list;
     }

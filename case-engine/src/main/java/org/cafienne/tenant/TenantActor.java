@@ -1,7 +1,6 @@
 package org.cafienne.tenant;
 
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.akka.command.TenantCommand;
 import org.cafienne.tenant.akka.event.*;
@@ -10,18 +9,15 @@ import org.cafienne.tenant.akka.event.platform.TenantDisabled;
 import org.cafienne.tenant.akka.event.platform.TenantEnabled;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TenantActor manages users and their roles inside a tenant.
  */
 public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     private TenantCreated creationEvent;
-    private Set<String> owners = new HashSet<>();
-    private Map<String, InternalTenantUserRepresentation> users = new HashMap<>();
+    private Map<String, User> users = new HashMap();
     private boolean disabled = false; // TODO: we can add some behavior behind this...
 
     public TenantActor() {
@@ -52,6 +48,32 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         this.creationEvent = tenantCreated;
     }
 
+    public void setInitialUsers(Set<TenantUser> owners) {
+        // Register the owners as TenantUsers with the specified roles
+        owners.forEach(owner -> createUser(owner, true));
+    }
+
+    private TenantUserCreated createUser(TenantUser user, boolean isOwner) {
+        TenantUserCreated event = addEvent(new TenantUserCreated(this, user.id(), user.name(), user.email()));
+        User newUser = getUser(user.id());
+        user.roles().foreach(role -> newUser.addRole(role));
+        if (isOwner) newUser.makeOwner();
+        return event;
+    }
+
+    public TenantUserCreated createUser(TenantUser user) {
+        return createUser(user, false);
+    }
+
+    public void upsertUser(TenantUser user) {
+        User existingUser = users.get(user.id());
+        if (existingUser == null) {
+            createUser(user);
+        } else {
+            existingUser.updateFrom(user);
+        }
+    }
+
     public void updateState(TenantDisabled event) {
         this.disabled = true;
     }
@@ -60,65 +82,28 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         this.disabled = false;
     }
 
-    public boolean isUser(String userId) {
-        return users.containsKey(userId);
+    public User getUser(String userId) {
+        return users.get(userId);
     }
 
     public boolean isOwner(String userId) {
-        return owners.contains(userId);
+        User user = getUser(userId);
+        return user != null && user.isOwner();
     }
 
     public boolean isOwner(TenantUser user) {
         return isOwner(user.id());
     }
 
-    public Set<String> getOwners() {
-        return owners;
+    public List<String> getOwnerList() {
+        return users.values().stream().filter(user -> user.isOwner()).map(owner -> owner.userId).collect(Collectors.toList());
     }
 
     public void updateState(TenantUserCreated event) {
-        users.put(event.userId, new InternalTenantUserRepresentation(event));
-    }
-
-    public void updateState(OwnerRemoved event) {
-        owners.remove(event.userId);
-    }
-
-    public void updateState(OwnerAdded event) {
-        owners.add(event.userId);
-    }
-
-    public void updateState(TenantUserEnabled event) {
-        users.get(event.userId).enabled = true;
-    }
-
-    public void updateState(TenantUserDisabled event) {
-        users.get(event.userId).enabled = false;
-    }
-
-    public void updateState(TenantUserRoleAdded event) {
-        users.get(event.userId).roles.add(event.role);
-    }
-
-    public void updateState(TenantUserRoleRemoved event) {
-        users.get(event.userId).roles.remove(event.role);
+        users.put(event.userId, new User(this, event));
     }
 
     public void updateState(TenantModified event) {
         setLastModified(event.lastModified());
-    }
-}
-
-class InternalTenantUserRepresentation {
-    final String userId;
-    final Set<String> roles = new HashSet<>();
-    boolean enabled = true;
-    String name;
-    String email;
-
-    InternalTenantUserRepresentation(TenantUserCreated event) {
-        this.userId = event.userId;
-        this.name = event.name;
-        this.email = event.email;
     }
 }

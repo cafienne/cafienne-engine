@@ -81,7 +81,7 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
     @Override
     public Iterator<Object> iterator() {
         final NullValue self = this;
-        return new Iterator<Object>() {
+        return new Iterator() {
             @Override
             public Object next() {
                 return self;
@@ -175,7 +175,7 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
     @Override
     public ListIterator<Object> listIterator() {
         NullValue self = this;
-        return new ListIterator<Object>() {
+        return new ListIterator() {
 
             @Override
             public boolean hasNext() {

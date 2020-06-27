@@ -7,16 +7,16 @@
  */
 package org.cafienne.cmmn.definition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Base class for top-level elements inside the <code>&lt;definitions&gt;</code> tag, such as
@@ -26,14 +26,14 @@ public class Definition extends CMMNElementDefinition {
     /**
      * Collection with all elements belonging to the case definition.
      */
-    private final Collection<CMMNElementDefinition> elements = new ArrayList<CMMNElementDefinition>();
+    private final Collection<CMMNElementDefinition> elements = new ArrayList();
     /**
      * Document to which this definition belongs.
      */
     private final DefinitionsDocument document;
 
-    private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap<String, InputParameterDefinition>();
-    private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap<String, OutputParameterDefinition>();
+    private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap();
+    private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap();
 
     protected Definition(Element element, DefinitionsDocument document) {
         super(element, null, null, true); // All definitions must have an identifier

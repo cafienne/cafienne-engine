@@ -70,8 +70,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def health = get {
     pathPrefix("health") {
       pathEndOrSingleSlash {
-        val value = HttpEntity(ContentTypes.`application/json`, CaseSystem.health.report)
-        complete(StatusCodes.OK, value)
+        completeJsonValue(CaseSystem.health.report)
       }
     }
   }
@@ -90,8 +89,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   @Produces(Array("application/json"))
   def version = get {
     path("version") {
-      val value = HttpEntity(ContentTypes.`application/json`, CaseSystem.version.toString)
-      complete(StatusCodes.OK, value)
+      completeJsonValue(CaseSystem.version.json)
     }
   }
 }

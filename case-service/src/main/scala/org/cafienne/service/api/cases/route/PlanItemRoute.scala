@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -18,18 +17,14 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
-import org.cafienne.cmmn.instance.casefile._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader, PlanItem, PlanItemHistory}
-
-import scala.util.{Failure, Success}
+import org.cafienne.service.api.cases.CaseQueries
 
 @Api(tags = Array("case plan"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute with CaseReader {
+class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
   val caseFileRoute = new CaseFileRoute(caseQueries)(userCache)
   val caseTeamRoute = new CaseTeamRoute(caseQueries)(userCache)
@@ -60,24 +55,11 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItems = get {
-    validUser { user =>
-      path(Segment / "planitems") { caseInstanceId =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          //          parameters(planItemType ?, 'status ?) { (planItemType, status) =>
-          // planItemType and status are removed!!
-          onComplete(handleSyncedQuery(() => caseQueries.getPlanItems(caseInstanceId, user), caseLastModified)) {
-            case Success(value) => complete(StatusCodes.OK, planItemToValueList(value))
-            case Failure(err) => complete(StatusCodes.InternalServerError, err)
-          }
-        }
+    validUser { platformUser =>
+      path(Segment / "planitems") {
+        caseInstanceId => runQuery(caseQueries.getPlanItems(caseInstanceId, platformUser))
       }
     }
-  }
-
-  private def planItemToValueList(items: Seq[PlanItem]): ValueList = {
-    val responseValues = new ValueList
-    items.foreach(item => responseValues.add(item.toValueMap))
-    responseValues
   }
 
   @Path("/{caseInstanceId}/planitems/{planItemId}")
@@ -98,15 +80,9 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItem = get {
-    validUser { user =>
-      path(Segment / "planitems" / Segment) { (_, planItemId) =>
-        optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
-          onComplete(handleSyncedQuery(() => caseQueries.getPlanItem(planItemId, user), caseLastModified)) {
-            case Success(Some(value)) => complete(StatusCodes.OK, value.toValueMap)
-            case Success(None) => complete(StatusCodes.NotFound)
-            case Failure(err) => complete(StatusCodes.InternalServerError, err)
-          }
-        }
+    validUser { platformUser =>
+      path(Segment / "planitems" / Segment) {
+        (_, planItemId) => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
       }
     }
   }
@@ -131,10 +107,10 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def planItemTransition = post {
-    validUser { user =>
+    validUser { platformUser =>
       path(Segment / "planitems" / Segment / Segment) { (caseInstanceId, planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)
-        askCase(user, caseInstanceId, user => new MakePlanItemTransition(user, caseInstanceId, planItemId, transition, ""))
+        askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition, ""))
       }
     }
   }
@@ -156,19 +132,10 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItemHistory = get {
-    validUser { user =>
-      path(Segment / "planitems" / Segment / "history") { (caseInstanceId, planItemId) =>
-        onComplete(caseQueries.getPlanItemHistory(planItemId, user)) {
-          case Success(value) => complete(StatusCodes.OK, planItemHistoryToValueList(value))
-          case Failure(err) => complete(StatusCodes.NotFound, err)
-        }
+    validUser { platformUser =>
+      path(Segment / "planitems" / Segment / "history") {
+        (_, planItemId) => runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))
       }
     }
-  }
-
-  private def planItemHistoryToValueList(items: Seq[PlanItemHistory]): ValueList = {
-    val responseValues = new ValueList
-    items.foreach(item => responseValues.add(item.toValueMap))
-    responseValues
   }
 }

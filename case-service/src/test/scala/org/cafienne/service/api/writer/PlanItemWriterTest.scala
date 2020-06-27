@@ -7,14 +7,14 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.cases.{CaseInstance, PlanItem}
+import org.cafienne.service.api.cases.table.{CaseRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.db.migration.Migrate
-import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 
@@ -71,8 +71,8 @@ class PlanItemWriterTest
       Thread.sleep(1000)
       eventually {
         persistence.records.length shouldBe 8
-        assert(persistence.records.exists(x => x.isInstanceOf[CaseInstance]))
-        assert(persistence.records.exists(x => x.isInstanceOf[PlanItem]))
+        assert(persistence.records.exists(x => x.isInstanceOf[CaseRecord]))
+        assert(persistence.records.exists(x => x.isInstanceOf[PlanItemRecord]))
       }
     }
   }

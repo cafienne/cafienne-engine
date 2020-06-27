@@ -26,7 +26,7 @@ public interface ItemDefinition {
     PlanItemDefinitionDefinition getPlanItemDefinition();
 
     default Collection<EntryCriterionDefinition> getEntryCriteria() {
-        return new ArrayList<>();
+        return new ArrayList();
     }
 
     Collection<ExitCriterionDefinition> getExitCriteria();

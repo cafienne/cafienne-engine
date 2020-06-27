@@ -16,7 +16,7 @@ import akka.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
   * @param offsetValue
   * @param timestamp
   */
-case class NamedOffset(name: String, offsetType: String, offsetValue: String, timestamp: Timestamp =  Timestamp.from(Instant.now)) {
+case class OffsetRecord(name: String, offsetType: String, offsetValue: String, timestamp: Timestamp =  Timestamp.from(Instant.now)) {
   def asOffset() : Offset = {
     offsetType match {
       case "TimeBasedUUID" => try {
@@ -43,18 +43,18 @@ case class NamedOffset(name: String, offsetType: String, offsetValue: String, ti
   }
 }
 
-object NamedOffset {
+object OffsetRecord {
   /**
     * Creates a new record for storage of offset
     * @param offsetName
     * @param offset
     * @return
     */
-  def apply(offsetName: String, offset: Offset) : NamedOffset = {
+  def apply(offsetName: String, offset: Offset) : OffsetRecord = {
     offset match {
-      case uuid: TimeBasedUUID => NamedOffset(offsetName, "TimeBasedUUID", uuid.value.toString)
-      case seq: Sequence => NamedOffset(offsetName, "Sequence", seq.value.toString)
-      case NoOffset => NamedOffset(offsetName, "None", "0")
+      case uuid: TimeBasedUUID => OffsetRecord(offsetName, "TimeBasedUUID", uuid.value.toString)
+      case seq: Sequence => OffsetRecord(offsetName, "Sequence", seq.value.toString)
+      case NoOffset => OffsetRecord(offsetName, "None", "0")
       case other =>  {
         throw new RuntimeException("Cannot handle offsets of type "+other.getClass.getName)
       }

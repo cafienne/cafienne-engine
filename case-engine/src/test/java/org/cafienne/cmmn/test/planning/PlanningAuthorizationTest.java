@@ -16,9 +16,7 @@ import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
-import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.junit.Test;
 
@@ -33,7 +31,7 @@ public class PlanningAuthorizationTest {
     @Test
     public void testPlanningAuthorization() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(anonymous, planner);
+        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), planner);
 
         testCase.addStep(new StartCase(anonymous, caseInstanceId, definitions, null, caseTeam), casePlan -> {
             casePlan.print();
@@ -63,7 +61,7 @@ public class PlanningAuthorizationTest {
     @Test
     public void testGetDiscretionaryItems() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(anonymous, planner);
+        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), planner);
 
         testCase.addStep(new StartCase(anonymous, caseInstanceId, definitions, null, caseTeam), casePlan -> casePlan.print());
 

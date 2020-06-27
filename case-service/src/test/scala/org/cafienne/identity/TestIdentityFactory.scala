@@ -1,7 +1,7 @@
 package org.cafienne.identity
 
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
-import org.cafienne.service.api.tenant.UserRole
+import org.cafienne.service.api.tenant.UserRoleRecord
 
 object TestIdentityFactory {
 
@@ -13,20 +13,20 @@ object TestIdentityFactory {
     PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, "", "")))
   }
 
-  def asDatabaseRecords(user: TenantUser) : Seq[UserRole] = {
-    var result:Seq[UserRole] = Seq()
-    user.roles.map(role => result = result :+ UserRole(user.id, user.tenant, user.name, user.email, role))
+  def asDatabaseRecords(user: TenantUser) : Seq[UserRoleRecord] = {
+    var result:Seq[UserRoleRecord] = Seq()
+    user.roles.map(role => result = result :+ UserRoleRecord(user.id, user.tenant, user.name, user.email, role, false, true))
     result
   }
 
-  def asDatabaseRecords(user: PlatformUser) : Seq[UserRole] = {
-    var result:Seq[UserRole] = Seq()
+  def asDatabaseRecords(user: PlatformUser) : Seq[UserRoleRecord] = {
+    var result:Seq[UserRoleRecord] = Seq()
     user.users.map(tenantUser => result = result ++ asDatabaseRecords(tenantUser))
     result
   }
 
-  def asDatabaseRecords(users: Seq[PlatformUser]) : Seq[UserRole] = {
-    var result:Seq[UserRole] = Seq()
+  def asDatabaseRecords(users: Seq[PlatformUser]) : Seq[UserRoleRecord] = {
+    var result:Seq[UserRoleRecord] = Seq()
     users.map(user => result = result ++ asDatabaseRecords(user))
     result
   }
