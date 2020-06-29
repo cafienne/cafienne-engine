@@ -40,34 +40,27 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
       val tenantUsers = tenants.map(tenant => {
         val user = users.find(u => u.tenant == tenant).get// no worries, this always exists (obviously, otherwise there would not be a tenant).
         val roles = records.filter(record => record.tenant == tenant && !record.role_name.isBlank).map(record => record.role_name)
-        TenantUser(user.userId, roles, tenant, user.name, user.email, user.enabled, user.isOwner)
+        TenantUser(user.userId, roles, tenant, user.isOwner, user.name, user.email, user.enabled)
       })
       PlatformUser(userId, tenantUsers)
     })
   }
 
-  private def readAllTenantUsers(user: PlatformUser, tenant: String) = {
+  private def readAllTenantUsers(platformUser: PlatformUser, tenant: String) = {
     // First a security check
-    user.shouldBelongTo(tenant)
+    platformUser.shouldBelongTo(tenant)
 
     val users = TableQuery[UserRoleTable].filter(_.tenant === tenant)
-    db.run(users.result).map(roleRecords => {
+    db.run(users.result).map(records => {
       // First sort and store all roles by user-id
-      val users = mutable.Map[String, Seq[UserRoleRecord]]()
-      roleRecords.map(role => {
-        val knownRoles = users.getOrElse(role.userId, Seq())
-        users.put(role.userId, knownRoles :+ role)
-      })
+      val userRecords = records.filter(record => record.role_name.isBlank)
+      val roleRecords = records.filter(record => !record.role_name.isBlank)
 
-      // Now go through all the UserRole objects per user-id and map them to TenantUser objects
-      val tenantUsers = users.map(entry => {
-        val userId = entry._1
-        val roles = entry._2
-        val roleNames = roles.map(role => role.role_name).filter(roleName => !roleName.isBlank)
-        val userIdentifyingRole = roles.find(role => role.role_name == "").getOrElse(UserRoleRecord(userId, "", tenant, "", "", false, false))
-        TenantUser(userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
+      val users = userRecords.map(user => {
+        val roles = roleRecords.filter(role => role.userId == user.userId).map(_.role_name)
+        TenantUser(user.userId, roles, tenant, user.isOwner, user.name, user.email, user.enabled)
       })
-      tenantUsers.toSeq
+      users
     })
   }
 
@@ -91,7 +84,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
       val userIdentifyingRole = roleRecords.find(role => role.role_name == "").getOrElse({
         throw UserSearchFailure(userId)
       })
-      TenantUser(userIdentifyingRole.userId, roleNames, tenant, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
+      TenantUser(userIdentifyingRole.userId, roleNames, tenant, userIdentifyingRole.isOwner, userIdentifyingRole.name, userIdentifyingRole.email, userIdentifyingRole.enabled)
     })
   }
 }

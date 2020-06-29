@@ -14,7 +14,6 @@ import org.cafienne.cmmn.akka.command.team.SetCaseTeam;
 import org.cafienne.humantask.akka.command.*;
 import org.cafienne.processtask.akka.command.*;
 import org.cafienne.tenant.akka.command.*;
-import org.cafienne.tenant.akka.command.platform.BootstrapTenant;
 import org.cafienne.tenant.akka.command.platform.CreateTenant;
 import org.cafienne.tenant.akka.command.platform.DisableTenant;
 import org.cafienne.tenant.akka.command.platform.EnableTenant;
@@ -81,7 +80,6 @@ public class CommandSerializer extends AkkaCaseObjectSerializer {
     }
 
     private static void addPlatformCommands() {
-        addManifestWrapper(BootstrapTenant.class, BootstrapTenant::new);
         addManifestWrapper(CreateTenant.class, CreateTenant::new);
         addManifestWrapper(DisableTenant.class, DisableTenant::new);
         addManifestWrapper(EnableTenant.class, EnableTenant::new);

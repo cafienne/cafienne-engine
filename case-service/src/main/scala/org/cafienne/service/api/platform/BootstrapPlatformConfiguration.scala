@@ -8,7 +8,7 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.service.Main
-import org.cafienne.tenant.akka.command.platform.BootstrapTenant
+import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
 import scala.collection.JavaConverters._
@@ -64,7 +64,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     None
    }
 
-  private def parseConfigFile(configFile: File): BootstrapTenant = {
+  private def parseConfigFile(configFile: File): CreateTenant = {
     val defaultTenant = CaseSystem.config.platform.defaultTenant
     logger.info(s"Bootstrapping tenant '$defaultTenant' from file ${configFile.getAbsolutePath}")
 
@@ -85,7 +85,8 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         val roles = readStringList(user, "roles")
         val userName = readStringOr(user, "name", "")
         val email = readStringOr(user, "email", "")
-        TenantUser(userId, roles, tenantName, userName, email)
+        val isOwner = ownerIds.contains(userId)
+        TenantUser(userId, roles, tenantName, isOwner, userName, email, enabled = true)
       })
 
       val undefinedOwners = ownerIds.filter(id => !users.map(u => u.id).contains(id))
@@ -93,12 +94,9 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("All bootstrap tenant owners must be defined as user. Following users not found: " + undefinedOwners)
       }
 
-      val owners = users.filter(user => ownerIds.contains(user.id)).toSet.asJava
-      val plainTenantUsers = users.filter(user => !ownerIds.contains(user.id)).toSet.asJava
-
       val aPlatformOwner = PlatformUser(CaseSystem.config.platform.platformOwners.get(0), Seq())
 
-      new BootstrapTenant(aPlatformOwner, tenantName, tenantName, owners, plainTenantUsers)
+      new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
 
     } catch {
       case c: ConfigException => throw new BootstrapFailure("Bootstrap file " + configFile.getAbsolutePath+" is invalid: " + c.getMessage, c)
@@ -121,7 +119,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     }
   }
 
-  private def sendCommand(bootstrapTenant: BootstrapTenant) = {
+  private def sendCommand(bootstrapTenant: CreateTenant) = {
     import akka.pattern.ask
     implicit val timeout = Main.caseSystemTimeout
     implicit val ec = scala.concurrent.ExecutionContext.global

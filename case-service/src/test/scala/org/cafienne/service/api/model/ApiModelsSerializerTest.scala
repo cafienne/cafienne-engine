@@ -11,7 +11,7 @@ class ApiModelsSerializerTest extends AnyFlatSpec with Matchers  {
   val minimalJson = "{\"definition\":\"startcase\",\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"
   val minimalJsonWithNull = "{\"definition\":\"startcase\",\"inputs\":null,\"caseTeam\":null,\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"
   val minimalJsonWithEmptyObjects = "{\"definition\":\"startcase\",\"inputs\":{},\"caseTeam\":{\"members\":[]},\"tenant\":\"\",\"caseInstanceId\":null,\"debug\":false}"
-  val extendedJson = "{\"definition\":\"startcase2\",\"inputs\":{\"input1\":\"bla\",\"input2\":\"bla\",\"input3\":{\"hello\":\"world\"}},\"caseTeam\":{\"members\":[{\"user\":\"gerald\",\"memberId\":null,\"memberType\":\"user\",\"removeRoles\":null,\"caseRoles\":null,\"roles\":[\"ADMIN\"],\"isOwner\":null}]},\"tenant\":\"\",\"caseInstanceId\":\"myinstanceid\",\"debug\":false}"
+  val extendedJson = "{\"definition\":\"startcase2\",\"inputs\":{\"input1\":\"bla\",\"input2\":\"bla\",\"input3\":{\"hello\":\"world\"}},\"caseTeam\":{\"members\":[{\"user\":\"gerald\",\"roles\":[\"ADMIN\"],\"memberId\":null,\"memberType\":\"user\",\"removeRoles\":null,\"caseRoles\":null,\"isOwner\":null}]},\"tenant\":\"\",\"caseInstanceId\":\"myinstanceid\",\"debug\":false}"
 
   "serialize" should "create proper json of a minimal StartCase API model" in {
     val cmd = StartCase("startcase", new ValueMap(), caseTeam = Some(BackwardCompatibleTeam()), Some(tenant), None)

@@ -7,11 +7,13 @@
  */
 package org.cafienne.service.api.tenant.route
 
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives.complete
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
-import org.cafienne.service.api.tenant.model.TenantAPI.User
+import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenant, User}
 import org.cafienne.tenant.akka.command.TenantCommand
-import org.cafienne.tenant.akka.command.platform.PlatformTenantCommand
+import org.cafienne.tenant.akka.command.platform.{CreateTenant, PlatformTenantCommand}
 
 import scala.concurrent.Future
 
@@ -19,10 +21,6 @@ trait TenantRoute extends CommandRoute with QueryRoute {
   override val lastModifiedRegistration = null
   override def handleSyncedQuery[A](query: () => Future[A], clm: Option[String]): Future[A] = {
     query()
-  }
-
-  def asTenantUser(user: User, tenant: String): TenantUser = {
-    TenantUser(user.userId, user.roles.toSeq, tenant, user.name.getOrElse(""), user.email.getOrElse(""), enabled = true, isOwner = false)
   }
 
   def askPlatform(command: PlatformTenantCommand) = {
@@ -35,6 +33,31 @@ trait TenantRoute extends CommandRoute with QueryRoute {
 
   trait CreateTenantCommand {
     def apply(tenantUser: TenantUser): TenantCommand
+  }
+
+  def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenant) = {
+    import scala.collection.JavaConverters._
+
+    val users = convertToTenant(newTenant).asJava
+    if (users.isEmpty) {
+      complete(StatusCodes.BadRequest, "Creation of tenant cannot be done without users and at least one owner")
+    } else {
+      val newTenantName = newTenant.name
+      askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, users))
+    }
+  }
+
+  def convertToTenant(tenant: BackwardsCompatibleTenant): Seq[TenantUser] = {
+    val users = tenant.users.getOrElse(tenant.owners.getOrElse(Seq()))
+    val defaultOwnership: Boolean = {
+      if (tenant.users.isEmpty && tenant.owners.nonEmpty) true // Owners is the old format, then all users become owner.
+      else false // In the new format every owner must be explicitly defined
+    }
+    users.map(user => asTenantUser(user, tenant.name, defaultOwnership))
+  }
+
+  def asTenantUser(user: User, tenant: String, defaultOwnership: Boolean = false): TenantUser = {
+    TenantUser(user.userId, user.roles, tenant, isOwner = user.isOwner.getOrElse(defaultOwnership), user.name.getOrElse(""), user.email.getOrElse(""), enabled = true)
   }
 }
 

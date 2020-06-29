@@ -138,7 +138,14 @@ case class StartCase(
 
 case class BackwardCompatibleTeam(members: Seq[BackwardCompatibleTeamMember] = Seq())
 
-case class BackwardCompatibleTeamMember(user: Option[String] = None, memberId: Option[String] = None, memberType: Option[String] = Some("user"), removeRoles: Option[Seq[String]] = None, caseRoles: Option[Seq[String]] = None, roles: Option[Seq[String]] = None, isOwner: Option[Boolean] = None)
+case class BackwardCompatibleTeamMember(user: Option[String] = None, // Old property, to be ccompatiblty
+                                        roles: Option[Seq[String]] = None, // Old property, just keep it here to remain compatible
+                                       // New structure below
+                                        memberId: Option[String] = None,
+                                        memberType: Option[String] = Some("user"),
+                                        removeRoles: Option[Seq[String]] = None,
+                                        caseRoles: Option[Seq[String]] = None,
+                                        isOwner: Option[Boolean] = None)
 
 // CaseFileItem
 case class CaseFileItem(id: String,

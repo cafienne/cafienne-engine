@@ -8,7 +8,7 @@ import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
 
-final case class TenantUser(id: String, roles: Seq[String], tenant: String, name: String, email: String = "", enabled: Boolean = true, isOwner: Boolean = false) extends AkkaSerializable with CafienneJson {
+final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends AkkaSerializable with CafienneJson {
 
   import scala.collection.JavaConverters._
 
@@ -58,16 +58,16 @@ object TenantUser {
 
     val rolesSet: Seq[String] = roles.toSeq
 
-    TenantUser(id, rolesSet, tenant, name, email, isOwner)
+    TenantUser(id, rolesSet, tenant, isOwner, name, email)
   }
 
   final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {
     if (!CaseSystem.isPlatformOwner(user.userId)) throw new SecurityException("Only platform owners can execute this type of command")
-    TenantUser(user.userId, Seq(), tenantId, "")
+    TenantUser(user.userId, Seq(), tenantId, name = "")
   }
 
   /**
     * An empty TenantUser (can be used in invalid messages)
     */
-  val NONE = TenantUser("", Seq(), "", "", "", false)
+  val NONE = TenantUser("", Seq(), "", name = "", email = "", enabled = false)
 }

@@ -6,11 +6,11 @@ import org.cafienne.service.api.tenant.UserRoleRecord
 object TestIdentityFactory {
 
   def createTenantUser(id: String, tenant: String = "", name: String = "", roles: List[String] = List.empty[String], email: String = "") : TenantUser = {
-    TenantUser(id, roles, tenant, id, email, true)
+    TenantUser(id, roles, tenant, name = id, email = email, enabled = true)
   }
 
   def createPlatformUser(userId: String, tenant: String, roles: Seq[String]) : PlatformUser = {
-    PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, "", "")))
+    PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, name = "", email = "")))
   }
 
   def asDatabaseRecords(user: TenantUser) : Seq[UserRoleRecord] = {
