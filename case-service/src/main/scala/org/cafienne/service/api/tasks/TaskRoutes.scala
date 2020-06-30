@@ -29,6 +29,7 @@ import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
 import org.cafienne.service.api.Sort
+import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.Examples
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
 
@@ -39,7 +40,7 @@ import scala.util.{Failure, Success}
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
 class TaskRoutes(taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends CommandRoute with QueryRoute {
-  override val lastModifiedRegistration = TaskReader.lastModifiedRegistration
+  override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[TaskRoutes])

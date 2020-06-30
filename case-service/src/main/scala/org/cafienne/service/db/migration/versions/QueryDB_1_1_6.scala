@@ -15,9 +15,6 @@ object QueryDB_1_1_6 extends DbSchemaVersion
     // We need to change CaseTeam table to also have a column for member type, which is also part of the primary key
     dropCaseTeamPK & enhanceCaseTeamTable & addUpdatedCaseTeamPK &
 
-    // We also need a task team table; but this requires that Task projection is rebuilt
-    createTaskTeamTable & Projections.resetTaskProjectionWriter &
-
     // Now replace all foreign keys with indexes
     convertFKtoIndexPlanItemTable &
     convertFKtoIndexCaseTeamTable &
@@ -49,19 +46,6 @@ object QueryDB_1_1_6 extends DbSchemaVersion
     .addColumnAndSet(_.isOwner, true)
 
   def addUpdatedCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addPrimaryKeys(_.pk)
-
-  def createTaskTeamTable = TableMigration(TableQuery[TaskTeamMemberTable])
-    .create
-    .addColumns(
-      _.memberId,
-      _.caseInstanceId,
-      _.tenant,
-      _.caseRole,
-      _.isTenantUser,
-      _.isOwner,
-      _.active
-    )
-    .addPrimaryKeys(_.pk)
 
   def convertFKtoIndexPlanItemTable = TableMigration(TableQuery[PlanItemTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
   def convertFKtoIndexCaseTeamTable = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)

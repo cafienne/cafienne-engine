@@ -1,4 +1,4 @@
-package org.cafienne.service.api.projection.task
+package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event.CaseModified
 import org.cafienne.humantask.akka.event._

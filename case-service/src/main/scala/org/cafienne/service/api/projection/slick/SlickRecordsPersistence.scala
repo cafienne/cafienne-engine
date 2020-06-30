@@ -5,8 +5,8 @@ import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.cases.table._
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.{TaskRecord, TaskTables, TaskTeamMemberRecord}
-import org.cafienne.service.api.tenant.{TenantOwnerRecord, TenantRecord, TenantTables, UserRoleKey, UserRoleRecord}
+import org.cafienne.service.api.tasks.{TaskRecord, TaskTables}
+import org.cafienne.service.api.tenant._
 
 import scala.concurrent.Future
 
@@ -30,7 +30,6 @@ class SlickRecordsPersistence
   val planItemTableQuery = TableQuery[PlanItemTable]
   val planItemHistoryTableQuery = TableQuery[PlanItemHistoryTable]
   val taskQuery = TableQuery[TaskTable]
-  val taskTeamMemberQuery = TableQuery[TaskTeamMemberTable]
   val caseInstanceRoleQuery = TableQuery[CaseInstanceRoleTable]
   val caseInstanceTeamMemberQuery = TableQuery[CaseInstanceTeamMemberTable]
   val tenantsQuery = TableQuery[TenantTable]
@@ -41,7 +40,6 @@ class SlickRecordsPersistence
   override def bulkUpdate(records: Seq[AnyRef]) = {
     val actions = records.collect {
       case value: TaskRecord => taskQuery.insertOrUpdate(value)
-      case value: TaskTeamMemberRecord => taskTeamMemberQuery.insertOrUpdate(value)
       case value: PlanItemRecord => planItemTableQuery.insertOrUpdate(value)
       case value: PlanItemHistoryRecord => planItemHistoryTableQuery.insertOrUpdate(value) // Enable restarting with noOffset
       case value: CaseRecord => caseInstanceQuery.insertOrUpdate(value)
