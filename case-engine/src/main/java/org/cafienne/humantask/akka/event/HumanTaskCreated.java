@@ -20,7 +20,7 @@ public class HumanTaskCreated extends HumanTaskEvent {
 
     public HumanTaskCreated(HumanTask task) {
         super(task);
-        this.createdOn = Instant.now();
+        this.createdOn = task.getCaseInstance().getTransactionTimestamp();
         this.createdBy = task.getCaseInstance().getCurrentUser().id();
     }
 

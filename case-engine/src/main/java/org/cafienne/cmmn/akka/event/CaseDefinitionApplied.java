@@ -35,7 +35,7 @@ public class CaseDefinitionApplied extends CaseEvent {
 
     public CaseDefinitionApplied(Case caseInstance, String rootCaseId, String parentCaseId, CaseDefinition definition, String caseName) {
         super(caseInstance);
-        this.createdOn = Instant.now();
+        this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;

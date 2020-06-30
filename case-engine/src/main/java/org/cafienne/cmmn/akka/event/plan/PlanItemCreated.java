@@ -38,7 +38,7 @@ public class PlanItemCreated extends PlanItemEvent {
 
     private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage stage, ItemDefinition definition, int index) {
         super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0);
-        this.createdOn = Instant.now();
+        this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.planItemName = name;
         this.stageId = stage == null ? "" : stage.getId();

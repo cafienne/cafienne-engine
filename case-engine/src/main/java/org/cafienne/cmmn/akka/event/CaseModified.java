@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
@@ -17,7 +18,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class CaseModified extends CaseEvent {
+public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
     private final Instant lastModified;
     private final int numFailures;
     private final State state;

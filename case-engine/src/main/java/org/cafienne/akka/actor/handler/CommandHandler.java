@@ -9,15 +9,16 @@ import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.event.DebugEvent;
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
-import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
@@ -148,14 +149,15 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             checkEngineVersion();
 
             // Change the last modified moment of this case; update it in the response, and publish an event about it
-            Instant lastModified = Instant.now();
-            E lastModifiedEvent = actor.createLastModifiedEvent(lastModified);
+            Instant lastModified = actor.getTransactionTimestamp();
+            TransactionEvent lastModifiedEvent = actor.createTransactionEvent();
             if (lastModifiedEvent != null) {
-                addEvent(lastModifiedEvent);
+                addModelEvent(lastModifiedEvent);
             }
             if (response != null) {
                 response.setLastModified(lastModified);
             }
+            actor.resetTransactionTimestamp();
             actor.persistEventsAndThenReply(events, response);
         }
     }

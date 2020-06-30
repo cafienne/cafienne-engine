@@ -8,13 +8,13 @@
 package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.akka.actor.event.BaseModelEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
 
-public abstract class CaseEvent extends ModelEvent<Case> {
+public abstract class CaseEvent extends BaseModelEvent<Case> {
     public static final String TAG = "cafienne:case";
 
     protected CaseEvent(Case caseInstance) {

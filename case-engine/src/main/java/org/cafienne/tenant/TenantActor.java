@@ -1,6 +1,7 @@
 package org.cafienne.tenant;
 
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.akka.command.TenantCommand;
 import org.cafienne.tenant.akka.event.*;
@@ -8,7 +9,6 @@ import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.platform.TenantDisabled;
 import org.cafienne.tenant.akka.event.platform.TenantEnabled;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,8 +35,8 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     @Override
-    public TenantModified createLastModifiedEvent(Instant lastModified) {
-        return new TenantModified(this, lastModified);
+    public TransactionEvent createTransactionEvent() {
+        return new TenantModified(this, getTransactionTimestamp());
     }
 
     public boolean exists() {

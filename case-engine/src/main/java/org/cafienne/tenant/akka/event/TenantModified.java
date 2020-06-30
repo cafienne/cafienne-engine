@@ -1,6 +1,7 @@
 package org.cafienne.tenant.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.akka.event.ProcessInstanceEvent;
@@ -16,7 +17,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class TenantModified extends TenantEvent {
+public class TenantModified extends TenantEvent implements TransactionEvent<TenantActor> {
     private final Instant lastModified;
 
     private enum Fields {

@@ -14,12 +14,11 @@ import org.cafienne.akka.actor.command.response.CommandResponseListener;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.*;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.event.DebugEvent;
-import org.cafienne.cmmn.akka.event.DebugDisabled;
-import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
@@ -83,6 +82,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * The moment of last modification of the case, i.e., the moment at which the last correctly handled command was completed
      */
     private Instant lastModified;
+    /**
+     * The moment the next transaction is started; will be used to fill the LastModified event and also inbetween timestamps in events.
+     */
+    private Instant transactionTimestamp;
+
 
     /**
      * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
@@ -197,7 +201,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
         // Step 1
         if (tenant == null && event instanceof ModelEvent) {
-            tenant = ((ModelEvent) event).tenant;
+            tenant = ((ModelEvent) event).getTenant();
         }
         // Step 2
         if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
@@ -385,14 +389,13 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * This method must be implemented by CommandHandlers to handle the fact that state changes
-     * have taken place while handling the command. The ModelActor will get a new last modified timestamp,
-     * and the actor should add an event for that to the log, so that projections can define and commit
-     * a transaction scope
+     * have taken place while handling the command. The ModelActor may return an event for that to the log,
+     * so that projections can use that to handle a bulk of events and commit a transaction scope.
+     * Note that the method may return null.
      *
-     * @param lastModified
      * @return
      */
-    public abstract E createLastModifiedEvent(Instant lastModified);
+    public abstract TransactionEvent createTransactionEvent();
 
     public Responder getResponseListener(String msgId) {
         return responseListeners.get(msgId);
@@ -562,6 +565,23 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     public Instant getLastModified() {
         return lastModified;
+    }
+
+    /**
+     * Returns the moment at which the last modification to the case was done. I.e., the moment at which a command was completed that resulted into
+     * events needing to be persisted.
+     *
+     * @return
+     */
+    public Instant getTransactionTimestamp() {
+        if (transactionTimestamp == null) {
+            transactionTimestamp = Instant.now();
+        }
+        return transactionTimestamp;
+    }
+
+    public void resetTransactionTimestamp() {
+        transactionTimestamp = null;
     }
 
     public void setLastModified(Instant lastModified) {
