@@ -45,6 +45,8 @@ final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: St
   def toValueMap: ValueMap = JSONReader.parse(data)
 }
 
+final case class CaseBusinessIdentifierRecord(caseInstanceId: String, tenant: String, name: String, value: Option[String], active: Boolean, path: String)
+
 final case class CaseRoleRecord(caseInstanceId: String, tenant: String, roleName: String, assigned: Boolean = true)
 
 final case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)

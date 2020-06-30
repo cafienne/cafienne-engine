@@ -62,6 +62,7 @@ abstract class CaseFileItemCommand extends CaseCommand {
         try {
             // Resolve the path on the case file
             caseFileItem = caseInstance.getCaseFile().getItem(path);
+            caseFileItem.getDefinition().validate(content);
         } catch (IllegalArgumentException iae) {
             throw new InvalidCommandException(iae);
         } catch (IndexOutOfBoundsException ioobe) {

@@ -81,7 +81,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   }
 
   it should "retrieve all cases" in {
-    val res = Await.result(caseQueries.getCases(Some(tenant), from = 0, numOfResults = 10, user = user, definition = None, status = None), 3.seconds)
+    val res = Await.result(caseQueries.getCases(Some(tenant), None, from = 0, numOfResults = 10, user = user, definition = None, status = None), 3.seconds)
     res must contain (activeCase)
     res must contain (terminatedCase)
     res must contain (completedCase)
@@ -91,12 +91,12 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   }
 
   it should "retrieve cases filtered by definition" in {
-    val res = Await.result(caseQueries.getCases(Some(tenant), from = 0, numOfResults = 10, user = user, definition = Some("eee"), status = None), 3.seconds)
+    val res = Await.result(caseQueries.getCases(Some(tenant), None, from = 0, numOfResults = 10, user = user, definition = Some("eee"), status = None), 3.seconds)
     res must be (Seq(completedCase, terminatedCase))
   }
 
   it should "retrieve cases filtered by status" in {
-    val res = Await.result(caseQueries.getCases(Some(tenant), from = 0, numOfResults = 10, user = user, definition = None, status = Some("Active")), 3.seconds)
+    val res = Await.result(caseQueries.getCases(Some(tenant), None, from = 0, numOfResults = 10, user = user, definition = None, status = Some("Active")), 3.seconds)
     res must be (Seq((activeCase)))
   }
 

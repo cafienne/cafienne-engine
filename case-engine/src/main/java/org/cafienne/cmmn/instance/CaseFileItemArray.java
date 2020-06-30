@@ -123,25 +123,13 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         createContent(parameterValue);
     }
 
-    /**
-     * Add a single content item.
-     * @param newContent
-     */
-    private void addContent(Value<?> newContent) {
-        CaseFileItem newInstance = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
-        actualArrayItems.add(newInstance);
-        newInstance.createContent(newContent);
-    }
-
     @Override
     public void createContent(Value<?> newContent) {
-        if (newContent instanceof ValueList) {
-            ValueList valueList = (ValueList) newContent;
-            for (Value<?> element : valueList) {
-                addContent(element);
-            }
-        } else {
-            addContent(newContent);
+        ValueList valueList = newContent instanceof ValueList ? (ValueList) newContent : new ValueList(newContent);
+        for (Value<?> newChildValue : valueList) {
+            CaseFileItem newInstance = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
+            actualArrayItems.add(newInstance);
+            newInstance.createContent(newChildValue);
         }
     }
 

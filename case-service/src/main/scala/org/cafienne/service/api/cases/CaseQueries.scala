@@ -1,12 +1,12 @@
 package org.cafienne.service.api.cases
 
-import akka.actor.{ActorRefFactory, ActorSystem}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.service.api.cases.table.{CaseRecord, CaseTables, CaseTeamMemberRecord}
+import org.cafienne.service.api.projection.query.BaseQueryImpl
 import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.api.tenant.{TenantTables, UserRoleRecord}
+import org.cafienne.service.api.tenant.TenantTables
 
 import scala.concurrent.Future
 
@@ -31,34 +31,21 @@ trait CaseQueries {
 
   def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
 
-  def getCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
+  def getCases(tenant: Option[String], identifiers: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
 }
 
-class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFactory: ActorRefFactory)
+class CaseQueriesImpl
   extends CaseQueries
-    with CaseTables
-    with TaskTables
-    with TenantTables {
+    with BaseQueryImpl {
 
   import dbConfig.profile.api._
-
-  implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
-
-  val caseInstanceQuery = TableQuery[CaseInstanceTable]
-  val caseFileQuery = TableQuery[CaseFileTable]
-
-  val planItemTableQuery = TableQuery[PlanItemTable]
-  val taskQuery = TableQuery[TaskTable]
-  val caseInstanceRoleQuery = TableQuery[CaseInstanceRoleTable]
-  val caseInstanceTeamMemberQuery = TableQuery[CaseInstanceTeamMemberTable]
-  val rolesQuery = TableQuery[UserRoleTable]
 
   override def authorizeCaseAccessAndReturnTenant(caseInstanceId: String, user: PlatformUser): Future[String] = {
     val query = for {
       // Get the case
       baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
       // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
 
     } yield baseQuery.tenant
 
@@ -111,7 +98,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
     * @param tenant
     * @return
     */
-  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String]): Query[(UserRoleTable, CaseInstanceTeamMemberTable), (UserRoleRecord, CaseTeamMemberRecord), Seq] = {
+  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String], identifiers: Option[String]) = {
     val query = for {
       // Validate tenant membership
       tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tenant)
@@ -124,6 +111,13 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
           (member.isTenantUser === true && member.memberId === user.userId) ||
             (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
         })
+      _ <- {
+        val query = {
+          if (identifiers.isEmpty) TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId)
+          else addBusinessIdentifiersFilter(identifiers, caseInstanceId)
+        }
+        query
+      }
     } yield (tenantMembership, teamMembership)
 
     query
@@ -134,7 +128,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
       // Get the case
       baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
       // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.result.headOption)
@@ -145,7 +139,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
       // Get the case file
       baseQuery <- caseFileQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.result.headOption).map {
@@ -161,7 +155,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
         .filter(_.caseInstanceId === caseInstanceId)
         .filter(_.active === true)
       // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -175,7 +169,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
       // Get the items in the case plan
       baseQuery <- planItemTableQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.result).map(records => {
@@ -189,7 +183,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
       // Get the item
       baseQuery <- planItemTableQuery.filter(_.id === planItemId)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.result.headOption).map{
@@ -203,7 +197,7 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
       // Get the item's history
       baseQuery <- TableQuery[PlanItemHistoryTable].filter(_.planItemId === planItemId)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -284,10 +278,10 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
 
   override def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
     // Note: you can only get cases if you are in the team ... This query and route makes no sense any more
-    getCases(tenant, from, numOfResults, user, definition, status)
+    getCases(tenant, None, from, numOfResults, user, definition, status)
   }
 
-  override def getCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
+  override def getCases(tenant: Option[String], identifiers: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
     // Depending on the value of the "status" filter, we have 3 different filters.
     // Reason is that admin-ui uses status=Failed for both Failed and "cases with Failures"
     //  Better approach is to simply add a failure count to the case instance and align the UI for that.
@@ -300,16 +294,19 @@ class CaseQueriesImpl(implicit val system: ActorSystem, implicit val actorRefFac
       }
     }
 
-    val query = for {
+    val query:Query[CaseInstanceTable, CaseRecord, Seq] = for {
       baseQuery <- stateFilterQuery
         .optionFilter(tenant)((t, value) => t.tenant === value)
         .optionFilter(definition)((t, value) => t.definition.toLowerCase like s"%${value.toLowerCase}%")
-        .sortBy(_.lastModified.desc)
+        .sortBy(_.lastModified)
         .drop(from).take(numOfResults)
-      // Validate team membership
-      _ <- membershipQuery(user, baseQuery.id, baseQuery.tenant)
-    } yield baseQuery
 
-    db.run(query.distinct.result)
+      // Validate team membership
+      _ <- membershipQuery(user, baseQuery.id, baseQuery.tenant, identifiers)
+    } yield baseQuery
+    db.run(query.distinct.result).map(records => {
+//      println("Found " + records.length +" matching cases on filter " + identifiers)
+      records
+    })
   }
 }

@@ -5,7 +5,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.cmmn.akka.event._
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent
+import org.cafienne.cmmn.akka.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
 import org.cafienne.cmmn.akka.event.plan._
 import org.cafienne.cmmn.akka.event.team._
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
@@ -22,6 +22,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
   val caseInstanceRoles = scala.collection.mutable.HashMap[String, CaseRoleRecord]()
   val caseInstanceTeamMembers = scala.collection.mutable.HashMap[(String, String, Boolean), CaseTeamMemberRecord]() // key = <role>:<userid>
+  val businessIdentifiers = scala.collection.mutable.Set[CaseBusinessIdentifierRecord]()
   // TODO: we need always a caseinstance (for casemodified); so no need to have it as an option?
   var caseInstance: Option[CaseRecord] = None
   var caseDefinition: CaseDefinitionRecord = null
@@ -35,6 +36,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case event: CaseFileEvent => handleCaseFileEvent(event)
       case event: CaseTeamEvent => handleCaseTeamEvent(event)
       case event: CaseModified => updateCaseInstance(event)
+      case event: BusinessIdentifierEvent => handleBusinessIdentifierEvent(event)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -86,6 +88,14 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
         logger.debug("Retrieving planitem " + planItemId + " from database")
         persistence.getPlanItem(planItemId)
     }
+  }
+
+  private def handleBusinessIdentifierEvent(event: BusinessIdentifierEvent): Future[Done] = {
+    event match {
+      case event: BusinessIdentifierSet => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
+      case event: BusinessIdentifierCleared => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
+    }
+    Future.successful(Done)
   }
 
   private def handleCaseFileEvent(event: CaseFileEvent): Future[Done] = {
@@ -160,6 +170,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     records ++= this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item))
     records ++= this.caseInstanceRoles.values
     records ++= this.caseInstanceTeamMembers.values
+    records ++= this.businessIdentifiers.toSeq
 
     // If we reach this point, we have real events handled and content added,
     // so also update the offset of the last event handled in this projection

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,7 +8,10 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
+import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
@@ -63,6 +66,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Constructor for {@link CaseFileItemArray}.
+     *
      * @param caseInstance
      * @param definition
      * @param parent
@@ -73,6 +77,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Returns the parent of this case file item, or null if this is a top level item (i.e., it is a child of the casefile)
+     *
      * @return
      */
     public CaseFileItem getParent() {
@@ -81,7 +86,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Returns the child items of this case file item
-     * 
+     *
      * @return
      */
     public Map<CaseFileItemDefinition, CaseFileItem> getChildren() {
@@ -90,7 +95,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Links the on part to this case file item. Is used by the case file item to connect the connected criterion whenever a transition happens.
-     * 
+     *
      * @param onPart
      */
     public void connectOnPart(CaseFileItemOnPart onPart) {
@@ -103,43 +108,69 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Framework method that allows parameters to be bound back to the case file
+     *
      * @param p
      * @param parameterValue
      */
     void bindParameter(Parameter<?> p, Value<?> parameterValue) {
         // Spec says (table 5.3.4, page 36): just trigger the proper transition, as that will be obvious. But is it?
         switch (state) {
-        case Available:
-            replaceContent(parameterValue);
-            break;
-        case Discarded:
-            throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
-        case Null:
-            createContent(parameterValue);
-        default:
-            break;
+            case Available:
+                replaceContent(parameterValue);
+                break;
+            case Discarded:
+                throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
+            case Null:
+                createContent(parameterValue);
+            default:
+                break;
         }
     }
 
-    private void makeTransition(CaseFileItemTransition transition, State newState, Value value) {
+    private void removeBusinessIdentifiers(Value value) {
+        getDefinition().getBusinessIdentifiers().forEach(property -> {
+            getCaseInstance().addEvent(new BusinessIdentifierCleared(this, property));
+        });
+    }
+
+    private void updateBusinessIdentifiers(Value newValue) {
+        getDefinition().getBusinessIdentifiers().forEach(property -> {
+            getCaseInstance().addEvent(new BusinessIdentifierSet(this, property, getBusinessIdentifierValue(newValue, property)));
+        });
+    }
+
+    private Value getBusinessIdentifierValue(Value value, PropertyDefinition identifier) {
+        if (value instanceof ValueMap) {
+            return ((ValueMap) value).get(identifier.getName());
+        }
+        return null;
+    }
+
+    private void makeTransition(CaseFileItemTransition transition, State newState, Value newValue) {
+        if (transition == CaseFileItemTransition.Delete) {
+            removeBusinessIdentifiers(newValue);
+        } else {
+            updateBusinessIdentifiers(newValue);
+        }
         // Now inform the sentry network of our change
-        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, value, getPath(), indexInArray));
+        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, newValue, getPath(), indexInArray));
     }
 
     public void updateState(CaseFileEvent event) {
-        addDebugInfo(() -> "CaseFile["+getName()+"]: updating CaseFileItem state based on CaseFileEvent");
+        addDebugInfo(() -> "CaseFile[" + getName() + "]: updating CaseFileItem state based on CaseFileEvent");
         this.transitionPublisher.addEvent(event);
         this.state = event.getState();
         this.indexInArray = event.getIndex();
         this.lastTransition = event.getTransition();
         this.setValue(event.getValue());
+//        propagateValueChangeToChildren(event.getValue());
         if (this.array != null) { // Update the array we belong too as well
             this.array.childChanged(this);
         }
 
         // Now propagate our new value into our parent.
         Value<?> valueToPropagate = this.value;
-        if (array != null) { // Update the array we belong too as well
+        if (array != null) { // If we belong to an array, we should propage the whole array instead of just our own value.
             array.childChanged(this);
             valueToPropagate = array.getValue();
         }
@@ -147,6 +178,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
+        // Finally propagate the changes to children.
+        propagateValueChangeToChildren(event.getValue());
+
+
         // Then inform the activating sentries
         transitionPublisher.informEntryCriteria(event);
     }
@@ -154,25 +189,26 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void informConnectedExitCriteria(CaseFileEvent event) {
         // Finally iterate the terminating sentries and inform them
         transitionPublisher.informExitCriteria(event);
-        addDebugInfo(() -> "CaseFile["+getName()+"]: Completed behavior for transition " + event.getTransition());
+        addDebugInfo(() -> "CaseFile[" + getName() + "]: Completed behavior for transition " + event.getTransition());
+    }
+
+    protected void adoptContent(Value<?> newContentFromParent) {
+        createContent(newContentFromParent);
     }
 
     // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
     public void createContent(Value<?> newContent) {
         validateState(State.Null, "create");
-        validateContents(newContent);
         makeTransition(CaseFileItemTransition.Create, State.Available, newContent);
     }
 
     public void replaceContent(Value<?> newContent) {
         validateState(State.Available, "replace");
-        validateContents(newContent);
         makeTransition(CaseFileItemTransition.Replace, State.Available, newContent);
     }
 
     public void updateContent(Value<?> newContent) {
         validateState(State.Available, "update");
-        validateContents(newContent);
         makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(newContent));
     }
 
@@ -186,6 +222,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Check whether we are in the correct state to execute the operation
+     *
      * @param expectedState
      * @param operationName
      */
@@ -196,33 +233,42 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     /**
-     * Check if the new content matches our definition
-     * @param newContent
-     */
-    private void validateContents(Value<?> newContent) {
-        getDefinition().getCaseFileItemDefinition().getDefinitionType().validate(this, newContent);
-    }
-
-    /**
      * Sets the value of this CaseFileItem. Internal framework method not to be used from applications.
+     *
      * @param newValue
      */
-    public void setValue(Value<?> newValue) {
+    protected void setValue(Value<?> newValue) {
         addDebugInfo(() -> "Setting case file item [" + getPath() + "] value", newValue);
 
         this.value = newValue;
         if (newValue != null) newValue.setOwner(this);
     }
 
+    private void propagateValueChangeToChildren(Value newValue) {
+        if (!(newValue instanceof ValueMap)) return;
+        ValueMap v = (ValueMap) newValue;
+        v.getValue().forEach((name, childValue) -> {
+            CaseFileItem child = getItem(name);
+            if (child != null) {
+                child.adoptContent(childValue);
+            }
+        });
+    }
+
     /**
      * This updates the json structure of the parent CaseFileItem, without triggering CaseFileItemTransitions
+     *
      * @param childName
      * @param childValue
      */
     private void propagateValueChangeToParent(String childName, Value<?> childValue) {
+        if (this.value == childValue) {
+            // We'll do our parents our self
+            return;
+        }
         if (parent != null) {
-            if (parent.value==null || parent.value == Value.NULL) {
-                addDebugInfo(() -> "Creating a location in parent "+parent.getPath()+" to store the newly changed child "+getName());
+            if (parent.value == null || parent.value == Value.NULL) {
+                addDebugInfo(() -> "Creating a location in parent " + parent.getPath() + " to store the newly changed child " + getName());
                 parent.value = new ValueMap();
             }
             if (parent.value instanceof ValueMap) {
@@ -230,13 +276,14 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 // And ... recurse
                 parent.propagateValueChangeToParent(parent.getName(), parent.value);
             } else {
-                addDebugInfo(() -> "Cannot propagate change in " + getPath()+" into parent, because it's value is not a ValueMap but a " + parent.value.getClass().getName());
+                addDebugInfo(() -> "Cannot propagate change in " + getPath() + " into parent, because it's value is not a ValueMap but a " + parent.value.getClass().getName());
             }
         }
     }
 
     /**
      * Returns the content of the CaseFileItem
+     *
      * @return
      */
     public Value<?> getValue() {
@@ -245,7 +292,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Returns the last known transition on this case file item
-     * 
+     *
      * @return
      */
     public CaseFileItemTransition getLastTransition() {
@@ -254,7 +301,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Returns a path to this case file item.
-     * 
+     *
      * @return
      */
     public Path getPath() {
@@ -263,6 +310,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Returns the current state of the case file item.
+     *
      * @return
      */
     public State getState() {
@@ -276,7 +324,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Dump the CaseFile item as XML.
-     * 
+     *
      * @param parentElement
      */
     public void dumpMemoryStateToXML(Element parentElement) {
@@ -304,6 +352,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     /**
      * Reference to most recently updated case file item. Returns <code>this</code> by default. CaseFileItemArray overwrites it
      * and returns the most recently changed / updated case file item in it's array
+     *
      * @return
      */
     public CaseFileItem getCurrent() {
@@ -313,6 +362,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     /**
      * Resolve the path on this case file item. Base implementation that is overridden in {@link CaseFileItemArray}, where the index
      * accessor of the path is used to navigate to the correct case file item.
+     *
      * @param currentPath
      * @return
      */
@@ -322,6 +372,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Returns the location of this case file item within the array it belongs to. If the case file item is not "iterable", then -1 is returned.
+     *
      * @return
      */
     public int getIndex() {
@@ -340,7 +391,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 /**
  * Case file item that represents an empty item.
  * See CMMN 1.0 specification page 107 ("an empty case file item must be returned")
- *
  */
 class EmptyCaseFileItem extends CaseFileItem {
     private final static Logger logger = LoggerFactory.getLogger(EmptyCaseFileItem.class);
@@ -348,6 +398,11 @@ class EmptyCaseFileItem extends CaseFileItem {
     EmptyCaseFileItem(CaseFileItem parent, String creationReason) {
         super(parent.getCaseInstance(), parent.getDefinition(), parent);
         logger.warn(creationReason);
+    }
+
+    @Override
+    protected void adoptContent(Value<?> newContentFromParent) {
+        logger.warn("Adopting content in EmptyCaseFileItem");
     }
 
     @Override
@@ -369,15 +424,15 @@ class EmptyCaseFileItem extends CaseFileItem {
     public void deleteContent() {
         logger.warn("Deleting content in EmptyCaseFileItem");
     }
-    
+
     @Override
     public Value<?> getValue() {
         logger.warn("Returning value from EmptyCaseFileItem");
         return Value.NULL;
     }
-    
+
     @Override
-    public void setValue(Value<?> newValue) {
+    protected void setValue(Value<?> newValue) {
         logger.warn("Setting value in EmptyCaseFileItem");
     }
 

@@ -7,8 +7,10 @@
  */
 package org.cafienne.cmmn.definition.casefile;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
@@ -64,5 +66,9 @@ public class CaseFileItemDefinitionDefinition extends Definition {
 
     public Map<String, PropertyDefinition> getProperties() {
         return properties;
+    }
+
+    public Collection<PropertyDefinition> getBusinessIdentifiers() {
+        return properties.values().stream().filter(property -> property.isBusinessIdentifier()).collect(Collectors.toList());
     }
 }
