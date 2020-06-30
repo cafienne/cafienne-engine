@@ -78,7 +78,7 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 34;
+            int expectedNumberOfEvents = 33;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
@@ -90,7 +90,6 @@ public class VariousSpelExpressions2 {
                         "RepetitionRuleEvaluated: 4\n" +
                         "RequiredRuleEvaluated: 3\n" +
                         "TaskInputFilled: 1\n" +
-                        "HumanTaskCreated: 1\n" +
                         "HumanTaskActivated: 1\n" +
                         "HumanTaskAssigned: 1\n" +
                         "HumanTaskOwnerChanged: 1\n" +
@@ -134,7 +133,7 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 34;
+            int expectedNumberOfEvents = 33;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
@@ -146,7 +145,6 @@ public class VariousSpelExpressions2 {
                         "RepetitionRuleEvaluated: 4\n" +
                         "RequiredRuleEvaluated: 3\n" +
                         "TaskInputFilled: 1\n" +
-                        "HumanTaskCreated: 1\n" +
                         "HumanTaskActivated: 1\n" +
                         "HumanTaskAssigned: 1\n" +
                         "HumanTaskOwnerChanged: 1\n" +
