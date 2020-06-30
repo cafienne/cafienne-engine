@@ -202,6 +202,10 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
               logger.debug("Deployment failure", failure)
               complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
             }
+            case failure: SecurityException => {
+              logger.debug("Deployment failure", failure)
+              complete(StatusCodes.Unauthorized, failure.getLocalizedMessage)
+            }
             case other: Throwable => {
               logger.debug("Unexpected deployment failure", other)
               complete(StatusCodes.InternalServerError)
