@@ -16,27 +16,34 @@ import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
+import java.time.Instant;
 
 /**
  * Event that happened on a HumanTask
  */
 @Manifest
 public class HumanTaskActivated extends HumanTaskTransitioned {
+    private final Instant createdOn;
+    private final String createdBy;
     private final String performer;
     private final ValueMap taskModel;
 
     private enum Fields {
-        performer, taskModel
+        createdOn, createdBy, performer, taskModel
     }
 
     public HumanTaskActivated(HumanTask task, String performer, ValueMap taskModel) {
         super(task, TaskState.Unassigned, TaskState.Null, TaskAction.Create);
+        this.createdOn = task.getCaseInstance().getTransactionTimestamp();
+        this.createdBy = task.getCaseInstance().getCurrentUser().id();
         this.performer = performer;
         this.taskModel = taskModel;
     }
 
     public HumanTaskActivated(ValueMap json) {
         super(json);
+        this.createdOn = readInstant(json, Fields.createdOn);
+        this.createdBy = readField(json, Fields.createdBy);
         this.performer = json.raw(Fields.performer);
         this.taskModel = readMap(json, Fields.taskModel);
     }
@@ -44,8 +51,17 @@ public class HumanTaskActivated extends HumanTaskTransitioned {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeTransitionEvent(generator);
+        writeField(generator, Fields.createdOn, createdOn);
+        writeField(generator, Fields.createdBy, createdBy);
         writeField(generator, Fields.performer, performer);
         writeField(generator, Fields.taskModel, taskModel);
+    }
+    public Instant getCreatedOn() {
+        return createdOn;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
     }
 
     /**

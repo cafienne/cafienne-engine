@@ -30,6 +30,8 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     public void beginLifeCycle() {
+        getCaseInstance().addEvent(new HumanTaskCreated(task));
+
         // Take the role of the task, and add that to the event
         HumanTaskDefinition htd = definition.getParentElement();
         CaseRoleDefinition performer = htd.getPerformer();
@@ -70,6 +72,8 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                 addDebugInfo(() -> "Failed to evaluate expression on task due date", e);
             }
         }
+
+        getCaseInstance().addEvent(new HumanTaskInputSaved(task, task.getMappedInputParameters()));
     }
 
     public void updateState(HumanTaskAssigned event) {

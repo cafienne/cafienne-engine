@@ -73,10 +73,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
     @Override
     protected void startImplementation(ValueMap inputParameters) {
-        getCaseInstance().addEvent(new HumanTaskCreated(this));
         getImplementation().beginLifeCycle();
-        getCaseInstance().addEvent(new HumanTaskInputSaved(this, getMappedInputParameters()));
-
     }
 
     @Override
