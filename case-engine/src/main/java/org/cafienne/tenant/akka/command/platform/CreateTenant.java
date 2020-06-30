@@ -13,25 +13,26 @@ import org.cafienne.tenant.akka.command.response.TenantResponse;
 import org.cafienne.tenant.akka.event.platform.TenantCreated;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Manifest
 public class CreateTenant extends PlatformTenantCommand implements BootstrapCommand {
     public final String name;
-    private final Set<TenantUser> owners;
+    private final List<TenantUser> users;
 
     private enum Fields {
-        name, owners
+        name, users
     }
 
-    public CreateTenant(PlatformUser user, String tenantId, String name, Set<TenantUser> owners) {
+    public CreateTenant(PlatformUser user, String tenantId, String name, List<TenantUser> users) {
         super(user, tenantId);
         this.name = name;
-        // Filter out empty and null user id's for the set of owners.
-        this.owners = owners;
+        this.users = users;
         // Check whether after the filtering there are still owners left. Tenant must have owners.
-        if (this.owners.isEmpty()) {
+        if (this.users.stream().filter(u -> u.isOwner()).count() == 0) {
             throw new SecurityException("Cannot create a tenant without providing tenant owners");
         }
     }
@@ -39,11 +40,10 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     public CreateTenant(ValueMap json) {
         super(json);
         this.name = readField(json, Fields.name);
-        this.owners = new HashSet();
-        ValueList jsonOwners = json.withArray(Fields.owners);
-        jsonOwners.forEach(value -> {
+        this.users = new ArrayList();
+        json.withArray(Fields.users).forEach(value -> {
             ValueMap ownerJson = (ValueMap) value;
-            this.owners.add(TenantUser.from(ownerJson));
+            this.users.add(TenantUser.from(ownerJson));
         });
     }
 
@@ -63,7 +63,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     @Override
     public TenantResponse process(TenantActor tenant) {
         tenant.addEvent(new TenantCreated(tenant));
-        tenant.setInitialUsers(owners);
+        tenant.setInitialUsers(users);
         return new TenantResponse(this);
     }
 
@@ -71,9 +71,9 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.name, name);
-        generator.writeArrayFieldStart(Fields.owners.toString());
-        for (TenantUser owner : owners) {
-            owner.write(generator);
+        generator.writeArrayFieldStart(Fields.users.toString());
+        for (TenantUser user : users) {
+            user.write(generator);
         }
         generator.writeEndArray();
     }

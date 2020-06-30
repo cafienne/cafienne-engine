@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.platform
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -17,19 +16,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
-import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
-
-import scala.collection.JavaConverters._
-import scala.collection.immutable.Seq
+import org.cafienne.service.api.tenant.route.TenantRoute
+import org.cafienne.tenant.akka.command.platform.{DisableTenant, EnableTenant}
 
 @Api(tags = Array("platform"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute()(override implicit val userCache: IdentityProvider) extends CommandRoute {
+class PlatformRoute()(override implicit val userCache: IdentityProvider) extends CommandRoute with TenantRoute {
 
   override def routes = {
       createTenant ~
@@ -58,12 +54,10 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
 
-        implicit val userFormat = jsonFormat4(TenantAPI.User)
-        implicit val tenantFormat = jsonFormat2(TenantAPI.Tenant)
-        entity(as[TenantAPI.Tenant]) { newTenant =>
-          val newTenantName = newTenant.name
-          val owners = newTenant.owners.map(owner => TenantUser(owner.userId, owner.roles.toSeq, newTenantName, owner.name.getOrElse(""), owner.email.getOrElse(""), enabled = true, isOwner = true))
-          askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, owners.asJava))
+        implicit val userFormat = jsonFormat5(TenantAPI.User)
+        implicit val tenantFormat = jsonFormat3(TenantAPI.BackwardsCompatibleTenant)
+        entity(as[TenantAPI.BackwardsCompatibleTenant]) { newTenant =>
+          invokeCreateTenant(platformOwner, newTenant)
         }
       }
     }
@@ -137,9 +131,4 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
       }
     }
   }
-
-  private def askPlatform(command: PlatformTenantCommand) = {
-    askModelActor(command)
-  }
-
 }

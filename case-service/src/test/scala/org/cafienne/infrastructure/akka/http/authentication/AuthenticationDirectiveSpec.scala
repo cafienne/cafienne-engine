@@ -44,7 +44,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     override protected val userCache: IdentityProvider = new IdentityProvider {
       override def getUser(userId: String): Future[PlatformUser] = {
         userId match {
-          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", "Match Name", "match@cafienne.io")))}
+          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
           case _ => Future.failed(new SecurityException("Not a matched user for this test"))
         }
       }
@@ -71,7 +71,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     override protected val userCache: IdentityProvider = new IdentityProvider {
       override def getUser(userId: String): Future[PlatformUser] = {
         userId match {
-          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", "Match Name", "match@cafienne.io")))}
+          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
           case _ => Future.failed(new SecurityException("Not a matched user for this test"))
         }
       }
@@ -99,7 +99,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     override protected val userCache: IdentityProvider = new IdentityProvider {
       override def getUser(userId: String): Future[PlatformUser] = {
         userId match {
-          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", "Match Name", "match@cafienne.io")))}
+          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
           case _ => Future.failed(new SecurityException("Not a matched user for this test"))
         }
       }

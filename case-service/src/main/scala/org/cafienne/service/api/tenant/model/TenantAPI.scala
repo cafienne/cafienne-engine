@@ -5,11 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import scala.annotation.meta.field
 
 object TenantAPI {
-  case class Tenant(name: String, owners: Set[User])
+  case class Tenant(name: String, users: Set[User])
 
   case class User(
                    @(Schema @field)(implementation = classOf[String], example = "User id (matched with token when user logs on)") userId: String,
-                   @(Schema @field)(description = "List of roles the user has within the tenant") roles: Set[String],
+                   @(Schema @field)(description = "List of roles the user has within the tenant") roles: Seq[String],
+                   @(Schema @field)(example = "Whether user is tenant owner (defaults to false, but there must be at least one user in the list  with true)", implementation = classOf[String]) isOwner: Option[Boolean],
                    @(Schema @field)(example = "Optional user name", implementation = classOf[String]) name: Option[String],
                    @(Schema @field)(example = "Optional user email", implementation = classOf[String]) email: Option[String])
 
@@ -22,4 +23,5 @@ object TenantAPI {
 
   case class PlatformUser(userId: String, tenants: Seq[TenantUser])
 
+  case class BackwardsCompatibleTenant(name: String, owners: Option[Seq[User]] = None, users: Option[Seq[User]] = None)
 }

@@ -23,7 +23,6 @@ import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.None;
 import scala.Some;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -123,7 +122,7 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", "", "", true, false);
+        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", false, "", "", true);
     }
 
     /**

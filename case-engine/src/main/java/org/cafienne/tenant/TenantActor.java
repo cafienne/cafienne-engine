@@ -48,9 +48,9 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         this.creationEvent = tenantCreated;
     }
 
-    public void setInitialUsers(Set<TenantUser> owners) {
+    public void setInitialUsers(List<TenantUser> owners) {
         // Register the owners as TenantUsers with the specified roles
-        owners.forEach(owner -> createUser(owner, true));
+        owners.forEach(owner -> createUser(owner, owner.isOwner()));
     }
 
     private TenantUserCreated createUser(TenantUser user, boolean isOwner) {
