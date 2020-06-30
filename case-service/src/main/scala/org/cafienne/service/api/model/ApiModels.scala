@@ -115,6 +115,7 @@ case class StartCase(
                       @(Schema @field)(
                         description = "Definition of the case to be started",
                         required = true,
+                        example = "Depending on the internally configured DefinitionProvider this can be a file name or the case model itself.",
                         implementation = classOf[String])
                       definition: String,
                       @(Schema @field)(
