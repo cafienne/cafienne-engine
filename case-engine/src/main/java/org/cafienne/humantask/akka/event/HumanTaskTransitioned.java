@@ -8,12 +8,12 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
@@ -21,10 +21,6 @@ public abstract class HumanTaskTransitioned extends HumanTaskEvent {
     private final TaskState currentState; // current taskState [Unassigned, Assigned or Delegated]
     private final TaskState historyState; // previous taskState [Unassigned, Assigned or Delegated]
     private final TaskAction transition; // last action happened on the task
-
-    public enum Fields {
-        currentState, historyState, transition
-    }
 
     protected HumanTaskTransitioned(HumanTask task, TaskState currentState, TaskState historyState, TaskAction transition) {
         super(task);

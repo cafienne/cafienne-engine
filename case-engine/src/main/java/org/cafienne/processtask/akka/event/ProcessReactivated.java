@@ -1,6 +1,7 @@
 package org.cafienne.processtask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.akka.command.ReactivateProcess;
@@ -11,10 +12,6 @@ import java.io.IOException;
 @Manifest
 public class ProcessReactivated extends ProcessInstanceEvent {
     public final ValueMap inputParameters;
-
-    private enum Fields {
-        input
-    }
 
     public ProcessReactivated(ProcessTaskActor actor, ReactivateProcess command) {
         super(actor);

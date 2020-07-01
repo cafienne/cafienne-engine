@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.akka.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -19,10 +20,6 @@ public abstract class DeprecatedCaseTeamEvent extends CaseTeamEvent {
     protected final String userId;
     protected final Set<String> roles = new HashSet();
     public final transient MemberKey key;
-
-    protected enum Fields {
-        userId, roles
-    }
 
     protected DeprecatedCaseTeamEvent(Case caseInstance, Member member) {
         super(caseInstance);

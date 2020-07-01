@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.akka.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.event.CaseEvent;
-import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
@@ -15,10 +15,6 @@ public abstract class TaskEvent<T extends Task> extends CaseEvent {
 
     private final String taskId;
     private final String type;
-
-    private enum Fields {
-        taskId, type
-    }
 
     protected TaskEvent(T task) {
         super(task.getCaseInstance());

@@ -8,14 +8,13 @@
 package org.cafienne.cmmn.akka.command.debug;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.akka.event.DebugDisabled;
-import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
 
 import java.io.IOException;
 
@@ -26,10 +25,6 @@ import java.io.IOException;
 @Manifest
 public class SwitchDebugMode extends CaseCommand {
     private final boolean debugMode;
-
-    private enum Fields {
-        debugMode
-    }
 
     /**
      * Starts a new case with the specified name from the definitions document

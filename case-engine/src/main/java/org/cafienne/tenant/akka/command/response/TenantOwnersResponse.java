@@ -1,23 +1,18 @@
 package org.cafienne.tenant.akka.command.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.akka.command.GetTenantOwners;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Manifest
 public class TenantOwnersResponse extends TenantResponse {
     public final String name;
     public final List<String> owners;
-
-    private enum Fields {
-        name, owners
-    }
 
     public TenantOwnersResponse(GetTenantOwners command, String name, List<String> owners) {
         super(command);

@@ -8,10 +8,11 @@
 package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskOutputSaved;
 import org.cafienne.humantask.instance.TaskState;
@@ -24,10 +25,6 @@ import java.io.IOException;
 @Manifest
 public class SaveTaskOutput extends HumanTaskCommand {
 	private final ValueMap taskOutput;
-
-	private enum Fields {
-		taskOutput
-	}
 
 	public SaveTaskOutput(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
 		super(tenantUser, caseInstanceId, taskId);

@@ -2,11 +2,11 @@ package org.cafienne.cmmn.akka.command.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.cmmn.instance.team.Team;
 
@@ -31,10 +31,6 @@ import java.io.IOException;
 @Manifest
 public class PutTeamMember extends CaseTeamMemberCommand {
     private final CaseTeamMember newMember;
-
-    private enum Fields {
-        member
-    }
 
     public PutTeamMember(TenantUser tenantUser, String caseInstanceId, CaseTeamMember newMember) {
         super(tenantUser, caseInstanceId, newMember.key());

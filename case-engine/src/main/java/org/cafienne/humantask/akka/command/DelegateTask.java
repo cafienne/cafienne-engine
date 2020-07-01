@@ -10,6 +10,7 @@ package org.cafienne.humantask.akka.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -22,10 +23,6 @@ import java.io.IOException;
 @Manifest
 public class DelegateTask extends HumanTaskCommand {
     private final String assignee;
-
-    private enum Fields {
-        assignee
-    }
 
     public DelegateTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
         super(tenantUser, caseInstanceId, taskId);

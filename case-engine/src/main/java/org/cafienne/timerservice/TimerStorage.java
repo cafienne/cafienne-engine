@@ -1,6 +1,7 @@
 package org.cafienne.timerservice;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.snapshot.ModelActorSnapshot;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -17,10 +18,6 @@ import java.util.Map;
 @Manifest
 public class TimerStorage implements ModelActorSnapshot {
     private Map<String, TimerJob> timers = new HashMap();
-
-    private enum Fields {
-        timers, timerId, caseInstanceId, moment, user
-    }
 
     public TimerStorage() {
     }

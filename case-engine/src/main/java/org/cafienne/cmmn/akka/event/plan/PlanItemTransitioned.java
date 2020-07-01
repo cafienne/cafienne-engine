@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
@@ -22,10 +23,6 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
     private final State currentState;
     private final State historyState;
     private final Transition transition;
-
-    public enum Fields {
-        currentState, historyState, transition
-    }
 
     public PlanItemTransitioned(PlanItem planItem, State newState, State historyState, Transition transition) {
         super(planItem);

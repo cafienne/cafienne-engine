@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.humantask.instance.TaskState;
 
 import java.io.IOException;
@@ -19,10 +19,6 @@ import java.util.Arrays;
 public abstract class HumanTaskCommand extends CaseCommand {
     private final String taskId;
     private HumanTask task;
-
-    private enum Fields {
-        taskId
-    }
 
     protected HumanTaskCommand(TenantUser tenantUser, String caseInstanceId, String taskId) {
         super(tenantUser, caseInstanceId);

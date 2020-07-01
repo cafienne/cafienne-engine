@@ -7,20 +7,21 @@
  */
 package org.cafienne.cmmn.test;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
-import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.LongValue;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * This is a helper class for the case unit test framework. Within a case, one can use timer events. When running a case unit test, sometimes after triggering a command a timer will run. The test may
@@ -33,10 +34,6 @@ public class PingCommand extends CaseCommand implements AkkaSerializable, Bootst
     private final long waitTime;
 
     private final String tenant;
-
-    private enum Fields {
-        waitTime, tenant
-    }
 
     public PingCommand(TenantUser tenantUser, String caseInstanceId, long waitTimeInMillis) {
         super(tenantUser, caseInstanceId);

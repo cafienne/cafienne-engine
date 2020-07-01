@@ -2,6 +2,7 @@ package org.cafienne.akka.actor.command.exception;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
@@ -14,10 +15,6 @@ public class SerializedException implements AkkaSerializable {
     private final String className;
     private final String message;
     private SerializedException cause;
-
-    private enum Fields {
-        className, message, cause
-    }
 
     public SerializedException(Throwable t) {
         this.className = t.getClass().getName();

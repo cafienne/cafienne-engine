@@ -7,13 +7,8 @@
  */
 package org.cafienne.cmmn.definition;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.definition.ProcessDefinition;
@@ -22,6 +17,11 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Base class for parsing XML elements defined in the CMMN specification.
@@ -444,10 +444,6 @@ public abstract class CMMNElementDefinition {
             }
         }
         return attributeValue;
-    }
-
-    private enum Fields {
-        elementId, source
     }
 
     public static <T extends CMMNElementDefinition> T fromJSON(ValueMap json, Class<T> tClass) {

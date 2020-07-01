@@ -9,9 +9,10 @@ package org.cafienne.cmmn.akka.command.response;
 
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.GetDiscretionaryItems;
-import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 /**
@@ -26,10 +27,6 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 @Manifest
 public class CaseResponse extends ModelResponse {
     private final String caseInstanceId;
-
-    private enum Fields {
-        caseInstanceId
-    }
 
     public CaseResponse(CaseCommand command) {
         super(command);

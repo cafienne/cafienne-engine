@@ -15,10 +15,6 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 public interface ModelEvent<M extends ModelActor> extends AkkaSerializable, TenantUserMessage {
     String TAG = "cafienne";
 
-    enum Fields {
-        tenant, actorId, user, modelEvent
-    }
-
     /**
      * Return true if, after the event has been added, and it's updateState method is invoked,
      * additional behavior must be executed (potentially leading to new events).

@@ -8,9 +8,9 @@
 package org.cafienne.timerservice;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.timerservice.akka.command.SetTimer;
@@ -32,10 +32,6 @@ public class TimerJob implements AkkaSerializable {
         return user;
     }
 
-    protected enum Fields {
-        timerId , caseInstanceId, moment, user
-    }
-
     public TimerJob(SetTimer command) {
         this.timerId = command.timerId;
         this.caseInstanceId = command.caseInstanceId;
@@ -55,7 +51,7 @@ public class TimerJob implements AkkaSerializable {
         writeField(generator, Fields.timerId, timerId);
         writeField(generator, Fields.caseInstanceId, caseInstanceId);
         writeField(generator, Fields.moment, moment);
-        generator.writeFieldName(ModelEvent.Fields.user.toString());
+        generator.writeFieldName(Fields.user.toString());
         user.write(generator);
     }
 }

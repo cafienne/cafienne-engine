@@ -2,6 +2,7 @@ package org.cafienne.akka.actor.identity
 
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.MissingTenantException
+import org.cafienne.akka.actor.serialization.Fields
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.infrastructure.json.CafienneJson
 

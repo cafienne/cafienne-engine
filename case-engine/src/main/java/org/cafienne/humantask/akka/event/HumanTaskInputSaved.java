@@ -8,20 +8,16 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
 @Manifest
 public class HumanTaskInputSaved extends HumanTaskEvent {
 	private final ValueMap input;
-
-	public enum Fields {
-		input
-	}
 
 	public HumanTaskInputSaved(HumanTask task, ValueMap input) {
 		super(task);

@@ -8,11 +8,10 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.event.plan.task.TaskEvent;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
@@ -21,10 +20,6 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
 
     public final String taskId; // taskName is same as the planItem id
     private final String taskName; // taskName is same as the planItemName
-
-    private enum Fields {
-        taskName, taskId
-    }
 
     /**
      * Constructor used by HumanTaskCreated event, since at that moment the task name is not yet known

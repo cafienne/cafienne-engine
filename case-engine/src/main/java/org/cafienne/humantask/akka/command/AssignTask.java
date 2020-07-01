@@ -9,10 +9,11 @@ package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskAssigned;
 import org.cafienne.humantask.akka.event.HumanTaskOwnerChanged;
@@ -23,10 +24,6 @@ import java.io.IOException;
 @Manifest
 public class AssignTask extends HumanTaskCommand {
     private final String assignee;
-
-    private enum Fields {
-        assignee
-    }
 
     public AssignTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
         super(tenantUser, caseInstanceId, taskId);

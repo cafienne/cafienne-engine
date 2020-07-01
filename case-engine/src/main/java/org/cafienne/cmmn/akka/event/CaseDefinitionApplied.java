@@ -10,6 +10,7 @@ package org.cafienne.cmmn.akka.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -28,10 +29,6 @@ public class CaseDefinitionApplied extends CaseEvent {
     public final String createdBy;
 
     private final transient CaseDefinition definition;
-
-    public enum Fields {
-        createdOn, createdBy, parentActorId, rootActorId, caseName, definition, engineVersion
-    }
 
     public CaseDefinitionApplied(Case caseInstance, String rootCaseId, String parentCaseId, CaseDefinition definition, String caseName) {
         super(caseInstance);

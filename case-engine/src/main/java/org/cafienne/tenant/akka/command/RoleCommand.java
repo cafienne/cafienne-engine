@@ -1,10 +1,9 @@
 package org.cafienne.tenant.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;
 
@@ -13,10 +12,6 @@ import java.io.IOException;
  */
 abstract class RoleCommand extends ExistingUserCommand {
     public final String role;
-
-    protected enum Fields {
-        role
-    }
 
     public RoleCommand(TenantUser tenantOwner, String tenantId, String userId, String role) {
         super(tenantOwner, tenantId, userId);

@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.akka.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.*;
@@ -32,10 +33,6 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
     private final String path;
     private final State state;
     private final int index;
-
-    public enum Fields {
-        name, transition, value, path, state, index
-    }
 
     public CaseFileEvent(Case caseInstance, String name, State newState, CaseFileItemTransition transition, Value<?> newValue, Path path, int index) {
         super(caseInstance);

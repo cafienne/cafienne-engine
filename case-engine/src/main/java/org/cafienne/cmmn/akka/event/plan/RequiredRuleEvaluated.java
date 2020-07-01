@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -17,10 +18,6 @@ import java.io.IOException;
 @Manifest
 public class RequiredRuleEvaluated extends PlanItemEvent {
     private final boolean isRequired;
-
-    private enum Fields {
-        isRequired
-    }
 
     public RequiredRuleEvaluated(PlanItem planItem, boolean isRequired) {
         super(planItem);

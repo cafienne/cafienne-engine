@@ -1,10 +1,10 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -13,10 +13,6 @@ import java.time.Instant;
 public class HumanTaskCreated extends HumanTaskEvent {
     private final Instant createdOn;
     private final String createdBy;
-
-    private enum Fields {
-        createdOn, createdBy
-    }
 
     @Deprecated
     public HumanTaskCreated(HumanTask task) {

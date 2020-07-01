@@ -13,6 +13,7 @@ import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.timerservice.TimerService;
 import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
@@ -24,10 +25,6 @@ import java.io.IOException;
  */
 public abstract class TimerServiceCommand extends ModelCommand<TimerService> implements BootstrapCommand {
     public final String timerId;
-
-    protected enum Fields {
-        timerId
-    }
 
     /**
      * Create a new command that can be sent to the case.

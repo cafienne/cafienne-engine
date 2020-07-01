@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.akka.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Task;
@@ -19,10 +20,6 @@ import java.io.IOException;
 public class TaskInputFilled extends TaskEvent {
     private final ValueMap taskParameters;
     private final ValueMap mappedInputParameters;
-
-    private enum Fields {
-        taskParameters, mappedInputParameters
-    }
 
     public TaskInputFilled(Task<?> task, ValueMap inputParameters, ValueMap mappedInputParameters) {
         super(task);

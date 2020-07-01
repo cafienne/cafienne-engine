@@ -2,6 +2,7 @@ package org.cafienne.cmmn.akka.command.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
@@ -35,9 +36,5 @@ abstract class CaseTeamMemberCommand extends CaseTeamCommand {
         super.write(generator);
         writeField(generator, Fields.memberId, memberId);
         writeField(generator, Fields.memberType, memberType);
-    }
-
-    protected enum Fields {
-        memberId, memberType
     }
 }

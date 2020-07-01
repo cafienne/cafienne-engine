@@ -3,10 +3,10 @@ package org.cafienne.processtask.akka.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.akka.command.response.ProcessResponse;
-import org.cafienne.processtask.akka.event.ProcessStarted;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
@@ -21,10 +21,6 @@ public class StartProcess extends ProcessCommand implements BootstrapCommand {
     private final ValueMap inputParameters;
     private transient ProcessDefinition definition;
     private final boolean debugMode;
-
-    private enum Fields {
-        name, tenant, parentActorId, rootActorId, inputParameters, processDefinition, debugMode
-    }
 
     public StartProcess(TenantUser tenantUser, String id, String name, ProcessDefinition definition, ValueMap inputParameters, String parentActorId, String rootActorId, boolean debugMode) {
         super(tenantUser, id);

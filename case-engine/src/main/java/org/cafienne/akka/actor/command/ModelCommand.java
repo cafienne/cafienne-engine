@@ -8,6 +8,7 @@ import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
 import org.cafienne.cmmn.instance.casefile.JSONParseFailure;
@@ -28,10 +29,6 @@ public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializ
      * Store the user that issued the Command.
      */
     final protected TenantUser user;
-
-    private enum Fields {
-        messageId, actorId, user
-    }
 
     protected ModelCommand(TenantUser tenantUser, String actorId) {
         this.msgId = new Guid().toString();

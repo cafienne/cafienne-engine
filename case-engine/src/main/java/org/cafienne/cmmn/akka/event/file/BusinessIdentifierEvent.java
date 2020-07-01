@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.akka.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.CaseFileItem;
@@ -16,10 +16,6 @@ public abstract class BusinessIdentifierEvent extends CaseEvent {
     public final String path;
     public final String name;
     public final String type;
-
-    protected enum Fields {
-        path, name, value, type
-    }
 
     protected BusinessIdentifierEvent(CaseFileItem caseFileItem, PropertyDefinition property) {
         super(caseFileItem.getCaseInstance());

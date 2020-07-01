@@ -12,6 +12,7 @@ import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
@@ -25,10 +26,6 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
     private Instant lastModified;
     private final TenantUser user;
     private final String commandType;
-
-    private enum Fields {
-        messageId, lastModified, user, commandType
-    }
 
     protected ModelResponse(ModelCommand<?> command) {
         this.messageId = command.getMessageId();
