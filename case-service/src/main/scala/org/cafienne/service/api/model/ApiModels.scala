@@ -123,11 +123,10 @@ case class StartCase(
                         required = false,
                         implementation = classOf[Examples.InputParameters])
                       inputs: ValueMap,
-                      @(ArraySchema @field)(schema =
-                        new Schema(
+                      @(Schema @field)(
                           description = "The team that will be connected to the execution of this case",
                           required = false,
-                          implementation = classOf[Examples.StartCaseTeam]))
+                          implementation = classOf[Examples.StartCaseTeam])
                       caseTeam: Option[BackwardCompatibleTeam],
                       @(Schema @field)(description = "Tenant in which to create the case. If empty, default tenant as configured is taken.", required = false, implementation = classOf[Option[String]], example = "Will be taken from settings if omitted or empty")
                       tenant: Option[String] = None,
