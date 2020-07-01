@@ -23,7 +23,6 @@ import scala.concurrent.ExecutionContextExecutor
 @Path("/cases")
 class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  implicit def executionContext: ExecutionContextExecutor = CaseSystem.system.dispatcher
   val caseRoute = new CaseRoute(caseQueries)(userCache)
   val caseFileRoute = new CaseFileRoute(caseQueries)(userCache)
   val caseTeamRoute = new CaseTeamRoute(caseQueries)(userCache)
