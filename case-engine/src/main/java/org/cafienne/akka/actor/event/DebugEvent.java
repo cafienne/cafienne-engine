@@ -21,7 +21,7 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugEvent extends ModelEvent {
+public class DebugEvent extends BaseModelEvent {
     private final ValueMap messages;
 
     private enum Fields {

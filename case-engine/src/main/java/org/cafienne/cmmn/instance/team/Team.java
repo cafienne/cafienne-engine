@@ -273,10 +273,11 @@ public class Team extends CMMNElement<CaseDefinition> {
             getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), ""));
             if (performer != null) getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), performer.getName()));
         } else {
-            // If a role is required, then check if one of the existing members has the role; if not, give the role.
+            // If a role is required, then check if "one of" the existing members (there can only be one, actually) has the role; if not, give the role.
             if (performer != null) {
                 Member member = existingMembers.get(0);
                 if (! member.hasRole(performer.getName())) {
+                    getCaseInstance().addDebugInfo(() -> "Adding case role '" + performer.getName()+"' to '" + assignee +"' because of dynamic task assignment");
                     getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), performer.getName()));
                 }
             }

@@ -44,9 +44,9 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                 String assignee = assignment.evaluate(this.task);
                 addDebugInfo(() -> "Assignee expression in task " + task.getName() + "[" + task.getId() + " resulted in: " + assignee);
 
-                /**
-                 * TODO: Validate assignee?! Against CaseTeam ???
-                 */
+                // Whether or not assignee is an existing tenant user cannot be determined here...
+                //  It is up to the application using the dynamic assignment to make sure it returns a valid user.
+                //  If not a valid user, then case owners have to change the task assignee.
                 if (assignee != null && !assignee.trim().isEmpty()) {
                     getCaseInstance().getCaseTeam().addDynamicMember(assignee, task.getPerformer());
                     task.addEvent(new HumanTaskAssigned(task, assignee));
@@ -70,6 +70,8 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                 addDebugInfo(() -> "Failed to evaluate expression on task due date", e);
             }
         }
+
+        getCaseInstance().addEvent(new HumanTaskInputSaved(task, task.getMappedInputParameters()));
     }
 
     public void updateState(HumanTaskAssigned event) {

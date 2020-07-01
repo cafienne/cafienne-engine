@@ -12,8 +12,6 @@ import org.cafienne.processtask.implementation.SubProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-
 public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstanceEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(ProcessTaskActor.class);
@@ -29,8 +27,8 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     }
 
     @Override
-    public ProcessModified createLastModifiedEvent(Instant lastModified) {
-        return new ProcessModified(this, lastModified);
+    public ProcessModified createTransactionEvent() {
+        return new ProcessModified(this, getTransactionTimestamp());
     }
 
     @Override

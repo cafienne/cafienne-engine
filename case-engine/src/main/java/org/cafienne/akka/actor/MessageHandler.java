@@ -91,13 +91,17 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * @param event
      */
     public <EV extends E> EV addEvent(EV event) {
-        return addModelEvent(events.size(), event);
+        return addModelEvent(event);
     }
 
     private EventBehaviorCallStack behaviorCallStack = new EventBehaviorCallStack(this);
     private boolean addingEvent = false;
 
-    private <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
+    protected <ME extends ModelEvent> ME addModelEvent(ME event) {
+        return addModelEvent(events.size(), event);
+    }
+
+    protected <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
         events.add(index, event);
 
         addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);

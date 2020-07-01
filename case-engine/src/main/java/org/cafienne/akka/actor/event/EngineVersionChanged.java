@@ -9,7 +9,7 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class EngineVersionChanged extends ModelEvent {
+public class EngineVersionChanged extends BaseModelEvent {
 
     private final CafienneVersion version;
 

@@ -59,7 +59,7 @@ public class Basic {
 
             PublishedEventsAssertion startCaseEvents = casePlan.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 57;
+            int expectedNumberOfEvents = 53;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nCaseDefinitionApplied: 1\n" +
                         "TeamRoleFilled: 1\n" +
@@ -69,7 +69,6 @@ public class Basic {
                         "RepetitionRuleEvaluated: 7\n" +
                         "RequiredRuleEvaluated: 7\n" +
                         "TaskInputFilled: 4\n" +
-                        "HumanTaskCreated: 4\n" +
                         "HumanTaskActivated: 4\n" +
                         "HumanTaskInputSaved: 4\n" +
                         "CaseModified: 1");

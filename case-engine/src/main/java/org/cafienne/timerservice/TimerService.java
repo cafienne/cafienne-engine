@@ -6,6 +6,7 @@ import akka.persistence.SnapshotOffer;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
 import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +73,7 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
     }
 
     @Override
-    public ModelEvent createLastModifiedEvent(Instant lastModified) {
+    public TransactionEvent createTransactionEvent() {
         return null;
     }
 

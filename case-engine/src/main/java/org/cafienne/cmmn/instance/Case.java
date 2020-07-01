@@ -83,7 +83,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
 
     public Case() {
         super(CaseCommand.class, CaseEvent.class);
-        this.createdOn = Instant.now();
+        this.createdOn = getTransactionTimestamp();
         this.sentryNetwork = new SentryNetwork(this);
 
         logger.info("Recovering/creating case " + this.getId() + " with path " + self().path());
@@ -104,9 +104,9 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     }
 
     @Override
-    public CaseModified createLastModifiedEvent(Instant lastModified) {
+    public CaseModified createTransactionEvent() {
         int numFailedPlanItems = Long.valueOf(planItems.stream().filter(p -> p.getState() == org.cafienne.cmmn.instance.State.Failed).count()).intValue();
-        return new CaseModified(this, lastModified, numFailedPlanItems);
+        return new CaseModified(this, getTransactionTimestamp(), numFailedPlanItems);
     }
 
     /**

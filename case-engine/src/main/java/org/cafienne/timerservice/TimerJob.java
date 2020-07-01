@@ -8,14 +8,11 @@
 package org.cafienne.timerservice;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.timerservice.TimerService;
-import org.cafienne.timerservice.TimerStorage;
 import org.cafienne.timerservice.akka.command.SetTimer;
 
 import java.io.IOException;

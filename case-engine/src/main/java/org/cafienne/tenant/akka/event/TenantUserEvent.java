@@ -8,7 +8,6 @@
 package org.cafienne.tenant.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.User;

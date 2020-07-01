@@ -18,10 +18,12 @@ public class HumanTaskCreated extends HumanTaskEvent {
         createdOn, createdBy
     }
 
+    @Deprecated
     public HumanTaskCreated(HumanTask task) {
         super(task);
-        this.createdOn = Instant.now();
+        this.createdOn = task.getCaseInstance().getTransactionTimestamp();
         this.createdBy = task.getCaseInstance().getCurrentUser().id();
+        throw new IllegalArgumentException("This code is no longer in use");
     }
 
     public HumanTaskCreated(ValueMap json) {
