@@ -9,8 +9,8 @@ import org.cafienne.cmmn.instance.CaseFileItemTransition
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
+import org.cafienne.service.api.projection.record.{CaseFileRecord, CaseRecord}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers

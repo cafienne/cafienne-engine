@@ -31,8 +31,9 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.cases.table.CaseRecord
 import org.cafienne.service.api.model.StartCase
+import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.service.api.projection.record.CaseRecord
 
 import scala.util.{Failure, Success}
 

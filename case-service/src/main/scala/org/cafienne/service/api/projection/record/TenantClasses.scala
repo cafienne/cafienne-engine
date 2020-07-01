@@ -1,4 +1,4 @@
-package org.cafienne.service.api.tenant
+package org.cafienne.service.api.projection.record
 
 import org.cafienne.tenant.akka.event.{TenantUserEvent, TenantUserRoleEvent}
 

@@ -1,9 +1,9 @@
-package org.cafienne.service.api.cases.table
+package org.cafienne.service.api.projection.table
 
 import java.time.Instant
 
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
-import org.cafienne.service.api.cases._
+import org.cafienne.service.api.projection.record._
 import slick.lifted
 
 trait CaseTables extends QueryDbConfig {

@@ -31,6 +31,7 @@ import org.cafienne.service.api
 import org.cafienne.service.api.Sort
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.Examples
+import org.cafienne.service.api.projection.query.{TaskCount, TaskQueries}
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
 
 import scala.collection.immutable.Seq

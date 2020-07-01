@@ -1,10 +1,10 @@
-package org.cafienne.service.api.tenant
+package org.cafienne.service.api.projection.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.service.api.projection.UserSearchFailure
+import org.cafienne.service.api.projection.table.TenantTables
 
-import scala.collection.mutable
 import scala.concurrent.Future
 
 trait UserQueries {

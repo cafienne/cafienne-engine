@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Directives._
 import io.swagger.annotations._
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
 
 import scala.collection.immutable.Seq
 

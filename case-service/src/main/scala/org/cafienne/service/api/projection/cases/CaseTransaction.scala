@@ -9,11 +9,10 @@ import org.cafienne.cmmn.akka.event.file.{BusinessIdentifierCleared, BusinessIde
 import org.cafienne.cmmn.akka.event.plan._
 import org.cafienne.cmmn.akka.event.team._
 import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
-import org.cafienne.humantask.akka.event.{HumanTaskActivated, HumanTaskAssigned, HumanTaskCompleted, HumanTaskCreated, HumanTaskDueDateFilled, HumanTaskEvent, HumanTaskInputSaved, HumanTaskOutputSaved, HumanTaskOwnerChanged, HumanTaskTerminated, HumanTaskTransitioned}
+import org.cafienne.humantask.akka.event._
 import org.cafienne.infrastructure.cqrs.OffsetRecord
-import org.cafienne.service.api.cases.table._
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.TaskRecord
+import org.cafienne.service.api.projection.record._
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}

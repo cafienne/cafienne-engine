@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.ValueMarshallers
-import org.cafienne.service.api.tenant.TenantQueriesImpl
+import org.cafienne.service.api.projection.query.TenantQueriesImpl
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 

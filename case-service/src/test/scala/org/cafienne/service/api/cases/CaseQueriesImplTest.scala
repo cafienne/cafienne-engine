@@ -8,7 +8,8 @@ import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
-import org.cafienne.service.api.cases.table.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.service.api.projection.query.CaseQueriesImpl
+import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
 import org.cafienne.service.db.migration.Migrate

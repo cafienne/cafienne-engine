@@ -1,9 +1,8 @@
 package org.cafienne.service.db.migration.versions
 
 import org.cafienne.infrastructure.jdbc.{OffsetStoreTables, QueryDbConfig}
-import org.cafienne.service.api.cases.table.{CaseTables, CaseTeamMemberRecord}
-import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.api.tenant.TenantTables
+import org.cafienne.service.api.projection.record.CaseTeamMemberRecord
+import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 import org.cafienne.service.db.migration.DbSchemaVersion
 import slick.lifted
 import slick.lifted.TableQuery

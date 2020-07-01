@@ -23,8 +23,8 @@ import org.cafienne.cmmn.instance.casefile._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.CaseQueries
 import org.cafienne.service.api.projection.CaseSearchFailure
+import org.cafienne.service.api.projection.query.CaseQueries
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

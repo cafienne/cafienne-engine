@@ -19,7 +19,7 @@ import org.cafienne.cmmn.akka.command.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.CaseQueries
+import org.cafienne.service.api.projection.query.CaseQueries
 
 @Api(tags = Array("case plan"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))

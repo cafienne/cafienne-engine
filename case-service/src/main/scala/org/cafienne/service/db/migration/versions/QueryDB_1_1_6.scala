@@ -1,7 +1,6 @@
 package org.cafienne.service.db.migration.versions
 
-import org.cafienne.service.api.cases.table.CaseTables
-import org.cafienne.service.api.tasks.TaskTables
+import org.cafienne.service.api.projection.table.{CaseTables, TaskTables}
 import org.cafienne.service.db.migration.{DbSchemaVersion, Projections}
 import slick.migration.api.TableMigration
 

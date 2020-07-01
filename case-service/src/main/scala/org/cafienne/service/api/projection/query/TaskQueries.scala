@@ -1,16 +1,13 @@
-package org.cafienne.service.api.tasks
+package org.cafienne.service.api.projection.query
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.instance.casefile.{LongValue, Value, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.Sort
-import org.cafienne.service.api.cases.table.{CaseBusinessIdentifierRecord, CaseTables, CaseTeamMemberRecord}
-import org.cafienne.service.api.projection.query.BaseQueryImpl
+import org.cafienne.service.api.projection.record.TaskRecord
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
-import org.cafienne.service.api.tenant.{TenantTables, UserRoleRecord}
 
 import scala.concurrent.Future
 
@@ -99,37 +96,8 @@ class TaskQueriesImpl extends TaskQueries
     })
   }
 
-  /**
-    * Query that validates that the user belongs to the team of the specified case, either by explicit
-    * membership of the user id, or by one of the tenant roles of the user that are bound to the team of the case
-    * @param user
-    * @param caseInstanceId
-    * @param tenant
-    * @return
-    */
-  private def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String], identifiers: Option[String]) = {
-    val query = for {
-      // Validate tenant membership
-      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tenant)
-      // Validate case team membership: either user is explicit member or has a matching tenant role
-      teamMembership <- TableQuery[CaseInstanceTeamMemberTable]
-        .filter(_.caseInstanceId === caseInstanceId)
-        .filter(_.active === true) // Only search in active team members
-        .filter(_.caseRole === "") // Only search by base membership, not in certain roles
-        .filter(member => { // Search by user id or by one of the user's tenant roles
-          (member.isTenantUser === true && member.memberId === user.userId) ||
-            (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
-        })
-      _ <- {
-        val query = {
-          if (identifiers.isEmpty) TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
-          else addBusinessIdentifiersFilter(identifiers, caseInstanceId)
-        }
-        query
-      }
-    } yield (tenantMembership, teamMembership)
-
-    query
+  override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]) = {
+    TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
   }
 
   override def authorizeTaskAccessAndReturnCaseAndTenantId(taskId: String, user: PlatformUser): Future[(String, String)] = {

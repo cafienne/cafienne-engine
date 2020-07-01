@@ -3,10 +3,9 @@ package org.cafienne.service.api.projection.slick
 import akka.Done
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
-import org.cafienne.service.api.cases.table._
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tasks.{TaskRecord, TaskTables}
-import org.cafienne.service.api.tenant._
+import org.cafienne.service.api.projection.record._
+import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 
 import scala.concurrent.Future
 

@@ -15,9 +15,10 @@ import org.cafienne.cmmn.akka.command._
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
-import org.cafienne.service.api.cases.{CaseQueries, CaseReader}
+import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember}
 import org.cafienne.service.api.projection.CaseSearchFailure
+import org.cafienne.service.api.projection.query.CaseQueries
 
 import scala.util.{Failure, Success}
 

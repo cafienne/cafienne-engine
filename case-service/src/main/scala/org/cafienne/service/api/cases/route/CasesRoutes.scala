@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.cases.CaseQueries
+import org.cafienne.service.api.projection.query.CaseQueries
 
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContextExecutor

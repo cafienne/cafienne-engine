@@ -6,8 +6,9 @@ import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.Sort
-import org.cafienne.service.api.cases.table.{CaseRecord, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.TaskSearchFailure
+import org.cafienne.service.api.projection.query.TaskQueriesImpl
+import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, TaskRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.db.migration.Migrate
 import org.scalatest.BeforeAndAfterAll

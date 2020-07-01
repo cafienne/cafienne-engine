@@ -1,8 +1,9 @@
-package org.cafienne.service.api.tasks
+package org.cafienne.service.api.projection.table
 
 import java.time.Instant
 
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
+import org.cafienne.service.api.projection.record.TaskRecord
 
 trait TaskTables extends QueryDbConfig {
 

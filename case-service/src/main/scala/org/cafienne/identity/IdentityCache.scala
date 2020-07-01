@@ -2,7 +2,7 @@ package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}

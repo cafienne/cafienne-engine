@@ -1,7 +1,7 @@
 package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event.team._
-import org.cafienne.service.api.cases.table.CaseTeamMemberRecord
+import org.cafienne.service.api.projection.record.CaseTeamMemberRecord
 
 object CaseInstanceTeamMemberMerger {
 

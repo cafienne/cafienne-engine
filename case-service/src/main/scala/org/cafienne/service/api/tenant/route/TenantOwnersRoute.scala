@@ -18,9 +18,9 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command.{AddTenantOwner, UpsertTenantUser, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole}
+import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole, UpsertTenantUser}
 
 import scala.collection.JavaConverters._
 

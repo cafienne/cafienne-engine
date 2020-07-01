@@ -8,7 +8,7 @@ import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, TaggedEventConsumer}
 import org.cafienne.service.api.projection.RecordsPersistence
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.tenant.akka.event.{TenantEvent, TenantModified}
 
 import scala.concurrent.Future

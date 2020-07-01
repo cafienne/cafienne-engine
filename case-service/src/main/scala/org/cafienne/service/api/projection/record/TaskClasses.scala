@@ -1,4 +1,4 @@
-package org.cafienne.service.api.tasks
+package org.cafienne.service.api.projection.record
 
 import java.time.Instant
 

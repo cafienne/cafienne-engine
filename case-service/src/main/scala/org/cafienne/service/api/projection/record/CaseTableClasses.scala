@@ -1,4 +1,4 @@
-package org.cafienne.service.api.cases.table
+package org.cafienne.service.api.projection.record
 
 import java.time.Instant
 

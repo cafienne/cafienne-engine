@@ -12,7 +12,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model._
 import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command._
