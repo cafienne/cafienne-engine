@@ -8,7 +8,7 @@ import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
-import org.cafienne.service.api.projection.query.CaseQueriesImpl
+import org.cafienne.service.api.projection.query.{Area, CaseQueriesImpl, CaseFilter, Sort}
 import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
@@ -81,8 +81,10 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     res must be (Some(activeCase))
   }
 
+  val tenantFilter = CaseFilter(Some(tenant))
+
   it should "retrieve all cases" in {
-    val res = Await.result(caseQueries.getCases(Some(tenant), None, from = 0, numOfResults = 10, user = user, definition = None, status = None), 3.seconds)
+    val res = Await.result(caseQueries.getCases(user, tenantFilter), 3.seconds)
     res must contain (activeCase)
     res must contain (terminatedCase)
     res must contain (completedCase)
@@ -92,23 +94,23 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   }
 
   it should "retrieve cases filtered by definition" in {
-    val res = Await.result(caseQueries.getCases(Some(tenant), None, from = 0, numOfResults = 10, user = user, definition = Some("eee"), status = None), 3.seconds)
+    val res = Await.result(caseQueries.getCases(user, tenantFilter.copy(definition = Some("eee"))), 3.seconds)
     res must be (Seq(completedCase, terminatedCase))
   }
 
   it should "retrieve cases filtered by status" in {
-    val res = Await.result(caseQueries.getCases(Some(tenant), None, from = 0, numOfResults = 10, user = user, definition = None, status = Some("Active")), 3.seconds)
-    res must be (Seq((activeCase)))
+    val res = Await.result(caseQueries.getCases(user, tenantFilter.copy(status = Some("Active"))), 3.seconds)
+    res must be (Seq(activeCase))
   }
 
   it should "retrieve my terminated cases" in {
-    val res = Await.result(caseQueries.getMyCases(Some(tenant), from = 0, numOfResults = 10, user = user, definition = Some("eee"), status = Some("Terminated")), 3.seconds)
-    res must be (Seq((terminatedCase)))
+    val res = Await.result(caseQueries.getMyCases(user, tenantFilter.copy(status = Some("Terminated"))), 3.seconds)
+    res must be (Seq(terminatedCase))
   }
 
   it should "retrieve my completed cases" in {
-    val res = Await.result(caseQueries.getMyCases(Some(tenant), from = 0, numOfResults = 10, user = user, definition = Some("eee"), status = Some("Completed")), 3.seconds)
-    res must be (Seq((completedCase)))
+    val res = Await.result(caseQueries.getMyCases(user, tenantFilter.copy(status = Some("Completed"))), 3.seconds)
+    res must be (Seq(completedCase))
   }
 
   // *******************************************************************************************************************

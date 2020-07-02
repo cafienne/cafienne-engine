@@ -4,7 +4,7 @@ import java.time.Instant
 
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.projection.record._
-import slick.lifted
+import slick.lifted.ColumnOrdered
 
 trait CaseTables extends QueryDbConfig {
 
@@ -13,6 +13,21 @@ trait CaseTables extends QueryDbConfig {
   //TODO: add lowercase index on definition in Postgresql to allow case insensitive searching
 
   final class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseRecord](tag, "case_instance") {
+    override def getSortColumn(field: String): ColumnOrdered[_] = field match {
+      case "id" => id
+      case "definition" => definition
+      case "status" => state
+      case "state" => state
+      case "tenant" => tenant
+      case "failures" => failures
+      case "parentcaseid" => parentCaseId
+      case "rootcaseid" => rootCaseId
+      case "modifiedny" => modifiedBy
+      case "createdon" => createdOn
+      case "createdby" => createdBy
+      case "lastmodified" =>  lastModified
+      case _ => lastModified
+    }
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -194,7 +209,7 @@ trait CaseTables extends QueryDbConfig {
 
     def * = (caseInstanceId, tenant, name, value, active, path) <> (CaseBusinessIdentifierRecord.tupled, CaseBusinessIdentifierRecord.unapply)
 
-    val caseInstanceTable = lifted.TableQuery[CaseInstanceTable]
+    val caseInstanceTable = TableQuery[CaseInstanceTable]
 
     def pk = primaryKey("pk_case_business_identifier", (caseInstanceId, name))
 

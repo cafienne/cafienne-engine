@@ -5,7 +5,6 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.instance.casefile.{LongValue, Value, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api.Sort
 import org.cafienne.service.api.projection.record.TaskRecord
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}
 
@@ -28,20 +27,7 @@ trait TaskQueries {
 
   def authorizeTaskAccessAndReturnCaseAndTenantId(taskId: String, user: PlatformUser): Future[(String, String)] = ???
 
-  def getAllTasks(tenant: Option[String],
-                  identifiers: Option[String],
-                  caseDefinition: Option[String],
-                  taskState: Option[String],
-                  assignee: Option[String],
-                  owner: Option[String],
-                  dueOn: Option[String],
-                  dueBefore: Option[String],
-                  dueAfter: Option[String],
-                  sort: Option[Sort],
-                  from: Int = 0,
-                  numOfResults: Int = 100,
-                  user: PlatformUser,
-                  timeZone: Option[String]): Future[Seq[TaskRecord]] = ???
+  def getAllTasks(user: PlatformUser, filter: TaskFilter = TaskFilter.Empty, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[TaskRecord]] = ???
 
   def getCountForUser(user: PlatformUser, tenant: Option[String]): Future[TaskCount] = ???
 }
@@ -74,7 +60,7 @@ class TaskQueriesImpl extends TaskQueries
       baseQuery <- TableQuery[TaskTable]
         .join(TableQuery[CaseInstanceTable]).on(_.caseInstanceId === _.id)
         .filter(_._2.definition === caseType)
-        .optionFilter(tenant)(_._1.tenant === _)
+        .filterOpt(tenant)(_._1.tenant === _)
       // Access control query
       _ <- membershipQuery(user, baseQuery._1.caseInstanceId, baseQuery._1.tenant, None)
     } yield baseQuery._1
@@ -115,24 +101,11 @@ class TaskQueriesImpl extends TaskQueries
     }
   }
 
-  override def getAllTasks(tenant: Option[String],
-                           identifiers: Option[String],
-                           caseDefinition: Option[String],
-                           taskState: Option[String],
-                           assignee: Option[String],
-                           owner: Option[String],
-                           dueOn: Option[String],
-                           dueBefore: Option[String],
-                           dueAfter: Option[String],
-                           sort: Option[Sort],
-                           from: Int,
-                           numOfResults: Int,
-                           user: PlatformUser,
-                           timeZone: Option[String]): Future[Seq[TaskRecord]] = {
+  override def getAllTasks(user: PlatformUser, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
 
     // If there is no assignee given, then we need to query tasks that have a role that the user also has.
     //  Otherwise the query will not filter on roles
-    val assignmentFilterQuery = assignee match {
+    val assignmentFilterQuery = filter.assignee match {
       case Some(assignee) => TableQuery[TaskTable].filter(_.assignee === assignee)
       case None => for {
         // Select all tasks
@@ -140,7 +113,7 @@ class TaskQueriesImpl extends TaskQueries
         // In tenants where i am a user
         tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tasks.tenant)
         // Where my case team roles map to the task role
-        caseRoles <- TableQuery[CaseInstanceTeamMemberTable]
+        myCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
           // Tasks for cases in which i belong to the case team ...
           .filter(_.caseInstanceId === tasks.caseInstanceId)
           // ... in an active membership
@@ -158,41 +131,21 @@ class TaskQueriesImpl extends TaskQueries
 
     val query = for {
       baseQuery <- assignmentFilterQuery
-        .optionFilter(tenant)(_.tenant === _)
-        .optionFilter(taskState)(_.taskState === _)
-        .optionFilter(owner)(_.owner === _)
-        .optionFilter(dueOn)(_.dueDate >= getStartDate(_, timeZone))
-        .optionFilter(dueOn)(_.dueDate <= getEndDate(_, timeZone))
-        .optionFilter(dueBefore)(_.dueDate < getStartDate(_, timeZone))
-        .optionFilter(dueAfter)(_.dueDate > getEndDate(_, timeZone))
+        .filterOpt(filter.tenant)(_.tenant === _)
+        .filterOpt(filter.taskState)(_.taskState === _)
+        .filterOpt(filter.owner)(_.owner === _)
+        .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
+        .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
+        .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
+        .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
+        .only(area)
 
-        .drop(from).take(numOfResults)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, identifiers)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, filter.identifiers)
 
     } yield baseQuery
 
-    db.run(query.sortBy(getTasksSortField(_, sort.getOrElse(Sort("", None)))).distinct.result)
-  }
-
-  private def getTasksSortField(rep: TaskTable, sort: Sort) = {
-    val isAsc = sort.sortOrder exists {
-      case s if s matches "(?i)asc" => true
-      case _ => false
-    }
-    getSortBy(rep, sort.sortBy, isAsc)
-  }
-
-  private def getSortBy(rep: TaskTable, field: String, isAsc: Boolean) = field.toLowerCase match {
-    case "taskstate" => if (isAsc) rep.taskState.asc else rep.taskState.desc
-    case "assignee" => if (isAsc) rep.assignee.asc else rep.assignee.desc
-    case "owner" => if (isAsc) rep.owner.asc else rep.owner.desc
-    case "duedate" => if (isAsc) rep.dueDate.asc else rep.dueDate.desc
-    case "createdon" => if (isAsc) rep.createdOn.asc else rep.createdOn.desc
-    case "createdby" => if (isAsc) rep.createdBy.asc else rep.createdBy.desc
-    case "modifiedby" => if (isAsc) rep.modifiedBy.asc else rep.modifiedBy.desc
-    case "lastmodified" => if (isAsc) rep.lastModified.asc else rep.lastModified.desc
-    case _ => if (isAsc) rep.lastModified.asc else rep.lastModified.desc
+    db.run(query.order(sort).distinct.result)
   }
 
   private def getStartDate(date: String, timeZone: Option[String]): Option[Instant] = {
@@ -214,10 +167,11 @@ class TaskQueriesImpl extends TaskQueries
     val claimedTasksQuery = TableQuery[TaskTable].filter(_.assignee === user.userId)
       .filterNot(_.taskState === "Completed")
       .filterNot(_.taskState === "Terminated")
-      .optionFilter(tenant)(_.tenant === _)
+      .filterOpt(tenant)(_.tenant === _)
 
     val unclaimedTasksQuery = for {
-      unclaimedTasks <- TableQuery[TaskTable].filter(_.assignee === "")
+      // Select all unassigned tasks (optionally from the specified tenant)
+      unclaimedTasks <- TableQuery[TaskTable].filter(_.assignee === "").filterOpt(tenant)(_.tenant === _)
       // In tenants where i am a user
       tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === unclaimedTasks.tenant)
       // Where my case team roles map to the task role

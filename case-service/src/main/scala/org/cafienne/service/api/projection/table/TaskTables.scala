@@ -4,6 +4,7 @@ import java.time.Instant
 
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.projection.record.TaskRecord
+import slick.lifted.ColumnOrdered
 
 trait TaskTables extends QueryDbConfig {
 
@@ -11,6 +12,18 @@ trait TaskTables extends QueryDbConfig {
 
   // Schema for the "task" table:
   final class TaskTable(tag: Tag) extends CafienneTable[TaskRecord](tag, "task") {
+
+    override def getSortColumn(field: String): ColumnOrdered[_] = field match {
+      case "taskstate" => taskState
+      case "assignee" => assignee
+      case "owner" => owner
+      case "duedate" => dueDate
+      case "createdon" => createdOn
+      case "createdby" => createdBy
+      case "modifiedby" => modifiedBy
+      case "lastmodified" => lastModified
+      case _ => lastModified
+    }
 
     def id = idColumn[String]("id", O.PrimaryKey)
 

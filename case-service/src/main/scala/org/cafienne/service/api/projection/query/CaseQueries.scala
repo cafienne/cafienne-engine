@@ -27,9 +27,9 @@ trait CaseQueries {
 
   def getCasesStats(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
 
-  def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
+  def getMyCases(user: PlatformUser, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 
-  def getCases(tenant: Option[String], identifiers: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = ???
+  def getCases(user: PlatformUser, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 }
 
 class CaseQueriesImpl
@@ -245,37 +245,39 @@ class CaseQueriesImpl
     newCaseList
   }
 
-  override def getMyCases(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
+  override def getMyCases(user: PlatformUser, filter: CaseFilter, area: Area, sort: Sort): Future[Seq[CaseRecord]] = {
     // Note: you can only get cases if you are in the team ... This query and route makes no sense any more
-    getCases(tenant, None, from, numOfResults, user, definition, status)
+    getCases(user, filter, area, sort)
   }
 
-  override def getCases(tenant: Option[String], identifiers: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseRecord]] = {
+  override def getCases(user: PlatformUser, filter: CaseFilter, area: Area, sort: Sort): Future[Seq[CaseRecord]] = {
+    val query: Query[CaseInstanceTable, CaseRecord, Seq] = for {
+      baseQuery <- statusFilter(filter.status)
+              .filterOpt(filter.tenant)((t, value) => t.tenant === value)
+              .filterOpt(filter.definition)((t, value) => t.definition.toLowerCase like s"%${value.toLowerCase}%")
+              .order(sort)
+              .only(area)
+
+      // Validate team membership
+      _ <- membershipQuery(user, baseQuery.id, baseQuery.tenant, filter.identifiers)
+    } yield baseQuery
+    db.run(query.distinct.result).map(records => {
+      //      println("Found " + records.length +" matching cases on filter " + identifiers)
+      records
+    })
+  }
+
+  def statusFilter(status: Option[String]) = {
     // Depending on the value of the "status" filter, we have 3 different filters.
     // Reason is that admin-ui uses status=Failed for both Failed and "cases with Failures"
     //  Better approach is to simply add a failure count to the case instance and align the UI for that.
 
-    val stateFilterQuery = status match {
+    status match {
       case None => caseInstanceQuery
       case Some(state) => state match {
         case "Failed" => caseInstanceQuery.filter(_.failures > 0)
         case other => caseInstanceQuery.filter(_.state === other)
       }
     }
-
-    val query:Query[CaseInstanceTable, CaseRecord, Seq] = for {
-      baseQuery <- stateFilterQuery
-        .optionFilter(tenant)((t, value) => t.tenant === value)
-        .optionFilter(definition)((t, value) => t.definition.toLowerCase like s"%${value.toLowerCase}%")
-        .sortBy(_.lastModified)
-        .drop(from).take(numOfResults)
-
-      // Validate team membership
-      _ <- membershipQuery(user, baseQuery.id, baseQuery.tenant, identifiers)
-    } yield baseQuery
-    db.run(query.distinct.result).map(records => {
-//      println("Found " + records.length +" matching cases on filter " + identifiers)
-      records
-    })
   }
 }

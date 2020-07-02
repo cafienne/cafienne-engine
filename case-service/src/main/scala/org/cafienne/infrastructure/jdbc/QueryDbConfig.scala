@@ -1,10 +1,11 @@
 package org.cafienne.infrastructure.jdbc
 
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.service.api.projection.query.{Area, Sort}
 import slick.ast.ColumnOption
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
-import slick.lifted.{AbstractTable, CanBeQueryCondition, Index}
+import slick.lifted.{ColumnOrdered, Index}
 import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
@@ -17,6 +18,13 @@ trait QueryDbConfig {
   lazy val isSQLServer = dbConfig.profile.isInstanceOf[slick.jdbc.SQLServerProfile]
 
   abstract class CafienneTable[T](tag: Tag, tableName: String) extends Table[T](tag, tableName) {
+
+    /**
+      * If queries on the table use the Sort case class, then the table must implement this method
+      * @param field
+      * @return
+      */
+    def getSortColumn(field: String): ColumnOrdered[_] = ???
 
     /**
       * Creates a String column with the specified name and options.
@@ -141,8 +149,28 @@ trait QueryDbConfig {
     }
   }
 
-  implicit class QueryHelper[T, E](query: Query[T, E, Seq]) {
-    def optionFilter[X, R: CanBeQueryCondition](name: Option[X])(f: (T, X) => R) =
-      name.map(v => query.withFilter(f(_, v))).getOrElse(query)
+  implicit class QueryHelper[T <: CafienneTable[_], E](query: Query[T, E, Seq]) {
+    /**
+      * Orders the results as given in the Sort object.
+      * Note that if the Sort.on field is empty (None), the query will not be affected.
+      * Default sort order is descending
+      * @param sort
+      * @return
+      */
+    def order(sort: Sort): Query[T, E, Seq] = {
+      sort.on.fold(query)(fieldName => sort.ascending match {
+        case true => query.sortBy(_.getSortColumn(fieldName.toLowerCase).asc)
+        case _ => query.sortBy(_.getSortColumn(fieldName.toLowerCase).desc)
+      })
+    }
+
+    /**
+      * Only select records from a certain offset and up to a certain number of results
+      * @param area
+      * @return
+      */
+    def only(area: Area) = {
+      query.drop(area.offset).take(area.numOfResults)
+    }
   }
 }

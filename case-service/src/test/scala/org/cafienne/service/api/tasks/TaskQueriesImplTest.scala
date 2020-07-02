@@ -5,9 +5,8 @@ import java.time.Instant
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
-import org.cafienne.service.api.Sort
 import org.cafienne.service.api.projection.TaskSearchFailure
-import org.cafienne.service.api.projection.query.TaskQueriesImpl
+import org.cafienne.service.api.projection.query.{Area, Sort, TaskFilter, TaskQueriesImpl}
 import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, TaskRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.db.migration.Migrate
@@ -35,8 +34,8 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Migrate.migrateDatabase()
 
     def freshData = Seq(
-      TaskRecord( "1", case33, tenant = tenant, role = "A", owner = "Piet", taskState = "Unassigned", createdOn = Instant.now, lastModified = Instant.now),
-      TaskRecord( "2", case33, tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now),
+      TaskRecord( "1", case33, tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now),
+      TaskRecord( "2", case33, tenant = tenant, role = "A", owner = "Piet", taskState = "Unassigned", createdOn = Instant.now, lastModified = Instant.now),
       TaskRecord( "3", case44, tenant = tenant, role = "B", owner = "Aart", createdOn = Instant.now, lastModified = Instant.now),
     ) ++ TestIdentityFactory.asDatabaseRecords(Seq(testUser, userWithAandB, userWithBandC))
 
@@ -99,7 +98,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "filter all tasks" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, None, 0, 100, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithAandB), 1.second)
     res.size must be (3)
   }
 
@@ -109,42 +108,43 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "not find tasks when not in case team" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, None, 0, 100, userWithBandC, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithBandC), 1.second)
     res.size must be (0)
   }
 
   it should "filter all tasks with pagination" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, None, 0, 2, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithAandB, area = Area(0, 2)), 1.second)
     res.size must be (2)
   }
 
   it should "filter all tasks with pagination, second page" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, None, 1, 100, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithAandB, area = Area(1, 100)), 1.second)
     res.size must be (2)
   }
 
   it should "insertion order correctly when not sorting" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, Some(Sort("owner", None)), 0, 100, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithAandB, sort = Sort(None)), 1.second)
     res.size must be (3)
+    res.map(record => record.owner) must be (Seq("Jan", "Piet", "Aart"))
     res.head.id must be ("1")
     res.last.id must be ("3")
   }
 
   it should "order correctly by non default column in desc direction" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, Some(Sort("owner", Some("desc"))), 0, 100, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithAandB, sort = Sort.on("owner")), 1.second)
     res.size must be (3)
     res.map(record => record.owner) must be (Seq("Piet", "Jan", "Aart"))
-    res.head.id must be ("1")
+    res.head.id must be ("2")
     res.last.id must be ("3")
 
   }
 
   it should "order correctly by non default column in asc direction" in {
-    val res = Await.result(taskQueries.getAllTasks(None, None, None, None, None, None, None, None, None, Some(Sort("owner", Some("ASC"))), 0, 100, userWithAandB, None), 1.second)
+    val res = Await.result(taskQueries.getAllTasks(userWithAandB, sort = Sort.asc("owner")), 1.second)
     res.size must be (3)
     res.map(record => record.owner) must be (Seq("Aart", "Jan", "Piet"))
     res.head.id must be ("3")
-    res.last.id must be ("1")
+    res.last.id must be ("2")
   }
 
   it should "get task count" in {

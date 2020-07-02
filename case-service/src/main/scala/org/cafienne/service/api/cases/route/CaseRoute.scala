@@ -25,17 +25,13 @@ import org.cafienne.cmmn.akka
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
-import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCase
-import org.cafienne.service.api.projection.query.CaseQueries
-import org.cafienne.service.api.projection.record.CaseRecord
-
-import scala.util.{Failure, Success}
+import org.cafienne.service.api.projection.query.{Area, CaseFilter, CaseQueries, Sort}
 
 @Api(tags = Array("case"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -77,7 +73,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       validUser { platformUser =>
         parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (optionalTenant, identifiers, offset, numResults, definition, state, sortBy, sortOrder) =>
-            runListQuery(caseQueries.getCases(optionalTenant, identifiers, offset, numResults, platformUser, definition, status = state))
+            val filter = CaseFilter(optionalTenant, identifiers = identifiers, definition = definition, status = state)
+            runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort(sortBy, sortOrder)))
         }
       }
     }
@@ -109,7 +106,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       validUser { platformUser =>
         parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (tenant, offset, numResults, definition, state, sortBy, sortOrder) =>
-            runListQuery(caseQueries.getMyCases(tenant, offset, numResults, platformUser, definition, status = state))
+            val filter = CaseFilter(tenant = tenant, definition = definition, status = state)
+            runListQuery(caseQueries.getMyCases(platformUser, filter, Area(offset, numResults), Sort(sortBy, sortOrder)))
         }
       }
     }

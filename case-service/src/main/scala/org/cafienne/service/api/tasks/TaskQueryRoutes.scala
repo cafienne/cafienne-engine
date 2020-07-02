@@ -17,8 +17,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api
-import org.cafienne.service.api.Sort
-import org.cafienne.service.api.projection.query.{TaskCount, TaskQueries}
+import org.cafienne.service.api.projection.query.{Area, Sort, TaskCount, TaskFilter, TaskQueries}
 
 @Api(tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -65,7 +64,10 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
         parameters('tenant ?, 'identifiers ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
           (tenant, identifiers, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
             optionalHeaderValueByName("timeZone") { timeZone =>
-              runListQuery(taskQueries.getAllTasks(tenant, identifiers, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy.map(Sort(_, sortOrder)), offset, numberOfResults, platformUser, timeZone))
+              val area = Area(offset, numberOfResults)
+              val sort = Sort(sortBy, sortOrder)
+              val taskFilter = TaskFilter(tenant = tenant, identifiers = identifiers, caseDefinition = caseDefinition, taskState = taskState, assignee = assignee, owner = owner, dueOn = dueOn, dueBefore = dueBefore, dueAfter = dueAfter, timeZone = timeZone)
+              runListQuery(taskQueries.getAllTasks(platformUser, taskFilter, area, sort))
             }
         }
       }
