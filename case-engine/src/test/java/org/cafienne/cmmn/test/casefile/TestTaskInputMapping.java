@@ -10,7 +10,6 @@ import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueList;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
 import org.cafienne.humantask.akka.command.CompleteHumanTask;
 import org.cafienne.util.Guid;
@@ -60,7 +59,7 @@ public class TestTaskInputMapping {
                     secondResult.print();
 
                     // Now trigger the event and check the input of the new TaskWithChild
-                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "Trigger.TaskWithChild"), planAfterEvent -> {
+                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, "Trigger.TaskWithChild", Transition.Occur), planAfterEvent -> {
                         planAfterEvent.print();
                         testCase.getEventListener().awaitTaskInputFilled("TaskWithChild", taskEvent -> {
                             ValueMap expectedInput = new ValueMap("Input", child2.cloneValueNode());
@@ -73,7 +72,7 @@ public class TestTaskInputMapping {
                     });
 
                     // Now trigger the other event and check the input of the new TaskWithChild
-                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "Trigger.TaskWithContainer"), planAfterEvent -> {
+                    testCase.insertStep(new MakePlanItemTransition(testUser, caseInstanceId, "Trigger.TaskWithContainer", Transition.Occur), planAfterEvent -> {
                         planAfterEvent.print();
                         testCase.getEventListener().awaitTaskInputFilled("TaskWithContainer", taskEvent -> {
                             ValueMap expectedInput = new ValueMap("Input", new ValueList(child1.cloneValueNode(), child2.cloneValueNode()));

@@ -14,7 +14,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.junit.Test;
 
@@ -30,7 +29,7 @@ public class SentryRef {
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
         testCase.addStep(startCase, action -> action.print());
 
-        MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Task_1");
+        MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, "Task_1", Transition.Complete);
         testCase.addStep(completeTask1, casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);

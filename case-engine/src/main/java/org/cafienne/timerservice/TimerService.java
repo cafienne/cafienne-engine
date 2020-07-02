@@ -177,7 +177,7 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
 
         ScheduledTimer(TimerJob request) {
             this.request = request;
-            MakePlanItemTransition command = new MakePlanItemTransition(request.user, request.caseInstanceId, request.timerId, Transition.Occur, "");
+            MakePlanItemTransition command = new MakePlanItemTransition(request.user, request.caseInstanceId, request.timerId, Transition.Occur);
 
             // Note: this code needs some refactoring
             // - We should not use the system scheduler (dispatcher), but create our own (?)

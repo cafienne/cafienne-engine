@@ -49,9 +49,8 @@ public class CasePlan extends Stage<CasePlanDefinition> {
 
     private void informParent(Transition transition) {
         String parentCaseTaskId = getCaseInstance().getId(); // Our Id within our parent
-        String parentCaseTaskName = ""; // We do not know the name of our planitem in the parent, but it is also not required.
         Case qase = getCaseInstance();
-        CaseCommand command = new MakePlanItemTransition(qase.getCurrentUser(), qase.getParentCaseId(), parentCaseTaskId, transition, parentCaseTaskName);
+        CaseCommand command = new MakePlanItemTransition(qase.getCurrentUser(), qase.getParentCaseId(), parentCaseTaskId, transition);
         informParent(command);
     }
 

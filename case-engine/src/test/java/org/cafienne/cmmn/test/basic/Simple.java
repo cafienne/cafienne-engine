@@ -14,7 +14,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -41,7 +40,7 @@ public class Simple {
         });
 
         // Completing Item1 should make it go to state Completed, others remain in same state
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Start, State.Active, State.Available);
@@ -52,7 +51,7 @@ public class Simple {
         });
         
         // Completing Item1 again should not change state.
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Start, State.Active, State.Available);
@@ -86,7 +85,7 @@ public class Simple {
         });        
 
         // Completing Item1.1 should make it go to state Completed, others remain in same state, causing completion check of surrounding stage
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Complete, State.Completed, State.Active);
             StageAssertion stage1 = casePlan.assertStage("Stage1");
             stage1.assertLastTransition(Transition.Complete, State.Completed, State.Active);

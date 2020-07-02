@@ -13,7 +13,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.junit.Test;
@@ -43,14 +42,14 @@ public class CasePlanExitCriteria {
             reviewTask2.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Review"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Review", Transition.Complete), casePlan -> {
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");
             reviewTask.assertState(State.Completed);
             PlanItemAssertion reviewTask2 = casePlan.assertTask("Review2");
             reviewTask2.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Review2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Review2", Transition.Complete), casePlan -> {
             casePlan.assertState(State.Completed);
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");
             reviewTask.assertState(State.Completed);
@@ -75,7 +74,7 @@ public class CasePlanExitCriteria {
             reviewTask2.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Review2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Review2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertState(State.Terminated);
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");

@@ -21,8 +21,6 @@ import org.cafienne.cmmn.instance.casefile.StringValue;
 import org.cafienne.cmmn.instance.casefile.ValueList;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
-import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.util.Guid;
@@ -84,7 +82,7 @@ public class CaseFileTransitionTest {
         });
 
         // Completing the task ReviewRequest
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
@@ -94,7 +92,7 @@ public class CaseFileTransitionTest {
         });
 
         // Completing the task ReviewRequest
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
@@ -134,7 +132,7 @@ public class CaseFileTransitionTest {
         });
 
         // Completing the task ReviewRequest; now the task should no longer be repeating
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, REVIEW_REQUEST), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, REVIEW_REQUEST, Transition.Complete), casePlan -> {
             casePlan.print();
 
             // All tasks should be completed, and no more repetition.
@@ -142,7 +140,7 @@ public class CaseFileTransitionTest {
         });
 
         // Complete the case, by completing JustAnotherTask
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "JustAnotherTask"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "JustAnotherTask", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Complete, State.Completed, State.Active);
 
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed);

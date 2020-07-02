@@ -39,8 +39,8 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Path("/{caseInstanceId}/planitems")
   @GET
   @Operation(
-    summary = "Get the planitems for a case",
-    description = "Get the planitems for the specified case instance",
+    summary = "Get the plan items of a case",
+    description = "Get the plan items of the specified case instance",
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -65,8 +65,8 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Path("/{caseInstanceId}/planitems/{planItemId}")
   @GET
   @Operation(
-    summary = "Get a planitem for a case by planItemId",
-    description = "Get a planitem for the specified case instance by it's planItemId",
+    summary = "Get a plan item of a case",
+    description = "Get a plan item of the specified case instance",
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -87,15 +87,15 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     }
   }
 
-  @Path("/{caseInstanceId}/planitems/{planItemId}/{transition}")
+  @Path("/{caseInstanceId}/planitems/{identifier}/{transition}")
   @POST
   @Operation(
     summary = "Apply a transition on a planItem",
-    description = "Applies a transition to the planItem for the given caseInstanceId",
+    description = "Applies a transition to all planItems in the case that have the identifier. If it is the planItemId there will be only one instance. If planItemName is given, more instances may be found",
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "planItemId", description = "Unique id of the planItem", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "identifier", description = "Identifier for the planItem; either a plan item id or a plan item name", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "transition", description = "Transition to apply", in = ParameterIn.PATH,
         schema = new Schema(implementation = classOf[String], allowableValues = Array("complete", "close", "create", "enable", "disable", "exit", "fault", "manualStart", "occur", "parentResume", "parentSuspend", "reactivate", "reenable", "resume", "start", "suspend", "terminate")),
         required = true),
@@ -110,7 +110,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "planitems" / Segment / Segment) { (caseInstanceId, planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)
-        askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition, ""))
+        askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
       }
     }
   }
@@ -118,12 +118,12 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Path("/{caseInstanceId}/planitems/{planItemId}/history")
   @GET
   @Operation(
-    summary = "Get history of a planitem for a case by planItemId",
-    description = "Get history of a planitem for the specified case instance by it's planItemId",
+    summary = "Get history of a plan item in a case by planItemId",
+    description = "Get history of a plan item in the specified case instance",
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "planItemId", description = "Unique id of the planItem", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "planItemId", description = "Unique id of the planItem (cannot be the plan item name, must be the id)", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
       new ApiResponse(description = "PlanItem found", responseCode = "200"),

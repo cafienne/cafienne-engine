@@ -15,7 +15,6 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class Stages {
             item4.assertHumanTask("Task1.1").assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Task1.1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Task1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             StageAssertion item4 = casePlan.assertStage("Item4");

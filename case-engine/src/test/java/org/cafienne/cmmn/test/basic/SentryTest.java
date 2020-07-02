@@ -14,7 +14,6 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.junit.Test;
@@ -39,7 +38,7 @@ public class SentryTest {
             });
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Active);
@@ -60,7 +59,7 @@ public class SentryTest {
             casePlan.assertPlanItem("Item1.1").assertState(State.Active).assertLastTransition(Transition.ParentResume);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Completed);
@@ -98,7 +97,7 @@ public class SentryTest {
         });
 
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Active);
@@ -106,7 +105,7 @@ public class SentryTest {
             casePlan.assertPlanItem("Disc1").assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Completed);
@@ -115,7 +114,7 @@ public class SentryTest {
             casePlan.assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Disc1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Disc1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Stage1").assertState(State.Completed);

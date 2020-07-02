@@ -17,7 +17,6 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.junit.Rule;
@@ -83,7 +82,7 @@ public class TestGetListGetDetails {
         });
 
         // Reactivate the GetCasesList task; but since the backend is not yet up, it should again lead to failure of GetList
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Reactivate, "GetList"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "GetList", Transition.Reactivate), casePlan -> {
             casePlan.print();
 
             // Wait for the second failure event
@@ -98,7 +97,7 @@ public class TestGetListGetDetails {
 
         // Now reactive GetList, since stubs have started.
         // This should also lead to 3 times GetDetails task being activated and completed.
-        MakePlanItemTransition reactivateCase = new MakePlanItemTransition(user, caseInstanceId, null, Transition.Reactivate, "GetList");
+        MakePlanItemTransition reactivateCase = new MakePlanItemTransition(user, caseInstanceId, "GetList", Transition.Reactivate);
         testCase.addStep(reactivateCase, casePlan -> {
             casePlan.print();
 

@@ -15,7 +15,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class EventListener {
         });
 
         // Having the user event occur should activate T1
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "UserEvent"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "UserEvent", Transition.Occur), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
@@ -65,7 +64,7 @@ public class EventListener {
         });
 
         // Completing Task1 should just complete it
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "T1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
@@ -82,7 +81,7 @@ public class EventListener {
         });   
         
         // Completing Task1 again should not change anything
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "T1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             TaskAssertion item1 = casePlan.assertTask("T1");
