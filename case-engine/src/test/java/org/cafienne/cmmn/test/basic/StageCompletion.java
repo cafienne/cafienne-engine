@@ -13,7 +13,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ public class StageCompletion {
         });
 
         // Trying to complete the stage should not change anything
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "TriggerStage1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerStage1", Transition.Occur), casePlan -> {
             casePlan.assertStage("Stage1").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertStage("Stage1").assertPlanItem("Task1").assertState(State.Active);
             casePlan.assertStage("Stage1").assertPlanItem("Task2").assertState(State.Available);
@@ -44,21 +43,21 @@ public class StageCompletion {
         });
 
         // Trying to complete the stage should not change anything
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Stage1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Stage1", Transition.Complete), casePlan -> {
             casePlan.assertStage("Stage1").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertStage("Stage1").assertPlanItem("Task1").assertState(State.Active);
             casePlan.assertStage("Stage1").assertPlanItem("Task2").assertState(State.Available);
         });
 
         // Let's complete Task1
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Task1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task1", Transition.Complete), casePlan -> {
             casePlan.assertStage("Stage1").assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertStage("Stage1").assertPlanItem("Task1").assertState(State.Completed);
             casePlan.assertStage("Stage1").assertPlanItem("Task2").assertState(State.Available);
         });
 
         // Trying to complete the stage should now terminate the children
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Stage1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Stage1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertStage("Stage1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
             casePlan.assertStage("Stage1").assertPlanItem("Task1").assertState(State.Completed);
@@ -83,7 +82,7 @@ public class StageCompletion {
         });
 
         // Trying to complete the stage should not change anything
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "TriggerStage2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerStage2", Transition.Occur), casePlan -> {
             casePlan.assertStage(mainStageName).assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertStage(mainStageName).assertPlanItem("Task3").assertState(State.Active);
             // Other stages should remain available
@@ -92,13 +91,13 @@ public class StageCompletion {
         });
 
         // Completing Task3 should not complete the stage
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Task3"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task3", Transition.Complete), casePlan -> {
             casePlan.assertStage(mainStageName).assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertStage(mainStageName).assertPlanItem("Task3").assertState(State.Completed);
         });
 
         // Let's try to manually complete the stage, it should allow for it
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, mainStageName), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, mainStageName, Transition.Complete), casePlan -> {
             casePlan.assertStage(mainStageName).assertLastTransition(Transition.Complete, State.Completed, State.Active);
         });
 
@@ -120,7 +119,7 @@ public class StageCompletion {
         });
 
         // Trying to complete the stage should not change anything
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Occur, "TriggerStage3"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerStage3", Transition.Occur), casePlan -> {
             casePlan.assertStage(mainStageName).assertLastTransition(Transition.Start, State.Active, State.Available);
             casePlan.assertStage(mainStageName).assertPlanItem("Task5").assertState(State.Active);
             // Other stages should remain available
@@ -129,7 +128,7 @@ public class StageCompletion {
         });
 
         // Completing Task5 should ALSO complete the stage
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "Task5"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task5", Transition.Complete), casePlan -> {
             casePlan.assertStage(mainStageName).assertLastTransition(Transition.Complete, State.Completed, State.Active);
             casePlan.assertStage(mainStageName).assertPlanItem("Task5").assertState(State.Completed);
             // As a matter of fact, even the case itself must be in completed stage, since the case plan has autoComplete==true

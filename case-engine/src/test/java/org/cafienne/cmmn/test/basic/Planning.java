@@ -12,7 +12,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
@@ -44,7 +43,7 @@ public class Planning {
             });
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "T1", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);
@@ -91,7 +90,7 @@ public class Planning {
             });
         });
 
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "T2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
@@ -107,7 +106,7 @@ public class Planning {
             });
         });
         
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, null, Transition.Complete, "T3"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "T3", Transition.Complete), casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
             casePlan.assertTask("T1").assertLastTransition(Transition.Complete, State.Completed, State.Active);

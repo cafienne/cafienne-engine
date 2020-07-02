@@ -14,7 +14,6 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -49,7 +48,7 @@ public class RequiredRule {
         });
 
         // Now complete Item2 multiple times. It is not supposed to repeat more than 10 times, it says in the definition
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Suspend, "Item1.2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1.2", Transition.Suspend), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -57,7 +56,7 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Resume, "Item1.2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1.2", Transition.Resume), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -66,7 +65,7 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1.2"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1.2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);
@@ -76,7 +75,7 @@ public class RequiredRule {
             casePlan.assertPlanItem("Item1.3").assertState(State.Available);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItem("Item1.1").assertState(State.Completed);

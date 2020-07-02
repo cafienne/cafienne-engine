@@ -27,8 +27,7 @@ import java.util.List;
  */
 @Manifest
 public class MakePlanItemTransition extends CaseCommand {
-    private final String planItemName;
-    private final String planItemId;
+    private final String identifier;
     private final Transition transition;
 
     /**
@@ -36,34 +35,25 @@ public class MakePlanItemTransition extends CaseCommand {
      * all plan items within the case having the specified name.
      *
      * @param caseInstanceId The id of the case in which to perform this command.
-     * @param planItemId     The id of the plan item. In general it is preferred to select a plan item by id, rather than by name. If the plan item id is null or
-     *                       left empty, then the value of the name parameter will be considered.
-     * @param transition     The transition to make on the plan item(s)
-     * @param name           When only the name is specified, then the transition will be made on _all_ plan items within the case having this name, in reverse
+     * @param identifier     Either planItemId or planItemName. When only the name is specified, then the transition will be made on _all_ plan items within the case having this name, in reverse
      *                       order. If the transition of such a plan item results in a new plan item in the case with the same name, then the command will _not_ be
      *                       invoked on the new plan item.
-     *                       If the name is not given (null or "") the planItemId will be used for further processing.
+     * @param transition     The transition to make on the plan item(s)
      */
-    public MakePlanItemTransition(TenantUser user, String caseInstanceId, String planItemId, Transition transition, String name) {
+    public MakePlanItemTransition(TenantUser user, String caseInstanceId, String identifier, Transition transition) {
         super(user, caseInstanceId);
-        if (name == null || name.trim().isEmpty()) { this.planItemName = planItemId; } else { this.planItemName = name; }
-        this.planItemId = planItemId;
+        this.identifier = identifier;
         this.transition = transition;
     }
 
     public MakePlanItemTransition(ValueMap json) {
         super(json);
-        this.planItemName = readField(json, Fields.planItemName);
-        this.planItemId = readField(json, Fields.planItemId);
+        this.identifier = readField(json, Fields.identifier);
         this.transition = readEnum(json, Fields.transition, Transition.class);
     }
 
-    public String getPlanItemName() {
-        return planItemName;
-    }
-
-    public String getPlanItemId() {
-        return planItemId;
+    public String getIdentifier() {
+        return identifier;
     }
 
     public Transition getTransition() {
@@ -72,17 +62,13 @@ public class MakePlanItemTransition extends CaseCommand {
 
     @Override
     public String toString() {
-        if (planItemId == null) {
-            return "Transition " + planItemName + "." + transition;
-        } else {
-            return "Transition " + planItemId + "." + transition;
-        }
+        return "Transition " + identifier + "." + transition;
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        if (planItemId != null && !planItemId.trim().isEmpty()) {
-            PlanItem planItem = caseInstance.getPlanItemById(planItemId);
+        if (identifier != null && !identifier.trim().isEmpty()) {
+            PlanItem planItem = caseInstance.getPlanItemById(identifier);
             if (planItem != null) {
                 // When Plan item exists by id
                 caseInstance.makePlanItemTransition(planItem, transition);
@@ -92,11 +78,9 @@ public class MakePlanItemTransition extends CaseCommand {
         //when the Plan Item is not found by id, check if it is found by name.
         //if the name was not set, it will use the planItemId as name.
         List<PlanItem> planItemsByName = new ArrayList<PlanItem>();
-        caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(planItemName)).forEach(p -> {
-            planItemsByName.add(p);
-        });
+        caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(identifier)).forEach(p -> planItemsByName.add(p));
         if (planItemsByName.isEmpty()) {
-            throw new CommandException("The plan item with id " + planItemId + " or name " + planItemName + " could not be found in case " + caseInstance.getId());
+            throw new CommandException("There is no plan item with identifier " + identifier + " in case " + caseInstance.getId());
         }
         for (int i = planItemsByName.size() - 1; i >= 0; i--) {
             caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
@@ -107,8 +91,7 @@ public class MakePlanItemTransition extends CaseCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.planItemName, planItemName);
-        writeField(generator, Fields.planItemId, planItemId);
+        writeField(generator, Fields.identifier, identifier);
         writeField(generator, Fields.transition, transition);
     }
 }

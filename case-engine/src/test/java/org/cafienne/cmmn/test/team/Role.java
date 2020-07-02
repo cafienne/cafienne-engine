@@ -13,7 +13,6 @@ import org.cafienne.cmmn.akka.command.MakeCaseTransition;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.team.*;
-import org.cafienne.cmmn.akka.event.team.TeamMemberRemoved;
 import org.cafienne.cmmn.akka.event.team.TeamRoleCleared;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
@@ -37,21 +36,21 @@ public class Role {
         testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, caseTeam), casePlan -> casePlan.print());
 
         // With Role admin
-        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Occur, "UserEvent1"), casePlan -> casePlan.print());
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "UserEvent1", Transition.Occur), casePlan -> casePlan.print());
 
         // With Role admin
-        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Complete, "Item1"), casePlan -> casePlan.print());
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "Item1", Transition.Complete), casePlan -> casePlan.print());
 
         // With anonymous
         testCase.addStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Suspend), casePlan -> casePlan.print());
 
         testCase.addStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Reactivate), casePlan -> casePlan.print());
 
-        testCase.assertStepFails(new MakePlanItemTransition(employee, caseInstanceId, null, Transition.Complete, "Item1.1"),
+        testCase.assertStepFails(new MakePlanItemTransition(employee, caseInstanceId, "Item1.1", Transition.Complete),
                 failure -> failure.assertException(TransitionDeniedException.class, "You do not have the permission to perform the task"));
 
         // With admin user
-        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, null, Transition.Complete, "Item1.1"), casePlan -> casePlan.print());
+        testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "Item1.1", Transition.Complete), casePlan -> casePlan.print());
 
         testCase.addStep(new MakeCaseTransition(admin, caseInstanceId, Transition.Complete), casePlan -> casePlan.print());
 
