@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,11 +41,12 @@ public class MakePlanItemTransition extends CaseCommand {
      * @param transition     The transition to make on the plan item(s)
      * @param name           When only the name is specified, then the transition will be made on _all_ plan items within the case having this name, in reverse
      *                       order. If the transition of such a plan item results in a new plan item in the case with the same name, then the command will _not_ be
-     *                       invoked on the new plan item
+     *                       invoked on the new plan item.
+     *                       If the name is not given (null or "") the planItemId will be used for further processing.
      */
     public MakePlanItemTransition(TenantUser user, String caseInstanceId, String planItemId, Transition transition, String name) {
         super(user, caseInstanceId);
-        this.planItemName = name;
+        if (name == null || name.trim().isEmpty()) { this.planItemName = planItemId; } else { this.planItemName = name; }
         this.planItemId = planItemId;
         this.transition = transition;
     }
@@ -82,21 +83,23 @@ public class MakePlanItemTransition extends CaseCommand {
     public CaseResponse process(Case caseInstance) {
         if (planItemId != null && !planItemId.trim().isEmpty()) {
             PlanItem planItem = caseInstance.getPlanItemById(planItemId);
-            if (planItem == null) {
-                // Plan item must exist by id
-                throw new CommandException("The plan item with id " + planItemId + " could not be found in case " + caseInstance.getId());
+            if (planItem != null) {
+                // When Plan item exists by id
+                caseInstance.makePlanItemTransition(planItem, transition);
+                return new CaseResponse(this);
             }
-            caseInstance.makePlanItemTransition(planItem, transition);
-        } else {
-            List<PlanItem> planItemsByName = new ArrayList();
-            caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(planItemName)).forEach(p -> {
-                // System.out.println("Preparing plan item " + p + " with state " + p.getState() + " for transition " + transition);
-                planItemsByName.add(p);
-            });
-            for (int i = planItemsByName.size() - 1; i >= 0; i--) {
-                // System.out.println("Now making the transition on plan item " + i + " with current state " + planItemsByName.get(i).getState());
-                caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
-            }
+        }
+        //when the Plan Item is not found by id, check if it is found by name.
+        //if the name was not set, it will use the planItemId as name.
+        List<PlanItem> planItemsByName = new ArrayList<PlanItem>();
+        caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(planItemName)).forEach(p -> {
+            planItemsByName.add(p);
+        });
+        if (planItemsByName.isEmpty()) {
+            throw new CommandException("The plan item with id " + planItemId + " or name " + planItemName + " could not be found in case " + caseInstance.getId());
+        }
+        for (int i = planItemsByName.size() - 1; i >= 0; i--) {
+            caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
         }
         return new CaseResponse(this);
     }
