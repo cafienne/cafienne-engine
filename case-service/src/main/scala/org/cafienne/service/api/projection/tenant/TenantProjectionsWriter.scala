@@ -9,6 +9,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, TaggedEventConsumer}
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.projection.query.UserQueries
+import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.tenant.akka.event.{TenantEvent, TenantModified}
 
 import scala.concurrent.Future
@@ -32,13 +33,13 @@ class TenantProjectionsWriter
         val transaction = getTransaction(tenant)
         transaction.handleEvent(evt).flatMap(_ => {
           evt match {
-            case _: TenantModified => {
+            case tm: TenantModified => {
               // Remove transaction with tenant records and commit it
               //  Also update the TenantReader if we add one.
               transactionCache.remove(tenant)
               transaction.commit(offsetStorage.name, newOffset).flatMap(_ => {
                 userCache.clear(transaction.modifiedUsers)
-                // TenantReader.inform(tm)
+                TenantReader.inform(tm)
                 Future.successful(Done)
               })
             }

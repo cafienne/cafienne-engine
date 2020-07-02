@@ -23,7 +23,7 @@ trait CaseServiceRoute extends LazyLogging {
   import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
   val corsSettings = CorsSettings.defaultSettings
-    .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", api.CASE_LAST_MODIFIED, "accept", "origin"))
+    .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", api.CASE_LAST_MODIFIED, api.TENANT_LAST_MODIFIED, "accept", "origin"))
     .withAllowedMethods(Seq(GET, POST, HEAD, OPTIONS, PUT, DELETE))
     .withMaxAge(Some(200L)
     )

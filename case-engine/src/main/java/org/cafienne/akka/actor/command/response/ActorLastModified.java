@@ -5,28 +5,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command.response;
+package org.cafienne.akka.actor.command.response;
+
+import org.cafienne.cmmn.akka.command.response.InvalidCaseLastModifiedException;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 
-public class CaseLastModified {
+public class ActorLastModified {
 
     //Variable to store the command completed moment
     private final Instant lastModified;
     //Variable to store the case instance identifier
-    private final String caseInstanceId;
+    private final String actorId;
 
-    public CaseLastModified(String caseInstanceId, Instant lastModified) {
+    public ActorLastModified(String actorId, Instant lastModified) {
         this.lastModified = lastModified;
-        this.caseInstanceId = caseInstanceId;
+        this.actorId = actorId;
     }
 
-    public CaseLastModified(String lastModifiedContent) throws InvalidCaseLastModifiedException {
+    public ActorLastModified(String lastModifiedContent) throws InvalidCaseLastModifiedException {
         try {
             String[] lastModifiedHeaderParts = lastModifiedContent.split(";");
             this.lastModified = java.time.Instant.parse(lastModifiedHeaderParts[0]);
-            this.caseInstanceId = lastModifiedHeaderParts[1];
+            this.actorId = lastModifiedHeaderParts[1];
         } catch (ArrayIndexOutOfBoundsException | DateTimeParseException | NullPointerException ex) {
             if (ex instanceof DateTimeParseException) {
                 throw new InvalidCaseLastModifiedException("Invalid time stamp '" + ((DateTimeParseException) ex).getParsedString() + "' received in CaseLastModified header");
@@ -36,10 +38,9 @@ public class CaseLastModified {
         }
     }
 
-
     @Override
     public String toString() {
-        return lastModified.toString() + ";" + caseInstanceId;
+        return lastModified.toString() + ";" + actorId;
     }
 
     /**
@@ -57,7 +58,7 @@ public class CaseLastModified {
      * @return String
      */
     public String getCaseInstanceId() {
-        return caseInstanceId;
+        return actorId;
     }
 
 }

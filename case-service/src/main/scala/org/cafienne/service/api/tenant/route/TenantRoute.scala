@@ -11,17 +11,17 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.complete
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
+import org.cafienne.service.api
+import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenant, User}
 import org.cafienne.tenant.akka.command.TenantCommand
 import org.cafienne.tenant.akka.command.platform.{CreateTenant, PlatformTenantCommand}
 
-import scala.concurrent.Future
-
 trait TenantRoute extends CommandRoute with QueryRoute {
-  override val lastModifiedRegistration = null
-  override def handleSyncedQuery[A](query: () => Future[A], clm: Option[String]): Future[A] = {
-    query()
-  }
+
+  override val lastModifiedRegistration = TenantReader.lastModifiedRegistration
+
+  override val lastModifiedHeaderName: String = api.TENANT_LAST_MODIFIED
 
   def askPlatform(command: PlatformTenantCommand) = {
     askModelActor(command)

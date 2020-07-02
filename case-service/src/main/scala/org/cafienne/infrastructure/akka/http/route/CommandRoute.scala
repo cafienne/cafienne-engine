@@ -3,10 +3,10 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHeader}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directive0, Route}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.akka.actor.command.response.{CommandFailure, SecurityFailure}
+import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse, SecurityFailure}
 import org.cafienne.cmmn.akka.command.response.CaseResponse
 import org.cafienne.humantask.akka.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
@@ -18,7 +18,6 @@ import scala.util.{Failure, Success}
 
 trait CommandRoute extends AuthenticatedRoute {
 
-
   import akka.pattern.ask
   implicit val timeout = Main.caseSystemTimeout
 
@@ -29,17 +28,19 @@ trait CommandRoute extends AuthenticatedRoute {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case tenantOwners: TenantOwnersResponse => complete(StatusCodes.OK, tenantOwners)
-          case _: TenantResponse => complete(StatusCodes.NoContent)
+          case value: TenantResponse => writeLastModifiedHeader(value, api.TENANT_LAST_MODIFIED) {
+            complete(StatusCodes.NoContent)
+          }
           case value: HumanTaskValidationResponse =>
-            respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
+            writeLastModifiedHeader(value) {
               complete(StatusCodes.Accepted, value.value())
             }
           case value: HumanTaskResponse =>
-            respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.caseLastModified().toString)) {
+            writeLastModifiedHeader(value) {
               complete(StatusCodes.Accepted, value)
             }
           case value: CaseResponse =>
-            respondWithHeader(RawHeader(api.CASE_LAST_MODIFIED, value.lastModifiedContent().toString)) {
+            writeLastModifiedHeader(value) {
               complete(StatusCodes.OK, value)
             }
         }
@@ -47,4 +48,7 @@ trait CommandRoute extends AuthenticatedRoute {
     }
   }
 
+  def writeLastModifiedHeader(response: ModelResponse, headerName: String = api.CASE_LAST_MODIFIED): Directive0 = {
+    respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
+  }
 }

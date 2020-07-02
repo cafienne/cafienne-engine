@@ -28,7 +28,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
   override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
 
   def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
-    optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
+    readLastModifiedHeader() { caseLastModified =>
       onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
         case Success(tenant) => askModelActor(createCaseCommand.apply(platformUser.getTenantUser(tenant)))
         case Failure(error) => {

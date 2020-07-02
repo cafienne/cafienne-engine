@@ -3,7 +3,7 @@ package org.cafienne.humantask.akka.command.response;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.akka.command.response.CaseLastModified;
+import org.cafienne.akka.actor.command.response.ActorLastModified;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.humantask.akka.command.HumanTaskCommand;
@@ -22,10 +22,6 @@ public class HumanTaskResponse extends CaseResponse {
     public HumanTaskResponse(ValueMap json) {
         super(json);
         this.taskId = readField(json, Fields.taskId);
-    }
-
-    public CaseLastModified caseLastModified() {
-        return new CaseLastModified(taskId, getLastModified());
     }
 
     @Override

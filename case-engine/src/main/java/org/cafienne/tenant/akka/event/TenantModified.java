@@ -40,7 +40,7 @@ public class TenantModified extends TenantEvent implements TransactionEvent<Tena
 
     @Override
     public String toString() {
-        return "Modified process task [" + getActorId() + "] at " + lastModified;
+        return "TenantModified[" + getActorId() + "] at " + lastModified;
     }
 
     @Override

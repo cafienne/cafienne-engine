@@ -42,7 +42,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     override val keySource: JWKSource[SecurityContext] = tokenWithRole._2
     override protected val issuer: String              = "issuerString"
     override protected val userCache: IdentityProvider = new IdentityProvider {
-      override def getUser(userId: String): Future[PlatformUser] = {
+      override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
         userId match {
           case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
           case _ => Future.failed(new SecurityException("Not a matched user for this test"))
@@ -57,7 +57,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import IncludeAuthDirectives._
     val route = get {
       path("secured") {
-        user { userContext =>
+        user(None) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
@@ -69,7 +69,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     override val keySource: JWKSource[SecurityContext] = tokenWithoutRole._2
     override protected val issuer: String              = "issuerString"
     override protected val userCache: IdentityProvider = new IdentityProvider {
-      override def getUser(userId: String): Future[PlatformUser] = {
+      override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
         userId match {
           case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
           case _ => Future.failed(new SecurityException("Not a matched user for this test"))
@@ -85,7 +85,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import AuthDirectivesWithoutRoles._
     val route = get {
       path("secured") {
-        user { userContext =>
+        user(None) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
@@ -97,7 +97,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     override val keySource: JWKSource[SecurityContext] = tokenWithoutUUID._2
     override protected val issuer: String              = "issuerString"
     override protected val userCache: IdentityProvider = new IdentityProvider {
-      override def getUser(userId: String): Future[PlatformUser] = {
+      override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
         userId match {
           case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
           case _ => Future.failed(new SecurityException("Not a matched user for this test"))
@@ -113,7 +113,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import AuthDirectivesNoUUID._
     val route = get {
       path("secured") {
-        user { userContext =>
+        user(None) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
