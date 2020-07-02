@@ -8,13 +8,13 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
@@ -24,10 +24,6 @@ public class HumanTaskAssigned extends HumanTaskTransitioned {
      * New assignee of the task
      */
     public final String assignee; // assignee of the task
-
-    private enum Fields {
-        assignee
-    }
 
     public HumanTaskAssigned(HumanTask task, String assignee) {
         this(task, assignee, TaskState.Assigned, TaskAction.Assign);

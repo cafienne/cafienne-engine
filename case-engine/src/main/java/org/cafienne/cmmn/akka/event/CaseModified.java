@@ -2,8 +2,9 @@ package org.cafienne.cmmn.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.LongValue;
@@ -22,10 +23,6 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
     private final Instant lastModified;
     private final int numFailures;
     private final State state;
-
-    public enum Fields {
-        lastModified, numFailures, state
-    }
 
     public CaseModified(Case caseInstance, Instant lastModified, int numFailures) {
         super(caseInstance);

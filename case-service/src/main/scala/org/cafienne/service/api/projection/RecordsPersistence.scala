@@ -1,9 +1,7 @@
 package org.cafienne.service.api.projection
 
 import akka.Done
-import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord, PlanItemRecord}
-import org.cafienne.service.api.tasks.TaskRecord
-import org.cafienne.service.api.tenant.{UserRoleKey, UserRoleRecord}
+import org.cafienne.service.api.projection.record._
 
 import scala.concurrent.Future
 

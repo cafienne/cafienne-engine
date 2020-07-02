@@ -1,8 +1,8 @@
-package org.cafienne.service.api.projection.task
+package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event.CaseModified
 import org.cafienne.humantask.akka.event._
-import org.cafienne.service.api.tasks.TaskRecord
+import org.cafienne.service.api.projection.record.TaskRecord
 
 object TaskMerger {
   // TODO: will be good if we add more fields to Task, like last action?

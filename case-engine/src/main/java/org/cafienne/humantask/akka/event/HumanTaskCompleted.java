@@ -8,22 +8,18 @@
 package org.cafienne.humantask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
 @Manifest
 public class HumanTaskCompleted extends HumanTaskTransitioned {
     private final ValueMap taskOutput; // taskOutput - task saved output
-
-    private enum Fields {
-        taskOutput
-    }
 
     public HumanTaskCompleted(HumanTask task, ValueMap output) {
         super(task, TaskState.Completed, TaskAction.Complete);

@@ -9,8 +9,9 @@
 package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.event.CaseEvent;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.slf4j.Logger;
@@ -27,10 +28,6 @@ public abstract class PlanItemEvent extends CaseEvent {
     public final String type;
     public final int seqNo;
     public final int index;
-
-    public enum Fields {
-        planItemId, type, planitem, seqNo, index
-    }
 
     protected PlanItemEvent(PlanItem planItem) {
         this(planItem.getCaseInstance(), planItem.getId(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);

@@ -1,9 +1,9 @@
 package org.cafienne.service.api.projection.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.service.api.cases.table.{CaseBusinessIdentifierRecord, CaseTables}
-import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.api.tenant.TenantTables
+import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.service.api.projection.record.CaseBusinessIdentifierRecord
+import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 
 trait BaseQueryImpl
   extends CaseTables
@@ -24,11 +24,48 @@ trait BaseQueryImpl
   val caseInstanceTeamMemberQuery = TableQuery[CaseInstanceTeamMemberTable]
   val rolesQuery = TableQuery[UserRoleTable]
 
-//  def baseTaskQuery(caseInstanceId: Rep[String]) = TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
-//  def baseCaseQuery(caseInstanceId: Rep[String]) = TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId)
-//
-//  def baseQuery(caseInstanceId: Rep[String])
-//
+
+  /**
+    * Query that validates that the user belongs to the team of the specified case, either by explicit
+    * membership of the user id, or by one of the tenant roles of the user that are bound to the team of the case
+    * @param user
+    * @param caseInstanceId
+    * @param tenant
+    * @return
+    */
+  def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String], identifiers: Option[String]) = {
+    val query = for {
+      // Validate tenant membership
+      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tenant)
+      // Validate case team membership: either user is explicit member or has a matching tenant role
+      teamMembership <- TableQuery[CaseInstanceTeamMemberTable]
+        .filter(_.caseInstanceId === caseInstanceId)
+        .filter(_.active === true) // Only search in active team members
+        .filter(_.caseRole === "") // Only search by base membership, not in certain roles
+        .filter(member => { // Search by user id or by one of the user's tenant roles
+          (member.isTenantUser === true && member.memberId === user.userId) ||
+            (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
+        })
+      _ <- {
+        val query = {
+          if (identifiers.isEmpty) blankIdentifierFilterQuery(caseInstanceId)
+          else addBusinessIdentifiersFilter(identifiers, caseInstanceId)
+        }
+        query
+      }
+    } yield (tenantMembership, teamMembership)
+
+    query
+  }
+
+  /**
+    * Membership query is extended with business identifier filters, if any.
+    * If no identifiers are passed, then we need to have a base query applied (either on Case or on Task)
+    * @param caseInstanceId
+    * @return
+    */
+  def blankIdentifierFilterQuery(caseInstanceId: Rep[String]): Query[_, _, Seq]
+
   def addBusinessIdentifiersFilter(filterString: Option[String], caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq]  = {
     new BusinessIdentifierFilterParser(filterString).asQuery(caseInstanceId)
   }
@@ -37,7 +74,6 @@ trait BaseQueryImpl
     private val filters: Seq[ParsedFilter] = string.fold(Seq[ParsedFilter]()) {
       parseFilters
     }
-//    if (filters.nonEmpty) println(toString)
 
     def asQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq]  = {
       val topLevelQuery = filters.length match {

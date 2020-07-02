@@ -25,16 +25,13 @@ import org.cafienne.cmmn.akka
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
-import org.cafienne.cmmn.instance.casefile.ValueList
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.cases.table.CaseRecord
 import org.cafienne.service.api.model.StartCase
-
-import scala.util.{Failure, Success}
+import org.cafienne.service.api.projection.query.{Area, CaseFilter, CaseQueries, Sort}
 
 @Api(tags = Array("case"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -57,13 +54,13 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the cases from", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "identifiers", description = "Comma separated string of business identifiers with values", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "state", description = "Optional state of the cases to fetch (e.g. Active or Completed)", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "definition", description = "Optional definition name of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0")),
-      new Parameter(name = "numberOfResults", description = "Maximum number of cases to fetch", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
-      new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "sortOrder", description = "Sort direction", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "identifiers", description = "Comma separated string of business identifiers with values", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "state", description = "Get cases with this state, e.g. Active or Completed (optional)", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "caseName", description = "Get cases with this name (optional)", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0"), required = false),
+      new Parameter(name = "numberOfResults", description = "Maximum number of cases to fetch", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100"), required = false),
+      new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "sortOrder", description = "Sort direction ('asc' or 'desc')", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Cases found", responseCode = "200"),
@@ -74,9 +71,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def getCases = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
-        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
-          (optionalTenant, identifiers, offset, numResults, definition, state, sortBy, sortOrder) =>
-            runListQuery(caseQueries.getCases(optionalTenant, identifiers, offset, numResults, platformUser, definition, status = state))
+        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
+          (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
+            val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
+            val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
+            runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort(sortBy, sortOrder)))
         }
       }
     }
@@ -92,8 +91,9 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the cases from", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
       new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0")),
       new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
-      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "definition", description = "Definition of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "identifiers", description = "Comma separated string of business identifiers with values", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "state", description = "Get cases with this state, e.g. Active or Completed", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
       new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "sortOrder", description = "Sort direction", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
     ),
@@ -106,9 +106,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def getUserCases = get {
     path("user") {
       validUser { platformUser =>
-        parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
-          (tenant, offset, numResults, definition, state, sortBy, sortOrder) =>
-            runListQuery(caseQueries.getMyCases(tenant, offset, numResults, platformUser, definition, status = state))
+        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
+          (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
+            val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
+            val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
+            runListQuery(caseQueries.getMyCases(platformUser, filter, Area(offset, numResults), Sort(sortBy, sortOrder)))
         }
       }
     }
@@ -122,10 +124,10 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the statistics in", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0")),
-      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
-      new Parameter(name = "definition", description = "Definition of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0"), required = false),
+      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100"), required = false),
+      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Statistics found and returned", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseList]))))),
@@ -136,9 +138,10 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def stats = get {
     path("stats") {
       validUser { platformUser =>
-        parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'definition ?, 'state ?
-        ) { (tenant, offset, numOfResults, definition, status) =>
-          runListQuery(caseQueries.getCasesStats(tenant, offset, numOfResults, platformUser, definition, status))
+        parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?
+        ) { (tenant, offset, numOfResults, caseName, definition, status) =>
+          val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
+          runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))
         }
       }
     }

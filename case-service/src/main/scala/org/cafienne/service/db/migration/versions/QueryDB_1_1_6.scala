@@ -1,7 +1,6 @@
 package org.cafienne.service.db.migration.versions
 
-import org.cafienne.service.api.cases.table.CaseTables
-import org.cafienne.service.api.tasks.TaskTables
+import org.cafienne.service.api.projection.table.{CaseTables, TaskTables}
 import org.cafienne.service.db.migration.{DbSchemaVersion, Projections}
 import slick.migration.api.TableMigration
 
@@ -12,11 +11,10 @@ object QueryDB_1_1_6 extends DbSchemaVersion
 
   val version = "1.1.6"
   val migrations = (
+    renameCaseTableDefinitionColumn &
+
     // We need to change CaseTeam table to also have a column for member type, which is also part of the primary key
     dropCaseTeamPK & enhanceCaseTeamTable & addUpdatedCaseTeamPK &
-
-    // We also need a task team table; but this requires that Task projection is rebuilt
-    createTaskTeamTable & Projections.resetTaskProjectionWriter &
 
     // Now replace all foreign keys with indexes
     convertFKtoIndexPlanItemTable &
@@ -36,6 +34,10 @@ object QueryDB_1_1_6 extends DbSchemaVersion
 
   import dbConfig.profile.api._
 
+  def renameCaseTableDefinitionColumn = TableMigration(TableQuery[CaseInstanceTable])
+    .renameColumnFrom("definition", _.caseName)
+    .addIndexes(_.indexCaseName, _.indexTenant, _.indexRootCaseId, _.indexState)
+
   def dropCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).dropPrimaryKeys(_.pk_V1)
 
   // Add 2 new columns for memberType ("user" or "role") and case ownership
@@ -49,19 +51,6 @@ object QueryDB_1_1_6 extends DbSchemaVersion
     .addColumnAndSet(_.isOwner, true)
 
   def addUpdatedCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addPrimaryKeys(_.pk)
-
-  def createTaskTeamTable = TableMigration(TableQuery[TaskTeamMemberTable])
-    .create
-    .addColumns(
-      _.memberId,
-      _.caseInstanceId,
-      _.tenant,
-      _.caseRole,
-      _.isTenantUser,
-      _.isOwner,
-      _.active
-    )
-    .addPrimaryKeys(_.pk)
 
   def convertFKtoIndexPlanItemTable = TableMigration(TableQuery[PlanItemTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)
   def convertFKtoIndexCaseTeamTable = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).addIndexes(_.indexCaseInstanceId).dropForeignKeys(_.fkCaseInstanceTable)

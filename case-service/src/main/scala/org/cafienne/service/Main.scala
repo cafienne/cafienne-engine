@@ -17,18 +17,16 @@ import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.JDBCBasedOffsetStorageProvider
 import org.cafienne.service.api.SwaggerHttpServiceRoute
-import org.cafienne.service.api.cases.CaseQueriesImpl
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
-import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
+import org.cafienne.service.api.projection.query.{CaseQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
-import org.cafienne.service.api.projection.task.TaskProjectionsWriter
+import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.registration.FormerRegistrationRoutes
 import org.cafienne.service.api.repository.RepositoryRoute
-import org.cafienne.service.api.tasks.{TaskQueriesImpl, TaskRoutes}
-import org.cafienne.service.api.tenant.TenantQueriesImpl
+import org.cafienne.service.api.tasks.TaskRoutes
 import org.cafienne.service.api.tenant.route.TenantRoutes
 import org.cafienne.service.db.migration.Migrate
 
@@ -79,7 +77,6 @@ object Main extends App {
     implicit val userCache = new IdentityCache(userQueries)
 
     new CaseProjectionsWriter(updater, offsetStorage).start()
-    new TaskProjectionsWriter(updater, offsetStorage).start()
     new TenantProjectionsWriter(userQueries, updater, offsetStorage).start()
 
     // When running with H2, you can start a debug web server on port 8082.

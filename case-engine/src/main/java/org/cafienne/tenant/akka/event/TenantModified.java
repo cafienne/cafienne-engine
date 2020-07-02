@@ -2,10 +2,9 @@ package org.cafienne.tenant.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.event.TransactionEvent;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.processtask.akka.event.ProcessInstanceEvent;
-import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;
@@ -19,10 +18,6 @@ import java.time.Instant;
 @Manifest
 public class TenantModified extends TenantEvent implements TransactionEvent<TenantActor> {
     private final Instant lastModified;
-
-    private enum Fields {
-        lastModified
-    }
 
     public TenantModified(TenantActor actor, Instant lastModified) {
         super(actor);
@@ -45,7 +40,7 @@ public class TenantModified extends TenantEvent implements TransactionEvent<Tena
 
     @Override
     public String toString() {
-        return "Modified process task [" + getActorId() + "] at " + lastModified;
+        return "TenantModified[" + getActorId() + "] at " + lastModified;
     }
 
     @Override

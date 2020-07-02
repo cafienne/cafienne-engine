@@ -12,6 +12,7 @@ import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
@@ -30,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 @Manifest
 public class StartCase extends CaseCommand implements BootstrapCommand {
@@ -43,10 +43,6 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     private transient CaseDefinition definition;
     private CaseTeam caseTeamInput;
     private final boolean debugMode;
-
-    private enum Fields {
-        tenant, name, parentActorId, rootActorId, caseTeam, inputParameters, definition, debugMode
-    }
 
     /**
      * Starts a new case with the specified case definition

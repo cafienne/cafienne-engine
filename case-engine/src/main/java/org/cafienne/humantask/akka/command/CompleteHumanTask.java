@@ -9,14 +9,14 @@ package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.ValidationError;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskCompleted;
 import org.cafienne.humantask.instance.TaskState;
@@ -30,10 +30,6 @@ import java.io.IOException;
 public class CompleteHumanTask extends HumanTaskCommand {
     protected final ValueMap taskOutput;
     protected Task<?> task;
-
-    private enum Fields {
-        taskOutput
-    }
 
     /**
      * Create a command to complete the human task with the specified id to complete.

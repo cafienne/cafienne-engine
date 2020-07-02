@@ -10,6 +10,7 @@ package org.cafienne.cmmn.akka.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -29,10 +30,6 @@ public class MakePlanItemTransition extends CaseCommand {
     private final String planItemName;
     private final String planItemId;
     private final Transition transition;
-
-    private enum Fields {
-        transition, planItemName, planItemId
-    }
 
     /**
      * Create a command to transition the plan item with the specified id or name. Note, if only the name is specified, then the command will work on

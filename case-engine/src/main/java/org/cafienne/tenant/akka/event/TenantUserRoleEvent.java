@@ -8,6 +8,7 @@
 package org.cafienne.tenant.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.TenantActor;
 
@@ -34,9 +35,5 @@ public abstract class TenantUserRoleEvent extends TenantUserEvent {
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.role, role);
-    }
-
-    protected enum Fields {
-        role
     }
 }

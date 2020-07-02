@@ -9,6 +9,7 @@ package org.cafienne.cmmn.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -21,10 +22,6 @@ import java.io.IOException;
 @Manifest
 public class MakeCaseTransition extends CaseCommand {
     private final Transition transition;
-
-    private enum Fields {
-        transition
-    }
 
     /**
      * Triggers the specified transition on the case (effectively on the case plan).

@@ -7,8 +7,8 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.cases.table.CaseRecord
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
+import org.cafienne.service.api.projection.record.CaseRecord
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.BeforeAndAfterAll

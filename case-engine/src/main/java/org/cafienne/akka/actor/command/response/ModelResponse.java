@@ -12,6 +12,7 @@ import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
@@ -22,18 +23,17 @@ import java.time.Instant;
  */
 public class ModelResponse implements AkkaSerializable, TenantUserMessage {
     private final String messageId;
+    private final String actorId;
     private Instant lastModified;
     private final TenantUser user;
     private final String commandType;
 
-    private enum Fields {
-        messageId, lastModified, user, commandType
-    }
-
     protected ModelResponse(ModelCommand<?> command) {
         this.messageId = command.getMessageId();
+        this.actorId = command.actorId;
         // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
         //  the actor will not be available. Checking that here. Required for CommandFailure.
+        this.lastModified = command.getActor() != null ? command.getActor().getLastModified() : null;
         this.lastModified = command.getActor() != null ? command.getActor().getLastModified() : null;
         this.user = command.getUser();
         this.commandType = command.getClass().getName();
@@ -41,6 +41,7 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
 
     public ModelResponse(ValueMap json) {
         this.messageId = readField(json, Fields.messageId);
+        this.actorId = readField(json, Fields.actorId);
         this.lastModified = readInstant(json, Fields.lastModified);
         this.user = TenantUser.from(json.with(Fields.user));
         this.commandType = readField(json, Fields.commandType);
@@ -54,6 +55,14 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
      */
     public String getMessageId() {
         return messageId;
+    }
+
+    /**
+     * Returns the actor to which a command was sent that led to this response
+     * @return
+     */
+    public String getActorId() {
+        return actorId;
     }
 
     /**
@@ -73,6 +82,10 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
         return lastModified;
     }
 
+    public ActorLastModified lastModifiedContent() {
+        return new ActorLastModified(actorId, getLastModified());
+    }
+
     public TenantUser getUser() {
         return user;
     }
@@ -80,6 +93,7 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         writeField(generator, Fields.messageId, this.getMessageId());
+        writeField(generator, Fields.actorId, actorId);
         writeField(generator, Fields.commandType, commandType);
         writeField(generator, Fields.lastModified, this.getLastModified());
         writeField(generator, Fields.user, user);

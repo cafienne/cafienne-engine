@@ -9,9 +9,10 @@ package org.cafienne.cmmn.akka.command.response;
 
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.GetDiscretionaryItems;
-import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 /**
@@ -25,34 +26,16 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
  */
 @Manifest
 public class CaseResponse extends ModelResponse {
-    private final String caseInstanceId;
-
-    private enum Fields {
-        caseInstanceId
-    }
-
     public CaseResponse(CaseCommand command) {
         super(command);
-        this.caseInstanceId = command.getCaseInstanceId();
-
-        // This is the default setting for completion moment: the current last modified of the case instance.
-        //  for CommandFailures, or for commands like GetDiscretionaryItems, no events are generated, and the
-        //  "case-last-modified" will not change, hence picking the current moment of the case last modified will remain the same.
-        // For other commands that actually DO change the case, the case will invoke the method setLastModified() of CaseResponse below.
-        setLastModified(command.getActor().getLastModified());
     }
 
     public CaseResponse(ValueMap json) {
         super(json);
-        this.caseInstanceId = readField(json, Fields.caseInstanceId);
     }
 
     @Override
     public String toString() {
-        return "CaseResponse for "+caseInstanceId+": last modified is "+getLastModified();
-    }
-
-    public CaseLastModified lastModifiedContent() {
-        return new CaseLastModified(caseInstanceId, getLastModified());
+        return "CaseResponse for "+getActorId()+": last modified is "+getLastModified();
     }
 }

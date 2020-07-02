@@ -3,6 +3,7 @@ package org.cafienne.akka.actor.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
@@ -12,10 +13,6 @@ import java.io.IOException;
 public class EngineVersionChanged extends BaseModelEvent {
 
     private final CafienneVersion version;
-
-    private enum Fields {
-        version
-    }
 
     public EngineVersionChanged(ModelActor actor, CafienneVersion version) {
         super(actor);

@@ -8,9 +8,12 @@
 package org.cafienne.cmmn.akka.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.util.Guid;
 
@@ -23,10 +26,6 @@ public class PlanItemCreated extends PlanItemEvent {
     public final String createdBy;
     public final String planItemName;
     public final String stageId;
-
-    public enum Fields {
-        name, stageId, createdOn, createdBy
-    }
 
     public PlanItemCreated(Case caseInstance) {
         this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);

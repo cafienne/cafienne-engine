@@ -1,8 +1,10 @@
-package org.cafienne.service.api.tasks
+package org.cafienne.service.api.projection.table
 
 import java.time.Instant
 
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
+import org.cafienne.service.api.projection.record.TaskRecord
+import slick.lifted.ColumnOrdered
 
 trait TaskTables extends QueryDbConfig {
 
@@ -10,6 +12,18 @@ trait TaskTables extends QueryDbConfig {
 
   // Schema for the "task" table:
   final class TaskTable(tag: Tag) extends CafienneTable[TaskRecord](tag, "task") {
+
+    override def getSortColumn(field: String): ColumnOrdered[_] = field match {
+      case "taskstate" => taskState
+      case "assignee" => assignee
+      case "owner" => owner
+      case "duedate" => dueDate
+      case "createdon" => createdOn
+      case "createdby" => createdBy
+      case "modifiedby" => modifiedBy
+      case "lastmodified" => lastModified
+      case _ => lastModified
+    }
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -51,26 +65,5 @@ trait TaskTables extends QueryDbConfig {
     def indexDueDate = index(generateIndexName(dueDate), dueDate)
 
     def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[TaskRecord]
-  }
-
-  final class TaskTeamMemberTable(tag: Tag) extends CafienneTable[TaskTeamMemberRecord](tag, "task_team_member") {
-
-    def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
-
-    def caseRole = idColumn[String]("case_role")
-
-    def memberId = idColumn[String]("member_id")
-
-    def isTenantUser = column[Boolean]("isTenantUser")
-
-    def isOwner = column[Boolean]("isOwner")
-
-    def active = column[Boolean]("active")
-
-    def pk = primaryKey("pk_task_team_member", (caseInstanceId, caseRole, memberId, isTenantUser))
-
-    def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active) <> (TaskTeamMemberRecord.tupled, TaskTeamMemberRecord.unapply)
   }
 }

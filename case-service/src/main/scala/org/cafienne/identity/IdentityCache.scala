@@ -1,14 +1,16 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
+import org.cafienne.service.api.tenant.TenantReader
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentityProvider {
-  def getUser(userId: String): Future[PlatformUser]
+  def getUser(userId: String, tlm: Option[String]): Future[PlatformUser]
   def clear(users: Iterable[String]): Unit
 }
 
@@ -18,10 +20,23 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
   // TODO: check for multithreading issues now that event materializer can clear.
   private val cache = new mutable.HashMap[String, PlatformUser]
 
-  def getUser(userId: String): Future[PlatformUser] = {
+  def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
     if (true == true) {
       // TODO: FOR NOW CACHE IS DISABLED, since TenantProjection does not properly clear the cache.
-      return executeUserQuery(userId)
+      tlm match {
+        case Some(s) => {
+            // Now go to the writer and ask it to wait for the clm for this case instance id...
+            val user = for {
+              p <- TenantReader.lastModifiedRegistration.waitFor(new ActorLastModified(s)).future
+              u <- executeUserQuery(userId).flatMap(u => Future(u)) // Not really sure why flatmap is required. Becuase the executeUserQuery returns a Future, i guess
+            } yield u
+
+          return user
+          }
+
+        case None => // Nothing to do, just continue
+          executeUserQuery(userId)
+      }
     }
 
 //    System.err.println("Fetching user " + userId + ", cache contents: " + cache)

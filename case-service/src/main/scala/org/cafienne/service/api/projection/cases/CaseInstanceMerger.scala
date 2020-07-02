@@ -2,7 +2,7 @@ package org.cafienne.service.api.projection.cases
 
 import org.cafienne.cmmn.akka.event.{CaseDefinitionApplied, CaseModified}
 import org.cafienne.cmmn.instance.State
-import org.cafienne.service.api.cases.table.CaseRecord
+import org.cafienne.service.api.projection.record.CaseRecord
 
 object CaseInstanceMerger {
 
@@ -12,7 +12,7 @@ object CaseInstanceMerger {
       tenant = evt.tenant,
       rootCaseId = evt.getRootCaseId,
       parentCaseId = evt.getParentCaseId,
-      name = evt.getCaseName,
+      caseName = evt.getCaseName,
       state = State.Active.toString, // Will always be overridden from CaseModified event
       failures = 0,
       lastModified = evt.createdOn,

@@ -9,7 +9,7 @@ package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.server.Directives._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.UserQueries
+import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command._
 

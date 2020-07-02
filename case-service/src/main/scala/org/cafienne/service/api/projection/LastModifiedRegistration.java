@@ -10,8 +10,8 @@ package org.cafienne.service.api.projection;
 
 import akka.dispatch.Futures;
 import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.cmmn.akka.command.response.CaseLastModified;
-import org.cafienne.cmmn.akka.event.CaseModified;
+import org.cafienne.akka.actor.event.TransactionEvent;
+import org.cafienne.akka.actor.command.response.ActorLastModified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Promise;
@@ -36,7 +36,8 @@ public class LastModifiedRegistration {
         this.name = name;
     }
 
-    public Promise<?> waitFor(CaseLastModified notBefore) {
+    public Promise<?> waitFor(ActorLastModified notBefore) {
+        log("Executing query after response for " + notBefore);
         Promise<String> p = Futures.promise();
 
         Instant lastKnownMoment = lastModifiedRegistration.get(notBefore.getCaseInstanceId());
@@ -51,6 +52,7 @@ public class LastModifiedRegistration {
             log("Adding waiter for entity " + notBefore.getCaseInstanceId() + ", because last known moment is " + lastKnownMoment + ", and we're waiting for " + notBefore.getLastModified());
             addWaiter(new Waiter(notBefore, p));
         } else {
+            log("Returning because already available");
             p.success("Your case last modified arrived already!");
         }
         return p;
@@ -60,10 +62,9 @@ public class LastModifiedRegistration {
     private void log(String msg) {
         msg = name + " in thread: " + Thread.currentThread().getName() + ": " + msg;
         logger.debug(msg);
-//        System.out.println(msg);
     }
 
-    public void handle(CaseModified event) {
+    public void handle(TransactionEvent event) {
         handle("case", event.getActorId(), event.lastModified());
     }
 
@@ -113,11 +114,11 @@ public class LastModifiedRegistration {
     }
 
     class Waiter {
-        private final CaseLastModified notBefore;
+        private final ActorLastModified notBefore;
         private final Promise<String> promise;
         private final long createdAt = System.currentTimeMillis();
 
-        Waiter(CaseLastModified notBefore, Promise<String> promise) {
+        Waiter(ActorLastModified notBefore, Promise<String> promise) {
 
             this.notBefore = notBefore;
             this.promise = promise;

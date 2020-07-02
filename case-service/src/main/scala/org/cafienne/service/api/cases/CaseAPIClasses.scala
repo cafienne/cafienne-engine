@@ -3,7 +3,7 @@ package org.cafienne.service.api.cases
 import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api.cases.table.{CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.service.api.projection.record.{CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan) extends CafienneJson {
   override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.toValue(), "file", file.toValue(), "planitems", planitems.toValue))

@@ -1,9 +1,8 @@
 package org.cafienne.service.db.migration.versions
 
 import org.cafienne.infrastructure.jdbc.{OffsetStoreTables, QueryDbConfig}
-import org.cafienne.service.api.cases.table.{CaseTables, CaseTeamMemberRecord}
-import org.cafienne.service.api.tasks.TaskTables
-import org.cafienne.service.api.tenant.TenantTables
+import org.cafienne.service.api.projection.record.CaseTeamMemberRecord
+import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 import org.cafienne.service.db.migration.DbSchemaVersion
 import slick.lifted
 import slick.lifted.TableQuery
@@ -12,6 +11,10 @@ import slick.migration.api.TableMigration
 trait CafienneTablesV1 extends QueryDbConfig with CaseTables with TenantTables {
 
   import dbConfig.profile.api._
+
+  final class CaseInstanceTableV1(tag: Tag) extends CaseInstanceTable(tag) {
+    def definition = idColumn[String]("definition")
+  }
 
   final class CaseInstanceTeamMemberTableV1(tag: Tag) extends CaseInstanceTeamMemberTable(tag) {
 
@@ -112,7 +115,7 @@ object QueryDB_1_0_0 extends DbSchemaVersion
       _.taskModel
     )
 
-  def createCaseInstanceTable = TableMigration(TableQuery[CaseInstanceTable])
+  def createCaseInstanceTable = TableMigration(TableQuery[CaseInstanceTableV1])
     .create
     .addColumns(
       _.id,

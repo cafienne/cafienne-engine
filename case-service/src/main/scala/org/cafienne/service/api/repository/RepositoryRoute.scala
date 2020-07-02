@@ -30,8 +30,6 @@ import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 import org.w3c.dom.Document
 
 import scala.collection.immutable.Seq
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 @Api(tags = Array("repository"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -201,6 +199,10 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
             case failure: WriteDefinitionException => {
               logger.debug("Deployment failure", failure)
               complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
+            }
+            case failure: SecurityException => {
+              logger.debug("Deployment failure", failure)
+              complete(StatusCodes.Unauthorized, failure.getLocalizedMessage)
             }
             case other: Throwable => {
               logger.debug("Unexpected deployment failure", other)

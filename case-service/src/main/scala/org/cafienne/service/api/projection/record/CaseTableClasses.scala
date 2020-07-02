@@ -1,4 +1,4 @@
-package org.cafienne.service.api.cases.table
+package org.cafienne.service.api.projection.record
 
 import java.time.Instant
 
@@ -7,7 +7,7 @@ import org.cafienne.infrastructure.json.CafienneJson
 
 final case class CaseRecord(id: String,
                             tenant: String,
-                            name: String,
+                            caseName: String,
                             state: String,
                             failures: Int,
                             parentCaseId: String = "",
@@ -23,8 +23,9 @@ final case class CaseRecord(id: String,
     val v = new ValueMap
     v.putRaw("id", id)
     v.putRaw("tenant", tenant)
-    v.putRaw("definition", name)
-    v.putRaw("name", name)
+    v.putRaw("caseName", caseName)
+    v.putRaw("definition", caseName) // Deprecated field
+    v.putRaw("name", caseName) // Deprecated field - todo: check where it must be removed (generic-ui probably)
     v.putRaw("state", state)
     v.putRaw("failures", failures)
     v.putRaw("parentCaseId", parentCaseId)

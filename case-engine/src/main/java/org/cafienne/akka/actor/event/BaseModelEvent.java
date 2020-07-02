@@ -3,6 +3,7 @@ package org.cafienne.akka.actor.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;

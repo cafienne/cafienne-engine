@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.akka.command.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
@@ -8,10 +9,6 @@ import java.io.IOException;
 
 public class CaseResponseWithValueMap extends CaseResponse {
     private final ValueMap value;
-
-    private enum Fields {
-        response
-    }
 
     protected CaseResponseWithValueMap(CaseCommand command, ValueMap value) {
         super(command);

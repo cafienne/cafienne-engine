@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.akka.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -14,10 +15,6 @@ public abstract class CaseTeamMemberEvent extends CaseTeamEvent {
     public final String memberId;
     public final boolean isTenantUser;
     public final transient MemberKey key;
-
-    protected enum Fields {
-        memberId, isTenantUser
-    }
 
     protected CaseTeamMemberEvent(Case caseInstance, MemberKey key) {
         super(caseInstance);

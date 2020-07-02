@@ -3,6 +3,7 @@ package org.cafienne.processtask.akka.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.CafienneVersion;
 import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.akka.command.StartProcess;
@@ -20,10 +21,6 @@ public class ProcessStarted extends ProcessInstanceEvent {
     public transient ProcessDefinition definition;
     public final boolean debugMode;
     public final CafienneVersion engineVersion;
-
-    private enum Fields {
-        parentActorId, rootActorId, name, input, processDefinition, debugMode, engineVersion
-    }
 
     public ProcessStarted(ProcessTaskActor actor, StartProcess command) {
         super(actor);

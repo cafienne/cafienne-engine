@@ -10,6 +10,7 @@ package org.cafienne.cmmn.akka.command.task;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
@@ -32,10 +33,6 @@ public class CompleteTask extends CaseCommand {
     protected final String taskId;
     protected final ValueMap taskOutput;
     protected Task<?> task;
-
-    private enum Fields {
-        taskId, taskOutput
-    }
 
     /**
      * Create a command to transition the plan item with the specified id or name to complete. Note, if only the name is specified, then the command

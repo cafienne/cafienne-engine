@@ -10,6 +10,7 @@ package org.cafienne.akka.actor.command.response;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.SerializedException;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -24,10 +25,6 @@ public class CommandFailure extends ModelResponse {
     private final Exception exception;
     private final SerializedException serializedException;
     private ValueMap exceptionAsJSON;
-
-    private enum Fields {
-        exception
-    }
 
     /**
      * Create a failure response for the command.

@@ -8,6 +8,7 @@
 package org.cafienne.tenant.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.User;
@@ -19,10 +20,6 @@ import java.io.IOException;
  */
 public abstract class TenantUserEvent extends TenantEvent {
     public final String userId;
-
-    protected enum Fields {
-        userId
-    }
 
     protected TenantUserEvent(TenantActor tenant, String userId) {
         super(tenant);

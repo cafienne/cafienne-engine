@@ -9,6 +9,7 @@ package org.cafienne.timerservice.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -25,10 +26,6 @@ import java.time.Instant;
 public class SetTimer extends TimerServiceCommand {
     public final String caseInstanceId;
     public final Instant moment;
-
-    protected enum Fields {
-        caseInstanceId, moment
-    }
 
     /**
      * Ask timer service to ping the case task when the moment has come

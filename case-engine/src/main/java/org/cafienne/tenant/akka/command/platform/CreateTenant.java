@@ -5,8 +5,8 @@ import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueList;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
@@ -14,18 +14,12 @@ import org.cafienne.tenant.akka.event.platform.TenantCreated;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Manifest
 public class CreateTenant extends PlatformTenantCommand implements BootstrapCommand {
     public final String name;
     private final List<TenantUser> users;
-
-    private enum Fields {
-        name, users
-    }
 
     public CreateTenant(PlatformUser user, String tenantId, String name, List<TenantUser> users) {
         super(user, tenantId);

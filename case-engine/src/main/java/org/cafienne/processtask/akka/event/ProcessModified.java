@@ -2,6 +2,7 @@ package org.cafienne.processtask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.event.TransactionEvent;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
@@ -17,10 +18,6 @@ import java.time.Instant;
 @Manifest
 public class ProcessModified extends ProcessInstanceEvent implements TransactionEvent<ProcessTaskActor> {
     private final Instant lastModified;
-
-    private enum Fields {
-        lastModified
-    }
 
     public ProcessModified(ProcessTaskActor actor, Instant lastModified) {
         super(actor);

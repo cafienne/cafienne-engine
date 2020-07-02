@@ -2,8 +2,8 @@ package org.cafienne.infrastructure.akka.http.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName}
-import akka.http.scaladsl.server.Route
-import org.cafienne.cmmn.akka.command.response.CaseLastModified
+import akka.http.scaladsl.server.{Directive1, Route}
+import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.cmmn.instance.casefile.Value
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
@@ -17,14 +17,20 @@ trait QueryRoute extends AuthenticatedRoute {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   implicit val lastModifiedRegistration: LastModifiedRegistration
 
+  val lastModifiedHeaderName: String = api.CASE_LAST_MODIFIED
+
+  def readLastModifiedHeader(): Directive1[Option[String]] = {
+    optionalHeaderValueByName(lastModifiedHeaderName)
+  }
+
   def runQuery(future: => Future[CafienneJson]): Route = {
-    optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
+    readLastModifiedHeader() { caseLastModified =>
       handleQueryResult(handleSyncedQuery(() => future, caseLastModified))
     }
   }
 
   def runListQuery(future: => Future[Seq[CafienneJson]]): Route = {
-    optionalHeaderValueByName(api.CASE_LAST_MODIFIED) { caseLastModified =>
+    readLastModifiedHeader() { caseLastModified =>
       handleQueryResultList(handleSyncedQuery(() => future, caseLastModified))
     }
   }
@@ -58,7 +64,7 @@ trait QueryRoute extends AuthenticatedRoute {
     clm match {
       case Some(s) =>
         // Now go to the writer and ask it to wait for the clm for this case instance id...
-        val promise = lastModifiedRegistration.waitFor(new CaseLastModified(s))
+        val promise = lastModifiedRegistration.waitFor(new ActorLastModified(s))
         promise.future.flatMap(_ => query())
       case None => // Nothing to do, just continue
         query()

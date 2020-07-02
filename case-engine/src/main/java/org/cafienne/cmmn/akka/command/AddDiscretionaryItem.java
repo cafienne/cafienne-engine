@@ -10,6 +10,7 @@ package org.cafienne.cmmn.akka.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.AddDiscretionaryItemResponse;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
@@ -33,10 +34,6 @@ public class AddDiscretionaryItem extends CaseCommand {
     private final String definitionId;
     private transient DiscretionaryItem discretionaryItem;
     private transient PlanItem parentItem;
-
-    private enum Fields {
-        name, planItemId, parentId, definitionId
-    }
 
     /**
      * Create a command to add a new plan item to the case, based on a discretionary item definition with the specified name.

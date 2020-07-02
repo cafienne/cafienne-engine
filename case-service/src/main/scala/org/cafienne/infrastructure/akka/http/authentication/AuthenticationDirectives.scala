@@ -33,16 +33,18 @@ trait AuthenticationDirectives extends Configured {
   //IdentityProvider to get the user
   protected val userCache: IdentityProvider
 
-  def user: Directive1[PlatformUser] = {
-    authenticateOAuth2Async("service", jwtToServiceUserAuthenticator)
+  def user(tlm: Option[String]): Directive1[PlatformUser] = {
+    authenticateOAuth2Async("service", c => {
+      jwtToServiceUserAuthenticator(c, tlm)
+    })
   }
 
-  private def jwtToServiceUserAuthenticator(credentials: Credentials): Future[Option[PlatformUser]] = {
+  private def jwtToServiceUserAuthenticator(credentials: Credentials, tlm: Option[String]): Future[Option[PlatformUser]] = {
     credentials match {
       case Credentials.Provided(token) => {
         for {
           usrCtx <- jwtTokenVerifier.verifyToken(token)
-          cachedUser <- userCache.getUser(usrCtx.subject.value)
+          cachedUser <- userCache.getUser(usrCtx.subject.value, tlm)
         } yield Some(cachedUser)
       }
       case _ => Future.successful(None)

@@ -1,4 +1,4 @@
-package org.cafienne.service.api.tasks
+package org.cafienne.service.api.projection.record
 
 import java.time.Instant
 
@@ -46,5 +46,3 @@ final case class TaskRecord(id: String,
     v
   }
 }
-
-final case class TaskTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)

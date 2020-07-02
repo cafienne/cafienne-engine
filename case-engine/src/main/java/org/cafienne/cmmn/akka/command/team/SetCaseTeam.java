@@ -1,16 +1,17 @@
 package org.cafienne.cmmn.akka.command.team;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.cmmn.akka.command.CaseCommand;
+
+import java.io.IOException;
 
 /**
  * Command to set the case team
@@ -41,10 +42,6 @@ import org.cafienne.cmmn.akka.command.CaseCommand;
 public class SetCaseTeam extends CaseCommand {
 
     private final CaseTeam newCaseTeam;
-
-    private enum Fields {
-        team
-    }
 
     public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam newCaseTeam) {
         // TODO: determine how to do authorization on this command.
