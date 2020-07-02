@@ -11,6 +11,8 @@ object QueryDB_1_1_6 extends DbSchemaVersion
 
   val version = "1.1.6"
   val migrations = (
+    renameCaseTableDefinitionColumn &
+
     // We need to change CaseTeam table to also have a column for member type, which is also part of the primary key
     dropCaseTeamPK & enhanceCaseTeamTable & addUpdatedCaseTeamPK &
 
@@ -31,6 +33,10 @@ object QueryDB_1_1_6 extends DbSchemaVersion
   )
 
   import dbConfig.profile.api._
+
+  def renameCaseTableDefinitionColumn = TableMigration(TableQuery[CaseInstanceTable])
+    .renameColumnFrom("definition", _.caseName)
+    .addIndexes(_.indexCaseName, _.indexTenant, _.indexRootCaseId, _.indexState)
 
   def dropCaseTeamPK = TableMigration(TableQuery[CaseInstanceTeamMemberTableV1]).dropPrimaryKeys(_.pk_V1)
 

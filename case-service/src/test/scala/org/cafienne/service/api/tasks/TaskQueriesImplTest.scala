@@ -43,8 +43,8 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
     Await.ready(updater.bulkUpdate({
       Seq(
-        CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, name = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now),
-        CaseRecord(id = case44, tenant = tenant, rootCaseId = case44, name = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now)
+        CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now),
+        CaseRecord(id = case44, tenant = tenant, rootCaseId = case44, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now)
       )
     }), 2.seconds)
 

@@ -25,7 +25,7 @@ trait CaseQueries {
 
   def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[PlanItemHistory] = ???
 
-  def getCasesStats(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
+  def getCasesStats(user: PlatformUser, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
 
   def getMyCases(user: PlatformUser, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 
@@ -175,28 +175,28 @@ class CaseQueriesImpl
     })
   }
 
-  override def getCasesStats(tenant: Option[String], from: Int, numOfResults: Int, user: PlatformUser, definition: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
+  override def getCasesStats(user: PlatformUser, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
     // TODO
     // Query must be converted to:
-    //   select count(*), definition, state, failures from case_instance group by definition, state, failures [having state == and definition == ]
-    val definitionFilter = definition.getOrElse("")
+    //   select count(*), case_name, state, failures from case_instance group by case_name, state, failures [having state == and case_name == ]
+    val definitionFilter = caseName.getOrElse("")
     val statusFilter = status.getOrElse("")
 
     val tenantSet = tenants(tenant, user)
     // NOTE: this uses a direct query. Fields must be escaped with quotes for the in-memory Hsql Database usage.
     val action = {
       status match {
-//        case Some(s) => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
+//        case Some(s) => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
         case Some(s) => s.toLowerCase() match {
-          case "active" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Active'""".as[(Long, String, String, String, Int)]
-          case "completed" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Completed'""".as[(Long, String, String, String, Int)]
-          case "terminated" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Terminated'""".as[(Long, String, String, String, Int)]
-          case "suspended" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Suspended'""".as[(Long, String, String, String, Int)]
-          case "failed" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Failed'""".as[(Long, String, String, String, Int)]
-          case "closed" => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" having "state" = 'Closed'""".as[(Long, String, String, String, Int)]
+          case "active" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Active'""".as[(Long, String, String, String, Int)]
+          case "completed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Completed'""".as[(Long, String, String, String, Int)]
+          case "terminated" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Terminated'""".as[(Long, String, String, String, Int)]
+          case "suspended" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Suspended'""".as[(Long, String, String, String, Int)]
+          case "failed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Failed'""".as[(Long, String, String, String, Int)]
+          case "closed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Closed'""".as[(Long, String, String, String, Int)]
           case other => throw new SearchFailure(s"Status $other is invalid")
         }
-        case None => sql"""select count("definition") as count, "tenant", "definition", "state", "failures" from  "case_instance" group by "tenant", "definition", "state", "failures" """.as[(Long, String, String, String, Int)]
+        case None => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" """.as[(Long, String, String, String, Int)]
       }
 
     }
@@ -204,16 +204,16 @@ class CaseQueriesImpl
       val r = collection.mutable.Map.empty[String, CaseList]
       value.filter(caseInstance => tenantSet.contains(caseInstance._2)).foreach { caseInstance =>
         val count = caseInstance._1
-        val definition = caseInstance._3
-        if (definitionFilter == "" || definitionFilter == definition) {
+        val caseName = caseInstance._3
+        if (definitionFilter == "" || definitionFilter == caseName) {
           // Only add stats for a certain filter if it is the same
           val state = caseInstance._4
           val failures = caseInstance._5
 
           if (statusFilter == "" || statusFilter == state) {
-            val caseList: CaseList = r.getOrElse(definition, CaseList(definition = definition))
+            val caseList: CaseList = r.getOrElse(caseName, CaseList(caseName = caseName))
             val newCaseList: CaseList = updateCaseList(state, count, failures, caseList)
-            r.put(definition, newCaseList)
+            r.put(caseName, newCaseList)
           }
         }
       }
@@ -254,7 +254,7 @@ class CaseQueriesImpl
     val query: Query[CaseInstanceTable, CaseRecord, Seq] = for {
       baseQuery <- statusFilter(filter.status)
               .filterOpt(filter.tenant)((t, value) => t.tenant === value)
-              .filterOpt(filter.definition)((t, value) => t.definition.toLowerCase like s"%${value.toLowerCase}%")
+              .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
               .order(sort)
               .only(area)
 

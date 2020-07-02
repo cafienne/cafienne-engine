@@ -38,7 +38,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "tenant", description = "Specific tenant to get tasks", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "caseDefinition", description = "Provide the case definition name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "caseName", description = "Provide the case definition name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "assignee", description = "Provide the username for whom the task is assigned", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "taskState", description = "Provide the state of the task", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String], allowableValues = Array("Assigned", "Unassigned", "Delegated", "Completed", "Suspended", "Terminated"))),
       new Parameter(name = "owner", description = "Owner of the task", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
@@ -61,12 +61,12 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
   def getAllTasks = get {
     validUser { platformUser =>
       pathEndOrSingleSlash {
-        parameters('tenant ?, 'identifiers ?, 'caseDefinition ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
-          (tenant, identifiers, caseDefinition, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
+        parameters('tenant ?, 'identifiers ?, 'caseName ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
+          (tenant, identifiers, caseName, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
             optionalHeaderValueByName("timeZone") { timeZone =>
               val area = Area(offset, numberOfResults)
               val sort = Sort(sortBy, sortOrder)
-              val taskFilter = TaskFilter(tenant = tenant, identifiers = identifiers, caseDefinition = caseDefinition, taskState = taskState, assignee = assignee, owner = owner, dueOn = dueOn, dueBefore = dueBefore, dueAfter = dueAfter, timeZone = timeZone)
+              val taskFilter = TaskFilter(tenant = tenant, identifiers = identifiers, caseName = caseName, taskState = taskState, assignee = assignee, owner = owner, dueOn = dueOn, dueBefore = dueBefore, dueAfter = dueAfter, timeZone = timeZone)
               runListQuery(taskQueries.getAllTasks(platformUser, taskFilter, area, sort))
             }
         }
@@ -149,15 +149,15 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     }
   }
 
-  @Path("/case-type/{type}")
+  @Path("/case-name/{caseName}")
   @GET
   @Operation(
-    summary = "Get all tasks for a certain type of case",
-    description = "Get all tasks for a certain type of case",
+    summary = "Get tasks from cases with the specified case name",
+    description = "Get tasks from cases with the specified case name",
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "tenant", description = "Optional tenant to get tasks from", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "type", description = "The type of case to get the tasks for", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "caseName", description = "The name of cases to get the tasks for", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = api.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
@@ -169,9 +169,9 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
   @Produces(Array("application/json"))
   def getCaseDefinitionTasks = get {
     validUser { platformUser =>
-      path("case-type" / Segment) { caseType =>
+      path("case-name" / Segment) { caseName =>
         parameters('tenant ?) {
-          optionalTenant => runListQuery(taskQueries.getCaseTypeTasks(caseType, optionalTenant, platformUser))
+          optionalTenant => runListQuery(taskQueries.getTasksWithCaseName(caseName, optionalTenant, platformUser))
         }
       }
     }

@@ -12,10 +12,12 @@ trait CaseTables extends QueryDbConfig {
 
   //TODO: add lowercase index on definition in Postgresql to allow case insensitive searching
 
-  final class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseRecord](tag, "case_instance") {
+  class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseRecord](tag, "case_instance") {
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "id" => id
-      case "definition" => definition
+      case "definition" => caseName // Backwards compatibility; column name before was "definition"
+      case "casename" => caseName
+      case "name" => caseName
       case "status" => state
       case "state" => state
       case "tenant" => tenant
@@ -33,7 +35,7 @@ trait CaseTables extends QueryDbConfig {
 
     def tenant = idColumn[String]("tenant")
 
-    def definition = idColumn[String]("definition")
+    def caseName = idColumn[String]("case_name")
 
     def state = stateColumn[String]("state")
 
@@ -59,8 +61,9 @@ trait CaseTables extends QueryDbConfig {
     def indexState = index(state)
     def indexTenant = index(tenant)
     def indexRootCaseId = index(rootCaseId)
+    def indexCaseName = index(caseName)
 
-    def * = (id, tenant, definition, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
+    def * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
   }
 
   final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTable[CaseDefinitionRecord](tag, "case_instance_definition") {

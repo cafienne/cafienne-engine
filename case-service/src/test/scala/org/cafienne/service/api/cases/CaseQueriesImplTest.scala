@@ -8,7 +8,7 @@ import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.QueryDbConfig
-import org.cafienne.service.api.projection.query.{Area, CaseQueriesImpl, CaseFilter, Sort}
+import org.cafienne.service.api.projection.query.{CaseQueriesImpl, CaseFilter}
 import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
@@ -32,9 +32,9 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   val idOfActiveCase = "active"
   val idOfTerminatedCase = "terminated"
   val idOfCompletedCase = "completed"
-  val activeCase = CaseRecord(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, name = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-  val terminatedCase = CaseRecord(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, name = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
-  val completedCase = CaseRecord(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, name = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val activeCase = CaseRecord(id = idOfActiveCase, tenant = tenant, rootCaseId = idOfActiveCase, caseName = "aaa bbb ccc", state = State.Active.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val terminatedCase = CaseRecord(id = idOfTerminatedCase, tenant = tenant, rootCaseId = idOfTerminatedCase, caseName = "ddd EeE fff", state = State.Terminated.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
+  val completedCase = CaseRecord(id = idOfCompletedCase, tenant = tenant, rootCaseId = idOfCompletedCase, caseName = "ddd EeE fff", state = State.Completed.name, failures = 0, lastModified = Instant.now, createdOn = Instant.now) //, casefile = "")
 
   val planItem1_1 = PlanItemRecord(id = UUID.randomUUID().toString, caseInstanceId = idOfActiveCase, tenant = tenant, stageId = "", name = "planitem1-1", index = 0, currentState = "Active",
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
@@ -49,9 +49,9 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     currentState = "", historyState = "", transition = "", index = 0, planItemType = "", required = false, repeating = false, lastModified = Instant.now,
     modifiedBy = "user1", eventType="?", sequenceNr = 1, taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
-  val caseListActive = CaseList(definition = "aaa bbb ccc", numActive = 1L, numClosed = 0L)
-  val caseListDDDEEEFFF = CaseList(definition = "ddd EeE fff", numTerminated = 1L, numCompleted = 1L)
-  val caseListTerminated = CaseList(definition = "ddd EeE fff", numTerminated = 1L)
+  val caseListActive = CaseList(caseName = "aaa bbb ccc", numActive = 1L, numClosed = 0L)
+  val caseListDDDEEEFFF = CaseList(caseName = "ddd EeE fff", numTerminated = 1L, numCompleted = 1L)
+  val caseListTerminated = CaseList(caseName = "ddd EeE fff", numTerminated = 1L)
 
   val user = TestIdentityFactory.createPlatformUser("user1", tenant, List("A", "B"))
 
@@ -94,7 +94,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   }
 
   it should "retrieve cases filtered by definition" in {
-    val res = Await.result(caseQueries.getCases(user, tenantFilter.copy(definition = Some("eee"))), 3.seconds)
+    val res = Await.result(caseQueries.getCases(user, tenantFilter.copy(caseName = Some("eee"))), 3.seconds)
     res must be (Seq(completedCase, terminatedCase))
   }
 
@@ -118,20 +118,20 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   // *******************************************************************************************************************
 
   it should "filter all cases by definition" in {
-    val res = Await.result(caseQueries.getCasesStats(Some(tenant), from = 0, numOfResults = 10, user = user, definition = Some("ddd EeE fff")), 1.second)
+    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, caseName = Some("ddd EeE fff")), 1.second)
     res.size must be (1)
     res.head must be(caseListDDDEEEFFF)
   }
 
   it should "filter all cases by status - active" in {
-    val res = Await.result(caseQueries.getCasesStats(Some(tenant), from = 0, numOfResults = 10, user = user, status = Some("Active")), 1.second)
+    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, status = Some("Active")), 1.second)
     res.size must be (1)
     res.head must be(caseListActive)
   }
 
 
   it should "filter all cases by status - terminated" in {
-    val res = Await.result(caseQueries.getCasesStats(Some(tenant), from = 0, numOfResults = 10, user = user, status = Some("Terminated")), 1.second)
+    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, status = Some("Terminated")), 1.second)
     res.size must be (1)
     res.head must be(caseListTerminated)
   }

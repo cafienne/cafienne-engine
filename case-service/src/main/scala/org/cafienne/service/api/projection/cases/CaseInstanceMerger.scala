@@ -12,7 +12,7 @@ object CaseInstanceMerger {
       tenant = evt.tenant,
       rootCaseId = evt.getRootCaseId,
       parentCaseId = evt.getParentCaseId,
-      name = evt.getCaseName,
+      caseName = evt.getCaseName,
       state = State.Active.toString, // Will always be overridden from CaseModified event
       failures = 0,
       lastModified = evt.createdOn,

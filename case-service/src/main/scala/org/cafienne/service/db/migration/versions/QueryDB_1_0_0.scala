@@ -12,6 +12,10 @@ trait CafienneTablesV1 extends QueryDbConfig with CaseTables with TenantTables {
 
   import dbConfig.profile.api._
 
+  final class CaseInstanceTableV1(tag: Tag) extends CaseInstanceTable(tag) {
+    def definition = idColumn[String]("definition")
+  }
+
   final class CaseInstanceTeamMemberTableV1(tag: Tag) extends CaseInstanceTeamMemberTable(tag) {
 
     def pk_V1 = primaryKey("pk_case_instance_team_member", (caseInstanceId, role, userId))
@@ -111,7 +115,7 @@ object QueryDB_1_0_0 extends DbSchemaVersion
       _.taskModel
     )
 
-  def createCaseInstanceTable = TableMigration(TableQuery[CaseInstanceTable])
+  def createCaseInstanceTable = TableMigration(TableQuery[CaseInstanceTableV1])
     .create
     .addColumns(
       _.id,

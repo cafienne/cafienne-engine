@@ -21,7 +21,7 @@ trait TaskQueries {
 
   def getTask(taskId: String, user: PlatformUser): Future[TaskRecord] = ???
 
-  def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = ???
+  def getTasksWithCaseName(caseName: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = ???
 
   def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[TaskRecord]] = ???
 
@@ -54,12 +54,12 @@ class TaskQueriesImpl extends TaskQueries
     }
   }
 
-  override def getCaseTypeTasks(caseType: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = {
+  override def getTasksWithCaseName(caseName: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = {
     val query = for {
       // Get the case
       baseQuery <- TableQuery[TaskTable]
         .join(TableQuery[CaseInstanceTable]).on(_.caseInstanceId === _.id)
-        .filter(_._2.definition === caseType)
+        .filter(_._2.caseName === caseName)
         .filterOpt(tenant)(_._1.tenant === _)
       // Access control query
       _ <- membershipQuery(user, baseQuery._1.caseInstanceId, baseQuery._1.tenant, None)
