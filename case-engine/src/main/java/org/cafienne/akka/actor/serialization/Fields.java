@@ -9,6 +9,7 @@ public enum Fields {
     user,
 
     lastModified,
+    timestamp,
     commandType,
     messages,
     version,
