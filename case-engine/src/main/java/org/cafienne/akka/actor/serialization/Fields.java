@@ -32,7 +32,6 @@ public enum Fields {
 
     parentActorId,
     rootActorId,
-    caseTeam,
     inputParameters,
     definition,
     debugMode,

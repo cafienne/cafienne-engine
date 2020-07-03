@@ -9,6 +9,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueList;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.infrastructure.json.CafienneJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,18 @@ public interface AkkaSerializable {
     }
 
     void write(JsonGenerator generator) throws IOException ;
+
+    default void writeListField(JsonGenerator generator, Enum fieldName, Collection<? extends CafienneJson> stringList) throws IOException {
+        generator.writeArrayFieldStart(fieldName.toString());
+        for (CafienneJson string : stringList) {
+            if (string == null) {
+                generator.writeNull();
+            } else {
+                string.toValue().print(generator);
+            }
+        }
+        generator.writeEndArray();
+    }
 
     default void writeField(JsonGenerator generator, Enum fieldName, Collection<String> stringList) throws IOException {
         generator.writeArrayFieldStart(fieldName.toString());

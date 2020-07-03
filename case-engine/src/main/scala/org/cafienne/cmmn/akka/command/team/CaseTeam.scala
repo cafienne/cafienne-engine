@@ -8,7 +8,7 @@ import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.JavaConverters._
 
-case class CaseTeam(members: Seq[CaseTeamMember] = Seq()) extends CafienneJson {
+case class CaseTeam(members: Seq[CaseTeamMember] = Seq(), caseRoles: Seq[String] = Seq(), unassignedRoles: Seq[String] = Seq()) extends CafienneJson {
 
   /**
     * Validates whether the case team setup matches the case definition
@@ -45,8 +45,8 @@ case class CaseTeam(members: Seq[CaseTeamMember] = Seq()) extends CafienneJson {
 
   def getMembers() = members.asJava
 
-  override def toValue(): ValueList = {
-    Value.convert(members.map(member => member.toValue)).asInstanceOf[ValueList]
+  override def toValue(): ValueMap = {
+    new ValueMap("caseRoles", caseRoles, "members", members, "unassignedRoles", unassignedRoles)
   }
 }
 

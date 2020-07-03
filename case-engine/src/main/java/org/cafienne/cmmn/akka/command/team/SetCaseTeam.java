@@ -57,7 +57,7 @@ public class SetCaseTeam extends CaseCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.team, newCaseTeam.toValue());
+        writeListField(generator, Fields.team, newCaseTeam.getMembers());
     }
 
     @Override

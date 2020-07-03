@@ -51,12 +51,12 @@ final object Examples {
                        description = "Whether the member is owner to the case",
                        required = false,
                        implementation = classOf[Boolean],
-                       example = "false")
+                       example = "false or true")
                      isOwner: Boolean = false,
                      @(ArraySchema @field)(schema = new Schema(
                        description = "Zero or more roles that the member has in the case team. An empty set means that the member has no roles, but is still part of the team",
                        required = true,
-                       implementation = classOf[String],
+                       implementation = classOf[NewCaseTeamRoles],
                        example = "[\"Employee\",  \"Customer\", \"Supplier\"]"))
                      caseRoles: Array[String]
                    )
@@ -95,19 +95,56 @@ final object Examples {
                                     example = "Zero or more case roles that need to be removed from the member"))
                                   removeRoles: Array[String]
                                 )
-  @Schema(description = "Zero or more case roles that need to be removed from the membe")
-  case class NewCaseTeamRoles(
-                                  @(Schema @field)(description = "Optional field to fill when ownership needs to change for the member",
-                                    required = false, implementation = classOf[String],
-                                    example = "Zero or more case roles that need will be added to the member")
-                                  role: String)
+  case class NewCaseTeamRoles()
+  case class RemoveCaseTeamRoles()
 
-  @Schema(description = "Zero or more case roles that need to be removed from the membe")
-  case class RemoveCaseTeamRoles(
-    @(Schema @field)(description = "Optional field to fill when ownership needs to change for the member",
-    required = false, implementation = classOf[String],
-    example = "Zero or more case roles that need to be removed from the member")
-   role: String)
+  @Schema(description = "Example case team member")
+  case class CaseTeamMemberResponse(
+                                @(Schema @field)(
+                                  description = "Identification of the team member (either user id or tenant role name)",
+                                  example = "Identification of the team member (either user id or tenant role name)",
+                                  implementation = classOf[String])
+                                memberId: String,
+                                @(Schema @field)(
+                                  description = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
+                                  implementation = classOf[String],
+                                  example = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
+                                  allowableValues = Array("user", "role"))
+                                memberType: String,
+                                @(Schema @field)(
+                                  description = "True if the member is a Case Owner; Case Owners are authorized to manage the case and the case team",
+                                  implementation = classOf[Option[Boolean]],
+                                  example = "True if the member is a Case Owner; Case Owners are authorized to manage the case and the case team")
+                                isOwner: Boolean,
+                                @(ArraySchema @field)(schema = new Schema(
+                                  description = "Zero or more case roles that will be added to the member",
+                                  implementation = classOf[NewCaseTeamRoles],
+                                  example = "Zero or more case roles that will be added to the member"))
+                                caseRoles: Array[String],
+                              )
+
+  @Schema(description = "Example case team")
+  case class CaseTeamResponse(
+                           @(ArraySchema @field)(schema = new Schema(
+                             description = "Names of roles as defined in the case definition",
+                             example = "Names of roles as defined in the case definition",
+                             implementation = classOf[CaseDefinedRoles]))
+                           caseRoles: Array[String],
+                            @(ArraySchema @field)(schema = new Schema(
+                              description = "Members of the case team",
+                              required = true,
+                              implementation = classOf[CaseTeamMemberResponse]))
+                            members: Array[CaseTeamMemberResponse],
+                           @(ArraySchema @field)(schema = new Schema(
+                             description = "Names of defined roles that are not assigned to any of the team members",
+                             example = "Names of defined roles that are not assigned to any of the team members",
+                             implementation = classOf[UnassignedRoles]))
+                           unassignedRoles: Array[String]
+                             )
+
+  case class CaseDefinedRoles()
+  case class UnassignedRoles()
+  case class CaseTeamRoles()
 }
 
 @Schema(description = "Start the execution of a new case")

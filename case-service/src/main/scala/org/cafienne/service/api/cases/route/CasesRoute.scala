@@ -46,8 +46,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
   }
 
   protected def teamConverter(caseTeam: BackwardCompatibleTeam): CaseTeam = {
-    if (caseTeam == null) CaseTeam()
-    else new CaseTeam(caseTeam.members.map {
+    CaseTeam(caseTeam.members.map {
       memberConverter
     })
   }
