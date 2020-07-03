@@ -52,8 +52,10 @@ trait CasesRoute extends CommandRoute with QueryRoute {
   }
 
   protected def memberConverter(member: BackwardCompatibleTeamMember): CaseTeamMember = {
-    val mId = member.memberId.getOrElse(member.user.getOrElse(throw new IllegalArgumentException("Member id is missing")))
-    val cr = member.caseRoles.getOrElse(member.roles.getOrElse(Seq()))
+    val memberId = member.memberId.getOrElse(member.user.getOrElse(throw new IllegalArgumentException("Member id is missing")))
+    val memberType = member.memberType.getOrElse("user")
+    val caseRoles = member.caseRoles.getOrElse(member.roles.getOrElse(Seq()))
+    val removeRoles = member.removeRoles.getOrElse(Seq())
 
     val isOwner = {
       if (member.isOwner.nonEmpty) member.isOwner // If the value of owner is filled, then that precedes (both in old and new format)
@@ -61,6 +63,6 @@ trait CasesRoute extends CommandRoute with QueryRoute {
       else member.isOwner // New format, take what is set
     }
 
-    new CaseTeamMember(MemberKey(mId, member.memberType.getOrElse("user")), caseRoles = cr, isOwner = isOwner, removeRoles = member.removeRoles.getOrElse(Seq()))
+    new CaseTeamMember(MemberKey(memberId, memberType), caseRoles = caseRoles, isOwner = isOwner, removeRoles = removeRoles)
   }
 }

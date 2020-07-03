@@ -166,22 +166,22 @@ case class StartCase(
                           implementation = classOf[Examples.StartCaseTeam])
                       caseTeam: Option[BackwardCompatibleTeam],
                       @(Schema @field)(description = "Tenant in which to create the case. If empty, default tenant as configured is taken.", required = false, implementation = classOf[Option[String]], example = "Will be taken from settings if omitted or empty")
-                      tenant: Option[String] = None,
+                      tenant: Option[String],
                       @(Schema @field)(description = "Unique identifier to be used for this case. When there is no identifier given, a UUID will be generated", required = false, example = "Will be generated if omitted or empty")
                       caseInstanceId: Option[String],
                       @(Schema @field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
-                      debug: Option[Boolean] = Some(false))
+                      debug: Option[Boolean])
 
 case class BackwardCompatibleTeam(members: Seq[BackwardCompatibleTeamMember] = Seq())
 
-case class BackwardCompatibleTeamMember(user: Option[String] = None, // Old property, to be ccompatiblty
-                                        roles: Option[Seq[String]] = None, // Old property, just keep it here to remain compatible
+case class BackwardCompatibleTeamMember(user: Option[String], // Old property, to be ccompatiblty
+                                        roles: Option[Seq[String]], // Old property, just keep it here to remain compatible
                                        // New structure below
-                                        memberId: Option[String] = None,
-                                        memberType: Option[String] = Some("user"),
-                                        removeRoles: Option[Seq[String]] = None,
-                                        caseRoles: Option[Seq[String]] = None,
-                                        isOwner: Option[Boolean] = None)
+                                        memberId: Option[String],
+                                        memberType: Option[String],
+                                        removeRoles: Option[Seq[String]],
+                                        caseRoles: Option[Seq[String]],
+                                        isOwner: Option[Boolean])
 
 // CaseFileItem
 case class CaseFileItem(id: String,
