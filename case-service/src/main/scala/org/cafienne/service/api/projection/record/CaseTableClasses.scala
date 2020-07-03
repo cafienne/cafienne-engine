@@ -2,7 +2,7 @@ package org.cafienne.service.api.projection.record
 
 import java.time.Instant
 
-import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
+import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueList, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 
 final case class CaseRecord(id: String,
@@ -34,8 +34,13 @@ final case class CaseRecord(id: String,
     v.putRaw("createdBy", createdBy)
     v.putRaw("lastModified", lastModified)
     v.putRaw("modifiedBy", modifiedBy)
+    v.putRaw("modifiedBy", modifiedBy)
     v.putRaw("caseInput", "")
     v.putRaw("caseOutput", "")
+    // Adding default empty values for case plan, case team and case file.
+    v.putRaw("planitems", new ValueList())
+    v.putRaw("team", new ValueList())
+    v.putRaw("file", new ValueMap())
     v
   }
 }

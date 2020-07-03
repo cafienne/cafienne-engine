@@ -6,7 +6,7 @@ import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.projection.record.{CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan) extends CafienneJson {
-  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.toValue(), "file", file.toValue(), "planitems", planitems.toValue))
+  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.members, "file", file.toValue(), "planitems", planitems.toValue))
 }
 
 final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {

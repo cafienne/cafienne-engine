@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.CaseFileItem;
+import org.cafienne.infrastructure.json.CafienneJson;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import scala.collection.Seq;
@@ -146,13 +147,36 @@ public abstract class Value<T> implements Serializable {
      * @return
      */
     public static Value<?> convert(Object object) {
+        // NOTE: order of if statements is measured by running Cafienne TypeScript test framework;
+        //  String convert happens 6500 times, Seq conversion 400, Array conversion 200, etc.
         if (object == null) {
             return Value.NULL;
-        }
-        if (object instanceof Value<?>) {
+        } else if (object instanceof Value<?>) {
             return (Value<?>) object;
         } else if (object instanceof String) {
             return new StringValue((String) object);
+        } else if (object instanceof Seq) {
+            Seq<?> list = (Seq<?>) object;
+            ValueList valueList = new ValueList();
+            list.foreach(item -> valueList.add(convert(item)));
+            return valueList;
+        } else if (object instanceof Object[] || object.getClass().isArray()) {
+            // We first check with instanceof, and then with isArray, because isArray is slower, and instanceof does not recognize primitive types.
+            ValueList valueList = new ValueList();
+            for (int i = 0; i < Array.getLength(object); i++) {
+                Object o = Array.get(object, i);
+                valueList.add(convert(Array.get(object, i)));
+            }
+            return valueList;
+        } else if (object instanceof CafienneJson) {
+            return ((CafienneJson) object).toValue();
+        } else if (object instanceof List) {
+            List<?> list = (List<?>) object;
+            ValueList valueList = new ValueList();
+            for (Object element : list) {
+                valueList.add(convert(element));
+            }
+            return valueList;
         } else if (object instanceof Boolean) {
             return new BooleanValue((Boolean) object);
         } else if (object instanceof Double || object instanceof Float) {
@@ -184,26 +208,6 @@ public abstract class Value<T> implements Serializable {
             ValueList valueList = new ValueList();
             for (Object element : list) {
                 valueList.add(convert(element));
-            }
-            return valueList;
-        } else if (object instanceof List) {
-            List<?> list = (List<?>) object;
-            ValueList valueList = new ValueList();
-            for (Object element : list) {
-                valueList.add(convert(element));
-            }
-            return valueList;
-       } else if (object instanceof Seq) {
-            Seq<?> list = (Seq<?>) object;
-            ValueList valueList = new ValueList();
-            list.foreach(item -> valueList.add(convert(item)));
-            return valueList;
-        } else if (object instanceof Object[] || object.getClass().isArray()) {
-            // We first check with instanceof, and then with isArray, because isArray is slower, and instanceof does not recognize primitive types.
-            ValueList valueList = new ValueList();
-            for (int i = 0; i < Array.getLength(object); i++) {
-                Object o = Array.get(object, i);
-                valueList.add(convert(Array.get(object, i)));
             }
             return valueList;
         } else if (object instanceof Throwable) {

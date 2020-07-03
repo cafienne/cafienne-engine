@@ -135,9 +135,13 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
                 addDebugInfo(() -> exception, logger);
                 actor.failedWithInvalidState(this, exception);
             }
+
+            actor.resetTransactionTimestamp();
+
         } else if (hasOnlyDebugEvents()) { // Nothing to persist, just respond to the client if there is something to say
             if (response != null) {
                 response.setLastModified(actor.getLastModified());
+                actor.resetTransactionTimestamp();
                 // Now tell the sender about the response
                 actor.reply(response);
                 // Also store the debug events if there are

@@ -51,12 +51,12 @@ final object Examples {
                        description = "Whether the member is owner to the case",
                        required = false,
                        implementation = classOf[Boolean],
-                       example = "false")
+                       example = "false or true")
                      isOwner: Boolean = false,
                      @(ArraySchema @field)(schema = new Schema(
                        description = "Zero or more roles that the member has in the case team. An empty set means that the member has no roles, but is still part of the team",
                        required = true,
-                       implementation = classOf[String],
+                       implementation = classOf[NewCaseTeamRoles],
                        example = "[\"Employee\",  \"Customer\", \"Supplier\"]"))
                      caseRoles: Array[String]
                    )
@@ -95,19 +95,56 @@ final object Examples {
                                     example = "Zero or more case roles that need to be removed from the member"))
                                   removeRoles: Array[String]
                                 )
-  @Schema(description = "Zero or more case roles that need to be removed from the membe")
-  case class NewCaseTeamRoles(
-                                  @(Schema @field)(description = "Optional field to fill when ownership needs to change for the member",
-                                    required = false, implementation = classOf[String],
-                                    example = "Zero or more case roles that need will be added to the member")
-                                  role: String)
+  case class NewCaseTeamRoles()
+  case class RemoveCaseTeamRoles()
 
-  @Schema(description = "Zero or more case roles that need to be removed from the membe")
-  case class RemoveCaseTeamRoles(
-    @(Schema @field)(description = "Optional field to fill when ownership needs to change for the member",
-    required = false, implementation = classOf[String],
-    example = "Zero or more case roles that need to be removed from the member")
-   role: String)
+  @Schema(description = "Example case team member")
+  case class CaseTeamMemberResponse(
+                                @(Schema @field)(
+                                  description = "Identification of the team member (either user id or tenant role name)",
+                                  example = "Identification of the team member (either user id or tenant role name)",
+                                  implementation = classOf[String])
+                                memberId: String,
+                                @(Schema @field)(
+                                  description = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
+                                  implementation = classOf[String],
+                                  example = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
+                                  allowableValues = Array("user", "role"))
+                                memberType: String,
+                                @(Schema @field)(
+                                  description = "True if the member is a Case Owner; Case Owners are authorized to manage the case and the case team",
+                                  implementation = classOf[Option[Boolean]],
+                                  example = "True if the member is a Case Owner; Case Owners are authorized to manage the case and the case team")
+                                isOwner: Boolean,
+                                @(ArraySchema @field)(schema = new Schema(
+                                  description = "Zero or more case roles that will be added to the member",
+                                  implementation = classOf[NewCaseTeamRoles],
+                                  example = "Zero or more case roles that will be added to the member"))
+                                caseRoles: Array[String],
+                              )
+
+  @Schema(description = "Example case team")
+  case class CaseTeamResponse(
+                           @(ArraySchema @field)(schema = new Schema(
+                             description = "Names of roles as defined in the case definition",
+                             example = "Names of roles as defined in the case definition",
+                             implementation = classOf[CaseDefinedRoles]))
+                           caseRoles: Array[String],
+                            @(ArraySchema @field)(schema = new Schema(
+                              description = "Members of the case team",
+                              required = true,
+                              implementation = classOf[CaseTeamMemberResponse]))
+                            members: Array[CaseTeamMemberResponse],
+                           @(ArraySchema @field)(schema = new Schema(
+                             description = "Names of defined roles that are not assigned to any of the team members",
+                             example = "Names of defined roles that are not assigned to any of the team members",
+                             implementation = classOf[UnassignedRoles]))
+                           unassignedRoles: Array[String]
+                             )
+
+  case class CaseDefinedRoles()
+  case class UnassignedRoles()
+  case class CaseTeamRoles()
 }
 
 @Schema(description = "Start the execution of a new case")
@@ -129,22 +166,22 @@ case class StartCase(
                           implementation = classOf[Examples.StartCaseTeam])
                       caseTeam: Option[BackwardCompatibleTeam],
                       @(Schema @field)(description = "Tenant in which to create the case. If empty, default tenant as configured is taken.", required = false, implementation = classOf[Option[String]], example = "Will be taken from settings if omitted or empty")
-                      tenant: Option[String] = None,
+                      tenant: Option[String],
                       @(Schema @field)(description = "Unique identifier to be used for this case. When there is no identifier given, a UUID will be generated", required = false, example = "Will be generated if omitted or empty")
                       caseInstanceId: Option[String],
                       @(Schema @field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
-                      debug: Option[Boolean] = Some(false))
+                      debug: Option[Boolean])
 
 case class BackwardCompatibleTeam(members: Seq[BackwardCompatibleTeamMember] = Seq())
 
-case class BackwardCompatibleTeamMember(user: Option[String] = None, // Old property, to be ccompatiblty
-                                        roles: Option[Seq[String]] = None, // Old property, just keep it here to remain compatible
+case class BackwardCompatibleTeamMember(user: Option[String], // Old property, to be ccompatiblty
+                                        roles: Option[Seq[String]], // Old property, just keep it here to remain compatible
                                        // New structure below
-                                        memberId: Option[String] = None,
-                                        memberType: Option[String] = Some("user"),
-                                        removeRoles: Option[Seq[String]] = None,
-                                        caseRoles: Option[Seq[String]] = None,
-                                        isOwner: Option[Boolean] = None)
+                                        memberId: Option[String],
+                                        memberType: Option[String],
+                                        removeRoles: Option[Seq[String]],
+                                        caseRoles: Option[Seq[String]],
+                                        isOwner: Option[Boolean])
 
 // CaseFileItem
 case class CaseFileItem(id: String,

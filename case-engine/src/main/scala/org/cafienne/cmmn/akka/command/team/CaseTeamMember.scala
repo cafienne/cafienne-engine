@@ -8,12 +8,15 @@ import org.cafienne.infrastructure.json.CafienneJson
 
 case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwner: Option[Boolean] = None, removeRoles: Seq[String] = Seq()) extends CafienneJson {
   def validateRolesExist(caseDefinition: CaseDefinition): Unit = {
-    val unfoundRole = (caseRoles ++ removeRoles).find(roleName => caseDefinition.getCaseRole(roleName) == null || roleName.isBlank)
-    unfoundRole match {
-      case Some(roleName) =>
-        if (roleName.isBlank) throw new CaseTeamError("An empty role is not permitted")
-        else throw new CaseTeamError("A role with name " + roleName + " is not defined in the case")
-      case None => // cool
+    val blankRoles = (caseRoles ++ removeRoles).filter(roleName => roleName.isBlank)
+    val undefinedRoles = (caseRoles ++ removeRoles).filter(roleName => caseDefinition.getCaseRole(roleName) == null)
+
+    if (blankRoles.nonEmpty || undefinedRoles.nonEmpty) {
+      if (undefinedRoles.isEmpty) {
+        throw new CaseTeamError("An empty role is not permitted")
+      } else {
+        throw new CaseTeamError("The following role(s) are not defined in the case: " + undefinedRoles.mkString(","))
+      }
     }
   }
 

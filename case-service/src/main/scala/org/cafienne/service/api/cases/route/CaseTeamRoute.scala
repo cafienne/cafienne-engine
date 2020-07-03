@@ -41,7 +41,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
-      new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeam])))),
+      new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[Examples.CaseTeamResponse])))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )

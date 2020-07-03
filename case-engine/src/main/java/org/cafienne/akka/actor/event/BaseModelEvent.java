@@ -7,6 +7,7 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
 import java.io.IOException;
+import java.time.Instant;
 
 public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent<M> {
     private final ValueMap json;
@@ -15,6 +16,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     private final String actorId;
     public final String tenant;
     private final TenantUser tenantUser;
+    private final Instant timestamp;
 
     /**
      * During recovery, Actor is set in call to {@link ModelEvent#recover(ModelActor)}
@@ -28,14 +30,16 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
         this.tenant = actor.getTenant();
         this.tenantUser = actor.getCurrentUser();
         this.actor = actor;
+        this.timestamp = actor.getTransactionTimestamp();
     }
 
     protected BaseModelEvent(ValueMap json) {
         this.json = json;
-        json = json.with(Fields.modelEvent);
-        this.actorId = readField(json, Fields.actorId);
-        this.tenant = readField(json, Fields.tenant);
-        this.tenantUser = TenantUser.from(json.with(Fields.user));
+        ValueMap modelEventJson = json.with(Fields.modelEvent);
+        this.actorId = readField(modelEventJson, Fields.actorId);
+        this.tenant = readField(modelEventJson, Fields.tenant);
+        this.timestamp = readInstant(modelEventJson, Fields.timestamp);
+        this.tenantUser = TenantUser.from(modelEventJson.with(Fields.user));
     }
 
     @Override
@@ -124,6 +128,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
         generator.writeStartObject();
         writeField(generator, Fields.actorId, this.getActorId());
         writeField(generator, Fields.tenant, this.tenant);
+        writeField(generator, Fields.timestamp, this.timestamp);
         generator.writeFieldName(Fields.user.toString());
         tenantUser.write(generator);
         generator.writeEndObject();

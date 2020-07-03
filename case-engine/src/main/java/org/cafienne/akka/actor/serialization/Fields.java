@@ -9,6 +9,7 @@ public enum Fields {
     user,
 
     lastModified,
+    timestamp,
     commandType,
     messages,
     version,
@@ -32,7 +33,6 @@ public enum Fields {
 
     parentActorId,
     rootActorId,
-    caseTeam,
     inputParameters,
     definition,
     debugMode,

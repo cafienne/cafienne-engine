@@ -3,7 +3,7 @@ package org.cafienne.service.api.projection.query
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord}
+import org.cafienne.service.api.projection.record.{CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 
 import scala.concurrent.Future
@@ -53,28 +53,14 @@ class CaseQueriesImpl
     }
   }
   private def fillCaseTeam(records: Seq[CaseTeamMemberRecord]): CaseTeam = {
-    def updateMember(member: CaseTeamMember, record: CaseTeamMemberRecord): CaseTeamMember = {
-      record.caseRole.isBlank match {
-        // If role is blank we check primary fields such as member type and ownership
-        case true => member.copy(key = member.key, isOwner = Some(record.isOwner))
-        // Otherwise we simply copy the roles
-        case false => member.copy(caseRoles = member.caseRoles ++ Seq(record.caseRole))
-      }
-    }
+    val members = records.filter(record => record.caseRole.isBlank)
+    val roles = records.filterNot(record => record.caseRole.isBlank)
 
-    def key(record: CaseTeamMemberRecord): MemberKey = record.isTenantUser match {
-      case true => MemberKey(record.memberId, "user")
-      case false => MemberKey(record.memberId, "role")
-    }
-
-    val members = scala.collection.mutable.HashMap[MemberKey, CaseTeamMember]()
-    records.map(record => {
-      val memberKey = key(record)
-      val memberToUpdate = members.getOrElse(memberKey, CaseTeamMember(memberKey))
-      members.put(memberKey, updateMember(memberToUpdate, record))
-    })
-
-    CaseTeam(members.map(m => m._2).toSeq)
+    CaseTeam(members.map(member => {
+      val key = MemberKey(member.memberId, member.isTenantUser match { case true => {"user"} case false => {"role"} })
+      val memberRoles = roles.filter(role => role.memberId == member.memberId && role.isTenantUser == member.isTenantUser).map(role => role.caseRole)
+      new CaseTeamMember(key, memberRoles, Some(member.isOwner))
+    }))
   }
 
   override def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = {
@@ -123,13 +109,19 @@ class CaseQueriesImpl
       baseQuery <- caseInstanceTeamMemberQuery
         .filter(_.caseInstanceId === caseInstanceId)
         .filter(_.active === true)
+        .joinRight(TableQuery[CaseInstanceRoleTable]) // Select all defined case roles; joining right will also return unfilled case roles
+          .on((m, r) => m.caseInstanceId === r.caseInstanceId && m.caseRole === r.roleName)
+        .filter(_._2.caseInstanceId === caseInstanceId) // but only for this case obviously
       // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery._2.tenant, None)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
       if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
-      fillCaseTeam(records)
+      val team = fillCaseTeam(records.map(r => r._1).filter(m => m.nonEmpty).map(m => m.get))
+      val unassignedRoles = records.filter(r => r._1.isEmpty).map(r => r._2.roleName)
+      val caseRoles = records.map(r => r._2.roleName).filterNot(_.isBlank)//.toSet.toSeq
+      team.copy(caseRoles = caseRoles, unassignedRoles = unassignedRoles)
     })
   }
 
