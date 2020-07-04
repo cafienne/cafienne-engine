@@ -138,14 +138,13 @@ class TaskQueriesImpl extends TaskQueries
         .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
         .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
         .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
-        .only(area)
 
       // Access control query
       _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, filter.identifiers)
 
     } yield baseQuery
 
-    db.run(query.order(sort).distinct.result)
+    db.run(query.distinct.only(area).order(sort).result)
   }
 
   private def getStartDate(date: String, timeZone: Option[String]): Option[Instant] = {

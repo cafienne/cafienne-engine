@@ -75,7 +75,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
-            runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort(sortBy, sortOrder)))
+            runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
         }
       }
     }
@@ -110,7 +110,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
-            runListQuery(caseQueries.getMyCases(platformUser, filter, Area(offset, numResults), Sort(sortBy, sortOrder)))
+            runListQuery(caseQueries.getMyCases(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
         }
       }
     }
