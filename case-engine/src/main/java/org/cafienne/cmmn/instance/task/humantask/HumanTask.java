@@ -153,6 +153,10 @@ public class HumanTask extends Task<HumanTaskDefinition> {
      * @return
      */
     public boolean currentUserIsAuthorized() {
+        if (getCaseInstance().getCurrentTeamMember().isOwner()) {
+            return true;
+        }
+
         CaseRoleDefinition performer = getPerformer();
         if (performer == null) { // Only do authorization if the performer role is set
             return true;
