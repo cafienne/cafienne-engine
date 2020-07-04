@@ -15,12 +15,13 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskDueDateFilled;
+import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class FillTaskDueDate extends HumanTaskCommand {
+public class FillTaskDueDate extends WorkflowCommand {
 	private final Instant dueDate;
 
 	public FillTaskDueDate(TenantUser tenantUser, String caseInstanceId, String taskId, Instant dueDate) {
@@ -40,8 +41,8 @@ public class FillTaskDueDate extends HumanTaskCommand {
 	}
 
 	@Override
-	public HumanTaskResponse process(HumanTask task) {
-		task.addEvent(new HumanTaskDueDateFilled(task, this.dueDate));
+	public HumanTaskResponse process(WorkflowTask workflowTask) {
+		workflowTask.setDueDate(dueDate);
 		return new HumanTaskResponse(this);
 	}
 

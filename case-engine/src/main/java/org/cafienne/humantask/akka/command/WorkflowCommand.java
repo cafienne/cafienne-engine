@@ -12,15 +12,16 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-public abstract class HumanTaskCommand extends CaseCommand {
+public abstract class WorkflowCommand extends CaseCommand {
     private final String taskId;
     private HumanTask task;
 
-    protected HumanTaskCommand(TenantUser tenantUser, String caseInstanceId, String taskId) {
+    protected WorkflowCommand(TenantUser tenantUser, String caseInstanceId, String taskId) {
         super(tenantUser, caseInstanceId);
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new NullPointerException("Task id should not be null or empty");
@@ -29,7 +30,7 @@ public abstract class HumanTaskCommand extends CaseCommand {
         this.taskId = taskId;
     }
 
-    protected HumanTaskCommand(ValueMap json) {
+    protected WorkflowCommand(ValueMap json) {
         super(json);
         this.taskId = readField(json, Fields.taskId);
     }
@@ -66,10 +67,10 @@ public abstract class HumanTaskCommand extends CaseCommand {
     public abstract void validate(HumanTask task) throws InvalidCommandException;
 
     public ModelResponse process(Case caseInstance) {
-        return process(task);
+        return process(task.getImplementation());
     }
 
-    public abstract ModelResponse process(HumanTask task) ;
+    public abstract ModelResponse process(WorkflowTask task);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
@@ -91,6 +92,15 @@ public abstract class HumanTaskCommand extends CaseCommand {
             }
         }
         raiseException("Cannot be done because the task is in " + currentTaskState + " state, but should be in any of " + Arrays.asList(expectedStates) + " state");
+    }
+
+    protected void mustBeAssigned(HumanTask task) {
+        validateProperCaseRole(task);
+
+        TaskState currentTaskState = task.getImplementation().getCurrentState();
+        if (!currentTaskState.inUse()) {
+            raiseException("Cannot be done because the task is not Active but " + currentTaskState);
+        }
     }
 
     /**

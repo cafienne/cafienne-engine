@@ -15,6 +15,14 @@ public enum TaskState {
         return name();
     }
 
+    public boolean inUse() {
+        return this == Assigned || this == Delegated;
+    }
+
+    public boolean isActive() {
+        return this == Unassigned || this == Assigned || this == Delegated;
+    }
+
     boolean isSemiTerminal() {
         return this == Completed || this == Terminated || this == Suspended;
     }
