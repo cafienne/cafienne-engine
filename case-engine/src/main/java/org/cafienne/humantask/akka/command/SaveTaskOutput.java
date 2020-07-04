@@ -15,7 +15,7 @@ import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskOutputSaved;
-import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ import java.io.IOException;
  * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.
  */
 @Manifest
-public class SaveTaskOutput extends HumanTaskCommand {
+public class SaveTaskOutput extends WorkflowCommand {
 	private final ValueMap taskOutput;
 
 	public SaveTaskOutput(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
@@ -43,12 +43,12 @@ public class SaveTaskOutput extends HumanTaskCommand {
 	@Override
 	public void validate(HumanTask task) {
 		super.validateTaskOwnership(task);
-		super.validateState(task, TaskState.Assigned, TaskState.Delegated);
+		super.mustBeAssigned(task);
 	}
 
 	@Override
-	public HumanTaskResponse process(HumanTask task) {
-		task.addEvent(new HumanTaskOutputSaved(task, this.taskOutput));
+	public HumanTaskResponse process(WorkflowTask workflowTask) {
+		workflowTask.saveOutput(this.taskOutput);
 		return new HumanTaskResponse(this);
 	}
 

@@ -30,6 +30,10 @@ public abstract class CaseTeamMemberEvent extends CaseTeamEvent {
         this.key = new MemberKey(memberId, isTenantUser ? "user" : "role");
     }
 
+    public String roleName() {
+        return "";
+    }
+
     protected String getMemberDescription() {
         return "Tenant " + key;
     }

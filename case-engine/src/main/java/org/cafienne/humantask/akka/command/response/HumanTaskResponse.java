@@ -3,10 +3,9 @@ package org.cafienne.humantask.akka.command.response;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.command.response.ActorLastModified;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.humantask.akka.command.HumanTaskCommand;
+import org.cafienne.humantask.akka.command.WorkflowCommand;
 
 import java.io.IOException;
 
@@ -14,7 +13,7 @@ import java.io.IOException;
 public class HumanTaskResponse extends CaseResponse {
     private final String taskId;
 
-    public HumanTaskResponse(HumanTaskCommand command) {
+    public HumanTaskResponse(WorkflowCommand command) {
         super(command);
         this.taskId = command.actorId;
     }

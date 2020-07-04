@@ -11,4 +11,5 @@ object Sort {
 
   def on(field: String) = Sort(Some(field))
 
+  def withDefault(on: Option[String], direction: Option[String], defaultOnField: String) = Sort(Some(on.getOrElse(defaultOnField)), direction)
 }

@@ -15,9 +15,10 @@ import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 
 @Manifest
-public class HumanTaskRevoked extends HumanTaskAssigned{
-    public HumanTaskRevoked(HumanTask task, String previousAssignee) {
-        super(task, previousAssignee, task.getImplementation().getCurrentState() == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned, TaskAction.Revoke);
+public class HumanTaskRevoked extends HumanTaskAssigned {
+
+    public HumanTaskRevoked(HumanTask task, String assignee, TaskState nextState, TaskAction transition) {
+        super(task, assignee, nextState, transition);
     }
 
     public HumanTaskRevoked(ValueMap json) {

@@ -15,14 +15,13 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
-import org.cafienne.humantask.akka.event.HumanTaskAssigned;
-import org.cafienne.humantask.akka.event.HumanTaskOwnerChanged;
 import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
 @Manifest
-public class AssignTask extends HumanTaskCommand {
+public class AssignTask extends WorkflowCommand {
     private final String assignee;
 
     public AssignTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
@@ -41,13 +40,15 @@ public class AssignTask extends HumanTaskCommand {
     @Override
     public void validate(HumanTask task) {
         super.validateCaseOwnership(task);
-        super.validateState(task, TaskState.Unassigned);
+        TaskState currentTaskState = task.getImplementation().getCurrentState();
+        if (! currentTaskState.isActive()) {
+            raiseException("Cannot be done because the task is in " + currentTaskState + " state, but must be in an active state (Unassigned or Assigned)");
+        }
     }
 
     @Override
-    public HumanTaskResponse process(HumanTask task) {
-        task.addEvent(new HumanTaskAssigned(task, this.assignee));
-        task.addEvent(new HumanTaskOwnerChanged(task, this.assignee));
+    public HumanTaskResponse process(WorkflowTask workflowTask) {
+        workflowTask.assign(this.assignee);
         return new HumanTaskResponse(this);
     }
 

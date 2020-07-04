@@ -19,7 +19,7 @@ import org.cafienne.cmmn.instance.task.validation.ValidationError;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.event.HumanTaskCompleted;
-import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ import java.io.IOException;
  * This command must be used to complete a human task with additional task output parameters.
  */
 @Manifest
-public class CompleteHumanTask extends HumanTaskCommand {
+public class CompleteHumanTask extends WorkflowCommand {
     protected final ValueMap taskOutput;
     protected Task<?> task;
 
@@ -54,7 +54,7 @@ public class CompleteHumanTask extends HumanTaskCommand {
     @Override
     public void validate(HumanTask task) throws InvalidCommandException {
         super.validateTaskOwnership(task);
-        super.validateState(task, TaskState.Assigned, TaskState.Delegated);
+        super.mustBeAssigned(task);
     }
 
     public ValueMap getTaskOutput() {
@@ -62,23 +62,8 @@ public class CompleteHumanTask extends HumanTaskCommand {
     }
 
     @Override
-    public HumanTaskResponse process(HumanTask task) {
-        // TTDL
-        // First validate task output. Note: this may result in "CommandException", instead of "InvalidCommandException". For that reason this cannot be done right now in validate method.
-
-        ValidationResponse validate = task.validateOutput(taskOutput);
-        if (validate instanceof ValidationError) {
-            throw new InvalidCommandException("Output for task "+task.getName()+" could not be validated due to an error", validate.getException());
-        } else {
-            if (! validate.getContent().getValue().isEmpty()) {
-                throw new InvalidCommandException("Output for task "+task.getName()+" is invalid\n" + validate.getContent());
-            }
-        }
-
-
-        task.addEvent(new HumanTaskCompleted(task, this.taskOutput));
-        // This will generate PlanItemTransitioned and CaseFileItem events
-        task.goComplete(this.taskOutput);
+    public HumanTaskResponse process(WorkflowTask workflowTask) {
+        workflowTask.complete(taskOutput);
         return new HumanTaskResponse(this);
     }
 

@@ -52,30 +52,20 @@ class CaseQueriesImpl
       case Some(tenant) => tenant
     }
   }
-  private def fillCaseTeam(records: Seq[CaseTeamMemberRecord]): CaseTeam = {
-    val members = records.filter(record => record.caseRole.isBlank)
-    val roles = records.filterNot(record => record.caseRole.isBlank)
-
-    CaseTeam(members.map(member => {
-      val key = MemberKey(member.memberId, member.isTenantUser match { case true => {"user"} case false => {"role"} })
-      val memberRoles = roles.filter(role => role.memberId == member.memberId && role.isTenantUser == member.isTenantUser).map(role => role.caseRole)
-      new CaseTeamMember(key, memberRoles, Some(member.isOwner))
-    }))
-  }
 
   override def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = {
     val result = for {
       caseInstance <- getCaseInstance(caseInstanceId, user)
-      caseTeam <- db.run(caseInstanceTeamMemberQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map{fillCaseTeam}
+      caseTeam <- db.run(caseInstanceTeamMemberQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map {
+        fillCaseTeam
+      }
       caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.getOrElse(null)))
-      casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map{CasePlan}
+      casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map {
+        CasePlan
+      }
     } yield (caseInstance, caseTeam, caseFile, casePlan)
 
     result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4)))
-  }
-
-  override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]) = {
-    TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId)
   }
 
   override def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseRecord]] = {
@@ -87,6 +77,10 @@ class CaseQueriesImpl
     } yield baseQuery
 
     db.run(query.result.headOption)
+  }
+
+  override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]) = {
+    TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId)
   }
 
   override def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = {
@@ -110,7 +104,7 @@ class CaseQueriesImpl
         .filter(_.caseInstanceId === caseInstanceId)
         .filter(_.active === true)
         .joinRight(TableQuery[CaseInstanceRoleTable]) // Select all defined case roles; joining right will also return unfilled case roles
-          .on((m, r) => m.caseInstanceId === r.caseInstanceId && m.caseRole === r.roleName)
+        .on((m, r) => m.caseInstanceId === r.caseInstanceId && m.caseRole === r.roleName)
         .filter(_._2.caseInstanceId === caseInstanceId) // but only for this case obviously
       // Access control query
       _ <- membershipQuery(user, caseInstanceId, baseQuery._2.tenant, None)
@@ -120,9 +114,26 @@ class CaseQueriesImpl
       if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
       val team = fillCaseTeam(records.map(r => r._1).filter(m => m.nonEmpty).map(m => m.get))
       val unassignedRoles = records.filter(r => r._1.isEmpty).map(r => r._2.roleName)
-      val caseRoles = records.map(r => r._2.roleName).filterNot(_.isBlank)//.toSet.toSeq
+      val caseRoles = records.map(r => r._2.roleName).filterNot(_.isBlank) //.toSet.toSeq
       team.copy(caseRoles = caseRoles, unassignedRoles = unassignedRoles)
     })
+  }
+
+  private def fillCaseTeam(records: Seq[CaseTeamMemberRecord]): CaseTeam = {
+    val members = records.filter(record => record.caseRole.isBlank)
+    val roles = records.filterNot(record => record.caseRole.isBlank)
+
+    CaseTeam(members.map(member => {
+      val key = MemberKey(member.memberId, member.isTenantUser match { case true => {
+        "user"
+      }
+      case false => {
+        "role"
+      }
+      })
+      val memberRoles = roles.filter(role => role.memberId == member.memberId && role.isTenantUser == member.isTenantUser).map(role => role.caseRole)
+      new CaseTeamMember(key, memberRoles, Some(member.isOwner))
+    }))
   }
 
   override def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = {
@@ -147,7 +158,7 @@ class CaseQueriesImpl
       _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
-    db.run(query.result.headOption).map{
+    db.run(query.result.headOption).map {
       case None => throw PlanItemSearchFailure(planItemId)
       case Some(record) => PlanItem(record)
     }
@@ -178,7 +189,7 @@ class CaseQueriesImpl
     // NOTE: this uses a direct query. Fields must be escaped with quotes for the in-memory Hsql Database usage.
     val action = {
       status match {
-//        case Some(s) => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
+        //        case Some(s) => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
         case Some(s) => s.toLowerCase() match {
           case "active" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Active'""".as[(Long, String, String, String, Int)]
           case "completed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Completed'""".as[(Long, String, String, String, Int)]
@@ -243,17 +254,15 @@ class CaseQueriesImpl
   }
 
   override def getCases(user: PlatformUser, filter: CaseFilter, area: Area, sort: Sort): Future[Seq[CaseRecord]] = {
-    val query: Query[CaseInstanceTable, CaseRecord, Seq] = for {
+    val query = for {
       baseQuery <- statusFilter(filter.status)
-              .filterOpt(filter.tenant)((t, value) => t.tenant === value)
-              .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
-              .order(sort)
-              .only(area)
+          .filterOpt(filter.tenant)((t, value) => t.tenant === value)
+          .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
 
       // Validate team membership
       _ <- membershipQuery(user, baseQuery.id, baseQuery.tenant, filter.identifiers)
     } yield baseQuery
-    db.run(query.distinct.result).map(records => {
+    db.run(query.distinct.only(area).order(sort).result).map(records => {
       //      println("Found " + records.length +" matching cases on filter " + identifiers)
       records
     })

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.humantask.akka.command.HumanTaskCommand;
+import org.cafienne.humantask.akka.command.WorkflowCommand;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import java.io.IOException;
 public class HumanTaskValidationResponse extends HumanTaskResponse {
     private final ValueMap value;
 
-    public HumanTaskValidationResponse(HumanTaskCommand command, ValueMap value) {
+    public HumanTaskValidationResponse(WorkflowCommand command, ValueMap value) {
         super(command);
         this.value = value;
     }

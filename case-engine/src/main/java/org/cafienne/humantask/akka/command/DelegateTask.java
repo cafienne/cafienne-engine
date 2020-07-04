@@ -15,13 +15,13 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
-import org.cafienne.humantask.akka.event.HumanTaskDelegated;
 import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 
 @Manifest
-public class DelegateTask extends HumanTaskCommand {
+public class DelegateTask extends WorkflowCommand {
     private final String assignee;
 
     public DelegateTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
@@ -47,8 +47,8 @@ public class DelegateTask extends HumanTaskCommand {
     }
 
     @Override
-    public HumanTaskResponse process(HumanTask task) {
-        task.addEvent(new HumanTaskDelegated(task, assignee));
+    public HumanTaskResponse process(WorkflowTask workflowTask) {
+        workflowTask.delegate(assignee);
         return new HumanTaskResponse(this);
     }
 

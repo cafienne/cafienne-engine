@@ -25,7 +25,7 @@ public class TeamRoleCleared extends CaseTeamRoleEvent {
             //  since that can only be done through removing the member explicitly, resulting in TeamMemberRemoved event
             return getClass().getSimpleName() + "[" + getMemberDescription()+" is removed from the case team]";
         } else {
-            return getClass().getSimpleName() + "[" + getMemberDescription()+" no longer has role " + roleName + " in the case team]";
+            return getClass().getSimpleName() + "[" + getMemberDescription()+" no longer has role " + roleName() + " in the case team]";
         }
     }
 
