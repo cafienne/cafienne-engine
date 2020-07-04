@@ -20,6 +20,10 @@ case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwne
     }
   }
 
+  def isTenantUser(): Boolean = {
+    key.`type`.equals("user")
+  }
+
   def getCaseRoles = {
     import scala.collection.JavaConverters._
     caseRoles.asJava

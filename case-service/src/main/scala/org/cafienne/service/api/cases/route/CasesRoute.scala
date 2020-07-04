@@ -8,13 +8,12 @@
 package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.akka.command._
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
-import org.cafienne.service.api
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember}
 import org.cafienne.service.api.projection.CaseSearchFailure
@@ -26,6 +25,42 @@ trait CasesRoute extends CommandRoute with QueryRoute {
   val caseQueries: CaseQueries
 
   override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
+
+  def askCaseWithValidMembers(platformUser: PlatformUser, members: Seq[CaseTeamMember], caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
+    readLastModifiedHeader() { caseLastModified =>
+      onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
+        case Success(tenant) => {
+          askCaseWithValidTeam(platformUser, tenant, members, createCaseCommand.apply(platformUser.getTenantUser(tenant)))
+        }
+        case Failure(error) => {
+          error match {
+            case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+            case _ => throw error
+          }
+        }
+      }
+    }
+  }
+
+  def askCaseWithValidTeam(platformUser: PlatformUser, tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
+    val userIds = members.filter(member => member.isTenantUser()).map(member => member.key.id)
+    onComplete(userCache.getUsers(userIds, tenant)) {
+      case Success(tenantUsers) => {
+        if (tenantUsers.size != userIds.size) {
+          val tenantUserIds = tenantUsers.map(t => t.id)
+          val unfoundUsers = userIds.filterNot(userId => tenantUserIds.contains(userId))
+          val msg = {
+            if (unfoundUsers.size == 1) s"Cannot find an active user '${unfoundUsers(0)}' in tenant '$tenant'"
+            else s"The users ${unfoundUsers.map(u => s"'$u'").mkString(", ")} are not active in tenant $tenant"
+          }
+          complete(StatusCodes.BadRequest, msg)
+        } else {
+          askModelActor(command)
+        }
+      }
+      case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+    }
+  }
 
   def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
     readLastModifiedHeader() { caseLastModified =>

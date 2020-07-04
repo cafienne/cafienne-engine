@@ -2,7 +2,7 @@ package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.command.response.ActorLastModified
-import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.TenantReader
 
@@ -11,6 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentityProvider {
   def getUser(userId: String, tlm: Option[String]): Future[PlatformUser]
+  def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = ???
   def clear(users: Iterable[String]): Unit
 }
 
@@ -65,5 +66,9 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
   def clear(users: Iterable[String]): Unit = {
     // NOTE: We can also extend this to update the cache information, instead of removing keys.
     users.foreach(userId => cache.remove(userId))
+  }
+
+  override def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = {
+    userQueries.getSelectedTenantUsers(tenant, userIds)
   }
 }

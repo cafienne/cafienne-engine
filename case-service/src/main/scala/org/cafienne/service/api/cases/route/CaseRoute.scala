@@ -22,6 +22,7 @@ import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.cmmn.akka
+import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
@@ -30,7 +31,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.model.StartCase
+import org.cafienne.service.api.model.StartCaseAPI
 import org.cafienne.service.api.projection.query.{Area, CaseFilter, CaseQueries, Sort}
 
 @Api(tags = Array("case"))
@@ -182,14 +183,14 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       new ApiResponse(description = "Something went wrong", responseCode = "500")
     )
   )
-  @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[StartCase]))))
+  @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[StartCaseAPI]))))
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
   def startCase = post {
     pathEndOrSingleSlash {
       validUser { platformUser =>
         post {
-          entity(as[StartCase]) { payload =>
+          entity(as[StartCaseAPI]) { payload =>
             try {
               val tenant = payload.tenant match {
                 case None => platformUser.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
@@ -205,7 +206,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
-              askModelActor(new akka.command.StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              askCaseWithValidTeam(platformUser, tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingTenantException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
