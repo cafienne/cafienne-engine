@@ -12,7 +12,7 @@ import java.io.IOException;
  * Basic event allowing listeners that are interested only in case team member role events to do initial filtering.
  */
 public abstract class CaseTeamRoleEvent extends CaseTeamMemberEvent {
-    public final String roleName;
+    private final String roleName;
 
     /**
      * Returns true if the role name is blank
@@ -30,6 +30,10 @@ public abstract class CaseTeamRoleEvent extends CaseTeamMemberEvent {
     protected CaseTeamRoleEvent(ValueMap json) {
         super(json);
         this.roleName = json.raw(Fields.role);
+    }
+
+    public String roleName() {
+        return roleName;
     }
 
     @Override

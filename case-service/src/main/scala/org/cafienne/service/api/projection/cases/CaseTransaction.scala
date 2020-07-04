@@ -22,7 +22,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
   val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
   val caseInstanceRoles = scala.collection.mutable.HashMap[String, CaseRoleRecord]()
-  val caseInstanceTeamMembers = scala.collection.mutable.HashMap[(String, String, Boolean), CaseTeamMemberRecord]() // key = <role>:<userid>
+  val caseInstanceTeamMembers = scala.collection.mutable.HashMap[(String, String, Boolean, String), CaseTeamMemberRecord]()
   val businessIdentifiers = scala.collection.mutable.Set[CaseBusinessIdentifierRecord]()
   val tasks = scala.collection.mutable.HashMap[String, TaskRecord]()
   // TODO: we need always a caseinstance (for casemodified); so no need to have it as an option?
@@ -128,15 +128,36 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   }
 
   private def handleCaseTeamEvent(event: CaseTeamEvent): Future[Done] = {
-    def updateMember(member: CaseTeamMemberRecord) = caseInstanceTeamMembers.put((member.caseRole, member.memberId, member.isTenantUser), member)
-
+    // We handle 2 types of event: either the old ones (which carried all info in one shot) or the new ones, which are more particular
     event match {
-      case event: TeamMemberAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
-      case event: TeamMemberRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
-      case event: TeamRoleFilled => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
-      case event: TeamRoleCleared => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
-      case event: CaseOwnerAdded => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
-      case event: CaseOwnerRemoved => CaseInstanceTeamMemberMerger.merge(event).foreach(updateMember)
+      case event: DeprecatedCaseTeamEvent => {
+        // Deprecated case team events have all member roles in them; these members are always of type user; all those users become owner and active;
+        import scala.collection.JavaConverters._
+        // We need to add the empty role (if not yet there),
+        //  in order to have member table also populated when a member has no roles but still is part of the team
+        val roles = event.getRoles.asScala ++ Seq("")
+        // Now determine whether the user (and it's roles) become active (and then also owner) or de-activated
+        val enabled = if (event.isInstanceOf[TeamMemberAdded]) true else false // Both for ownership and active
+        // For reach role add a record.
+        roles.map(role => {
+          val key = (event.getActorId, event.getUserId, true, role)
+          val record = CaseTeamMemberRecord(event.getActorId, tenant = tenant, memberId = event.getUserId, caseRole = role, isTenantUser = true, isOwner = enabled, active = enabled)
+          caseInstanceTeamMembers.put(key, record)
+        })
+      }
+      // New type of event:
+      case event: CaseTeamMemberEvent => {
+        val key = (event.getActorId, event.memberId, event.isTenantUser, event.roleName)
+        // Make sure to update any existing versions of the record (especially if first a user is added and at the same time becomes owner this is necessary)
+        //  We have seen situation with SQL Server where the order of the update actually did not make a user owner
+        val member = caseInstanceTeamMembers.getOrElseUpdate(key, CaseTeamMemberRecord(event.getActorId, tenant = tenant, caseRole = event.roleName, isTenantUser = event.isTenantUser, memberId = event.memberId, isOwner = false, active = true))
+        event match {
+          case _: TeamRoleFilled => caseInstanceTeamMembers.put(key, member.copy(active = true))
+          case _: TeamRoleCleared => caseInstanceTeamMembers.put(key, member.copy(active = false))
+          case _: CaseOwnerAdded => caseInstanceTeamMembers.put(key, member.copy(isOwner = true))
+          case _: CaseOwnerRemoved => caseInstanceTeamMembers.put(key, member.copy(isOwner = false))
+        }
+      }
     }
     Future.successful(Done)
   }
@@ -162,6 +183,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
         Future.successful(Some(value))
     }
   }
+
   def createTask(evt: HumanTaskActivated): Future[Done] = {
     // See above comments. HumanTaskActivated has replaced HumanTaskCreated.
     //  We check here to see if our version is an old or a new one, by checking whether

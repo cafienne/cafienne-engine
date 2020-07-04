@@ -24,7 +24,7 @@ public class TeamRoleFilled extends CaseTeamRoleEvent {
             // The event that adds the member to the team
             return getClass().getSimpleName() + "[" + getMemberDescription() + " is added to the case team]";
         } else {
-            return getClass().getSimpleName() + "[" + getMemberDescription() + " now has role " + roleName + " in the case team]";
+            return getClass().getSimpleName() + "[" + getMemberDescription() + " now has role " + roleName() + " in the case team]";
         }
     }
 

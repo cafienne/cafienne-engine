@@ -52,7 +52,7 @@ public class Member extends CMMNElement<CaseDefinition> {
     }
 
     void updateState(TeamRoleFilled event) {
-        addRole(event.roleName);
+        addRole(event.roleName());
     }
 
     void updateState(CaseOwnerAdded event) {
@@ -64,7 +64,7 @@ public class Member extends CMMNElement<CaseDefinition> {
     }
 
     void updateState(TeamRoleCleared event) {
-        CaseRoleDefinition role = findRole(event.roleName);
+        CaseRoleDefinition role = findRole(event.roleName());
         if (role != null) {
             roles.remove(role);
         }
