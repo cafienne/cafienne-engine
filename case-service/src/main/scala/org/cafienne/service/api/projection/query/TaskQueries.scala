@@ -48,7 +48,7 @@ class TaskQueriesImpl extends TaskQueries
       _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
-    db.run(query.result.headOption).map{
+    db.run(query.result.headOption).map {
       case Some(task) => task
       case None => throw TaskSearchFailure(taskId)
     }
@@ -95,7 +95,7 @@ class TaskQueriesImpl extends TaskQueries
 
     } yield (baseQuery.caseInstanceId, baseQuery.tenant)
 
-    db.run(query.result.headOption).map{
+    db.run(query.result.headOption).map {
       case None => throw TaskSearchFailure(taskId)
       case Some(result) => result
     }
@@ -112,20 +112,22 @@ class TaskQueriesImpl extends TaskQueries
         tasks <- TableQuery[TaskTable]
         // In tenants where i am a user
         tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tasks.tenant)
-        // Where my case team roles map to the task role
-        myCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
+        // Where my case team roles map to the task role (or where i am a case owner)
+        tasksForMyCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
           // Tasks for cases in which i belong to the case team ...
           .filter(_.caseInstanceId === tasks.caseInstanceId)
           // ... in an active membership
           .filter(_.active === true) // Only search in active team members
-          // ... where my case role matches the task's role ...
+          // ... where any of my case roles matches the task's role - or where I am owner
           // (Note: if role in task is left empty, then it it still found because team members have also an empty role)
-          .filter(_.caseRole === tasks.role)
-          // Now filter by either user id or tenant role (depending on the type of case team membership)
-          .filter(member => { // Search by user id or by one of the user's tenant roles
-            (member.isTenantUser === true && member.memberId === user.userId) ||
-              (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
-          })
+          .filter(member =>
+            (
+                (member.caseRole === tasks.role || member.isOwner === true)
+                  &&
+              // Now filter by either user id or tenant role (depending on the type of case team membership)
+              ((member.isTenantUser === true && member.memberId === user.userId) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
+            )
+          )
       } yield tasks
     }
 
@@ -174,19 +176,21 @@ class TaskQueriesImpl extends TaskQueries
       // In tenants where i am a user
       tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === unclaimedTasks.tenant)
       // Where my case team roles map to the task role
-      caseRoles <- TableQuery[CaseInstanceTeamMemberTable]
+      tasksForMyCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
         // Tasks for cases in which i belong to the case team ...
         .filter(_.caseInstanceId === unclaimedTasks.caseInstanceId)
         // ... in an active membership
         .filter(_.active === true) // Only search in active team members
-        // ... where my case role matches the task's role ...
+        // ... where any of my case roles matches the task's role - or where I am owner
         // (Note: if role in task is left empty, then it it still found because team members have also an empty role)
-        .filter(_.caseRole === unclaimedTasks.role)
-        // Now filter by either user id or tenant role (depending on the type of case team membership)
-        .filter(member => { // Search by user id or by one of the user's tenant roles
-          (member.isTenantUser === true && member.memberId === user.userId) ||
-            (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
-        })
+        .filter(member =>
+          (
+            (member.caseRole === unclaimedTasks.role || member.isOwner === true)
+              &&
+              // Now filter by either user id or tenant role (depending on the type of case team membership)
+              ((member.isTenantUser === true && member.memberId === user.userId) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
+            )
+        )
     } yield unclaimedTasks
 
     val count = for {
