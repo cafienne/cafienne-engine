@@ -7,54 +7,28 @@
  */
 package org.cafienne.humantask.akka.command;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
-import org.cafienne.humantask.akka.event.HumanTaskOutputSaved;
 import org.cafienne.humantask.instance.WorkflowTask;
-
-import java.io.IOException;
 
 /**
  * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.
  */
 @Manifest
-public class SaveTaskOutput extends WorkflowCommand {
-	private final ValueMap taskOutput;
-
+public class SaveTaskOutput extends TaskOutputCommand {
 	public SaveTaskOutput(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
-		super(tenantUser, caseInstanceId, taskId);
-		this.taskOutput = taskOutput;
+		super(tenantUser, caseInstanceId, taskId, taskOutput);
 	}
 
 	public SaveTaskOutput(ValueMap json) {
 		super(json);
-		this.taskOutput = readMap(json, Fields.taskOutput);
-	}
-
-	public ValueMap getOutput() {
-		return taskOutput;
-	}
-
-	@Override
-	public void validate(HumanTask task) {
-		super.validateTaskOwnership(task);
-		super.mustBeAssigned(task);
 	}
 
 	@Override
 	public HumanTaskResponse process(WorkflowTask workflowTask) {
 		workflowTask.saveOutput(this.taskOutput);
 		return new HumanTaskResponse(this);
-	}
-
-	@Override
-	public void write(JsonGenerator generator) throws IOException {
-		super.write(generator);
-		writeField(generator, Fields.taskOutput, taskOutput);
 	}
 }

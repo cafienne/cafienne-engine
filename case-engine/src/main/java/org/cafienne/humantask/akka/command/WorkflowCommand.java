@@ -97,11 +97,11 @@ public abstract class WorkflowCommand extends CaseCommand {
         raiseException("Cannot be done because the task is in " + currentTaskState + " state, but should be in any of " + Arrays.asList(expectedStates) + " state");
     }
 
-    protected void mustBeAssigned(HumanTask task) {
+    protected void mustBeActive(HumanTask task) {
         validateProperCaseRole(task);
 
         TaskState currentTaskState = task.getImplementation().getCurrentState();
-        if (!currentTaskState.inUse()) {
+        if (!currentTaskState.isActive()) {
             raiseException("Cannot be done because the task is not Active but " + currentTaskState);
         }
     }
