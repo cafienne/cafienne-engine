@@ -8,7 +8,6 @@
 package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
@@ -24,12 +23,9 @@ import java.io.IOException;
 public class DelegateTask extends WorkflowCommand {
     private final String assignee;
 
-    public DelegateTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
+    public DelegateTask(TenantUser tenantUser, String caseInstanceId, String taskId, TenantUser delegatee) {
         super(tenantUser, caseInstanceId, taskId);
-        if (assignee == null || assignee.trim().isEmpty()) {
-            throw new InvalidCommandException("DelegateTask: The delegate should not be null or empty");
-        }
-        this.assignee = assignee;
+        this.assignee = delegatee.id();
     }
 
     public DelegateTask(ValueMap json) {
@@ -41,9 +37,7 @@ public class DelegateTask extends WorkflowCommand {
     public void validate(HumanTask task) {
         super.validateTaskOwnership(task);
         super.validateState(task, TaskState.Assigned);
-
-        // TODO: 1. Validate whether delegate is a valid user in the system
-        // TODO: 3. Check whether the delegate is part of CaseTeam. If not what to do?
+        super.validateCaseTeamMembership(task, assignee);
     }
 
     @Override

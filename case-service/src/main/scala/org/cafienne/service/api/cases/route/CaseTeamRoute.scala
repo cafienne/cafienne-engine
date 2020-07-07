@@ -75,8 +75,9 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   def setCaseTeam = post {
     validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
-        entity(as[BackwardCompatibleTeam]) { caseTeam =>
-          askCase(platformUser, caseInstanceId, tenantUser => new SetCaseTeam(tenantUser, caseInstanceId, teamConverter(caseTeam)))
+        entity(as[BackwardCompatibleTeam]) { oldFormat =>
+          val caseTeam = teamConverter(oldFormat)
+          askCaseWithValidMembers(platformUser, caseTeam.members, caseInstanceId, tenantUser => new SetCaseTeam(tenantUser, caseInstanceId, caseTeam))
         }
       }
     }
@@ -102,8 +103,9 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   def putCaseTeamMember = put {
     validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
-        entity(as[BackwardCompatibleTeamMember]) { caseTeamMember =>
-          askCase(platformUser, caseInstanceId, tenantUser => new PutTeamMember(tenantUser, caseInstanceId, memberConverter(caseTeamMember)))
+        entity(as[BackwardCompatibleTeamMember]) { oldFormat =>
+          val caseTeamMember = memberConverter(oldFormat)
+          askCaseWithValidMembers(platformUser, Seq(caseTeamMember), caseInstanceId, tenantUser => new PutTeamMember(tenantUser, caseInstanceId, caseTeamMember))
         }
       }
     }

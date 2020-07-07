@@ -7,28 +7,18 @@
  */
 package org.cafienne.humantask.akka.command;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.task.validation.ValidationError;
-import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
-import org.cafienne.humantask.akka.event.HumanTaskCompleted;
 import org.cafienne.humantask.instance.WorkflowTask;
-
-import java.io.IOException;
 
 /**
  * This command must be used to complete a human task with additional task output parameters.
  */
 @Manifest
-public class CompleteHumanTask extends WorkflowCommand {
-    protected final ValueMap taskOutput;
+public class CompleteHumanTask extends TaskOutputCommand {
     protected Task<?> task;
 
     /**
@@ -42,23 +32,11 @@ public class CompleteHumanTask extends WorkflowCommand {
      *                   means that the parameters will also be bound to the case file, which may cause sentries to activate before the task completes.
      */
     public CompleteHumanTask(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
-        super(tenantUser, caseInstanceId, taskId);
-        this.taskOutput = taskOutput;
+        super(tenantUser, caseInstanceId, taskId, taskOutput);
     }
 
     public CompleteHumanTask(ValueMap json) {
         super(json);
-        this.taskOutput = readMap(json, Fields.taskOutput);
-    }
-
-    @Override
-    public void validate(HumanTask task) throws InvalidCommandException {
-        super.validateTaskOwnership(task);
-        super.mustBeAssigned(task);
-    }
-
-    public ValueMap getTaskOutput() {
-        return taskOutput;
     }
 
     @Override
@@ -71,11 +49,5 @@ public class CompleteHumanTask extends WorkflowCommand {
     public String toString() {
         String taskName = task != null ? task.getName() + " with id " + getTaskId() : getTaskId() + " (unknown name)";
         return "Complete HumanTask '" + taskName + "' with output\n" + taskOutput;
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.taskOutput, taskOutput);
     }
 }

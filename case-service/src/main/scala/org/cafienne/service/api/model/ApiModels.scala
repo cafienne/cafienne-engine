@@ -148,7 +148,7 @@ final object Examples {
 }
 
 @Schema(description = "Start the execution of a new case")
-case class StartCase(
+case class StartCaseAPI(
                       @(Schema @field)(
                         description = "Definition of the case to be started",
                         required = true,

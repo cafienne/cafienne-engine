@@ -10,6 +10,8 @@ import scala.concurrent.Future
 trait UserQueries {
   def getPlatformUser(userId: String) : Future[PlatformUser] = ???
 
+  def getSelectedTenantUsers(tenant: String, users: Seq[String]): Future[Seq[TenantUser]] = ???
+
   def getTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
 
   def getDisabledTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
@@ -43,6 +45,17 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
         TenantUser(user.userId, roles, tenant, user.isOwner, user.name, user.email, user.enabled)
       })
       PlatformUser(userId, tenantUsers)
+    })
+  }
+
+  override def getSelectedTenantUsers(tenant: String, users: Seq[String]): Future[Seq[TenantUser]] = {
+    val query = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.tenant === tenant).filter(_.enabled === true)
+    db.run(query.result).map(records => {
+      val users = records.filter(record => record.role_name == "")
+      users.map(user => {
+        val roles = records.filter(record => record.userId == user.userId && !record.role_name.isBlank).map(record => record.role_name)
+        TenantUser(user.userId, roles, tenant, user.isOwner, user.name, user.email, user.enabled)
+      })
     })
   }
 

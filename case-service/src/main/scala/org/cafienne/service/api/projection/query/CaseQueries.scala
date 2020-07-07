@@ -114,7 +114,7 @@ class CaseQueriesImpl
       if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
       val team = fillCaseTeam(records.map(r => r._1).filter(m => m.nonEmpty).map(m => m.get))
       val unassignedRoles = records.filter(r => r._1.isEmpty).map(r => r._2.roleName)
-      val caseRoles = records.map(r => r._2.roleName).filterNot(_.isBlank) //.toSet.toSeq
+      val caseRoles = records.map(r => r._2.roleName).filterNot(_.isBlank).toSet.toSeq
       team.copy(caseRoles = caseRoles, unassignedRoles = unassignedRoles)
     })
   }
