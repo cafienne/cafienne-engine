@@ -6,11 +6,14 @@ import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.cmmn.akka.command.team.MemberKey;
+import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 
@@ -142,5 +145,25 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     protected void raiseException(String msg) {
         throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
+    }
+
+    protected void validateCaseTeamMembership(HumanTask task, String assignee) {
+        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+            // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
+            return;
+        }
+        // Validate that the new assignee is part of the team
+        Member member = task.getCaseInstance().getCaseTeam().getMember(new MemberKey(assignee, "user"));
+        if (member == null) {
+            raiseException("There is no case team member with id '" + assignee + "'");
+        }
+        // Validate that - if the task needs a role - the new assignee has that role
+        CaseRoleDefinition role = task.getPerformer();
+        if (role != null) {
+            // Members need to have the role, Owners don't need to
+            if (!member.isOwner() && !member.getRoles().contains(role)) {
+                raiseException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
+            }
+        }
     }
 }

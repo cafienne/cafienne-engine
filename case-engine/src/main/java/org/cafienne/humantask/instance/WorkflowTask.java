@@ -122,8 +122,13 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     public void assign(String newAssignee) {
+        addCaseTeamMember(newAssignee);
         task.addEvent(new HumanTaskAssigned(task, newAssignee));
         checkOwnershipChange(newAssignee);
+    }
+
+    private void addCaseTeamMember(String newMember) {
+        getCaseInstance().getCaseTeam().addDynamicMember(newMember, task.getPerformer());
     }
 
     public void claim(String claimer) {
@@ -132,6 +137,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     public void delegate(String newAssignee) {
+        addCaseTeamMember(newAssignee);
         task.addEvent(new HumanTaskDelegated(task, newAssignee));
     }
 

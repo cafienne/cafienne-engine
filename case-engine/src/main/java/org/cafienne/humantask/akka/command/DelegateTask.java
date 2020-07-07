@@ -37,9 +37,7 @@ public class DelegateTask extends WorkflowCommand {
     public void validate(HumanTask task) {
         super.validateTaskOwnership(task);
         super.validateState(task, TaskState.Assigned);
-
-        // TODO: 1. Validate whether delegate is a valid user in the system
-        // TODO: 3. Check whether the delegate is part of CaseTeam. If not what to do?
+        super.validateCaseTeamMembership(task, assignee);
     }
 
     @Override
