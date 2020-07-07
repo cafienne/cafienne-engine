@@ -8,7 +8,6 @@
 package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
@@ -24,12 +23,9 @@ import java.io.IOException;
 public class AssignTask extends WorkflowCommand {
     private final String assignee;
 
-    public AssignTask(TenantUser tenantUser, String caseInstanceId, String taskId, String assignee) {
+    public AssignTask(TenantUser tenantUser, String caseInstanceId, String taskId, TenantUser assignee) {
         super(tenantUser, caseInstanceId, taskId);
-        this.assignee = assignee;
-        if (assignee == null || assignee.trim().isEmpty()) {
-            throw new InvalidCommandException("AssignTask: The assignee should not be null or empty");
-        }
+        this.assignee = assignee.id();
     }
 
     public AssignTask(ValueMap json) {

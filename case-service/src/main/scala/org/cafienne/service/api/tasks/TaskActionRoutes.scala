@@ -8,6 +8,7 @@
 package org.cafienne.service.api.tasks
 
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
+import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.akka.command.CaseCommandModels
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.humantask.akka.command._
@@ -196,7 +198,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
               implicit val format = jsonFormat1(CaseCommandModels.Assignee)
 
               entity(as[CaseCommandModels.Assignee]) { data =>
-                askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new AssignTask(tenantUser, caseInstanceId, taskId, data.assignee))
+                askTaskWithMember(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }
@@ -231,7 +233,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
               implicit val format = jsonFormat1(CaseCommandModels.Assignee)
 
               entity(as[CaseCommandModels.Assignee]) { data =>
-                askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new DelegateTask(tenantUser, caseInstanceId, taskId, data.assignee))
+                askTaskWithMember(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }

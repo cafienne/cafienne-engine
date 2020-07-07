@@ -24,6 +24,37 @@ trait TaskRoute extends CommandRoute with QueryRoute {
 
   override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
 
+  def askTaskWithMember(platformUser: PlatformUser, taskId: String, userId: String, createTaskCommand: CreateTaskCommandWithMember): Route = {
+    onComplete(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId(taskId, platformUser)) {
+      case Success((caseInstanceId, tenant)) => {
+        onComplete(userCache.getUsers(Seq(userId), tenant)) {
+          case Success(tenantUsers) => {
+            if (tenantUsers.isEmpty) {
+              // Not found, hence not a valid user (it can be also because the user account is not enabled)
+              complete(StatusCodes.BadRequest, s"Cannot find an active user '$userId' in tenant '$tenant'")
+            } else if (tenantUsers.size > 1) {
+              logger.error(s"Found ${tenantUsers.size} users matching userId '$userId' in tenant '$tenant'. The query should only result in one user only.")
+              complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$userId'")
+            } else {
+              val member = tenantUsers(0)
+              askModelActor(createTaskCommand.apply(caseInstanceId, platformUser.getTenantUser(tenant), member))
+            }
+          }
+          case Failure(t: Throwable) => {
+            logger.warn(s"An error happened while retrieving user information on user '$userId' in tenant '$tenant'", t)
+            complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$userId'")
+          }
+        }
+      }
+      case Failure(error) => {
+        error match {
+          case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+          case _ => throw error
+        }
+      }
+    }
+  }
+
   def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
     onComplete(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId(taskId, platformUser)) {
       case Success((caseInstanceId, tenant)) => askModelActor(createTaskCommand.apply(caseInstanceId, platformUser.getTenantUser(tenant)))
@@ -34,6 +65,10 @@ trait TaskRoute extends CommandRoute with QueryRoute {
         }
       }
     }
+  }
+
+  trait CreateTaskCommandWithMember {
+    def apply(caseInstanceId: String, user: TenantUser, member: TenantUser): WorkflowCommand
   }
 
   trait CreateTaskCommand {

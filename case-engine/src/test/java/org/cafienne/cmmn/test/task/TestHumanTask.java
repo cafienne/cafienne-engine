@@ -70,7 +70,7 @@ public class TestHumanTask {
             /**
              * DelegateTask - Only Assigned task can be delegated
              */
-            testCase.assertStepFails(new DelegateTask(gimy, caseInstanceId, taskId, "pete"),
+            testCase.assertStepFails(new DelegateTask(gimy, caseInstanceId, taskId, pete),
                     failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
@@ -99,7 +99,7 @@ public class TestHumanTask {
             /**
              * AssignTask - Only Unassigned task can be assigned to a user
              */
-            testCase.assertStepFails(new AssignTask(pete, caseInstanceId, taskId, "gimy"),
+            testCase.assertStepFails(new AssignTask(pete, caseInstanceId, taskId, gimy),
                     failure -> failure.assertException("You must be case owner to perform this operation"));
 
             /**
@@ -149,7 +149,7 @@ public class TestHumanTask {
             /**
              * AssignTask - User should be able to assign the task to another user
              */
-            testCase.addStep(new AssignTask(tom, caseInstanceId, taskId, "gimy"), action -> {
+            testCase.addStep(new AssignTask(tom, caseInstanceId, taskId, gimy), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -160,13 +160,13 @@ public class TestHumanTask {
             /**
              * DelegateTask - Only the current task assignee can delegate the task to another user
              */
-            testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, "pete"),
+            testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, pete),
                     failure -> failure.assertException("You do not have permission to perform this operation"));
 
             /**
              * DelegateTask - User should be able to delegate the task
              */
-            testCase.addStep(new DelegateTask(gimy, caseInstanceId, taskId, "pete"), action -> {
+            testCase.addStep(new DelegateTask(gimy, caseInstanceId, taskId, pete), action -> {
 //                CaseAssertion taskAssertion = new CaseAssertion(action);
 //                TestScript.debugMessage("Current case: " + taskAssertion);
 
@@ -178,7 +178,7 @@ public class TestHumanTask {
             /**
              * DelegateTask - Already delegated task can not be further delegated
              */
-            testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, "pete"),
+            testCase.assertStepFails(new DelegateTask(pete, caseInstanceId, taskId, pete),
                     failure -> failure.assertException("Cannot be done because the task is in Delegated state, but should be in any of [Assigned] state"));
 
             /**
