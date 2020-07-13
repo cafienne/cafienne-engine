@@ -38,10 +38,6 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         this.workflow = getDefinition().getImplementationDefinition().createInstance(this);
     }
 
-    public <T extends HumanTaskEvent> T addEvent(T event) {
-        return getCaseInstance().addEvent(event);
-    }
-
     /**
      * Returns the state tracking implementation of the task
      *

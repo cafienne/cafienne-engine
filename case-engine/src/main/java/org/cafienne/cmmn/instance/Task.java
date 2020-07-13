@@ -151,7 +151,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
             }
         }
 
-        getCaseInstance().addEvent(new TaskInputFilled(this, taskInputParameters, mappedInputParameters));
+        addEvent(new TaskInputFilled(this, taskInputParameters, mappedInputParameters));
     }
 
     /**
@@ -192,7 +192,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
             });
         }
 
-        getCaseInstance().addEvent(new TaskOutputFilled(this, newTaskOutput, implementationOutput));
+        addEvent(new TaskOutputFilled(this, newTaskOutput, implementationOutput));
     }
 
     protected ValueMap getInputParameters() {

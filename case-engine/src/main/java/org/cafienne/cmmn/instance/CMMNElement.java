@@ -7,10 +7,12 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.humantask.akka.event.HumanTaskEvent;
 
 public class CMMNElement<T extends CMMNElementDefinition> {
     private final Case caseInstance;
@@ -61,4 +63,7 @@ public class CMMNElement<T extends CMMNElementDefinition> {
         return super.toString();
     }
 
+    protected <T extends CaseEvent> T addEvent(T event) {
+        return getCaseInstance().addEvent(event);
+    }
 }

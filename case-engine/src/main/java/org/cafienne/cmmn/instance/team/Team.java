@@ -43,15 +43,15 @@ public class Team extends CMMNElement<CaseDefinition> {
     }
 
     private void addMember(MemberKey key) {
-        getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), key, ""));
+        addEvent(new TeamRoleFilled(getCaseInstance(), key, ""));
     }
 
     private void addMemberRole(MemberKey key, String roleName) {
-        getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), key, roleName));
+        addEvent(new TeamRoleFilled(getCaseInstance(), key, roleName));
     }
 
     private void removeMemberRole(MemberKey key, String roleName) {
-        getCaseInstance().addEvent(new TeamRoleCleared(getCaseInstance(), key, roleName));
+        addEvent(new TeamRoleCleared(getCaseInstance(), key, roleName));
     }
 
     public void upsert(CaseTeamMember newMemberInfo) {
@@ -98,7 +98,7 @@ public class Team extends CMMNElement<CaseDefinition> {
                 removeOwner(key);
             }
             new ArrayList<>(member.getRoles()).forEach(role -> removeMemberRole(member.key, role.getName()));
-            getCaseInstance().addEvent(new TeamRoleCleared(getCaseInstance(), member.key, ""));
+            addEvent(new TeamRoleCleared(getCaseInstance(), member.key, ""));
         } else {
             addDebugInfo(() -> "Cannot remove case team member '" + key.id() + "', since this member is not in the team");
         }
@@ -117,7 +117,7 @@ public class Team extends CMMNElement<CaseDefinition> {
             addDebugInfo(() -> "Member is already owner");
             return;
         }
-        getCaseInstance().addEvent(new CaseOwnerAdded(getCaseInstance(), key));
+        addEvent(new CaseOwnerAdded(getCaseInstance(), key));
     }
 
     /**
@@ -129,7 +129,7 @@ public class Team extends CMMNElement<CaseDefinition> {
         addDebugInfo(() -> "Trying to remove ownership for member " + key);
         Member member = getMember(key);
         if (member.isOwner()) {
-            getCaseInstance().addEvent(new CaseOwnerRemoved(getCaseInstance(), key));
+            addEvent(new CaseOwnerRemoved(getCaseInstance(), key));
         } else {
             addDebugInfo(() -> "Member is not an owner");
         }

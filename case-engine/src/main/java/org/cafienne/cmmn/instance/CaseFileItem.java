@@ -129,13 +129,13 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     private void removeBusinessIdentifiers(Value value) {
         getDefinition().getBusinessIdentifiers().forEach(property -> {
-            getCaseInstance().addEvent(new BusinessIdentifierCleared(this, property));
+            addEvent(new BusinessIdentifierCleared(this, property));
         });
     }
 
     private void updateBusinessIdentifiers(Value newValue) {
         getDefinition().getBusinessIdentifiers().forEach(property -> {
-            getCaseInstance().addEvent(new BusinessIdentifierSet(this, property, getBusinessIdentifierValue(newValue, property)));
+            addEvent(new BusinessIdentifierSet(this, property, getBusinessIdentifierValue(newValue, property)));
         });
     }
 
@@ -153,7 +153,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             updateBusinessIdentifiers(newValue);
         }
         // Now inform the sentry network of our change
-        getCaseInstance().addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, newValue, getPath(), indexInArray));
+        addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, newValue, getPath(), indexInArray));
     }
 
     public void updateState(CaseFileEvent event) {
