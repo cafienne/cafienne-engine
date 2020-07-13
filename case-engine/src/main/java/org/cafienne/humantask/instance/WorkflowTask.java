@@ -48,15 +48,15 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         AssignmentDefinition assignment = getDefinition().getAssignmentExpression();
         if (assignment != null) {
             try {
-                String assignee = assignment.evaluate(this.task);
-                addDebugInfo(() -> "Assignee expression in task " + task.getName() + "[" + task.getId() + " resulted in: " + assignee);
+                String newAssignee = assignment.evaluate(this.task);
+                addDebugInfo(() -> "Assignee expression in task " + task.getName() + "[" + task.getId() + " resulted in: " + newAssignee);
 
                 // Whether or not assignee is an existing tenant user cannot be determined here...
                 //  It is up to the application using the dynamic assignment to make sure it returns a valid user.
                 //  If not a valid user, then case owners have to change the task assignee.
-                if (assignee != null && !assignee.trim().isEmpty()) {
-                    getCaseInstance().getCaseTeam().addDynamicMember(assignee, task.getPerformer());
-                    assign(assignee);
+                if (newAssignee != null && !newAssignee.trim().isEmpty()) {
+                    addCaseTeamMember(newAssignee);
+                    assign(newAssignee);
                 }
             } catch (Exception e) {
                 addDebugInfo(() -> "Failed to evaluate expression to assign task", e);
@@ -128,7 +128,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     private void addCaseTeamMember(String newMember) {
-        getCaseInstance().getCaseTeam().addDynamicMember(newMember, task.getPerformer());
+        getCaseInstance().getCaseTeam().upsertCaseTeamMember(newMember, task.getPerformer());
     }
 
     public void claim(String claimer) {
