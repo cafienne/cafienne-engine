@@ -12,13 +12,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
+public abstract class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
     private final static Logger logger = LoggerFactory.getLogger(AkkaCaseObjectSerializer.class);
-
-    /**
-     * The unique identifier for the AkkaCaseObjectSerializer (value is <code>424242</code>)
-     */
-    public static final int IDENTIFIER = 52943;
 
     private final static Map<String, ManifestWrapper> manifests = new HashMap();
     private final static Map<Class<?>, ManifestWrapper> manifestsByClass = new HashMap();
@@ -66,11 +61,6 @@ public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
             logger.error("Deserialization failure (manifest " + manifestString + ")", t);
             throw t;
         }
-    }
-
-    @Override
-    public int identifier() {
-        return IDENTIFIER;
     }
 
     @Override

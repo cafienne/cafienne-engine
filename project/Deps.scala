@@ -17,9 +17,9 @@ object Deps {
   object V {
     val scala       = "2.12.11"
     val spray       = "1.3.5"
-    val akkaHttp    = "10.1.12"
+    val akkaHttp    = "10.2.0"
     val slf4j       = "1.7.12"
-    val akka        = "2.6.5"
+    val akka        = "2.6.9"
     val jackson     = "2.11.0"
     val enumeratum  = "1.6.1"
     val swagger     = "2.1.5"
@@ -56,7 +56,7 @@ object Deps {
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
   val akkaHtppJackson       = "com.typesafe.akka"       %% "akka-http-jackson"                    % V.akkaHttp
-  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "1.0.0"
+  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "1.1.0"
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
   val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
