@@ -13,7 +13,7 @@ import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
 import org.cafienne.service.api.tenant.TenantReader
-import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenant, User}
+import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenantFormat, UserFormat}
 import org.cafienne.tenant.akka.command.TenantCommand
 import org.cafienne.tenant.akka.command.platform.{CreateTenant, PlatformTenantCommand}
 
@@ -35,7 +35,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
     def apply(tenantUser: TenantUser): TenantCommand
   }
 
-  def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenant) = {
+  def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenantFormat) = {
     import scala.collection.JavaConverters._
 
     val users = convertToTenant(newTenant).asJava
@@ -47,7 +47,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def convertToTenant(tenant: BackwardsCompatibleTenant): Seq[TenantUser] = {
+  def convertToTenant(tenant: BackwardsCompatibleTenantFormat): Seq[TenantUser] = {
     val users = tenant.users.getOrElse(tenant.owners.getOrElse(Seq()))
     val defaultOwnership: Boolean = {
       if (tenant.users.isEmpty && tenant.owners.nonEmpty) true // Owners is the old format, then all users become owner.
@@ -56,7 +56,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
     users.map(user => asTenantUser(user, tenant.name, defaultOwnership))
   }
 
-  def asTenantUser(user: User, tenant: String, defaultOwnership: Boolean = false): TenantUser = {
+  def asTenantUser(user: UserFormat, tenant: String, defaultOwnership: Boolean = false): TenantUser = {
     TenantUser(user.userId, user.roles, tenant, isOwner = user.isOwner.getOrElse(defaultOwnership), user.name.getOrElse(""), user.email.getOrElse(""), enabled = true)
   }
 }

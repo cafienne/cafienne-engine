@@ -18,22 +18,22 @@ import scala.annotation.meta.field
 
 final object Examples {
   @Schema(description = "Input parameters example json")
-  case class InputParameters(input1: String, input2: Object)
+  case class InputParametersFormat(input1: String, input2: Object)
 
   @Schema(description = "Output parameters example json")
-  case class OutputParameters(output1: String, output2: Object, output3: List[String])
+  case class OutputParametersFormat(output1: String, output2: Object, output3: List[String])
 
   @Schema(description = "Example case team")
-  case class StartCaseTeam(
+  case class StartCaseTeamFormat(
                                   @(ArraySchema @field)(schema = new Schema(
                                     description = "If members is left empty, only current user will be added to the case team",
                                     required = true,
-                                    implementation = classOf[StartCaseTeamMember]))
-                                  members: Array[StartCaseTeamMember]
+                                    implementation = classOf[StartCaseTeamMemberFormat]))
+                                  members: Array[StartCaseTeamMemberFormat]
                                 )
 
   @Schema(description = "Example case team member")
-  case class StartCaseTeamMember(
+  case class StartCaseTeamMemberFormat(
                      @(Schema @field)(
                        description = "Identification of the team member (either user id or tenant role name)",
                        example = "Identification of the team member (either user id or tenant role name)",
@@ -56,13 +56,13 @@ final object Examples {
                      @(ArraySchema @field)(schema = new Schema(
                        description = "Zero or more roles that the member has in the case team. An empty set means that the member has no roles, but is still part of the team",
                        required = true,
-                       implementation = classOf[NewCaseTeamRoles],
+                       implementation = classOf[NewCaseTeamRolesFormat],
                        example = "[\"Employee\",  \"Customer\", \"Supplier\"]"))
                      caseRoles: Array[String]
                    )
 
   @Schema(description = "Example case team member")
-  case class PutCaseTeamMember(
+  case class PutCaseTeamMemberFormat(
                                   @(Schema @field)(
                                     description = "Identification of the team member (either user id or tenant role name)",
                                     example = "Identification of the team member (either user id or tenant role name)",
@@ -85,21 +85,21 @@ final object Examples {
                                   @(ArraySchema @field)(schema = new Schema(
                                     description = "Zero or more case roles that will be added to the member",
                                     required = true,
-                                    implementation = classOf[NewCaseTeamRoles],
+                                    implementation = classOf[NewCaseTeamRolesFormat],
                                     example = "Zero or more case roles that will be added to the member"))
                                   caseRoles: Array[String],
                                   @(ArraySchema @field)(schema = new Schema(
                                     description = "Zero or more case roles that need to be removed from the member",
                                     required = true,
-                                    implementation = classOf[RemoveCaseTeamRoles],
+                                    implementation = classOf[RemoveCaseTeamRolesFormat],
                                     example = "Zero or more case roles that need to be removed from the member"))
                                   removeRoles: Array[String]
                                 )
-  case class NewCaseTeamRoles()
-  case class RemoveCaseTeamRoles()
+  case class NewCaseTeamRolesFormat()
+  case class RemoveCaseTeamRolesFormat()
 
   @Schema(description = "Example case team member")
-  case class CaseTeamMemberResponse(
+  case class CaseTeamMemberResponseFormat(
                                 @(Schema @field)(
                                   description = "Identification of the team member (either user id or tenant role name)",
                                   example = "Identification of the team member (either user id or tenant role name)",
@@ -118,37 +118,37 @@ final object Examples {
                                 isOwner: Boolean,
                                 @(ArraySchema @field)(schema = new Schema(
                                   description = "Zero or more case roles that will be added to the member",
-                                  implementation = classOf[NewCaseTeamRoles],
+                                  implementation = classOf[NewCaseTeamRolesFormat],
                                   example = "Zero or more case roles that will be added to the member"))
                                 caseRoles: Array[String],
                               )
 
   @Schema(description = "Example case team")
-  case class CaseTeamResponse(
-                           @(ArraySchema @field)(schema = new Schema(
+  case class CaseTeamResponseFormat(
+                               @(ArraySchema @field)(schema = new Schema(
                              description = "Names of roles as defined in the case definition",
                              example = "Names of roles as defined in the case definition",
-                             implementation = classOf[CaseDefinedRoles]))
+                             implementation = classOf[CaseDefinedRolesFormat]))
                            caseRoles: Array[String],
-                            @(ArraySchema @field)(schema = new Schema(
+                               @(ArraySchema @field)(schema = new Schema(
                               description = "Members of the case team",
                               required = true,
-                              implementation = classOf[CaseTeamMemberResponse]))
-                            members: Array[CaseTeamMemberResponse],
-                           @(ArraySchema @field)(schema = new Schema(
+                              implementation = classOf[CaseTeamMemberResponseFormat]))
+                            members: Array[CaseTeamMemberResponseFormat],
+                               @(ArraySchema @field)(schema = new Schema(
                              description = "Names of defined roles that are not assigned to any of the team members",
                              example = "Names of defined roles that are not assigned to any of the team members",
-                             implementation = classOf[UnassignedRoles]))
+                             implementation = classOf[UnassignedRolesFormat]))
                            unassignedRoles: Array[String]
                              )
 
-  case class CaseDefinedRoles()
-  case class UnassignedRoles()
-  case class CaseTeamRoles()
+  case class CaseDefinedRolesFormat()
+  case class UnassignedRolesFormat()
+  case class CaseTeamRolesFormat()
 }
 
 @Schema(description = "Start the execution of a new case")
-case class StartCaseAPI(
+case class StartCaseFormat(
                       @(Schema @field)(
                         description = "Definition of the case to be started",
                         required = true,
@@ -158,13 +158,13 @@ case class StartCaseAPI(
                       @(Schema @field)(
                         description = "Input parameters that will be passed to the started case",
                         required = false,
-                        implementation = classOf[Examples.InputParameters])
+                        implementation = classOf[Examples.InputParametersFormat])
                       inputs: ValueMap,
                       @(Schema @field)(
-                          description = "The team that will be connected to the execution of this case",
-                          required = false,
-                          implementation = classOf[Examples.StartCaseTeam])
-                      caseTeam: Option[BackwardCompatibleTeam],
+                        description = "The team that will be connected to the execution of this case",
+                        required = false,
+                        implementation = classOf[Examples.StartCaseTeamFormat])
+                      caseTeam: Option[BackwardCompatibleTeamFormat],
                       @(Schema @field)(description = "Tenant in which to create the case. If empty, default tenant as configured is taken.", required = false, implementation = classOf[Option[String]], example = "Will be taken from settings if omitted or empty")
                       tenant: Option[String],
                       @(Schema @field)(description = "Unique identifier to be used for this case. When there is no identifier given, a UUID will be generated", required = false, example = "Will be generated if omitted or empty")
@@ -172,29 +172,29 @@ case class StartCaseAPI(
                       @(Schema @field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
                       debug: Option[Boolean])
 
-case class BackwardCompatibleTeam(members: Seq[BackwardCompatibleTeamMember] = Seq())
+case class BackwardCompatibleTeamFormat(members: Seq[BackwardCompatibleTeamMemberFormat] = Seq())
 
-case class BackwardCompatibleTeamMember(user: Option[String], // Old property, to be ccompatiblty
-                                        roles: Option[Seq[String]], // Old property, just keep it here to remain compatible
-                                       // New structure below
-                                        memberId: Option[String],
-                                        memberType: Option[String],
-                                        removeRoles: Option[Seq[String]],
-                                        caseRoles: Option[Seq[String]],
-                                        isOwner: Option[Boolean])
+case class BackwardCompatibleTeamMemberFormat(user: Option[String], // Old property, to be ccompatiblty
+                                              roles: Option[Seq[String]], // Old property, just keep it here to remain compatible
+                                              // New structure below
+                                              memberId: Option[String],
+                                              memberType: Option[String],
+                                              removeRoles: Option[Seq[String]],
+                                              caseRoles: Option[Seq[String]],
+                                              isOwner: Option[Boolean])
 
 // CaseFileItem
-case class CaseFileItem(id: String,
-                        name: String,
-                        caseInstanceId: String,
-                        properties: Option[List[Property]],
-                        parentCaseFileItemId: String,
-                        content: String,
-                        mimetype: String,
-                        transition: String,
-                        lastModified: Instant)
+case class CaseFileItemFormat(id: String,
+                              name: String,
+                              caseInstanceId: String,
+                              properties: Option[List[PropertyFormat]],
+                              parentCaseFileItemId: String,
+                              content: String,
+                              mimetype: String,
+                              transition: String,
+                              lastModified: Instant)
 
 
 //base types
 // Property of a caseFileItem
-case class Property(name: String, `type`: String, value: String)
+case class PropertyFormat(name: String, `type`: String, value: String)

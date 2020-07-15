@@ -44,7 +44,7 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUser]))))),
+      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
@@ -69,7 +69,7 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUser]))))),
+      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )

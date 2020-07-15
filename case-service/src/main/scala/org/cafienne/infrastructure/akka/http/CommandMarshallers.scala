@@ -10,7 +10,7 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.cafienne.akka.actor.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
 import org.cafienne.cmmn.akka.command.CaseCommandModels
 import org.cafienne.cmmn.instance.casefile.ValueMap
-import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember, StartCaseAPI}
+import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, StartCaseFormat}
 
 /**
   * This file contains some marshallers and unmarshallers for the engine
@@ -18,20 +18,20 @@ import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibl
 object CommandMarshallers {
 
   implicit val StartCaseUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
-    JsonUtil.fromJson[StartCaseAPI](data)
+    JsonUtil.fromJson[StartCaseFormat](data)
   })
 
-  implicit val StartCaseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: StartCaseAPI =>
+  implicit val StartCaseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: StartCaseFormat =>
     val startCaseJson = JsonUtil.toJson(value)
     HttpEntity(ContentTypes.`application/json`,  startCaseJson)
   }
 
   implicit val CaseTeamUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
-    JsonUtil.fromJson[BackwardCompatibleTeam](data)
+    JsonUtil.fromJson[BackwardCompatibleTeamFormat](data)
   })
 
   implicit val CaseTeamMemberUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
-    JsonUtil.fromJson[BackwardCompatibleTeamMember](data)
+    JsonUtil.fromJson[BackwardCompatibleTeamMemberFormat](data)
   })
 
   implicit val DiscretionaryItemUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {

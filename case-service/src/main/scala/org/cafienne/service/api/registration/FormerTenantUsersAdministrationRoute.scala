@@ -38,8 +38,8 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
       path(Segment / "users") { tenant =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
-        implicit val format = jsonFormat5(TenantAPI.User)
-        entity(as[TenantAPI.User]) { newUser =>
+        implicit val format = jsonFormat5(TenantAPI.UserFormat)
+        entity(as[TenantAPI.UserFormat]) { newUser =>
           askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
         }
       }

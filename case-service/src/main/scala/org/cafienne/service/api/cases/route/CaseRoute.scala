@@ -31,7 +31,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.model.StartCaseAPI
+import org.cafienne.service.api.model.StartCaseFormat
 import org.cafienne.service.api.projection.query.{Area, CaseFilter, CaseQueries, Sort}
 
 @Api(tags = Array("case"))
@@ -183,14 +183,14 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       new ApiResponse(description = "Something went wrong", responseCode = "500")
     )
   )
-  @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[StartCaseAPI]))))
+  @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[StartCaseFormat]))))
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
   def startCase = post {
     pathEndOrSingleSlash {
       validUser { platformUser =>
         post {
-          entity(as[StartCaseAPI]) { payload =>
+          entity(as[StartCaseFormat]) { payload =>
             try {
               val tenant = payload.tenant match {
                 case None => platformUser.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured

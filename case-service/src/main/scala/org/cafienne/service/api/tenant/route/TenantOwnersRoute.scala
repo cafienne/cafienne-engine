@@ -130,15 +130,15 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
-  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.User]))))
+  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UserFormat]))))
   @Consumes(Array("application/json"))
   def upsertTenantUser = put {
     validUser { platformUser =>
       path(Segment / "users") { tenant =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
-        implicit val format = jsonFormat5(TenantAPI.User)
-        entity(as[TenantAPI.User]) { newUser =>
+        implicit val format = jsonFormat5(TenantAPI.UserFormat)
+        entity(as[TenantAPI.UserFormat]) { newUser =>
           askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
         }
       }
