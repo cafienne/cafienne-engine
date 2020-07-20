@@ -16,9 +16,4 @@ public class InvalidCommandException extends CommandException {
     public InvalidCommandException(String msg, Throwable cause) {
         super(msg, cause);
     }
-    
-    public InvalidCommandException(Throwable cause) {
-        super(cause);
-    }
-
 }
