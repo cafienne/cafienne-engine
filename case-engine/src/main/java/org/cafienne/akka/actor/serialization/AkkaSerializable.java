@@ -57,7 +57,7 @@ public interface AkkaSerializable {
 
     void write(JsonGenerator generator) throws IOException ;
 
-    default void writeListField(JsonGenerator generator, Enum fieldName, Collection<? extends CafienneJson> stringList) throws IOException {
+    default void writeListField(JsonGenerator generator, Fields fieldName, Collection<? extends CafienneJson> stringList) throws IOException {
         generator.writeArrayFieldStart(fieldName.toString());
         for (CafienneJson string : stringList) {
             if (string == null) {
@@ -69,7 +69,7 @@ public interface AkkaSerializable {
         generator.writeEndArray();
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, Collection<String> stringList) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, Collection<String> stringList) throws IOException {
         generator.writeArrayFieldStart(fieldName.toString());
         for (String string : stringList) {
             if (string == null) {
@@ -81,11 +81,11 @@ public interface AkkaSerializable {
         generator.writeEndArray();
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, boolean value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, boolean value) throws IOException {
         generator.writeBooleanField(fieldName.toString(), value);
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, CMMNElementDefinition value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, CMMNElementDefinition value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {
@@ -94,7 +94,7 @@ public interface AkkaSerializable {
         }
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, Value<?> value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, Value<?> value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {
@@ -103,11 +103,11 @@ public interface AkkaSerializable {
         }
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, String value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, String value) throws IOException {
         generator.writeStringField(fieldName.toString(), String.valueOf(value));
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, AkkaSerializable value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, AkkaSerializable value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {
@@ -116,7 +116,7 @@ public interface AkkaSerializable {
         }
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, Instant value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, Instant value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {
@@ -124,7 +124,7 @@ public interface AkkaSerializable {
         }
     }
 
-    default void writeField(JsonGenerator generator, Enum fieldName, Enum value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, Enum value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {
@@ -132,31 +132,31 @@ public interface AkkaSerializable {
         }
     }
 
-    default <T extends Object> T readField(ValueMap json, Enum fieldName) {
+    default <T extends Object> T readField(ValueMap json, Fields fieldName) {
         return json.raw(fieldName);
     }
 
-    default <T extends Enum<?>> T readEnum(ValueMap json, Enum fieldName, Class<T> enumClass) {
+    default <T extends Enum<?>> T readEnum(ValueMap json, Fields fieldName, Class<T> enumClass) {
         return json.getEnum(fieldName, enumClass);
     }
 
-    default Instant readInstant(ValueMap json, Enum fieldName) {
+    default Instant readInstant(ValueMap json, Fields fieldName) {
         return json.rawInstant(fieldName);
     }
 
-    default ValueMap readMap(ValueMap json, Enum fieldName) {
+    default ValueMap readMap(ValueMap json, Fields fieldName) {
         return json.with(fieldName);
     }
 
-    default ValueList readArray(ValueMap json, Enum fieldName) {
+    default ValueList readArray(ValueMap json, Fields fieldName) {
         return json.withArray(fieldName);
     }
 
-    default <T> Set<T> readSet(ValueMap json, Enum fieldName) {
+    default <T> Set<T> readSet(ValueMap json, Fields fieldName) {
         return new HashSet(readArray(json, fieldName).rawList());
     }
 
-    default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Enum fieldName, Class<T> tClass) {
+    default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Fields fieldName, Class<T> tClass) {
         return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(json, fieldName), tClass);
     }
 }

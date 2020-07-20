@@ -10,6 +10,7 @@ package org.cafienne.cmmn.instance.casefile;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.akka.actor.serialization.ValueMapJacksonSerializer;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
@@ -54,8 +55,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
             throw new IllegalArgumentException("Must provide sufficient input data to the ValueMap construction, of pattern String, Object, String, Object ...");
         }
         for (int i=0; i<rawInputs.length; i+=2) {
-            if (! (rawInputs[i] instanceof String || rawInputs[i] instanceof Enum)) {
-                throw new IllegalArgumentException("Field name of parameter "+(i%2) + " is not of type String or Enum, but it must be; found type " + rawInputs[i].getClass().getName());
+            if (! (rawInputs[i] instanceof String || rawInputs[i] instanceof Fields)) {
+                throw new IllegalArgumentException("Field name of parameter "+(i%2) + " is not of type String or Fields, but it must be; found type " + rawInputs[i].getClass().getName());
             }
             putRaw(String.valueOf(rawInputs[i]), rawInputs[i+1]);
         }
@@ -75,7 +76,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @param fieldValue
      */
-    public Value<?> put(Enum fieldName, Value<?> fieldValue) {
+    public Value<?> put(Fields fieldName, Value<?> fieldValue) {
         return put(fieldName.toString(), fieldValue);
     }
 
@@ -156,7 +157,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return (ValueMap) v;
     }
 
-    public ValueMap with(Enum fieldName) {
+    public ValueMap with(Fields fieldName) {
         return with(fieldName.toString());
     }
 
@@ -172,7 +173,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return rawValue;
     }
 
-    public <T> T raw(Enum fieldName) {
+    public <T> T raw(Fields fieldName) {
         return this.raw(fieldName.toString());
     }
 
@@ -186,7 +187,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return ((Long) v.value).intValue();
     }
 
-    public int rawInt(Enum fieldName) {
+    public int rawInt(Fields fieldName) {
         return rawInt(fieldName.toString());
     }
 
@@ -203,11 +204,11 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return Instant.parse(v.value.toString());
     }
 
-    public Instant rawInstant(Enum fieldName) {
+    public Instant rawInstant(Fields fieldName) {
         return this.rawInstant(fieldName.toString());
     }
 
-    public <T extends Enum<?>> T getEnum(Enum fieldName, Class<T> tClass) {
+    public <T extends Enum<?>> T getEnum(Fields fieldName, Class<T> tClass) {
         return getEnum(fieldName.toString(), tClass);
     }
 
@@ -252,7 +253,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return (ValueList) v;
     }
 
-    public ValueList withArray(Enum fieldName) {
+    public ValueList withArray(Fields fieldName) {
         return withArray(fieldName.toString());
     }
 
