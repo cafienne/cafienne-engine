@@ -84,7 +84,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         // First validate the tenant information.
         this.tenant = tenant;
         if (tenant == null || tenant.isEmpty()) {
-            throw new IllegalArgumentException("Tenant cannot be null or empty");
+            throw new NullPointerException("Tenant cannot be null or empty");
         }
         this.definition = definition;
         this.rootCaseId = rootCaseId;

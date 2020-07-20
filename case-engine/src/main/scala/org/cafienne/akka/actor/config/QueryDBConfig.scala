@@ -7,7 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 
 class QueryDBConfig(val parent: CafienneConfig) extends MandatoryConfig {
   val path = "query-db"
-  override val exception: Throwable = new IllegalArgumentException("Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings")
+  override val exception = ConfigurationException("Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings")
 
   lazy val restartSettings = new RestartConfig(this)
   lazy val debug = readBoolean("debug", false)

@@ -14,7 +14,7 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
     if (systemConfig.hasPath(path)) {
       systemConfig.getConfig(path)
     } else {
-      throw new IllegalArgumentException("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
+      throw ConfigurationException("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
     }
   }
 
