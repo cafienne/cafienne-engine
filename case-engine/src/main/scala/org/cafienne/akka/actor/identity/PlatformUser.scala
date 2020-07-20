@@ -1,7 +1,7 @@
 package org.cafienne.akka.actor.identity
 
 import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.exception.MissingTenantException
+import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.akka.actor.serialization.Fields
 import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.infrastructure.json.CafienneJson
@@ -40,7 +40,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
     map
   }
 
-  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw new SecurityException("Tenant '" + tenant +"' does not exist, or user '"+userId+"' is not registered in it"))
+  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw AuthorizationException("Tenant '" + tenant +"' does not exist, or user '"+userId+"' is not registered in it"))
 
   final def isPlatformOwner: Boolean = CaseSystem.isPlatformOwner(userId)
 
@@ -49,6 +49,6 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
       case true => s"User '$userId' is not registered in tenant '$tenant' (nor in any other tenant)"
       case false => "User '" + userId+"' is not registered in tenant '"+tenant+"'; tenants are: "+tenants.map(tenant => s"'$tenant'").mkString(",")
     }
-    throw new SecurityException(message)
+    throw AuthorizationException(message)
   })
 }

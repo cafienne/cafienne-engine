@@ -8,6 +8,7 @@
 package org.cafienne.akka.actor.command.response;
 
 import org.cafienne.akka.actor.command.ModelCommand;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
 
@@ -23,7 +24,7 @@ public class SecurityFailure extends CommandFailure {
      * @param command
      * @param failure The reason why the command failed
      */
-    public SecurityFailure(ModelCommand command, Exception failure) {
+    public SecurityFailure(ModelCommand command, AuthorizationException failure) {
         super(command, failure);
     }
 

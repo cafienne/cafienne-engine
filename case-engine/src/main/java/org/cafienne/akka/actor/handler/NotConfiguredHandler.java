@@ -4,7 +4,6 @@ import org.cafienne.akka.actor.MessageHandler;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.slf4j.Logger;
@@ -21,11 +20,6 @@ public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, 
 
     public NotConfiguredHandler(A actor, TenantUserMessage msg) {
         super(actor, msg, msg.getUser());
-    }
-
-    @Override
-    final protected InvalidCommandException runSecurityChecks() {
-        return null;
     }
 
     final protected void process() {

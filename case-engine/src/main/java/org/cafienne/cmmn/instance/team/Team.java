@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.instance.team;
 
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
@@ -260,7 +261,7 @@ public class Team extends CMMNElement<CaseDefinition> {
             }
         }
 
-        throw new SecurityException("User " + user.id() + " is not part of the case team");
+        throw new AuthorizationException("User " + user.id() + " is not part of the case team");
     }
 
     public CurrentMember getTeamMember(TenantUser currentTenantUser) {

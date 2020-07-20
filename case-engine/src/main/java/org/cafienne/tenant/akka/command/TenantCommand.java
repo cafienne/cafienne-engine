@@ -8,6 +8,7 @@
 package org.cafienne.tenant.akka.command;
 
 import org.cafienne.akka.actor.command.ModelCommand;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.exception.MissingTenantException;
@@ -69,7 +70,7 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
         }
 
         if (!tenant.isOwner(this.getUser())) {
-            throw new SecurityException("You do not have the privileges to perform this action");
+            throw new AuthorizationException("You do not have the privileges to perform this action");
         }
     }
 

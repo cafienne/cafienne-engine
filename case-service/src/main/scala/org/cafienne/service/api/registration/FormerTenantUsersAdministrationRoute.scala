@@ -10,6 +10,7 @@ package org.cafienne.service.api.registration
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
+import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
@@ -97,7 +98,7 @@ class FormerTenantUsersAdministrationRoute(userQueries: UserQueries)(override im
             completeJsonValue(tenantUserInformation.toValue)
           case Failure(err) =>
             err match {
-              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
+              case err: AuthorizationException => complete(StatusCodes.Unauthorized, err.getMessage)
               case _ => complete(StatusCodes.InternalServerError, err)
             }
         }

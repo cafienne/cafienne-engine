@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.exception.MissingTenantException
+import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.instance.casefile.ValueMap
@@ -200,7 +200,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
               logger.debug("Deployment failure", failure)
               complete(StatusCodes.BadRequest, failure.getLocalizedMessage)
             }
-            case failure: SecurityException => {
+            case failure: AuthorizationException => {
               logger.debug("Deployment failure", failure)
               complete(StatusCodes.Unauthorized, failure.getLocalizedMessage)
             }

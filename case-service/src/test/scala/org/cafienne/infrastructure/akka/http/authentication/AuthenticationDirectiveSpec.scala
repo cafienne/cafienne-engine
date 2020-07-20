@@ -16,6 +16,7 @@ import com.nimbusds.jose.jwk.{JWKSet, RSAKey}
 import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
+import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures
@@ -45,7 +46,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
         userId match {
           case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
-          case _ => Future.failed(new SecurityException("Not a matched user for this test"))
+          case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
         }
       }
       override def clear(users: Iterable[String]): Unit = ???
@@ -72,7 +73,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
         userId match {
           case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
-          case _ => Future.failed(new SecurityException("Not a matched user for this test"))
+          case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
         }
       }
 
@@ -100,7 +101,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
         userId match {
           case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
-          case _ => Future.failed(new SecurityException("Not a matched user for this test"))
+          case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
         }
       }
 

@@ -2,11 +2,11 @@ package org.cafienne.akka.actor;
 
 import akka.actor.ActorRef;
 import org.cafienne.akka.actor.command.ModelCommand;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
@@ -42,6 +42,8 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      */
     protected final M msg;
 
+    protected final TenantUser user;
+
     private final static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     private final static int avgNumEvents = 30;
@@ -56,6 +58,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         // Take a copy of the sender at the moment we start handling the message (for lifecycle safety).
         this.sender = actor.sender();
         this.msg = msg;
+        this.user = user;
     }
 
     /**
@@ -64,7 +67,9 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      *
      * @return
      */
-    abstract protected InvalidCommandException runSecurityChecks();
+    protected AuthorizationException runSecurityChecks() {
+        return null;
+    }
 
     protected void checkEngineVersion() {
         // First check whether the engine version has changed or not; this may lead to an EngineVersionChanged event
