@@ -59,7 +59,7 @@ public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
                 // Invoke the deserializer
                 ValueMapDeserializer<?> deserializer = manifest.deserializer;
                 return deserializer.deserialize(value);
-            } catch (IOException | JSONParseFailure e) {
+            } catch (IOException | JSONParseFailure | DeserializationError e) {
                 return new DeserializationFailure(manifestString, e, eventBlob);
             }
         } catch (Throwable t) {

@@ -157,6 +157,6 @@ public interface AkkaSerializable {
     }
 
     default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Enum fieldName, Class<T> tClass) {
-        return CMMNElementDefinition.fromJSON(readMap(json, fieldName), tClass);
+        return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(json, fieldName), tClass);
     }
 }
