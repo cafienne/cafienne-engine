@@ -23,10 +23,9 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
     public CaseFileItemOnPartDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
         String standardEventName = parse("standardEvent", String.class, true);
-        try {
-            standardEvent = CaseFileItemTransition.getEnum(standardEventName);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            getCaseDefinition().addDefinitionError("The standard event '" + standardEventName + "' in sentry " + getParentElement().getName() + " is not valid");
+        standardEvent = CaseFileItemTransition.getEnum(standardEventName);
+        if (standardEvent == null) {
+            getCaseDefinition().addDefinitionError("A standard event named " + standardEventName + " does not exist for case file items");
         }
         sourceRef = parseAttribute("sourceRef", true);
     }
@@ -37,8 +36,7 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
         // Add a check that the source only has to be filled if the standardEvent is specified
         source = getCaseDefinition().findCaseFileItem(sourceRef);
         if (source == null) {
-            getDefinition()
-                    .addReferenceError("A case file item with name '" + sourceRef + "' is referenced from sentry " + getParentElement().getName() + ", but it does not exist in the case file model");
+            getDefinition().addReferenceError("A case file item with name '" + sourceRef + "' is referenced from sentry " + getParentElement().getName() + ", but it does not exist in the case file model");
         }
     }
 

@@ -39,8 +39,9 @@ public enum Transition {
     }
 
     public static Transition getEnum(String value) {
+        if (value == null) return null;
         for (Transition transition : values())
             if (transition.getValue().equalsIgnoreCase(value)) return transition;
-        throw new IllegalArgumentException(value + " is not a valid Transition");
+        return null;
     }
 }

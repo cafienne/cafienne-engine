@@ -49,6 +49,7 @@ public class PropertyDefinition extends CMMNElementDefinition {
         }
         
         public static PropertyType getEnum(String value) {
+            if (value == null) return null;
             for (PropertyType type : values())
                 if (type.toString().equals(value)) return type;
             
