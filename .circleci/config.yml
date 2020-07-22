@@ -16,6 +16,14 @@ jobs:
             wget https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
             sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Updating node version to 10.22.0
+          command: |
+            nvm install v10.22.0
+            nvm alias default v10.22.0
+            node -v
       - run:
           name: Compile code
           command: sbt compile
@@ -176,6 +184,14 @@ jobs:
             wget https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
             sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Updating node version to 10.22.0
+          command: |
+            nvm install v10.22.0
+            nvm alias default v10.22.0
+            node -v
       - run:
           name: Compile code
           command: sbt compile
@@ -247,6 +263,14 @@ jobs:
             wget https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
             sudo dpkg -i sbt-$SBT_VERSION.deb
             sbt sbtVersion
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Updating node version to 10.22.0
+          command: |
+            nvm install v10.22.0
+            nvm alias default v10.22.0
+            node -v
       - run:
           name: Check for version TAG
           command: |
@@ -351,10 +375,6 @@ jobs:
             cd ./cmmn-test-framework
             npm run dev
       - run:
-          name: Docker logs of engine
-          command: docker logs cafienne
-          when: on_fail
-      - run:
           name: Stop the containers
           command: |
             docker-compose -f .circleci/docker-test-jdbc.yml stop
@@ -380,6 +400,10 @@ jobs:
             cd ..
             cd ./cmmn-test-framework
             npm run dev
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+          when: on_fail
       - run:
           name: Stop the containers
           command: |
