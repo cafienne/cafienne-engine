@@ -7,17 +7,15 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
+import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
+import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     /**
      * History of events on this item
      */
-    private final TransitionPublisher transitionPublisher = new TransitionPublisher(this);
+    protected TransitionPublisher transitionPublisher;
     private State state = State.Null; // Current state of the item
     private CaseFileItemTransition lastTransition; // Last transition
 
@@ -58,7 +56,34 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.parent = parent instanceof CaseFileItem ? (CaseFileItem) parent : null;
         this.array = array;
         this.indexInArray = indexInArray;
+        this.transitionPublisher = createTransitionPublisher();
         getCaseInstance().getSentryNetwork().connect(this);
+    }
+
+    @Override
+    public void releaseBootstrapEvents() {
+        TransitionPublisher bootstrapPublisher = transitionPublisher;
+        bootstrapPublisher.releaseBootstrapEvents();
+        super.releaseBootstrapEvents();
+        // From now onwards we can handle case file events the regular way
+        transitionPublisher = new TransitionPublisher(bootstrapPublisher);
+    }
+
+    private TransitionPublisher createTransitionPublisher() {
+        // If the case plan is not yet available, we need to preserve the case file events and
+        //  only trigger entry/exit criteria after case plan has become available.
+        //  This happens in the release method.
+        if (getCaseInstance().getCasePlan() == null) {
+            if (this.array != null) {
+                // NOTE: weirdly enough the case file item events before bootstrap need to be done on the array instead of the item. Unclear why ...
+                return this.array.transitionPublisher;
+            } else {
+                return new BootstrapCaseFileTransitionPublisher(this);
+            }
+        } else {
+            // NOTE: see above note: apparently normal transition publisher does not use the parent array...
+            return new TransitionPublisher(this);
+        }
     }
 
     public CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent) {

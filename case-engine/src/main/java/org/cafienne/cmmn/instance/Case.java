@@ -331,6 +331,17 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         });
     }
 
+    public void createCasePlan() {
+        PlanItemCreated pic = new PlanItemCreated(this);
+        addEvent(pic);
+        pic.getCreatedPlanItem().makeTransition(Transition.Create);
+    }
+
+    public void releaseBootstrapCaseFileEvents() {
+        addDebugInfo(() -> "Releasing potentially delayed Case File Events");
+        getCaseFile().releaseBootstrapEvents();
+    }
+
     /**
      * Returns a map with output parameters by name with their "raw" value
      *

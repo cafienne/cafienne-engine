@@ -44,7 +44,17 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
     protected Map<CaseFileItemDefinition, CaseFileItem> getItems() {
         return items;
     }
-    
+
+    /**
+     * Case input parameters are bound to the CaseFile. This is done before CasePlan creation,
+     * hence entry/exit criteria in the CasePlan do not yet listen to the CaseFile.
+     * To overcome this, these CaseFileEvents are not published to the sentry network
+     * unless and until this call is done.
+     */
+    public void releaseBootstrapEvents() {
+        getItems().values().forEach(item -> item.releaseBootstrapEvents());
+    }
+
     /**
      * Return the child item with the name and specified index. Only works for case file items that have a multiplicity {@link Multiplicity#ZeroOrMore} or {@link Multiplicity#OneOrMore},
      * will throw an {@link InvalidPathException} for the other types.

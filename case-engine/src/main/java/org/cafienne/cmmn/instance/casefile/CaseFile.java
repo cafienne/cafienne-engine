@@ -63,7 +63,6 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
         return caseFileJson;
     }
 
-
     @Override
     public Value<?> read(String propertyName) {
         return getItem(propertyName).getValue();

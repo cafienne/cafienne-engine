@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.OnPart;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
 
@@ -7,15 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
-    private final I item;
+    protected final I item;
     private final List<StandardEvent> transitions = new ArrayList();
 
     public TransitionPublisher(I item) {
         this.item = item;
     }
 
+    /**
+     * Special constructor to be invoked from Bootstrap publisher.
+     * It inherits the already bound entry and exit criteria.
+     * @param bootstrapPublisher
+     */
+    public TransitionPublisher(TransitionPublisher<I, P> bootstrapPublisher) {
+        this.item = bootstrapPublisher.item;
+        this.connectedEntryCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
+        this.connectedExitCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
+    }
+
     public void addEvent(StandardEvent event) {
         transitions.add(0, event);
+    }
+
+    /**
+     * Generic hook for releasing bootstrap events from case file.
+     */
+    public void releaseBootstrapEvents() {
     }
 
     /**
@@ -58,6 +76,9 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
     }
 
     public void informEntryCriteria(StandardEvent transition) {
+        if (! connectedEntryCriteria.isEmpty()) {
+            addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() +" entry criteria that listen to item " + item);
+        }
         // Then inform the activating sentries
         new ArrayList<>(connectedEntryCriteria).forEach(onPart -> onPart.inform(item, transition));
     }
@@ -73,5 +94,9 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
         } else {
             connectedExitCriteria.remove(onPart);
         }
+    }
+
+    protected void addDebugInfo(DebugStringAppender appender) {
+        item.addDebugInfo(appender);
     }
 }
