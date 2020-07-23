@@ -19,8 +19,6 @@ import org.w3c.dom.Element;
 import java.util.Collection;
 
 public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> {
-    private final static Logger logger = LoggerFactory.getLogger(PlanItem.class);
-
     /**
      * Unique identifier of the plan item, typically a guid
      */
@@ -109,6 +107,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             // Register with parent stage
             stage.register(this);
         }
+
         // Link ourselves to any existing sentries in the case
         getCaseInstance().getSentryNetwork().connect(this);
     }
@@ -119,14 +118,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     public void releaseOnPart(PlanItemOnPart onPart) {
         transitionPublisher.releaseOnPart(onPart);
-    }
-
-    public void satisfiedEntryCriterion(EntryCriterion criterion) {
-        entryCriteria.satisfy(criterion);
-    }
-
-    public void satisfiedExitCriterion(ExitCriterion criterion) {
-        exitCriteria.satisfy(criterion);
     }
 
     /**
