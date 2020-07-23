@@ -19,7 +19,8 @@ import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.CaseFile;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
@@ -328,6 +329,17 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
             CaseInputParameter parameter = new CaseInputParameter(inputParameterDefinition, this, externalParameter);
             parameter.bindParameterToCaseFile();
         });
+    }
+
+    public void createCasePlan() {
+        PlanItemCreated pic = new PlanItemCreated(this);
+        addEvent(pic);
+        pic.getCreatedPlanItem().makeTransition(Transition.Create);
+    }
+
+    public void releaseBootstrapCaseFileEvents() {
+        addDebugInfo(() -> "Releasing potentially delayed Case File Events");
+        getCaseFile().releaseBootstrapEvents();
     }
 
     /**

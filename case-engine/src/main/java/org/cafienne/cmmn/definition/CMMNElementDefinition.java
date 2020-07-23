@@ -10,7 +10,7 @@ package org.cafienne.cmmn.definition;
 import org.cafienne.akka.actor.serialization.DeserializationError;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;

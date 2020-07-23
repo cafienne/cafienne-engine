@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.instance;
+package org.cafienne.cmmn.instance.casefile;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -14,8 +14,9 @@ import java.util.Map.Entry;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,7 +62,6 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
         getItems().values().forEach(item -> caseFileJson.put(item.getName(), item.getValue()));
         return caseFileJson;
     }
-
 
     @Override
     public Value<?> read(String propertyName) {

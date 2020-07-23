@@ -19,7 +19,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.io.IOException;
 

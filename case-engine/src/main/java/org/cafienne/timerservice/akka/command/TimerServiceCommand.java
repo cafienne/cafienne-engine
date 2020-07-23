@@ -14,7 +14,7 @@ import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.timerservice.TimerService;
 import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 

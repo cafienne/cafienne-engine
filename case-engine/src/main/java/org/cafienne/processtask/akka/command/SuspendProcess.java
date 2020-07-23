@@ -9,10 +9,8 @@ package org.cafienne.processtask.akka.command;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.akka.command.response.ProcessResponse;
-import org.cafienne.processtask.akka.event.ProcessSuspended;
-import org.cafienne.processtask.akka.event.ProcessTerminated;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest

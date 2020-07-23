@@ -3,7 +3,7 @@ package org.cafienne.cmmn.expression.spel;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 /**
  * Provides context for input/output transformation of parameters.

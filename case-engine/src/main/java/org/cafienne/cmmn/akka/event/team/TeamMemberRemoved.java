@@ -2,7 +2,7 @@ package org.cafienne.cmmn.akka.event.team;
 
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;
 
 /**

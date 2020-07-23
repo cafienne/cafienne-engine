@@ -1,16 +1,16 @@
 package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.PlanItemEntry;
 
 public class EntryCriterion extends Criterion<EntryCriterionDefinition> {
-    public EntryCriterion(PlanItem target, EntryCriterionDefinition definition) {
+    public EntryCriterion(PlanItemEntry target, EntryCriterionDefinition definition) {
         super(target, definition);
     }
 
     @Override
     protected void satisfy() {
-        target.satisfiedEntryCriterion(this);
+        target.satisfy(this);
     }
 
     @Override

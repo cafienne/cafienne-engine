@@ -2,7 +2,7 @@ package org.cafienne.processtask.implementation.report;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;

@@ -6,10 +6,9 @@ import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 

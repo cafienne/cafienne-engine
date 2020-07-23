@@ -1,21 +1,39 @@
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.OnPart;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
-    private final I item;
+public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
+    protected final I item;
     private final List<StandardEvent> transitions = new ArrayList();
 
-    TransitionPublisher(I item) {
+    public TransitionPublisher(I item) {
         this.item = item;
     }
 
-    void addEvent(StandardEvent event) {
+    /**
+     * Special constructor to be invoked from Bootstrap publisher.
+     * It inherits the already bound entry and exit criteria.
+     * @param bootstrapPublisher
+     */
+    public TransitionPublisher(TransitionPublisher<I, P> bootstrapPublisher) {
+        this.item = bootstrapPublisher.item;
+        this.connectedEntryCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
+        this.connectedExitCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
+    }
+
+    public void addEvent(StandardEvent event) {
         transitions.add(0, event);
+    }
+
+    /**
+     * Generic hook for releasing bootstrap events from case file.
+     */
+    public void releaseBootstrapEvents() {
     }
 
     /**
@@ -57,12 +75,15 @@ class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
         list.add(i, onPart);
     }
 
-    void informEntryCriteria(StandardEvent transition) {
+    public void informEntryCriteria(StandardEvent transition) {
+        if (! connectedEntryCriteria.isEmpty()) {
+            addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() +" entry criteria that listen to item " + item);
+        }
         // Then inform the activating sentries
         new ArrayList<>(connectedEntryCriteria).forEach(onPart -> onPart.inform(item, transition));
     }
 
-    void informExitCriteria(StandardEvent transition) {
+    public void informExitCriteria(StandardEvent transition) {
         // Then inform the activating sentries
         new ArrayList<>(connectedExitCriteria).forEach(onPart -> onPart.inform(item, transition));
     }
@@ -73,5 +94,9 @@ class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
         } else {
             connectedExitCriteria.remove(onPart);
         }
+    }
+
+    protected void addDebugInfo(DebugStringAppender appender) {
+        item.addDebugInfo(appender);
     }
 }

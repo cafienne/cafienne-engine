@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions.event;
 
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 
 /**

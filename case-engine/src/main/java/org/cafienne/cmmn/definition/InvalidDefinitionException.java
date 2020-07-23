@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

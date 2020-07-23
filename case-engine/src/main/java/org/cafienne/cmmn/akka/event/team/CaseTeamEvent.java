@@ -3,7 +3,7 @@ package org.cafienne.cmmn.akka.event.team;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.io.IOException;
 

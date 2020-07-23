@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;

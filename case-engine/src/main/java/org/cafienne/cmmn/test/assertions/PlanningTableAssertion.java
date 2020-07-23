@@ -1,9 +1,8 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
-import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.test.CaseTestCommand;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -9,7 +9,7 @@ package org.cafienne.timerservice.akka.command.response;
 
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.timerservice.akka.command.TimerServiceCommand;
 
 /**

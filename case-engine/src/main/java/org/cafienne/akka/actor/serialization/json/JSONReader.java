@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.instance.casefile;
+package org.cafienne.akka.actor.serialization.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;

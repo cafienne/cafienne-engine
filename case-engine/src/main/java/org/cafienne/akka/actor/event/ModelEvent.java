@@ -10,7 +10,7 @@ package org.cafienne.akka.actor.event;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 public interface ModelEvent<M extends ModelActor> extends AkkaSerializable, TenantUserMessage {
     String TAG = "cafienne";

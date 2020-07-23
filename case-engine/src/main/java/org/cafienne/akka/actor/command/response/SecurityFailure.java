@@ -10,7 +10,7 @@ package org.cafienne.akka.actor.command.response;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**
  * Can be used to return an exception to the sender of the command.

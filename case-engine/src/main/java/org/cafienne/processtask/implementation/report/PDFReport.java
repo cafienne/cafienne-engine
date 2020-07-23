@@ -9,8 +9,8 @@ package org.cafienne.processtask.implementation.report;
 
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
-import org.cafienne.cmmn.instance.casefile.StringValue;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.StringValue;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 

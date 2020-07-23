@@ -16,8 +16,8 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.LongValue;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.LongValue;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

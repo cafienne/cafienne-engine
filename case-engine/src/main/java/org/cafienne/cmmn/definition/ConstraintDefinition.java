@@ -10,8 +10,8 @@ package org.cafienne.cmmn.definition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.expression.DefaultValueEvaluator;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.Path;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.w3c.dom.Element;
 

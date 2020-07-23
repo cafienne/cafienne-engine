@@ -1,6 +1,6 @@
 package org.cafienne.service.api.projection.cases;
 
-import org.cafienne.cmmn.instance.Path;
+import org.cafienne.cmmn.instance.casefile.Path;
 
 /**
  * Note: StringPath is basically a copy of {@link Path}. Reason for this is

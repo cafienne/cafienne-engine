@@ -2,8 +2,8 @@ package org.cafienne.cmmn.test.assertions.file;
 
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueList;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;

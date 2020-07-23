@@ -15,7 +15,7 @@ import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 

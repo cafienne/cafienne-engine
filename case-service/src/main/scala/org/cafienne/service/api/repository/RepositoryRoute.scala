@@ -21,8 +21,8 @@ import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
-import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._

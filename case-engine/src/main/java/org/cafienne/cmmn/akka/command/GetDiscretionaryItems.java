@@ -14,9 +14,9 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
-import org.cafienne.cmmn.instance.casefile.StringValue;
-import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.StringValue;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;

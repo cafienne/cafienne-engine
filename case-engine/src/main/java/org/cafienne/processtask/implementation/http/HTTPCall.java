@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.http;
 
-import org.cafienne.cmmn.instance.casefile.*;
+import org.cafienne.akka.actor.serialization.json.*;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;

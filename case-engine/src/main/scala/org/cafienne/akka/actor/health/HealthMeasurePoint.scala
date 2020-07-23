@@ -3,7 +3,7 @@ package org.cafienne.akka.actor.health
 import java.time.Instant
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.instance.casefile.ValueMap
+import org.cafienne.akka.actor.serialization.json.ValueMap
 
 class HealthMeasurePoint(val key: String) extends LazyLogging {
   private var healthy = true

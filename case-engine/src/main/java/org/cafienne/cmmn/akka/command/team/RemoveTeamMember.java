@@ -4,8 +4,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.team.Member;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Team;
 
 /**

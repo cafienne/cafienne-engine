@@ -9,7 +9,8 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 import java.io.Serializable;
 

@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 /**
  * A TaskOutputParameter is created right before a task completes.

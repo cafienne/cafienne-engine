@@ -9,7 +9,7 @@ package org.cafienne.cmmn.akka.command.response;
 
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**
  * Response when a StartCase command is sent

@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.task.validation;
 
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 public class ValidationResponse {
     private final ValueMap content;

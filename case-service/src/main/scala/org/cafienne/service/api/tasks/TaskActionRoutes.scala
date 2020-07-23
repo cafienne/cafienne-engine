@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.akka.command.CaseCommandModels
-import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.humantask.akka.command._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._

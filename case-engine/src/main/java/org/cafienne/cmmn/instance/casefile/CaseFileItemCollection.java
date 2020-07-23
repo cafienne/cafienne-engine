@@ -5,11 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.instance;
+package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
+import org.cafienne.cmmn.instance.CMMNElement;
+import org.cafienne.cmmn.instance.Case;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,7 +44,17 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
     protected Map<CaseFileItemDefinition, CaseFileItem> getItems() {
         return items;
     }
-    
+
+    /**
+     * Case input parameters are bound to the CaseFile. This is done before CasePlan creation,
+     * hence entry/exit criteria in the CasePlan do not yet listen to the CaseFile.
+     * To overcome this, these CaseFileEvents are not published to the sentry network
+     * unless and until this call is done.
+     */
+    public void releaseBootstrapEvents() {
+        getItems().values().forEach(item -> item.releaseBootstrapEvents());
+    }
+
     /**
      * Return the child item with the name and specified index. Only works for case file items that have a multiplicity {@link Multiplicity#ZeroOrMore} or {@link Multiplicity#OneOrMore},
      * will throw an {@link InvalidPathException} for the other types.

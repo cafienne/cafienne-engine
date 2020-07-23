@@ -3,7 +3,7 @@ package org.cafienne.cmmn.akka.event.team;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**
  * Event caused when a team member is no longer owner

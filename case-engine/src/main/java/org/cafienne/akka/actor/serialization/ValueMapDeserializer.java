@@ -1,6 +1,6 @@
 package org.cafienne.akka.actor.serialization;
 
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**
  * Deserializes a {@link ValueMap} based json AST into an object

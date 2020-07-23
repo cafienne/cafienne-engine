@@ -5,7 +5,7 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;
 
 import java.io.IOException;

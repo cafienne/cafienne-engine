@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.akka.actor.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
 import org.cafienne.cmmn.akka.command.CaseCommandModels
-import org.cafienne.cmmn.instance.casefile.ValueMap
 import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, StartCaseFormat}
 
 /**

@@ -2,8 +2,8 @@ package org.cafienne.cmmn.akka.event.file;
 
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**
  * Basic event allowing listeners that are interested only in case team member events to do initial filtering.

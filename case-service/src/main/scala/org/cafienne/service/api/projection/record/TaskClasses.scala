@@ -2,7 +2,7 @@ package org.cafienne.service.api.projection.record
 
 import java.time.Instant
 
-import org.cafienne.cmmn.instance.casefile.{JSONReader, Value, ValueMap}
+import org.cafienne.akka.actor.serialization.json.{JSONReader, Value, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 
 final case class TaskRecord(id: String,

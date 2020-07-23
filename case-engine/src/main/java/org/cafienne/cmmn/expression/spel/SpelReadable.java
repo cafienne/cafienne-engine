@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.expression.spel;
 
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 /**
  * Interface to make case file values readable for the spel engine.

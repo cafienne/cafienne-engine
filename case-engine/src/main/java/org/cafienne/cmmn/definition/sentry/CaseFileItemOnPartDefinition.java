@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
-import org.cafienne.cmmn.instance.CaseFileItemTransition;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 

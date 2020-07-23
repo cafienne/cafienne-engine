@@ -8,17 +8,16 @@
 package org.cafienne.cmmn.definition.casefile;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.CaseFileItemArray;
-import org.cafienne.cmmn.instance.CaseFileItemCollection;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemArray;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
+import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.w3c.dom.Element;
 
 public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {

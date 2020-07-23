@@ -2,9 +2,9 @@ package org.cafienne.akka.actor.serialization;
 
 import akka.actor.ExtendedActorSystem;
 import akka.serialization.SerializerWithStringManifest;
-import org.cafienne.cmmn.instance.casefile.JSONParseFailure;
-import org.cafienne.cmmn.instance.casefile.JSONReader;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.JSONParseFailure;
+import org.cafienne.akka.actor.serialization.json.JSONReader;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

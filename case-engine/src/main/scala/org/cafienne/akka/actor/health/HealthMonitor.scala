@@ -2,7 +2,7 @@ package org.cafienne.akka.actor.health
 
 import java.util
 
-import org.cafienne.cmmn.instance.casefile.ValueMap
+import org.cafienne.akka.actor.serialization.json.ValueMap
 
 import scala.collection.mutable.Set
 import scala.collection.JavaConverters._

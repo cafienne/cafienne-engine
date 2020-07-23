@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeade
 import akka.http.scaladsl.server.{Directive1, Route}
 import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.command.response.ActorLastModified
-import org.cafienne.cmmn.instance.casefile.Value
+import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
 import org.cafienne.service.api.projection.{LastModifiedRegistration, SearchFailure}

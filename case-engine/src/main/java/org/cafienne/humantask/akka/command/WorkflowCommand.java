@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.humantask.instance.TaskState;

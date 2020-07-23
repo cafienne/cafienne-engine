@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.akka.command.team
 
+import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
 import org.cafienne.cmmn.akka.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
 import org.cafienne.cmmn.instance.team.CaseTeamError
 import org.cafienne.infrastructure.json.CafienneJson
 

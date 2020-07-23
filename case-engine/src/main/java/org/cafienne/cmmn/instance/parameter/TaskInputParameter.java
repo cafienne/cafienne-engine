@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 /**
  * TaskInputParameter is specific from other parameters, in that its value is typically bound to the case file.

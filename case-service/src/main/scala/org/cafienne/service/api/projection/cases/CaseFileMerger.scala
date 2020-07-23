@@ -1,9 +1,9 @@
 package org.cafienne.service.api.projection.cases
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.serialization.json.{Value, ValueList, ValueMap}
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent
-import org.cafienne.cmmn.instance.CaseFileItemTransition
-import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
+import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 
 object CaseFileMerger extends LazyLogging {
 

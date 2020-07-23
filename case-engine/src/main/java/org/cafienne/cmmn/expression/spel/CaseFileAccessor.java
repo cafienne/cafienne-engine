@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.expression.spel;
 
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.expression.AccessException;

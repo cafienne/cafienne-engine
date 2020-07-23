@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.instance.casefile;
+package org.cafienne.akka.actor.serialization.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;

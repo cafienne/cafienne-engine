@@ -6,10 +6,8 @@ import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.DefinitionType;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 public class JSONType extends DefinitionType {
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, TreeNode}
 import com.fasterxml.jackson.databind.{DeserializationContext, SerializerProvider}
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import org.cafienne.cmmn.instance.casefile.{JSONReader, ValueMap}
+import org.cafienne.akka.actor.serialization.json.{JSONReader, ValueMap}
 
 class ValueMapJacksonSerializer(c: Class[ValueMap]) extends StdSerializer[ValueMap](c) {
 

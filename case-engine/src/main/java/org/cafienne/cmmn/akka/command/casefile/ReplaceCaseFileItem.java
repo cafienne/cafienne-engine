@@ -9,9 +9,9 @@ package org.cafienne.cmmn.akka.command.casefile;
 
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 
 /**

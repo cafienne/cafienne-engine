@@ -10,7 +10,7 @@ package org.cafienne.cmmn.instance.parameter;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 /**
  * CaseOutputParameters are bound to the case file. They are filled at the moment the CasePlan completes.

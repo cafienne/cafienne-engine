@@ -2,7 +2,7 @@ package org.cafienne.processtask.akka.command;
 
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 

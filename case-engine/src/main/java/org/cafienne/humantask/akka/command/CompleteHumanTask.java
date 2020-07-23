@@ -10,7 +10,7 @@ package org.cafienne.humantask.akka.command;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
 
