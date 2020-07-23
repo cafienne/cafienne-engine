@@ -18,6 +18,6 @@ public class DeserializationFailure implements Serializable {
 
     @Override
     public String toString() {
-        return "Unrecognized manifest "+exception+" with blob "+new String(blob);
+        return "Unrecognized manifest "+manifest+" gives failure of type " + exception.getClass().getName() +" for blob "+new String(blob);
     }
 }

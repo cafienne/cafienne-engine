@@ -31,7 +31,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
         String standardEventName = parse("standardEvent", String.class, true);
         standardEvent = Transition.getEnum(standardEventName);
         if (standardEvent == null) {
-            getCaseDefinition().addDefinitionError("A standard event named " + standardEventName + " does not exist");
+            getCaseDefinition().addDefinitionError("A standard event named " + standardEventName + " does not exist for plan items");
         }
         sourceRef = parseAttribute("sourceRef", true);
         String sentryRef = parseAttribute("sentryRef", false);

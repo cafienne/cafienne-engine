@@ -46,7 +46,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
-  @RequestBody(description = "Tenant", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.Tenant]))))
+  @RequestBody(description = "Tenant", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.TenantFormat]))))
   @Consumes(Array("application/json"))
   def createTenant = post {
     pathEndOrSingleSlash {
@@ -54,9 +54,9 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
 
-        implicit val userFormat = jsonFormat5(TenantAPI.User)
-        implicit val tenantFormat = jsonFormat3(TenantAPI.BackwardsCompatibleTenant)
-        entity(as[TenantAPI.BackwardsCompatibleTenant]) { newTenant =>
+        implicit val userFormat = jsonFormat5(TenantAPI.UserFormat)
+        implicit val tenantFormat = jsonFormat3(TenantAPI.BackwardsCompatibleTenantFormat)
+        entity(as[TenantAPI.BackwardsCompatibleTenantFormat]) { newTenant =>
           invokeCreateTenant(platformOwner, newTenant)
         }
       }
@@ -116,7 +116,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
     description = "Retrieves the user information of current user",
     tags = Array("platform"),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUser])))),
+      new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUserFormat])))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )

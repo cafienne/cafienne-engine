@@ -8,11 +8,11 @@ import org.cafienne.akka.actor.identity.TenantUser
 
 class PlatformConfig(val parent: CafienneConfig) extends MandatoryConfig {
   val path = "platform"
-  override val exception: Throwable = new IllegalArgumentException("Check configuration property 'cafienne.platform'. This must be available")
+  override val exception = ConfigurationException("Check configuration property 'cafienne.platform'. This must be available")
 
   val platformOwners: util.List[String] = config.getStringList("owners")
   if (platformOwners.isEmpty) {
-    throw new IllegalArgumentException("Platform owners cannot be an empty list. Check configuration property cafienne.platform.owners")
+    throw ConfigurationException("Platform owners cannot be an empty list. Check configuration property cafienne.platform.owners")
   }
 
   lazy val defaultTenant = {

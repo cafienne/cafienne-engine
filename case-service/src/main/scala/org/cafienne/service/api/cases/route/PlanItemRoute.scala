@@ -7,6 +7,7 @@
  */
 package org.cafienne.service.api.cases.route
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -110,7 +111,11 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "planitems" / Segment / Segment) { (caseInstanceId, planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)
-        askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
+        if (transition == null) {
+          complete(StatusCodes.BadRequest, "Transition " + transition +" is not valid")
+        } else {
+          askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
+        }
       }
     }
   }

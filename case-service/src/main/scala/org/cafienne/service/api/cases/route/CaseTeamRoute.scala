@@ -20,7 +20,7 @@ import org.cafienne.cmmn.akka.command.team._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember, Examples}
+import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, Examples}
 import org.cafienne.service.api.projection.query.CaseQueries
 
 @Api(tags = Array("case team"))
@@ -41,7 +41,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
-      new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[Examples.CaseTeamResponse])))),
+      new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[Examples.CaseTeamResponseFormat])))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )
@@ -70,12 +70,12 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
-  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[Examples.StartCaseTeamMember])))))
+  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[Examples.StartCaseTeamMemberFormat])))))
   @Consumes(Array("application/json"))
   def setCaseTeam = post {
     validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
-        entity(as[BackwardCompatibleTeam]) { oldFormat =>
+        entity(as[BackwardCompatibleTeamFormat]) { oldFormat =>
           val caseTeam = teamConverter(oldFormat)
           askCaseWithValidMembers(platformUser, caseTeam.members, caseInstanceId, tenantUser => new SetCaseTeam(tenantUser, caseInstanceId, caseTeam))
         }
@@ -98,12 +98,12 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
-  @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMember]))))
+  @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMemberFormat]))))
   @Consumes(Array("application/json"))
   def putCaseTeamMember = put {
     validUser { platformUser =>
       path(Segment / "caseteam") { caseInstanceId =>
-        entity(as[BackwardCompatibleTeamMember]) { oldFormat =>
+        entity(as[BackwardCompatibleTeamMemberFormat]) { oldFormat =>
           val caseTeamMember = memberConverter(oldFormat)
           askCaseWithValidMembers(platformUser, Seq(caseTeamMember), caseInstanceId, tenantUser => new PutTeamMember(tenantUser, caseInstanceId, caseTeamMember))
         }

@@ -14,7 +14,7 @@ import org.cafienne.cmmn.instance.casefile.Value;
 public class JSONType extends DefinitionType {
 
     @Override
-    public void validate(CaseFileItemDefinition itemDefinition, Value value) {
+    public void validate(CaseFileItemDefinition itemDefinition, Value value) throws CaseFileError {
         if (value instanceof ValueMap) {
             final ValueMap object = (ValueMap) value;
             Map<String, PropertyDefinition> properties = itemDefinition.getCaseFileItemDefinition().getProperties();

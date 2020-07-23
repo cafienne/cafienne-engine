@@ -28,7 +28,7 @@ public class ValueTests {
         try {
             m = new ValueMap(0, "13");
         } catch (IllegalArgumentException e) {
-            if (!e.getMessage().contains("is not of type String or Enum, but it must be; found type")) {
+            if (!e.getMessage().contains("is not of type String or Fields, but it must be; found type")) {
                 throw new AssertionError("Hmmmm, something breaks nastily", e);
             }
         }

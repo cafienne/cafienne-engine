@@ -42,21 +42,21 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         CaseRoleDefinition performer = htd.getPerformer();
         String performerRole = performer != null ? performer.getName() : "";
 
-        task.addEvent(new HumanTaskActivated(task, performerRole, definition.getTaskModel()));
+        addEvent(new HumanTaskActivated(task, performerRole, definition.getTaskModel()));
 
         // Now check if we can already assign and fill due date
         AssignmentDefinition assignment = getDefinition().getAssignmentExpression();
         if (assignment != null) {
             try {
-                String assignee = assignment.evaluate(this.task);
-                addDebugInfo(() -> "Assignee expression in task " + task.getName() + "[" + task.getId() + " resulted in: " + assignee);
+                String newAssignee = assignment.evaluate(this.task);
+                addDebugInfo(() -> "Assignee expression in task " + task.getName() + "[" + task.getId() + " resulted in: " + newAssignee);
 
                 // Whether or not assignee is an existing tenant user cannot be determined here...
                 //  It is up to the application using the dynamic assignment to make sure it returns a valid user.
                 //  If not a valid user, then case owners have to change the task assignee.
-                if (assignee != null && !assignee.trim().isEmpty()) {
-                    getCaseInstance().getCaseTeam().addDynamicMember(assignee, task.getPerformer());
-                    assign(assignee);
+                if (newAssignee != null && !newAssignee.trim().isEmpty()) {
+                    addCaseTeamMember(newAssignee);
+                    assign(newAssignee);
                 }
             } catch (Exception e) {
                 addDebugInfo(() -> "Failed to evaluate expression to assign task", e);
@@ -77,7 +77,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
             }
         }
 
-        getCaseInstance().addEvent(new HumanTaskInputSaved(task, task.getMappedInputParameters()));
+        addEvent(new HumanTaskInputSaved(task, task.getMappedInputParameters()));
     }
 
     public void updateState(HumanTaskAssigned event) {
@@ -123,22 +123,22 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
 
     public void assign(String newAssignee) {
         addCaseTeamMember(newAssignee);
-        task.addEvent(new HumanTaskAssigned(task, newAssignee));
+        addEvent(new HumanTaskAssigned(task, newAssignee));
         checkOwnershipChange(newAssignee);
     }
 
     private void addCaseTeamMember(String newMember) {
-        getCaseInstance().getCaseTeam().addDynamicMember(newMember, task.getPerformer());
+        getCaseInstance().getCaseTeam().upsertCaseTeamMember(newMember, task.getPerformer());
     }
 
     public void claim(String claimer) {
-        task.addEvent(new HumanTaskClaimed(task, claimer));
+        addEvent(new HumanTaskClaimed(task, claimer));
         checkOwnershipChange(claimer);
     }
 
     public void delegate(String newAssignee) {
         addCaseTeamMember(newAssignee);
-        task.addEvent(new HumanTaskDelegated(task, newAssignee));
+        addEvent(new HumanTaskDelegated(task, newAssignee));
     }
 
     public void revoke() {
@@ -151,13 +151,13 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         TaskState nextState = currentTaskState == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned;
         String nextAssignee = currentTaskState == TaskState.Delegated ? owner : "";
 
-        task.addEvent(new HumanTaskRevoked(task, nextAssignee, nextState, TaskAction.Revoke));
+        addEvent(new HumanTaskRevoked(task, nextAssignee, nextState, TaskAction.Revoke));
         checkOwnershipChange(nextAssignee);
     }
 
     private void checkOwnershipChange(String newOwner) {
         if (this.owner.equalsIgnoreCase(newOwner)) return;
-        task.addEvent(new HumanTaskOwnerChanged(task, newOwner));
+        addEvent(new HumanTaskOwnerChanged(task, newOwner));
     }
 
     public void complete(ValueMap taskOutput) {
@@ -172,17 +172,17 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
             }
         }
 
-        task.addEvent(new HumanTaskCompleted(task, taskOutput));
+        addEvent(new HumanTaskCompleted(task, taskOutput));
         // This will generate PlanItemTransitioned and CaseFileItem events
         task.goComplete(taskOutput);
     }
 
     public void setDueDate(Instant newDueDate) {
-        task.addEvent(new HumanTaskDueDateFilled(task, newDueDate));
+        addEvent(new HumanTaskDueDateFilled(task, newDueDate));
     }
 
     public void saveOutput(ValueMap taskOutput) {
-        task.addEvent(new HumanTaskOutputSaved(task, taskOutput));
+        addEvent(new HumanTaskOutputSaved(task, taskOutput));
     }
 
     //

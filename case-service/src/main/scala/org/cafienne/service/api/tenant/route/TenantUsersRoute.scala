@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
+import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.UserSearchFailure
 import org.cafienne.service.api.projection.query.UserQueries
@@ -44,7 +45,7 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUser]))))),
+      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
@@ -69,7 +70,7 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUser]))))),
+      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
       new ApiResponse(responseCode = "400", description = "Invalid request"),
       new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
@@ -90,7 +91,7 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
           case Failure(failure) =>
             failure match {
               case u: UserSearchFailure => complete(StatusCodes.NotFound, u.getLocalizedMessage)
-              case err: SecurityException => complete(StatusCodes.Unauthorized, err.getMessage)
+              case err: AuthorizationException => complete(StatusCodes.Unauthorized, err.getMessage)
               case _ => {
                 logger.warn(s"Ran into an exception while getting user '$userId' in tenant '$tenant'", failure)
                 complete(StatusCodes.InternalServerError)

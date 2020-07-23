@@ -2,23 +2,20 @@ package org.cafienne.akka.actor.handler;
 
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.ModelCommand;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.command.exception.MissingTenantException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.event.DebugEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
@@ -26,15 +23,9 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
     protected final C command;
     protected ModelResponse response;
 
-    /**
-     * User context passed with the current command or event.
-     */
-    private TenantUser user;
-
     public CommandHandler(A actor, C msg) {
         super(actor, msg);
         this.command = msg;
-        this.user = command.getUser();
         addDebugInfo(() -> "\n\n\txxxxxxxxxxxxxxxxxxxx new command " + command.getCommandDescription() +" xxxxxxxxxxxxxxx\n\n", logger);
     }
 
@@ -46,23 +37,10 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
      * Runs the case security checks on user context and case tenant.
      */
     @Override
-    protected InvalidCommandException runSecurityChecks() {
-        InvalidCommandException issue = null;
-        // Security checks:
-        // - need a proper user.
-        // - is the case tenant already available, and is the user in that same tenant?
-        // Same exception is needed for security reasons: do not expose more info than needed.
-        if (user == null || user.id() == null || user.id().trim().isEmpty()) {
-            issue = new InvalidCommandException("The user id must not be null or empty");
-        } else if (user.tenant() == null) {
-            issue = new MissingTenantException("User must provide tenant information in order to execute a command");
-        } else if (actor.getTenant() != null && !actor.getTenant().equals(user.tenant())) {
-            issue = new InvalidCommandException("Cannot handle command " + getClass().getName() + "; StartCase not yet sent, or not in this user context");
-        }
-
+    protected AuthorizationException runSecurityChecks() {
+        AuthorizationException issue = validateUserAndTenant();
         if (issue != null) {
-            final Exception e = issue;
-            addDebugInfo(() -> e, logger);
+            addDebugInfo(() -> issue, logger);
             setNextResponse(new SecurityFailure(command, issue));
         }
 
@@ -76,7 +54,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         // First, simple, validation
         try {
             command.validate(actor);
-        } catch (SecurityException e) {
+        } catch (AuthorizationException e) {
             addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
             logger.debug("===== Command was not authorized ======");
@@ -92,7 +70,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             // Leave the actual work of processing to the command itself.
             setNextResponse(command.process(actor));
             logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
-        } catch (SecurityException e) {
+        } catch (AuthorizationException e) {
             addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
             logger.debug("===== Command was not authorized ======");

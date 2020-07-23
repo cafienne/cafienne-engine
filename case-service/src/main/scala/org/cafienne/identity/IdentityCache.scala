@@ -1,6 +1,7 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.service.api.projection.query.UserQueries
@@ -56,7 +57,7 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
     userQueries.getPlatformUser(userId).map(u => {
       if (u.users.isEmpty && !u.isPlatformOwner) {
         logger.info("User " + userId + " has a valid token, but is not registered in the case system")
-        throw new SecurityException("User " + userId + " is not registered in the case system")
+        throw AuthorizationException("User " + userId + " is not registered in the case system")
       }
       cache.put(userId, u)
       u

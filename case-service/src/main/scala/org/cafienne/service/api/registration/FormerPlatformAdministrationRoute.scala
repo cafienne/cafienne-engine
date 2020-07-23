@@ -28,9 +28,9 @@ class FormerPlatformAdministrationRoute()(override implicit val userCache: Ident
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
 
-        implicit val userFormat = jsonFormat5(TenantAPI.User)
-        implicit val tenantFormat = jsonFormat3(TenantAPI.BackwardsCompatibleTenant)
-        entity(as[TenantAPI.BackwardsCompatibleTenant]) { newTenant =>
+        implicit val userFormat = jsonFormat5(TenantAPI.UserFormat)
+        implicit val tenantFormat = jsonFormat3(TenantAPI.BackwardsCompatibleTenantFormat)
+        entity(as[TenantAPI.BackwardsCompatibleTenantFormat]) { newTenant =>
           invokeCreateTenant(platformOwner, newTenant)
         }
       }

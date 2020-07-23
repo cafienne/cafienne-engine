@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.serialization.DeserializationError;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.cmmn.instance.casefile.ValueMap;
@@ -446,7 +446,7 @@ public abstract class CMMNElementDefinition {
         return attributeValue;
     }
 
-    public static <T extends CMMNElementDefinition> T fromJSON(ValueMap json, Class<T> tClass) {
+    public static <T extends CMMNElementDefinition> T fromJSON(String sourceClassName, ValueMap json, Class<T> tClass) {
         String guid = json.raw(Fields.elementId);
         String source = json.raw(Fields.source);
         try {
@@ -457,7 +457,7 @@ public abstract class CMMNElementDefinition {
             // TTD we need to come up with a more suitable exception, since this logic is typically also
             //  invoked when recovering from events.
 
-            throw new InvalidCommandException("Could not parse the definitions document this command was creaetd with ...", e);
+            throw new DeserializationError("Failure while deserializing an instance of " + sourceClassName, e);
         }
     }
 

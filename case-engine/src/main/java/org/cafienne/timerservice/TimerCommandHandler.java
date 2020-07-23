@@ -1,6 +1,6 @@
 package org.cafienne.timerservice;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.handler.CommandHandler;
 import org.cafienne.timerservice.akka.command.TimerServiceCommand;
@@ -15,7 +15,8 @@ public class TimerCommandHandler extends CommandHandler<TimerServiceCommand, Mod
     }
 
     @Override
-    protected InvalidCommandException runSecurityChecks() {
+    protected AuthorizationException runSecurityChecks() {
+        // Need to override default CommandHandler security checking - all timers from all tenants are allowed ...
         return null;
     }
 }

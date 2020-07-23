@@ -12,7 +12,7 @@ trait MandatoryConfig extends CafienneBaseConfig {
     if (parent.config.hasPath(path)) {
       parent.config.getConfig(path)
     } else {
-      throw new Exception("Missing config " + path +" in " + parent.config)
+      throw ConfigurationException("Missing config " + path + " in " + parent.config)
     }
   }
 }
@@ -22,10 +22,6 @@ trait MandatoryConfig extends CafienneBaseConfig {
   * Perhaps something like this already exists.
   */
 trait CafienneBaseConfig extends LazyLogging {
-  val parent: CafienneBaseConfig
-  val path: String
-  val exception: Throwable = null
-
   lazy val config: Config = {
     if (parent.config.hasPath(path)) {
       parent.config.getConfig(path)
@@ -33,6 +29,9 @@ trait CafienneBaseConfig extends LazyLogging {
       null
     }
   }
+  val parent: CafienneBaseConfig
+  val path: String
+  val exception: ConfigurationException = null
 
   def readNumber(path: String, default: Number): Number = {
     if (config != null && config.hasPath(path)) {

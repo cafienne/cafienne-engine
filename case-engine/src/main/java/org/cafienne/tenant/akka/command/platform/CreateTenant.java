@@ -2,6 +2,7 @@ package org.cafienne.tenant.akka.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.BootstrapCommand;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -27,7 +28,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         this.users = users;
         // Check whether after the filtering there are still owners left. Tenant must have owners.
         if (this.users.stream().filter(u -> u.isOwner()).count() == 0) {
-            throw new SecurityException("Cannot create a tenant without providing tenant owners");
+            throw new AuthorizationException("Cannot create a tenant without providing tenant owners");
         }
     }
 

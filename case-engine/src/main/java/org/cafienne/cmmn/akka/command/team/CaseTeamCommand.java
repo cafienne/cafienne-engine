@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.akka.command.team;
 
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
@@ -28,7 +29,7 @@ abstract class CaseTeamCommand extends CaseCommand {
     public void validate(Case caseInstance) throws InvalidCommandException {
         super.validate(caseInstance);
         if (! caseInstance.getCurrentTeamMember().isOwner()) {
-            throw new SecurityException("Only case team owners can perform this action");
+            throw new AuthorizationException("Only case team owners can perform this action");
         }
     }
 

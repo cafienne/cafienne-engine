@@ -81,7 +81,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
-  @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParameters]))))
+  @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
   @Produces(Array("application/json"))
   def validateTaskOutput = post {
     validUser { platformUser =>
@@ -108,7 +108,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
-  @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParameters]))))
+  @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
   @Produces(Array("application/json"))
   def saveTaskOutput = put {
     validUser { platformUser =>
@@ -256,7 +256,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Unable to complete the task due to an internal failure", responseCode = "500")
     )
   )
-  @RequestBody(description = "Output (optional) to complete the task with", required = false, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParameters]))))
+  @RequestBody(description = "Output (optional) to complete the task with", required = false, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
   @Produces(Array("application/json"))
   def completeTaskRoute =
     post {

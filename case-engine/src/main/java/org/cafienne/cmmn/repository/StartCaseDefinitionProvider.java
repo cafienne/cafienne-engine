@@ -2,6 +2,7 @@ package org.cafienne.cmmn.repository;
 
 import com.typesafe.config.Config;
 import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -46,7 +47,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
                 return;
             }
         }
-        throw new SecurityException("User " + user.id() + " is not allowed to perform this operation");
+        throw new AuthorizationException("User " + user.id() + " is not allowed to perform this operation");
     }
 
     @Override

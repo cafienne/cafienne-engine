@@ -32,16 +32,14 @@ public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializ
 
     protected ModelCommand(TenantUser tenantUser, String actorId) {
         this.msgId = new Guid().toString();
-        if (tenantUser == null) {
-            throw new SecurityException("TenantUser cannot be null");
+        if (tenantUser == null || tenantUser.id() == null || tenantUser.id().trim().isEmpty()) {
+            throw new InvalidCommandException("Tenant user cannot be null");
         }
-
-        // TTR: must be validated before command is sent
         if (tenantUser.tenant() == null || tenantUser.tenant().isEmpty()) {
-            throw new SecurityException("Tenant information is missing for the "+this.getClass().getSimpleName()+" command");
+            throw new InvalidCommandException("Tenant information is missing for the "+this.getClass().getSimpleName()+" command");
         }
         if (actorId == null) {
-            throw new SecurityException("Actor id cannot be null");
+            throw new InvalidCommandException("Actor id cannot be null");
         }
         this.user = tenantUser;
         this.actorId = actorId;

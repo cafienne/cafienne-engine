@@ -15,7 +15,7 @@ import org.cafienne.cmmn.akka.command._
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
-import org.cafienne.service.api.model.{BackwardCompatibleTeam, BackwardCompatibleTeamMember}
+import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat}
 import org.cafienne.service.api.projection.CaseSearchFailure
 import org.cafienne.service.api.projection.query.CaseQueries
 
@@ -80,13 +80,13 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     def apply(user: TenantUser): CaseCommand
   }
 
-  protected def teamConverter(caseTeam: BackwardCompatibleTeam): CaseTeam = {
+  protected def teamConverter(caseTeam: BackwardCompatibleTeamFormat): CaseTeam = {
     CaseTeam(caseTeam.members.map {
       memberConverter
     })
   }
 
-  protected def memberConverter(member: BackwardCompatibleTeamMember): CaseTeamMember = {
+  protected def memberConverter(member: BackwardCompatibleTeamMemberFormat): CaseTeamMember = {
     val memberId = member.memberId.getOrElse(member.user.getOrElse(throw new IllegalArgumentException("Member id is missing")))
     val memberType = member.memberType.getOrElse("user")
     val caseRoles = member.caseRoles.getOrElse(member.roles.getOrElse(Seq()))

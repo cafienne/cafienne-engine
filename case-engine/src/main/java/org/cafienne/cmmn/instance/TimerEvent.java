@@ -49,7 +49,7 @@ public class TimerEvent extends PlanItem<TimerEventDefinition> {
 
     @Override
     protected void createInstance() {
-        getCaseInstance().addEvent(new TimerSet(this));
+        addEvent(new TimerSet(this));
     }
 
     @Override

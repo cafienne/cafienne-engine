@@ -156,7 +156,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             // Create a new plan item
             addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
             PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
-            getCaseInstance().addEvent(pic);
+            addEvent(pic);
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
             pic.getCreatedPlanItem().makeTransition(getEntryTransition());
         }
@@ -214,7 +214,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         PlanItemTransitioned event = stateMachine.transition(this, transition);
         if (event != null) { // means, a transition happened.
             addDebugInfo(() -> "StateMachine-"+this+": allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
-            getCaseInstance().addEvent(event);
+            addEvent(event);
         } else {
             addDebugInfo(() -> "StateMachine-"+this+": transition " + transition + " has no effect, current state remains " + getState());
         }
@@ -287,7 +287,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     void evaluateRepetitionRule() {
         boolean repeats = itemDefinition.getPlanItemControl().getRepetitionRule().evaluate(this);
-        getCaseInstance().addEvent(new RepetitionRuleEvaluated(this, repeats));
+        addEvent(new RepetitionRuleEvaluated(this, repeats));
     }
 
     /**
@@ -295,7 +295,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     void evaluateRequiredRule() {
         boolean required = itemDefinition.getPlanItemControl().getRequiredRule().evaluate(this);
-        getCaseInstance().addEvent(new RequiredRuleEvaluated(this, required));
+        addEvent(new RequiredRuleEvaluated(this, required));
     }
 
     /**

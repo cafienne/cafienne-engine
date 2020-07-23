@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition.parameter;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.w3c.dom.Element;
@@ -18,7 +19,7 @@ public class InputParameterDefinition extends ParameterDefinition {
         super(element, definition, parentElement);
     }
 
-    public void validate(Value value) {
+    public void validate(Value value) throws CaseFileError {
         CaseFileItemDefinition binding = getBinding();
         if (binding != null) {
             binding.validate(value);

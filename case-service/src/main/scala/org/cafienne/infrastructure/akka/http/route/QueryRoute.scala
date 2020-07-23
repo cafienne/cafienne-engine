@@ -3,6 +3,7 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName}
 import akka.http.scaladsl.server.{Directive1, Route}
+import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.cmmn.instance.casefile.Value
 import org.cafienne.infrastructure.json.CafienneJson
@@ -52,6 +53,7 @@ trait QueryRoute extends AuthenticatedRoute {
   def handleFailure(t: Throwable): Route = {
     t match {
       case notFound: SearchFailure => complete(StatusCodes.NotFound, notFound.getLocalizedMessage)
+      case notAllowed: AuthorizationException => complete(StatusCodes.Unauthorized, notAllowed.getMessage)
       case notAllowed: SecurityException => complete(StatusCodes.Unauthorized, notAllowed.getMessage)
       case error => {
         logger.whenDebugEnabled(() => logger.debug("Failure while handling query", error))

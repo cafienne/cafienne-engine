@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.instance.team;
 
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
@@ -42,17 +43,29 @@ public class Team extends CMMNElement<CaseDefinition> {
         newCaseTeam.getMembers().forEach(this::upsert);
     }
 
+    private void addMember(MemberKey key) {
+        addEvent(new TeamRoleFilled(getCaseInstance(), key, ""));
+    }
+
+    private void addMemberRole(MemberKey key, String roleName) {
+        addEvent(new TeamRoleFilled(getCaseInstance(), key, roleName));
+    }
+
+    private void removeMemberRole(MemberKey key, String roleName) {
+        addEvent(new TeamRoleCleared(getCaseInstance(), key, roleName));
+    }
+
     public void upsert(CaseTeamMember newMemberInfo) {
         MemberKey key = newMemberInfo.key();
         Member member = getMember(key);
         if (member == null) {
             // We need to add a new member;
             // Always add an empty role
-            getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), key, ""));
+            addMember(key);
         }
         newMemberInfo.getCaseRoles().forEach(caseRole -> {
             if (!getMember(key).hasRole(caseRole)) {
-                getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), key, caseRole));
+                addMemberRole(key, caseRole);
             } else {
                 addDebugInfo(() -> "Ignoring request to add case role '" + caseRole + "' to member '" + key + "' since the member already has this role");
             }
@@ -69,7 +82,7 @@ public class Team extends CMMNElement<CaseDefinition> {
 
         if (newMemberInfo.removeRoles().nonEmpty()) {
             addDebugInfo(() -> "Removing roles from member " + key);
-            newMemberInfo.rolesToRemove().forEach(roleName -> getCaseInstance().addEvent(new TeamRoleCleared(getCaseInstance(), key, roleName)));
+            newMemberInfo.rolesToRemove().forEach(roleName -> removeMemberRole(key, roleName));
         }
     }
 
@@ -85,8 +98,8 @@ public class Team extends CMMNElement<CaseDefinition> {
             if (member.isOwner()) {
                 removeOwner(key);
             }
-            new ArrayList<>(member.getRoles()).forEach(role -> getCaseInstance().addEvent(new TeamRoleCleared(getCaseInstance(), member.key, role.getName())));
-            getCaseInstance().addEvent(new TeamRoleCleared(getCaseInstance(), member.key, ""));
+            new ArrayList<>(member.getRoles()).forEach(role -> removeMemberRole(member.key, role.getName()));
+            addEvent(new TeamRoleCleared(getCaseInstance(), member.key, ""));
         } else {
             addDebugInfo(() -> "Cannot remove case team member '" + key.id() + "', since this member is not in the team");
         }
@@ -105,7 +118,7 @@ public class Team extends CMMNElement<CaseDefinition> {
             addDebugInfo(() -> "Member is already owner");
             return;
         }
-        getCaseInstance().addEvent(new CaseOwnerAdded(getCaseInstance(), key));
+        addEvent(new CaseOwnerAdded(getCaseInstance(), key));
     }
 
     /**
@@ -117,7 +130,7 @@ public class Team extends CMMNElement<CaseDefinition> {
         addDebugInfo(() -> "Trying to remove ownership for member " + key);
         Member member = getMember(key);
         if (member.isOwner()) {
-            getCaseInstance().addEvent(new CaseOwnerRemoved(getCaseInstance(), key));
+            addEvent(new CaseOwnerRemoved(getCaseInstance(), key));
         } else {
             addDebugInfo(() -> "Member is not an owner");
         }
@@ -248,7 +261,7 @@ public class Team extends CMMNElement<CaseDefinition> {
             }
         }
 
-        throw new SecurityException("User " + user.id() + " is not part of the case team");
+        throw new AuthorizationException("User " + user.id() + " is not part of the case team");
     }
 
     public CurrentMember getTeamMember(TenantUser currentTenantUser) {
@@ -262,23 +275,26 @@ public class Team extends CMMNElement<CaseDefinition> {
 
     /**
      * Adds a member to the case team upon request of a Task that has dynamic assignment.
-     * @param assignee
-     * @param performer
+     * @param userId The tenant user id; note that assignment cannot be done on roles, only on users
+     * @param role The (optional) role that the team member must have for executing the task leading to this call
      */
-    public void addDynamicMember(String assignee, CaseRoleDefinition performer) {
-        List<Member> existingMembers = getMembers().stream().filter(member -> member.isUser() && member.key.id().equals(assignee)).collect(Collectors.toList());
+    public void upsertCaseTeamMember(String userId, CaseRoleDefinition role) {
+        MemberKey key = new MemberKey(userId, "user");
+        List<Member> existingMembers = getMembers().stream().filter(member -> member.isUser() && member.key.id().equals(userId)).collect(Collectors.toList());
         if (existingMembers.isEmpty()) {
             // Add the member; as a member, and if a role is required also with the role
-            getCaseInstance().addDebugInfo(() -> "Adding team member '" + assignee +"' because of dynamic task assignment");
-            getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), ""));
-            if (performer != null) getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), performer.getName()));
+            addDebugInfo(() -> "Adding tenant user '" + userId +"' to case team because of task assignment");
+            addMember(key);
+            if (role != null) {
+                addMemberRole(key, role.getName());
+            }
         } else {
             // If a role is required, then check if "one of" the existing members (there can only be one, actually) has the role; if not, give the role.
-            if (performer != null) {
+            if (role != null) {
                 Member member = existingMembers.get(0);
-                if (! member.hasRole(performer.getName())) {
-                    getCaseInstance().addDebugInfo(() -> "Adding case role '" + performer.getName()+"' to '" + assignee +"' because of dynamic task assignment");
-                    getCaseInstance().addEvent(new TeamRoleFilled(getCaseInstance(), new MemberKey(assignee, "user"), performer.getName()));
+                if (! member.isOwner() && ! member.hasRole(role.getName())) {
+                    addDebugInfo(() -> "Adding case role '" + role.getName()+"' to '" + userId +"' because of task assignment");
+                    addMemberRole(key, role.getName());
                 }
             }
         }

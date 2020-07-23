@@ -30,8 +30,9 @@ public enum TaskAction {
     }
 
     public static TaskAction getEnum(String value) {
+        if (value == null) return null;
         for (TaskAction action : values())
             if (action.getValue().equalsIgnoreCase(value)) return action;
-        throw new IllegalArgumentException(value + " is not a valid action");
+        return null;
     }
 }

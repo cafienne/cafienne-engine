@@ -7,6 +7,7 @@ import akka.persistence.RecoveryCompleted;
 import akka.persistence.SnapshotMetadata;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.ModelCommand;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.CommandFailureListener;
@@ -300,7 +301,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     private void runHandler(MessageHandler handler) {
         this.currentMessageHandler = handler;
 
-        InvalidCommandException securityIssue = this.currentMessageHandler.runSecurityChecks();
+        AuthorizationException securityIssue = this.currentMessageHandler.runSecurityChecks();
         if (securityIssue == null) {
             // Only process if we did not find any security issues.
             this.currentMessageHandler.process();

@@ -28,8 +28,9 @@ public enum CaseFileItemTransition {
     }
 
     public static CaseFileItemTransition getEnum(String value) {
+        if (value == null) return null;
         for (CaseFileItemTransition transition : values())
             if (transition.getValue().equalsIgnoreCase(value)) return transition;
-        throw new IllegalArgumentException(value + " is not a valid CaseFileItemTransition");
+        return null;
     }
 }

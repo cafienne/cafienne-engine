@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.cafienne.cmmn.definition.Multiplicity;
+import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.casefile.Value;
 import org.cafienne.cmmn.instance.casefile.ValueList;
@@ -48,8 +49,6 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     @Override
     protected CaseFileItem getItem(int index) {
-        // TODO: add check for index out of bounds, and raise a proper case engine exception (or handle the array index out of bounds exception
-        // in the validate method and the process method)
         if (index < 0 || index >= actualArrayItems.size()) {
 
             // Special case here. If recovery is running, then this code is being invoked from CaseFileEvent.recover()
@@ -80,7 +79,6 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     @Override
     CaseFileItem resolve(Path currentPath) {
         if (currentPath.getIndex() >= 0) {
-            // TODO: this may result in an ArrayIndexOutOfBoundsException
             return getItem(currentPath.getIndex());
         }
         // By default we can also access "this", but we do that only if we are the end of the path...
@@ -114,7 +112,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             // It's the latest and greatest new child
             actualValueOfCaseFileItemArray.add(childContent);
         } else {
-            throw new InvalidCommandException("We're not letting you in, number " + childIndex + ", because we only have " + actualValueOfCaseFileItemArray.size() + " items, and it seems you're skipping one or more");
+            throw new CaseFileError("We're not letting you in, number " + childIndex + ", because we only have " + actualValueOfCaseFileItemArray.size() + " items, and it seems you're skipping one or more");
         }
     }
 

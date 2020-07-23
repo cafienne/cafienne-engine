@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
@@ -45,7 +46,7 @@ public class UserEvent extends PlanItem<UserEventDefinition> {
             }
         }
         // Apparently no matching role was found.s
-        throw new SecurityException("User '"+currentUser.getMemberId()+"' does not have the permission to raise the event " + getName());
+        throw new AuthorizationException("User '"+currentUser.getMemberId()+"' does not have the permission to raise the event " + getName());
     }
 
     @Override

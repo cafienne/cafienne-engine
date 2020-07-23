@@ -132,7 +132,7 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
      * and, if there are children in the value, then also matches those children against our children.
      * @param value
      */
-    public void validate(Value value) {
+    public void validate(Value value) throws CaseFileError {
         getCaseFileItemDefinition().getDefinitionType().validate(this, value);
     }
 
