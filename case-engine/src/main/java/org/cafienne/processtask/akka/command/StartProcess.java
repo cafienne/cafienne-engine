@@ -5,7 +5,7 @@ import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.akka.command.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;

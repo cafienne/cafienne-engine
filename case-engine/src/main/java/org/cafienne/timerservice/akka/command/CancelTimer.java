@@ -10,7 +10,7 @@ package org.cafienne.timerservice.akka.command;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.TimerEvent;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.timerservice.TimerService;
 import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 

@@ -1,8 +1,7 @@
 package org.cafienne.processtask.akka.event;
 
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
-import org.cafienne.processtask.implementation.SubProcess;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest

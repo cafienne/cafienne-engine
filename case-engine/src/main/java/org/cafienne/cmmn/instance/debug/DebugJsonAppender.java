@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.debug;
 
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 
 @FunctionalInterface
 public interface DebugJsonAppender {

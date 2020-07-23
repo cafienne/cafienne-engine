@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.instance;
+package org.cafienne.cmmn.instance.casefile;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,9 +9,9 @@ import java.util.ListIterator;
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.cmmn.instance.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -117,7 +117,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     }
 
     @Override
-    void bindParameter(Parameter<?> p, Value<?> parameterValue) {
+    public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
         createContent(parameterValue);
     }
 

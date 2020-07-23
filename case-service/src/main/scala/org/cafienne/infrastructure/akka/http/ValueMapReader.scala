@@ -1,6 +1,6 @@
 package org.cafienne.infrastructure.akka.http
 
-import org.cafienne.cmmn.instance.casefile.ValueMap
+import org.cafienne.akka.actor.serialization.json.ValueMap
 
 /**
   * Mechanism to easily read entity fields from a ValueMap

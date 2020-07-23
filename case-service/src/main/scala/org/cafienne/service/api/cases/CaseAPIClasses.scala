@@ -1,7 +1,7 @@
 package org.cafienne.service.api.cases
 
+import org.cafienne.akka.actor.serialization.json.{Value, ValueList, ValueMap}
 import org.cafienne.cmmn.akka.command.team.CaseTeam
-import org.cafienne.cmmn.instance.casefile.{Value, ValueList, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.projection.record.{CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 

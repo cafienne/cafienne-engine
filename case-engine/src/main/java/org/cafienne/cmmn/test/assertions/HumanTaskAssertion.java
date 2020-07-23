@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.humantask.akka.command.response.HumanTaskValidationResponse;
 import org.cafienne.humantask.akka.event.*;

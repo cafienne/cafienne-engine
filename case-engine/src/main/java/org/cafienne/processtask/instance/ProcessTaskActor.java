@@ -3,7 +3,7 @@ package org.cafienne.processtask.instance;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.task.FailTask;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.akka.command.*;
 import org.cafienne.processtask.akka.command.response.ProcessResponse;
 import org.cafienne.processtask.akka.event.*;

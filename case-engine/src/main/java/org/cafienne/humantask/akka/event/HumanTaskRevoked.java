@@ -8,11 +8,10 @@
 package org.cafienne.humantask.akka.event;
 
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 @Manifest
 public class HumanTaskRevoked extends HumanTaskAssigned {

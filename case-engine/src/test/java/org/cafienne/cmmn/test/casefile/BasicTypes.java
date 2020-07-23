@@ -15,13 +15,10 @@ import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
-import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 

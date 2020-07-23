@@ -18,7 +18,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

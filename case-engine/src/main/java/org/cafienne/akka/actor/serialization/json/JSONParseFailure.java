@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.instance.casefile;
+package org.cafienne.akka.actor.serialization.json;
 
 /**
  * Exception thrown when a JSON parsing ran into a failure.

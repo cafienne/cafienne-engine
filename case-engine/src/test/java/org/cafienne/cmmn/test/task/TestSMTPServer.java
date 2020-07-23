@@ -10,9 +10,8 @@ package org.cafienne.cmmn.test.task;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.junit.Test;
 

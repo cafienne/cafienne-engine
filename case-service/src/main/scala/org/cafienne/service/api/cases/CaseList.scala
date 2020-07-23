@@ -1,6 +1,6 @@
 package org.cafienne.service.api.cases
 
-import org.cafienne.cmmn.instance.casefile.ValueMap
+import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.infrastructure.json.CafienneJson
 
 final case class CaseList(caseName: String = "",

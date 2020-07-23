@@ -15,7 +15,7 @@ import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 

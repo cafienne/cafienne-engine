@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
 import org.junit.Test;
 

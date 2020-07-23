@@ -4,8 +4,9 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.casefile.ValueList;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.w3c.dom.Element;
 
 import java.util.HashSet;

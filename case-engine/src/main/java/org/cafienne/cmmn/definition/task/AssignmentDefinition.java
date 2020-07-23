@@ -3,12 +3,6 @@ package org.cafienne.cmmn.definition.task;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.Definition;
-import org.cafienne.cmmn.definition.ExpressionDefinition;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.expression.DefaultValueEvaluator;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.CaseFileItem;
-import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.w3c.dom.Element;
 

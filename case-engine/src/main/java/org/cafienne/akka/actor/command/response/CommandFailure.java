@@ -12,8 +12,8 @@ import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.SerializedException;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.io.IOException;
 

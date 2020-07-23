@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.casefile.Value;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;

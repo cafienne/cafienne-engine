@@ -6,15 +6,15 @@ import org.cafienne.cmmn.instance.sentry.StandardEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
+public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
     private final I item;
     private final List<StandardEvent> transitions = new ArrayList();
 
-    TransitionPublisher(I item) {
+    public TransitionPublisher(I item) {
         this.item = item;
     }
 
-    void addEvent(StandardEvent event) {
+    public void addEvent(StandardEvent event) {
         transitions.add(0, event);
     }
 
@@ -57,12 +57,12 @@ class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
         list.add(i, onPart);
     }
 
-    void informEntryCriteria(StandardEvent transition) {
+    public void informEntryCriteria(StandardEvent transition) {
         // Then inform the activating sentries
         new ArrayList<>(connectedEntryCriteria).forEach(onPart -> onPart.inform(item, transition));
     }
 
-    void informExitCriteria(StandardEvent transition) {
+    public void informExitCriteria(StandardEvent transition) {
         // Then inform the activating sentries
         new ArrayList<>(connectedExitCriteria).forEach(onPart -> onPart.inform(item, transition));
     }

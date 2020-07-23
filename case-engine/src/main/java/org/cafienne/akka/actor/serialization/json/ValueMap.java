@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.instance.casefile;
+package org.cafienne.akka.actor.serialization.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -14,7 +14,7 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.akka.actor.serialization.ValueMapJacksonSerializer;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

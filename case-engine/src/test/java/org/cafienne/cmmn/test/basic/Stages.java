@@ -13,7 +13,7 @@ import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
 import org.junit.Test;

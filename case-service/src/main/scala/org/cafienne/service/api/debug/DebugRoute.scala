@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs.{GET, Path, Produces}
-import org.cafienne.cmmn.instance.casefile.ValueList
+import org.cafienne.akka.actor.serialization.json.ValueList
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 

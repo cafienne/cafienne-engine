@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.task.validation;
 
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**
  * Validation errors can occur if the TaskOutputValidator ran into some networking error and the like.

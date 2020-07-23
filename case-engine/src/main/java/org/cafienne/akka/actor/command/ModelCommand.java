@@ -11,10 +11,10 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.AkkaSerializable;
-import org.cafienne.cmmn.instance.casefile.JSONParseFailure;
-import org.cafienne.cmmn.instance.casefile.JSONReader;
-import org.cafienne.cmmn.instance.casefile.Value;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.JSONParseFailure;
+import org.cafienne.akka.actor.serialization.json.JSONReader;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;

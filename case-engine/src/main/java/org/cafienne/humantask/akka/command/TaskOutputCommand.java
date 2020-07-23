@@ -11,10 +11,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
-import org.cafienne.humantask.instance.WorkflowTask;
 
 import java.io.IOException;
 

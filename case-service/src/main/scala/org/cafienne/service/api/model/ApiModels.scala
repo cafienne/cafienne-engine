@@ -11,8 +11,8 @@ import java.time.Instant
 
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.ArraySchema
+import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.akka.command.team.CaseTeam
-import org.cafienne.cmmn.instance.casefile.ValueMap
 
 import scala.annotation.meta.field
 

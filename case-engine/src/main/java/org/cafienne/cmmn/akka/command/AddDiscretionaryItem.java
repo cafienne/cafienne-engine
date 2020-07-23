@@ -18,7 +18,7 @@ import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;

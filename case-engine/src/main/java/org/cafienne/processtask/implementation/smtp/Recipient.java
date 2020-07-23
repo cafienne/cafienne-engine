@@ -1,6 +1,6 @@
 package org.cafienne.processtask.implementation.smtp;
 
-import org.cafienne.cmmn.instance.casefile.ValueMap;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.util.StringTemplate;
 
 import javax.mail.Message;

@@ -5,7 +5,7 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.serialization.Fields
 import org.cafienne.akka.actor.serialization.AkkaSerializable
-import org.cafienne.cmmn.instance.casefile.{BooleanValue, Value, ValueMap}
+import org.cafienne.akka.actor.serialization.json.{BooleanValue, Value, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
