@@ -2,7 +2,9 @@ version: 2.1
 jobs:
   master-build:
     working_directory: ~/cafienne-engine
-    machine: true
+    machine:
+      image: ubuntu-1604:201903-01
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -170,7 +172,9 @@ jobs:
 
   branch-build:
     working_directory: ~/cafienne-engine
-    machine: true
+    machine:
+      image: ubuntu-1604:201903-01
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -249,7 +253,9 @@ jobs:
 
   release-build:
     working_directory: ~/cafienne-engine
-    machine: true
+    machine:
+      image: ubuntu-1604:201903-01
+    resource_class: large
     steps:
       - checkout
       - run:
