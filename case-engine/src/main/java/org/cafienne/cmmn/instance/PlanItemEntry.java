@@ -11,6 +11,9 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
         super(target);
     }
 
+    /**
+     * Connect the plan item to the sentry network
+     */
     public void connect() {
         item.getItemDefinition().getEntryCriteria().forEach(c -> criteria.add(new EntryCriterion(this, c)));
         if (! criteria.isEmpty()) {
@@ -18,7 +21,11 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
         }
     }
 
+    /**
+     * Disconnect the plan item from the sentry network
+     */
     void release() {
+        item.addDebugInfo(() -> "Releasing all " + criteria.size() + " entry criteria for " + item);
         criteria.forEach(c -> c.release());
     }
 

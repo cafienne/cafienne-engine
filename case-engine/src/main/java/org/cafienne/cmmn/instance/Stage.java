@@ -36,6 +36,12 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     void register(PlanItem child) {
+        if (getCaseInstance().recoveryRunning() && child.getIndex() > 0) {
+            planItems.stream().filter(p -> p.getDefinition().equals(child.getDefinition()) && p.getIndex() + 1 == child.getIndex()).forEach(leftSibling -> {
+                System.out.println("!!!Releasing already repeated plan item " + leftSibling);
+                leftSibling.getEntryCriteria().release();
+            });
+        }
         planItems.add(child);
     }
 

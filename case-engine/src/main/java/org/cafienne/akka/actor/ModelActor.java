@@ -265,7 +265,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     private MessageHandler createMessageHandler(Object msg) {
         if (commandClass.isAssignableFrom(msg.getClass())) {
-            if (tenant == null) {
+            if (inNeedOfTenantInformation()) {
                 if (msg instanceof BootstrapCommand) {
                     this.tenant = ((BootstrapCommand) msg).tenant();
                 } else {
@@ -277,7 +277,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             CommandHandler c = createCommandHandler(command);
             return c;
         } else if (msg instanceof ModelResponse) {
-            if (tenant == null) {
+            if (inNeedOfTenantInformation()) {
                 // We cannot handle responses if we have not been properly initialized.
                 return new NotConfiguredHandler(this, (ModelResponse) msg);
             }
@@ -287,6 +287,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         } else {
             return createInvalidMessageHandler(msg);
         }
+    }
+
+    protected boolean inNeedOfTenantInformation() {
+        return tenant == null;
     }
 
     /**
@@ -404,29 +408,39 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * askCase allows inter-case communication. One case (or, typically, a plan item's special logic) can ask another case to execute
      * a command, and when the response is received back from the other case, the handler is invoked with that response.
+     * Note that nothing will be sent to the other actor when recovery is running.
      *
      * @param command
      * @param left    Listener to handle response failures.
      * @param right   Optional listener to handle response success.
      */
     public void askCase(CaseCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        if (recoveryRunning()) {
-            return;
-        }
-        responseListeners.put(command.getMessageId(), new Responder(left, right));
-        CaseSystem.router().tell(command, self());
+        askModel(command, left, right);
     }
 
+    /**
+     * Similar to {@link #askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)}
+     * @param command
+     * @param left
+     * @param right
+     */
     public void askProcess(ProcessCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        if (recoveryRunning()) {
-            return;
-        }
-        responseListeners.put(command.getMessageId(), new Responder(left, right));
-        CaseSystem.router().tell(command, self());
+        askModel(command, left, right);
     }
 
+    /**
+     * Similar to {@link #askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)}
+     * @param command
+     * @param left
+     * @param right
+     */
     public void askTimerService(TimerServiceCommand command, CommandFailureListener left, CommandResponseListener... right) {
+        askModel(command, left, right);
+    }
+
+    private void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
         if (recoveryRunning()) {
+//            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
             return;
         }
         responseListeners.put(command.getMessageId(), new Responder(left, right));

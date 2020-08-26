@@ -30,7 +30,11 @@ class CaseFileAccessor implements PropertyAccessor {
             logger.debug("Reading property "+propertyName+" results in value "+value);
             return new TypedValueWrapper(value);
         } else {
-            logger.error("Cannot read property " + propertyName + " from strange context : " + object);
+            if (object == null) {
+                logger.error("Cannot read property " + propertyName + " from null object");
+            } else {
+                logger.error("Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName()+": with value " + object);
+            }
             return null;
         }
     }
