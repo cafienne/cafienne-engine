@@ -171,6 +171,12 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         new Thread(saveJob).start();
     }
 
+    @Override
+    protected boolean inNeedOfTenantInformation() {
+        // No need of tenant information, as this is a singleton actor in this JVM that is tenant-agnostic
+        return false;
+    }
+
     class ScheduledTimer {
         final TimerJob request;
         final Cancellable schedule;
