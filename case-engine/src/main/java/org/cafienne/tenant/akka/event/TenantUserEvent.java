@@ -33,7 +33,12 @@ public abstract class TenantUserEvent extends TenantEvent {
 
     @Override
     public void updateState(TenantActor actor) {
-        updateUserState(actor.getUser(userId));
+        User user = actor.getUser(userId);
+        if (user == null) {
+            logger.error("Cannot apply event of type " + getClass().getName() + ", because user with id " + userId + " has not (yet) been registered");
+        } else {
+            updateUserState(actor.getUser(userId));
+        }
     }
 
     protected abstract void updateUserState(User user);
