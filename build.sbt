@@ -107,6 +107,21 @@
     )
     .enablePlugins(BuildInfoPlugin)
     .enablePlugins(GitPlugin)
+    .enablePlugins(GitVersioning, GitBranchPrompt)
+    .settings(
+      git.gitTagToVersionNumber := { tag: String =>
+        val splittedTag = tag.split("-");
+        splittedTag.length match {
+          case 0 => Some(tag)
+          case 1 => Some(tag)
+          case _ => splittedTag(1) match {
+            case "1" => Some(splittedTag(0) + "-with-1-additional-commit")
+            case more => Some(splittedTag(0) + s"-with-$more-additional-commits")
+          }
+        }
+      },
+      git.useGitDescribe := true
+    )
     .configs(MultiJvm)
 
   lazy val service = project("case-service")
