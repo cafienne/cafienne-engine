@@ -155,9 +155,11 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             // Ensure log message is only generated once.
             String logMessage = appender.debugInfo();
-            logger.debug(logMessage); // plain log4j
-            debugIndentedConsoleLogging(logMessage); // special dev indentation in console
-            getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
+            if (! logMessage.isBlank()) { // Ignore blank messages
+                logger.debug(logMessage); // plain log4j
+                debugIndentedConsoleLogging(logMessage); // special dev indentation in console
+                getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
+            }
         }
     }
 
