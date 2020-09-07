@@ -1,6 +1,5 @@
 package org.cafienne.akka.actor;
 
-import akka.actor.ActorRef;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.event.DebugEvent;
@@ -30,10 +29,6 @@ import java.util.List;
  */
 public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> {
     /**
-     * The sender of the message; copied from the Actor upon creating the handler.
-     */
-    private final ActorRef sender;
-    /**
      * The ModelActor to which the message was sent
      */
     protected final A actor;
@@ -55,8 +50,6 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
     protected MessageHandler(A actor, M msg, TenantUser user) {
         this.actor = actor;
         this.actor.setCurrentUser(user);
-        // Take a copy of the sender at the moment we start handling the message (for lifecycle safety).
-        this.sender = actor.sender();
         this.msg = msg;
         this.user = user;
     }
