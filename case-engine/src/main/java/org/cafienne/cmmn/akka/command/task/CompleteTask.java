@@ -57,7 +57,14 @@ public class CompleteTask extends CaseCommand {
 
     @Override
     public void validate(Case caseInstance) {
-        super.validate(caseInstance);
+        // We bypass invoking super.validate, because super asserts that the user is
+        //  part of the case team. However, completion of task from e.g. a SubCase can be done
+        //  by a member of _that_ subcase that is NOT a member in _this_ case (parent).
+        // In such a scenario, CompleteTask (and FailTask) are successfully done in that sub-case,
+        // but not handled in the parent case, leaving state of the CaseTask as Active instead of Completed or Failed.
+        // Note: the user is logged as the one completing the task. But the user is NOT added to the CaseTeam.
+
+//        super.validate(caseInstance);
 
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new InvalidCommandException("Invalid or missing task id");
