@@ -46,6 +46,8 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
   }
 
   def handleUserEvent(event: TenantUserEvent): Future[Done] = {
+//    println("Clearing user " + event.userId +" from user cache")
+    userCache.clear(event.userId)
     val key = UserRoleKey(event)
     getUserRoleRecord(key).map(user => {
       event match {

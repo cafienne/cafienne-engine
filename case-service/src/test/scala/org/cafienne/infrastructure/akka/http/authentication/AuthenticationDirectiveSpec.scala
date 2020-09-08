@@ -49,7 +49,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
           case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
         }
       }
-      override def clear(users: Iterable[String]): Unit = ???
+      override def clear(userId: String): Unit = ???
     }
     override implicit val ec: ExecutionContext = ec
   }
@@ -76,8 +76,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
           case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
         }
       }
-
-      override def clear(users: Iterable[String]): Unit = ???
+      override def clear(userId: String): Unit = ???
     }
     override implicit val ec: ExecutionContext = ec
   }
@@ -104,8 +103,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
           case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
         }
       }
-
-      override def clear(users: Iterable[String]): Unit = ???
+      override def clear(userId: String): Unit = ???
     }
     override implicit val ec: ExecutionContext = ec
   }
