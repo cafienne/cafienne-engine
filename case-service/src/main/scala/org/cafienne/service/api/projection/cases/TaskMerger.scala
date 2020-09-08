@@ -1,6 +1,6 @@
 package org.cafienne.service.api.projection.cases
 
-import org.cafienne.cmmn.akka.event.CaseModified
+import org.cafienne.akka.actor.event.TransactionEvent
 import org.cafienne.humantask.akka.event._
 import org.cafienne.service.api.projection.record.TaskRecord
 
@@ -15,7 +15,7 @@ object TaskMerger {
   def apply(evt: HumanTaskOwnerChanged, current: TaskRecord): TaskRecord = current.copy(owner = evt.owner)
   def apply(evt: HumanTaskOutputSaved, current: TaskRecord): TaskRecord = current.copy(output = evt.getTaskOutput.toString)
   def apply(evt: HumanTaskInputSaved, current: TaskRecord): TaskRecord = current.copy(input = evt.getInput.toString)
-  def apply(evt: CaseModified, current: TaskRecord): TaskRecord = current.copy(modifiedBy = evt.getUser.id, lastModified = evt.lastModified)
+  def apply(evt: TransactionEvent[_], current: TaskRecord): TaskRecord = current.copy(modifiedBy = evt.getUser.id, lastModified = evt.lastModified)
 
   def apply(evt: HumanTaskActivated, current: TaskRecord): TaskRecord = {
     // We should never reach this point

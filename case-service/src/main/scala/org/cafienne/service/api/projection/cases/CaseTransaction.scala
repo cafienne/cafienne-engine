@@ -37,7 +37,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case event: PlanItemEvent => handlePlanItemEvent(event)
       case event: CaseFileEvent => handleCaseFileEvent(event)
       case event: CaseTeamEvent => handleCaseTeamEvent(event)
-      case event: HumanTaskCreated => createTask(event)
+      case event: HumanTaskCreated => deprecatedCreateTask(event)
       case event: HumanTaskActivated => createTask(event)
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
 
@@ -212,7 +212,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     Future.successful{ Done }
   }
 
-  def createTask(evt: HumanTaskCreated): Future[Done] = {
+  def deprecatedCreateTask(evt: HumanTaskCreated): Future[Done] = {
     this.tasks.put(evt.taskId, TaskRecord(id = evt.taskId,
       caseInstanceId = evt.getActorId,
       tenant = evt.tenant,
@@ -223,10 +223,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       modifiedBy = evt.getCreatedBy,
     ))
     Future.successful{ Done }
-  }
-
-  def updateLastModifiedInformationInTasks(event: CaseModified) = {
-    tasks.values.foreach(task => tasks.put(task.id, TaskMerger(event, task)))
   }
 
   def handleHumanTaskEvent(event: HumanTaskEvent) = {
@@ -282,7 +278,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     records ++= this.caseInstanceRoles.values
     records ++= this.caseInstanceTeamMembers.values
     records ++= this.businessIdentifiers.toSeq
-    records ++= this.tasks.values
+    records ++= this.tasks.values.map(current => TaskMerger(caseModified, current))
 
     // If we reach this point, we have real events handled and content added,
     // so also update the offset of the last event handled in this projection
