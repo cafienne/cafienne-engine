@@ -201,6 +201,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
+            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
