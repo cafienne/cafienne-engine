@@ -7,6 +7,7 @@
  */
 package org.cafienne.akka.actor.command.response;
 
+import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
@@ -22,6 +23,11 @@ import java.time.Instant;
  * Interface for creating responses to {@link ModelCommand}
  */
 public class ModelResponse implements AkkaSerializable, TenantUserMessage {
+    /**
+     * Recipient is assigned during construction of the response message.
+     * It is the current value of sender() in the actor.
+     */
+    private final transient ActorRef recipient;
     private final String messageId;
     private final String actorId;
     private Instant lastModified;
@@ -29,6 +35,12 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
     private final String commandType;
 
     protected ModelResponse(ModelCommand<?> command) {
+        // Make sure that we capture the recipient during creation.
+        //  This is required since sending the response is done after events are persisted,
+        //  and that in itself may or may not happen asynchronously, and if it is happening
+        //  asynchronously, then the sender() value of the Actor may have been overwritten with the sender
+        //  of the next message handled by the actor already.
+        this.recipient = command.getActor().sender();
         this.messageId = command.getMessageId();
         this.actorId = command.actorId;
         // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
@@ -40,11 +52,20 @@ public class ModelResponse implements AkkaSerializable, TenantUserMessage {
     }
 
     public ModelResponse(ValueMap json) {
+        this.recipient = null;
         this.messageId = readField(json, Fields.messageId);
         this.actorId = readField(json, Fields.actorId);
         this.lastModified = readInstant(json, Fields.lastModified);
         this.user = TenantUser.from(json.with(Fields.user));
         this.commandType = readField(json, Fields.commandType);
+    }
+
+    /**
+     * Returns the actor ref to whom the response message must be sent
+     * @return
+     */
+    public ActorRef getRecipient() {
+        return recipient;
     }
 
     /**

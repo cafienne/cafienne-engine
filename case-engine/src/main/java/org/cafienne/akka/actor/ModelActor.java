@@ -56,14 +56,13 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     private final Class<E> eventClass;
     /**
-     * Reference to current command being processed by the ModelActor.
+     * Reference to handler for the current message being processed by the ModelActor.
      */
-    protected C currentCommand;
+    private MessageHandler currentMessageHandler;
     /**
      * User context of current message
      */
     private TenantUser currentUser;
-
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
@@ -312,18 +311,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         this.currentMessageHandler.complete();
     }
 
-    private MessageHandler currentMessageHandler;
-
-    /**
-     * Returns a typed version of the current message handler
-     *
-     * @param <T>
-     * @return
-     */
-    private <T extends MessageHandler> T currentHandler() {
-        return (T) currentMessageHandler;
-    }
-
     /**
      * Basic handler for commands received in this ModelActor.
      * Be careful in overriding it.
@@ -374,13 +361,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     /**
-     * Returns the current command being processed by the ModelActor.
-     */
-    public C getCurrentCommand() {
-        return currentCommand;
-    }
-
-    /**
      * Adds an event to the current message handler
      *
      * @param event
@@ -388,7 +368,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @return
      */
     public <EV extends E> EV addEvent(EV event) {
-        return (EV) currentHandler().addEvent(event);
+        return (EV) currentMessageHandler.addEvent(event);
     }
 
     /**
@@ -477,7 +457,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             logger.debug(msg);
             currentMessageHandler.debugIndentedConsoleLogging(msg);
         }
-        sender().tell(response, self());
+        response.getRecipient().tell(response, self());
     }
 
     /**
@@ -538,7 +518,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         //  Not sure right now what the reason is for this.
         CaseSystem.health().writeJournal().hasFailed(cause);
         logger.error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
-        reply(new CommandFailure(getCurrentCommand(), new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
+        if (currentMessageHandler instanceof CommandHandler) {
+            ModelCommand command = ((CommandHandler) currentMessageHandler).getCommand();
+            reply(new CommandFailure(command, new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
+        }
         context().stop(self());
     }
 
@@ -560,15 +543,15 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param appender
      */
     public void addDebugInfo(DebugStringAppender appender) {
-        currentHandler().addDebugInfo(appender, getLogger());
+        currentMessageHandler.addDebugInfo(appender, getLogger());
     }
 
     public void addDebugInfo(DebugStringAppender appender, Value json) {
-        currentHandler().addDebugInfo(appender, json, getLogger());
+        currentMessageHandler.addDebugInfo(appender, json, getLogger());
     }
 
     public void addDebugInfo(DebugStringAppender appender, Exception exception) {
-        currentHandler().addDebugInfo(appender, exception, getLogger());
+        currentMessageHandler.addDebugInfo(appender, exception, getLogger());
     }
 
     /**
