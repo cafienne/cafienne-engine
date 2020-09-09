@@ -144,7 +144,7 @@ class CaseQueriesImpl
       _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
-    db.run(query.result).map(records => {
+    db.run(query.distinct.result).map(records => {
       if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
       CasePlan(records)
     })
