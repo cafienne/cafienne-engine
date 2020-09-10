@@ -3,6 +3,7 @@ package org.cafienne.service.api.projection.cases
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.event.TransactionEvent
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.serialization.json.{JSONReader, ValueMap}
 import org.cafienne.cmmn.akka.event._
@@ -13,11 +14,12 @@ import org.cafienne.humantask.akka.event._
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.projection.record._
+import org.cafienne.service.api.projection.slick.SlickTransaction
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseTransaction(caseInstanceId: String, tenant: String, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseTransaction(caseInstanceId: String, tenant: String, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends SlickTransaction[CaseEvent] with LazyLogging {
 
   val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
   val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
@@ -30,7 +32,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   var caseDefinition: CaseDefinitionRecord = null
   var caseFile: Option[ValueMap] = None
 
-  def handleEvent(evt: CaseEvent): Future[Done] = {
+  override def handleEvent(evt: CaseEvent): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " in case " + caseInstanceId)
     evt match {
       case event: CaseDefinitionApplied => createCaseInstance(event)
@@ -264,7 +266,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
-  def commit(offsetName: String, offset: Offset, caseModified: CaseModified): Future[Done] = {
+  override def commit(offsetName: String, offset: Offset, caseModified: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
 
     var records = ListBuffer.empty[AnyRef]

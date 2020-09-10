@@ -64,7 +64,7 @@ public class LastModifiedRegistration {
         logger.debug(msg);
     }
 
-    public void handle(TransactionEvent event) {
+    public void handle(TransactionEvent<?> event) {
         handle("case", event.getActorId(), event.lastModified());
     }
 

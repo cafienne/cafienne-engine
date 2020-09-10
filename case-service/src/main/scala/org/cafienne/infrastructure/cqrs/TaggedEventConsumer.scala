@@ -1,7 +1,5 @@
 package org.cafienne.infrastructure.cqrs
 
-import java.util.concurrent.TimeUnit
-
 import akka.{Done, NotUsed}
 import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
@@ -9,7 +7,6 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.akka.actor.serialization.{DeserializationFailure, UnrecognizedManifest}
-import org.cafienne.service.Main
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

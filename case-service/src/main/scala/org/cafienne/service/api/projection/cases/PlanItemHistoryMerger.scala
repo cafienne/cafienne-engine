@@ -1,5 +1,6 @@
 package org.cafienne.service.api.projection.cases
 
+import org.cafienne.akka.actor.event.TransactionEvent
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
 import org.cafienne.service.api.projection.record.PlanItemHistoryRecord
@@ -65,6 +66,6 @@ object PlanItemHistoryMerger {
         )
     }
   }
-  def merge(modified: CaseModified, current: PlanItemHistoryRecord): PlanItemHistoryRecord =
+  def merge(modified: TransactionEvent[_], current: PlanItemHistoryRecord): PlanItemHistoryRecord =
     current.copy(lastModified = modified.lastModified(), modifiedBy = modified.getUser.id)
 }
