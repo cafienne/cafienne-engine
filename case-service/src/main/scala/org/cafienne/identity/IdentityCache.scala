@@ -1,13 +1,14 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.TenantReader
 
-import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentityProvider {
@@ -20,7 +21,7 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
-  private val cache = new mutable.HashMap[String, PlatformUser]
+  private val cache = new SimpleLRUCache[String, PlatformUser](CaseSystem.config.api.security.identityCacheSize)
 
   def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
     tlm match {
@@ -38,15 +39,20 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
 
   private def executeUserQuery(userId: String): Future[PlatformUser] = {
     cache.get(userId) match {
-      case Some(user) => Future(user)
-      case None => userQueries.getPlatformUser(userId).map(u => {
-        if (u.users.isEmpty && !u.isPlatformOwner) {
-          logger.info("User " + userId + " has a valid token, but is not registered in the case system")
-          throw AuthorizationException("User " + userId + " is not registered in the case system")
-        }
-        cache.put(userId, u)
-        u
-      })
+      case user: PlatformUser => Future(user)
+      case null => {
+//        println("User " + userId +" it not in cache. fetching it")
+        userQueries.getPlatformUser(userId).map(u => {
+
+          if (u.users.isEmpty && !u.isPlatformOwner) {
+            logger.info("User " + userId + " has a valid token, but is not registered in the case system")
+            throw AuthorizationException("User " + userId + " is not registered in the case system")
+          }
+//          println("Trying to put user " + userId +" into the cache")
+          cache.put(userId, u)
+          u
+        })
+      }
     }
   }
 
