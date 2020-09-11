@@ -13,6 +13,8 @@ trait CaseQueries {
 
   def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = ???
 
+  def getCaseDefinition(caseInstanceId: String, user: PlatformUser): Future[CaseDefinitionDocument] = ???
+
   def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseRecord]] = ???
 
   def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = ???
@@ -66,6 +68,20 @@ class CaseQueriesImpl
     } yield (caseInstance, caseTeam, caseFile, casePlan)
 
     result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4)))
+  }
+
+  override def getCaseDefinition(caseInstanceId: String, user: PlatformUser): Future[CaseDefinitionDocument] = {
+    val query = for {
+      // Get the case file
+      baseQuery <- caseDefinitionQuery.filter(_.caseInstanceId === caseInstanceId)
+      // Validate team membership
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+    } yield baseQuery
+
+    db.run(query.result.headOption).map {
+      case Some(result) => CaseDefinitionDocument(result)
+      case None => throw CaseSearchFailure(caseInstanceId)
+    }
   }
 
   override def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseRecord]] = {

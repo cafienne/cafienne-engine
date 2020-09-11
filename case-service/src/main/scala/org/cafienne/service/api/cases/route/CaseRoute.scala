@@ -44,6 +44,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
       getUserCases ~
       stats ~
       getCase ~
+      getCaseDefinition ~
       startCase ~
       debugCase
   }
@@ -168,6 +169,30 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     validUser { platformUser =>
       path(Segment) {
         caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, platformUser))
+      }
+    }
+  }
+
+  @Path("/{caseInstanceId}")
+  @GET
+  @Operation(
+    summary = "Get a case instance by caseInstanceId",
+    description = "Returns a case instance",
+    tags = Array("case"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+    ),
+    responses = Array(
+      new ApiResponse(description = "Case found and returned", responseCode = "200"),
+      new ApiResponse(description = "Case not found", responseCode = "404")
+    )
+  )
+  @Produces(Array("application/json"))
+  def getCaseDefinition = get {
+    validUser { platformUser =>
+      path(Segment / "definition" ) {
+        caseInstanceId => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, platformUser))
       }
     }
   }

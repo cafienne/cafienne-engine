@@ -1,6 +1,6 @@
 package org.cafienne.infrastructure.akka.http.route
 
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName}
 import akka.http.scaladsl.server.{Directive1, Route}
 import org.cafienne.akka.actor.command.exception.AuthorizationException
@@ -8,6 +8,7 @@ import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
+import org.cafienne.service.api.cases.CaseDefinitionDocument
 import org.cafienne.service.api.projection.{LastModifiedRegistration, SearchFailure}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,6 +23,19 @@ trait QueryRoute extends AuthenticatedRoute {
 
   def readLastModifiedHeader(): Directive1[Option[String]] = {
     optionalHeaderValueByName(lastModifiedHeaderName)
+  }
+
+  def runXMLQuery(future: => Future[CaseDefinitionDocument]): Route = {
+    readLastModifiedHeader() { caseLastModified =>
+      handleXMLResult(handleSyncedQuery(() => future, caseLastModified))
+    }
+  }
+
+  def handleXMLResult(future: => Future[CaseDefinitionDocument]): Route = {
+    onComplete(future) {
+      case Success(value) => complete(StatusCodes.OK, HttpEntity(ContentTypes.`text/xml(UTF-8)`, value.xml))
+      case Failure(t) => handleFailure(t)
+    }
   }
 
   def runQuery(future: => Future[CafienneJson]): Route = {

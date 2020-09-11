@@ -33,7 +33,6 @@ public class CaseDefinition extends Definition implements TaskImplementationCont
 
         // The XSD states that the name of the element is caseRoles (rather than caseRole). We also support the tag <caseRole> and here read
         // additionally the standard tag ...
-        CaseRoleDefinition.createEmptyDefinition(this);
         parse("caseRole", CaseRoleDefinition.class, caseRoles); // Custom because we don't like the 1.0 XSD
 
         // Some tricky XML parsing to figure out if we are CMMN 1.0 or CMMN 1.1;
@@ -48,6 +47,8 @@ public class CaseDefinition extends Definition implements TaskImplementationCont
                 parse("caseRoles", CaseRoleDefinition.class, caseRoles); // CMMN 1.0
             }
         }
+        // We add an "Empty Role", such that even if a team member has "no role", they can still become member of the team.
+        caseRoles.add(CaseRoleDefinition.createEmptyDefinition(this));
     }
 
     /**

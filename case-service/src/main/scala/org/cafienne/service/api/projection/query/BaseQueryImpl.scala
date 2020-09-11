@@ -16,6 +16,7 @@ trait BaseQueryImpl
   implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
   val caseInstanceQuery = TableQuery[CaseInstanceTable]
+  val caseDefinitionQuery = TableQuery[CaseInstanceDefinitionTable]
   val caseFileQuery = TableQuery[CaseFileTable]
 
   val planItemTableQuery = TableQuery[PlanItemTable]
