@@ -17,4 +17,9 @@ class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
   lazy val location: String = {
     config.getString("location")
   }
+
+  lazy val cacheSize: Int = {
+    if (config.hasPath("cache.size")) config.getInt("cache.size")
+    100
+  }
 }

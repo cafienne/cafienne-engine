@@ -24,11 +24,6 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
   val platform: PlatformConfig = new PlatformConfig(this)
 
   /**
-    * Returns the Open ID Connect configuration settings of this Case System
-    */
-  lazy val OIDC: OIDCConfig = new OIDCConfig(this)
-
-  /**
     * Returns configuration options for the QueryDB
     */
   lazy val queryDB: QueryDBConfig = new QueryDBConfig(this)
@@ -47,6 +42,11 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
     * Returns configuration options for the HTTP APIs
     */
   lazy val api: ApiConfig = new ApiConfig(this)
+
+  /**
+    * Returns the Open ID Connect configuration settings of this Case System
+    */
+  lazy val OIDC: OIDCConfig = api.security.oidc
 
   /**
     * Returns configuration options for reading and writing case definitions

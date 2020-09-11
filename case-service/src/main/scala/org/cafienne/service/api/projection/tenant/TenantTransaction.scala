@@ -3,18 +3,20 @@ package org.cafienne.service.api.projection.tenant
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.event.TransactionEvent
+import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.projection.record.{TenantRecord, UserRoleKey, UserRoleRecord}
-import org.cafienne.service.api.tenant._
+import org.cafienne.service.api.projection.slick.SlickTransaction
 import org.cafienne.tenant.akka.event._
 import org.cafienne.tenant.akka.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
-class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: RecordsPersistence, userCache: IdentityProvider)(implicit val executionContext: ExecutionContext) extends SlickTransaction[TenantEvent] with LazyLogging {
 
   val tenants = scala.collection.mutable.HashMap[String, TenantRecord]()
   val users = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
@@ -44,6 +46,8 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
   }
 
   def handleUserEvent(event: TenantUserEvent): Future[Done] = {
+//    println("Clearing user " + event.userId +" from user cache")
+    userCache.clear(event.userId)
     val key = UserRoleKey(event)
     getUserRoleRecord(key).map(user => {
       event match {
@@ -60,7 +64,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     })
   }
 
-  def commit(offsetName: String, offset: Offset): Future[Done] = {
+  override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
     var records = ListBuffer.empty[AnyRef]
     this.users.values.foreach(role => records += role)

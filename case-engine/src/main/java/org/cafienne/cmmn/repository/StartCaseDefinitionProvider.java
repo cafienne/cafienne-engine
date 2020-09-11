@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StartCaseDefinitionProvider implements DefinitionProvider {
-    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache();
+    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache(CaseSystem.config().repository().cacheSize());
     private final static String AUTHORIZED_TENANT_ROLES = "authorized-tenant-roles";
     private final List<String> authorizedTenantRoles;
 

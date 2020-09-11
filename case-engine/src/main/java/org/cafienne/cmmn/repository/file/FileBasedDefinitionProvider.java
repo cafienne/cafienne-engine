@@ -19,7 +19,7 @@ import java.util.*;
 
 public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final static Logger logger = LoggerFactory.getLogger(FileBasedDefinitionProvider.class);
-    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache();
+    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache(CaseSystem.config().repository().cacheSize());
     private String deployDirectory = null;
     private final String EXTENSION = ".xml";
 
