@@ -3,10 +3,14 @@ package org.cafienne.service.api.cases
 import org.cafienne.akka.actor.serialization.json.{Value, ValueList, ValueMap}
 import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api.projection.record.{CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.service.api.projection.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan) extends CafienneJson {
   override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.members, "file", file.toValue(), "planitems", planitems.toValue))
+}
+
+final case class CaseDefinitionDocument(record: CaseDefinitionRecord) {
+  def xml = record.content
 }
 
 final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {
