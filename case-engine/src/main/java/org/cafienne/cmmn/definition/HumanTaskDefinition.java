@@ -44,9 +44,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
         WorkflowTaskDefinition def = getExtension("implementation", WorkflowTaskDefinition.class, false);
         if (def == null) {
             // If we cannot find the extension, we'll create an empty one.
-            Element customTag = getElement().getOwnerDocument().createElementNS(NAMESPACE_URI, "implementation");
-            getElement().appendChild(customTag);
-            def = new WorkflowTaskDefinition(customTag, getDefinition(), this);
+            def = WorkflowTaskDefinition.createEmptyDefinition(this);
         }
         return def;
     }

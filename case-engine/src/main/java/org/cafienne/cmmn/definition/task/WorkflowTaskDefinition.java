@@ -7,10 +7,7 @@
  */
 package org.cafienne.cmmn.definition.task;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
-import org.cafienne.cmmn.definition.ParameterMappingDefinition;
-import org.cafienne.cmmn.definition.TaskDefinition;
+import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.akka.actor.serialization.json.JSONParseFailure;
@@ -103,5 +100,10 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
 
     public DueDateDefinition getDueDateExpression() {
         return dueDate;
+    }
+
+    public static WorkflowTaskDefinition createEmptyDefinition(HumanTaskDefinition taskDefinition) {
+        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(NAMESPACE_URI, "implementation");
+        return new WorkflowTaskDefinition(customTag, taskDefinition.getDefinition(), taskDefinition);
     }
 }
