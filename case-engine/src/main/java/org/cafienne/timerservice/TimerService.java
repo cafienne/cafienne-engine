@@ -1,6 +1,5 @@
 package org.cafienne.timerservice;
 
-import akka.actor.Cancellable;
 import akka.persistence.SaveSnapshotFailure;
 import akka.persistence.SnapshotOffer;
 import org.cafienne.akka.actor.CaseSystem;
@@ -9,8 +8,6 @@ import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
 import org.cafienne.akka.actor.handler.CommandHandler;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.timerservice.akka.command.CancelTimer;
 import org.cafienne.timerservice.akka.command.SetTimer;
 import org.cafienne.timerservice.akka.command.TimerServiceCommand;
@@ -83,10 +80,10 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
     }
 
     private void setTimer(TimerJob job) {
-        timers.put(job.timerId, new ScheduledTimer(job));
+        timers.put(job.timerId, new ScheduledTimer(this, job));
     }
 
-    private void removeTimer(String timerId, boolean externalRequest) {
+    void removeTimer(String timerId, boolean externalRequest) {
         ScheduledTimer timer = timers.get(timerId);
         if (externalRequest) {
             logger.debug("Canceling timer " + timerId +" from case " + timer.request.caseInstanceId);
@@ -177,43 +174,4 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         return false;
     }
 
-    class ScheduledTimer {
-        final TimerJob request;
-        final Cancellable schedule;
-
-        ScheduledTimer(TimerJob request) {
-            this.request = request;
-            MakePlanItemTransition command = new MakePlanItemTransition(request.user, request.caseInstanceId, request.timerId, Transition.Occur);
-
-            // Note: this code needs some refactoring
-            // - We should not use the system scheduler (dispatcher), but create our own (?)
-            // - We should leverage more of java.time (i.e., not rely on System.currentTimeMillis, but get a java.time.Duration instead)
-            long millis = request.moment.toEpochMilli();
-            long delay = millis - System.currentTimeMillis();
-
-            FiniteDuration duration = Duration.create(delay, TimeUnit.MILLISECONDS);
-            if (logger.isDebugEnabled()) {
-//            System.out.println("Scheduling to run timer request " + request.timerId + " in " + (duration.length() / 1000) + " seconds from now");
-                logger.debug("Scheduling to run timer request " + request.timerId + " in " + (duration.length() / 1000) + " seconds from now");
-            }
-            Runnable job = () -> {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Raising timer in case " + request.caseInstanceId+" for timer " + request.timerId + " on behalf of user " + request.user.id());
-                }
-                askCase(command, failure -> {
-                    // Is logging an error sufficient? Or should we go Fault?!
-                    logger.error("Could not make event " + getId() + " occur\n" + failure);
-                }, success -> {
-//                    System.out.println("Called back ok");
-                });
-                removeTimer(request.timerId, false);
-            };
-
-            schedule = getScheduler().schedule(duration, job);
-        }
-
-        void cancel() {
-            schedule.cancel();
-        }
-    }
 }
