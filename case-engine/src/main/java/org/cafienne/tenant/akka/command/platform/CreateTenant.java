@@ -10,6 +10,7 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.akka.command.exception.TenantException;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 import org.cafienne.tenant.akka.event.platform.TenantCreated;
 
@@ -28,7 +29,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         this.users = users;
         // Check whether after the filtering there are still owners left. Tenant must have owners.
         if (this.users.stream().filter(u -> u.isOwner()).count() == 0) {
-            throw new AuthorizationException("Cannot create a tenant without providing tenant owners");
+            throw new TenantException("Cannot create a tenant without providing tenant owners");
         }
     }
 
@@ -51,7 +52,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
         if (tenant.exists()) {
-            throw new InvalidCommandException("Tenant already exists");
+            throw new TenantException("Tenant already exists");
         }
     }
 

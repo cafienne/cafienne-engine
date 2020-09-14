@@ -2,6 +2,7 @@ package org.cafienne.tenant.akka.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -28,7 +29,7 @@ public abstract class PlatformTenantCommand extends TenantCommand {
     @Override
     public void validate(TenantActor modelActor) throws InvalidCommandException {
         if (! CaseSystem.isPlatformOwner(getUser())) {
-            throw new InvalidCommandException("Only platform owners can invoke platform commands");
+            throw new AuthorizationException("Only platform owners can invoke platform commands");
         }
     }
 

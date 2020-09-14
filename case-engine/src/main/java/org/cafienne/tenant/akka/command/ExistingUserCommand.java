@@ -8,6 +8,7 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.User;
+import org.cafienne.tenant.akka.command.exception.TenantException;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ abstract class ExistingUserCommand extends TenantCommand {
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
         if (tenant.getUser(userId) == null) {
-            throw new InvalidCommandException("User '" + userId + "' doesn't exist in tenant " + tenant.getId());
+            throw new TenantException("User '" + userId + "' doesn't exist in tenant " + tenant.getId());
         }
     }
 

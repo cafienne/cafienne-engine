@@ -21,6 +21,7 @@ import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.akka.command.exception.TenantException;
 
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
@@ -60,13 +61,13 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
     public void validate(TenantActor tenant) throws InvalidCommandException {
         // Tenant must exist
         if (!tenant.exists()) {
-            throw new InvalidCommandException("Not allowed to access this tenant from " + getUser().tenant());
+            throw new TenantException("Not allowed to access this tenant from " + getUser().tenant());
 //            throw new SecurityException("This tenant does not exist");
         }
 
         // User must do it in the right tenant
         if (!tenant.getTenant().equals(getUser().tenant())) {
-            throw new InvalidCommandException("Not allowed to access this tenant from " + getUser().tenant());
+            throw new TenantException("Not allowed to access this tenant from " + getUser().tenant());
         }
 
         if (!tenant.isOwner(this.getUser())) {
