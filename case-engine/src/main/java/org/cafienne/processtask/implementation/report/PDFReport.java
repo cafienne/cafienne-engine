@@ -67,10 +67,10 @@ public class PDFReport extends SubProcess<PDFReportDefinition> {
                     JasperReport subReportje = subReport.createInstance(this);
                     jasperParameters.put(subReportName, subReportje);
                 } catch (JRException e) {
-                    raiseFault(new RuntimeException("Could not compile parameter " + subReportName + " into report definition", e));
+                    raiseFault("Could not compile parameter " + subReportName + " into report definition", e);
                     return;
                 } catch (IllegalArgumentException iae) {
-                    raiseFault(iae);
+                    raiseFault(iae.getMessage(), iae);
                     return;
                 }
             });
@@ -88,9 +88,9 @@ public class PDFReport extends SubProcess<PDFReportDefinition> {
             raiseComplete();
 
         } catch (JRException e) {
-            raiseFault(new RuntimeException("Error while generating pdf report", e));
+            raiseFault("Error while generating pdf report", e);
         } catch (MissingParameterException mpe) {
-            raiseFault(mpe);
+            raiseFault("Missing parameter", mpe);
         }
     }
 

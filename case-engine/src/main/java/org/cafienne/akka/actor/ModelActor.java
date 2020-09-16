@@ -22,6 +22,7 @@ import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
 import org.cafienne.timerservice.akka.command.TimerServiceCommand;
@@ -548,6 +549,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     public void addDebugInfo(DebugStringAppender appender, Value json) {
         currentMessageHandler.addDebugInfo(appender, json, getLogger());
+    }
+
+    public void addDebugInfo(DebugJsonAppender appender) {
+        currentMessageHandler.addDebugInfo(appender, getLogger());
     }
 
     public void addDebugInfo(DebugStringAppender appender, Exception exception) {

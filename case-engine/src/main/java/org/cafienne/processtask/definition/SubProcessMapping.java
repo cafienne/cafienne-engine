@@ -76,5 +76,9 @@ public class SubProcessMapping extends CMMNElementDefinition {
 
     public ParameterDefinition getTarget() {
         return target;
-    }	
+    }
+
+    public ParameterDefinition getSource() {
+        return source;
+    }
 }
