@@ -91,8 +91,7 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
 
     protected CaseFileItem getItem(CaseFileItemDefinition childDefinition) {
         CaseFileItem item = getItems().get(childDefinition);
-        if (item == null)
-        {
+        if (item == null) {
             // Does not yet exist, so create it. Without setting a value or transitioning it into the Available state!
             item = childDefinition.createInstance(getCaseInstance(), this);
             getItems().put(childDefinition, item);

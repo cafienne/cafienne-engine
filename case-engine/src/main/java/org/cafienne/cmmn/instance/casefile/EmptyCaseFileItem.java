@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ class EmptyCaseFileItem extends CaseFileItem {
     }
 
     @Override
-    protected void adoptContent(Value<?> newContentFromParent) {
+    protected void adoptContentFromParent(Value<?> newContentFromParent, CaseFileEvent event) {
         logger.warn("Adopting content in EmptyCaseFileItem");
     }
 

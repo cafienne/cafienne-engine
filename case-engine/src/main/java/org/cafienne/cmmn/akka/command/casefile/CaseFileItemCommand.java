@@ -8,15 +8,17 @@
 package org.cafienne.cmmn.akka.command.casefile;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.io.IOException;
 
@@ -57,6 +59,13 @@ abstract class CaseFileItemCommand extends CaseCommand {
 
         // Resolve the path on the case file
         caseFileItem = caseInstance.getCaseFile().getItem(path);
+
+        // Validate current state
+        if (!caseFileItem.allows(intendedTransition())) {
+            throw new InvalidCommandException(getClass().getSimpleName() + "["+path+"] is not allowed in " + caseFileItem.getState() +" state.");
+        }
+
+        // Validate type of new content
         caseFileItem.getDefinition().validate(content);
     }
 
@@ -65,6 +74,8 @@ abstract class CaseFileItemCommand extends CaseCommand {
         apply(caseInstance, caseFileItem, content);
         return new CaseResponse(this);
     }
+
+    abstract CaseFileItemTransition intendedTransition();
 
     abstract void apply(Case caseInstance, CaseFileItem caseFileItem, Value<?> content);
 

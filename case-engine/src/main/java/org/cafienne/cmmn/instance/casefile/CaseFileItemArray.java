@@ -58,8 +58,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             if (getCaseInstance().recoveryRunning()) {
                 if (index == actualArrayItems.size()) {
                     // This will automatically update 'current' to last one that is being recovered as it happens in sequence
-                    current = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
-                    actualArrayItems.add(current);
+                    current = getNextItem();
                     return current;
                 }
                 if (index > actualArrayItems.size()) {
@@ -116,33 +115,85 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         }
     }
 
+    public boolean allows(CaseFileItemTransition intendedTransition) {
+        // In CaseFileItemArray it is allowed to add new items to the existing array (through Create method)
+        if (this.getState() == State.Available && intendedTransition == CaseFileItemTransition.Create) return true;
+        return super.allows(intendedTransition);
+    }
+
     @Override
     public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
         createContent(parameterValue);
     }
 
+    private CaseFileItem getNextItem() {
+        CaseFileItem nextItem = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
+        actualArrayItems.add(nextItem);
+        return nextItem;
+    }
+
+    private void createNewItem(Value value) {
+        setState(State.Available);
+        getNextItem().createContent(value);
+    }
+
     @Override
     public void createContent(Value<?> newContent) {
         ValueList valueList = newContent.isList() ? (ValueList) newContent : new ValueList(newContent);
-        for (Value<?> newItemValue : valueList) {
-            CaseFileItem newInstance = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
-            actualArrayItems.add(newInstance);
-            newInstance.createContent(newItemValue);
+        for (Value<?> newChildValue : valueList) {
+            createNewItem(newChildValue);
         }
     }
 
     @Override
     public void updateContent(Value<?> newContent) {
-        throw new TransitionDeniedException("Cannot update the content of the case file item container. Have to address an individual item");
+        ValueList valueList = asList(newContent, "Updating");
+        int numberToUpdate = valueList.size();
+        for (int i = 0; i<numberToUpdate; i++) {
+            Value<?> newChildValue = valueList.get(i);
+            if (actualArrayItems.size() > i) {
+                CaseFileItem arrayItem = actualArrayItems.get(i);
+                arrayItem.updateContent(newChildValue);
+            } else {
+                createNewItem(newChildValue);
+            }
+        }
+    }
+
+    private ValueList asList(Value<?> newContent, String actionType) {
+        if (newContent instanceof ValueList) {
+            return (ValueList) newContent;
+        } else {
+            addDebugInfo(() -> "Warning: CaseFileItem[" + getPath()+"] has multiplicity '" + getDefinition().getMultiplicity() +"'. " + actionType +" should be done through a JSON array object. Given object is converted into a list with 1 element");
+            return new ValueList(newContent);
+        }
     }
 
     @Override
     public void replaceContent(Value<?> newContent) {
-        throw new TransitionDeniedException("Cannot replace the content of the case file item container. Have to address an individual item");
+        // TODO: clear should remove owners from underlying value structures
+        actualValueOfCaseFileItemArray.clear();
+
+        ValueList valueList = asList(newContent, "Replacing");
+        int numberToReplace = valueList.size();
+        int numberToRemove = actualArrayItems.size() - numberToReplace;
+        for (int i = 0; i<numberToReplace; i++) {
+            Value<?> newChildValue = valueList.get(i);
+            if (actualArrayItems.size() > i) {
+                CaseFileItem arrayItem = actualArrayItems.get(i);
+                arrayItem.replaceContent(newChildValue);
+            } else {
+                createNewItem(newChildValue);
+            }
+        }
+        while (numberToRemove-- > 0) {
+            actualArrayItems.remove(actualArrayItems.size() - 1);
+        }
     }
 
     @Override
     public void deleteContent() {
+        setState(State.Discarded);
         actualArrayItems.forEach(CaseFileItem::deleteContent);
     }
 
@@ -170,7 +221,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     public CaseFileItem getCurrent() {
         // Override from CaseFileItem.current(); returns the most recently changed case file item.
         if (current == null) {
-            current = getItem(-1);
+            current = getItem(-1); // Get -1 will return EmptyCaseFileItem
         }
         return current;
     }
