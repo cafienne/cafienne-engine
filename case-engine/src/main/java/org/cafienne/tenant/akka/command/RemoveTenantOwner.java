@@ -6,6 +6,7 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.User;
+import org.cafienne.tenant.akka.command.exception.TenantException;
 
 @Manifest
 public class RemoveTenantOwner extends ExistingUserCommand {
@@ -22,10 +23,10 @@ public class RemoveTenantOwner extends ExistingUserCommand {
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
         if (! tenant.isOwner(userId)) {
-            throw new InvalidCommandException("User '" + userId + "' is not a tenant owner.");
+            throw new TenantException("User '" + userId + "' is not a tenant owner.");
         }
         if (tenant.getOwnerList().size() == 1) {
-            throw new InvalidCommandException("Cannot remove tenant owner. There must be at least one tenant owner.");
+            throw new TenantException("Cannot remove tenant owner. There must be at least one tenant owner.");
         }
     }
 

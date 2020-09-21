@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * Furthermore for convenience, the definition can contain parameter mappings, in a manner similar to the {@link TaskDefinition#getParameterMappings()} parameter mappings.
  * Upon completion/failure of the sub process instance, the engine will map the raw, internal process output parameters to the CMMN compliant Process output parameters. In order to
  * enable this functionality, the sub process definition has to provide a list of possible raw output parameter names, which map to keys in the {@link ValueMap} that is passed
- * in the {@link SubProcess#raiseComplete()} and {@link SubProcess#raiseFault()} methods.
+ * in the {@link SubProcess#raiseComplete()} and {@link SubProcess#raiseFault(String)} methods.
  * <br/>
  * Alternatively sub process instances may do this mapping themselves.
  * <p>

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,10 +7,8 @@
  */
 package org.cafienne.cmmn.instance;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
@@ -126,6 +124,9 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
 
     private void makeTransitionWithOutput(ValueMap rawOutputParameters, Transition transition) {
         prepareTransition(transition);
+        if (rawOutputParameters == null) {
+            rawOutputParameters = new ValueMap();
+        }
         transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
         makeTransition(transition);
     }
@@ -162,13 +163,35 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
      * @param validateOutput Indicates whether a check on mandatory parameter values must be done
      */
     protected void transformOutputParameters(ValueMap implementationOutput, boolean validateOutput) {
-        if (implementationOutput == null) {
-            implementationOutput = new ValueMap();
-        }
+        Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
+
+        // Check on missing raw parameters
+        addDebugInfo(() -> {
+            List<ParameterMappingDefinition> missingParameters = mappings.stream().filter(m -> !m.isInputParameterMapping() && !implementationOutput.has(m.getSource().getName())).collect(Collectors.toList());
+            if (missingParameters.isEmpty()) {
+                return "";
+            } else if (missingParameters.size() == 1) {
+                return "Task Output: parameter " + missingParameters.get(0).getTarget().getName() +" has no value, because raw parameter " + missingParameters.get(0).getSource().getName() + " is missing";
+            } else {
+                List<String> missingRawParameters = missingParameters.stream().map(m -> m.getSource().getName()).collect(Collectors.toList());
+                List<String> missingTaskParameters = missingParameters.stream().map(m -> m.getTarget().getName()).collect(Collectors.toList());
+                return "Task Output: parameters " + missingTaskParameters +" have no value - missing raw output parameters " + missingRawParameters;
+            }
+        });
+        // Check on raw parameters that have no matching definition
+        addDebugInfo(() -> {
+            List<String> undefinedParameters = implementationOutput.getValue().keySet().stream().filter(rawOutputParameterName -> mappings.stream().filter(m -> m.getSource().getName().equals(rawOutputParameterName)).count() == 0).collect(Collectors.toList());
+            if (undefinedParameters.isEmpty()) {
+                return "";
+            } else if (undefinedParameters.size() == 1) {
+                return "Task Output: found parameter " + undefinedParameters.get(0) +", but it is not defined";
+            } else {
+                return "Task Output: found parameters " + undefinedParameters + ", but they are not defined";
+            }
+        });
 
         // First, transform values of all raw output parameters into task parameters
         ValueMap newTaskOutput = new ValueMap();
-        Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
         for (ParameterMappingDefinition mapping : mappings) {
             if (!mapping.isInputParameterMapping()) {
                 String rawOutputParameterName = mapping.getSource().getName();

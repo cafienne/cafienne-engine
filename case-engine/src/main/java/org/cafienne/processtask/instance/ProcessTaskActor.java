@@ -95,6 +95,18 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
             success -> addDebugInfo(() -> "Completed process task " + getId() + " '" + name + "' in parent " + parentActorId));
     }
 
+    public void failed(String errorDescription, ValueMap processOutputParameters) {
+        addEvent(new ProcessFailed(this, processOutputParameters));
+        addDebugInfo(() -> "Encountered failure in process task '" + name + "' of process type " + taskImplementation.getClass().getName());
+        addDebugInfo(() -> "Error: " + errorDescription, processOutputParameters);
+
+        askCase(new FailTask(this, processOutputParameters), failure -> {
+            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
+        }, success -> {
+            addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
+        });
+    }
+
     public void failed(ValueMap processOutputParameters) {
         addEvent(new ProcessFailed(this, processOutputParameters));
         addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);

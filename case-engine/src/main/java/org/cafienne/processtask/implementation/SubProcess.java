@@ -48,9 +48,19 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         processTaskActor.completed(processOutputParameters);
     }
 
-    protected final void raiseFault() {
+    protected final void raiseFault(String description) {
         transformRawParametersToProcessOutputParameters();
-        processTaskActor.failed(processOutputParameters);
+        processTaskActor.failed(description, processOutputParameters);
+    }
+
+    /**
+     * Store an exception in the process output parameters (and in the raw parameters),
+     * under the name {@link SubProcessDefinition#EXCEPTION_PARAMETER}, and raise fault for the task.
+     * @param cause
+     */
+    protected void raiseFault(String message, Throwable cause) {
+        setFault(Value.convert(cause));
+        raiseFault(message);
     }
 
     /**
@@ -66,22 +76,12 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
     /**
      * Stores the value as an output parameter both in the raw and in the process output parameters.
      * This enables propagating faults back into the process task without any in-process mappings defined.
-     * @param name
      * @param value
      */
-    private void addFault(String name, Value<?> value) {
+    protected void setFault(Value<?> value) {
+        String name = SubProcessDefinition.EXCEPTION_PARAMETER;
         rawOutputParameters.put(name, value);
         processOutputParameters.put(name, value);
-    }
-     /**
-     * Store an exception in the process output parameters (and in the raw parameters),
-     * under the name {@link SubProcessDefinition#EXCEPTION_PARAMETER}, and raise fault for the task.
-     * @param throwable
-     */
-    protected void raiseFault(Throwable throwable) {
-        logger.info("Task implementation failed", throwable);
-        addFault(SubProcessDefinition.EXCEPTION_PARAMETER, Value.convert(throwable));
-        raiseFault();
     }
 
     /**
@@ -114,13 +114,14 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
     private void transformRawParametersToProcessOutputParameters() {
         // TODO: this code belongs in the custom Process implementations, they only should provide the process output
         Collection<SubProcessMapping> mappings = definition.getParameterMappings();
+        processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
         for (SubProcessMapping mapping : mappings) {
             String outputParameterName = mapping.getTarget().getName();
+            processTaskActor.addDebugInfo(() -> "Mapping " + mapping.getSource().getName() +" to " + mapping.getTarget().getName());
             Value<?> outputParameterValue = mapping.transformOutput(processTaskActor, rawOutputParameters);
             setProcessOutputParameter(outputParameterName, outputParameterValue);
         }
     }
-
 
     /**
      * Start is invoked when the Task has become {@link State#Active}, either through {@link Transition#Start} or {@link Transition#ManualStart}

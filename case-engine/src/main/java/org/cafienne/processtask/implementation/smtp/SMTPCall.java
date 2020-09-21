@@ -98,11 +98,11 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
                     mailMessage.addRecipient(recipientType, new InternetAddress(email, name));
                 } catch (UnsupportedEncodingException ex) {
                     logger.error("Invalid email address " + email + " " + ex.getMessage());
-                    raiseFault(new RuntimeException("Failed to set recipients for SMTP call", ex));
+                    raiseFault("Failed to set recipients for SMTP call", ex);
                     return;
                 } catch (MessagingException mex) {
                     logger.error("Unable to set recipient " + email + " " + mex.getMessage());
-                    raiseFault(new RuntimeException("Failed to set recipients for SMTP call", mex));
+                    raiseFault("Failed to set recipients for SMTP call", mex);
                     return;
                 }
             }
@@ -114,10 +114,10 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
             setMailContent(processInputParameters);
 
         } catch (AddressException aex) {
-            raiseFault(new RuntimeException("Invalid email address in from and/or replyTo", aex));
+            raiseFault("Invalid email address in from and/or replyTo", aex);
             return;
         } catch (MessagingException mex) {
-            raiseFault(new RuntimeException("Failed to generate email message", mex));
+            raiseFault("Failed to generate email message", mex);
             return;
         }
 
@@ -132,11 +132,11 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
             processTaskActor.addDebugInfo(() -> "Completed sending email in " + (System.currentTimeMillis() - now) + " milliseconds");
         } catch (NoSuchProviderException ex) {
             // we should never get here since provider is set hardcoded to "smtp"
-            raiseFault(new RuntimeException("No such provider", ex));
+            raiseFault("No such provider", ex);
             return;
         } catch (MessagingException mex) {
             processTaskActor.addDebugInfo(() -> "Unable to process and send SMTP message", mex);
-            raiseFault(new RuntimeException("Unable to process and send SMTP message", mex));
+            raiseFault("Unable to process and send SMTP message", mex);
             return;
         }
 
