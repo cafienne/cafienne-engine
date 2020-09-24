@@ -32,7 +32,7 @@ public class JSONType extends DefinitionType {
                 } else {
                     CaseFileItemDefinition childDefinition = itemDefinition.getChild(fieldName);
                     if (childDefinition == null) {
-                        throw new CaseFileError("Property '" + fieldName + "' is not found in the definition of "+itemDefinition.getDefinition().getName());
+                        throw new CaseFileError("Property '" + fieldName + "' is not found in the definition of "+itemDefinition.getName());
                     }
                     childDefinition.validate(fieldValue);
                 }
