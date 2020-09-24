@@ -154,10 +154,10 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeCaseInstanceEvent(generator);
-        writeField(generator, Fields.name, name);
         writeField(generator, Fields.transition, transition);
-        writeField(generator, Fields.value, value);
         writeField(generator, Fields.path, path);
+        writeField(generator, Fields.value, value);
+        writeField(generator, Fields.name, name);
         writeField(generator, Fields.state, state);
         generator.writeNumberField(Fields.index.toString(), index);
     }
