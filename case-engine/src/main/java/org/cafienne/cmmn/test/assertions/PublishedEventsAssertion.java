@@ -4,6 +4,7 @@ import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
 import org.cafienne.cmmn.test.CaseTestCommand;
+import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.filter.EventFilter;
 
 import java.time.Instant;
@@ -152,6 +153,16 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
         StringBuilder sb = new StringBuilder();
         eventsByType.forEach((eventClass, number) -> sb.append(eventClass.getSimpleName() +": " + number + "\n"));
         return sb.toString();
+    }
+
+    public void printSummary() {
+        TestScript.debugMessage("Found these events:\n"  + enumerateEventsByType());
+    }
+
+    public void printEventList() {
+        StringBuffer eventList = new StringBuffer("\nEvents:");
+        events.forEach(event -> eventList.append("\n " + (events.indexOf(event)) +": " + event ));
+        TestScript.debugMessage(eventList+"\n");
     }
 
     /**

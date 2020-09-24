@@ -1,0 +1,25 @@
+<case id="casefile.case" name="casefile" guid="_kWyIV">
+    <caseFileModel>
+        <caseFileItem id="_kWyIV_1" name="RootCaseFileItem" multiplicity="ExactlyOne" definitionRef="rootcasefileitem.cfid">
+            <children>
+                <caseFileItem id="_kWyIV_3" name="ChildItem" multiplicity="ExactlyOne" definitionRef="childitem.cfid">
+                    <children>
+                        <caseFileItem id="_kWyIV_5" name="GrandChildItem" multiplicity="ExactlyOne" definitionRef="grandchilditem.cfid"/>
+                        <caseFileItem id="_kWyIV_6" name="GrandChildArray" multiplicity="ZeroOrMore" definitionRef="grandchilditem.cfid"/>
+                    </children>
+                </caseFileItem>
+                <caseFileItem id="_kWyIV_4" name="ChildArray" multiplicity="ZeroOrMore" definitionRef="childitem.cfid">
+                    <children>
+                        <caseFileItem id="_kWyIV_7" name="GrandChildItemInArray" multiplicity="ExactlyOne" definitionRef="grandchilditem.cfid"/>
+                        <caseFileItem id="_kWyIV_8" name="GrandChildArrayInArray" multiplicity="ZeroOrMore" definitionRef="grandchilditem.cfid"/>
+                    </children>
+                </caseFileItem>
+            </children>
+        </caseFileItem>
+        <caseFileItem id="_kWyIV_2" name="RootCaseFileArray" multiplicity="ZeroOrMore" definitionRef="rootcasefileitem.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__kWyIV_0" name="casefile" autoComplete="true">
+        <planItem id="pi_ht__kWyIV_0" name="Simplistic Unused Task" definitionRef="ht__kWyIV_0"/>
+        <humanTask id="ht__kWyIV_0" name="Simplistic Unused Task" isBlocking="true"/>
+    </casePlanModel>
+</case>

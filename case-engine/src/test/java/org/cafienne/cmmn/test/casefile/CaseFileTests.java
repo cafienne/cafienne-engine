@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
     CaseFileTest.class,
     InvalidCaseFileDefinition.class,
     MultiplicityTest.class,
+    NewCaseFileTest.class,
     RepetitiveFileItems.class,
     TestTaskInputMapping.class
     })
