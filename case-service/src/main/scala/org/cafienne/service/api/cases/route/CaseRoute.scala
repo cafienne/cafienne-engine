@@ -173,18 +173,18 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     }
   }
 
-  @Path("/{caseInstanceId}")
+  @Path("/{caseInstanceId}/definition")
   @GET
   @Operation(
-    summary = "Get a case instance by caseInstanceId",
-    description = "Returns a case instance",
+    summary = "Get the definition of a case instance",
+    description = "Returns the definition of a case instance",
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
-      new ApiResponse(description = "Case found and returned", responseCode = "200"),
+      new ApiResponse(description = "Case definition found and returned", responseCode = "200"),
       new ApiResponse(description = "Case not found", responseCode = "404")
     )
   )
