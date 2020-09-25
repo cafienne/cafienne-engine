@@ -151,7 +151,7 @@ public class CaseFileTransitionTest {
         //  which is captured through the negative test
         ValueList customers = getCustomers("Piet", "Joop");
         ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, "Request/Customer");
-        testCase.assertStepFails(customerReplace, action -> action.assertException(TransitionDeniedException.class, "Cannot replace the content of the case file item container. Have to address an individual child"));
+        testCase.assertStepFails(customerReplace, action -> action.assertException(TransitionDeniedException.class, "Cannot replace the content of the case file item container. Have to address an individual item"));
 
         // TODO: we're now updating the Request object with the new customers, but merge feature does not work 'as expected' in the engine, resulting in an exception
         //  which is captured through the negative test

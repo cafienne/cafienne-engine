@@ -189,18 +189,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.indexInArray = event.getIndex();
         this.lastTransition = event.getTransition();
         this.setValue(event.getValue());
-//        propagateValueChangeToChildren(event.getValue());
-        if (this.array != null) { // Update the array we belong too as well
-            this.array.childChanged(this);
-        }
-
-        // Now propagate our new value into our parent.
-        Value<?> valueToPropagate = this.value;
-        if (array != null) { // If we belong to an array, we should propage the whole array instead of just our own value.
-            array.childChanged(this);
-            valueToPropagate = array.getValue();
-        }
-        propagateValueChangeToParent(getName(), valueToPropagate);
     }
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
@@ -268,6 +256,45 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
         this.value = newValue;
         if (newValue != null) newValue.setOwner(this);
+
+        // Now update our parent chain (including the array if we belong to one).
+        if (this.array != null) { // Update the array we belong too as well
+            this.array.itemChanged(this);
+        }
+
+        // Now propagate our new value into our parent.
+        Value<?> valueToPropagate = this.value;
+        if (array != null) { // If we belong to an array, we should propage the whole array instead of just our own value.
+            array.itemChanged(this);
+            valueToPropagate = array.getValue();
+        }
+        propagateValueChangeToParent(getName(), valueToPropagate);
+    }
+
+    /**
+     * This updates the json structure of the parent CaseFileItem, without triggering CaseFileItemTransitions
+     *
+     * @param childName
+     * @param childValue
+     */
+    private void propagateValueChangeToParent(String childName, Value<?> childValue) {
+        if (parent != null) {
+            if (parent.value == null || parent.value == Value.NULL) {
+                addDebugInfo(() -> "Creating a location in parent " + parent.getPath() + " to store the newly changed child " + getName());
+                // Setting parent value will propagate the changes further up if needed.
+                parent.setValue(new ValueMap(childName, childValue));
+            } else if (parent.value instanceof ValueMap) {
+                // Check whether we need to change our value in the parent. E.g. for arrays, if a new item is added
+                //  to the array, the value in the parent will not change (it is same ValueList - with new item)
+                ValueMap parentMap = (ValueMap) parent.value;
+                if (parentMap.get(childName) != childValue) {
+                    // Ah. We have a real new value. Let's update it in our parent
+                    parentMap.put(childName, childValue);
+                }
+            } else {
+                addDebugInfo(() -> "Cannot propagate change in " + getPath() + " into parent, because it's value is not a ValueMap but a " + parent.value.getClass().getName());
+            }
+        }
     }
 
     private void propagateValueChangeToChildren(Value newValue) {
@@ -279,32 +306,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 child.adoptContent(childValue);
             }
         });
-    }
-
-    /**
-     * This updates the json structure of the parent CaseFileItem, without triggering CaseFileItemTransitions
-     *
-     * @param childName
-     * @param childValue
-     */
-    private void propagateValueChangeToParent(String childName, Value<?> childValue) {
-        if (this.value == childValue) {
-            // We'll do our parents our self
-            return;
-        }
-        if (parent != null) {
-            if (parent.value == null || parent.value == Value.NULL) {
-                addDebugInfo(() -> "Creating a location in parent " + parent.getPath() + " to store the newly changed child " + getName());
-                parent.value = new ValueMap();
-            }
-            if (parent.value instanceof ValueMap) {
-                ((ValueMap) parent.value).put(childName, childValue);
-                // And ... recurse
-                parent.propagateValueChangeToParent(parent.getName(), parent.value);
-            } else {
-                addDebugInfo(() -> "Cannot propagate change in " + getPath() + " into parent, because it's value is not a ValueMap but a " + parent.value.getClass().getName());
-            }
-        }
     }
 
     /**
