@@ -47,7 +47,8 @@ public class DefinitionType {
      * The default implementation is empty - anything goes. Subclasses can override this to do type specific validations.
      * @param item
      * @param value
+     * @param onlyProperties
      */
-    public void validate(CaseFileItemDefinition item, Value value) throws CaseFileError {
+    public void validate(CaseFileItemDefinition item, Value value, boolean onlyProperties) throws CaseFileError {
     }
 }

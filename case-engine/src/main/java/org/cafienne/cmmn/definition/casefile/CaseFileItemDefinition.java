@@ -132,7 +132,11 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
      * @param value
      */
     public void validate(Value value) throws CaseFileError {
-        getCaseFileItemDefinition().getDefinitionType().validate(this, value);
+        getCaseFileItemDefinition().getDefinitionType().validate(this, value, false);
+    }
+
+    public void validatePropertyTypes(Value value) throws CaseFileError {
+        getCaseFileItemDefinition().getDefinitionType().validate(this, value, true);
     }
 
     /**

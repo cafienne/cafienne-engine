@@ -141,6 +141,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param parameterValue
      */
     public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
+        getDefinition().validatePropertyTypes(parameterValue);
         // Spec says (table 5.3.4, page 36): just trigger the proper transition, as that will be obvious. But is it?
         switch (getState()) {
             case Available:

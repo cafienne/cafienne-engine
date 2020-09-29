@@ -123,6 +123,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     @Override
     public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
+        getDefinition().validatePropertyTypes(parameterValue);
         createContent(parameterValue);
     }
 
