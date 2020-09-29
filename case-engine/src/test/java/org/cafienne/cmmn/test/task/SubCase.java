@@ -131,6 +131,54 @@ public class SubCase {
     }
 
     @Test
+    public void testSubCaseTermination() {
+        String caseInstanceId = "SubCaseTest";
+        TestScript testCase = new TestScript("SubCase");
+
+        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
+        TenantUser testUser = TestScript.getTestUser("Anonymous");
+
+        /**
+         * Start the MainCase
+         */
+        StartCase startCase = new StartCase(testUser, caseInstanceId, xml, null, null);
+        testCase.addStep(startCase, action -> action.print());
+
+        /**
+         * Complete the Task1 in MainCase
+         * This should start both SubCaseTask (blocking) and NonBlockingSubCaseTask (non-blocking)
+         */
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task1", Transition.Complete), mainCasePlan ->
+        {
+            mainCasePlan.print();
+
+            // Get a hold of sub case id and assert it is active.
+            String subCaseId = testCase.getEventListener().awaitPlanItemState("SubCaseTask", State.Active).getPlanItemId();
+            mainCasePlan.assertTask("SubCaseTask").assertState(State.Active);
+
+            // Now wait until we find the Item1 task in the blocking subcase.
+            String item1IdInSubCase = testCase.getEventListener().waitUntil(PlanItemCreated.class, pic -> pic.getCaseInstanceId().equals(subCaseId) && pic.getPlanItemName().equals("Item1")).getPlanItemId();
+
+            // And check that it is not only Created, but also Active
+            String item1InSubCase = testCase.getEventListener().waitUntil(PlanItemTransitioned.class, pit ->
+                    pit.getCaseInstanceId().equals(subCaseId) // Sub case
+                            && pit.getPlanItemId().equals(item1IdInSubCase) // Having plan item with name "Item1" and correct id
+                            && pit.getCurrentState().equals(State.Active) // in state Active
+            ).getPlanItemId();
+
+            // Terminating subCaseTask from MainCase should also terminate SubCase and task in it
+            // And the transition in SubCase task Should be Exit
+            testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "SubCaseTask", Transition.Terminate), result ->
+            {
+                testCase.getEventListener().awaitPlanItemState(subCaseId, State.Terminated);
+                testCase.getEventListener().awaitPlanItemState(item1InSubCase, Transition.Exit, State.Terminated, State.Active);
+            });
+        });
+
+        testCase.runTest();
+    }
+
+    @Test
     public void testFailingSubCase() {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");

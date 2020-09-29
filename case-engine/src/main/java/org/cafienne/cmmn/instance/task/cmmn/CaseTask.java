@@ -40,7 +40,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
 
     @Override
     protected void terminateInstance() {
-        tell(Transition.Complete);
+        tell(Transition.Terminate);
     }
 
     @Override
