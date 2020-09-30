@@ -64,6 +64,10 @@ public abstract class Value<T> implements Serializable {
         this.owner = caseFileItem;
     }
 
+    public void clearOwner() {
+        this.setOwner(null);
+    }
+
     /**
      * Returns the raw, typed value
      *

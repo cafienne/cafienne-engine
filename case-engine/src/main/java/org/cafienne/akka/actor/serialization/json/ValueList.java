@@ -40,6 +40,12 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
     }
 
     @Override
+    public void clearOwner() {
+        super.clearOwner();
+        getValue().forEach(v -> v.clearOwner());
+    }
+
+    @Override
     public boolean isSupersetOf(Value otherValue) {
         if (otherValue == null || !otherValue.isList()) {
             return false;

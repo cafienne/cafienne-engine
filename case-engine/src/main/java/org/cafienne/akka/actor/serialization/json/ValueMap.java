@@ -145,6 +145,12 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return true;
     }
 
+    @Override
+    public void clearOwner() {
+        super.clearOwner();
+        value.values().forEach(v -> v.clearOwner());
+    }
+
     /**
      * Returns a list of the field names in this object.
      *

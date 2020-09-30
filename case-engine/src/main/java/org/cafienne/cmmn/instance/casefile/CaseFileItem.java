@@ -8,25 +8,27 @@
 package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
 import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
+import org.cafienne.cmmn.definition.parameter.BindingOperation;
+import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> {
+    private final static Logger logger = LoggerFactory.getLogger(CaseFileItem.class);
 
     private final List<CaseFileItemOnPart> connectedEntryCriteria = new ArrayList();
     private final List<CaseFileItemOnPart> connectedExitCriteria = new ArrayList();
@@ -45,21 +47,59 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     private final CaseFileItem parent;
     /**
-     * The array that this CaseFileItem belongs to (if we have multiplicity "...OrMore"). Otherwise <code>null</code>
+     * The container holding this item - either the item itself, or the array in which it exists
      */
-    private final CaseFileItemArray array;
+    private final CaseFileItem container;
     /**
-     * Our location in the {@link CaseFileItem#array}, if we belong to one. Else -1.
+     * Our location in a {@link CaseFileItemArray}, if we belong to one. Else -1.
      */
     private int indexInArray;
+    /**
+     * Shortcut to know our type of class
+     */
+    private final boolean isArray;
 
-    protected CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent, CaseFileItemArray array, int indexInArray) {
+    private final BindingOperation defaultBindingOperation;
+
+    private CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent, CaseFileItemArray array, int indexInArray, boolean isArray) {
         super(caseInstance, definition, definition.getName());
         this.parent = parent instanceof CaseFileItem ? (CaseFileItem) parent : null;
-        this.array = array;
+        this.container = array == null ? this : array;
         this.indexInArray = indexInArray;
         this.transitionPublisher = createTransitionPublisher();
+        this.isArray = isArray;
+        this.defaultBindingOperation = isArray ? BindingOperation.Add : BindingOperation.Replace;
         getCaseInstance().getSentryNetwork().connect(this);
+    }
+
+    /**
+     * Constructor for CaseFileItems that belong to an array
+     * @param array
+     * @param indexInArray
+     */
+    protected CaseFileItem(CaseFileItemArray array, int indexInArray) {
+        this(array.getCaseInstance(), array.getDefinition(), array.getParent(), array, indexInArray, false);
+    }
+
+    /**
+     * Constructor for {@link CaseFileItemArray}.
+     *
+     * @param caseInstance
+     * @param definition
+     * @param parent
+     */
+    protected CaseFileItem(CaseFileItemDefinition definition, Case caseInstance, CaseFileItemCollection<?> parent) {
+        this(caseInstance, definition, parent, null, -1, true);
+    }
+
+    /**
+     * Constructor for plain CaseFileItems (i.e., not belonging to an array)
+     * @param caseInstance
+     * @param definition
+     * @param parent
+     */
+    public CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent) {
+        this(caseInstance, definition, parent, null, -1, false);
     }
 
     @Override
@@ -76,31 +116,16 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         //  only trigger entry/exit criteria after case plan has become available.
         //  This happens in the release method.
         if (getCaseInstance().getCasePlan() == null) {
-            if (this.array != null) {
-                // NOTE: weirdly enough the case file item events before bootstrap need to be done on the array instead of the item. Unclear why ...
-                return this.array.transitionPublisher;
-            } else {
-                return new BootstrapCaseFileTransitionPublisher(this);
+            // NOTE: weirdly enough the case file item events before bootstrap need to be done on the array instead of the item. Unclear why ...
+            //  We use this.container => this is either the CaseFileItemArray or a non-array-element CaseFileItem
+            if (this.container.transitionPublisher == null) {
+                this.container.transitionPublisher = new BootstrapCaseFileTransitionPublisher(this.container);
             }
+            return this.container.transitionPublisher;
         } else {
             // NOTE: see above note: apparently normal transition publisher does not use the parent array...
             return new TransitionPublisher(this);
         }
-    }
-
-    public CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent) {
-        this(caseInstance, definition, parent, null, -1);
-    }
-
-    /**
-     * Constructor for {@link CaseFileItemArray}.
-     *
-     * @param caseInstance
-     * @param definition
-     * @param parent
-     */
-    protected CaseFileItem(CaseFileItemDefinition definition, Case caseInstance, CaseFileItemCollection<?> parent) {
-        this(caseInstance, definition, parent, null, -1);
     }
 
     /**
@@ -143,17 +168,51 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
         getDefinition().validatePropertyTypes(parameterValue);
         // Spec says (table 5.3.4, page 36): just trigger the proper transition, as that will be obvious. But is it?
+        //  We have implemented specific type of BindingRefinement to make more predictable what to do
+
         switch (getState()) {
-            case Available:
-                replaceContent(parameterValue);
-                break;
-            case Discarded:
+            case Discarded: {
+                addDebugInfo(() -> "Cannot bind parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "], since the item is in state Discarded");
                 throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
-            case Null:
-                createContent(parameterValue);
+            }
+            case Null: {
+                // In all cases we will try to create content if state is Null;
+                //  If we are an array, then an item in the array is created. Else we ourselves are created
+                addDebugInfo(() -> "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] will create new content (transition -> Create)");
+                this.container.createContent(parameterValue);
                 break;
-            default:
-                break;
+            }
+            case Available: {
+                BindingRefinementDefinition refinement = p.getDefinition().getBindingRefinement();
+                BindingOperation operation = refinement != null ? refinement.getRefinementOperation() : this.defaultBindingOperation;
+                addDebugInfo(() -> {
+                    if (refinement == null) {
+                        return "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] is done with default operation " + operation;
+                    } else {
+                        return "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] is done with operation " + operation;
+                    }
+                });
+
+                switch (operation) {
+                    case Add: {
+                        if (this.isArray) {
+                            createContent(parameterValue);
+                        } else {
+                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; replacing content instead");
+                            replaceContent(parameterValue);
+                        }
+                        break;
+                    }
+                    case Replace: {
+                        replaceContent(parameterValue);
+                        break;
+                    }
+                    case Update:{
+                        updateContent(parameterValue);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -254,11 +313,37 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
     public void createContent(Value<?> newContent) {
+        generateContentWarnings(newContent, "Create");
         makeTransition(CaseFileItemTransition.Create, State.Available, newContent);
     }
 
     public void replaceContent(Value<?> newContent) {
+        generateContentWarnings(newContent, "Replace");
+        itemVanished(); // Make sure current value (and it's descendants) no longer points at us (otherwise potential memory leak?)
         makeTransition(CaseFileItemTransition.Replace, State.Available, newContent);
+    }
+
+    private boolean isUndefined(String name) {
+        return this.getChildDefinition(name) == null && !this.getDefinition().getCaseFileItemDefinition().getProperties().containsKey(name);
+    }
+
+    private void generateContentWarnings(Value<?> newContent, String op) {
+        addDebugInfo(() -> {
+            if (newContent.isMap()) {
+                // Filter properties that are not defined
+                List<String> undefinedProperties = ((ValueMap) newContent).getValue().keySet().stream().filter(this::isUndefined).collect(Collectors.toList());
+                if (undefinedProperties.size() == 1) {
+                    return op + " on CaseFileItem[" + getPath() + "] contains undefined property '" + undefinedProperties.get(0) + "'";
+                } else if (undefinedProperties.size() > 1) {
+                    return op + " on CaseFileItem[" + getPath() + "] contains undefined properties " + undefinedProperties.stream().map(p -> "'" + p + "'").collect(Collectors.joining(", "));
+                }
+            } else {
+                if (getDefinition().getCaseFileItemDefinition().getProperties().size() > 0) {
+                    return op + " on CaseFileItem[" + getPath() + "] is done with a value of type " + newContent.getValue().getClass().getSimpleName() + "; a Map<Name,Value> is expected instead.";
+                }
+            }
+            return "";
+        });
     }
 
     public void updateContent(Value<?> newContent) {
@@ -283,7 +368,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 if (newContent.isMap()) {
                     return "Update on CaseFileItem[" + getPath() + "] overwrites value of type " + value.getClass().getSimpleName() +" with a ValueMap";
                 } else { // Current content is (probably?) a value map - which is overwritten by something else
-                    if (newContent.isList() && this.array != null) {
+                    if (newContent.isList() && this.container != this) {
                         return "Update on CaseFileItem[" + getPath() + "] is overwritten with a list. This seems to be an error on passing the path, but it is accepted";
                     }
                     if (!getDefinition().getCaseFileItemDefinition().getProperties().isEmpty()) {
@@ -302,7 +387,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
         // Now iterate our children and check if the newContent has values for them as well, and if
         //  they are changed, then we will first update those children.
-        getDefinition().getChildren().stream().map(childDefinition -> childDefinition.getName()).forEach(childName -> {
+        getDefinition().getChildren().stream().map(CMMNElementDefinition::getName).forEach(childName -> {
             if (newMap.has(childName)) {
                 Value newChildValue = newMap.get(childName);
                 CaseFileItem childItem = getItem(childName);
@@ -313,22 +398,28 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             }
         });
 
-        // For our properties, merge and make Update (or Create) transition when
-        // there is a difference with our current value;
+        // Iterate the properties in the new content (skip the children as they are handled above)
+        // If there is a difference with our current value, update the property.
+        // Accept undefined properties as well, but generate a debug warning for those.
         ValueMap updatedProperties = new ValueMap();
-        getDefinition().getCaseFileItemDefinition().getProperties().forEach((propertyName, propertyDefinition) -> {
-            if (newMap.has(propertyName)) {
-                Value newPropertyValue = newMap.get(propertyName);
-                Value currentPropertyValue = ourMap.get(propertyName);
-                if (!currentPropertyValue.isSupersetOf(newPropertyValue)) {
-                    updatedProperties.put(propertyName, newPropertyValue);
+        newMap.getValue().forEach((propertyName, newPropertyValue) -> {
+            if (getItem(propertyName) != null) {
+                // This is actually a child. Let's skip it, because it is handled above.
+                return;
+            }
+            Value currentPropertyValue = ourMap.get(propertyName);
+            if (!currentPropertyValue.isSupersetOf(newPropertyValue)) {
+                if (getDefinition().getCaseFileItemDefinition().getProperties().get(propertyName) == null) {
+                    addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] contains property '" + propertyName + "'. This property is NOT DEFINED in the CaseDefinition");
                 }
+                updatedProperties.put(propertyName, newPropertyValue);
             }
         });
 
-        if (! updatedProperties.getValue().isEmpty()) {
+        // Only make a transition if there are changed properties.
+        if (!updatedProperties.getValue().isEmpty()) {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] contains changes in properties " + updatedProperties.getValue().keySet().stream().map(p -> "'" + p + "'").collect(Collectors.joining(", ")));
-            makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(newContent));
+            makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(updatedProperties));
         } else {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] has no property changes");
         }
@@ -356,12 +447,16 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // to make sure the parent's value map is up-to-date with our value
         //  Note: if we are in an array, then we need to update the array and
         //  propagate the whole array value instead of just our own value
-        if (array != null) {
-            this.array.itemChanged(this);
-            propagateValueChangeToParent(getName(), array.getValue());
-        } else {
-            propagateValueChangeToParent(getName(), this.value);
-        }
+        this.container.itemChanged(this);
+        propagateValueChangeToParent(getName(), this.container.getValue());
+    }
+
+    protected void itemChanged(CaseFileItem item) {
+    }
+
+    protected void itemVanished() {
+        value.clearOwner();
+        getChildren().values().forEach(CaseFileItem::itemVanished);
     }
 
     /**
@@ -452,7 +547,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         parentElement.appendChild(caseFileItemXML);
         caseFileItemXML.setAttribute("name", getDefinition().getName());
         caseFileItemXML.setAttribute("transition", "" + lastTransition);
-        if (array != null) {
+        if (indexInArray >= 0) {
             caseFileItemXML.setAttribute("index", "" + indexInArray);
         }
 

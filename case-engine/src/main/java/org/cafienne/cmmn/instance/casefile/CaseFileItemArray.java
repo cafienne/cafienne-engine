@@ -98,6 +98,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
      * Framework method to indicate the change of an case file item inside our array
      * @param item
      */
+    @Override
     protected void itemChanged(CaseFileItem item) {
         // Update the reference to current;
         current = item;
@@ -121,14 +122,8 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         return super.allows(intendedTransition);
     }
 
-    @Override
-    public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
-        getDefinition().validatePropertyTypes(parameterValue);
-        createContent(parameterValue);
-    }
-
     private CaseFileItem getNextItem() {
-        CaseFileItem nextItem = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
+        CaseFileItem nextItem = new CaseFileItem(this, actualArrayItems.size());
         actualArrayItems.add(nextItem);
         return nextItem;
     }
@@ -148,7 +143,17 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     @Override
     public void updateContent(Value<?> newContent) {
-        ValueList valueList = asList(newContent, "Updating");
+        if (! newContent.isList()) {
+            if (current != null) {
+                addDebugInfo(() -> "Update for CaseFileItem[" + getPath()+"] with an object structure is executed on 'current':  (" + current.getPath() +")");
+                current.updateContent(newContent);
+            } else {
+                // Plain behavior; 'Replace' on empty array results in Create, whether the element is presented in a list or not
+                createNewItem(newContent);
+            }
+            return;
+        }
+        ValueList valueList = (ValueList) newContent;
         int numberToUpdate = valueList.size();
         for (int i = 0; i<numberToUpdate; i++) {
             Value<?> newChildValue = valueList.get(i);
@@ -161,21 +166,19 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         }
     }
 
-    private ValueList asList(Value<?> newContent, String actionType) {
-        if (newContent instanceof ValueList) {
-            return (ValueList) newContent;
-        } else {
-            addDebugInfo(() -> "Warning: CaseFileItem[" + getPath()+"] has multiplicity '" + getDefinition().getMultiplicity() +"'. " + actionType +" should be done through a JSON array object. Given object is converted into a list with 1 element");
-            return new ValueList(newContent);
-        }
-    }
-
     @Override
     public void replaceContent(Value<?> newContent) {
-        // TODO: clear should remove owners from underlying value structures
-        actualValueOfCaseFileItemArray.clear();
-
-        ValueList valueList = asList(newContent, "Replacing");
+        if (! newContent.isList()) {
+            if (current != null) {
+                addDebugInfo(() -> "Replace for CaseFileItem[" + getPath()+"] with an object structure is executed on 'current':  (" + current.getPath() +")");
+                current.replaceContent(newContent);
+            } else {
+                // Plain behavior; 'Replace' on empty array results in Create, whether the element is presented in a list or not
+                createNewItem(newContent);
+            }
+            return;
+        }
+        ValueList valueList = (ValueList) newContent;
         int numberToReplace = valueList.size();
         int numberToRemove = actualArrayItems.size() - numberToReplace;
         for (int i = 0; i<numberToReplace; i++) {
@@ -188,7 +191,8 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             }
         }
         while (numberToRemove-- > 0) {
-            actualArrayItems.remove(actualArrayItems.size() - 1);
+            // Now clean up the items that "vanished" while replacing
+            actualArrayItems.remove(actualArrayItems.size() - 1).itemVanished();
         }
     }
 
