@@ -9,9 +9,7 @@ package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.akka.event.file.*;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
@@ -216,10 +214,15 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
     }
 
-    private void removeBusinessIdentifiers(Value value) {
+    private void removeBusinessIdentifiers() {
         getDefinition().getBusinessIdentifiers().forEach(property -> {
             addEvent(new BusinessIdentifierCleared(this, property));
         });
+    }
+
+    private void addCaseFileEvent(CaseFileEvent event) {
+        updateBusinessIdentifiers(event.getValue());
+        super.addEvent(event);
     }
 
     private void updateBusinessIdentifiers(Value newValue) {
@@ -233,16 +236,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             return ((ValueMap) value).get(identifier.getName());
         }
         return null;
-    }
-
-    private void makeTransition(CaseFileItemTransition transition, State newState, Value newValue) {
-        if (transition == CaseFileItemTransition.Delete) {
-            removeBusinessIdentifiers(newValue);
-        } else {
-            updateBusinessIdentifiers(newValue);
-        }
-        // Now inform the sentry network of our change
-        addEvent(new CaseFileEvent(this.getCaseInstance(), this.getName(), newState, transition, newValue, getPath(), indexInArray));
     }
 
     public void updateState(CaseFileEvent event) {
@@ -314,13 +307,13 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
     public void createContent(Value<?> newContent) {
         generateContentWarnings(newContent, "Create");
-        makeTransition(CaseFileItemTransition.Create, State.Available, newContent);
+        addCaseFileEvent(new CaseFileItemCreated(this, newContent));
     }
 
     public void replaceContent(Value<?> newContent) {
         generateContentWarnings(newContent, "Replace");
         itemVanished(); // Make sure current value (and it's descendants) no longer points at us (otherwise potential memory leak?)
-        makeTransition(CaseFileItemTransition.Replace, State.Available, newContent);
+        addCaseFileEvent(new CaseFileItemReplaced(this, newContent));
     }
 
     private boolean isUndefined(String name) {
@@ -378,7 +371,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                     }
                 }
             });
-            makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(newContent));
+            Value newValue = value.cloneValueNode().merge(newContent);
+            addCaseFileEvent(new CaseFileItemUpdated(this, newValue));
             return;
         }
 
@@ -419,7 +413,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // Only make a transition if there are changed properties.
         if (!updatedProperties.getValue().isEmpty()) {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] contains changes in properties " + updatedProperties.getValue().keySet().stream().map(p -> "'" + p + "'").collect(Collectors.joining(", ")));
-            makeTransition(CaseFileItemTransition.Update, State.Available, value.merge(updatedProperties));
+            Value newValue = value.cloneValueNode().merge(updatedProperties);
+            addCaseFileEvent(new CaseFileItemUpdated(this, newValue));
         } else {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] has no property changes");
         }
@@ -427,7 +422,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void deleteContent() {
         removedValue = value;
-        makeTransition(CaseFileItemTransition.Delete, State.Discarded, Value.NULL);
+        removeBusinessIdentifiers();
+        super.addEvent(new CaseFileItemDeleted(this));
         // Now recursively also delete all of our children... Are you sure? Isn't this overinterpreting the spec?
         getChildren().forEach((definition, childItem) -> childItem.deleteContent());
     }

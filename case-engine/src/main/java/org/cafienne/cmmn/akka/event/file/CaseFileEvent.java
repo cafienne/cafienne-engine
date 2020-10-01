@@ -38,14 +38,14 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
     private final State state;
     private final int index;
 
-    public CaseFileEvent(Case caseInstance, String name, State newState, CaseFileItemTransition transition, Value<?> newValue, Path path, int index) {
-        super(caseInstance);
-        this.name = name;
+    public CaseFileEvent(CaseFileItem item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
+        super(item.getCaseInstance());
+        this.name = item.getName();
         this.transition = transition;
         this.value = newValue;
-        this.path = path.toString();
+        this.path = item.getPath().toString();
         this.state = newState;
-        this.index = index;
+        this.index = item.getIndex();
     }
 
     public CaseFileEvent(ValueMap json) {
