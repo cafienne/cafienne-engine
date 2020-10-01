@@ -166,7 +166,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     private Value getBusinessIdentifierValue(Value value, PropertyDefinition identifier) {
-        if (value instanceof ValueMap) {
+        if (value.isMap()) {
             return ((ValueMap) value).get(identifier.getName());
         }
         return null;
@@ -283,7 +283,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 addDebugInfo(() -> "Creating a location in parent " + parent.getPath() + " to store the newly changed child " + getName());
                 // Setting parent value will propagate the changes further up if needed.
                 parent.setValue(new ValueMap(childName, childValue));
-            } else if (parent.value instanceof ValueMap) {
+            } else if (parent.value.isMap()) {
                 // Check whether we need to change our value in the parent. E.g. for arrays, if a new item is added
                 //  to the array, the value in the parent will not change (it is same ValueList - with new item)
                 ValueMap parentMap = (ValueMap) parent.value;
@@ -298,7 +298,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     private void propagateValueChangeToChildren(Value newValue) {
-        if (!(newValue instanceof ValueMap)) return;
+        if (!newValue.isMap()) return;
         ValueMap v = (ValueMap) newValue;
         v.getValue().forEach((name, childValue) -> {
             CaseFileItem child = getItem(name);

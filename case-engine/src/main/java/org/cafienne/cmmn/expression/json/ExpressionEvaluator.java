@@ -99,7 +99,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
             Object result = JsonPath.read(json, jsonPath);
             Value<?> output = Value.convert(result); // Typically a ValueMap or a ValueList
             // JsonPath returns single element results sometimes in an array; then we'll return that value instead.
-            if (output instanceof ValueList) {
+            if (output.isList()) {
                 if (((ValueList) output).size() == 1) {
                     output = ((ValueList) output).get(0);
                     String outputClassName = output.getClass().getSimpleName();

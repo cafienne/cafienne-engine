@@ -13,7 +13,7 @@ public class JSONType extends DefinitionType {
 
     @Override
     public void validate(CaseFileItemDefinition itemDefinition, Value value) throws CaseFileError {
-        if (value instanceof ValueMap) {
+        if (value.isMap()) {
             final ValueMap object = (ValueMap) value;
             Map<String, PropertyDefinition> properties = itemDefinition.getCaseFileItemDefinition().getProperties();
             if (properties.isEmpty()) {

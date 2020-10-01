@@ -123,7 +123,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     @Override
     public void createContent(Value<?> newContent) {
-        ValueList valueList = newContent instanceof ValueList ? (ValueList) newContent : new ValueList(newContent);
+        ValueList valueList = newContent.isList() ? (ValueList) newContent : new ValueList(newContent);
         for (Value<?> newItemValue : valueList) {
             CaseFileItem newInstance = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
             actualArrayItems.add(newInstance);

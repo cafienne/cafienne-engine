@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -90,6 +90,20 @@ public abstract class Value<T> implements Serializable {
         return sw.toString();
     }
 
+    /**
+     * Returns true if "this" value equals or contains the "other" value.
+     * Note, values must have same type. E.g., a ValueList.contains(someValueMap) returns false, even
+     * if the value list has an element that equals the ValueMap. It would return for
+     * ValueList.contains(new ValueList(someValueMap)).
+     * For PrimitiveValue this is a plain comparison on the internal, typed value.
+     *
+     * @param otherValue Value that should be contained within this value
+     * @return
+     */
+    public boolean isSupersetOf(Value otherValue) {
+        return false;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -114,6 +128,14 @@ public abstract class Value<T> implements Serializable {
      * @return
      */
     public abstract boolean isPrimitive();
+
+    public boolean isList() {
+        return false;
+    }
+
+    public boolean isMap() {
+        return false;
+    }
 
     public void print(JsonGenerator generator) throws IOException {
     }
@@ -221,6 +243,7 @@ public abstract class Value<T> implements Serializable {
 
     /**
      * Recursive function that also contains exception cause
+     *
      * @param throwable
      * @return
      */
@@ -230,7 +253,7 @@ public abstract class Value<T> implements Serializable {
         value.put("message", new StringValue(throwable.getLocalizedMessage()));
         ValueList valueList = value.withArray("lines");
         StackTraceElement[] trace = throwable.getStackTrace();
-        for (int i=0; i<trace.length; i++) {
+        for (int i = 0; i < trace.length; i++) {
             StackTraceElement traceElement = trace[i];
             valueList.add(new StringValue(traceElement.toString()));
         }

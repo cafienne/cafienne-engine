@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,20 +14,16 @@ import java.util.*;
 
 /**
  * {@link List} based set of {@link Value} objects. Typically corresponds to a json array structure.
- *
  */
 public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
-    public ValueList() {
-        super(new ArrayList());
-    }
-
     /**
      * Creates a new ValueList, while converting and adding the array of raw objects
      * passed as input (through the {@link Value#convert(Object)} method.
+     *
      * @param rawItems
      */
     public ValueList(Object... rawItems) {
-        this();
+        super(new ArrayList());
         for (Object listItem : rawItems) {
             add(convert(listItem));
         }
@@ -36,6 +32,32 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
     @Override
     public boolean isPrimitive() {
         return false;
+    }
+
+    @Override
+    public boolean isList() {
+        return true;
+    }
+
+    @Override
+    public boolean isSupersetOf(Value otherValue) {
+        if (otherValue == null || !otherValue.isList()) {
+            return false;
+        }
+        ValueList otherList = (ValueList) otherValue;
+        // Compare sizes
+        if (otherList.size() > this.size()) {
+            return false;
+        }
+        // Compare contents
+        for (int i = 0; i < otherList.size(); i++) {
+            Value thisListItem = this.get(i);
+            Value otherListItem = otherList.get(i);
+            if (!thisListItem.isSupersetOf(otherListItem)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -175,13 +197,14 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
 
     /**
      * Convert raw values of the list to typed array
+     *
      * @param <T>
      * @return
      */
     public <T> List<T> rawList() {
         List<Value<?>> values = getValue();
         List<T> list = new ArrayList();
-        values.forEach(value -> list.add((T)value.getValue()));
+        values.forEach(value -> list.add((T) value.getValue()));
         return list;
     }
 
@@ -199,7 +222,20 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
 
     @Override
     public Value<?> merge(Value<?> withValue) {
-        // TODO Auto-generated method stub; yet to be implemented, but not sure if array merges can be done / need be done
-        return withValue;
+        if (! (withValue instanceof ValueList)) {
+            return withValue;
+        }
+        ValueList fromList = (ValueList) withValue;
+        for (int i = 0; i < fromList.size(); i++) {
+            Value fromValue = fromList.get(i);
+            if (i < this.size()) {
+                // Merge into existing value (and replace, since merge may or may not return a new object reference)
+                this.set(i, this.get(i).merge(fromValue));
+            } else {
+                // Simply extend this array
+                this.add(fromValue);
+            }
+        }
+        return this;
     }
 }

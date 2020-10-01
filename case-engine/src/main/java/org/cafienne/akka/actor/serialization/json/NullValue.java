@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,6 @@ import java.util.ListIterator;
 
 /**
  * NullValue is an object to prevent NullPointerExceptions
- *
  */
 class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Object> {
     NullValue() {
@@ -30,7 +29,7 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
     public void print(JsonGenerator generator) throws IOException {
         generator.writeNull();
     }
-    
+
     @Override
     public NullValue cloneValueNode() {
         return this; // singleton only??
@@ -40,12 +39,17 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
     public boolean matches(PropertyDefinition.PropertyType propertyType) {
         return true; // Null matches all types
     }
-    
+
+    @Override
+    public boolean isSupersetOf(Value otherValue) {
+        return otherValue == null || otherValue.value == null;
+    }
+
     @Override
     public String toString() {
         return "null";
     }
-    
+
     @Override
     public Object getValue() {
         return this;
@@ -61,7 +65,7 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
     public boolean canRead(String propertyName) {
         return true;
     }
-    
+
     @Override
     public int size() {
         // TODO Auto-generated method stub
@@ -91,7 +95,8 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
             public boolean hasNext() {
                 return false;
             }
-        };    }
+        };
+    }
 
     @Override
     public Object[] toArray() {
