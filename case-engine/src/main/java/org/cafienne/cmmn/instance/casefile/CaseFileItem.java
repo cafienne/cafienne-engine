@@ -40,6 +40,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     private Value<?> value = Value.NULL;
     private Value<?> removedValue = Value.NULL;
+    private Map<String, BusinessIdentifier> businessIdentifiers = new HashMap();
     /**
      * The parent case file item that we are contained in, or null if we are contained in the top level case file.
      */
@@ -67,11 +68,15 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.transitionPublisher = createTransitionPublisher();
         this.isArray = isArray;
         this.defaultBindingOperation = isArray ? BindingOperation.Add : BindingOperation.Update;
+        for (PropertyDefinition property : definition.getBusinessIdentifiers()) {
+            businessIdentifiers.put(property.getName(), new BusinessIdentifier(this, property));
+        }
         getCaseInstance().getSentryNetwork().connect(this);
     }
 
     /**
      * Constructor for CaseFileItems that belong to an array
+     *
      * @param array
      * @param indexInArray
      */
@@ -92,6 +97,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * Constructor for plain CaseFileItems (i.e., not belonging to an array)
+     *
      * @param caseInstance
      * @param definition
      * @param parent
@@ -205,7 +211,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                         replaceContent(parameterValue);
                         break;
                     }
-                    case Update:{
+                    case Update: {
                         updateContent(parameterValue);
                         break;
                     }
@@ -214,28 +220,16 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
     }
 
-    private void removeBusinessIdentifiers() {
-        getDefinition().getBusinessIdentifiers().forEach(property -> {
-            addEvent(new BusinessIdentifierCleared(this, property));
-        });
-    }
-
     private void addCaseFileEvent(CaseFileEvent event) {
-        updateBusinessIdentifiers(event.getValue());
+        if (event.getValue().isMap()) {
+            this.businessIdentifiers.values().forEach(bi -> bi.update((ValueMap) event.getValue()));
+        }
         super.addEvent(event);
     }
 
-    private void updateBusinessIdentifiers(Value newValue) {
-        getDefinition().getBusinessIdentifiers().forEach(property -> {
-            addEvent(new BusinessIdentifierSet(this, property, getBusinessIdentifierValue(newValue, property)));
-        });
-    }
-
-    private Value getBusinessIdentifierValue(Value value, PropertyDefinition identifier) {
-        if (value.isMap()) {
-            return ((ValueMap) value).get(identifier.getName());
-        }
-        return null;
+    private void addDeletedEvent(CaseFileItemDeleted event) {
+        this.businessIdentifiers.values().forEach(BusinessIdentifier::clear);
+        super.addEvent(event);
     }
 
     public void updateState(CaseFileEvent event) {
@@ -245,6 +239,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.indexInArray = event.getIndex();
         this.lastTransition = event.getTransition();
         this.setValue(event.getValue());
+    }
+
+    public void updateState(BusinessIdentifierEvent event) {
+        businessIdentifiers.get(event.name).updateState(event);
     }
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
@@ -292,7 +290,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
 
         Value newValue = event.getValue();
-        if (! newValue.isMap()) {
+        if (!newValue.isMap()) {
             return;
         }
         ValueMap v = (ValueMap) newValue;
@@ -359,15 +357,15 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         if (!newContent.isMap() || !value.isMap()) {
             addDebugInfo(() -> {
                 if (newContent.isMap()) {
-                    return "Update on CaseFileItem[" + getPath() + "] overwrites value of type " + value.getClass().getSimpleName() +" with a ValueMap";
+                    return "Update on CaseFileItem[" + getPath() + "] overwrites value of type " + value.getClass().getSimpleName() + " with a ValueMap";
                 } else { // Current content is (probably?) a value map - which is overwritten by something else
                     if (newContent.isList() && this.container != this) {
                         return "Update on CaseFileItem[" + getPath() + "] is overwritten with a list. This seems to be an error on passing the path, but it is accepted";
                     }
                     if (!getDefinition().getCaseFileItemDefinition().getProperties().isEmpty()) {
-                        return "Update on CaseFileItem[" + getPath() + "] overwrites existing properties with a single " + value.getClass().getSimpleName() +". This seems to be an error, but it is accepted";
+                        return "Update on CaseFileItem[" + getPath() + "] overwrites existing properties with a single " + value.getClass().getSimpleName() + ". This seems to be an error, but it is accepted";
                     } else {
-                        return "Update on CaseFileItem[" + getPath() + "] overwrites a " + value.getClass().getSimpleName() +" with a " + newContent.getClass().getSimpleName();
+                        return "Update on CaseFileItem[" + getPath() + "] overwrites a " + value.getClass().getSimpleName() + " with a " + newContent.getClass().getSimpleName();
                     }
                 }
             });
@@ -422,8 +420,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void deleteContent() {
         removedValue = value;
-        removeBusinessIdentifiers();
-        super.addEvent(new CaseFileItemDeleted(this));
+        addDeletedEvent(new CaseFileItemDeleted(this));
         // Now recursively also delete all of our children... Are you sure? Isn't this overinterpreting the spec?
         getChildren().forEach((definition, childItem) -> childItem.deleteContent());
     }
@@ -457,7 +454,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     /**
      * This updates the json structure of the parent CaseFileItem, without triggering CaseFileItemTransitions
-     *  @param childName
+     *
+     * @param childName
      * @param childValue
      */
     private void propagateValueChangeToParent(String childName, Value<?> childValue) {
@@ -522,6 +520,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * Items in it have their own state, complying with the standard.
      * Array also has a state helping to understand how to deal with operations that slightly deviates
      * (e.g., Create can be done on an array in state "Available" and results in adding an element)
+     *
      * @param newState
      */
     protected void setState(State newState) {
@@ -600,10 +599,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public boolean allows(CaseFileItemTransition intendedTransition) {
         switch (getState()) {
-            case Null: return intendedTransition == CaseFileItemTransition.Create;
-            case Available: return intendedTransition == CaseFileItemTransition.Update || intendedTransition == CaseFileItemTransition.Replace || intendedTransition == CaseFileItemTransition.Delete;
+            case Null:
+                return intendedTransition == CaseFileItemTransition.Create;
+            case Available:
+                return intendedTransition == CaseFileItemTransition.Update || intendedTransition == CaseFileItemTransition.Replace || intendedTransition == CaseFileItemTransition.Delete;
             default: {
-                addDebugInfo(() ->"CFI[" + getPath() +"] is in state " + getState() +" and then we cannot do transition " + intendedTransition);
+                addDebugInfo(() -> "CFI[" + getPath() + "] is in state " + getState() + " and then we cannot do transition " + intendedTransition);
                 return false;
             }
         }
