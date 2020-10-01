@@ -68,7 +68,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.indexInArray = indexInArray;
         this.transitionPublisher = createTransitionPublisher();
         this.isArray = isArray;
-        this.defaultBindingOperation = isArray ? BindingOperation.Add : BindingOperation.Replace;
+        this.defaultBindingOperation = isArray ? BindingOperation.Add : BindingOperation.Update;
         getCaseInstance().getSentryNetwork().connect(this);
     }
 
@@ -198,8 +198,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                         if (this.isArray) {
                             createContent(parameterValue);
                         } else {
-                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; replacing content instead");
-                            replaceContent(parameterValue);
+                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; updating content instead");
+                            updateContent(parameterValue);
                         }
                         break;
                     }
