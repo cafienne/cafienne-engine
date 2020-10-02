@@ -28,6 +28,11 @@ public class BusinessIdentifierSet extends BusinessIdentifierEvent {
     }
 
     @Override
+    public Value getValue() {
+        return value;
+    }
+
+    @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.value, value);

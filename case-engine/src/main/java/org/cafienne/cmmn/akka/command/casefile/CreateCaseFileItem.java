@@ -7,12 +7,13 @@
  */
 package org.cafienne.cmmn.akka.command.casefile;
 
+import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 
 /**
  * Creates a new case file item with certain content.
@@ -35,6 +36,11 @@ public class CreateCaseFileItem extends CaseFileItemCommand {
 
     public CreateCaseFileItem(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    CaseFileItemTransition intendedTransition() {
+        return CaseFileItemTransition.Create;
     }
 
     @Override

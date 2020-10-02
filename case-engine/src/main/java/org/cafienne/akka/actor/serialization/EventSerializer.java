@@ -6,9 +6,7 @@ import org.cafienne.cmmn.akka.event.*;
 import org.cafienne.cmmn.akka.event.DebugDisabled;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.event.DebugEvent;
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
+import org.cafienne.cmmn.akka.event.file.*;
 import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
@@ -70,6 +68,10 @@ public class EventSerializer extends AkkaCaseObjectSerializer {
     }
 
     private static void registerCaseFileEvents() {
+        addManifestWrapper(CaseFileItemCreated.class, CaseFileItemCreated::new);
+        addManifestWrapper(CaseFileItemUpdated.class, CaseFileItemUpdated::new);
+        addManifestWrapper(CaseFileItemReplaced.class, CaseFileItemReplaced::new);
+        addManifestWrapper(CaseFileItemDeleted.class, CaseFileItemDeleted::new);
         addManifestWrapper(CaseFileEvent.class, CaseFileEvent::new);
         addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
         addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);

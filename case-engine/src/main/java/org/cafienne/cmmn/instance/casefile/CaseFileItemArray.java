@@ -25,13 +25,13 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     private final static Logger logger = LoggerFactory.getLogger(CaseFileItemArray.class);
 
     /**
-     * CaseFileItemCollection has a field {@link CaseFileItemCollection#items}, holding the children
+     * CaseFileItemCollection has a field {@link CaseFileItemCollection#getItems()}, holding the children
      * of a CaseFileItem. However, for a CaseFileItemArray, these items may not be accessed, 
      * since the array consists itself of CaseFileItems each having their own children.
      */
     private final List<CaseFileItem> actualArrayItems = new ArrayList();
     /**
-     * "Override" member of {@link CaseFileItem#value} field. Is returned in the override
+     * "Override" member of the private {@link CaseFileItem} value field. Is returned in the override
      * of {@link CaseFileItemArray#getValue()} method
      */
     private final ValueList actualValueOfCaseFileItemArray;
@@ -58,8 +58,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             if (getCaseInstance().recoveryRunning()) {
                 if (index == actualArrayItems.size()) {
                     // This will automatically update 'current' to last one that is being recovered as it happens in sequence
-                    current = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
-                    actualArrayItems.add(current);
+                    current = getNextItem();
                     return current;
                 }
                 if (index > actualArrayItems.size()) {
@@ -97,52 +96,109 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     /**
      * Framework method to indicate the change of an case file item inside our array
-     * @param child
+     * @param item
      */
-    protected void childChanged(CaseFileItem child) {
+    @Override
+    protected void itemChanged(CaseFileItem item) {
         // Update the reference to current;
-        current = child;
+        current = item;
 
-        // Now lookup the child in our ValueList and update the element.
-        Value<?> childContent = child.getValue();
-        int childIndex = child.getIndex();
-        if (childIndex < actualValueOfCaseFileItemArray.size()) {
-            actualValueOfCaseFileItemArray.set(childIndex, childContent);
-        } else if (childIndex == actualValueOfCaseFileItemArray.size()) {
-            // It's the latest and greatest new child
-            actualValueOfCaseFileItemArray.add(childContent);
+        // Now lookup the item in our ValueList and update the element.
+        Value<?> itemContent = item.getValue();
+        int itemIndex = item.getIndex();
+        if (itemIndex < actualValueOfCaseFileItemArray.size()) {
+            actualValueOfCaseFileItemArray.set(itemIndex, itemContent);
+        } else if (itemIndex == actualValueOfCaseFileItemArray.size()) {
+            // It's the latest and greatest new item
+            actualValueOfCaseFileItemArray.add(itemContent);
         } else {
-            throw new CaseFileError("We're not letting you in, number " + childIndex + ", because we only have " + actualValueOfCaseFileItemArray.size() + " items, and it seems you're skipping one or more");
+            throw new CaseFileError("We're not letting you in, number " + itemIndex + ", because we only have " + actualValueOfCaseFileItemArray.size() + " items, and it seems you're skipping one or more");
         }
     }
 
-    @Override
-    public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
-        createContent(parameterValue);
+    public boolean allows(CaseFileItemTransition intendedTransition) {
+        // In CaseFileItemArray it is allowed to add new items to the existing array (through Create method)
+        if (this.getState() == State.Available && intendedTransition == CaseFileItemTransition.Create) return true;
+        return super.allows(intendedTransition);
+    }
+
+    private CaseFileItem getNextItem() {
+        CaseFileItem nextItem = new CaseFileItem(this, actualArrayItems.size());
+        actualArrayItems.add(nextItem);
+        return nextItem;
+    }
+
+    private void createNewItem(Value value) {
+        setState(State.Available);
+        getNextItem().createContent(value);
     }
 
     @Override
     public void createContent(Value<?> newContent) {
-        ValueList valueList = newContent instanceof ValueList ? (ValueList) newContent : new ValueList(newContent);
+        ValueList valueList = newContent.isList() ? (ValueList) newContent : new ValueList(newContent);
         for (Value<?> newChildValue : valueList) {
-            CaseFileItem newInstance = new CaseFileItem(getCaseInstance(), getDefinition(), getParent(), this, actualArrayItems.size());
-            actualArrayItems.add(newInstance);
-            newInstance.createContent(newChildValue);
+            createNewItem(newChildValue);
         }
     }
 
     @Override
     public void updateContent(Value<?> newContent) {
-        throw new TransitionDeniedException("Cannot update the content of the case file item container. Have to address an individual child");
+        if (! newContent.isList()) {
+            if (current != null) {
+                addDebugInfo(() -> "Update for CaseFileItem[" + getPath()+"] with an object structure is executed on 'current':  (" + current.getPath() +")");
+                current.updateContent(newContent);
+            } else {
+                // Plain behavior; 'Replace' on empty array results in Create, whether the element is presented in a list or not
+                createNewItem(newContent);
+            }
+            return;
+        }
+        ValueList valueList = (ValueList) newContent;
+        int numberToUpdate = valueList.size();
+        for (int i = 0; i<numberToUpdate; i++) {
+            Value<?> newChildValue = valueList.get(i);
+            if (actualArrayItems.size() > i) {
+                CaseFileItem arrayItem = actualArrayItems.get(i);
+                arrayItem.updateContent(newChildValue);
+            } else {
+                createNewItem(newChildValue);
+            }
+        }
     }
 
     @Override
     public void replaceContent(Value<?> newContent) {
-        throw new TransitionDeniedException("Cannot replace the content of the case file item container. Have to address an individual child");
+        if (! newContent.isList()) {
+            if (current != null) {
+                addDebugInfo(() -> "Replace for CaseFileItem[" + getPath()+"] with an object structure is executed on 'current':  (" + current.getPath() +")");
+                current.replaceContent(newContent);
+            } else {
+                // Plain behavior; 'Replace' on empty array results in Create, whether the element is presented in a list or not
+                createNewItem(newContent);
+            }
+            return;
+        }
+        ValueList valueList = (ValueList) newContent;
+        int numberToReplace = valueList.size();
+        int numberToRemove = actualArrayItems.size() - numberToReplace;
+        for (int i = 0; i<numberToReplace; i++) {
+            Value<?> newChildValue = valueList.get(i);
+            if (actualArrayItems.size() > i) {
+                CaseFileItem arrayItem = actualArrayItems.get(i);
+                arrayItem.replaceContent(newChildValue);
+            } else {
+                createNewItem(newChildValue);
+            }
+        }
+        while (numberToRemove-- > 0) {
+            // Now clean up the items that "vanished" while replacing
+            actualArrayItems.remove(actualArrayItems.size() - 1).itemVanished();
+        }
     }
 
     @Override
     public void deleteContent() {
+        setState(State.Discarded);
         actualArrayItems.forEach(CaseFileItem::deleteContent);
     }
 
@@ -157,7 +213,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     @Override
     public CaseFileItem getItem(String propertyName) {
         // TODO: can we get rid of this override?
-        throw new TransitionDeniedException("Cannot access a property '" + propertyName + "' of the case file item container. Have to address an individual child");
+        throw new TransitionDeniedException("Cannot access a property '" + propertyName + "' of the case file item container. Have to address an individual item");
     }
 
     @Override
@@ -170,7 +226,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     public CaseFileItem getCurrent() {
         // Override from CaseFileItem.current(); returns the most recently changed case file item.
         if (current == null) {
-            current = getItem(-1);
+            current = getItem(-1); // Get -1 will return EmptyCaseFileItem
         }
         return current;
     }

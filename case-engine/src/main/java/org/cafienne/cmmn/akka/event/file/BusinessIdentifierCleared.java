@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.akka.event.file;
 
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -16,5 +17,10 @@ public class BusinessIdentifierCleared extends BusinessIdentifierEvent {
 
     public BusinessIdentifierCleared(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    public Value getValue() {
+        return null;
     }
 }

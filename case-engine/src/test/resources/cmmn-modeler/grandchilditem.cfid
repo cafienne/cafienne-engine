@@ -1,0 +1,4 @@
+<caseFileItemDefinition name="grandchilditem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="GrandChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="GrandChildBirthDate" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
+</caseFileItemDefinition>

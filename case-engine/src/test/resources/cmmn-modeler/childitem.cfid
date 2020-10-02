@@ -1,0 +1,4 @@
+<caseFileItemDefinition name="childitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified">
+    <property name="ChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    <property name="ChildAge" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+</caseFileItemDefinition>

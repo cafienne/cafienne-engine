@@ -12,8 +12,8 @@ import org.cafienne.akka.actor.serialization.json.Value;
 public class JSONType extends DefinitionType {
 
     @Override
-    public void validate(CaseFileItemDefinition itemDefinition, Value value) throws CaseFileError {
-        if (value instanceof ValueMap) {
+    public void validate(CaseFileItemDefinition itemDefinition, Value value, boolean onlyProperties) throws CaseFileError {
+        if (value.isMap()) {
             final ValueMap object = (ValueMap) value;
             Map<String, PropertyDefinition> properties = itemDefinition.getCaseFileItemDefinition().getProperties();
             if (properties.isEmpty()) {
@@ -23,7 +23,7 @@ public class JSONType extends DefinitionType {
 
             // Now iterate the object fields and validate each item.
             object.getValue().forEach((fieldName, fieldValue) -> {
-                
+
                 // First check to see if it matches one of the properties,
                 // and if not, go check for a child item.
                 PropertyDefinition propertyDefinition = properties.get(fieldName);
@@ -31,10 +31,16 @@ public class JSONType extends DefinitionType {
                     validateProperty(propertyDefinition, fieldValue); // Validation may throw TransitionDeniedException
                 } else {
                     CaseFileItemDefinition childDefinition = itemDefinition.getChild(fieldName);
-                    if (childDefinition == null) {
-                        throw new CaseFileError("Property '" + fieldName + "' is not found in the definition of "+itemDefinition.getDefinition().getName());
+                    if (onlyProperties) {
+                        if (childDefinition != null) {
+                            childDefinition.validatePropertyTypes(fieldValue);
+                        }
+                    } else {
+                        if (childDefinition == null) {
+                            throw new CaseFileError("Property '" + fieldName + "' is not found in the definition of "+itemDefinition.getName());
+                        }
+                        childDefinition.validate(fieldValue);
                     }
-                    childDefinition.validate(fieldValue);
                 }
             });
         }

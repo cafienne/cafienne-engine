@@ -12,7 +12,6 @@ import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemArray;
 import org.cafienne.cmmn.instance.sentry.Criterion;
@@ -41,30 +40,14 @@ import org.cafienne.cmmn.instance.sentry.Criterion;
  * @param <T> A generic referencing the definition of the constraint; can be accessed in the expression through <code>definition</code>
  */
 class ConstraintContext<T extends ConstraintDefinition> extends ExpressionContext {
-    public final CaseFileItem caseFileItem;
-    private final String contextName;
-    public final T definition;
-
-    protected ConstraintContext(T constraint, Case caseInstance) {
+    protected ConstraintContext(T constraintDefinition, Case caseInstance) {
         super(caseInstance);
-        this.caseFileItem = constraint.resolveContext(caseInstance);
-        this.contextName = constraint.getContext() != null ? constraint.getContext().getName() : null;
-        this.definition = constraint;
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        if (propertyName.equals(contextName)) {
-            Value<?> value = caseFileItem.getCurrent().getValue();
-            return value;
-        } else { // How on earth did we end up here???
-            return null;
+        CaseFileItem item = constraintDefinition.resolveContext(caseInstance);
+        if (constraintDefinition.getContext() != null) {
+            super.addPropertyReader(constraintDefinition.getContext().getName(), () -> item.getCurrent().getValue());
         }
-    }
-
-    @Override
-    public boolean canRead(String propertyName) {
-        return propertyName.equals(contextName);
+        super.addPropertyReader("definition", () -> constraintDefinition);
+        super.addPropertyReader("caseFileItem", () -> item);
     }
 }
 
@@ -74,61 +57,26 @@ class ConstraintContext<T extends ConstraintDefinition> extends ExpressionContex
  * custom HumanTask settings on Assignment and DueDate.
  */
 class PlanItemContext<T extends ConstraintDefinition> extends ConstraintContext<T> {
-    /**
-     * The plan item on which this rule is executed
-     */
-    public final PlanItem planItem;
-    private final String planItemType;
-
     protected PlanItemContext(T constraint, PlanItem planItem) {
         super(constraint, planItem.getCaseInstance());
-        this.planItem = planItem;
-        this.planItemType =
+        String planItemType =
             planItem instanceof Task ? "task" : // It is either a Task (human-, process- or casetask, but in all cases "task")
             planItem instanceof Stage ? "stage" : // or a Stage (caseplan or stage)
             planItem instanceof Milestone ? "milestone" : // or a Milestone
             "event"; // or an event listener (timer event, user event)
-    }
-
-    @Override
-    public boolean canRead(String propertyName) {
-        if  (propertyName.equalsIgnoreCase("planItem") || propertyName.equalsIgnoreCase(planItemType)) {
-            return true;
-        }
-        return super.canRead(propertyName);
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        if (propertyName.equalsIgnoreCase("planItem") || propertyName.equalsIgnoreCase(planItemType)) {
-            return Value.convert(planItem);
-        } else { // How on earth did we end up here???
-            return super.read(propertyName);
-        }
+        addPropertyReader("planItem", () -> planItem);
+        addPropertyReader(planItemType, () -> planItem);
     }
 }
 
 /**
  * Applicability rules are executed on discretionary items related to a Stage or HumanTask.
  * This context provides the additional information with the properties <code>planItem</code> and <code>discretionaryItem</code>.
- * <p>See {@link ApplicabilityRuleContext#planItem} and {@link ApplicabilityRuleContext#discretionaryItem}
  */
 class ApplicabilityRuleContext extends PlanItemContext<ApplicabilityRuleDefinition> {
-    /**
-     * The definition of the discretionary item (can be used e.g. to fetch the name)
-     */
-    public final DiscretionaryItemDefinition discretionaryItem;
-
     protected ApplicabilityRuleContext(PlanItem planItem, DiscretionaryItemDefinition itemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
         super(ruleDefinition, planItem);
-        this.discretionaryItem = itemDefinition;
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        if (propertyName.equals("discretionaryItem"))
-            return Value.convert(discretionaryItem);
-        return super.read(propertyName);
+        addPropertyReader("discretionaryItem", () -> itemDefinition);
     }
 }
 
@@ -136,20 +84,9 @@ class ApplicabilityRuleContext extends PlanItemContext<ApplicabilityRuleDefiniti
  * Context for evaluation of an if part in a criterion.
  */
 class IfPartContext extends ConstraintContext<IfPartDefinition> {
-    /**
-     * The criterion for which the if part is being evaluated.
-     */
-    public final Criterion criterion;
-
     protected IfPartContext(IfPartDefinition ifPartDefinition, Criterion criterion) {
         super(ifPartDefinition, criterion.getCaseInstance());
-        this.criterion = criterion;
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        if (propertyName.equals("criterion") || propertyName.equals("sentry"))
-            return Value.convert(criterion);
-        return super.read(propertyName);
+        addPropertyReader("criterion", () -> criterion);
+        addDeprecatedReader("sentry", "criterion", () -> criterion); // Compatibility
     }
 }

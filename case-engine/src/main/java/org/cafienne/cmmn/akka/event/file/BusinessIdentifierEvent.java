@@ -2,10 +2,14 @@ package org.cafienne.cmmn.akka.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.InvalidPathException;
+import org.cafienne.cmmn.instance.casefile.Path;
 
 import java.io.IOException;
 
@@ -30,6 +34,19 @@ public abstract class BusinessIdentifierEvent extends CaseEvent {
         this.name = readField(json, Fields.name);
         this.type = readField(json, Fields.type);
     }
+
+    @Override
+    public void updateState(Case caseInstance) {
+        try {
+            // Resolve the path on the case file
+            // Have to recover it this way in order to overcome fact that Path.definition is not serializable
+            caseInstance.getCaseFile().getItem(new Path(path, caseInstance)).updateState(this);
+        } catch (InvalidPathException shouldNotHappen) {
+            logger.error("Could not recover path on case instance?!", shouldNotHappen);
+        }
+    }
+
+    public abstract Value getValue();
 
     @Override
     public String getDescription() {

@@ -1,0 +1,49 @@
+<definitions>
+    <case id="casefile.case" name="casefile">
+        <caseFileModel>
+            <caseFileItem id="_kWyIV_1" name="RootCaseFileItem" multiplicity="ExactlyOne" definitionRef="rootcasefileitem.cfid">
+                <children>
+                    <caseFileItem id="_kWyIV_3" name="ChildItem" multiplicity="ExactlyOne" definitionRef="childitem.cfid">
+                        <children>
+                            <caseFileItem id="_kWyIV_5" name="GrandChildItem" multiplicity="ExactlyOne" definitionRef="grandchilditem.cfid"/>
+                            <caseFileItem id="_kWyIV_6" name="GrandChildArray" multiplicity="ZeroOrMore" definitionRef="grandchilditem.cfid"/>
+                        </children>
+                    </caseFileItem>
+                    <caseFileItem id="_kWyIV_4" name="ChildArray" multiplicity="ZeroOrMore" definitionRef="childitem.cfid">
+                        <children>
+                            <caseFileItem id="_kWyIV_7" name="GrandChildItemInArray" multiplicity="ExactlyOne" definitionRef="grandchilditem.cfid"/>
+                            <caseFileItem id="_kWyIV_8" name="GrandChildArrayInArray" multiplicity="ZeroOrMore" definitionRef="grandchilditem.cfid"/>
+                        </children>
+                    </caseFileItem>
+                </children>
+            </caseFileItem>
+            <caseFileItem id="_kWyIV_2" name="RootCaseFileArray" multiplicity="ZeroOrMore" definitionRef="rootcasefileitem.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__kWyIV_0" name="casefile" autoComplete="true">
+            <planItem id="pi_ht__kWyIV_0" name="Simplistic Unused Task" definitionRef="ht__kWyIV_0"/>
+            <humanTask id="ht__kWyIV_0" name="Simplistic Unused Task" isBlocking="true"/>
+        </casePlanModel>
+    </case>
+    <caseFileItemDefinition name="rootcasefileitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="rootcasefileitem.cfid">
+        <property name="RootProperty1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="RootProperty2" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="childitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="childitem.cfid">
+        <property name="ChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="ChildAge" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="grandchilditem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="grandchilditem.cfid">
+        <property name="GrandChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="GrandChildBirthDate" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
+    </caseFileItemDefinition>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__kWyIV_0">
+                <Bounds x="20" y="20" width="800" height="500"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__kWyIV_0">
+                <Bounds x="150" y="110" width="140" height="80"/>
+            </CMMNShape>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

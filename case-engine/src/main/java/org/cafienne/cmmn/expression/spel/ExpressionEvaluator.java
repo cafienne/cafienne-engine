@@ -8,18 +8,18 @@
 package org.cafienne.cmmn.expression.spel;
 
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
+import org.cafienne.akka.actor.serialization.json.LongValue;
+import org.cafienne.akka.actor.serialization.json.StringValue;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
+import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.akka.actor.serialization.json.LongValue;
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.springframework.expression.Expression;
@@ -104,7 +104,6 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         return evaluateParameterTransformation(caseInstance, rawOutputParameterDefinition.getName(), value, task);
     }
 
-
     @Override
     public Duration evaluateTimerExpression(TimerEvent timerEvent, TimerEventDefinition definition) {
         try {
@@ -125,20 +124,9 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         }
     }
 
-    /**
-     * Evaluate a constraint rule.
-     *
-     * @param caseInstance
-     * @param context
-     * @return
-     */
-    private boolean evaluateConstraint(Case caseInstance, ConstraintContext<?> context) {
-        return evaluateConstraint(caseInstance, context, context.definition.getType());
-    }
-
     @Override
     public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
-        return evaluateConstraint(planItem.getCaseInstance(), new PlanItemContext(ruleDefinition, planItem));
+        return evaluateConstraint(planItem.getCaseInstance(), new PlanItemContext(ruleDefinition, planItem), ruleDefinition.getContextDescription());
     }
 
     @Override

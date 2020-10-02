@@ -22,9 +22,9 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         BasicTests.class,
         CaseFileTests.class,
+        ExpressionTests.class,
         TaskTests.class,
         TeamTests.class,
-        ExpressionTests.class,
         ValueTests.class,
         StringTemplateTest.class
 })

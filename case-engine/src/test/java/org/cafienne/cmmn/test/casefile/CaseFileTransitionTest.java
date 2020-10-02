@@ -25,6 +25,7 @@ import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.util.Guid;
 import org.junit.Test;
+import org.scalatest.concurrent.TestThreadsStartingCounter;
 
 public class CaseFileTransitionTest {
 
@@ -145,19 +146,43 @@ public class CaseFileTransitionTest {
 
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed);
             casePlan.assertTask("JustAnotherTask").assertState(State.Completed);
+
+            TestScript.debugMessage(casePlan);
         });
 
-        // TODO: we're now replacing the customer array, but as such this feature has not been implemented in the engine, resulting in an exception
-        //  which is captured through the negative test
         ValueList customers = getCustomers("Piet", "Joop");
         ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, "Request/Customer");
-        testCase.assertStepFails(customerReplace, action -> action.assertException(TransitionDeniedException.class, "Cannot replace the content of the case file item container. Have to address an individual child"));
+        testCase.addStep(customerReplace, action -> {
+            TestScript.debugMessage(action);
+            TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
+            action.getEvents().assertSize(3);
+        });
 
-        // TODO: we're now updating the Request object with the new customers, but merge feature does not work 'as expected' in the engine, resulting in an exception
-        //  which is captured through the negative test
-        ValueMap newRequestContent = new ValueMap();
-        newRequestContent.put("Customer", getCustomers("Klaas", "Henk"));
-        testCase.assertStepFails(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action -> action.assertException(TransitionDeniedException.class, "Cannot create case file item Description because it is in state Available and should be in state Null"));
+        ValueMap newRequestContent = new ValueMap("Customer", getCustomers("Klaas", "Henk"));
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action -> {
+            TestScript.debugMessage(action);
+            TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
+            action.getEvents().assertSize(3);
+        });
+
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, new ValueMap("Customer", getCustomers("Klaas", "Henk")), "Request"), action -> {
+            TestScript.debugMessage(action);
+            TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
+            action.getEvents().assertSize(0);
+        });
+
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action -> {
+            TestScript.debugMessage(action);
+            TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
+            action.getEvents().assertSize(4);
+        });
+
+        ValueMap singularRequestCustomerContent = new ValueMap("Customer", getCustomer("Loner"));
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, singularRequestCustomerContent, "Request"), action -> {
+            TestScript.debugMessage(action);
+            TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
+            action.getEvents().assertSize(3);
+        });
 
         testCase.runTest();
 

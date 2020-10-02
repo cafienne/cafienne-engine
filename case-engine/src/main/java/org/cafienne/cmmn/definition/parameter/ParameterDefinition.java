@@ -20,12 +20,12 @@ import org.w3c.dom.Element;
 public class ParameterDefinition extends CMMNElementDefinition {
     private final String bindingRef;
     private CaseFileItemDefinition binding;
-    private final ExpressionDefinition bindingRefinement;
+    private final BindingRefinementDefinition bindingRefinement;
 
     public ParameterDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
         bindingRef = parseAttribute("bindingRef", false, "");
-        bindingRefinement = parse("bindingRefinement", ExpressionDefinition.class, false);
+        bindingRefinement = parse("bindingRefinement", BindingRefinementDefinition.class, false);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ParameterDefinition extends CMMNElementDefinition {
      *
      * @return
      */
-    public ExpressionDefinition getBindingRefinement() {
+    public BindingRefinementDefinition getBindingRefinement() {
         return bindingRefinement;
     }
 }

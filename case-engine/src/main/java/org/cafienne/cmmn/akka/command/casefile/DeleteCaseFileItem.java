@@ -9,10 +9,11 @@ package org.cafienne.cmmn.akka.command.casefile;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 
 /**
  * Deletes a case file item.
@@ -31,6 +32,11 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
 
     public DeleteCaseFileItem(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    CaseFileItemTransition intendedTransition() {
+        return CaseFileItemTransition.Delete;
     }
 
     @Override
