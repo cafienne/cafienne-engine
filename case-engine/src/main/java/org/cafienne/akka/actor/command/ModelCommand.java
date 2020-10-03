@@ -10,7 +10,7 @@ import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.json.JSONParseFailure;
 import org.cafienne.akka.actor.serialization.json.JSONReader;
 import org.cafienne.akka.actor.serialization.json.Value;
@@ -20,7 +20,7 @@ import org.cafienne.util.Guid;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public abstract class ModelCommand<T extends ModelActor> implements AkkaSerializable, TenantUserMessage {
+public abstract class ModelCommand<T extends ModelActor> implements CafienneSerializable, TenantUserMessage {
     protected final String msgId;
     public final String actorId;
     protected transient T actor;

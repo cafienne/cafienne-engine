@@ -3,14 +3,13 @@ package org.cafienne.akka.actor.identity
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.AuthorizationException
-import org.cafienne.akka.actor.serialization.Fields
-import org.cafienne.akka.actor.serialization.AkkaSerializable
+import org.cafienne.akka.actor.serialization.{CafienneSerializable, Fields}
 import org.cafienne.akka.actor.serialization.json.{BooleanValue, Value, ValueMap}
 import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
 
-final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends AkkaSerializable with CafienneJson {
+final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneSerializable with CafienneJson {
 
   import scala.collection.JavaConverters._
 

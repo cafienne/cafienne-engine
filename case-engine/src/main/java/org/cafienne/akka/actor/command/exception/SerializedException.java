@@ -1,7 +1,7 @@
 package org.cafienne.akka.actor.command.exception;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
  * Wrapper class around Exception that can be serialized
  * and used to read the content of the exception across the akka network.
  */
-public class SerializedException implements AkkaSerializable {
+public class SerializedException implements CafienneSerializable {
     private final String className;
     private final String message;
     private SerializedException cause;

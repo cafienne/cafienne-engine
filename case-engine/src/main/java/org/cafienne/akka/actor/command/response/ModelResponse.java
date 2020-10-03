@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 
@@ -22,7 +22,7 @@ import java.time.Instant;
 /**
  * Interface for creating responses to {@link ModelCommand}
  */
-public class ModelResponse implements AkkaSerializable, TenantUserMessage {
+public class ModelResponse implements CafienneSerializable, TenantUserMessage {
     /**
      * Recipient is assigned during construction of the response message.
      * It is the current value of sender() in the actor.

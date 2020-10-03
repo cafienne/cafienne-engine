@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public interface AkkaSerializable {
-    Logger logger = LoggerFactory.getLogger(AkkaCaseObjectSerializer.class);
+public interface CafienneSerializable {
+    Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
 
     default byte[] toBytes() {
         JsonFactory factory = new JsonFactory();
@@ -43,7 +43,7 @@ public interface AkkaSerializable {
     }
 
     /**
-     * Writes this AkkaSerializable object with a start and end object. In between invokes the write method.
+     * Writes this CafienneSerializable object with a start and end object. In between invokes the write method.
      * @param generator
      * @throws IOException
      */
@@ -105,7 +105,7 @@ public interface AkkaSerializable {
         generator.writeStringField(fieldName.toString(), String.valueOf(value));
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, AkkaSerializable value) throws IOException {
+    default void writeField(JsonGenerator generator, Fields fieldName, CafienneSerializable value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {

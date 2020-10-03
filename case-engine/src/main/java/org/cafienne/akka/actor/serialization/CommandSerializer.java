@@ -21,18 +21,8 @@ import org.cafienne.timerservice.akka.command.CancelTimer;
 import org.cafienne.timerservice.akka.command.SetTimer;
 import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 
-public class CommandSerializer extends AkkaCaseObjectSerializer {
-    /**
-     * The unique identifier for the AkkaCaseObjectSerializer (value is <code>424242</code>)
-     */
-    public static final int IDENTIFIER = 52932674;
-
-    @Override
-    public int identifier() {
-        return IDENTIFIER;
-    }
-
-    static {
+public class CommandSerializer extends CafienneSerializer {
+    static void register() {
         addCaseCommands();
         addHumanTaskCommands();
         addProcessActorCommands();

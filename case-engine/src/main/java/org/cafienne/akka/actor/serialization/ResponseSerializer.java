@@ -12,18 +12,8 @@ import org.cafienne.processtask.akka.command.response.ProcessResponse;
 import org.cafienne.tenant.akka.command.response.TenantOwnersResponse;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
-public class ResponseSerializer extends AkkaCaseObjectSerializer {
-    /**
-     * The unique identifier for the AkkaCaseObjectSerializer (value is <code>424242</code>)
-     */
-    public static final int IDENTIFIER = 52932081;
-
-    @Override
-    public int identifier() {
-        return IDENTIFIER;
-    }
-
-    static {
+public class ResponseSerializer extends CafienneSerializer {
+    static void register() {
         addCaseResponses();
         addHumanTaskResponses();
         addProcessResponses();
