@@ -10,7 +10,6 @@ package org.cafienne.service.api.repository
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -31,7 +30,6 @@ import org.w3c.dom.Document
 
 import scala.collection.immutable.Seq
 
-@Api(tags = Array("repository"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
 class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {

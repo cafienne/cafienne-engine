@@ -9,10 +9,10 @@ package org.cafienne.akka.actor.event;
 
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.TenantUserMessage;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 
-public interface ModelEvent<M extends ModelActor> extends AkkaSerializable, TenantUserMessage {
+public interface ModelEvent<M extends ModelActor> extends CafienneSerializable, TenantUserMessage {
     String TAG = "cafienne";
 
     /**

@@ -17,13 +17,14 @@ object Deps {
   object V {
     val scala       = "2.12.11"
     val spray       = "1.3.5"
-    val akkaHttp    = "10.1.12"
+    val akkaHttp    = "10.2.0"
     val slf4j       = "1.7.12"
-    val akka        = "2.6.5"
-    val jackson     = "2.11.0"
+    val akka        = "2.6.9"
+    val jackson     = "2.11.2"
     val enumeratum  = "1.6.1"
-    val swagger     = "2.1.2"
-    val slick       = "3.3.2"
+    val swagger     = "2.1.5"
+    val slick       = "3.3.3"
+    val jasper      = "6.14.0"
   }
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
@@ -56,14 +57,11 @@ object Deps {
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
   val akkaHtppJackson       = "com.typesafe.akka"       %% "akka-http-jackson"                    % V.akkaHttp
-  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "1.0.0"
+  val akkaHttpCors          = "ch.megard"               %% "akka-http-cors"                       % "1.1.0"
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
   val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
-  val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.0.4"
-  val swaggerAkkaHttpFix    = "io.swagger"              % "swagger-jaxrs"                         % "1.6.0"
-  val swaggerAkkaHttpFix2   = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
-  val swaggerAkkaHttpScala  = "com.github.swagger-akka-http" %% "swagger-scala-module"            % "2.0.6"
+  val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.2.0"
   val swaggerCore           = "io.swagger.core.v3"      % "swagger-core"                          % V.swagger
   val swaggerAnnotations    = "io.swagger.core.v3"      % "swagger-annotations"                   % V.swagger
   val swaggerModels         = "io.swagger.core.v3"      % "swagger-models"                        % V.swagger
@@ -71,33 +69,33 @@ object Deps {
 
   // The test scope will be added in the build so we don't need to declare it in here
   val scalaMock             = "org.scalamock"           %% "scalamock"                            % "4.4.0"
-  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.1.2"
+  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.2.2"
   val junit                 = "org.junit.jupiter"       % "junit-jupiter-api"                     % "5.6.2"
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
-  val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.26.3"
+  val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.27.2"
   val commonsIO             = "commons-io"              %  "commons-io"                           % "2.7"
   val apacheCommonsText     = "org.apache.commons"      % "commons-text"                          % "1.8"
   val jsonJava              = "com.fasterxml.jackson.core"   % "jackson-core"					            % V.jackson
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
   val jacksonScala          = "com.fasterxml.jackson.module" %% "jackson-module-scala"            % V.jackson
 
-  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.2.5.RELEASE"
+  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.2.9.RELEASE"
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
-  val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % "6.12.2"
-  val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % "6.12.2"
+  val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % V.jasper
+  val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % V.jasper
   // Lowagie is for PDF document generation with Jasper. It must remain fixed on 2.1.7, because that is what Jasper needs.
   val lowagie               = "com.lowagie"             % "itext"                                 % "2.1.7" // DO NOT CHANGE THIS VALUE
 
   val sw4jj                 = "com.github.j5ik2o"       % "sw4jj_2.11"                            % "1.0.2"
   val slick                 = "com.typesafe.slick"      %% "slick"                                % V.slick
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % V.slick
-  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.13"
+  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.16"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
-  val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.0"
-  val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.2.2.jre11"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "6.4.3"
+  val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.1"
+  val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.4.1.jre11"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.0.0"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
 

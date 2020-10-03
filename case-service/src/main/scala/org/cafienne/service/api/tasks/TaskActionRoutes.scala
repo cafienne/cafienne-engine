@@ -9,7 +9,6 @@ package org.cafienne.service.api.tasks
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -26,7 +25,6 @@ import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api.model.Examples
 import org.cafienne.service.api.projection.query.{TaskCount, TaskQueries}
 
-@Api(tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
 class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends TaskRoute {

@@ -8,7 +8,6 @@
 package org.cafienne.service.api.tasks
 
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -19,7 +18,6 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api
 import org.cafienne.service.api.projection.query.{Area, Sort, TaskCount, TaskFilter, TaskQueries}
 
-@Api(tags = Array("tasks"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
 class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends TaskRoute {

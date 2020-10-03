@@ -2,8 +2,8 @@ package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.timerservice.TimerStorage;
 
-public class SnapshotSerializer extends AkkaCaseObjectSerializer {
-    static {
+public class SnapshotSerializer extends CafienneSerializer {
+    static void register() {
         registerSnapshots();
     }
 

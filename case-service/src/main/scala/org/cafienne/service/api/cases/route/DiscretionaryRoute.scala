@@ -8,7 +8,6 @@
 package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.server.Directives.{path, _}
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -22,7 +21,6 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.projection.query.CaseQueries
 
-@Api(tags = Array("discretionary items"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {

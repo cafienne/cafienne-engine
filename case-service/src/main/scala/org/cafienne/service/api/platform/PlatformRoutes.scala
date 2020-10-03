@@ -9,7 +9,6 @@ package org.cafienne.service.api.platform
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
@@ -17,7 +16,6 @@ import org.cafienne.infrastructure.akka.http.route.CommandRoute
 
 import scala.collection.immutable.Seq
 
-@Api(tags = Array("platform"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
 class PlatformRoutes()(override implicit val userCache: IdentityProvider) extends CommandRoute {

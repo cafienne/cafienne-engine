@@ -22,8 +22,8 @@ import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.platform.TenantDisabled;
 import org.cafienne.tenant.akka.event.platform.TenantEnabled;
 
-public class EventSerializer extends AkkaCaseObjectSerializer {
-    static {
+public class EventSerializer extends CafienneSerializer {
+    static void register() {
         registerBaseEvents();
         registerCaseEvents();
         registerHumanTaskEvents();

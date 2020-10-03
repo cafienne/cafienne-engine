@@ -12,16 +12,23 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
-    private final static Logger logger = LoggerFactory.getLogger(AkkaCaseObjectSerializer.class);
+public class CafienneSerializer extends SerializerWithStringManifest {
+    private final static Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
 
     /**
-     * The unique identifier for the AkkaCaseObjectSerializer (value is <code>424242</code>)
+     * The unique identifier for the CafienneSerializer (value is <code>424242</code>)
      */
     public static final int IDENTIFIER = 52943;
 
     private final static Map<String, ManifestWrapper> manifests = new HashMap();
     private final static Map<Class<?>, ManifestWrapper> manifestsByClass = new HashMap();
+
+    static {
+        EventSerializer.register();
+        CommandSerializer.register();
+        ResponseSerializer.register();
+        SnapshotSerializer.register();
+    }
 
     static ManifestWrapper getManifest(String manifestString) {
         return manifests.get(manifestString);
@@ -36,10 +43,10 @@ public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
         }
     }
 
-    protected AkkaCaseObjectSerializer() {
+    protected CafienneSerializer() {
     }
 
-    protected AkkaCaseObjectSerializer(ExtendedActorSystem system) {
+    protected CafienneSerializer(ExtendedActorSystem system) {
     }
 
     @Override
@@ -75,7 +82,7 @@ public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
 
     @Override
     public String manifest(Object o) {
-        if (o instanceof AkkaSerializable) {
+        if (o instanceof CafienneSerializable) {
             ManifestWrapper manifest = manifestsByClass.get(o.getClass());
             if (manifest != null) {
                 return manifest.toString();
@@ -83,16 +90,16 @@ public class AkkaCaseObjectSerializer extends SerializerWithStringManifest {
                 throw new RuntimeException("A manifest wrapper for class "+o.getClass().getName()+" has not been registered");
             }
         }
-        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing AkkaSerializable");
+        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing CafienneSerializable");
     }
 
     @Override
     public byte[] toBinary(Object o) {
-        if (o instanceof AkkaSerializable) {
-            AkkaSerializable target = (AkkaSerializable) o;
+        if (o instanceof CafienneSerializable) {
+            CafienneSerializable target = (CafienneSerializable) o;
             return target.toBytes();
         }
-        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing AkkaSerializable");
+        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing CafienneSerializable");
     }
 
 }

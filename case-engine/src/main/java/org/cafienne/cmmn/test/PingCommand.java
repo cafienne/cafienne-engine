@@ -10,7 +10,7 @@ package org.cafienne.cmmn.test;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.AkkaSerializable;
+import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
@@ -28,7 +28,7 @@ import java.io.IOException;
  * need to wait a certain time before continuing, in order to wait for the "after-timer" actions.
  */
 @Manifest
-public class PingCommand extends CaseCommand implements AkkaSerializable, BootstrapCommand {
+public class PingCommand extends CaseCommand implements CafienneSerializable, BootstrapCommand {
     private final static Logger logger = LoggerFactory.getLogger(PingCommand.class);
 
     private final long waitTime;

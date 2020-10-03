@@ -12,7 +12,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -25,7 +24,6 @@ import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 
 import scala.util.{Failure, Success}
 
-@Api(tags = Array("case"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/debug")
 class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem) extends AuthenticatedRoute {

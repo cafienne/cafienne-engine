@@ -8,7 +8,6 @@
 package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.server.Directives._
-import io.swagger.annotations._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -24,7 +23,6 @@ import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUserRole, Disa
 
 import scala.collection.JavaConverters._
 
-@Api(tags = Array("tenant"))
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {

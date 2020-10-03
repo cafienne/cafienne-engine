@@ -22,14 +22,10 @@ object TestConfig {
       |          serialize-messages = off
       |
       |          serializers {
-      |            command_serializer = "org.cafienne.akka.actor.serialization.CommandSerializer"
-      |            response_serializer = "org.cafienne.akka.actor.serialization.ResponseSerializer"
-      |            event_serializer = "org.cafienne.akka.actor.serialization.EventSerializer"
+      |            cafienne_serializer = "org.cafienne.akka.actor.serialization.CafienneSerializer"
       |          }
       |          serialization-bindings {
-      |            "org.cafienne.akka.actor.event.ModelEvent" = event_serializer
-      |            "org.cafienne.akka.actor.command.ModelCommand" = command_serializer
-      |            "org.cafienne.akka.actor.command.response.ModelResponse" = response_serializer
+      |            "org.cafienne.akka.actor.serialization.CafienneSerializable" = cafienne_serializer
       |          }
       |        }
       |

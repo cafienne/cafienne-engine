@@ -12,8 +12,8 @@ import org.cafienne.processtask.akka.command.response.ProcessResponse;
 import org.cafienne.tenant.akka.command.response.TenantOwnersResponse;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
-public class ResponseSerializer extends AkkaCaseObjectSerializer {
-    static {
+public class ResponseSerializer extends CafienneSerializer {
+    static void register() {
         addCaseResponses();
         addHumanTaskResponses();
         addProcessResponses();

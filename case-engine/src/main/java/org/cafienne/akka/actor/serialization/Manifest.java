@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * A Manifest contains the manifest information that will be used in the akka serialization of
  * case engine events. The manifest consists of a string and an optional version number.
- * If the {@link AkkaCaseObjectSerializer} encounters a manifest of an older version, it will check
+ * If the {@link CafienneSerializer} encounters a manifest of an older version, it will check
  * whether there are {@link Migrator} classes defined along with the {@link Manifest} and use that to migrate
  * the json ast before deserializing the event.
  *
@@ -23,7 +23,7 @@ public @interface Manifest {
     /**
      * Current version of this {@link Manifest}. The default version is 0.
      * The version of the manifest is prefixed to the manifest string that is used in akka serialization by
-     * the {@link AkkaCaseObjectSerializer}.
+     * the {@link CafienneSerializer}.
      * @return
      */
     int version() default 0;
