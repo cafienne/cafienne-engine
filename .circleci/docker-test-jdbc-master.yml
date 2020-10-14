@@ -32,7 +32,7 @@ services:
       POSTGRES_USER: postgresuser
       POSTGRES_PASSWORD: mysecret
       POSTGRES_DB: cafienne-eventstore
-      PGDATA: postgres
+      PGDATA: event-data
 
   cafienne-query-db:
     image: postgres:12.1-alpine
