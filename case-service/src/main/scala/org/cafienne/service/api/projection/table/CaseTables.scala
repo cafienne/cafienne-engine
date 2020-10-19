@@ -2,11 +2,11 @@ package org.cafienne.service.api.projection.table
 
 import java.time.Instant
 
-import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.projection.record._
+import org.cafienne.service.db.querydb.QueryDBSchema
 import slick.lifted.ColumnOrdered
 
-trait CaseTables extends QueryDbConfig {
+trait CaseTables extends QueryDBSchema {
 
   import dbConfig.profile.api._
 

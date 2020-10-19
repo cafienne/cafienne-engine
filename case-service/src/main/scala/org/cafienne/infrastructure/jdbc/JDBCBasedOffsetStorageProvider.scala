@@ -1,7 +1,8 @@
 package org.cafienne.infrastructure.jdbc
 
 import akka.persistence.query.Offset
-import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider, OffsetRecord}
+import org.cafienne.infrastructure.cqrs.{OffsetRecord, OffsetStorage, OffsetStorageProvider}
+import org.cafienne.service.db.querydb.QueryDBSchema
 
 import scala.concurrent.Future
 
@@ -11,7 +12,7 @@ class JDBCBasedOffsetStorageProvider extends OffsetStorageProvider {
   }
 }
 
-class OffsetStorageImpl(override val name: String) extends OffsetStorage with OffsetStoreTables with QueryDbConfig {
+class OffsetStorageImpl(override val name: String) extends OffsetStorage with OffsetStoreTables with QueryDBSchema {
 
   import dbConfig.profile.api._
 
@@ -36,7 +37,7 @@ class OffsetStorageImpl(override val name: String) extends OffsetStorage with Of
   }
 }
 
-trait OffsetStoreTables extends QueryDbConfig {
+trait OffsetStoreTables extends QueryDBSchema {
 
   import java.sql.Timestamp
 

@@ -4,6 +4,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.{LongValue, Value, ValueMap}
+import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.projection.record.TaskRecord
 import org.cafienne.service.api.projection.{CaseSearchFailure, TaskSearchFailure}

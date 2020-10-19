@@ -1,16 +1,23 @@
 package org.cafienne.infrastructure.jdbc
 
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.service.api.projection.query.{Area, Sort}
+import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import slick.ast.ColumnOption
 import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
+import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.lifted.{ColumnOrdered, Index}
+import slick.migration.api.org.cafienne.infrastructure.jdbc.sqlserver.SQLServerDialect
+import slick.migration.api.{Dialect, GenericDialect}
 import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
-trait QueryDbConfig {
-  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", CaseSystem.config.queryDB.config)
+/**
+  * Basic JDBC abstraction on Slick that can be used to hook a database connection
+  * based on config properties.
+  *
+  * Includes some helpers for queries and MS SQL Server support
+  */
+trait CafienneJDBCConfig {
+  val dbConfig: DatabaseConfig[JdbcProfile]
 
   lazy val db = dbConfig.db
 
@@ -171,6 +178,13 @@ trait QueryDbConfig {
       */
     def only(area: Area) = {
       query.drop(area.offset).take(area.numOfResults)
+    }
+  }
+
+  implicit lazy val dialect: Dialect[_ <: JdbcProfile] = {
+    dbConfig.profile match {
+      case _: SQLServerProfile => new SQLServerDialect
+      case _ => GenericDialect(dbConfig.profile)
     }
   }
 }

@@ -7,12 +7,11 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.QueryDbConfig
-import org.cafienne.service.api.projection.query.{CaseQueriesImpl, CaseFilter}
+import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueriesImpl}
 import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
-import org.cafienne.service.db.migration.Migrate
+import org.cafienne.service.db.querydb.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers
@@ -20,7 +19,7 @@ import org.scalatest.matchers.must.Matchers
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll with QueryDbConfig {
+class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll with QueryDBSchema {
 
   implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
 
@@ -62,7 +61,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   )
 
   override def beforeAll {
-    Migrate.migrateDatabase()
+    QueryDB.verifyConnectivity()
     val records = Seq(activeCase, planItem1_1, terminatedCase, completedCase, planItem2_1, planItemHistory2_1) ++ caseTeamMemberRecords ++ TestIdentityFactory.asDatabaseRecords(user)
     updater.bulkUpdate(records)
     //    Await.ready(Future.sequence(caseQueries.bulkUpdate(records), 1.seconds)
@@ -73,7 +72,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   // *******************************************************************************************************************
 
   "Create a table" should "succeed the second time as well" in {
-    Migrate.migrateDatabase()
+    QueryDB.verifyConnectivity()
   }
 
   "A query" should "retrieve an existing case" in {

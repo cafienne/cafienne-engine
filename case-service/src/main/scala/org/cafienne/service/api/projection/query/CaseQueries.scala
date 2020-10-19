@@ -2,6 +2,7 @@ package org.cafienne.service.api.projection.query
 
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
+import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.projection.record.{CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
