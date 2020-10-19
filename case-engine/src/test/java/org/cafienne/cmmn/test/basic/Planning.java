@@ -8,6 +8,10 @@
 package org.cafienne.cmmn.test.basic;
 
 import org.cafienne.cmmn.akka.command.*;
+import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
+import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;

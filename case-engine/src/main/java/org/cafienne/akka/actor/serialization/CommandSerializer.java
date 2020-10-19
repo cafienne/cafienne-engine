@@ -6,8 +6,12 @@ import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode;
-import org.cafienne.cmmn.akka.command.task.CompleteTask;
-import org.cafienne.cmmn.akka.command.task.FailTask;
+import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
+import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.task.CompleteTask;
+import org.cafienne.cmmn.akka.command.plan.task.FailTask;
 import org.cafienne.cmmn.akka.command.team.PutTeamMember;
 import org.cafienne.cmmn.akka.command.team.RemoveTeamMember;
 import org.cafienne.cmmn.akka.command.team.SetCaseTeam;
@@ -27,10 +31,6 @@ import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 public class CommandSerializer extends CafienneSerializer {
     static void register() {
         addCaseCommands();
-        addCasePlanCommands();
-        addCaseFileCommands();
-        addCaseTeamCommands();
-        addHumanTaskCommands();
         addProcessActorCommands();
         addTenantCommands();
         addPlatformCommands();
@@ -41,6 +41,10 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(StartCase.class, StartCase::new);
         addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
         addManifestWrapper(UpdateCaseWithPlatformInformation.class, UpdateCaseWithPlatformInformation::new);
+        addCasePlanCommands();
+        addCaseFileCommands();
+        addCaseTeamCommands();
+        addHumanTaskCommands();
     }
 
     private static void addCasePlanCommands() {

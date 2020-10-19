@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.test.basic;
 
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;

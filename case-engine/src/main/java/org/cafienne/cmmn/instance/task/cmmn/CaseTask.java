@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.instance.task.cmmn;
 
 import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.command.MakeCaseTransition;
+import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;

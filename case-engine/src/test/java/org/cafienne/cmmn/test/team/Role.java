@@ -9,8 +9,8 @@ package org.cafienne.cmmn.test.team;
 
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.MakeCaseTransition;
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.team.*;
 import org.cafienne.cmmn.akka.event.team.TeamRoleCleared;

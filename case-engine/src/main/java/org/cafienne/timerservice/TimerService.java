@@ -9,7 +9,7 @@ import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
 import org.cafienne.akka.actor.handler.CommandHandler;
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.timerservice.akka.command.CancelTimer;
 import org.cafienne.timerservice.akka.command.SetTimer;

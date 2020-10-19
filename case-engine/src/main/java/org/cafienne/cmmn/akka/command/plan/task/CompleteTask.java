@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command.task;
+package org.cafienne.cmmn.akka.command.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.ModelActor;
@@ -13,7 +13,7 @@ import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
