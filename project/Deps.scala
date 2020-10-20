@@ -52,7 +52,7 @@ object Deps {
   val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.19"
 
   val akkaHttp              = "com.typesafe.akka"       %% "akka-http"                            % V.akkaHttp
-  val akkHttpXml            = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
+  val akkaHttpXml            = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
   val akkaHttpSprayJson     = "com.typesafe.akka"       %% "akka-http-spray-json"                 % V.akkaHttp
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
