@@ -18,7 +18,6 @@ object Deps {
     val scala       = "2.12.11"
     val spray       = "1.3.5"
     val akkaHttp    = "10.2.0"
-    val slf4j       = "1.7.12"
     val akka        = "2.6.9"
     val jackson     = "2.11.2"
     val enumeratum  = "1.6.1"
@@ -40,7 +39,6 @@ object Deps {
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
-  val slf4j                 = akkaSlf4j
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.1"
   val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.3"
   val config                = "com.typesafe"            %  "config"                               % "1.4.0"
