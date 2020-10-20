@@ -144,7 +144,6 @@ lazy val service = project("case-service")
       Deps.akkaQuery,
       Deps.akkaSlf4j,
       Deps.akkaStream,
-      Deps.akkaTestKit,
       Deps.bcrypt,
       Deps.cassandraPersistence,
       Deps.config,
@@ -167,6 +166,7 @@ lazy val service = project("case-service")
       Deps.sw4jj,
     ) ++
       Deps.test(
+        Deps.akkaTestKit,
         Deps.akkaHttpTestkit,
         Deps.akkaMultiNodeTestKit,
         Deps.junit,
