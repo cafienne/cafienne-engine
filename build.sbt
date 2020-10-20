@@ -156,8 +156,6 @@ lazy val service = project("case-service")
       Deps.jacksonScala,
       Deps.javaxws,
       Deps.joseJwt,
-      Deps.levelDbFixed,
-      Deps.levelDbJNI,
       Deps.logback,
       Deps.postgres,
       Deps.scalaLogging,

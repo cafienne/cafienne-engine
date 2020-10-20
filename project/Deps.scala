@@ -34,9 +34,6 @@ object Deps {
   val akkaPersistence       = "com.typesafe.akka"       %% "akka-persistence"                     % V.akka    // exclude("org.iq80.leveldb","leveldb")
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
   val akkaClusterSharding   = "com.typesafe.akka"       %% "akka-cluster-sharding"                % V.akka
-  val akkaKryo              = "io.altoo"                %% "akka-kryo-serialization"              % "1.1.5"
-  val levelDbFixed          = "org.iq80.leveldb"        %  "leveldb"                              % "0.12"
-  val levelDbJNI            = "org.fusesource.leveldbjni" % "leveldbjni-all"                      % "1.8"
   val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.103"
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
   val akkaPersistenceJDBC   = "com.github.dnvriend"     %% "akka-persistence-jdbc"                % "3.5.3"
