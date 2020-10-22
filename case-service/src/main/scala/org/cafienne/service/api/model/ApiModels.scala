@@ -154,7 +154,7 @@ case class StartCaseFormat(
                         required = true,
                         example = "Depending on the internally configured DefinitionProvider this can be a file name or the case model itself.",
                         implementation = classOf[String])
-                      definition: String,
+                      definition: String = "", // by default an empty string to avoid nullpointers down the line
                       @(Schema @field)(
                         description = "Input parameters that will be passed to the started case",
                         required = false,
