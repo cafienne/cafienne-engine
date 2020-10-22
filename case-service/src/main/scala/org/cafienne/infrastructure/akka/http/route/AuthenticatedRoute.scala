@@ -8,9 +8,10 @@ import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
 import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.command.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, CannotReachIDPException}
+import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
 import org.cafienne.service.api
 
 import scala.concurrent.ExecutionContext
@@ -25,32 +26,40 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   val uc = userCache
 
   override def exceptionHandler = ExceptionHandler {
-    case h: UnhealthyCaseSystem => complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = h.getLocalizedMessage))
-    case s: SecurityException =>
-      extractMethod { method =>
-        extractUri { uri =>
-          logger.warn(s"Request ${method.name} $uri has a security issue: " + s)
-          if (logger.underlying.isInfoEnabled()) {
-            logger.info("", s)
-          } else {
-            logger.warn("Enable info logging to see more details on the security issue")
-          }
-          s match {
-            case e: CannotReachIDPException => {
-              logger.error("Service cannot validate security tokens, because IDP is not reachable")
-              complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = e.getMessage)).andThen(g => {
-                // TODO: this probably should be checked upon system startup in the first place
-                //              System.err.println("CANNOT REACH IDP, downing the system")
-                //              System.exit(-1)
-                //              CaseSystem.system.terminate()
-                g
-              })
-            }
-            case _ => complete(HttpResponse(StatusCodes.Unauthorized, entity = s.getMessage()))
-          }
+    case e: CannotReachIDPException => handleIDPException(e)
+    case s: AuthenticationException => handleAuthenticationException(s)
+    case a: AuthorizationException => handleAuthorizationException(a)
+    case i: InvalidCommandException => complete(StatusCodes.BadRequest, i.getMessage)
+    case s: SecurityException => handleAuthorizationException(s) // Pretty weird, as our code does not throw it; log it similar to Authorizaton issues
+    case other => defaultExceptionHandler(other) // All other exceptions just handle the default way from CaseServiceRoute
+  }
+
+  private def handleIDPException(e: CannotReachIDPException) ={
+    logger.error("Service cannot validate security tokens, because IDP is not reachable")
+    complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = e.getMessage)).andThen(g => {
+      // TODO: this probably should be checked upon system startup in the first place
+      //              System.err.println("CANNOT REACH IDP, downing the system")
+      //              System.exit(-1)
+      //              CaseSystem.system.terminate()
+      g
+    })
+  }
+
+  private def handleAuthenticationException(s: AuthenticationException) = {
+    complete(HttpResponse(StatusCodes.Unauthorized, entity = s.getMessage()))
+  }
+
+  private def handleAuthorizationException(s: Exception) = {
+    extractMethod { method =>
+      extractUri { uri =>
+        if (logger.underlying.isInfoEnabled()) {
+          logger.info(s"Authorization issue in request ${method.name} $uri ", s)
+        } else {
+          logger.warn(s"Authorization issue in request ${method.name} $uri (enable info logging for stack trace): " + s.getMessage)
         }
+        complete(HttpResponse(StatusCodes.Unauthorized, entity = s.getMessage()))
       }
-    case other => defaultExceptionHandler(other) // All other exceptions just handle the default way
+    }
   }
 
   // TODO: this is a temporary switch to enable IDE's debugger to show events

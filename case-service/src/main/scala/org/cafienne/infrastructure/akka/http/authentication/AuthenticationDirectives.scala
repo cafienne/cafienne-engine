@@ -2,11 +2,11 @@ package org.cafienne.infrastructure.akka.http.authentication
 
 import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.{Directive1, Directives}
-import org.cafienne.infrastructure.Configured
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.Configured
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -47,7 +47,7 @@ trait AuthenticationDirectives extends Configured {
           cachedUser <- userCache.getUser(usrCtx.subject.value, tlm)
         } yield Some(cachedUser)
       }
-      case _ => Future.successful(None)
+      case Credentials.Missing => Future.failed(MissingTokenException)
     }
   }
 

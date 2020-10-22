@@ -41,14 +41,11 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
     cache.get(userId) match {
       case user: PlatformUser => Future(user)
       case null => {
-//        println("User " + userId +" it not in cache. fetching it")
         userQueries.getPlatformUser(userId).map(u => {
-
           if (u.users.isEmpty && !u.isPlatformOwner) {
             logger.info("User " + userId + " has a valid token, but is not registered in the case system")
             throw AuthorizationException("User " + userId + " is not registered in the case system")
           }
-//          println("Trying to put user " + userId +" into the cache")
           cache.put(userId, u)
           u
         })

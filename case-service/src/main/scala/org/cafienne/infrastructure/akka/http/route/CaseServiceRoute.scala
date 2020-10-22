@@ -67,15 +67,20 @@ trait CaseServiceRoute extends LazyLogging {
   }
 
   def defaultExceptionHandler(t: Throwable): Route = {
-    extractUri { uri =>
-      extractMethod { method =>
-        // Simply print headline of the exception
-        if (logger.underlying.isDebugEnabled()) {
-          logger.debug(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t, t)
-        } else {
-          logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t)
+    t match {
+      case h: UnhealthyCaseSystem => complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = h.getLocalizedMessage))
+      case _ => extractUri { uri =>
+        extractMethod { method =>
+          // Depending on debug logging - either print full exception or only headline
+          if (logger.underlying.isDebugEnabled()) {
+            logger.debug(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri", t)
+          } else if (logger.underlying.isInfoEnabled()) {
+            logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t)
+          } else {
+            logger.warn(s"Bumped into ${t.getClass.getName} in ${this.getClass().getSimpleName} on ${method.name} $uri - enable debug logging for stack trace")
+          }
+          complete(HttpResponse(StatusCodes.InternalServerError))
         }
-        complete(HttpResponse(StatusCodes.InternalServerError))
       }
     }
   }
