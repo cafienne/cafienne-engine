@@ -8,6 +8,7 @@ import akka.persistence.SnapshotMetadata;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.CommandFailureListener;
 import org.cafienne.akka.actor.command.response.CommandResponseListener;
@@ -508,7 +509,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     public void failedWithInvalidState(CommandHandler handler, Throwable exception) {
         this.getScheduler().clearSchedules(); // Remove all schedules.
-        logger.error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
+        if (exception instanceof CommandException) {
+            logger.error("Restarting " + this + ". Handling msg of type " + handler.msg.getClass().getName() + " resulted in invalid state.");
+            logger.error("  Cause: "+exception.getClass().getSimpleName()+" - " + exception.getMessage());
+        } else {
+            logger.error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
+        }
         this.supervisorStrategy().restartChild(self(), exception, true);
     }
 
