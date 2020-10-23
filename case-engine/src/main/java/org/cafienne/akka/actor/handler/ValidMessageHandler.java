@@ -5,8 +5,8 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.command.exception.EmptyTenantException;
 import org.cafienne.akka.actor.command.exception.InvalidTenantException;
-import org.cafienne.akka.actor.command.exception.MissingTenantException;
 import org.cafienne.akka.actor.event.ModelEvent;
 
 abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
@@ -25,7 +25,7 @@ abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelC
             return new AuthorizationException("The user id must not be null or empty");
         } else if (user.tenant() == null) {
             // Note: this check is also done in ModelCommand itself
-            return new MissingTenantException("User must provide tenant information in order to execute a command");
+            return new EmptyTenantException("User must provide tenant information in order to execute a command");
         } else if (actor.getTenant() != null && !actor.getTenant().equals(user.tenant())) {
             // Note: this check can only be done here
             return new InvalidTenantException(user, msg, actor);

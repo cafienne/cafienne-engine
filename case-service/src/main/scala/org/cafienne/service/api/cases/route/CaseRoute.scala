@@ -19,8 +19,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.exception.MissingTenantException
-import org.cafienne.cmmn.akka
 import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.akka.command.team.CaseTeam
@@ -231,10 +229,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
               askCaseWithValidTeam(platformUser, tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
-              case e: MissingTenantException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
-              case e: InvalidDefinitionException => complete(StatusCodes.InternalServerError, e.getMessage)
-              case other: Throwable => complete(StatusCodes.InternalServerError, other)
+              case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
             }
           }
         }

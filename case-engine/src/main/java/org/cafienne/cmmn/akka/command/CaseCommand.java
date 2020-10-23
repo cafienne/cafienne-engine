@@ -11,12 +11,11 @@ import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
-import org.cafienne.akka.actor.command.exception.MissingTenantException;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.akka.event.CaseEvent;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.akka.command.response.CaseResponse;
+import org.cafienne.cmmn.akka.event.CaseEvent;
+import org.cafienne.cmmn.instance.Case;
 
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
@@ -29,7 +28,6 @@ public abstract class CaseCommand extends ModelCommand<Case> {
      *
      * @param user           The user that issues this command.
      * @param caseInstanceId The id of the case in which to perform this command.
-     * @throws MissingTenantException If the user context does not have a tenant field.
      */
     protected CaseCommand(TenantUser user, String caseInstanceId) {
         super(user, caseInstanceId);
