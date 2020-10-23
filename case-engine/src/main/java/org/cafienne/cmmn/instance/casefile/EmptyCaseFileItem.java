@@ -20,42 +20,42 @@ class EmptyCaseFileItem extends CaseFileItem {
 
     @Override
     protected void adoptContentFromParent(Value<?> newContentFromParent, CaseFileEvent event) {
-        logger.warn("Adopting content in EmptyCaseFileItem");
+        logger.warn("Adopting content in EmptyCaseFileItem " + getPath());
     }
 
     @Override
     public void createContent(Value<?> newContent) {
-        logger.warn("Creating content in EmptyCaseFileItem");
+        logger.warn("Creating content in EmptyCaseFileItem " + getPath());
     }
 
     @Override
     public void updateContent(Value<?> newContent) {
-        logger.warn("Updating content in EmptyCaseFileItem");
+        logger.warn("Updating content in EmptyCaseFileItem " + getPath());
     }
 
     @Override
     public void replaceContent(Value<?> newContent) {
-        logger.warn("Replacing content in EmptyCaseFileItem");
+        logger.warn("Replacing content in EmptyCaseFileItem " + getPath());
     }
 
     @Override
     public void deleteContent() {
-        logger.warn("Deleting content in EmptyCaseFileItem");
+        logger.warn("Deleting content in EmptyCaseFileItem " + getPath());
     }
 
     @Override
     public Value<?> getValue() {
-        logger.warn("Returning value from EmptyCaseFileItem");
+        logger.warn("Returning value from EmptyCaseFileItem " + getPath());
         return Value.NULL;
     }
 
     @Override
     protected void setValue(Value<?> newValue) {
-        logger.warn("Setting value in EmptyCaseFileItem");
+        logger.warn("Setting value in EmptyCaseFileItem " + getPath());
     }
 
     @Override
     public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
-        logger.warn("Binding parameter to EmptyCaseFileItem");
+        logger.warn("Binding parameter to EmptyCaseFileItem " + getPath());
     }
 }

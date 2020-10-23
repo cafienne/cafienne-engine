@@ -199,7 +199,11 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     @Override
     public void deleteContent() {
         setState(State.Discarded);
-        actualArrayItems.forEach(CaseFileItem::deleteContent);
+        // Delete content in reverse order
+        int numberToRemove = actualArrayItems.size();
+        while (--numberToRemove >= 0) {
+            actualArrayItems.get(numberToRemove).deleteContent();
+        }
     }
 
     @Override
