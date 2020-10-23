@@ -1,12 +1,12 @@
 package org.cafienne.cmmn.repository.file;
 
 import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.DefinitionProvider;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.repository.WriteDefinitionException;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final String EXTENSION = ".xml";
 
     @Override
-    public List<String> list(TenantUser user) {
+    public List<String> list(PlatformUser user, String tenant) {
         return listDefinitions();
     }
 
@@ -33,6 +33,9 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      * up loading of the document; the cache checks for the file's last modified timestamp; if it differs from
      * what's in the cache, the file will be newly parsed and stored in the cache instead.
      *
+     *
+     * @param user
+     * @param tenant
      * @param name
      * @return
      * @throws IOException
@@ -41,7 +44,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      * @throws InvalidDefinitionException
      */
     @Override
-    public DefinitionsDocument read(TenantUser user, String name) throws MissingDefinitionException, InvalidDefinitionException {
+    public DefinitionsDocument read(PlatformUser user, String tenant, String name) throws MissingDefinitionException, InvalidDefinitionException {
         if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
         try {
             long lastModified = -1; // Note, -1 is the default value for reading files from class path (resourceAsStream)
@@ -74,7 +77,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     }
 
     @Override
-    public void write(TenantUser user, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
+    public void write(PlatformUser user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
         if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
 
         String prefix = getDeployDirectory() + File.separator;
@@ -168,7 +171,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
             }
             long middle = System.currentTimeMillis();
             for (int i = 0; i < numTests; i++) {
-                DefinitionsDocument dd = provider.read(null, fileName);
+                DefinitionsDocument dd = provider.read(null, null, fileName);
             }
             long end = System.currentTimeMillis();
             File file = provider.getFile(fileName);

@@ -73,7 +73,7 @@ public class TestScript {
      */
     public static DefinitionsDocument getDefinitions(String fileName) {
         try {
-            return CaseSystem.config().repository().DefinitionProvider().read(null, fileName);
+            return CaseSystem.config().repository().DefinitionProvider().read(null, null, fileName);
         } catch (MissingDefinitionException | InvalidDefinitionException e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +107,7 @@ public class TestScript {
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
         try {
-            CaseSystem.config().repository().DefinitionProvider().read(null, fileName);
+            CaseSystem.config().repository().DefinitionProvider().read(null, null, fileName);
         } catch (MissingDefinitionException e) {
             throw new AssertionError(e);
         }

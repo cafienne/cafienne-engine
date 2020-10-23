@@ -213,14 +213,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
         post {
           entity(as[StartCaseFormat]) { payload =>
             try {
-              val tenant = payload.tenant match {
-                case None => platformUser.defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
-                case Some(string) => string.isEmpty match {
-                  case true => platformUser.defaultTenant
-                  case false => payload.tenant.get
-                }
-              }
-              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser.getTenantUser(tenant), payload.definition)
+              val tenant = platformUser.resolveTenant(payload.tenant)
+              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, payload.definition)
               val caseDefinition = definitionsDocument.getFirstCase
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)

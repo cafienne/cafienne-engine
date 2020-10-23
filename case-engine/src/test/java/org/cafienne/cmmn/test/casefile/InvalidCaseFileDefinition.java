@@ -43,7 +43,7 @@ public class InvalidCaseFileDefinition {
     public void testMissingDefinition() {
         // First, test with an invalid Definitions document
         try {
-            CaseSystem.config().repository().DefinitionProvider().read(null, "a file that does not exist");
+            CaseSystem.config().repository().DefinitionProvider().read(null, null, "a file that does not exist");
             // Did not go to the catch block
             throw new AssertionError("Test failed, as the case definition is not invalid");
         } catch (MissingDefinitionException e) {
