@@ -1,6 +1,7 @@
 package org.cafienne.humantask.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -112,7 +113,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      */
     protected void validateCaseOwnership(HumanTask task) {
         if (! task.getCaseInstance().getCurrentTeamMember().isOwner()) {
-            raiseException("You must be case owner to perform this operation");
+            raiseAuthorizationException("You must be case owner to perform this operation");
         }
     }
 
@@ -122,7 +123,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      */
     protected void validateProperCaseRole(HumanTask task) {
         if (!task.currentUserIsAuthorized()) {
-            raiseException("You do not have permission to perform this operation");
+            raiseAuthorizationException("You do not have permission to perform this operation");
         }
     }
 
@@ -139,8 +140,12 @@ public abstract class WorkflowCommand extends CaseCommand {
         String currentTaskAssignee = task.getImplementation().getAssignee();
         String currentUserId = getUser().id();
         if (!currentUserId.equals(currentTaskAssignee)) {
-            raiseException("You do not have permission to perform this operation");
+            raiseAuthorizationException("You do not have permission to perform this operation");
         }
+    }
+
+    protected void raiseAuthorizationException(String msg) {
+        throw new AuthorizationException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
     }
 
     protected void raiseException(String msg) {
@@ -162,7 +167,7 @@ public abstract class WorkflowCommand extends CaseCommand {
         if (role != null) {
             // Members need to have the role, Owners don't need to
             if (!member.isOwner() && !member.getRoles().contains(role)) {
-                raiseException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
+                raiseAuthorizationException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
             }
         }
     }
