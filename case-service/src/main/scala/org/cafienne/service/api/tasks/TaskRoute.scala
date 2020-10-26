@@ -31,7 +31,7 @@ trait TaskRoute extends CommandRoute with QueryRoute {
           case Success(tenantUsers) => {
             if (tenantUsers.isEmpty) {
               // Not found, hence not a valid user (it can be also because the user account is not enabled)
-              complete(StatusCodes.BadRequest, s"Cannot find an active user '$userId' in tenant '$tenant'")
+              complete(StatusCodes.NotFound, s"Cannot find an active user '$userId' in tenant '$tenant'")
             } else if (tenantUsers.size > 1) {
               logger.error(s"Found ${tenantUsers.size} users matching userId '$userId' in tenant '$tenant'. The query should only result in one user only.")
               complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$userId'")
