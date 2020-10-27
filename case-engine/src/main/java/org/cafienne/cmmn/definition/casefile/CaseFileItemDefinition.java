@@ -73,32 +73,10 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
         return typeDefinition;
     }
 
-    public Collection<CaseFileItemDefinition> getChildren() {
-        return getItems();
-    }
 
-    public CaseFileItemDefinition getChild(String identifier) {
-        return getChildren().stream().filter(i -> i.getName().equals(identifier) || i.getId().equals(identifier)).findFirst().orElse(null);
-    }
-
-    /**
-     * Recursively searches this level and all children until an item with the specified name is found.
-     * 
-     * @param identifier
-     * @return
-     */
-    public CaseFileItemDefinition findCaseFileItem(String identifier) {
-        CaseFileItemDefinition item = getChild(identifier);
-        if (item == null) {
-            for (CaseFileItemDefinition caseFileItem : getChildren()) {
-                item = caseFileItem.findCaseFileItem(identifier);
-                if (item != null) {
-                    // Immediately return if we found one.
-                    return item;
-                }
-            }
-        }
-        return item;
+    @Override
+    public boolean isUndefined(String identifier) {
+        return super.isUndefined(identifier) && !getCaseFileItemDefinition().getProperties().containsKey(identifier);
     }
 
     /**

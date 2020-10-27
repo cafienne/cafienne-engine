@@ -14,10 +14,7 @@ import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
-import org.cafienne.cmmn.instance.casefile.InvalidPathException;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +26,21 @@ import java.io.IOException;
  */
 @Manifest
 public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition> {
-    private final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
+    protected final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
     private final String name;
     private final CaseFileItemTransition transition;
     private final Value<?> value;
-    private final String path;
+    protected final Path path;
     private final State state;
     private final int index;
 
-    public CaseFileEvent(CaseFileItem item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
+    public CaseFileEvent(CaseFileItemCollection<?> item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
         super(item.getCaseInstance());
         this.name = item.getName();
         this.transition = transition;
         this.value = newValue;
-        this.path = item.getPath().toString();
+        this.path = item.getPath();
         this.state = newState;
         this.index = item.getIndex();
     }
@@ -53,8 +50,8 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         this.name = json.raw(Fields.name);
         this.transition = json.getEnum(Fields.transition, CaseFileItemTransition.class);
         this.value = json.get(Fields.value.toString());
-        this.path = json.raw(Fields.path);
-        this.state = json.getEnum(Fields.state, State.class);
+        this.path = readPath(json, Fields.path);
+        this.state = readEnum(json, Fields.state, State.class);
         this.index = json.rawInt(Fields.index.toString());
     }
 
@@ -116,20 +113,17 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
      *
      * @return
      */
-    public String getPath() {
+    public Path getPath() {
         return path;
     }
 
-    private transient CaseFileItem caseFileItem;
+    protected transient CaseFileItem caseFileItem;
 
     @Override
     public void updateState(Case caseInstance) {
         try {
-            // Have to recover it this way in order to overcome fact that Path.definition is not serializable
-            Path recoveredPath = new Path(path, caseInstance);
-
             // Resolve the path on the case file
-            caseFileItem = caseInstance.getCaseFile().getItem(recoveredPath);
+            caseFileItem = path.resolve(caseInstance);
             caseFileItem.updateState(this);
         } catch (InvalidPathException shouldNotHappen) {
             logger.error("Could not recover path on case instance?!", shouldNotHappen);

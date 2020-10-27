@@ -8,7 +8,7 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 object CaseFileMerger extends LazyLogging {
 
   def merge(event: CaseFileEvent, currentCaseFile: ValueMap): ValueMap = {
-    val pathString = event.getPath
+    val pathString = event.getPath.toString
 
     val path: StringPath = {
       try {

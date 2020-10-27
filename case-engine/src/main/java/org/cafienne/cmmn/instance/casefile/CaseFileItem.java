@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.file.*;
@@ -141,13 +142,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         return parent;
     }
 
-    /**
-     * Returns the child items of this case file item
-     *
-     * @return
-     */
-    public Map<CaseFileItemDefinition, CaseFileItem> getChildren() {
-        return getItems();
+    public boolean isArray() {
+        return isArray;
+    }
+
+    public <C extends CaseFileItem> C getContainer() {
+        return (C) container;
     }
 
     /**
@@ -299,19 +299,17 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         });
     }
 
+    @Override
     public void createContent(Value<?> newContent) {
         generateContentWarnings(newContent, "Create");
         addCaseFileEvent(new CaseFileItemCreated(this, newContent));
     }
 
+    @Override
     public void replaceContent(Value<?> newContent) {
         generateContentWarnings(newContent, "Replace");
         itemVanished(); // Make sure current value (and it's descendants) no longer points at us (otherwise potential memory leak?)
         addCaseFileEvent(new CaseFileItemReplaced(this, newContent));
-    }
-
-    private boolean isUndefined(String name) {
-        return this.getChildDefinition(name) == null && !this.getDefinition().getCaseFileItemDefinition().getProperties().containsKey(name);
     }
 
     private void generateContentWarnings(Value<?> newContent, String op) {
@@ -333,6 +331,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         });
     }
 
+    @Override
     public void updateContent(Value<?> newContent) {
         if (value.isSupersetOf(newContent)) {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] does not contain changes");
@@ -414,11 +413,13 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
     }
 
+    @Override
     public void deleteContent() {
         removedValue = value;
         // Now recursively also delete all of our 'Available' children... Are you sure? Isn't this overinterpreting the spec?
-        getChildren().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
-        addDeletedEvent(new CaseFileItemDeleted(this));
+        getItems().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
+        // Only generate the event if we're not yet in discarded state.
+        if (getState() != State.Discarded) addDeletedEvent(new CaseFileItemDeleted(this));
     }
 
     /**
@@ -445,7 +446,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     protected void itemVanished() {
         value.clearOwner();
-        getChildren().values().forEach(CaseFileItem::itemVanished);
+        getItems().values().forEach(CaseFileItem::itemVanished);
     }
 
     /**
@@ -548,7 +549,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         value.dumpMemoryStateToXML(contentElement);
 
         // Next, print our children.
-        Iterator<Entry<CaseFileItemDefinition, CaseFileItem>> c = getChildren().entrySet().iterator();
+        Iterator<Entry<CaseFileItemDefinition, CaseFileItem>> c = getItems().entrySet().iterator();
         while (c.hasNext()) {
             c.next().getValue().dumpMemoryStateToXML(caseFileItemXML);
         }
@@ -562,17 +563,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @return
      */
     public CaseFileItem getCurrent() {
-        return this;
-    }
-
-    /**
-     * Resolve the path on this case file item. Base implementation that is overridden in {@link CaseFileItemArray}, where the index
-     * accessor of the path is used to navigate to the correct case file item.
-     *
-     * @param currentPath
-     * @return
-     */
-    CaseFileItem resolve(Path currentPath) {
         return this;
     }
 
@@ -593,7 +583,18 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         return connectedExitCriteria;
     }
 
-    public boolean allows(CaseFileItemTransition intendedTransition) {
+    @Override
+    public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> content) {
+        // Validate current state against transition
+        if (! allowTransition(intendedTransition)) {
+            throw new InvalidCommandException(intendedTransition+ "CaseFileItem["+getPath()+"] cannot be done because item is in state " + getState());
+        }
+
+        // Validate type of new content
+        getDefinition().validate(content);
+    }
+
+    protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         switch (getState()) {
             case Null:
                 return intendedTransition == CaseFileItemTransition.Create;

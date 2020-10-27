@@ -24,26 +24,38 @@ import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 public class CommandSerializer extends CafienneSerializer {
     static void register() {
         addCaseCommands();
+        addCasePlanCommands();
+        addCaseFileCommands();
+        addCaseTeamCommands();
         addHumanTaskCommands();
         addProcessActorCommands();
         addTenantCommands();
         addPlatformCommands();
-        addTimerCommands();
+        addTimerServiceCommands();
     }
 
     private static void addCaseCommands() {
         addManifestWrapper(StartCase.class, StartCase::new);
+        addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
+    }
+
+    private static void addCasePlanCommands() {
         addManifestWrapper(AddDiscretionaryItem.class, AddDiscretionaryItem::new);
         addManifestWrapper(GetDiscretionaryItems.class, GetDiscretionaryItems::new);
         addManifestWrapper(MakeCaseTransition.class, MakeCaseTransition::new);
         addManifestWrapper(MakePlanItemTransition.class, MakePlanItemTransition::new);
+        addManifestWrapper(CompleteTask.class, CompleteTask::new);
+        addManifestWrapper(FailTask.class, FailTask::new);
+    }
+
+    private static void addCaseFileCommands() {
         addManifestWrapper(CreateCaseFileItem.class, CreateCaseFileItem::new);
         addManifestWrapper(DeleteCaseFileItem.class, DeleteCaseFileItem::new);
         addManifestWrapper(ReplaceCaseFileItem.class, ReplaceCaseFileItem::new);
         addManifestWrapper(UpdateCaseFileItem.class, UpdateCaseFileItem::new);
-        addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
-        addManifestWrapper(CompleteTask.class, CompleteTask::new);
-        addManifestWrapper(FailTask.class, FailTask::new);
+    }
+
+    private static void addCaseTeamCommands() {
         addManifestWrapper(PutTeamMember.class, PutTeamMember::new);
         addManifestWrapper(RemoveTeamMember.class, RemoveTeamMember::new);
         addManifestWrapper(SetCaseTeam.class, SetCaseTeam::new);
@@ -85,7 +97,7 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(EnableTenant.class, EnableTenant::new);
     }
 
-    private static void addTimerCommands() {
+    private static void addTimerServiceCommands() {
         addManifestWrapper(SetTimer.class, SetTimer::new);
         addManifestWrapper(CancelTimer.class, CancelTimer::new);
         addManifestWrapper(TimerServiceResponse.class, TimerServiceResponse::new);

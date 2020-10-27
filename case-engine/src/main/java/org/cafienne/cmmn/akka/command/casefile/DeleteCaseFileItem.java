@@ -12,8 +12,9 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
+import org.cafienne.cmmn.instance.casefile.Path;
 
 /**
  * Deletes a case file item.
@@ -24,23 +25,18 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
      * Deletes the case file item.
      *
      * @param caseInstanceId   The id of the case in which to perform this command.
-     * @param caseFileItemPath Path to the case file item to be created
+     * @param path Path to the case file item to be created
      */
-    public DeleteCaseFileItem(TenantUser tenantUser, String caseInstanceId, String caseFileItemPath) {
-        super(tenantUser, caseInstanceId, Value.NULL, caseFileItemPath);
+    public DeleteCaseFileItem(TenantUser tenantUser, String caseInstanceId, Path path) {
+        super(tenantUser, caseInstanceId, Value.NULL, path, CaseFileItemTransition.Delete);
     }
 
     public DeleteCaseFileItem(ValueMap json) {
-        super(json);
+        super(json, CaseFileItemTransition.Delete);
     }
 
     @Override
-    CaseFileItemTransition intendedTransition() {
-        return CaseFileItemTransition.Delete;
-    }
-
-    @Override
-    void apply(Case caseInstance, CaseFileItem caseFileItem, Value<?> content) {
+    void apply(Case caseInstance, CaseFileItemCollection<?> caseFileItem, Value<?> content) {
         caseFileItem.deleteContent();
     }
 }

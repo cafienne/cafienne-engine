@@ -7,16 +7,18 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.State;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
+public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
     private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap();
     private final String name;
     public final int instanceNumber;
@@ -30,7 +32,7 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
 
     /**
      * Returns the case file item name (taken from it's definition)
-     * 
+     *
      * @return
      */
     public String getName() {
@@ -65,7 +67,7 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
     public CaseFileItem getItem(String childName, int index) {
         return getItem(childName).getItem(index); // By default return the item; array will overwrite this method
     }
-    
+
     /**
      * Returns the case file item with the specified index. Default implementation throws an exception, i.e., invoking this method
      * on a plain case file item will result in an {@link InvalidPathException}. It can only be invoked properly on a CaseFileItemArray.
@@ -99,30 +101,13 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
         return item;
     }
 
-    protected CaseFileItem getItem(Path destinationPath, Path currentPath, Case caseInstance, CaseFileItemCollection<?> parent) {
-        CaseFileItem currentItem = getItem(currentPath.getCaseFileItemDefinition(), caseInstance, parent);
-        currentItem = currentItem.resolve(currentPath); // Hmmm, should be done more elegantly, i guess
-
-        // Now, check to see if we have reached our destination, and if so, return our item
-        if (currentPath.getChild() == null) {
-            return currentItem;
-        } else { // go get the item in our children
-            return getItem(destinationPath, currentPath.getChild(), caseInstance, currentItem);
-        }
-    }
-
-    private CaseFileItem getItem(CaseFileItemDefinition caseFileItemDefinition, Case caseInstance, CaseFileItemCollection<?> parent) {
-        Map<CaseFileItemDefinition, CaseFileItem> itemCollection = parent.getItems();
-
-        for (CaseFileItem caseFileItem : itemCollection.values()) {
-            if (caseFileItem.getDefinition().equals(caseFileItemDefinition)) {
-                return caseFileItem;
-            }
-        }
-        // Does not yet exist, so create it. Without setting a value!
-        CaseFileItem item = caseFileItemDefinition.createInstance(caseInstance, parent);
-        itemCollection.put(caseFileItemDefinition, item);
-        return item;
+    /**
+     * Returns true if the an item (or property) is undefined.
+     * @param identifier
+     * @return
+     */
+    protected boolean isUndefined(String identifier) {
+        return this.getDefinition().isUndefined(identifier);
     }
 
     /**
@@ -131,10 +116,25 @@ public class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> 
      * @return
      */
     public CaseFileItemDefinition getChildDefinition(String childName) {
-        CaseFileItemDefinition childDefinition = getDefinition().getItems().stream().filter(d -> {
-            return d.getName().equals(childName);
-        }).findFirst().orElse(null);
-        return childDefinition;
+        return getDefinition().getChildren().stream().filter(d -> d.getName().equals(childName)).findFirst().orElse(null);
     }
 
+    public abstract void createContent(Value<?> newContent);
+    public abstract void deleteContent();
+    public abstract void replaceContent(Value<?> newContent);
+    public abstract void updateContent(Value<?> newContent);
+
+    public abstract void validateTransition(CaseFileItemTransition intendedTransition, Value<?> newContent);
+
+    public State getState() {
+        return State.Available;
+    }
+
+    public int getIndex() {
+        return -1;
+    }
+
+    public Path getPath() {
+        return new Path("");
+    }
 }

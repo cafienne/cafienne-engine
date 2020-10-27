@@ -47,7 +47,7 @@ public class Parameter<T extends ParameterDefinition> extends CMMNElement<T> imp
         }
 
         CaseFileItemDefinition cfid = getDefinition().getBinding();
-        CaseFileItem item = getCaseInstance().getCaseFile().getItem(cfid.getPath());
+        CaseFileItem item = cfid.getPath().resolve(getCaseInstance());//.getCaseFile().getItem(cfid.getPath());
         
         // Note: we're navigating to the CURRENT case file item. That is, for array type of case file item,
         //  this will lead to the item that is most recently modified.
@@ -61,7 +61,7 @@ public class Parameter<T extends ParameterDefinition> extends CMMNElement<T> imp
         // Now do the binding to the case file, if it is defined
         CaseFileItemDefinition cfid = getDefinition().getBinding();
         if (cfid != null) {
-            CaseFileItem item = getCaseInstance().getCaseFile().getItem(cfid.getPath());
+            CaseFileItem item = cfid.getPath().resolve(getCaseInstance());
             item.bindParameter(this, value);
         }
     }

@@ -12,6 +12,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.processtask.akka.event.ProcessCompleted;
@@ -49,7 +50,7 @@ public class TestPDFReport {
             testCase.getEventListener().awaitPlanItemState(reportTaskId, State.Completed);
 
             // TODO: perhaps this test should test the actual PDF report contents???
-            testCase.insertStep(new PingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem("Request/pdfReportData").assertValueType(StringValue.class));
+            testCase.insertStep(new PingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem(new Path("Request/pdfReportData")).assertValueType(StringValue.class));
 
             // Assert that the ProcessActor has published events
             testCase.getEventListener().getEvents().assertEventType(ProcessStarted.class, 1).assertEventType(ProcessCompleted.class, 1);

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,27 +7,35 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Represents a path into the case file to find a specific case file item
  */
 public class Path implements Serializable {
-    private final String name;
-    private final Map<String, Object> identifiers = new LinkedHashMap();
-    private final transient CaseFileItemDefinition definition; // TODO: should this be transient. Unfortunately yes.
+
+    public final String name;
+    public final int index;
+    private final String originalPath;
     private final Path parent;
-    private int index = -1; // TODO: index should become final too. Additionally it should also support "last" and "current. Probably need an
-                            // additional class for it.
-    private Path child;
+    private final Path root;
+    private final Path child;
+    private final int depth;
+
+    /**
+     * Create a new path from a string. Uses the case definition to validate the path.
+     * Throws an exception if the path is invalid, i.e., if not all the elements inside the path could be mapped to the case file definition.
+     *
+     * @param rawPath
+     * @throws InvalidPathException
+     */
+    public Path(String rawPath) throws InvalidPathException {
+        this(convertRawPath(rawPath), rawPath);
+    }
 
     /**
      * Creates a path that matches the case file item definition's "path" within the case file.
@@ -35,204 +43,153 @@ public class Path implements Serializable {
      * @param cfid
      */
     public Path(CaseFileItemDefinition cfid) {
+        this(cfid, null);
+    }
+
+    /**
+     * Create a path for the case file item instance (including [index] if the item belongs to an array)
+     * @param caseFileItem
+     */
+    public Path(CaseFileItem caseFileItem) {
+        this(caseFileItem, null);
+    }
+
+    private Path(CaseFileItemDefinition cfid, Path child) {
         this.name = cfid.getName();
-        this.definition = cfid;
+        this.index = -1;
+        this.child = child;
         if (cfid.getParentElement() instanceof CaseFileDefinition) {
             parent = null;
+            root = this;
+            depth = 0;
         } else { // ... it is an instance of CaseFileItemDefinition
-            parent = new Path((CaseFileItemDefinition) cfid.getParentElement());
-            parent.child = this;
+            parent = new Path(cfid.getParentElement(), this);
+            root = parent.root;
+            depth = parent.depth + 1;
         }
+        this.originalPath = toString();
     }
 
-    /**
-     * Create a new path from a string. Uses the case definition to validate the path.
-     * Throws an exception if the path is invalid, i.e., if not all the elements inside the path could be mapped to the case file definition.
-     *
-     * @param path
-     * @param caseInstance
-     * @throws InvalidPathException
-     */
-    public Path(String path, Case caseInstance) throws InvalidPathException {
-        this(path, path, caseInstance.getDefinition());
-    }
-
-    /**
-     * Internal constructor that parses the path, whilst keeping the original path in order to be able to throw a proper exception
-     *
-     * @param path
-     * @param originalPath
-     * @param caseDefinition
-     * @throws InvalidPathException
-     */
-    private Path(String path, String originalPath, CaseDefinition caseDefinition) throws InvalidPathException {
-        // Note, this algorithm works it's way up from the bottom to the top path.
-        // So, it also resolves all of the parent paths.
-
-        // First remove slashes at begin and end
-        if (path.endsWith("/"))
-            path = path.substring(0, path.length() - 1); // Remove ending slash
-        if (path.startsWith("/"))
-            path = path.substring(1); // Remove starting slash
-
-        int lastIndexOfSlash = path.lastIndexOf("/");
-        if (lastIndexOfSlash >= 0) {
-            name = parseName(path.substring(lastIndexOfSlash + 1));
-            String parentPath = path.substring(0, lastIndexOfSlash);
-            parent = new Path(parentPath, originalPath, caseDefinition);
-            parent.child = this;
-            definition = resolveCaseFileItemDefinition(parent.definition.getChildren());
-        } else {
-            parent = null;
-            name = parseName(path);
-            definition = resolveCaseFileItemDefinition(caseDefinition.getCaseFileModel().getCaseFileItems());
-        }
-        if (this.definition == null) {
-            throw new InvalidPathException("The path '" + originalPath + "' is invalid, since the part '" + name + "' is not defined in the case file");
-        }
-    }
-
-    /**
-     * Simple constructor to copy and create a new path.
-     *
-     * @param path
-     */
-    private Path(Path path) {
-        name = path.name;
-        parent = path.parent;
-        child = path.child;
-        definition = path.definition;
-        index = path.index;
-    }
-
-    Path(CaseFileItem caseFileItem) {
-        name = caseFileItem.getDefinition().getName();
+    private Path(CaseFileItem caseFileItem, Path child) {
+        this.name = caseFileItem.getDefinition().getName();
+        this.index = caseFileItem.getIndex();
+        this.child = child;
         CaseFileItem parentItem = caseFileItem.getParent();
         if (parentItem == null) {
-            parent = null;
+            this.parent = null;
+            this.root = this;
+            this.depth = 0;
         } else {
-            parent = new Path(parentItem);
-            parent.child = this;
+            this.parent = new Path(parentItem, this);
+            this.root = parent.root;
+            this.depth = parent.depth + 1;
         }
-        definition = caseFileItem.getDefinition();
-        index = caseFileItem.getIndex();
+        this.originalPath = toString();
     }
 
-    private String parseName(String subPath) throws InvalidPathException {
-        int openingBracket = subPath.indexOf("[");
-        if (openingBracket == 0) {
-            throw new InvalidPathException("Missing name part in path, cannot start with an opening bracket");
-        }
-        if (openingBracket > 0) {
-            if (subPath.lastIndexOf("]") != subPath.length() - 1) {
-                throw new InvalidPathException("Path should end with a closing bracket, as it has an opening bracket");
+    private Path(String[] chain, String originalPath) {
+        this(chain, null, chain.length - 1, originalPath);
+    }
+
+    private Path(String[] chain, Path child, int depth, String originalPath) {
+//        System.out.println("PARSING '" + originalPath +"' with " + chain.length +" chain elements, at depth " + depth + " part is: " + chain[depth]);
+        this.child = child;
+        this.depth = depth;
+        String myPart = chain[depth];
+        int openingBracket = myPart.indexOf("[");
+        this.index = parseIndex(myPart, originalPath, openingBracket);
+        this.name = myPart.substring(0, openingBracket >= 0 ? openingBracket : myPart.length());
+        this.parent = depth > 0 ? new Path(chain, this, depth - 1, originalPath) : null;
+        this.root = this.parent == null ? this : parent.root;
+        this.originalPath = originalPath != null ? originalPath : toString();
+    }
+
+    private int parseIndex(String part, String originalPath, int openingBracketPosition) {
+        if (openingBracketPosition == 0) {
+            throw new InvalidPathException("Missing name part in path, cannot start with an opening bracket '" + originalPath + "'");
+        } else if (openingBracketPosition < 0) {
+            return -1;
+        } else {
+            if (!part.endsWith("]")) {
+                throw new InvalidPathException("Path should end with a closing bracket, as it has an opening bracket '" + originalPath + "'");
             }
-            String indexString = subPath.substring(openingBracket + 1, subPath.length() - 1);
+            String indexString = part.substring(openingBracketPosition + 1, part.length() - 1);
             try {
-                index = Integer.parseInt(indexString);
+                int index = Integer.parseInt(indexString);
                 if (index < 0) {
-                    throw new InvalidPathException("'" + indexString + "' is not a valid index. Path index may not be negative");
+                    throw new InvalidPathException("'" + indexString + "' is not a valid index. Path index may not be negative '" + originalPath + "'");
                 }
+                return index;
             } catch (NumberFormatException e) {
-                throw new InvalidPathException("'" + indexString + "' is not a valid index in a path object");
+                throw new InvalidPathException("'" + indexString + "' is not a valid index in path '" + originalPath + "'");
             }
-        } else {
-            openingBracket = subPath.length();
         }
-        return subPath.substring(0, openingBracket);
     }
 
-    private CaseFileItemDefinition resolveCaseFileItemDefinition(Collection<CaseFileItemDefinition> itemDefinitions) {
-        return itemDefinitions.stream().filter(c -> {
-            return c.getName().equals(name);
-        }).findFirst().orElse(null);
+    /**
+     * Resolve the path on the specified case instance to return the corresponding case file item
+     *
+     * @param caseInstance
+     * @return
+     * @throws InvalidPathException if the path is not compliant with the case definition, or if it points to
+     *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
+     *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
+     */
+    public CaseFileItem resolve(Case caseInstance) throws InvalidPathException {
+        return root.resolve(caseInstance.getCaseFile());
+    }
+
+    /**
+     * Resolve this path on the parent.
+     *
+     * @param parentItem
+     * @return
+     * @throws InvalidPathException if the path is not compliant with the case definition, or if it points to
+     *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
+     *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
+     */
+    private CaseFileItem resolve(CaseFileItemCollection<?> parentItem) throws InvalidPathException {
+        CaseFileItemDefinition itemDefinition = parentItem.getDefinition().getChild(name);
+        if (itemDefinition == null) {
+            throw new InvalidPathException("The path '" + originalPath + "' is invalid, since the part '" + name + "' is not defined in the case file");
+        }
+        CaseFileItem item = this.resolveOptionalArrayItem(parentItem.getItem(itemDefinition));
+        if (child != null) {
+            return child.resolve(item);
+        } else {
+            return item;
+        }
+    }
+
+    private CaseFileItem resolveOptionalArrayItem(CaseFileItem item) {
+        if (index >= 0) { // This path points to a specific array element, check whether that is valid
+            if (item.isArray()) {
+                // Ok, that part is ok, but now check whether the index element exists
+                CaseFileItemArray array = item.getContainer();
+                if (array.size() < index) {
+                    throw new InvalidPathException("The array " + array.getPath() + " has only " + array.size() + " items; cannot access " + originalPath);
+                } else if (array.size() == index) {
+                    throw new InvalidPathException("The array " + array.getPath() + " has only " + array.size() + " items; cannot access " + originalPath + " (Note: index starts at 0 instead of 1)");
+                }
+                return array.get(index);
+            } else {
+                throw new InvalidPathException("The path '" + originalPath + "' is invalid because the CaseFileItem is not of type array");
+            }
+        }
+        return item;
     }
 
     public String toString() {
+        String myPart = index < 0 ? name : name + "[" + index + "]";
         if (parent != null) {
-            return parent.toString() + "/" + getSubPathString();
+            return parent.toString() + "/" + myPart;
         } else {
-            return getSubPathString();
+            return myPart;
         }
     }
 
-    private String getSubPathString() {
-        StringBuilder subPath = new StringBuilder(name);
-        if (index >= 0) {
-            subPath.append("[" + index + "]");
-        }
-        return subPath.toString();
-    }
-
-    /**
-     * Returns the parent path.
-     *
-     * @return
-     */
-    public Path getParent() {
-        return parent;
-    }
-
-    /**
-     * Returns the direct child path
-     *
-     * @return
-     */
-    public Path getChild() {
-        return child;
-    }
-
-    /**
-     * Returns a trimmed version of this path. I.e., any trailing children are removed from the path.
-     *
-     * @return
-     */
-    public Path trim() {
-        Path trimmed = new Path(this);
-        trimmed.child = null;
-        return trimmed;
-    }
-
-    /**
-     * Returns the {@link CaseFileItemDefinition} that corresponds with this {@link Path}
-     *
-     * @return
-     */
-    CaseFileItemDefinition getCaseFileItemDefinition() {
-        return definition;
-    }
-
-    /**
-     * Returns the map of identifiers for this level in the path
-     *
-     * @return
-     */
-    public Map<String, Object> getIdentifiers() {
-        return identifiers;
-    }
-
-    /**
-     * Allows to search for a specific object within the path, e.g., if an order
-     * has 10 lines, then through <code>setIdentifier("LineID", 10)</code> the path
-     * can be made more specific.
-     *
-     * @param propertyName
-     * @param propertyValue
-     */
-    public void setIdentifier(String propertyName, Object propertyValue) {
-        identifiers.put(propertyName, propertyValue);
-    }
-
-    /**
-     * Returns the top level path element.
-     *
-     * @return
-     */
-    public Path getRoot() {
-        if (parent == null) {
-            return this;
-        }
-        return parent.getRoot();
+    public boolean isEmpty() {
+        return name.isEmpty();
     }
 
     /**
@@ -246,9 +203,107 @@ public class Path implements Serializable {
 
     /**
      * Returns the path index (or -1 if it does not have one)
+     *
      * @return
      */
     public int getIndex() {
         return index;
+    }
+
+    public Path getContainer() {
+        if (index < 0) {
+            return this;
+        } else {
+            return new Path(this.parent.originalPath + "/" + this.name);
+        }
+    }
+
+    /**
+     * Returns true if the other path matches this path
+     * @param otherPath
+     * @return
+     */
+    public boolean matches(Path otherPath) {
+        return match(this.leaf(), otherPath.leaf());
+    }
+
+    /**
+     * Returns true if the other path is a child of this path
+     * @param otherPath
+     * @return
+     */
+    public boolean hasChild(Path otherPath) {
+        if (this.depth > otherPath.depth) {
+            return false;
+        }
+        while (otherPath.depth > this.depth) {
+            otherPath = otherPath.parent;
+        }
+        return match(this, otherPath);
+    }
+
+    /**
+     * Returns true if this path element is an element in the other path.
+     * E.g. other path is /abc, and this is /abc[0] then it returns true
+     * @param otherPath
+     * @return
+     */
+    public boolean isArrayElementOf(Path otherPath) {
+        return (this.depth == otherPath.depth && this.index != -1 && otherPath.index == -1 && this.name.equals(otherPath.name) && match(this.parent, otherPath.parent));
+    }
+
+    private boolean match(Path path1, Path path2) {
+        if (path1 == null && path2 == null) {
+            return true;
+        }
+        if (path1.depth != path2.depth) {
+            return false;
+        }
+        if (! path1.name.equals(path2.name)) {
+            return false;
+        }
+        if (path1.index != path2.index) {
+            return false;
+        }
+        return match(path1.parent, path2.parent);
+    }
+
+    private Path leaf() {
+        if (child == null) {
+            return this;
+        }
+        return child.leaf();
+    }
+
+    /**
+     * Check whether path is not null, whether it has empty elements,
+     * and removes first and last slash if they exist.
+     *
+     * @param rawPath
+     * @return
+     * @throws InvalidPathException
+     */
+    private static String[] convertRawPath(String rawPath) throws InvalidPathException {
+        if (rawPath == null) {
+            throw new InvalidPathException("Missing path parameter");
+        }
+        // Empty path elements are no allowed.
+        if (rawPath.indexOf("//") >= 0) {
+            throw new InvalidPathException("Path should not contain empty elements '//' " + rawPath);
+        }
+        // Remove optional trailing slash and ending slash
+        if (rawPath.startsWith("/")) {
+            rawPath = rawPath.substring(1);
+        }
+        if (rawPath.endsWith("/")) {
+            rawPath = rawPath.substring(0, rawPath.length() - 1);
+        }
+
+        String[] pathElements = rawPath.split("/");
+        for (int i=0; i<pathElements.length; i++) {
+//            System.out.println("part["+i+"] = '" + pathElements[i] + "'");
+            pathElements[i] = pathElements[i].trim();
+        }
+        return pathElements;
     }
 }

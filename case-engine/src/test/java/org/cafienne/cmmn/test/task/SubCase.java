@@ -19,6 +19,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.junit.Test;
@@ -197,7 +198,7 @@ public class SubCase {
         // Next, we expect the main case's task to go to Fault state.
         ValueMap invalidMainRequest = new ValueMap();
         invalidMainRequest.putRaw("aBoolean", "I ought to be boolean but i am a string");
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, invalidMainRequest, "InvalidMainRequest"), action -> action.print());
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, invalidMainRequest, new Path("InvalidMainRequest")), action -> action.print());
 
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerFailingBlockingSubCaseTask", Transition.Complete), mainCasePlan -> {
             testCase.getEventListener().awaitPlanItemState("TriggerFailingBlockingSubCaseTask", State.Completed);
@@ -216,7 +217,7 @@ public class SubCase {
 
             ValueMap validMainRequest = new ValueMap();
             validMainRequest.putRaw("aBoolean", false);
-            testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, "InvalidMainRequest"), r -> r.print()); // print the updated case file
+            testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, new Path("InvalidMainRequest")), r -> r.print()); // print the updated case file
 
             testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "FailingBlockingSubCaseTask", Transition.Reactivate), r -> {
                 // SubCaseTask should be active

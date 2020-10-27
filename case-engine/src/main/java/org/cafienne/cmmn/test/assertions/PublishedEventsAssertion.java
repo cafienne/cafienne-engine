@@ -3,6 +3,7 @@ package org.cafienne.cmmn.test.assertions;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.CaseModified;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.filter.EventFilter;
@@ -98,12 +99,9 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param filter
      * @return
      */
-    public CaseFileEvent assertCaseFileEvent(String path, EventFilter<CaseFileEvent> filter) {
+    public CaseFileEvent assertCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter) {
 //        logger.debug("Searching for case file event on path "+path);
-        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, event -> {
-            boolean pathMatches = path.equals(event.getPath()) || path.matches(cleanPath(event.getPath()));
-            return (! (!pathMatches || !filter.matches(event)));
-        });
+        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, event -> path.matches(event.getPath()) && filter.matches(event));
     }
 
     /**
@@ -111,7 +109,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param path CaseFileItem path, e.g. /Root/Top/List[3]
      * @return
      */
-    public PublishedEventsAssertion assertNoCaseFileEvent(String path) {
+    public PublishedEventsAssertion assertNoCaseFileEvent(Path path) {
         return assertNoCaseFileEvent(path, e -> true);
     }
 
@@ -122,10 +120,9 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param filter
      * @return
      */
-    public PublishedEventsAssertion assertNoCaseFileEvent(String path, EventFilter<CaseFileEvent> filter) {
+    public PublishedEventsAssertion assertNoCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter) {
         filter(CaseFileEvent.class).getEvents().forEach(event -> {
-            boolean pathMatches = path.equals(event.getPath()) || path.matches(cleanPath(event.getPath()));
-            if (pathMatches && filter.matches(event)) {
+            if (path.matches(event.getPath()) && filter.matches(event)) {
                 throw new AssertionError("Did not expect to find a matching case file event on path "+path+", but found\n" + event);
             }
         });

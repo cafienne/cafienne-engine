@@ -18,7 +18,12 @@ public class FailureAssertion extends ModelTestCommandAssertion {
     }
 
     public void print() {
-        TestScript.debugMessage("Result of step " + testCommand.getActionNumber() +": " + testCommand.getActualFailure().toJson());
+        TestScript.debugMessage(this.toString());
+    }
+
+    @Override
+    public String toString() {
+        return "Result of step " + testCommand.getActionNumber() +": " + testCommand.getActualFailure().toJson();
     }
 
     /**
