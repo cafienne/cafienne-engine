@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.file.*;
@@ -418,7 +419,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         removedValue = value;
         // Now recursively also delete all of our 'Available' children... Are you sure? Isn't this overinterpreting the spec?
         getChildren().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
-        addDeletedEvent(new CaseFileItemDeleted(this));
+        // Only generate the event if we're not yet in discarded state.
+        if (getState() != State.Discarded) addDeletedEvent(new CaseFileItemDeleted(this));
     }
 
     /**
@@ -593,7 +595,18 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         return connectedExitCriteria;
     }
 
-    public boolean allows(CaseFileItemTransition intendedTransition) {
+
+    public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> content) {
+        // Validate current state against transition
+        if (! allowTransition(intendedTransition)) {
+            throw new InvalidCommandException(intendedTransition+ "CaseFileItem["+getPath()+" cannot be done because item is in state " + getState());
+        }
+
+        // Validate type of new content
+        getDefinition().validate(content);
+    }
+
+    protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         switch (getState()) {
             case Null:
                 return intendedTransition == CaseFileItemTransition.Create;

@@ -116,10 +116,10 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         }
     }
 
-    public boolean allows(CaseFileItemTransition intendedTransition) {
+    protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         // In CaseFileItemArray it is allowed to add new items to the existing array (through Create method)
         if (this.getState() == State.Available && intendedTransition == CaseFileItemTransition.Create) return true;
-        return super.allows(intendedTransition);
+        return super.allowTransition(intendedTransition);
     }
 
     private CaseFileItem getNextItem() {

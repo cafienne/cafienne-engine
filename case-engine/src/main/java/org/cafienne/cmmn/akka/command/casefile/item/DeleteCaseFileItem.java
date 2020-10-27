@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command.casefile;
+package org.cafienne.cmmn.akka.command.casefile.item;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
@@ -27,16 +27,11 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
      * @param caseFileItemPath Path to the case file item to be created
      */
     public DeleteCaseFileItem(TenantUser tenantUser, String caseInstanceId, String caseFileItemPath) {
-        super(tenantUser, caseInstanceId, Value.NULL, caseFileItemPath);
+        super(tenantUser, caseInstanceId, Value.NULL, caseFileItemPath, CaseFileItemTransition.Delete);
     }
 
     public DeleteCaseFileItem(ValueMap json) {
-        super(json);
-    }
-
-    @Override
-    CaseFileItemTransition intendedTransition() {
-        return CaseFileItemTransition.Delete;
+        super(json, CaseFileItemTransition.Delete);
     }
 
     @Override

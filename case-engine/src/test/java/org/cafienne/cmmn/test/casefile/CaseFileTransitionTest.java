@@ -10,13 +10,12 @@ package org.cafienne.cmmn.test.casefile;
 import org.cafienne.cmmn.akka.command.MakeCaseTransition;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.item.CreateCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.item.ReplaceCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.item.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -25,7 +24,6 @@ import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.util.Guid;
 import org.junit.Test;
-import org.scalatest.concurrent.TestThreadsStartingCounter;
 
 public class CaseFileTransitionTest {
 

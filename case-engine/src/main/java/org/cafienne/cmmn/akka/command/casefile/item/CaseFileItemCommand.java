@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command.casefile;
+package org.cafienne.cmmn.akka.command.casefile.item;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
@@ -13,7 +13,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.cmmn.akka.command.casefile.CaseFileCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
@@ -25,28 +25,25 @@ import java.io.IOException;
 /**
  * Holds some generic validation and processing behavior for CaseFile operations.
  */
-abstract class CaseFileItemCommand extends CaseCommand {
-    protected final Value<?> content;
+abstract class CaseFileItemCommand extends CaseFileCommand {
     protected final String caseFileItemPath;
     protected Path path;
     protected CaseFileItem caseFileItem;
 
     /**
      * Determine path and content for the CaseFileItem to be touched.
-     *
-     * @param caseInstanceId   The id of the case in which to perform this command.
+     *  @param caseInstanceId   The id of the case in which to perform this command.
      * @param newContent         A value structure with contents of the new case file item
      * @param caseFileItemPath Path to the case file item to be created
+     * @param intendedTransition
      */
-    protected CaseFileItemCommand(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, String caseFileItemPath) {
-        super(tenantUser, caseInstanceId);
+    protected CaseFileItemCommand(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, String caseFileItemPath, CaseFileItemTransition intendedTransition) {
+        super(tenantUser, caseInstanceId, newContent, intendedTransition);
         this.caseFileItemPath = caseFileItemPath;
-        this.content = newContent;
     }
 
-    protected CaseFileItemCommand(ValueMap json) {
-        super(json);
-        this.content = json.get(Fields.content.toString());
+    protected CaseFileItemCommand(ValueMap json, CaseFileItemTransition intendedTransition) {
+        super(json, intendedTransition);
         this.caseFileItemPath = readField(json, Fields.path);
     }
 
@@ -61,12 +58,11 @@ abstract class CaseFileItemCommand extends CaseCommand {
         caseFileItem = caseInstance.getCaseFile().getItem(path);
 
         // Validate current state
-        if (!caseFileItem.allows(intendedTransition())) {
-            throw new InvalidCommandException(getClass().getSimpleName() + "["+path+"] is not allowed in " + caseFileItem.getState() +" state.");
-        }
+        caseFileItem.validateTransition(intendedTransition, content);
 
-        // Validate type of new content
-        caseFileItem.getDefinition().validate(content);
+//        if (caseFileItem.validateTransition(intendedTransition, content)) {
+//            throw new InvalidCommandException(getClass().getSimpleName() + "["+path+"] is not allowed in " + caseFileItem.getState() +" state.");
+//        }
     }
 
     @Override
@@ -74,8 +70,6 @@ abstract class CaseFileItemCommand extends CaseCommand {
         apply(caseInstance, caseFileItem, content);
         return new CaseResponse(this);
     }
-
-    abstract CaseFileItemTransition intendedTransition();
 
     abstract void apply(Case caseInstance, CaseFileItem caseFileItem, Value<?> content);
 
@@ -87,7 +81,6 @@ abstract class CaseFileItemCommand extends CaseCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.content, content);
         writeField(generator, Fields.path, caseFileItemPath);
     }
 }

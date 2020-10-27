@@ -7,7 +7,7 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{StatusCodes, Uri}
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -17,15 +17,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.serialization.json.Value
-import org.cafienne.cmmn.akka.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
+import org.cafienne.cmmn.akka.command.casefile.file.{CreateCaseFile, DeleteCaseFile, ReplaceCaseFile, UpdateCaseFile}
+import org.cafienne.cmmn.akka.command.casefile.item.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.projection.CaseSearchFailure
 import org.cafienne.service.api.projection.query.CaseQueries
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -84,11 +81,16 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "casefile" / "create" / RemainingPath) { (caseInstanceId, path) =>
         entity(as[Value[_]]) { json =>
-          askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
+          isEmpty(path) match {
+            case true =>  askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFile(tenantUser, caseInstanceId, json))
+            case false => askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
+          }
         }
       }
     }
   }
+
+  private def isEmpty(path: Uri.Path): Boolean = path.toString.replace("/","").isBlank
 
   @Path("/{caseInstanceId}/casefile/replace/{path}")
   @PUT
@@ -111,7 +113,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "casefile" / "replace" / RemainingPath) { (caseInstanceId, path) =>
         entity(as[Value[_]]) { json =>
-          askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
+          isEmpty(path) match {
+            case true =>  askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFile(tenantUser, caseInstanceId, json))
+            case false => askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
+          }
         }
       }
     }
@@ -137,7 +142,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "casefile" / "update" / RemainingPath) { (caseInstanceId, path) => {
         entity(as[Value[_]]) { json =>
-          askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
+          isEmpty(path) match {
+            case true =>  askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFile(tenantUser, caseInstanceId, json))
+            case false => askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
+          }
         }
       }
       }
@@ -163,7 +171,10 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   def deleteCaseFileItem = delete {
     validUser { platformUser =>
       path(Segment / "casefile" / "delete" / RemainingPath) { (caseInstanceId, path) =>
-        askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path.toString))
+        isEmpty(path) match {
+          case true =>  askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFile(tenantUser, caseInstanceId))
+          case false => askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path.toString))
+        }
       }
     }
   }

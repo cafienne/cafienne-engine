@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command.casefile;
+package org.cafienne.cmmn.akka.command.casefile.item;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
@@ -31,16 +31,11 @@ public class ReplaceCaseFileItem extends CaseFileItemCommand {
      * @param caseFileItemPath Path to the case file item to be created
      */
     public ReplaceCaseFileItem(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, String caseFileItemPath) {
-        super(tenantUser, caseInstanceId, newContent, caseFileItemPath);
+        super(tenantUser, caseInstanceId, newContent, caseFileItemPath, CaseFileItemTransition.Replace);
     }
 
     public ReplaceCaseFileItem(ValueMap json) {
-        super(json);
-    }
-
-    @Override
-    CaseFileItemTransition intendedTransition() {
-        return CaseFileItemTransition.Replace;
+        super(json, CaseFileItemTransition.Replace);
     }
 
     @Override

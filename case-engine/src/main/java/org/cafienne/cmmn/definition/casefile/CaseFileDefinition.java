@@ -9,8 +9,12 @@ package org.cafienne.cmmn.definition.casefile;
 
 import java.util.Collection;
 
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.w3c.dom.Element;
 
 public class CaseFileDefinition extends CaseFileItemCollectionDefinition {
@@ -44,4 +48,14 @@ public class CaseFileDefinition extends CaseFileItemCollectionDefinition {
         }
         return item;
     }
+
+//    @Override
+//    public CaseFileItem createInstance(Case caseInstance, CaseFileItemCollection<?> parent) {
+//        return null;
+//    }
+//
+//    @Override
+//    public void validate(Value value) throws CaseFileError {
+//
+//    }
 }

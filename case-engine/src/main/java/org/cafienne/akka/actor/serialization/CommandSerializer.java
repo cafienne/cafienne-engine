@@ -1,10 +1,11 @@
 package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.cmmn.akka.command.*;
-import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.file.CreateCaseFile;
+import org.cafienne.cmmn.akka.command.casefile.item.CreateCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.item.DeleteCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.item.ReplaceCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.item.UpdateCaseFileItem;
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode;
 import org.cafienne.cmmn.akka.command.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.task.FailTask;
@@ -41,6 +42,8 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(DeleteCaseFileItem.class, DeleteCaseFileItem::new);
         addManifestWrapper(ReplaceCaseFileItem.class, ReplaceCaseFileItem::new);
         addManifestWrapper(UpdateCaseFileItem.class, UpdateCaseFileItem::new);
+        addManifestWrapper(CreateCaseFile.class, CreateCaseFile::new);
+
         addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
         addManifestWrapper(CompleteTask.class, CompleteTask::new);
         addManifestWrapper(FailTask.class, FailTask::new);
