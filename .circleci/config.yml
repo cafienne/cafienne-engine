@@ -3,7 +3,7 @@ jobs:
   master-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-1604:202007-01
     resource_class: large
     steps:
       - checkout
@@ -162,7 +162,7 @@ jobs:
   branch-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-1604:202007-01
     resource_class: large
     steps:
       - checkout
@@ -244,7 +244,7 @@ jobs:
   release-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-1604:202007-01
     resource_class: large
     steps:
       - checkout
