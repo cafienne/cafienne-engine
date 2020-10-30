@@ -79,18 +79,17 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def createCaseFileItem = post {
     validUser { platformUser =>
-      path(Segment / "casefile" / "create" / RemainingPath) { (caseInstanceId, path) =>
+      path(Segment / "casefile" / "create" / RemainingPath) { (caseInstanceId, rawPath) =>
         entity(as[Value[_]]) { json =>
-          isEmpty(path) match {
-            case true =>  askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFile(tenantUser, caseInstanceId, json))
+          val path = new PathParser(rawPath)
+          path.isEmpty match {
+            case true => askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFile(tenantUser, caseInstanceId, json))
             case false => askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
           }
         }
       }
     }
   }
-
-  private def isEmpty(path: Uri.Path): Boolean = path.toString.replace("/","").isBlank
 
   @Path("/{caseInstanceId}/casefile/replace/{path}")
   @PUT
@@ -111,10 +110,11 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def replaceCaseFileItem = put {
     validUser { platformUser =>
-      path(Segment / "casefile" / "replace" / RemainingPath) { (caseInstanceId, path) =>
+      path(Segment / "casefile" / "replace" / RemainingPath) { (caseInstanceId, rawPath) =>
         entity(as[Value[_]]) { json =>
-          isEmpty(path) match {
-            case true =>  askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFile(tenantUser, caseInstanceId, json))
+          val path = new PathParser(rawPath)
+          path.isEmpty match {
+            case true => askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFile(tenantUser, caseInstanceId, json))
             case false => askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
           }
         }
@@ -140,10 +140,11 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   def updateCaseFileItem = put {
     validUser { platformUser =>
-      path(Segment / "casefile" / "update" / RemainingPath) { (caseInstanceId, path) => {
+      path(Segment / "casefile" / "update" / RemainingPath) { (caseInstanceId, rawPath) => {
         entity(as[Value[_]]) { json =>
-          isEmpty(path) match {
-            case true =>  askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFile(tenantUser, caseInstanceId, json))
+          val path = new PathParser(rawPath)
+          path.isEmpty match {
+            case true => askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFile(tenantUser, caseInstanceId, json))
             case false => askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
           }
         }
@@ -170,12 +171,28 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Consumes(Array("application/json"))
   def deleteCaseFileItem = delete {
     validUser { platformUser =>
-      path(Segment / "casefile" / "delete" / RemainingPath) { (caseInstanceId, path) =>
-        isEmpty(path) match {
-          case true =>  askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFile(tenantUser, caseInstanceId))
+      path(Segment / "casefile" / "delete" / RemainingPath) { (caseInstanceId, rawPath) =>
+        val path = new PathParser(rawPath)
+        path.isEmpty match {
+          case true => askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFile(tenantUser, caseInstanceId))
           case false => askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path.toString))
         }
       }
+    }
+  }
+
+  /**
+    * Simple helper class to convert a case file element path with array elements
+    * E.g. for handling path like /File/Item/Array[3]/Object
+    *
+    * @param raw
+    */
+  class PathParser(raw: Uri.Path) {
+    val isEmpty = raw.toString.replace("/", "").isBlank
+
+    override def toString(): java.lang.String = {
+      import java.nio.charset.StandardCharsets
+      java.net.URLDecoder.decode(raw.toString, StandardCharsets.UTF_8.name)
     }
   }
 }
