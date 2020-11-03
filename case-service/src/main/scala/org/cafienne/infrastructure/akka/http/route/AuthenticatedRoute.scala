@@ -29,12 +29,25 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     case e: CannotReachIDPException => handleIDPException(e)
     case s: AuthenticationException => handleAuthenticationException(s)
     case a: AuthorizationException => handleAuthorizationException(a)
-    case i: InvalidCommandException => complete(StatusCodes.BadRequest, i.getMessage)
+    case i: InvalidCommandException => handleInvalidCommandException(i)
     case s: SecurityException => handleAuthorizationException(s) // Pretty weird, as our code does not throw it; log it similar to Authorizaton issues
     case other => defaultExceptionHandler(other) // All other exceptions just handle the default way from CaseServiceRoute
   }
 
-  private def handleIDPException(e: CannotReachIDPException) ={
+  private def handleInvalidCommandException(i: InvalidCommandException) = {
+    if (logger.underlying.isDebugEnabled) {
+      extractUri { uri =>
+        extractMethod { method =>
+          logger.debug(s"Invalid command on ${method.value} $uri", i)
+          complete(StatusCodes.BadRequest, i.getMessage)
+        }
+      }
+    } else {
+      complete(StatusCodes.BadRequest, i.getMessage)
+    }
+  }
+
+  private def handleIDPException(e: CannotReachIDPException) = {
     logger.error("Service cannot validate security tokens, because IDP is not reachable")
     complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = e.getMessage)).andThen(g => {
       // TODO: this probably should be checked upon system startup in the first place
