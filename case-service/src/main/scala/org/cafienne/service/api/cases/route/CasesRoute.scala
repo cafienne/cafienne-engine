@@ -53,7 +53,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
             if (unfoundUsers.size == 1) s"Cannot find an active user '${unfoundUsers(0)}' in tenant '$tenant'"
             else s"The users ${unfoundUsers.map(u => s"'$u'").mkString(", ")} are not active in tenant $tenant"
           }
-          complete(StatusCodes.BadRequest, msg)
+          complete(StatusCodes.NotFound, msg)
         } else {
           askModelActor(command)
         }

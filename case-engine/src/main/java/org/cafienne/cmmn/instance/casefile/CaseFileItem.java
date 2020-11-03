@@ -286,9 +286,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             // Update propagation is handled in update method itself.
             return;
         }
-        // TODO: For replace we should check whether or not to remove the existing children
-
-
         Value newValue = event.getValue();
         if (!newValue.isMap()) {
             return;
@@ -302,7 +299,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         });
     }
 
-    // TODO: The following 4 methods should generate specific events instead of generic CaseFileEvent event
     public void createContent(Value<?> newContent) {
         generateContentWarnings(newContent, "Create");
         addCaseFileEvent(new CaseFileItemCreated(this, newContent));
@@ -420,9 +416,9 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void deleteContent() {
         removedValue = value;
+        // Now recursively also delete all of our 'Available' children... Are you sure? Isn't this overinterpreting the spec?
+        getChildren().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
         addDeletedEvent(new CaseFileItemDeleted(this));
-        // Now recursively also delete all of our children... Are you sure? Isn't this overinterpreting the spec?
-        getChildren().forEach((definition, childItem) -> childItem.deleteContent());
     }
 
     /**

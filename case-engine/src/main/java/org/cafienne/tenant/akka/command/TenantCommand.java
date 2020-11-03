@@ -11,15 +11,14 @@ import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.command.exception.MissingTenantException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.akka.event.CaseEvent;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.exception.TenantException;
 
@@ -34,7 +33,6 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
      *
      * @param tenantOwner The user that issues this command.
      * @param tenantId The id of the case in which to perform this command.
-     * @throws MissingTenantException If the user context does not have a tenant field.
      */
     protected TenantCommand(TenantUser tenantOwner, String tenantId) {
         super(tenantOwner, tenantId);

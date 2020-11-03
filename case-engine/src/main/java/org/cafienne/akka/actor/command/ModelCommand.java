@@ -1,5 +1,6 @@
 package org.cafienne.akka.actor.command;
 
+import akka.actor.ActorPath;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -8,13 +9,13 @@ import org.cafienne.akka.actor.TenantUserMessage;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.CafienneSerializable;
+import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.JSONParseFailure;
 import org.cafienne.akka.actor.serialization.json.JSONReader;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;
@@ -31,16 +32,22 @@ public abstract class ModelCommand<T extends ModelActor> implements CafienneSeri
     final protected TenantUser user;
 
     protected ModelCommand(TenantUser tenantUser, String actorId) {
-        this.msgId = new Guid().toString();
+        // First, validate actor id to be akka compliant
+        if (actorId == null) {
+            throw new InvalidCommandException("Actor id cannot be null");
+        }
+        try {
+            ActorPath.validatePathElement(actorId);
+        } catch (Throwable t) {
+            throw new InvalidCommandException("Invalid actor path " + actorId, t);
+        }
         if (tenantUser == null || tenantUser.id() == null || tenantUser.id().trim().isEmpty()) {
             throw new InvalidCommandException("Tenant user cannot be null");
         }
         if (tenantUser.tenant() == null || tenantUser.tenant().isEmpty()) {
             throw new InvalidCommandException("Tenant information is missing for the "+this.getClass().getSimpleName()+" command");
         }
-        if (actorId == null) {
-            throw new InvalidCommandException("Actor id cannot be null");
-        }
+        this.msgId = new Guid().toString();
         this.user = tenantUser;
         this.actorId = actorId;
     }

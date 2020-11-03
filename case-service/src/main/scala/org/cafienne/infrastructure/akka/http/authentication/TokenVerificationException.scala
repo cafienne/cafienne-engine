@@ -1,6 +1,6 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-class TokenVerificationException(val msg: String) extends SecurityException(msg) {
+class TokenVerificationException(val msg: String) extends AuthenticationException(msg) {
   def this(msg: String, cause: Throwable) {
     this(msg)
     initCause(cause)
@@ -17,8 +17,7 @@ object TokenVerificationException {
     Some((e.getMessage, Option(e.getCause)))
 }
 
-class MissingTokenException() extends TokenVerificationException("Authorization token is missing")
-class InvalidJWTException() extends TokenVerificationException("Authorization token does not match JWT standard")
+object MissingTokenException extends TokenVerificationException("Authorization token is missing")
 class MissingClaimsException(msg: String) extends TokenVerificationException(msg)
 class InvalidIssuerException(msg: String) extends TokenVerificationException(msg)
 class CannotReachIDPException(msg: String, cause: Throwable) extends TokenVerificationException(msg, cause)

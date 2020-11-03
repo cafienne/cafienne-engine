@@ -3,6 +3,7 @@ package org.cafienne.cmmn.repository;
 import com.typesafe.config.Config;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -22,7 +23,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     private final List<String> authorizedTenantRoles;
 
     @Override
-    public List<String> list(TenantUser user) {
+    public List<String> list(PlatformUser user, String tenant) {
         return new ArrayList();
     }
 
@@ -51,8 +52,8 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     }
 
     @Override
-    public DefinitionsDocument read(TenantUser user, String contents) throws InvalidDefinitionException {
-        checkAccess(user);
+    public DefinitionsDocument read(PlatformUser user, String tenant, String contents) throws InvalidDefinitionException {
+        checkAccess(user.getTenantUser(tenant));
         try {
             // Now check to see if the file is already in our cache, and, if so, check whether it has the same last modified; if not, put the new one in the cache instead
             DefinitionsDocument cacheEntry = cache.get(contents);
@@ -67,7 +68,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     }
 
     @Override
-    public void write(TenantUser user, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
+    public void write(PlatformUser user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
         throw new WriteDefinitionException("This operation is not supported");
     }
 }

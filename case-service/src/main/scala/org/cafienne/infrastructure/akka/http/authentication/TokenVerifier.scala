@@ -51,7 +51,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
     import scala.collection.JavaConverters._
     var claimsSet: Option[JWTClaimsSet] = None
     if (token.isEmpty) {
-      throw new MissingTokenException
+      throw MissingTokenException
     }
     try {
       //noinspection ScalaStyle
@@ -103,7 +103,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
           }
           case e: Exception => {
             logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
-            throw new Exception("Token verification failure of type " + e.getClass.getSimpleName, e)
+            throw new TokenVerificationException("Token verification failure of type " + e.getClass.getSimpleName, e)
           }
         }
       }

@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
@@ -32,7 +33,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
     @Override
     protected void completeInstance() {
         super.completeInstance();
-        informParent(new CompleteTask(getCaseInstance(), getCaseInstance().getOutputParameters()));
+        informParent(() -> new CompleteTask(getCaseInstance(), getCaseInstance().getOutputParameters()));
     }
 
     @Override
@@ -44,28 +45,33 @@ public class CasePlan extends Stage<CasePlanDefinition> {
     @Override
     protected void failInstance() {
         super.failInstance();
-        informParent(new FailTask(getCaseInstance(), getCaseInstance().getOutputParameters()));
+        informParent(() -> new FailTask(getCaseInstance(), getCaseInstance().getOutputParameters()));
     }
 
     private void informParent(Transition transition) {
         String parentCaseTaskId = getCaseInstance().getId(); // Our Id within our parent
-        Case qase = getCaseInstance();
-        CaseCommand command = new MakePlanItemTransition(qase.getCurrentUser(), qase.getParentCaseId(), parentCaseTaskId, transition);
-        informParent(command);
+        String parentCaseId = getCaseInstance().getParentCaseId(); // Id of our parent
+        TenantUser user = getCaseInstance().getCurrentUser();
+        informParent(() -> new MakePlanItemTransition(user, parentCaseId, parentCaseTaskId, transition));
     }
 
-    private void informParent(CaseCommand command) {
+    private void informParent(CommandCreator createIfParent) {
         String parentCaseId = getCaseInstance().getParentCaseId(); // Id of our parent
         if (parentCaseId.isEmpty()) {
             // No need to inform about our transitions.
             return;
         }
-
+        CaseCommand command = createIfParent.createCommand();
         getCaseInstance().askCase(command, failure ->
             // TTD: this needs better handling
 
             // Wow, now what? CaseTask did not accept our information, but why??
             //  And... should we handle this by e.g. going to Fault state? Or what? Can we make this inconsistency clear somehow other than through the log file? Generate a special event or so?
             logger.error("Parent case " + parentCaseId + " did not accept our request " + command + " and responded with a failure\n" + failure));
+    }
+
+    @FunctionalInterface
+    interface CommandCreator {
+        CaseCommand createCommand();
     }
 }
