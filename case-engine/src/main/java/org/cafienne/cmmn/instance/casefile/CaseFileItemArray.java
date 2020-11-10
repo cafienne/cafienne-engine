@@ -176,10 +176,17 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
                 createNewItem(newChildValue);
             }
         }
+        // Generate RemoveChild events for the items that are not in the new list
         while (numberToRemove-- > 0) {
-            // Now clean up the items that "vanished" while replacing
-            actualArrayItems.remove(actualArrayItems.size() - 1).itemVanished();
+            // Now clean up the items that "vanished" while replacing;
+            CaseFileItem removable = actualArrayItems.get(numberToReplace + numberToRemove);
+            getParent().removeChildItem(removable);
         }
+    }
+
+    protected void itemRemoved(int index) {
+        actualArrayItems.remove(index);
+        actualValueOfCaseFileItemArray.remove(index);
     }
 
     @Override

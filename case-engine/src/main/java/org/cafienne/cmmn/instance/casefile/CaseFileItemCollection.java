@@ -8,6 +8,8 @@
 package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.akka.event.file.CaseFileItemChildRemoved;
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
@@ -17,6 +19,8 @@ import org.cafienne.cmmn.instance.State;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
     private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap();
@@ -91,6 +95,24 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
         return getItem(childDefinition);
     }
 
+    /**
+     * Returns true if the an item (or property) is undefined.
+     * @param identifier
+     * @return
+     */
+    protected boolean isUndefined(String identifier) {
+        return getDefinition().isUndefined(identifier);
+    }
+
+    /**
+     * Returns true if a CaseFileItem with the specified name has an instance.
+     * @param childName
+     * @return
+     */
+    protected boolean hasItem(String childName) {
+        return getItems().keySet().stream().filter(def -> def.getName().equals(childName)).count() > 0;
+    }
+
     protected CaseFileItem getItem(CaseFileItemDefinition childDefinition) {
         CaseFileItem item = getItems().get(childDefinition);
         if (item == null) {
@@ -99,15 +121,6 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
             getItems().put(childDefinition, item);
         }
         return item;
-    }
-
-    /**
-     * Returns true if the an item (or property) is undefined.
-     * @param identifier
-     * @return
-     */
-    protected boolean isUndefined(String identifier) {
-        return this.getDefinition().isUndefined(identifier);
     }
 
     /**
@@ -122,6 +135,31 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     public abstract void createContent(Value<?> newContent);
     public abstract void deleteContent();
     public abstract void replaceContent(Value<?> newContent);
+
+    /**
+     * When replacing existing content with the map, it should generate removeChild events for existing children not in map.
+     * @param map
+     */
+    protected void removeReplacedItems(ValueMap map) {
+        Set<String> newKeys = map.getValue().keySet();
+        Set<CaseFileItem> unfoundItems = getItems().values().stream().filter(item -> !newKeys.contains(item.getName())).collect(Collectors.toSet());
+        unfoundItems.forEach(this::removeChildItem);
+    }
+
+    protected void removeChildItem(CaseFileItem child) {
+        addEvent(new CaseFileItemChildRemoved(this, child.getPath()));
+    }
+
+    public void updateState(CaseFileItemChildRemoved event) {
+        Path childPath = event.getChildPath();
+        CaseFileItem child = getItem(childPath.getName());
+        if (childPath.isArrayElement()) {
+            child.getContainer().itemRemoved(childPath.index);
+        } else {
+            getItems().remove(child.getDefinition());
+        }
+    }
+
     public abstract void updateContent(Value<?> newContent);
 
     public abstract void validateTransition(CaseFileItemTransition intendedTransition, Value<?> newContent);

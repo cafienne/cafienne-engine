@@ -82,7 +82,7 @@ public class NewCaseFileTest {
         // Replacing with the shallow copy should replace entire file
         testCase.addStep(new ReplaceCaseFileItem(user, caseInstanceId, shallowValue, rootPath), result -> {
             result.getEvents().printEventList();
-            result.getEvents().assertSize(2);
+            result.getEvents().assertSize(4);
         });
 
         // Set back entire file should lead to 7 events again

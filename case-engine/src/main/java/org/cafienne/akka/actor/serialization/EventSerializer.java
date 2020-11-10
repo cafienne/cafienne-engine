@@ -72,6 +72,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseFileItemUpdated.class, CaseFileItemUpdated::new);
         addManifestWrapper(CaseFileItemReplaced.class, CaseFileItemReplaced::new);
         addManifestWrapper(CaseFileItemDeleted.class, CaseFileItemDeleted::new);
+        addManifestWrapper(CaseFileItemChildRemoved.class, CaseFileItemChildRemoved::new);
         addManifestWrapper(CaseFileEvent.class, CaseFileEvent::new);
         addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
         addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);

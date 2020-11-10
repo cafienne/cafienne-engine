@@ -7,6 +7,9 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -87,6 +90,30 @@ public class Path implements Serializable {
         this.originalPath = toString();
     }
 
+    /**
+     * Clones the path.
+     * @param pathToClone
+     * @param newPathRoot
+     * @param newPathParent
+     * @param requiredDepth
+     * @param requiredIndex
+     */
+    private Path(Path pathToClone, Path newPathRoot, Path newPathParent, int requiredDepth, int requiredIndex) {
+        this.name = pathToClone.name;
+        this.depth = pathToClone.depth;
+        this.root = newPathRoot == null ? this : newPathRoot;
+        this.parent = newPathParent;
+        // Stop either when we reach depth, or when there is no more child
+        if (pathToClone.child == null || pathToClone.depth == requiredDepth) {
+            this.index = requiredIndex;
+            this.child = null;
+        } else {
+            this.index = pathToClone.index;
+            this.child = new Path(pathToClone.child, this.root, this, requiredDepth, requiredIndex);
+        }
+        this.originalPath = toString();
+    }
+
     private Path(String[] chain, String originalPath) {
         this(chain, null, chain.length - 1, originalPath);
     }
@@ -135,8 +162,13 @@ public class Path implements Serializable {
      *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
      *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
      */
-    public CaseFileItem resolve(Case caseInstance) throws InvalidPathException {
-        return root.resolve(caseInstance.getCaseFile());
+    public <C extends CaseFileItemCollection> C resolve(Case caseInstance) throws InvalidPathException {
+        CaseFile caseFile = caseInstance.getCaseFile();
+        if (this.isEmpty()) {
+            return (C) caseFile;
+        } else {
+            return (C) root.resolve(caseFile);
+        }
     }
 
     /**
@@ -148,7 +180,10 @@ public class Path implements Serializable {
      *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
      *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
      */
-    private CaseFileItem resolve(CaseFileItemCollection<?> parentItem) throws InvalidPathException {
+    private <C extends CaseFileItemCollection> C resolve(CaseFileItemCollection<?> parentItem) throws InvalidPathException {
+        if (isEmpty()) {
+            return (C) parentItem;
+        }
         CaseFileItemDefinition itemDefinition = parentItem.getDefinition().getChild(name);
         if (itemDefinition == null) {
             throw new InvalidPathException("The path '" + originalPath + "' is invalid, since the part '" + name + "' is not defined in the case file");
@@ -157,12 +192,12 @@ public class Path implements Serializable {
         if (child != null) {
             return child.resolve(item);
         } else {
-            return item;
+            return (C) item;
         }
     }
 
     private CaseFileItem resolveOptionalArrayItem(CaseFileItem item) {
-        if (index >= 0) { // This path points to a specific array element, check whether that is valid
+        if (isArrayElement()) { // This path points to a specific array element, check whether that is valid
             if (item.isArray()) {
                 // Ok, that part is ok, but now check whether the index element exists
                 CaseFileItemArray array = item.getContainer();
@@ -179,17 +214,94 @@ public class Path implements Serializable {
         return item;
     }
 
-    public String toString() {
-        String myPart = index < 0 ? name : name + "[" + index + "]";
-        if (parent != null) {
-            return parent.toString() + "/" + myPart;
+    public Value resolve(ValueMap casefile) {
+        if (isEmpty()) {
+            return casefile;
+        }
+        return root.travel(casefile);
+    }
+
+    private Value travel(ValueMap parent) {
+        Value myValue = getCurrentValue(parent);
+        if (child == null) {
+            return myValue;
         } else {
-            return myPart;
+            ValueMap myMap = new ValueMap();
+            if (myValue.isMap()) {
+                myMap = (ValueMap) myValue;
+            } else {
+                // This replaces the old value with a new Map.
+                parent.put(name, myMap);
+            }
+            return child.travel(myMap);
+        }
+    }
+
+    private Value getCurrentValue(ValueMap parent) {
+        if (this.isArrayElement()) {
+            ValueList list = parent.withArray(this.name);
+            if (list.size() > this.index) {
+                return list.get(this.index);
+            } else {
+                // Now what? Let's increase list to proper size with NULL values ...
+                for (int i = list.size(); i < this.index; i++) {
+                    list.add(Value.NULL);
+                }
+                // ... but the last one as a ValueMap, so that we can fill it
+                Value<?> value = new ValueMap();
+                list.add(value);
+                return value;
+            }
+        } else {
+            if (parent.has(this.name)) {
+                return parent.get(this.name);
+            } else {
+                return parent.with(this.name);
+            }
+        }
+    }
+
+    public String toString() {
+        if (parent != null) {
+            return parent.toString() + "/" + getPart();
+        } else {
+            return getPart();
         }
     }
 
     public boolean isEmpty() {
         return name.isEmpty();
+    }
+
+    /**
+     * Return the relative name of this path.
+     *
+     * @return
+     */
+    public String getPart() {
+        return isArrayElement() ? name + "[" + index + "]" : name;
+    }
+
+    /**
+     * Returns this path as array path, so if index is -1 it returns this, else it returns
+     * a new path without index element.
+     * @return
+     */
+    public Path getContainer() {
+        return new Path(this.root, null, null, this.depth, -1);
+    }
+
+    /**
+     * Returns the parent path (or an empty path if parent is null)
+     * This parent path has no child.
+     * @return
+     */
+    public Path getParent() {
+        if (this.parent == null) {
+            return new Path("");
+        } else {
+            return new Path(this.root, null, null, this.depth - 1, this.parent.index);
+        }
     }
 
     /**
@@ -210,12 +322,12 @@ public class Path implements Serializable {
         return index;
     }
 
-    public Path getContainer() {
-        if (index < 0) {
-            return this;
-        } else {
-            return new Path(this.parent.originalPath + "/" + this.name);
-        }
+    /**
+     * Returns true if index greater than or equal to 0;
+     * @return
+     */
+    public boolean isArrayElement() {
+        return index >= 0;
     }
 
     /**
@@ -249,7 +361,7 @@ public class Path implements Serializable {
      * @return
      */
     public boolean isArrayElementOf(Path otherPath) {
-        return (this.depth == otherPath.depth && this.index != -1 && otherPath.index == -1 && this.name.equals(otherPath.name) && match(this.parent, otherPath.parent));
+        return (this.depth == otherPath.depth && this.isArrayElement() && !otherPath.isArrayElement() && this.name.equals(otherPath.name) && match(this.parent, otherPath.parent));
     }
 
     private boolean match(Path path1, Path path2) {

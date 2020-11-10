@@ -62,7 +62,11 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
 
     @Override
     public void replaceContent(Value<?> newContent) {
-        validateValueMap(newContent).getValue().entrySet().forEach(entry -> getItem(entry.getKey()).replaceContent(entry.getValue()));
+        ValueMap newCaseFileContent = validateValueMap(newContent);
+        // Replace new content found in the map
+        newCaseFileContent.getValue().entrySet().forEach(entry -> getItem(entry.getKey()).replaceContent(entry.getValue()));
+        // Now remove children not found in the map
+        removeReplacedItems(newCaseFileContent);
     }
 
     @Override

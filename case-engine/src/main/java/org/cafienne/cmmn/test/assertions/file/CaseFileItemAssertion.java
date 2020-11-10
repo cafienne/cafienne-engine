@@ -23,7 +23,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
         super(command);
         this.caseFileAssertion = caseFileAssertion;
         this.path = path;
-        this.isArrayElement = path.index >= 0;
+        this.isArrayElement = path.isArrayElement();
     }
 
     void addEvent(CaseFileEvent event) {
@@ -42,7 +42,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
      * @return
      */
     private CaseFileItemAssertion assertIterable() {
-        Object something = this.events.getEvents().stream().filter(e -> e.getPath().index >= 0).findFirst();
+        Object something = this.events.getEvents().stream().filter(e -> e.getPath().isArrayElement()).findFirst();
         if (something == null) {
             // There should be at least one 'array' like event, right?
             throw new AssertionError("Case file item " + getName() + " is expected to be an array, but it is not");
