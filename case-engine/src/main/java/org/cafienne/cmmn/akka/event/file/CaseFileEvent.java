@@ -28,31 +28,25 @@ import java.io.IOException;
 public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition> {
     protected final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
-    private final String name;
     private final CaseFileItemTransition transition;
     private final Value<?> value;
     protected final Path path;
     private final State state;
-    private final int index;
 
     public CaseFileEvent(CaseFileItemCollection<?> item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
         super(item.getCaseInstance());
-        this.name = item.getName();
         this.transition = transition;
         this.value = newValue;
         this.path = item.getPath();
         this.state = newState;
-        this.index = item.getIndex();
     }
 
     public CaseFileEvent(ValueMap json) {
         super(json);
-        this.name = json.raw(Fields.name);
         this.transition = json.getEnum(Fields.transition, CaseFileItemTransition.class);
         this.value = json.get(Fields.value.toString());
         this.path = readPath(json, Fields.path);
         this.state = readEnum(json, Fields.state, State.class);
-        this.index = json.rawInt(Fields.index.toString());
     }
 
     @Override
@@ -87,16 +81,7 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
      * @return
      */
     public int getIndex() {
-        return index;
-    }
-
-    /**
-     * Returns the name of the case file item
-     *
-     * @return
-     */
-    public String getCaseFileItemName() {
-        return name;
+        return path.getIndex();
     }
 
     /**
@@ -151,8 +136,6 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         writeField(generator, Fields.transition, transition);
         writeField(generator, Fields.path, path);
         writeField(generator, Fields.value, value);
-        writeField(generator, Fields.name, name);
         writeField(generator, Fields.state, state);
-        generator.writeNumberField(Fields.index.toString(), index);
     }
 }

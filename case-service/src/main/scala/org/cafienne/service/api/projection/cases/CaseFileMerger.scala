@@ -3,48 +3,46 @@ package org.cafienne.service.api.projection.cases
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.akka.event.file._
-import org.cafienne.cmmn.instance.casefile.Path
+import org.cafienne.cmmn.instance.casefile.{CaseFileItemTransition, Path}
 
 object CaseFileMerger extends LazyLogging {
 
   def merge(event: CaseFileEvent, currentCaseFile: ValueMap): Unit = {
     val path: Path = event.getPath
-    val parentValue = path.getParent.resolve(currentCaseFile).asInstanceOf[ValueMap]
-//    println("FOUND PV: " + parentValue)
-
     if (path.isArrayElement) {
+      val parentValue = path.getParent.resolve(currentCaseFile).asInstanceOf[ValueMap]
       val arrayValue = parentValue.withArray(path.getName)
-      event match {
-        case d: CaseFileItemDeleted => arrayValue.getValue.remove(d.getIndex)
-        case r: CaseFileItemReplaced => arrayValue.set(r.getIndex, r.getValue)
-        case r: CaseFileItemUpdated => arrayValue.set(r.getIndex, r.getValue)
-        case c: CaseFileItemCreated => {
-//          arrayValue.add(c.getValue)
-          arrayValue.size > c.getIndex match {
-            case true => arrayValue.set(c.getIndex, c.getValue)
-            case false => arrayValue.add(c.getValue)
-          }
+      val itemIndex = path.index
+      val itemValue = event.getValue
+      event.getTransition match { // Matching on transition instead of event class, because classes only introduced in 1.1.9
+        case CaseFileItemTransition.Delete => arrayValue.getValue.remove(event.getIndex)
+        case CaseFileItemTransition.Replace => arrayValue.set(itemIndex, itemValue)
+        case CaseFileItemTransition.Update => arrayValue.set(itemIndex, itemValue)
+        case CaseFileItemTransition.Create => arrayValue.size > itemIndex match {
+          case true => arrayValue.set(itemIndex, itemValue)
+          case false => arrayValue.add(itemValue)
         }
-        case r: CaseFileItemChildRemoved => {
-          val myValue = arrayValue.get(r.getIndex).asInstanceOf[ValueMap]
-//          println("HANDLING ARRRRRR on " + myValue)
-          handleRemoveChild(r, myValue)
+        case CaseFileItemTransition.RemoveChild => {
+          val myValue = arrayValue.get(itemIndex).asInstanceOf[ValueMap]
+          handleRemoveChild(event.asInstanceOf[CaseFileItemChildRemoved], myValue)
         }
       }
     } else {
-      event match {
-        case d: CaseFileItemDeleted => parentValue.getValue.remove(path.getName)
-        case r: CaseFileItemReplaced => parentValue.put(path.getName, r.getValue)
-        case r: CaseFileItemUpdated => parentValue.put(path.getName, r.getValue)
-        case r: CaseFileItemCreated => parentValue.put(path.getName, r.getValue)
-        case r: CaseFileItemChildRemoved => {
+      val parentValue = path.getParent.resolve(currentCaseFile).asInstanceOf[ValueMap]
+      val itemName = path.getName
+      val itemValue = event.getValue
+      event.getTransition match { // Matching on transition instead of event class, because classes only introduced in 1.1.9
+        case CaseFileItemTransition.Delete => parentValue.getValue.remove(itemName)
+        case CaseFileItemTransition.Replace => parentValue.put(itemName, itemValue)
+        case CaseFileItemTransition.Update => parentValue.put(itemName, itemValue)
+        case CaseFileItemTransition.Create => parentValue.put(itemName, itemValue)
+        case CaseFileItemTransition.RemoveChild => {
           val myValue = if (path.isEmpty) {
-            parentValue
+            parentValue // My value is top level is case file itself
           } else {
-            parentValue.`with`(path.getName)
+            parentValue.`with`(itemName)
           }
-//          println("HANDLING OOOOOR["+path.getPart+"'] for child [" + r.getChildPath +"] on " + myValue)
-          handleRemoveChild(r, myValue)
+          handleRemoveChild(event.asInstanceOf[CaseFileItemChildRemoved], myValue)
         }
       }
     }
