@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.test.assertions.file;
 
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
@@ -12,16 +13,12 @@ import java.util.*;
 
 public class CaseFileAssertion extends ModelTestCommandAssertion {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileAssertion.class);
-    private final Map<String, CaseFileItemAssertion> assertions = new HashMap();
+    private final Map<Path, CaseFileItemAssertion> assertions = new HashMap();
 
     public CaseFileAssertion(ModelTestCommand command) {
         super(command);
         PublishedEventsAssertion<CaseFileEvent> allCaseFileEvents = command.getEventListener().getEvents().filter(CaseFileEvent.class);
-        allCaseFileEvents.getEvents().forEach(e -> {
-            CaseFileItemAssertion cfia = assertions.getOrDefault(e.getPath(), new CaseFileItemAssertion(this, command, e.getPath()));
-            assertions.put(e.getPath(), cfia);
-            cfia.addEvent(e);
-        });
+        allCaseFileEvents.getEvents().forEach(e -> assertCaseFileItem(e.getPath()).addEvent(e));
 //        System.out.println("\n\nWe have "+assertions.size()+" assertions: " + assertions.keySet());
     }
 
@@ -32,10 +29,10 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
      * @param optionalDuration
      * @return
      */
-    public CaseFileEvent awaitCaseFileEvent(String path, EventFilter<CaseFileEvent> filter, long... optionalDuration) {
+    public CaseFileEvent awaitCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter, long... optionalDuration) {
         logger.debug("Waiting for case file event on path "+path);
         return testCommand.getEventListener().waitUntil("CaseFileEvent-"+path, CaseFileEvent.class, event -> {
-            boolean pathMatches = path.equals(event.getPath()) || path.matches(cleanPath(event.getPath()));
+            boolean pathMatches = path.matches(event.getPath());
             if (pathMatches) {
                 logger.debug("Receiving case file event "+event);
             }
@@ -46,47 +43,22 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
     /**
      * Returns a CaseFileItemAssertion wrapper for the given path
      *
-     * @param fileItemPath item name
+     * @param path item name
      * @return CaseFileItemAssertion
      */
-    public CaseFileItemAssertion assertCaseFileItem(String fileItemPath) {
-        CaseFileItemAssertion cfia = assertions.get(fileItemPath);
-        if (cfia == null) {
-            // Return a dummy, none existing CFIA.
-            cfia = new CaseFileItemAssertion(this, testCommand, fileItemPath);
-            assertions.put(fileItemPath, cfia);
-        }
+    public CaseFileItemAssertion assertCaseFileItem(Path path) {
+        Path existingPath = assertions.keySet().stream().filter(key -> key.matches(path)).findAny().orElse(null);
+        if (existingPath == null) existingPath = path;
+        CaseFileItemAssertion cfia = assertions.getOrDefault(existingPath, new CaseFileItemAssertion(this, testCommand, path));
+        assertions.put(existingPath, cfia);
         return cfia;
     }
 
-    List<CaseFileItemAssertion> getArrayElements(String path) {
+    List<CaseFileItemAssertion> getArrayElements(Path path) {
         List<CaseFileItemAssertion> children = new ArrayList();
-        assertions.forEach((key, value) -> {
-            if (key.startsWith(path)) {
-                String restOfKey = key.substring(path.length());
-//                System.out.println("Potential child in " + path + ": second part is "+restOfKey);
-                if (restOfKey.startsWith("[") && restOfKey.indexOf(']') == restOfKey.length() - 1) {
-                    children.add(value);
-//                } else {
-//                    System.out.println("NO match after all...");
-                }
-            }
-        });
+        assertions.entrySet().stream().filter(entry -> entry.getKey().isArrayElementOf(path)).forEach(entry -> children.add(entry.getValue()));
 //        System.out.println("Sorting "+children.size());
         children.sort(Comparator.comparing(CaseFileItemAssertion::getIndexInArray));
         return children;
-    }
-
-    private String cleanPath(String path) {
-        int openBracket = path.indexOf('[');
-        int closeBracket = path.indexOf(']');
-        if (openBracket > 0 && closeBracket > openBracket) {
-            String newPath = path.substring(0, openBracket) + path.substring(closeBracket + 1);
-//            System.out.println("Further cleansing path from "+path+" with "+newPath);
-            return cleanPath(newPath);
-        } else {
-//            System.out.println("No more cleansing of path. Returning "+path);
-            return path;
-        }
     }
 }

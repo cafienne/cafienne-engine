@@ -16,6 +16,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -73,7 +74,7 @@ public class TestGetListGetDetails {
         // So GetList goes to Failed state & GetDetails remains in Available state
         ValueMap requestObject = new ValueMap();
         requestObject.putRaw("port", PORT_NUMBER);
-        CreateCaseFileItem createChild = new CreateCaseFileItem(user, caseInstanceId, requestObject.cloneValueNode(), "HTTP-Configuration");
+        CreateCaseFileItem createChild = new CreateCaseFileItem(user, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTP-Configuration"));
         testCase.addStep(createChild, casePlan -> {
             casePlan.print();
 

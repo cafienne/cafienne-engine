@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.cmmn.test.assertions.file.CaseFileItemAssertion;
@@ -83,10 +84,10 @@ public class CaseAssertion extends StageAssertion {
     /**
      * Returns a CaseFileItemAssertion wrapper for the given path
      *
-     * @param fileItemPath item name
+     * @param path item name
      * @return CaseFileItemAssertion
      */
-    public CaseFileItemAssertion assertCaseFileItem(String fileItemPath) {
-        return caseFileAssertion.assertCaseFileItem(fileItemPath);
+    public CaseFileItemAssertion assertCaseFileItem(Path path) {
+        return caseFileAssertion.assertCaseFileItem(path);
     }
 }

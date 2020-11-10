@@ -12,8 +12,9 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
+import org.cafienne.cmmn.instance.casefile.Path;
 
 /**
  * Updates content and/or properties of a case file item.
@@ -28,23 +29,18 @@ public class UpdateCaseFileItem extends CaseFileItemCommand {
      *
      * @param caseInstanceId   The id of the case in which to perform this command.
      * @param newContent         A value structure with contents of the new case file item
-     * @param caseFileItemPath Path to the case file item to be created
+     * @param path Path to the case file item to be created
      */
-    public UpdateCaseFileItem(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, String caseFileItemPath) {
-        super(tenantUser, caseInstanceId, newContent, caseFileItemPath);
+    public UpdateCaseFileItem(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, Path path) {
+        super(tenantUser, caseInstanceId, newContent, path, CaseFileItemTransition.Update);
     }
 
     public UpdateCaseFileItem(ValueMap json) {
-        super(json);
+        super(json, CaseFileItemTransition.Update);
     }
 
     @Override
-    CaseFileItemTransition intendedTransition() {
-        return CaseFileItemTransition.Update;
-    }
-
-    @Override
-    void apply(Case caseInstance, CaseFileItem caseFileItem, Value<?> content) {
+    void apply(Case caseInstance, CaseFileItemCollection<?> caseFileItem, Value<?> content) {
         caseFileItem.updateContent(content);
     }
 }

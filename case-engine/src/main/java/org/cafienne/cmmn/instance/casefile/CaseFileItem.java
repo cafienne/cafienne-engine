@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.file.*;
@@ -39,7 +40,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     private CaseFileItemTransition lastTransition; // Last transition
 
     private Value<?> value = Value.NULL;
-    private Value<?> removedValue = Value.NULL;
     private Map<String, BusinessIdentifier> businessIdentifiers = new HashMap();
     /**
      * The parent case file item that we are contained in, or null if we are contained in the top level case file.
@@ -141,13 +141,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         return parent;
     }
 
-    /**
-     * Returns the child items of this case file item
-     *
-     * @return
-     */
-    public Map<CaseFileItemDefinition, CaseFileItem> getChildren() {
-        return getItems();
+    public boolean isArray() {
+        return isArray;
+    }
+
+    public <C extends CaseFileItem> C getContainer() {
+        return (C) container;
     }
 
     /**
@@ -246,10 +245,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
-        // Finally propagate the changes to children.
-        propagateValueChangeToChildren(event);
-
-        // Then inform the activating sentries
+        // Inform the activating sentries
         transitionPublisher.informEntryCriteria(event);
     }
 
@@ -259,59 +255,58 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         addDebugInfo(() -> "CaseFile[" + getName() + "]: Completed behavior for transition " + event.getTransition());
     }
 
-    protected void adoptContentFromParent(Value<?> newContentFromParent, CaseFileEvent event) {
-        if (getState().equals(State.Null)) {
-            createContent(newContentFromParent);
-        } else {
-            switch (event.getTransition()) {
-                case Delete: throw new RuntimeException("Not expecting to reach this code");// This actually should not be happening
-                case Replace: {
-                    replaceContent(newContentFromParent);
-                    break;
-                }
-                case Update: {
-                    updateContent(newContentFromParent);
-                    break;
-                }
-                case Create: {
-                    createContent(newContentFromParent);
-                    break;
-                }
-            }
-        }
-    }
-
-    protected void propagateValueChangeToChildren(CaseFileEvent event) {
-        if (event.getTransition() == CaseFileItemTransition.Update) {
-            // Update propagation is handled in update method itself.
-            return;
-        }
-        Value newValue = event.getValue();
-        if (!newValue.isMap()) {
-            return;
-        }
-        ValueMap v = (ValueMap) newValue;
-        v.getValue().forEach((name, newChildValue) -> {
-            CaseFileItem child = getItem(name);
-            if (child != null) {
-                child.adoptContentFromParent(newChildValue.cloneValueNode(), event);
-            }
-        });
-    }
-
+    @Override
     public void createContent(Value<?> newContent) {
+        // EVENT ORDER for Create Content: first create ourselves, then the children
         generateContentWarnings(newContent, "Create");
         addCaseFileEvent(new CaseFileItemCreated(this, newContent));
+        if (newContent.isMap()) {
+            ValueMap map = (ValueMap) newContent;
+            map.getValue().forEach((name, newChildValue) -> {
+                CaseFileItem child = getItem(name);
+                if (child != null) {
+                    child.createContent(newChildValue.cloneValueNode());
+                }
+            });
+        }
     }
 
+    @Override
     public void replaceContent(Value<?> newContent) {
-        generateContentWarnings(newContent, "Replace");
-        itemVanished(); // Make sure current value (and it's descendants) no longer points at us (otherwise potential memory leak?)
-        addCaseFileEvent(new CaseFileItemReplaced(this, newContent));
-    }
+        // EVENT ORDER for Replace Content: first replace children, then ourselves
 
-    private boolean isUndefined(String name) {
-        return this.getChildDefinition(name) == null && !this.getDefinition().getCaseFileItemDefinition().getProperties().containsKey(name);
+        if (newContent.equals(value)) {
+            addDebugInfo(() -> "Replace on CaseFileItem[" + getPath() + "] does not contain changes");
+            return;
+        }
+        generateContentWarnings(newContent, "Replace");
+        if (newContent == Value.NULL) {
+            // Replace all existing, Available children with "null"
+            getDefinition().getChildren().forEach(childDefinition -> {
+                CaseFileItem item = getItem(childDefinition.getName());
+                if (item.getState() == State.Available) {
+                    item.deleteContent();
+                }
+            });
+        } else if (newContent.isMap()) {
+            ValueMap map = (ValueMap) newContent;
+            // Replace new content found in the map
+            getDefinition().getChildren().forEach(childDefinition -> {
+                String childName = childDefinition.getName();
+                if (map.has(childName)) {
+                    Value newChildValue = map.get(childName);
+                    CaseFileItem item = getItem(childName);
+                    if (item.getState() == State.Available) {
+                        item.replaceContent(newChildValue);
+                    } else if (item.getState() == State.Null && map.has(childName)) {
+                        item.createContent(map.get(childName));
+                    }
+                }
+            });
+            // Now remove children not found in the map
+            removeReplacedItems(map);
+        }
+        addCaseFileEvent(new CaseFileItemReplaced(this, newContent));
     }
 
     private void generateContentWarnings(Value<?> newContent, String op) {
@@ -333,7 +328,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         });
     }
 
+    @Override
     public void updateContent(Value<?> newContent) {
+        // EVENT ORDER for Update Content: first update children, then ourselves (optionally)
+
         if (value.isSupersetOf(newContent)) {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] does not contain changes");
             return;
@@ -414,11 +412,14 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
     }
 
+    @Override
     public void deleteContent() {
-        removedValue = value;
-        // Now recursively also delete all of our 'Available' children... Are you sure? Isn't this overinterpreting the spec?
-        getChildren().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
-        addDeletedEvent(new CaseFileItemDeleted(this));
+        // EVENT ORDER for Delete Content: first delete children, then ourselves (optionally)
+
+        // First recursively delete all of our 'Available' children...
+        getItems().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
+        // Only generate the event if we're not yet in discarded state.
+        if (getState() != State.Discarded) addDeletedEvent(new CaseFileItemDeleted(this));
     }
 
     /**
@@ -428,9 +429,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     protected void setValue(Value<?> newValue) {
         addDebugInfo(() -> "Setting case file item [" + getPath() + "] value", newValue);
-        // Set our value, and also tell the value that we now own it.
+        // Remove ownership from former value, set our value, and also tell the value that we now own it.
+        this.value.clearOwner();
         this.value = newValue;
-        newValue.setOwner(this);
+        this.value.setOwner(this);
 
         // Now update our parent chain (including the array if we belong to one),
         // to make sure the parent's value map is up-to-date with our value
@@ -440,12 +442,20 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         propagateValueChangeToParent(getName(), this.container.getValue());
     }
 
+    /**
+     * Hook to inform array (if we belong to one) about our change.
+     *
+     * @param item
+     */
     protected void itemChanged(CaseFileItem item) {
     }
 
-    protected void itemVanished() {
-        value.clearOwner();
-        getChildren().values().forEach(CaseFileItem::itemVanished);
+    /**
+     * Hook to inform array (if we belong to one) about removal of a child.
+     *
+     * @param index
+     */
+    protected void itemRemoved(int index) {
     }
 
     /**
@@ -548,7 +558,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         value.dumpMemoryStateToXML(contentElement);
 
         // Next, print our children.
-        Iterator<Entry<CaseFileItemDefinition, CaseFileItem>> c = getChildren().entrySet().iterator();
+        Iterator<Entry<CaseFileItemDefinition, CaseFileItem>> c = getItems().entrySet().iterator();
         while (c.hasNext()) {
             c.next().getValue().dumpMemoryStateToXML(caseFileItemXML);
         }
@@ -562,17 +572,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @return
      */
     public CaseFileItem getCurrent() {
-        return this;
-    }
-
-    /**
-     * Resolve the path on this case file item. Base implementation that is overridden in {@link CaseFileItemArray}, where the index
-     * accessor of the path is used to navigate to the correct case file item.
-     *
-     * @param currentPath
-     * @return
-     */
-    CaseFileItem resolve(Path currentPath) {
         return this;
     }
 
@@ -593,7 +592,18 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         return connectedExitCriteria;
     }
 
-    public boolean allows(CaseFileItemTransition intendedTransition) {
+    @Override
+    public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> content) {
+        // Validate current state against transition
+        if (!allowTransition(intendedTransition)) {
+            throw new InvalidCommandException(intendedTransition + "CaseFileItem[" + getPath() + "] cannot be done because item is in state " + getState());
+        }
+
+        // Validate type of new content
+        getDefinition().validate(content);
+    }
+
+    protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         switch (getState()) {
             case Null:
                 return intendedTransition == CaseFileItemTransition.Create;

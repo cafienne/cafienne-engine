@@ -106,9 +106,11 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     Future.successful(Done)
   }
 
+  private val bufferedCaseFileEvents = new CaseFileEventBuffer()
+
   private def handleCaseFileEvent(event: CaseFileEvent): Future[Done] = {
+    bufferedCaseFileEvents.addEvent(event)
     getCaseFile(event.getCaseInstanceId, event.getUser)
-      .map(CaseFileMerger.merge(event, _))
       .map { data =>
         this.caseFile = Some(data)
         Done
@@ -266,6 +268,30 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
+//  private def addUpdatedCaseFile(records:ListBuffer[AnyRef]) = {
+//    val events = bufferedCaseFileEvents.events()
+//    if (! events.isEmpty) {
+//      var caseFileInProgress = caseFile match {
+//        case Some(valuemap) => valuemap
+//        None
+//      }.getOrElse(new ValueMap())
+//      bufferedCaseFileEvents.events.forEach(event => {
+//        caseFileInProgress = CaseFileMerger.merge(event, caseFileInProgress)
+//      })
+//      records += CaseFileRecord(caseInstanceId, tenant, caseFileInProgress.toString)
+//
+//    }
+//  }
+  /**
+    * Depending on the presence of CaseFileEvents this will add a new CaseFileRecord
+    * @param records
+    * @return
+    */
+  private def getNewCaseFile(caseFileInProgress: ValueMap): CaseFileRecord = {
+    bufferedCaseFileEvents.events.forEach(event => CaseFileMerger.merge(event, caseFileInProgress))
+    CaseFileRecord(caseInstanceId, tenant, caseFileInProgress.toString)
+  }
+
   override def commit(offsetName: String, offset: Offset, caseModified: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
 
@@ -273,7 +299,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     this.caseInstance.foreach(instance => records += instance)
     records += this.caseDefinition
     this.caseFile.foreach { caseFile =>
-      records += CaseFileRecord(caseInstanceId, tenant, caseFile.toString)
+      records += getNewCaseFile(caseFile)
     }
     records ++= this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item))
     records ++= this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item))

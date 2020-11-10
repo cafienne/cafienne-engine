@@ -16,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
     BasicTypes.class,
     CaseFileTransitionTest.class,
     CaseFileTest.class,
+    PathTest.class,
     InvalidCaseFileDefinition.class,
     MultiplicityTest.class,
     NewCaseFileTest.class,

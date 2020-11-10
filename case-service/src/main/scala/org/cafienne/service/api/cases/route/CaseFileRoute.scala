@@ -7,8 +7,10 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.javadsl.model.StatusCodes
+import akka.http.scaladsl.model.StatusCode
+import akka.http.scaladsl.server.Directives.{Segments, path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -16,16 +18,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
+import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.cmmn.akka.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api
-import org.cafienne.service.api.projection.CaseSearchFailure
 import org.cafienne.service.api.projection.query.CaseQueries
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -81,13 +80,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def createCaseFileItem = post {
-    validUser { platformUser =>
-      path(Segment / "casefile" / "create" / RemainingPath) { (caseInstanceId, path) =>
-        entity(as[Value[_]]) { json =>
-          askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
-        }
-      }
-    }
+    casefileContentRoute("create", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/replace/{path}")
@@ -108,13 +101,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def replaceCaseFileItem = put {
-    validUser { platformUser =>
-      path(Segment / "casefile" / "replace" / RemainingPath) { (caseInstanceId, path) =>
-        entity(as[Value[_]]) { json =>
-          askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
-        }
-      }
-    }
+    casefileContentRoute("replace", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/update/{path}")
@@ -134,14 +121,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   def updateCaseFileItem = put {
-    validUser { platformUser =>
-      path(Segment / "casefile" / "update" / RemainingPath) { (caseInstanceId, path) => {
-        entity(as[Value[_]]) { json =>
-          askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path.toString))
-        }
-      }
-      }
-    }
+    casefileContentRoute("update", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/delete/{path}")
@@ -161,10 +141,55 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Consumes(Array("application/json"))
   def deleteCaseFileItem = delete {
+    casefileRoute("delete", (platformUser, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path)))
+  }
+
+  /**
+    * Run the action (replace, update, create) for the user on the case instance with the path and the json posted.
+    * @param action
+    * @param subRoute
+    * @return
+    */
+  private def casefileContentRoute(action: String, subRoute: (PlatformUser, Value[_], String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
+    casefileRoute(action, (platformUser, caseInstanceId, path) => {
+      entity(as[Value[_]]) { json => {
+        subRoute(platformUser, json, caseInstanceId, path)
+      }}
+    })
+  }
+
+  /**
+    * Run the action (replace, update, create, delete) for the user on the case instance with the path.
+    * @param action
+    * @param subRoute
+    * @return
+    */
+  private def casefileRoute(action: String, subRoute: (PlatformUser, String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
     validUser { platformUser =>
-      path(Segment / "casefile" / "delete" / RemainingPath) { (caseInstanceId, path) =>
-        askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path.toString))
+      pathPrefix(Segment / "casefile" / action ) { caseInstanceId =>
+        withCaseFilePath(path => subRoute(platformUser, caseInstanceId, path))
       }
+    }
+  }
+
+  /**
+    * Checks if the path ends or has more elements left, and returns any remains into a Cafienne Path object.
+    * Empty path (either with or without slash results in an empty path object, referring to top level CaseFile)
+    * @param subRoute
+    * @return
+    */
+  private def withCaseFilePath(subRoute: org.cafienne.cmmn.instance.casefile.Path => Route): Route = {
+    // Creating a "cafienne-path" will validate the syntax
+    import org.cafienne.cmmn.instance.casefile.Path
+    pathEndOrSingleSlash {
+      subRoute(new Path(""))
+    } ~ path(Remaining) { rawPath =>
+      // Take the "raw" remaining string, and decode it, and make it a Cafienne CaseFile Path
+      // Note: taking "Segment" or "Segments" instead of "Remaining" fails and returns 405 on paths like "abc[0 ",
+      //  when parsing it to a Cafienne path the error message is more clear.
+      import java.nio.charset.StandardCharsets
+      val decodedRawPath = java.net.URLDecoder.decode(rawPath, StandardCharsets.UTF_8.name)
+      subRoute(new Path(decodedRawPath))
     }
   }
 }

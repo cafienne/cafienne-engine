@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,7 +11,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
+import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.akka.actor.serialization.json.Value;
@@ -28,33 +30,65 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
 
     /**
      * Returns the case file items within this case file
+     *
      * @return
      */
     public Map<CaseFileItemDefinition, CaseFileItem> getCaseFileItems() {
         return getItems();
     }
 
-    /**
-     * Returns the items within this CaseFile.
-     * @return
-     */
-    public Map<CaseFileItemDefinition, CaseFileItem> getItems() {
-        return super.getItems();
+    private ValueMap validateValueMap(Value<?> newContent) {
+        if (newContent instanceof ValueMap) {
+            ValueMap items = (ValueMap) newContent;
+            items.fieldNames().forEachRemaining(name -> {
+                if (getItem(name) == null) {
+                    throw new InvalidCommandException("A case file item with name '" + name + "' is not defined");
+                }
+            });
+            return (ValueMap) newContent;
+        }
+        throw new InvalidCommandException("Operations on entire case file need a JSON object structure");
     }
-    
-    /**
-    * Traverses the case file along the path and returns the corresponding case file item.
-    * If the case file item does not yet exist, one will be created (without a value).
-    * @param path
-    * @return
-    */
-    public CaseFileItem getItem(Path path) {
 
-        // TODO: this code belongs in the super class
+    @Override
+    public void createContent(Value<?> newContent) {
+        validateValueMap(newContent).getValue().entrySet().forEach(entry -> getItem(entry.getKey()).createContent(entry.getValue()));
+    }
 
-        if (path.getName().isEmpty())
-            return null; // It is top level.
-        return getItem(path, path.getRoot(), getCaseInstance(), this);
+    @Override
+    public void deleteContent() {
+        getItems().values().forEach(CaseFileItem::deleteContent);
+    }
+
+    @Override
+    public void replaceContent(Value<?> newContent) {
+        ValueMap newCaseFileContent = validateValueMap(newContent);
+        // Replace new content found in the map
+        newCaseFileContent.getValue().entrySet().forEach(entry -> getItem(entry.getKey()).replaceContent(entry.getValue()));
+        // Now remove children not found in the map
+        removeReplacedItems(newCaseFileContent);
+    }
+
+    @Override
+    public void updateContent(Value<?> newContent) {
+        validateValueMap(newContent).getValue().entrySet().forEach(entry -> getItem(entry.getKey()).updateContent(entry.getValue()));
+    }
+
+    @Override
+    public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> newContent) {
+        if (intendedTransition == CaseFileItemTransition.Delete) {
+            // Deleting entire case file is allowed under all circumstances...
+            return;
+        }
+        validateValueMap(newContent).getValue().entrySet().stream().forEach(entry -> {
+            String itemName = entry.getKey();
+            Value newItemContent = entry.getValue();
+            CaseFileItem item = getItem(itemName);
+            if (item == null) {
+                throw new CaseFileError("Item '" + itemName + "' is not found in the Case File definition");
+            }
+            item.validateTransition(intendedTransition, newItemContent);
+        });
     }
 
     public ValueMap toJson() {

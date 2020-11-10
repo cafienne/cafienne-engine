@@ -7,6 +7,7 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.infrastructure.json.CafienneJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,10 @@ public interface CafienneSerializable {
         generator.writeStringField(fieldName.toString(), String.valueOf(value));
     }
 
+    default void writeField(JsonGenerator generator, Fields fieldName, Path value) throws IOException {
+        generator.writeStringField(fieldName.toString(), String.valueOf(value));
+    }
+
     default void writeField(JsonGenerator generator, Fields fieldName, CafienneSerializable value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
@@ -156,5 +161,9 @@ public interface CafienneSerializable {
 
     default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Fields fieldName, Class<T> tClass) {
         return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(json, fieldName), tClass);
+    }
+
+    default Path readPath(ValueMap json, Fields fieldName) {
+        return new Path((String) json.raw(fieldName));
     }
 }

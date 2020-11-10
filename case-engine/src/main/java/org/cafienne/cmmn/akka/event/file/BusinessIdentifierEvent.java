@@ -17,20 +17,20 @@ import java.io.IOException;
  * Basic event allowing listeners that are interested only in case team member events to do initial filtering.
  */
 public abstract class BusinessIdentifierEvent extends CaseEvent {
-    public final String path;
+    public final Path path;
     public final String name;
     public final String type;
 
     protected BusinessIdentifierEvent(CaseFileItem caseFileItem, PropertyDefinition property) {
         super(caseFileItem.getCaseInstance());
-        this.path = caseFileItem.getPath().toString();
+        this.path = caseFileItem.getPath();
         this.name = property.getName();
         this.type = property.getPropertyType().toString();
     }
 
     protected BusinessIdentifierEvent(ValueMap json) {
         super(json);
-        this.path = readField(json, Fields.path);
+        this.path = readPath(json, Fields.path);
         this.name = readField(json, Fields.name);
         this.type = readField(json, Fields.type);
     }
@@ -40,7 +40,8 @@ public abstract class BusinessIdentifierEvent extends CaseEvent {
         try {
             // Resolve the path on the case file
             // Have to recover it this way in order to overcome fact that Path.definition is not serializable
-            caseInstance.getCaseFile().getItem(new Path(path, caseInstance)).updateState(this);
+            CaseFileItem item = path.resolve(caseInstance);
+            item.updateState(this);
         } catch (InvalidPathException shouldNotHappen) {
             logger.error("Could not recover path on case instance?!", shouldNotHappen);
         }

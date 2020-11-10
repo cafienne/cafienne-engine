@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,7 +41,7 @@ public class ConstraintDefinition extends CMMNElementDefinition {
         }
         context = getCaseDefinition().findCaseFileItem(contextRef);
         if (context == null) {
-            getCaseDefinition().addReferenceError(getContextDescription()+" refers to a Case File item with id '" + contextRef + "', but the corresponding Case File item cannot be found.");
+            getCaseDefinition().addReferenceError(getContextDescription() + " refers to a Case File item with id '" + contextRef + "', but the corresponding Case File item cannot be found.");
         } else {
             pathToContext = context.getPath();
         }
@@ -52,7 +52,7 @@ public class ConstraintDefinition extends CMMNElementDefinition {
         String parentType = getParentElement().getType();
         String parentId = getParentElement().getId();
         // This will return something like "The required rule in HumanTask 'abc'
-        return "The "+getType()+" in " + parentType + " '" + parentId + "'";
+        return "The " + getType() + " in " + parentType + " '" + parentId + "'";
     }
 
     /**
@@ -71,9 +71,11 @@ public class ConstraintDefinition extends CMMNElementDefinition {
      * @return
      */
     public CaseFileItem resolveContext(Case caseInstance) {
-        if (context == null)
+        if (context == null) {
             return null;
-        return caseInstance.getCaseFile().getItem(pathToContext);
+        }
+        CaseFileItem caseFileContainer = pathToContext.resolve(caseInstance);
+        return caseFileContainer.getCurrent();
     }
 
     public ExpressionDefinition getExpressionDefinition() {

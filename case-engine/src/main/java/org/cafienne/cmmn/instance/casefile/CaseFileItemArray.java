@@ -76,20 +76,6 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     }
 
     @Override
-    CaseFileItem resolve(Path currentPath) {
-        if (currentPath.getIndex() >= 0) {
-            return getItem(currentPath.getIndex());
-        }
-        // By default we can also access "this", but we do that only if we are the end of the path...
-        // Otherwise we return current CaseFileItem in our array.
-        if (currentPath.getChild() == null) {
-            return this;
-        } else {
-            return getCurrent();
-        }
-    }
-
-    @Override
     public Value<?> getValue() {
         return actualValueOfCaseFileItemArray;
     }
@@ -116,10 +102,10 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         }
     }
 
-    public boolean allows(CaseFileItemTransition intendedTransition) {
+    protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         // In CaseFileItemArray it is allowed to add new items to the existing array (through Create method)
         if (this.getState() == State.Available && intendedTransition == CaseFileItemTransition.Create) return true;
-        return super.allows(intendedTransition);
+        return super.allowTransition(intendedTransition);
     }
 
     private CaseFileItem getNextItem() {
@@ -190,10 +176,17 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
                 createNewItem(newChildValue);
             }
         }
+        // Generate RemoveChild events for the items that are not in the new list
         while (numberToRemove-- > 0) {
-            // Now clean up the items that "vanished" while replacing
-            actualArrayItems.remove(actualArrayItems.size() - 1).itemVanished();
+            // Now clean up the items that "vanished" while replacing;
+            CaseFileItem removable = actualArrayItems.get(numberToReplace + numberToRemove);
+            getParent().removeChildItem(removable);
         }
+    }
+
+    protected void itemRemoved(int index) {
+        actualArrayItems.remove(index);
+        actualValueOfCaseFileItemArray.remove(index);
     }
 
     @Override

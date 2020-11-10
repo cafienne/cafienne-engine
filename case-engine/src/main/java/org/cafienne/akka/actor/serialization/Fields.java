@@ -38,6 +38,7 @@ public enum Fields {
     debugMode,
     content,
     path,
+    childPath,
     memberId,
     memberType,
     team,

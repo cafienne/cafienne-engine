@@ -16,16 +16,15 @@ import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.util.Guid;
 import org.junit.Test;
-import org.scalatest.concurrent.TestThreadsStartingCounter;
 
 public class CaseFileTransitionTest {
 
@@ -34,6 +33,10 @@ public class CaseFileTransitionTest {
     private final String inputParameterName = "inputCaseFile";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repetitivefileitems.xml");
     private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final Path requestPath = new Path("Request");
+    private final Path helperPath = new Path("Request/Helper");
+    private final Path customerPath = new Path("Request/Customer");
+    private final Path customer0 = new Path("Request/Customer[0]");
 
     private ValueList getCustomers(String... customers) {
         ValueList customerList = new ValueList();
@@ -63,7 +66,7 @@ public class CaseFileTransitionTest {
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
-            casePlan.assertCaseFileItem("Request").assertValue(content).assertCaseFileItem("/Customer").assertState(State.Null);
+            casePlan.assertCaseFileItem(requestPath).assertValue(content).assertCaseFileItem(new Path("/Customer")).assertState(State.Null);
         });
 
         // Create the CaseFileItem Request/Helper
@@ -71,9 +74,9 @@ public class CaseFileTransitionTest {
         helper.putRaw("Name", "Piet");
         helper.putRaw("Description", "Piet is a nice guy");
 
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, "Request/Helper"), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, helperPath), casePlan -> {
             casePlan.print();
-            casePlan.assertCaseFileItem("Request/Helper").assertValue(helper);
+            casePlan.assertCaseFileItem(helperPath).assertValue(helper);
 
 
             // 2 repeating ReviewRequest task in state Active and Available.
@@ -126,7 +129,7 @@ public class CaseFileTransitionTest {
         });
 
         StringValue piet = getCustomer("Piet");
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, piet, "Request/Customer[0]"), casePlan -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, piet, customer0), casePlan -> {
             casePlan.print();
             // After changing customer, task should still be repeating, although value is now different.
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed, State.Active).assertRepeats();
@@ -151,7 +154,7 @@ public class CaseFileTransitionTest {
         });
 
         ValueList customers = getCustomers("Piet", "Joop");
-        ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, "Request/Customer");
+        ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, customerPath);
         testCase.addStep(customerReplace, action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
@@ -159,26 +162,26 @@ public class CaseFileTransitionTest {
         });
 
         ValueMap newRequestContent = new ValueMap("Customer", getCustomers("Klaas", "Henk"));
-        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action -> {
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(3);
         });
 
-        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, new ValueMap("Customer", getCustomers("Klaas", "Henk")), "Request"), action -> {
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, new ValueMap("Customer", getCustomers("Klaas", "Henk")), requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(0);
         });
 
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, newRequestContent, "Request"), action -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, newRequestContent, requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(4);
         });
 
         ValueMap singularRequestCustomerContent = new ValueMap("Customer", getCustomer("Loner"));
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, singularRequestCustomerContent, "Request"), action -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, singularRequestCustomerContent, requestPath), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(3);

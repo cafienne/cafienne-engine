@@ -6,6 +6,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.humantask.akka.command.CompleteHumanTask;
@@ -66,7 +67,7 @@ public class TestTaskOutputParameters {
                         // TTD - test step below should test on whole set of events; requires refactoring of / addition to whole structure?
 
                         // "Outcome" inside "Root" must have value 6 (2 * 3)
-                        response.assertCaseFile().awaitCaseFileEvent("Root", e -> e.getValue().equals(new ValueMap("Outcome", 6)));
+                        response.assertCaseFile().awaitCaseFileEvent(new Path("Root"), e -> e.getValue().equals(new ValueMap("Outcome", 6)));
                     });
                 });
             });

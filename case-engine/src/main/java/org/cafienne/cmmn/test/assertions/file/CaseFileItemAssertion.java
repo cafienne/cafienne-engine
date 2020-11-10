@@ -4,6 +4,7 @@ import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
@@ -12,17 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CaseFileItemAssertion extends ModelTestCommandAssertion {
-    private final String path;
+    private final Path path;
     private final PublishedEventsAssertion<CaseFileEvent> events = new PublishedEventsAssertion(new ArrayList());
     private final CaseFileAssertion caseFileAssertion;
     private final boolean isArrayElement;
     private int indexInArray = -1;
 
-    CaseFileItemAssertion(CaseFileAssertion caseFileAssertion, ModelTestCommand command, String fileItemPath) {
+    CaseFileItemAssertion(CaseFileAssertion caseFileAssertion, ModelTestCommand command, Path path) {
         super(command);
         this.caseFileAssertion = caseFileAssertion;
-        this.path = fileItemPath;
-        this.isArrayElement = path.endsWith("]");
+        this.path = path;
+        this.isArrayElement = path.isArrayElement();
     }
 
     void addEvent(CaseFileEvent event) {
@@ -37,10 +38,11 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
 
     /**
      * Asserts that this case file item is an array.
+     *
      * @return
      */
     private CaseFileItemAssertion assertIterable() {
-        Object something = this.events.getEvents().stream().filter(e -> e.getPath().endsWith("]")).findFirst();
+        Object something = this.events.getEvents().stream().filter(e -> e.getPath().isArrayElement()).findFirst();
         if (something == null) {
             // There should be at least one 'array' like event, right?
             throw new AssertionError("Case file item " + getName() + " is expected to be an array, but it is not");
@@ -50,6 +52,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
 
     /**
      * Asserts that this is an array and contains the expected number of elements.
+     *
      * @param expectedSize
      * @return
      */
@@ -68,8 +71,13 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
      * @param relativePath item path, starting from this case file item.
      * @return CaseFileItemAssertion
      */
-    public CaseFileItemAssertion assertCaseFileItem(String relativePath) {
-        return caseFileAssertion.assertCaseFileItem(this.path + relativePath);
+    public CaseFileItemAssertion assertCaseFileItem(Path relativePath) {
+        Path absolutePath = new Path(this.path.toString() + "/" + relativePath.toString());
+        return caseFileAssertion.assertCaseFileItem(absolutePath);
+    }
+
+    public CaseFileItemAssertion assertArrayElement(int index) {
+        return caseFileAssertion.assertCaseFileItem(new Path(this.path.toString() + "[" + index + "]"));
     }
 
     /**
@@ -79,20 +87,21 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
      * @return CaseFileItemAssertion
      */
     public CaseFileItemAssertion assertValue(Value<?> expectedValue) {
-        if (! getValue().equals(expectedValue)) {
-            throw new AssertionError("The value of case file item " + getName() + " does not match the expected value.\nFound:\n" + getValue()+"\nExpected:\n"+expectedValue);
+        if (!getValue().equals(expectedValue)) {
+            throw new AssertionError("The value of case file item " + getName() + " does not match the expected value.\nFound:\n" + getValue() + "\nExpected:\n" + expectedValue);
         }
         return this;
     }
 
     /**
      * Asserts the CaseFileItem value has the specified json type class
+     *
      * @param vClass
      * @return
      */
     public CaseFileItemAssertion assertValueType(Class<? extends Value<?>> vClass) {
-        if (! getValue().getClass().equals(vClass)) {
-            throw new AssertionError("The value of case file item " + getName() + " does not match the expected type '"+vClass.getSimpleName()+"', found '" + getValue().getClass().getSimpleName()+"' instead");
+        if (!getValue().getClass().equals(vClass)) {
+            throw new AssertionError("The value of case file item " + getName() + " does not match the expected type '" + vClass.getSimpleName() + "', found '" + getValue().getClass().getSimpleName() + "' instead");
         }
         return this;
     }
@@ -112,11 +121,12 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
 
     /**
      * Returns current value of case file item (i.e., value as passed in last event, or Value.NULL if there are no events)
+     *
      * @return
      */
     public Value getValue() {
         Value value = getEventValue(e -> e.getValue(), Value.NULL);
-        if (! isArrayElement && value == Value.NULL) {
+        if (!isArrayElement && value == Value.NULL) {
 
             final List<CaseFileItemAssertion> arrayElements = caseFileAssertion.getArrayElements(this.path);
             if (arrayElements.isEmpty()) {
@@ -135,7 +145,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     }
 
     private String getName() {
-        return getEventValue(e -> e.getCaseFileItemName(), path);
+        return getEventValue(e -> e.getCaseFileItemName(), path.toString());
     }
 
     private <T> T getEventValue(EventValuePicker<T> picker, T defaultValue) {

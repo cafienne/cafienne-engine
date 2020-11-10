@@ -19,11 +19,6 @@ class EmptyCaseFileItem extends CaseFileItem {
     }
 
     @Override
-    protected void adoptContentFromParent(Value<?> newContentFromParent, CaseFileEvent event) {
-        logger.warn("Adopting content in EmptyCaseFileItem " + getPath());
-    }
-
-    @Override
     public void createContent(Value<?> newContent) {
         logger.warn("Creating content in EmptyCaseFileItem " + getPath());
     }

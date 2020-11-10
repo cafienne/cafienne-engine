@@ -31,8 +31,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     @Override
     void connectToCase() {
         // Try to connect with the case file item that is referenced from our definition
-        CaseFile caseFile = getCaseInstance().getCaseFile();
-        CaseFileItem item = caseFile.getItem(getDefinition().getSourceDefinition().getPath());
+        CaseFileItem item = getDefinition().getSourceDefinition().getPath().resolve(getCaseInstance());
         criterion.establishPotentialConnection(item);
     }
 

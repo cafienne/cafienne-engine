@@ -14,7 +14,7 @@ import org.cafienne.cmmn.instance.casefile.Path;
  * Thrown if a {@link Path} is not valid according to the CaseDefinition
  */
 public class InvalidPathException extends InvalidCommandException {
-    InvalidPathException(String msg) {
+    public InvalidPathException(String msg) {
         super(msg);
     }
 }
