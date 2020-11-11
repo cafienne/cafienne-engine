@@ -145,7 +145,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     }
 
     private String getName() {
-        return getEventValue(e -> e.getCaseFileItemName(), path.toString());
+        return getEventValue(e -> e.getPath().getName(), path.toString());
     }
 
     private <T> T getEventValue(EventValuePicker<T> picker, T defaultValue) {
