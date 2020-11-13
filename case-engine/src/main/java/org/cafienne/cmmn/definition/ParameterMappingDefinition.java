@@ -63,6 +63,11 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
     protected void resolveReferences() {
         super.resolveReferences();
         TaskImplementationContract taskImplementationDefinition = taskDefinition.getImplementationDefinition();
+        if (taskImplementationDefinition == null) {
+            // If implementation definition is not found, a reference error will be added from the task itself.
+            //  No need to throw an error here, simply return and do not continue (as it leads to NullPointerException)
+            return;
+        }
         source = findParameter(taskDefinition.getInputParameters(), sourceRef);
         if (source == null) {
             isInputMapping = false;
@@ -88,7 +93,6 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
             if (target == null) {
                 String msg = "The input parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but that input parameter is not found in " + taskDefinition.getImplementationDefinition().getId();
                 getDefinition().addReferenceError(msg);
-
             }
         }
     }
