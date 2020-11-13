@@ -23,7 +23,7 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
     public TransitionPublisher(TransitionPublisher<I, P> bootstrapPublisher) {
         this.item = bootstrapPublisher.item;
         this.connectedEntryCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
-        this.connectedExitCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
+        this.connectedExitCriteria.addAll(bootstrapPublisher.connectedExitCriteria);
     }
 
     public void addEvent(StandardEvent event) {
@@ -84,6 +84,9 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
     }
 
     public void informExitCriteria(StandardEvent transition) {
+        if (! connectedExitCriteria.isEmpty()) {
+            addDebugInfo(() -> "Informing " + connectedExitCriteria.size() +" exit criteria that listen to item " + item);
+        }
         // Then inform the activating sentries
         new ArrayList<>(connectedExitCriteria).forEach(onPart -> onPart.inform(item, transition));
     }

@@ -27,11 +27,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> {
-    private final static Logger logger = LoggerFactory.getLogger(CaseFileItem.class);
-
-    private final List<CaseFileItemOnPart> connectedEntryCriteria = new ArrayList();
-    private final List<CaseFileItemOnPart> connectedExitCriteria = new ArrayList();
-
     /**
      * History of events on this item
      */
@@ -582,14 +577,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     public int getIndex() {
         return indexInArray;
-    }
-
-    public List<CaseFileItemOnPart> getConnectedEntryCriteria() {
-        return connectedEntryCriteria;
-    }
-
-    public List<CaseFileItemOnPart> getConnectedExitCriteria() {
-        return connectedExitCriteria;
     }
 
     @Override
