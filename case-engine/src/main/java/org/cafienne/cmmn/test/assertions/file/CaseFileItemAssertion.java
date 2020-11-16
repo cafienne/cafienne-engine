@@ -29,7 +29,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     void addEvent(CaseFileEvent event) {
         // Reverse order of events; most recent one always at front
         this.events.getEvents().add(0, event);
-        indexInArray = event.getIndex();
+        indexInArray = event.path.index;
     }
 
     int getIndexInArray() {
@@ -42,7 +42,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
      * @return
      */
     private CaseFileItemAssertion assertIterable() {
-        Object something = this.events.getEvents().stream().filter(e -> e.getPath().isArrayElement()).findFirst();
+        Object something = this.events.getEvents().stream().filter(e -> e.path.isArrayElement()).findFirst();
         if (something == null) {
             // There should be at least one 'array' like event, right?
             throw new AssertionError("Case file item " + getName() + " is expected to be an array, but it is not");
@@ -145,7 +145,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     }
 
     private String getName() {
-        return getEventValue(e -> e.getPath().getName(), path.toString());
+        return getEventValue(e -> e.path.getName(), path.toString());
     }
 
     private <T> T getEventValue(EventValuePicker<T> picker, T defaultValue) {

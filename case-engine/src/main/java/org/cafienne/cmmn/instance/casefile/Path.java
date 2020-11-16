@@ -21,7 +21,13 @@ import java.io.Serializable;
  */
 public class Path implements Serializable {
 
+    /**
+     * The name of the case file item (relative to it's parent (or -1 if it is not an iterable case file item)
+     */
     public final String name;
+    /**
+     * The index of the case file item within it's parent (or -1 if it is not an iterable case file item)
+     */
     public final int index;
     private final String originalPath;
     private final Path parent;

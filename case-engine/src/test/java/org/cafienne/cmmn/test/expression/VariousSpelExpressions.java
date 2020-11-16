@@ -73,23 +73,23 @@ public class VariousSpelExpressions {
             testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active);
         });
 
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(1), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new Path("SpecialOutput/Multi"), new LongValue(1)), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(2), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new Path("SpecialOutput/Multi"), new LongValue(2)), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(3), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new Path("SpecialOutput/Multi"), new LongValue(3)), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
         });
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(4), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new Path("SpecialOutput/Multi"), new LongValue(4)), result -> {
             result.assertPlanItems("HumanTask").assertSize(2).assertStates(State.Terminated, State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Completed);
         });
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(5), new Path("SpecialOutput/Multi")), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new Path("SpecialOutput/Multi"), new LongValue(5)), result -> {
             result.assertPlanItems("HumanTask").assertSize(3).assertStates(State.Terminated, State.Active);
             result.assertPlanItems("Milestone").assertSize(2).assertStates(State.Completed);
         });

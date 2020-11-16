@@ -198,7 +198,7 @@ public class SubCase {
         // Next, we expect the main case's task to go to Fault state.
         ValueMap invalidMainRequest = new ValueMap();
         invalidMainRequest.putRaw("aBoolean", "I ought to be boolean but i am a string");
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, invalidMainRequest, new Path("InvalidMainRequest")), action -> action.print());
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, new Path("InvalidMainRequest"), invalidMainRequest), action -> action.print());
 
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerFailingBlockingSubCaseTask", Transition.Complete), mainCasePlan -> {
             testCase.getEventListener().awaitPlanItemState("TriggerFailingBlockingSubCaseTask", State.Completed);
@@ -217,7 +217,7 @@ public class SubCase {
 
             ValueMap validMainRequest = new ValueMap();
             validMainRequest.putRaw("aBoolean", false);
-            testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, new Path("InvalidMainRequest")), r -> r.print()); // print the updated case file
+            testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, new Path("InvalidMainRequest"), validMainRequest), r -> r.print()); // print the updated case file
 
             testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "FailingBlockingSubCaseTask", Transition.Reactivate), r -> {
                 // SubCaseTask should be active

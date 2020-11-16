@@ -10,10 +10,10 @@ package org.cafienne.cmmn.akka.event.file;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.akka.event.CaseEvent;
-import org.cafienne.cmmn.instance.*;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
 import org.slf4j.Logger;
@@ -25,19 +25,17 @@ import java.io.IOException;
  * Event caused by a transition on a CaseFileItem
  */
 @Manifest
-public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition> {
+public class CaseFileEvent extends CaseFileBaseEvent implements StandardEvent<CaseFileItemTransition> {
     protected final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
     private final CaseFileItemTransition transition;
     private final Value<?> value;
-    protected final Path path;
     private final State state;
 
     public CaseFileEvent(CaseFileItemCollection<?> item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
-        super(item.getCaseInstance());
+        super(item);
         this.transition = transition;
         this.value = newValue;
-        this.path = item.getPath();
         this.state = newState;
     }
 
@@ -45,7 +43,6 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         super(json);
         this.transition = json.getEnum(Fields.transition, CaseFileItemTransition.class);
         this.value = json.get(Fields.value.toString());
-        this.path = readPath(json, Fields.path);
         this.state = readEnum(json, Fields.state, State.class);
     }
 
@@ -77,14 +74,6 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
     }
 
     /**
-     * Returns the index of the case file item within it's parent (or -1 if it is not an iterable case file item)
-     * @return
-     */
-    public int getIndex() {
-        return path.getIndex();
-    }
-
-    /**
      * Returns the new value of the case file item.
      *
      * @return
@@ -93,26 +82,9 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         return value;
     }
 
-    /**
-     * Return the case file item's path through which the change was made (e.g., Order/Line)
-     *
-     * @return
-     */
-    public Path getPath() {
-        return path;
-    }
-
-    protected transient CaseFileItem caseFileItem;
-
     @Override
-    public void updateState(Case caseInstance) {
-        try {
-            // Resolve the path on the case file
-            caseFileItem = path.resolve(caseInstance);
-            caseFileItem.updateState(this);
-        } catch (InvalidPathException shouldNotHappen) {
-            logger.error("Could not recover path on case instance?!", shouldNotHappen);
-        }
+    protected void updateState(CaseFileItem item) {
+        item.updateState(this);
     }
 
     @Override
@@ -132,9 +104,8 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseFileEvent(generator);
         writeField(generator, Fields.transition, transition);
-        writeField(generator, Fields.path, path);
         writeField(generator, Fields.value, value);
         writeField(generator, Fields.state, state);
     }

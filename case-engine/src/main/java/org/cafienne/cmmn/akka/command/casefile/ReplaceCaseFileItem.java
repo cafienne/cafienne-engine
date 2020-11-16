@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,7 +11,6 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.Path;
@@ -27,12 +26,12 @@ public class ReplaceCaseFileItem extends CaseFileItemCommand {
      * be replaced with new property values.<br/>
      * In addition, the engine will try to map any child content into child case file items, and additionally trigger the Replace transition on those children.
      *
-     * @param caseInstanceId   The id of the case in which to perform this command.
-     * @param newContent         A value structure with contents of the new case file item
-     * @param path Path to the case file item to be created
+     * @param caseInstanceId The id of the case in which to perform this command.
+     * @param path           Path to the case file item to be created
+     * @param newContent     A value structure with contents of the new case file item
      */
-    public ReplaceCaseFileItem(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, Path path) {
-        super(tenantUser, caseInstanceId, newContent, path, CaseFileItemTransition.Replace);
+    public ReplaceCaseFileItem(TenantUser tenantUser, String caseInstanceId, Path path, Value<?> newContent) {
+        super(tenantUser, caseInstanceId, path, newContent, CaseFileItemTransition.Replace);
     }
 
     public ReplaceCaseFileItem(ValueMap json) {
@@ -40,7 +39,7 @@ public class ReplaceCaseFileItem extends CaseFileItemCommand {
     }
 
     @Override
-    void apply(Case caseInstance, CaseFileItemCollection<?> caseFileItem, Value<?> content) {
+    protected void apply(CaseFileItemCollection<?> caseFileItem, Value<?> content) {
         caseFileItem.replaceContent(content);
     }
 }

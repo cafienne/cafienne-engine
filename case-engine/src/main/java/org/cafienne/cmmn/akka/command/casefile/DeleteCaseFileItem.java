@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,7 +11,6 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.Path;
@@ -24,11 +23,11 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
     /**
      * Deletes the case file item.
      *
-     * @param caseInstanceId   The id of the case in which to perform this command.
-     * @param path Path to the case file item to be created
+     * @param caseInstanceId The id of the case in which to perform this command.
+     * @param path           Path to the case file item to be created
      */
     public DeleteCaseFileItem(TenantUser tenantUser, String caseInstanceId, Path path) {
-        super(tenantUser, caseInstanceId, Value.NULL, path, CaseFileItemTransition.Delete);
+        super(tenantUser, caseInstanceId, path, Value.NULL, CaseFileItemTransition.Delete);
     }
 
     public DeleteCaseFileItem(ValueMap json) {
@@ -36,7 +35,7 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
     }
 
     @Override
-    void apply(Case caseInstance, CaseFileItemCollection<?> caseFileItem, Value<?> content) {
+    protected void apply(CaseFileItemCollection<?> caseFileItem, Value<?> content) {
         caseFileItem.deleteContent();
     }
 }

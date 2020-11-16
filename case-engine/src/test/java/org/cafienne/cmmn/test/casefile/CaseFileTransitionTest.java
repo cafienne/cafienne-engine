@@ -74,7 +74,7 @@ public class CaseFileTransitionTest {
         helper.putRaw("Name", "Piet");
         helper.putRaw("Description", "Piet is a nice guy");
 
-        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, helperPath), casePlan -> {
+        testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helperPath, helper), casePlan -> {
             casePlan.print();
             casePlan.assertCaseFileItem(helperPath).assertValue(helper);
 
@@ -129,7 +129,7 @@ public class CaseFileTransitionTest {
         });
 
         StringValue piet = getCustomer("Piet");
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, piet, customer0), casePlan -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, customer0, piet), casePlan -> {
             casePlan.print();
             // After changing customer, task should still be repeating, although value is now different.
             casePlan.assertStage(REVIEW_STAGE).assertPlanItems(REVIEW_REQUEST).assertSize(3).assertStates(State.Completed, State.Active).assertRepeats();
@@ -154,7 +154,7 @@ public class CaseFileTransitionTest {
         });
 
         ValueList customers = getCustomers("Piet", "Joop");
-        ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customers, customerPath);
+        ReplaceCaseFileItem customerReplace = new ReplaceCaseFileItem(testUser, caseInstanceId, customerPath, customers);
         testCase.addStep(customerReplace, action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
@@ -162,26 +162,26 @@ public class CaseFileTransitionTest {
         });
 
         ValueMap newRequestContent = new ValueMap("Customer", getCustomers("Klaas", "Henk"));
-        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, newRequestContent, requestPath), action -> {
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, requestPath, newRequestContent), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(3);
         });
 
-        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, new ValueMap("Customer", getCustomers("Klaas", "Henk")), requestPath), action -> {
+        testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, requestPath, new ValueMap("Customer", getCustomers("Klaas", "Henk"))), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(0);
         });
 
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, newRequestContent, requestPath), action -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, requestPath, newRequestContent), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(4);
         });
 
         ValueMap singularRequestCustomerContent = new ValueMap("Customer", getCustomer("Loner"));
-        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, singularRequestCustomerContent, requestPath), action -> {
+        testCase.addStep(new ReplaceCaseFileItem(testUser, caseInstanceId, requestPath, singularRequestCustomerContent), action -> {
             TestScript.debugMessage(action);
             TestScript.debugMessage("Found these events:\n"  + action.getEvents().enumerateEventsByType());
             action.getEvents().assertSize(3);

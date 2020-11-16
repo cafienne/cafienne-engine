@@ -37,7 +37,7 @@ public class NewCaseFileTest {
         });
 
         ValueList grandChildren = new ValueList(createGrandChildItem(), createGrandChildItem());
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, grandChildren, grandChildArrayPath), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, grandChildArrayPath, grandChildren), result -> {
             result.print();
             result.getEvents().printEventList();
             result.getEvents().assertSize(3);
@@ -59,7 +59,7 @@ public class NewCaseFileTest {
         });
 
         ValueMap caseFileItem = new ValueMap("RootProperty1", "string", "RootProperty2", true, "ChildItem", createFamily(), "ChildArray", new ValueList(createChildItem(), createChildItem()));
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, caseFileItem, rootPath), result -> {
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, rootPath, caseFileItem), result -> {
             result.getEvents().printEventList();
             result.getEvents().assertSize(8);
         });
@@ -67,26 +67,26 @@ public class NewCaseFileTest {
         // Clone entire structure, change a single property and then update should lead to only 1 update event
         ValueMap cfi2 = caseFileItem.cloneValueNode();
         cfi2.putRaw("RootProperty2", false);
-        testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, cfi2, rootPath), result -> {
+        testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, rootPath, cfi2), result -> {
             result.getEvents().printEventList();
             result.getEvents().assertSize(2);
         });
 
         // Update the case file item with only a new value for "RootProperty1" should only change that field.
         ValueMap shallowValue = new ValueMap("RootProperty1", "Second String");
-        testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, shallowValue, rootPath), result -> {
+        testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, rootPath, shallowValue), result -> {
             result.getEvents().printEventList();
             result.getEvents().assertSize(2);
         });
 
         // Replacing with the shallow copy should replace entire file
-        testCase.addStep(new ReplaceCaseFileItem(user, caseInstanceId, shallowValue, rootPath), result -> {
+        testCase.addStep(new ReplaceCaseFileItem(user, caseInstanceId, rootPath, shallowValue), result -> {
             result.getEvents().printEventList();
             result.getEvents().assertSize(4);
         });
 
         // Set back entire file should lead to 7 events again
-        testCase.addStep(new ReplaceCaseFileItem(user, caseInstanceId, cfi2, rootPath), result -> {
+        testCase.addStep(new ReplaceCaseFileItem(user, caseInstanceId, rootPath, cfi2), result -> {
             result.getEvents().printEventList();
             result.getEvents().assertSize(8);
         });
@@ -103,7 +103,7 @@ public class NewCaseFileTest {
         ValueMap firstGrandChildFromArray = grandChildArray.get(0).asMap();
         firstGrandChildFromArray.putRaw("GrandChildName", "Second name update");
 
-        testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, updateDeeperProperty, rootPath), result -> {
+        testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, rootPath, updateDeeperProperty), result -> {
             result.getEvents().printEventList();
             Value v = new CaseFileAssertion(result.getTestCommand()).assertCaseFileItem(rootPath).getValue();
             result.getEvents().assertSize(3);

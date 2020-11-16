@@ -25,7 +25,7 @@ class CaseFileEventBuffer {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < events.size(); i++) {
             CaseFileEvent event = events.get(i);
-            sb.append(i +":\t" + event.getClass().getSimpleName() + "["+event.getPath()+"]\n");
+            sb.append(i +":\t" + event.getClass().getSimpleName() + "["+event.path+"]\n");
         }
         return sb.toString();
     }
@@ -46,8 +46,8 @@ class CaseFileEventBuffer {
         // First check to see if any of the existing events overrides our event; if so, just ignore the event.
         for (int i = 0; i < events.size(); i++) {
             CaseFileEvent current = events.get(i);
-            Path currentPath = current.getPath();
-            if (currentPath.hasChild(newEvent.getPath())) {
+            Path currentPath = current.path;
+            if (currentPath.hasChild(newEvent.path)) {
 //                System.out.println("Event[" + i + "] on path " + currentPath + " overrides new event on path " + newPath);
                 return;
             }
@@ -56,8 +56,8 @@ class CaseFileEventBuffer {
         // Reversely go through our array to avoid strange index behavior
         for (int i = events.size() - 1 ; i >= 0 ; i--) {
             CaseFileEvent current = events.get(i);
-            Path currentPath = current.getPath();
-            Path newPath = newEvent.getPath();
+            Path currentPath = current.path;
+            Path newPath = newEvent.path;
             if (newPath.hasChild(currentPath)) {
 //                System.out.println("Event[" + i + "] on path " + currentPath + " is overridden with new event on path " + newPath);
                 events.remove(i);

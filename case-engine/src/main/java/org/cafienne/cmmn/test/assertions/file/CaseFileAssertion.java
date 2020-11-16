@@ -18,7 +18,7 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
     public CaseFileAssertion(ModelTestCommand command) {
         super(command);
         PublishedEventsAssertion<CaseFileEvent> allCaseFileEvents = command.getEventListener().getEvents().filter(CaseFileEvent.class);
-        allCaseFileEvents.getEvents().forEach(e -> assertCaseFileItem(e.getPath()).addEvent(e));
+        allCaseFileEvents.getEvents().forEach(e -> assertCaseFileItem(e.path).addEvent(e));
 //        System.out.println("\n\nWe have "+assertions.size()+" assertions: " + assertions.keySet());
     }
 
@@ -32,7 +32,7 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
     public CaseFileEvent awaitCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter, long... optionalDuration) {
         logger.debug("Waiting for case file event on path "+path);
         return testCommand.getEventListener().waitUntil("CaseFileEvent-"+path, CaseFileEvent.class, event -> {
-            boolean pathMatches = path.matches(event.getPath());
+            boolean pathMatches = path.matches(event.path);
             if (pathMatches) {
                 logger.debug("Receiving case file event "+event);
             }

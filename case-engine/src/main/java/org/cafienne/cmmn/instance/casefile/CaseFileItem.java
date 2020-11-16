@@ -171,7 +171,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         addDebugInfo(() -> "CaseFile[" + getName() + "]: updating CaseFileItem state based on CaseFileEvent");
         this.transitionPublisher.addEvent(event);
         this.setState(event.getState());
-        this.indexInArray = event.getIndex();
+        this.indexInArray = event.path.index;
         this.lastTransition = event.getTransition();
         this.setValue(event.getValue());
     }

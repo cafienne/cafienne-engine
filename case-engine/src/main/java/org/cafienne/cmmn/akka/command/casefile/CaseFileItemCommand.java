@@ -12,9 +12,9 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
+import org.cafienne.cmmn.akka.command.response.file.CaseFileResponse;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.CaseFile;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.Path;
@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Holds some generic validation and processing behavior for CaseFile operations.
  */
-abstract class CaseFileItemCommand extends CaseCommand {
+abstract public class CaseFileItemCommand extends CaseFileCommand {
     protected Path path;
     protected final Value<?> content;
     protected final CaseFileItemTransition intendedTransition;
@@ -34,11 +34,11 @@ abstract class CaseFileItemCommand extends CaseCommand {
      * Determine path and content for the CaseFileItem to be touched.
      *
      * @param caseInstanceId     The id of the case in which to perform this command.
+     * @param path               Path to the case file item to be created
      * @param newContent         A value structure with contents of the new case file item
-     * @param path   Path to the case file item to be created
      * @param intendedTransition
      */
-    protected CaseFileItemCommand(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, Path path, CaseFileItemTransition intendedTransition) {
+    protected CaseFileItemCommand(TenantUser tenantUser, String caseInstanceId, Path path, Value<?> newContent, CaseFileItemTransition intendedTransition) {
         super(tenantUser, caseInstanceId);
         this.path = path;
         this.content = newContent;
@@ -58,17 +58,21 @@ abstract class CaseFileItemCommand extends CaseCommand {
         super.validate(caseInstance);
         // Resolve the path on the case file, this validates whether the path matches the case file definition
         caseFileItem = path.resolve(caseInstance);
+        validate(caseFileItem);
+    }
+
+    protected void validate(CaseFileItemCollection<?> item) {
         // Validate current item state against intended operation
-        caseFileItem.validateTransition(intendedTransition, content);
+        item.validateTransition(intendedTransition, content);
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
-        apply(caseInstance, caseFileItem, content);
-        return new CaseResponse(this);
+    protected CaseFileResponse apply(CaseFile caseFile) {
+        apply(caseFileItem, content);
+        return new CaseFileResponse(this);
     }
 
-    abstract void apply(Case caseInstance, CaseFileItemCollection<?> caseFileItem, Value<?> content);
+    abstract protected void apply(CaseFileItemCollection<?> caseFileItem, Value<?> content);
 
     @Override
     public String toString() {

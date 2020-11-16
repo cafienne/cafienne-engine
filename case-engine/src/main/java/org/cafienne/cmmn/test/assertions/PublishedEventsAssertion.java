@@ -101,7 +101,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      */
     public CaseFileEvent assertCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter) {
 //        logger.debug("Searching for case file event on path "+path);
-        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, event -> path.matches(event.getPath()) && filter.matches(event));
+        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, event -> path.matches(event.path) && filter.matches(event));
     }
 
     /**
@@ -122,7 +122,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      */
     public PublishedEventsAssertion assertNoCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter) {
         filter(CaseFileEvent.class).getEvents().forEach(event -> {
-            if (path.matches(event.getPath()) && filter.matches(event)) {
+            if (path.matches(event.path) && filter.matches(event)) {
                 throw new AssertionError("Did not expect to find a matching case file event on path "+path+", but found\n" + event);
             }
         });
