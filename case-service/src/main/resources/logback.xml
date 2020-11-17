@@ -4,23 +4,29 @@
             <pattern>%date|%-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <logger name="akka.cluster.ClusterHeartbeatSender"    level="WARN" />
-    <logger name="akka.cluster.ClusterCoreDaemon" level="WARN" />
-    <logger name="akka.serialization" level="WARN" />
-    <logger name="org.cafienne"    level="WARN" />
+
+    <logger name="org.cafienne" level="WARN" />
+
+<!-- The settings below can be enabled to show the HTTP traffic errors and so, without the ubiquitous info from the projections -->
+<!--    <logger name="org.cafienne.service.api" level="DEBUG" />-->
+<!--    <logger name="org.cafienne.service.api.projection" level="WARN" />-->
+
+<!-- Show logging for engine -->
 <!--        <logger name="org.cafienne.cmmn"    level="DEBUG" />-->
+
+<!-- Show logging for HTTP traffic and projections -->
 <!--        <logger name="org.cafienne.service"    level="DEBUG" />-->
+
     <logger name="com.datastax" level="WARN"/>
     <logger name="com.wordnik" level="ERROR"/>
     <logger name="com.gettyimages" level="ERROR"/>
-    <logger name="akka.persistence.query.journal.leveldb" level="INFO"/>
-    <logger name="akka.persistence.cassandra" level="INFO"/>
+
     <logger name="slick" level="INFO"/>
 <!--    <logger name="slick.basic.BasicBackend.action" level="DEBUG"/>-->
 <!--    <logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG"/>-->
     <!--<logger name="slick.jdbc.JdbcBackend.statementAndParameter" level="DEBUG"/>-->
     <!--<logger name="slick.jdbc.JdbcBackend.parameter" level="DEBUG"/>-->
-    <logger name="org.flywaydb" level="INFO"/>
+<!--    <logger name="org.flywaydb" level="INFO"/>-->
     <root level="INFO">
         <appender-ref ref="console"/>
     </root>
