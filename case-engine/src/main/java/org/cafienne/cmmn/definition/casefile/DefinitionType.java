@@ -1,10 +1,6 @@
 package org.cafienne.cmmn.definition.casefile;
 
-import org.cafienne.cmmn.definition.casefile.definitiontype.UnknownType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.UnspecifiedType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.XMLComplexType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.XMLElementType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.XMLSimpleType;
+import org.cafienne.cmmn.definition.casefile.definitiontype.*;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +16,7 @@ public class DefinitionType {
             // Not implemented
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/CMISDocument")) {
             // Not implemented
+            return new CMISDocumentType();
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/CMISRelationship")) {
             // Not implemented
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/XSDElement")) {
@@ -28,10 +25,6 @@ public class DefinitionType {
             return new XMLComplexType();
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/XSDSimpleType")) {
             return new XMLSimpleType();
-        } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/WSDLMessage")) {
-            // Not implemented
-        } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/UMLClass")) {
-            // Not implemented
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/Unknown")) {
             return new UnknownType();
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/Unspecified")) {
@@ -50,5 +43,9 @@ public class DefinitionType {
      * @param onlyProperties
      */
     public void validate(CaseFileItemDefinition item, Value value, boolean onlyProperties) throws CaseFileError {
+    }
+
+    public boolean isDocument() {
+        return false;
     }
 }
