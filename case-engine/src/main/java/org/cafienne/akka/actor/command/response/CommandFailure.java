@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 @Manifest
 public class CommandFailure extends ModelResponse {
-    private final Exception exception;
+    private final Throwable exception;
     private final SerializedException serializedException;
     private ValueMap exceptionAsJSON;
 
@@ -32,7 +32,7 @@ public class CommandFailure extends ModelResponse {
      * @param command
      * @param failure The reason why the command failed
      */
-    public CommandFailure(ModelCommand<?> command, Exception failure) {
+    public CommandFailure(ModelCommand<?> command, Throwable failure) {
         super(command);
         this.exception = failure;
         this.exceptionAsJSON = Value.convertThrowable(failure);
@@ -56,7 +56,7 @@ public class CommandFailure extends ModelResponse {
      * Returns the underlying exception that caused the command failure.
      * @return
      */
-    public Exception internalException() {
+    public Throwable internalException() {
         return exception;
     }
 
