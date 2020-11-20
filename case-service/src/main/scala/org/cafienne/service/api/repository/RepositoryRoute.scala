@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+
 import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
@@ -27,8 +28,6 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 import org.w3c.dom.Document
-
-import scala.collection.immutable.Seq
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
@@ -214,7 +213,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
     */
   private def userWithTenant(subRoute: (PlatformUser, String) => Route): Route = {
     validUser { platformUser =>
-      parameters('tenant ?) { optionalTenant =>
+      parameters("tenant".?) { optionalTenant =>
         val tenant = platformUser.resolveTenant(optionalTenant)
         subRoute(platformUser, tenant)
       }

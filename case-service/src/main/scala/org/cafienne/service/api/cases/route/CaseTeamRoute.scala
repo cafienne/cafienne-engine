@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+
 import javax.ws.rs._
 import org.cafienne.cmmn.akka.command.team._
 import org.cafienne.identity.IdentityProvider
@@ -144,7 +145,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   def deleteCaseTeamMember = delete {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("caseteam" / Segment) { memberId =>
-        parameters('type ?) { memberType =>
+        parameters("type".?) { memberType =>
           askCase(platformUser, caseInstanceId, tenantUser => new RemoveTeamMember(tenantUser, caseInstanceId, MemberKey(memberId, memberType.getOrElse("user"))))
         }
       }

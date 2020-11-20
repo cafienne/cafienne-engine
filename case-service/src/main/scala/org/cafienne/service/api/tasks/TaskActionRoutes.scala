@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.akka.actor.serialization.json.ValueMap
@@ -48,7 +49,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
   @Produces(Array("application/json"))
   def getTaskCount = get {
     validUser { platformUser =>
-      parameters('tenant ?) { tenant =>
+      parameters("tenant".?) { tenant =>
         path("user" / "count") {
           runQuery(taskQueries.getCountForUser(platformUser, tenant))
         }

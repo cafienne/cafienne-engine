@@ -9,11 +9,11 @@ import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
 import org.cafienne.infrastructure.cqrs.{OffsetRecord, ReadJournalProvider}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ModelEventsReader()(implicit override val system: ActorSystem) extends LazyLogging with ReadJournalProvider {
 
-  implicit val executionContext = system.dispatcher
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   def getEvents(user: PlatformUser, actorId: String, from: Long, to: Long): Future[ValueList] = {
     val eventList = new ValueList

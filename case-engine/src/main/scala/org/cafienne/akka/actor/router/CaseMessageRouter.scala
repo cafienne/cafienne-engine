@@ -61,5 +61,5 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
     }
   }
 
-  def forwardMessage(m: ModelCommand[_])
+  def forwardMessage(m: ModelCommand[_]): Unit
 }

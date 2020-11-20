@@ -12,7 +12,7 @@ import org.cafienne.tenant.akka.command.TenantUserInformation
 import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * The platform can be configured with a default tenant setup.
@@ -81,7 +81,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("Bootstrap file should contain a list of owners, with at least one owner for the tenant")
       }
 
-      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.map(user => {
+      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.toSeq.map(user => {
         val userId = user.getString("id")
         val roles = readStringList(user, "roles")
         val name = readStringOr(user, "name", "")
@@ -114,7 +114,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def readStringList(config: Config, path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
     if (config.hasPath(path)) {
-      config.getStringList(path).asScala
+      config.getStringList(path).asScala.toSeq
     } else {
       defaultValue
     }

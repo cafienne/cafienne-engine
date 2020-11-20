@@ -1,9 +1,11 @@
 package org.cafienne.tenant.akka.command
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.akka.actor.serialization.{CafienneSerializable, Fields}
 import org.cafienne.akka.actor.serialization.json.{BooleanValue, StringValue, ValueList, ValueMap}
+import org.cafienne.akka.actor.serialization.{CafienneSerializable, Fields}
 import org.cafienne.infrastructure.json.CafienneJson
+
+import scala.jdk.CollectionConverters._
 
 final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = None, name: Option[String] = None, email: Option[String] = None, owner: Option[Boolean] = None, enabled: Option[Boolean] = None) extends CafienneSerializable with CafienneJson {
 
@@ -23,10 +25,7 @@ final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = 
     writeField(generator, Fields.userId, id)
     name.map(name => writeField(generator, Fields.name, name))
     email.map(email => writeField(generator, Fields.email, email))
-    roles.map(roles => {
-      import scala.jdk.CollectionConverters._
-      writeField(generator, Fields.roles, roles.asJava)
-    })
+    roles.map(roles => writeField(generator, Fields.roles, roles.asJava))
     owner.map(value => writeField(generator, Fields.isOwner, value))
     enabled.map(value => writeField(generator, Fields.enabled, value))
     generator.writeEndObject()
@@ -51,9 +50,8 @@ final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = 
 object TenantUserInformation {
   def from(json: ValueMap) : TenantUserInformation = {
     def readOptionalStringList(field:Fields): Option[Seq[String]] = {
-      import scala.jdk.CollectionConverters._
       json.get(field) match {
-        case list: ValueList => Some(list.getValue.asScala.map(v => v.getValue.asInstanceOf[String]))
+        case list: ValueList => Some(list.getValue.asScala.toSeq.map(v => v.getValue.asInstanceOf[String]))
         case _ => None
       }
     }

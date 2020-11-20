@@ -5,6 +5,8 @@ import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.api.projection.record.CaseBusinessIdentifierRecord
 import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 
+import scala.collection.mutable.ArrayBuffer
+
 trait BaseQueryImpl
   extends CaseTables
     with TaskTables
@@ -182,7 +184,7 @@ trait BaseQueryImpl
       }
 
       // TODO: for performance reasons we can sort the array to have the "NOT" filters at the end
-      filtersPerField.toArray[(String, Seq[RawFilter])].map(fieldFilter => combineToBasicFilter(fieldFilter._1, fieldFilter._2))
+      filtersPerField.toSeq.map(fieldFilter => combineToBasicFilter(fieldFilter._1, fieldFilter._2.toSeq))
     }
   }
 

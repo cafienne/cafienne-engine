@@ -48,8 +48,8 @@ object Main extends App {
     System.exit(-1)
   }
 
-  def httpRoutesTimeout = Timeout(15 seconds) // This is the timeout that the http engine uses to wait for futures
-  def caseSystemTimeout = Timeout(10 seconds) // This is the timeout that the routes use to interact with the case engine
+  def httpRoutesTimeout = Timeout(15.seconds) // This is the timeout that the http engine uses to wait for futures
+  def caseSystemTimeout = Timeout(10.seconds) // This is the timeout that the routes use to interact with the case engine
 
   def startup(): Unit = {
     // Start case system
@@ -116,11 +116,11 @@ object Main extends App {
     val apiPort = CaseSystem.config.api.bindPort
     val httpServer = Http().newServerAt(apiHost, apiPort).bindFlow(apiRoutes)
     httpServer onComplete {
-      case Success(answer) ⇒ {
+      case Success(answer) => {
         system.log.info(s"service is done: $answer")
         system.log.info(s"Running [$BuildInfo]")
       }
-      case Failure(msg) ⇒ {
+      case Failure(msg) => {
         system.log.error(s"service failed: $msg")
         System.exit(-1) // Also exit the JVM; what use do we have to keep running when there is no http available...
       }
