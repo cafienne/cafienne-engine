@@ -56,7 +56,6 @@ public class SerializedException implements CafienneSerializable {
      */
     public <T extends Throwable> Class<T> getExceptionClass() {
         try {
-            new RuntimeException("test");
             return (Class<T>) Class.forName(getClassName());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("The internal exception class with name "+className+" cannot be found in the classpath", e);

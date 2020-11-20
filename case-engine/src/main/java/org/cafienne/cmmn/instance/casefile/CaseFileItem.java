@@ -103,11 +103,11 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     @Override
     public void releaseBootstrapEvents() {
-        TransitionPublisher bootstrapPublisher = transitionPublisher;
-        bootstrapPublisher.releaseBootstrapEvents();
-        super.releaseBootstrapEvents();
         // From now onwards we can handle case file events the regular way
-        transitionPublisher = new TransitionPublisher(bootstrapPublisher);
+        // Creating the normal publisher will release events from bootstrap publisher
+        transitionPublisher = new TransitionPublisher(transitionPublisher);
+        // Now release child item bootstrap events
+        super.releaseBootstrapEvents();
     }
 
     private TransitionPublisher createTransitionPublisher() {

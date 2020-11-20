@@ -6,11 +6,13 @@ import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
+import org.cafienne.akka.actor.command.response.EngineChokedFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
+import org.cafienne.cmmn.instance.Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,11 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             setNextResponse(new CommandFailure(getCommand(), e));
             logger.debug("===== Command was invalid ======");
             return;
+        } catch (Throwable e) {
+            addDebugInfo(() -> e, logger);
+            setNextResponse(new EngineChokedFailure(getCommand(), e));
+            addDebugInfo(() -> "---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in actor " + this.actor.getId() + "\nwith exception", logger);
+            return;
         }
 
         try {
@@ -77,6 +84,10 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         } catch (CommandException e) {
             setNextResponse(new CommandFailure(getCommand(), e));
             addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception", logger);
+            addDebugInfo(() -> e, logger);
+        } catch (Throwable e) {
+            setNextResponse(new EngineChokedFailure(getCommand(), e));
+            addDebugInfo(() -> "---------- Engine choked during processing of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in actor " + this.actor.getId() + "\nwith exception", logger);
             addDebugInfo(() -> e, logger);
         }
     }

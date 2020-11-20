@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHe
 import akka.http.scaladsl.server.{Directive0, Route}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse, SecurityFailure}
+import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
 import org.cafienne.cmmn.akka.command.response.CaseResponse
 import org.cafienne.humantask.akka.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
@@ -26,6 +26,7 @@ trait CommandRoute extends AuthenticatedRoute {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
+          case e: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case tenantOwners: TenantOwnersResponse => complete(StatusCodes.OK, tenantOwners)
           case value: TenantResponse => writeLastModifiedHeader(value, api.TENANT_LAST_MODIFIED) {
