@@ -58,7 +58,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      * unless and until this call is done.
      */
     public void releaseBootstrapEvents() {
-        getItems().values().forEach(item -> item.releaseBootstrapEvents());
+        getItems().values().iterator().forEachRemaining(item -> item.releaseBootstrapEvents());
     }
 
     /**
@@ -102,15 +102,6 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      */
     protected boolean isUndefined(String identifier) {
         return getDefinition().isUndefined(identifier);
-    }
-
-    /**
-     * Returns true if a CaseFileItem with the specified name has an instance.
-     * @param childName
-     * @return
-     */
-    protected boolean hasItem(String childName) {
-        return getItems().keySet().stream().filter(def -> def.getName().equals(childName)).count() > 0;
     }
 
     protected CaseFileItem getItem(CaseFileItemDefinition childDefinition) {

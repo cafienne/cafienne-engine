@@ -21,6 +21,9 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
      * @param bootstrapPublisher
      */
     public TransitionPublisher(TransitionPublisher<I, P> bootstrapPublisher) {
+        // Release bootstrap publishers' events. This potentially releases some of the entry and exit criteria
+        bootstrapPublisher.releaseBootstrapEvents();
+        // After release of bootstrap events, we start listening ourselves, with updated set of entry and exit criteria
         this.item = bootstrapPublisher.item;
         this.connectedEntryCriteria.addAll(bootstrapPublisher.connectedEntryCriteria);
         this.connectedExitCriteria.addAll(bootstrapPublisher.connectedExitCriteria);
