@@ -11,7 +11,10 @@ class QueryDBConfig(val parent: CafienneConfig) extends MandatoryConfig {
 
   lazy val restartSettings = new RestartConfig(this)
   lazy val debug = readBoolean("debug", false)
-  lazy val readJournal = readString("read-journal", "")
+  lazy val readJournal = {
+    logger.warn("Obtaining read-journal settings from 'cafienne.querydb.read-journal' is deprecated; please place these settings in 'cafienne.read-journal' instead")
+    readString("read-journal", "")
+  }
 }
 
 class RestartConfig(val parent: QueryDBConfig) extends CafienneBaseConfig {

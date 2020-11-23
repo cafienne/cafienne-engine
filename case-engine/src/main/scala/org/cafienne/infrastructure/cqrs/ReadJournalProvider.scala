@@ -26,7 +26,7 @@ trait ReadJournalProvider extends LazyLogging {
 
   private def findReadJournalSetting(): String = {
 
-    val explicitReadJournal = CaseSystem.config.queryDB.readJournal
+    val explicitReadJournal = CaseSystem.config.readJournal
     if (!explicitReadJournal.isEmpty) {
       return explicitReadJournal
     }
@@ -35,7 +35,7 @@ trait ReadJournalProvider extends LazyLogging {
     import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal
     import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 
-    logger.warn("Missing conf 'cafienne.query-db.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
+    logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
     if (configuredJournal.contains("jdbc")) {
       return JdbcReadJournal.Identifier
     } else if (configuredJournal.contains("cassandra")) {

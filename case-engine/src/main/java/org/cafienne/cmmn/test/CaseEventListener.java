@@ -1,14 +1,8 @@
 package org.cafienne.cmmn.test;
 
-import akka.NotUsed;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.persistence.inmemory.query.javadsl.InMemoryReadJournal;
-import akka.persistence.query.EventEnvelope;
-import akka.persistence.query.Offset;
-import akka.persistence.query.PersistenceQuery;
-import akka.stream.javadsl.Source;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.cmmn.akka.event.*;
@@ -30,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The CaseEventListener reads CaseInstanceEvents from the event stream (eventsByTag for 'cafienne:case')
+ * The CaseEventListener reads and stores ModelEvents
  */
 public class CaseEventListener {
     private final static Logger logger = LoggerFactory.getLogger(CaseEventListener.class);
@@ -41,6 +35,7 @@ public class CaseEventListener {
     private final ActorRef caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
     private final TestScript testScript;
+    private final CaseEventPublisher readJournal;
 
     CaseEventListener(TestScript testScript) {
         this.testScript = testScript;
@@ -50,26 +45,24 @@ public class CaseEventListener {
         final ActorSystem system = CaseSystem.system();
         // Now create the callback mechanism for the case system
         this.responseHandlingActor = system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
-
-
-        final InMemoryReadJournal readJournal = PersistenceQuery.get(system).getReadJournalFor(InMemoryReadJournal.class, InMemoryReadJournal.Identifier());
-        Source<EventEnvelope, NotUsed> source = readJournal.eventsByTag(ModelEvent.TAG, Offset.noOffset());
-        source.runForeach(eventEnvelope -> {
-            Object event = eventEnvelope.event();
-            if (event instanceof ModelEvent) {
-                if (event instanceof CaseModified) {
-                    lastCaseModifiedEvent = (CaseModified) event;
-                }
-                handle((ModelEvent) event);
-            } else {
-                logger.warn("Received unexpected event " + event);
-            }
-        }, system);
+        // And create a connection with the Akka Event database to receive events from the case system
+        this.readJournal = new CaseEventPublisher(this, system);
     }
 
     void sendCommand(Object command) {
         newEvents = new ArrayList();
         caseMessageRouter.tell(command, responseHandlingActor);
+    }
+
+    void handle(Object object) {
+        if (object instanceof ModelEvent) {
+            if (object instanceof CaseModified) {
+                lastCaseModifiedEvent = (CaseModified) object;
+            }
+            handle((ModelEvent) object);
+        } else {
+            logger.warn("Received unexpected event " + object);
+        }
     }
 
     private void handle(ModelEvent event) {

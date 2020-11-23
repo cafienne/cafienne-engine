@@ -26,6 +26,17 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
   /**
     * Returns configuration options for the QueryDB
     */
+  lazy val readJournal = {
+    if (config.hasPath("read-journal")) {
+      readString("read-journal", "")
+    } else {
+      queryDB.readJournal
+    }
+  }
+
+  /**
+    * Returns configuration options for the QueryDB
+    */
   lazy val queryDB: QueryDBConfig = new QueryDBConfig(this)
 
   /**
