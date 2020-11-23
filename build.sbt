@@ -58,6 +58,8 @@ lazy val engine = project("case-engine")
       Deps.akkaHttpSprayJson,
       Deps.akkaHttpXml,
       Deps.akkaInMemoryTestDB,
+      Deps.cassandraPersistence,
+      Deps.akkaPersistenceJDBC,
       Deps.akkaPersistence,
       Deps.akkaQuery,
       Deps.akkaSlf4j,
@@ -130,9 +132,7 @@ lazy val service = project("case-service")
     Deps.compile(
       Deps.akkaHttpCore,
       Deps.akkaHtppJackson,
-      Deps.akkaPersistenceJDBC,
       Deps.bcrypt,
-      Deps.cassandraPersistence,
       Deps.config,
       Deps.flyway,
       Deps.hikariCP,
