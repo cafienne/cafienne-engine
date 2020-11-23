@@ -9,7 +9,7 @@ import org.cafienne.akka.actor.CaseSystem
 /**
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)
   */
-trait ReadJournalProvider extends LazyLogging with ActorSystemProvider {
+trait ReadJournalProvider extends LazyLogging {
   val configuredJournal = system.settings.config.getString("akka.persistence.journal.plugin")
   val readJournalSetting = findReadJournalSetting()
 
