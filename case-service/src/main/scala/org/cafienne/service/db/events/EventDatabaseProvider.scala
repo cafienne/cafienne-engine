@@ -5,11 +5,11 @@ import java.sql.Connection
 import java.util.logging.Logger
 
 import akka.actor.ActorSystem
-import akka.persistence.jdbc.util.{DefaultSlickDatabaseProvider, SlickDatabase, SlickDatabaseProvider}
+import akka.persistence.jdbc.db.{DefaultSlickDatabaseProvider, SlickDatabase}
 import com.typesafe.config.Config
 import javax.sql.DataSource
 import org.flywaydb.core.Flyway
-import slick.jdbc.{JdbcBackend, JdbcProfile}
+import slick.jdbc.JdbcBackend
 
 class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabaseProvider(system) {
 

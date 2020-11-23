@@ -17,42 +17,37 @@ object Deps {
   object V {
     val scala       = "2.12.11"
     val spray       = "1.3.5"
-    val akkaHttp    = "10.2.0"
-    val slf4j       = "1.7.12"
-    val akka        = "2.6.9"
-    val jackson     = "2.11.2"
+    val akkaHttp    = "10.2.1"
+    val akka        = "2.6.10"
+    val jackson     = "2.11.3"
     val enumeratum  = "1.6.1"
     val swagger     = "2.1.5"
     val slick       = "3.3.3"
-    val jasper      = "6.14.0"
+    val jasper      = "6.16.0"
   }
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
   val akkaStream            = "com.typesafe.akka"       %% "akka-stream"                          % V.akka
-  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % "2.5.31"
+  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % "2.5.32"
   val akkaClusterTools      = "com.typesafe.akka"       %% "akka-cluster-tools"                   % V.akka
   val akkaPersistence       = "com.typesafe.akka"       %% "akka-persistence"                     % V.akka    // exclude("org.iq80.leveldb","leveldb")
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
   val akkaClusterSharding   = "com.typesafe.akka"       %% "akka-cluster-sharding"                % V.akka
-  val akkaKryo              = "io.altoo"                %% "akka-kryo-serialization"              % "1.1.5"
-  val levelDbFixed          = "org.iq80.leveldb"        %  "leveldb"                              % "0.12"
-  val levelDbJNI            = "org.fusesource.leveldbjni" % "leveldbjni-all"                      % "1.8"
   val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.103"
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  val akkaPersistenceJDBC   = "com.github.dnvriend"     %% "akka-persistence-jdbc"                % "3.5.3"
+  val akkaPersistenceJDBC   = "com.lightbend.akka"      %% "akka-persistence-jdbc"                % "4.0.0"
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
-  val slf4j                 = akkaSlf4j
-  val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.1"
+  val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.3"
-  val config                = "com.typesafe"            %  "config"                               % "1.4.0"
+  val config                = "com.typesafe"            %  "config"                               % "1.4.1"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.2"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
-  val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "8.19"
+  val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "9.1.2"
 
   val akkaHttp              = "com.typesafe.akka"       %% "akka-http"                            % V.akkaHttp
-  val akkHttpXml            = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
+  val akkaHttpXml            = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
   val akkaHttpSprayJson     = "com.typesafe.akka"       %% "akka-http-spray-json"                 % V.akkaHttp
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
@@ -68,18 +63,18 @@ object Deps {
   val swaggerjaxrs2         = "io.swagger.core.v3"      % "swagger-jaxrs2"                        % V.swagger
 
   // The test scope will be added in the build so we don't need to declare it in here
-  val scalaMock             = "org.scalamock"           %% "scalamock"                            % "4.4.0"
-  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.2.2"
-  val junit                 = "org.junit.jupiter"       % "junit-jupiter-api"                     % "5.6.2"
+  val scalaMock             = "org.scalamock"           %% "scalamock"                            % "5.0.0"
+  val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.2.3"
+  val junit                 = "org.junit.jupiter"       % "junit-jupiter-api"                     % "5.7.0"
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
   val wireMock              = "com.github.tomakehurst"  % "wiremock"                              % "2.27.2"
-  val commonsIO             = "commons-io"              %  "commons-io"                           % "2.7"
-  val apacheCommonsText     = "org.apache.commons"      % "commons-text"                          % "1.8"
+  val commonsIO             = "commons-io"              %  "commons-io"                           % "20030203.000550"
+  val apacheCommonsText     = "org.apache.commons"      % "commons-text"                          % "1.9"
   val jsonJava              = "com.fasterxml.jackson.core"   % "jackson-core"					            % V.jackson
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
   val jacksonScala          = "com.fasterxml.jackson.module" %% "jackson-module-scala"            % V.jackson
 
-  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.2.9.RELEASE"
+  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.3.1"
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
@@ -91,11 +86,11 @@ object Deps {
   val sw4jj                 = "com.github.j5ik2o"       % "sw4jj_2.11"                            % "1.0.2"
   val slick                 = "com.typesafe.slick"      %% "slick"                                % V.slick
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % V.slick
-  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.16"
+  val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.18"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
   val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.1"
   val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "8.4.1.jre11"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.0.0"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.2.1"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
 
