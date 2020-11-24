@@ -1,6 +1,7 @@
 package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.akka.actor.command.response.CommandFailure;
+import org.cafienne.akka.actor.command.response.EngineChokedFailure;
 import org.cafienne.akka.actor.command.response.SecurityFailure;
 import org.cafienne.cmmn.akka.command.response.AddDiscretionaryItemResponse;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
@@ -40,6 +41,7 @@ public class ResponseSerializer extends CafienneSerializer {
     private static void addFailureResponses() {
         addManifestWrapper(CommandFailure.class, CommandFailure::new);
         addManifestWrapper(SecurityFailure.class, SecurityFailure::new);
+        addManifestWrapper(EngineChokedFailure.class, EngineChokedFailure::new);
     }
 
     private static void addTenantResponses() {

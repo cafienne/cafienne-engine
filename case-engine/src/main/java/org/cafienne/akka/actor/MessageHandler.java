@@ -67,7 +67,8 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
     protected void checkEngineVersion() {
         // First check whether the engine version has changed or not; this may lead to an EngineVersionChanged event
         CafienneVersion currentEngineVersion = CaseSystem.version();
-        if (currentEngineVersion.differs(actor.getEngineVersion())) {
+        CafienneVersion actorVersion = actor.getEngineVersion();
+        if (actorVersion != null && currentEngineVersion.differs(actor.getEngineVersion())) {
             logger.info(this + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
             addModelEvent(0, new EngineVersionChanged(actor, currentEngineVersion));
         }
