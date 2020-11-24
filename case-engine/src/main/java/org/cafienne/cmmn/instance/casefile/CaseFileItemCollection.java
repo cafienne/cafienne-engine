@@ -58,7 +58,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      * unless and until this call is done.
      */
     public void releaseBootstrapEvents() {
-        getItems().values().iterator().forEachRemaining(item -> item.releaseBootstrapEvents());
+        new LinkedHashMap<>(getItems()).values().forEach(item -> item.releaseBootstrapEvents());
     }
 
     /**
