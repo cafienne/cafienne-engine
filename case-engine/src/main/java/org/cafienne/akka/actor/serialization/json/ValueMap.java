@@ -175,6 +175,10 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return fieldValue;
     }
 
+    public Value<?> get(Fields fieldName) {
+        return get(fieldName.toString());
+    }
+
     /**
      * Determines whether a field with the specified name is present in this ValueMap.
      *
@@ -183,6 +187,10 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      */
     public boolean has(String fieldName) {
         return value.containsKey(fieldName);
+    }
+
+    public boolean has(Fields fieldName) {
+        return has(fieldName.toString());
     }
 
     /**

@@ -25,7 +25,7 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
       path(Segment / "users") { tenant =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
-        implicit val format = jsonFormat5(TenantAPI.UserFormat)
+        implicit val format = jsonFormat6(TenantAPI.UserFormat)
         entity(as[TenantAPI.UserFormat]) { newUser =>
           extractUri { uri =>
             logger.warn(s"Using deprecated POST on $uri to update Tenant User. Please use PUT instead of POST")

@@ -2,17 +2,15 @@ package org.cafienne.tenant.akka.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.BootstrapCommand;
-import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.PlatformUser;
-import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.command.exception.TenantException;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
-import org.cafienne.tenant.akka.event.platform.TenantCreated;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,9 +19,9 @@ import java.util.List;
 @Manifest
 public class CreateTenant extends PlatformTenantCommand implements BootstrapCommand {
     public final String name;
-    private final List<TenantUser> users;
+    private final List<TenantUserInformation> users;
 
-    public CreateTenant(PlatformUser user, String tenantId, String name, List<TenantUser> users) {
+    public CreateTenant(PlatformUser user, String tenantId, String name, List<TenantUserInformation> users) {
         super(user, tenantId);
         this.name = name;
         this.users = users;
@@ -37,10 +35,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         super(json);
         this.name = readField(json, Fields.name);
         this.users = new ArrayList();
-        json.withArray(Fields.users).forEach(value -> {
-            ValueMap ownerJson = (ValueMap) value;
-            this.users.add(TenantUser.from(ownerJson));
-        });
+        json.withArray(Fields.users).forEach(value -> this.users.add(TenantUserInformation.from((ValueMap)value)));
     }
 
     @Override
@@ -67,7 +62,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         super.write(generator);
         writeField(generator, Fields.name, name);
         generator.writeArrayFieldStart(Fields.users.toString());
-        for (TenantUser user : users) {
+        for (TenantUserInformation user : users) {
             user.write(generator);
         }
         generator.writeEndArray();

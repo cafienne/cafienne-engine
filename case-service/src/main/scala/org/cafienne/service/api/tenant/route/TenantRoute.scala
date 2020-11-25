@@ -14,7 +14,7 @@ import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
 import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenantFormat, UserFormat}
-import org.cafienne.tenant.akka.command.TenantCommand
+import org.cafienne.tenant.akka.command.{TenantCommand, TenantUserInformation}
 import org.cafienne.tenant.akka.command.platform.{CreateTenant, PlatformTenantCommand}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
@@ -47,17 +47,18 @@ trait TenantRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def convertToTenant(tenant: BackwardsCompatibleTenantFormat): Seq[TenantUser] = {
+  def convertToTenant(tenant: BackwardsCompatibleTenantFormat): Seq[TenantUserInformation] = {
     val users = tenant.users.getOrElse(tenant.owners.getOrElse(Seq()))
-    val defaultOwnership: Boolean = {
-      if (tenant.users.isEmpty && tenant.owners.nonEmpty) true // Owners is the old format, then all users become owner.
-      else false // In the new format every owner must be explicitly defined
+    val defaultOwnership: Option[Boolean] = {
+      if (tenant.users.isEmpty && tenant.owners.nonEmpty) Some(true) // Owners is the old format, then all users become owner.
+      else None // In the new format every owner must be explicitly defined
     }
     users.map(user => asTenantUser(user, tenant.name, defaultOwnership))
   }
 
-  def asTenantUser(user: UserFormat, tenant: String, defaultOwnership: Boolean = false): TenantUser = {
-    TenantUser(user.userId, user.roles, tenant, isOwner = user.isOwner.getOrElse(defaultOwnership), user.name.getOrElse(""), user.email.getOrElse(""), enabled = true)
+  def asTenantUser(user: UserFormat, tenant: String, defaultOwnership: Option[Boolean] = None): TenantUserInformation = {
+    val ownerShip = defaultOwnership.fold(user.isOwner)(Some(_))
+    TenantUserInformation(user.userId, roles = user.roles, name = user.name, email = user.email, owner = ownerShip, enabled = user.enabled)
   }
 }
 

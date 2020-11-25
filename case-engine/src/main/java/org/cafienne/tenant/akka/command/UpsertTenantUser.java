@@ -12,16 +12,16 @@ import java.io.IOException;
 
 @Manifest
 public class UpsertTenantUser extends TenantCommand {
-    private final TenantUser newUser;
+    private final TenantUserInformation newUser;
 
-    public UpsertTenantUser(TenantUser tenantOwner, TenantUser newUser) {
+    public UpsertTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
         super(tenantOwner);
         this.newUser = newUser;
     }
 
     public UpsertTenantUser(ValueMap json) {
         super(json);
-        this.newUser = TenantUser.from(json.with(Fields.newTenantUser));
+        this.newUser = TenantUserInformation.from(json.with(Fields.newTenantUser));
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.akka.command.TenantCommand;
+import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.event.*;
 import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.platform.TenantDisabled;
@@ -43,13 +44,22 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         return this.creationEvent != null;
     }
 
-    public void createInstance(List<TenantUser> users) {
+    public void createInstance(List<TenantUserInformation> newUsers) {
         addEvent(new TenantCreated(this));
-        updateInstance(users);
+        updateInstance(newUsers);
     }
 
-    public void updateInstance(List<TenantUser> users) {
-        users.forEach(this::upsertUser);
+    public void replaceInstance(List<TenantUserInformation> newUsers) {
+        new HashMap(users).keySet().forEach(userId -> {
+            if (newUsers.stream().filter(user -> user.id().equals(userId)).count() == 0) {
+                users.get(userId).disable();
+            }
+        });
+        newUsers.forEach(newUser -> getOrCreate(newUser).replaceWith(newUser));
+    }
+
+    public void updateInstance(List<TenantUserInformation> usersToUpdate) {
+        usersToUpdate.forEach(this::upsertUser);
     }
 
     public void updateState(TenantCreated tenantCreated) {
@@ -57,19 +67,18 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         this.creationEvent = tenantCreated;
     }
 
-    public void upsertUser(TenantUser user) {
-        User existingUser = users.get(user.id());
+    private User getOrCreate(TenantUserInformation userInfo) {
+        User existingUser = users.get(userInfo.id());
         if (existingUser == null) {
-            addEvent(new TenantUserCreated(this, user.id(), user.name(), user.email()));
-            User newUser = getUser(user.id());
-            user.roles().foreach(role -> newUser.addRole(role));
-            if (user.isOwner()) {
-                // Add ownership
-                newUser.makeOwner();
-            }
+            addEvent(new TenantUserCreated(this, userInfo.id(), userInfo.getName(), userInfo.getEmail()));
+            return getUser(userInfo.id());
         } else {
-            existingUser.updateFrom(user);
+            return existingUser;
         }
+    }
+
+    public void upsertUser(TenantUserInformation newInfo) {
+        getOrCreate(newInfo).upsertWith(newInfo);
     }
 
     public void disable() {

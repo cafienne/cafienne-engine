@@ -20,6 +20,7 @@ public enum Fields {
     name,
     email,
     isOwner,
+    enabled,
     identifier,
     planItemId,
     parentId,

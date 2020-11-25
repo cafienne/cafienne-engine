@@ -21,8 +21,6 @@ import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole, UpsertTenantUser}
 
-import scala.collection.JavaConverters._
-
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
@@ -135,7 +133,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
       path(Segment / "users") { tenant =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
-        implicit val format = jsonFormat5(TenantAPI.UserFormat)
+        implicit val format = jsonFormat6(TenantAPI.UserFormat)
         entity(as[TenantAPI.UserFormat]) { newUser =>
           askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
         }

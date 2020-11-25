@@ -8,6 +8,7 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.service.Main
+import org.cafienne.tenant.akka.command.TenantUserInformation
 import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
@@ -80,13 +81,13 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("Bootstrap file should contain a list of owners, with at least one owner for the tenant")
       }
 
-      val users: Seq[TenantUser] = tenantConfig.getConfigList("users").asScala.map(user => {
+      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.map(user => {
         val userId = user.getString("id")
         val roles = readStringList(user, "roles")
-        val userName = readStringOr(user, "name", "")
+        val name = readStringOr(user, "name", "")
         val email = readStringOr(user, "email", "")
         val isOwner = ownerIds.contains(userId)
-        TenantUser(userId, roles, tenantName, isOwner, userName, email, enabled = true)
+        TenantUserInformation(userId, roles = Some(roles), name = Some(name), email = Some(email), owner = Some(isOwner), enabled = Some(true))
       })
 
       val undefinedOwners = ownerIds.filter(id => !users.map(u => u.id).contains(id))
