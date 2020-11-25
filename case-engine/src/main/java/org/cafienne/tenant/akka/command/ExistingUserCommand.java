@@ -19,8 +19,8 @@ import java.io.IOException;
 abstract class ExistingUserCommand extends TenantCommand {
     public final String userId;
 
-    public ExistingUserCommand(TenantUser tenantOwner, String tenantId, String userId) {
-        super(tenantOwner, tenantId);
+    public ExistingUserCommand(TenantUser tenantOwner, String userId) {
+        super(tenantOwner);
         this.userId = userId;
     }
 

@@ -13,8 +13,8 @@ import java.io.IOException;
 
 @Manifest
 public class GetTenantOwners extends TenantCommand {
-    public GetTenantOwners(TenantUser tenantOwner, String tenantId) {
-        super(tenantOwner, tenantId);
+    public GetTenantOwners(TenantUser tenantOwner) {
+        super(tenantOwner);
     }
 
     public GetTenantOwners(ValueMap json) {

@@ -14,8 +14,8 @@ import java.io.IOException;
 public class UpsertTenantUser extends TenantCommand {
     private final TenantUser newUser;
 
-    public UpsertTenantUser(TenantUser tenantOwner, String tenantId, TenantUser newUser) {
-        super(tenantOwner, tenantId);
+    public UpsertTenantUser(TenantUser tenantOwner, TenantUser newUser) {
+        super(tenantOwner);
         this.newUser = newUser;
     }
 

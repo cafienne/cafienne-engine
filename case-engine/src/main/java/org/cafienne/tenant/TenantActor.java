@@ -43,34 +43,44 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         return this.creationEvent != null;
     }
 
-    public void setInitialState(TenantCreated tenantCreated) {
+    public void createInstance(List<TenantUser> users) {
+        addEvent(new TenantCreated(this));
+        updateInstance(users);
+    }
+
+    public void updateInstance(List<TenantUser> users) {
+        users.forEach(this::upsertUser);
+    }
+
+    public void updateState(TenantCreated tenantCreated) {
         this.setEngineVersion(tenantCreated.engineVersion);
         this.creationEvent = tenantCreated;
-    }
-
-    public void setInitialUsers(List<TenantUser> owners) {
-        // Register the owners as TenantUsers with the specified roles
-        owners.forEach(owner -> createUser(owner, owner.isOwner()));
-    }
-
-    private TenantUserCreated createUser(TenantUser user, boolean isOwner) {
-        TenantUserCreated event = addEvent(new TenantUserCreated(this, user.id(), user.name(), user.email()));
-        User newUser = getUser(user.id());
-        user.roles().foreach(role -> newUser.addRole(role));
-        if (isOwner) newUser.makeOwner();
-        return event;
-    }
-
-    public TenantUserCreated createUser(TenantUser user) {
-        return createUser(user, false);
     }
 
     public void upsertUser(TenantUser user) {
         User existingUser = users.get(user.id());
         if (existingUser == null) {
-            createUser(user);
+            addEvent(new TenantUserCreated(this, user.id(), user.name(), user.email()));
+            User newUser = getUser(user.id());
+            user.roles().foreach(role -> newUser.addRole(role));
+            if (user.isOwner()) {
+                // Add ownership
+                newUser.makeOwner();
+            }
         } else {
             existingUser.updateFrom(user);
+        }
+    }
+
+    public void disable() {
+        if (! disabled) {
+            addEvent(new TenantDisabled(this));
+        }
+    }
+
+    public void enable() {
+        if (disabled) {
+            addEvent(new TenantEnabled(this));
         }
     }
 
@@ -100,7 +110,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void updateState(TenantUserCreated event) {
-        users.put(event.userId, new User(this, event));
+        users.put(event.userId, new User(this, event.userId, event.name, event.email));
     }
 
     public void updateState(TenantModified event) {

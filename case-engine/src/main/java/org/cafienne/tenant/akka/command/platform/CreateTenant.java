@@ -58,8 +58,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.addEvent(new TenantCreated(tenant));
-        tenant.setInitialUsers(users);
+        tenant.createInstance(users);
         return new TenantResponse(this);
     }
 

@@ -22,11 +22,11 @@ public class User {
 
     private final TenantActor tenant;
 
-    User(TenantActor tenant, TenantUserCreated event) {
+    User(TenantActor tenant, String userId, String name, String email) {
         this.tenant = tenant;
-        this.userId = event.userId;
-        this.name = event.name;
-        this.email = event.email;
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
     }
 
     public boolean isOwner() {

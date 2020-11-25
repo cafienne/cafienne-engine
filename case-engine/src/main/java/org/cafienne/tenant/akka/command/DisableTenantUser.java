@@ -8,8 +8,8 @@ import org.cafienne.tenant.User;
 @Manifest
 public class DisableTenantUser extends ExistingUserCommand {
 
-    public DisableTenantUser(TenantUser tenantOwner, String tenantId, String userId) {
-        super(tenantOwner, tenantId, userId);
+    public DisableTenantUser(TenantUser tenantOwner, String userId) {
+        super(tenantOwner, userId);
     }
 
     public DisableTenantUser(ValueMap json) {

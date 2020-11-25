@@ -30,12 +30,11 @@ import org.cafienne.tenant.akka.command.exception.TenantException;
 public abstract class TenantCommand extends ModelCommand<TenantActor> {
     /**
      * Create a new command that can be sent to the case.
+     *  @param tenantOwner The user that issues this command.
      *
-     * @param tenantOwner The user that issues this command.
-     * @param tenantId The id of the case in which to perform this command.
      */
-    protected TenantCommand(TenantUser tenantOwner, String tenantId) {
-        super(tenantOwner, tenantId);
+    protected TenantCommand(TenantUser tenantOwner) {
+        super(tenantOwner, tenantOwner.tenant());
     }
 
     protected TenantCommand(ValueMap json) {

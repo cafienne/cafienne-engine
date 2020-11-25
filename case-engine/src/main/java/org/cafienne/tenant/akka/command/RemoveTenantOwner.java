@@ -11,8 +11,8 @@ import org.cafienne.tenant.akka.command.exception.TenantException;
 @Manifest
 public class RemoveTenantOwner extends ExistingUserCommand {
 
-    public RemoveTenantOwner(TenantUser tenantOwner, String tenantId, String userId) {
-        super(tenantOwner, tenantId, userId);
+    public RemoveTenantOwner(TenantUser tenantOwner, String userId) {
+        super(tenantOwner, userId);
     }
 
     public RemoveTenantOwner(ValueMap json) {

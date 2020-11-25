@@ -29,7 +29,7 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
         entity(as[TenantAPI.UserFormat]) { newUser =>
           extractUri { uri =>
             logger.warn(s"Using deprecated POST on $uri to update Tenant User. Please use PUT instead of POST")
-            askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
+            askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
           }
         }
       }

@@ -59,7 +59,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def addTenantOwner = put {
     validUser { tenantOwner =>
       path(Segment / "owners" / Segment) { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new AddTenantOwner(tenantUser, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new AddTenantOwner(tenantUser, userId))
       }
     }
   }
@@ -84,7 +84,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def removeTenantOwner = delete {
     validUser { tenantOwner =>
       path(Segment / "owners" / Segment) { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new RemoveTenantOwner(tenantUser, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new RemoveTenantOwner(tenantUser, userId))
       }
     }
   }
@@ -108,7 +108,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def getTenantOwners = get {
     validUser { tenantOwner =>
       path(Segment / "owners") { tenant =>
-        askTenant(tenantOwner, tenant, tenantUser => new GetTenantOwners(tenantUser, tenant))
+        askTenant(tenantOwner, tenant, tenantUser => new GetTenantOwners(tenantUser))
       }
     }
   }
@@ -137,7 +137,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat5(TenantAPI.UserFormat)
         entity(as[TenantAPI.UserFormat]) { newUser =>
-          askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
+          askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
         }
       }
     }
@@ -162,7 +162,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def disableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "disable") { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new DisableTenantUser(tenantUser, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new DisableTenantUser(tenantUser, userId))
       }
     }
   }
@@ -186,7 +186,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def enableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "enable") { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new EnableTenantUser(tenantUser, tenant, userId))
+        askTenant(tenantOwner, tenant, tenantUser => new EnableTenantUser(tenantUser, userId))
       }
     }
   }
@@ -213,7 +213,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def addTenantUserRoles = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-        askTenant(tenantOwner, tenant, tenantUser => new AddTenantUserRole(tenantUser, tenant, userId, role))
+        askTenant(tenantOwner, tenant, tenantUser => new AddTenantUserRole(tenantUser, userId, role))
       }
     }
   }
@@ -238,7 +238,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def removeTenantUserRole = delete {
     validUser { platformUser =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-        askTenant(platformUser, tenant, tenantUser => new RemoveTenantUserRole(tenantUser, tenant, userId, role))
+        askTenant(platformUser, tenant, tenantUser => new RemoveTenantUserRole(tenantUser, userId, role))
       }
     }
   }
