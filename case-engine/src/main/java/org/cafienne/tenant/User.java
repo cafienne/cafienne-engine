@@ -30,7 +30,7 @@ public class User {
     }
 
     public boolean isOwner() {
-        return isOwner;
+        return isOwner && enabled;
     }
 
     private <T extends TenantUserEvent> T addEvent(T event) {
