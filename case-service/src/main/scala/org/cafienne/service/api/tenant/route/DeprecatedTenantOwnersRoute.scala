@@ -13,7 +13,7 @@ import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command._
 
-class FormerAddTenantUserRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   // POST Method has been replaced with PUT method. Keeping this for compatibility
   override def routes = {
