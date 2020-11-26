@@ -28,9 +28,7 @@ public class UpsertTenantUser extends TenantCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (newUser.owner().nonEmpty() && !newUser.isOwner()) {
-            validateNotLastOwner(tenant, newUser.id());
-        }
+        validateNotLastOwner(tenant, newUser);
     }
 
     @Override

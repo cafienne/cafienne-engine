@@ -74,10 +74,18 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
         }
     }
 
-    protected void validateNotLastOwner(TenantActor tenant, String userId) {
-        List<String> currentOwners = tenant.getOwnerList();
-        if (currentOwners.size() == 1 && currentOwners.contains(userId)) {
-            throw new TenantException("Cannot remove tenant owner. There must be at least one tenant owner.");
+    protected void validateNotLastOwner(TenantActor tenant, TenantUserInformation newUser) {
+        // If either
+        // 1. ownership is defined and revoked in the new information (needs to be checked like this, because isOwner() defaults to false)
+        // 2. or if the account is no longer enabled (isEnabled defaults to true, so if false it must have been set to change)
+        // Then
+        //  check whether this user is the last man standing in the list of owners. If so, the command cannot be executed.
+        if ((newUser.owner().nonEmpty() && !newUser.isOwner()) || !newUser.isEnabled()) {
+            List<String> currentOwners = tenant.getOwnerList();
+            // If only 1 owner, and newUser has the same id, then throw the exception
+            if (currentOwners.size() == 1 && currentOwners.contains(newUser.id())) {
+                throw new TenantException("Cannot remove tenant ownership or disable the account. There must be at least one tenant owner.");
+            }
         }
     }
 

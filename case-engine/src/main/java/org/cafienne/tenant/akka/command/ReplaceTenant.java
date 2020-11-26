@@ -36,8 +36,8 @@ public class ReplaceTenant extends TenantCommand {
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
         // Check whether after the filtering there are still owners left. Tenant must have owners.
-        if (users.stream().filter(potentialOwner -> potentialOwner.isOwner()).count() == 0) {
-            throw new TenantException("Cannot update the tenant and remove all tenant owners");
+        if (users.stream().filter(potentialOwner -> potentialOwner.isOwner() && potentialOwner.isEnabled()).count() == 0) {
+            throw new TenantException("Cannot update the tenant and remove all tenant owners or disable their accounts");
         }
     }
 

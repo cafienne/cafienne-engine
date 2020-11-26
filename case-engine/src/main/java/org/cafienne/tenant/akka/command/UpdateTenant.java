@@ -41,8 +41,8 @@ public class UpdateTenant extends TenantCommand {
         Stream<String> currentOwners = tenant.getOwnerList().stream();
         List<String> userIdsThatWillBeUpdated = this.users.stream().map(user -> user.id()).collect(Collectors.toList());
         long untouchedOwners = currentOwners.filter(currentOwner -> !userIdsThatWillBeUpdated.contains(currentOwner)).count();
-        if (untouchedOwners == 0 && this.users.stream().filter(u -> u.isOwner()).count() == 0) {
-            throw new TenantException("Cannot update the tenant and remove all tenant owners");
+        if (untouchedOwners == 0 && this.users.stream().filter(u -> u.isOwner() && u.isEnabled()).count() == 0) {
+            throw new TenantException("Cannot update the tenant and remove all tenant owners or disable their accounts");
         }
     }
 

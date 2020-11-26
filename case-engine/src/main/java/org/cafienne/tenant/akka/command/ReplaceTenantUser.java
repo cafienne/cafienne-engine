@@ -28,9 +28,7 @@ public class ReplaceTenantUser extends ExistingUserCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (!newUser.isOwner()) {
-            validateNotLastOwner(tenant, newUser.id());
-        }
+        validateNotLastOwner(tenant, newUser);
     }
 
     @Override
