@@ -8,6 +8,11 @@
 package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.server.Directives._
+import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import javax.ws.rs.{Consumes, DELETE, PUT, Path}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
@@ -17,21 +22,106 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
 
   // POST Method has been replaced with PUT method. Keeping this for compatibility
   override def routes = {
-      addTenantUser
+    addTenantOwner ~
+      removeTenantOwner ~
+      enableTenantUser ~
+      disableTenantUser
   }
 
-  def addTenantUser = post {
-    validUser { platformUser =>
-      path(Segment / "users") { tenant =>
-        import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-        import spray.json.DefaultJsonProtocol._
-        implicit val format = jsonFormat6(TenantAPI.UserFormat)
-        entity(as[TenantAPI.UserFormat]) { newUser =>
-          extractUri { uri =>
-            logger.warn(s"Using deprecated POST on $uri to update Tenant User. Please use PUT instead of POST")
-            askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
-          }
-        }
+  @Path("/{tenant}/owners/{userId}")
+  @PUT
+  @Operation(
+    summary = "Add a tenant owner",
+    description = "Add a user to the group of owners of the tenant. Only tenant owners have permission to manage tenant user information",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "userId", description = "Id of user to be added", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant to add the owner to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "204", description = "Owner added successfully"),
+      new ApiResponse(responseCode = "400", description = "Owner information is invalid"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Consumes(Array("application/json"))
+  def addTenantOwner = put {
+    validUser { tenantOwner =>
+      path(Segment / "owners" / Segment) { (tenant, userId) =>
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, owner = Some(true))))
+      }
+    }
+  }
+
+  @Path("/{tenant}/owners/{userId}")
+  @DELETE
+  @Operation(
+    summary = "Remove a tenant owner",
+    description = "Remove the user with the specified id from the group of tenant owners",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "userId", description = "Id of user to be removed", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant to remove the owner from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "204", description = "Owner removed successfully"),
+      new ApiResponse(responseCode = "400", description = "Owner information is invalid"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Consumes(Array("application/json"))
+  def removeTenantOwner = delete {
+    validUser { tenantOwner =>
+      path(Segment / "owners" / Segment) { (tenant, userId) =>
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, owner = Some(false))))
+      }
+    }
+  }
+
+  @Path("/{tenant}/users/{userId}/disable")
+  @PUT
+  @Operation(
+    summary = "Disable the tenant user",
+    description = "Disable the tenant user",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "userId", description = "Id of user to disable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant in which to disable the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Tenant user disabled successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  def disableTenantUser = put {
+    validUser { tenantOwner =>
+      path(Segment / "users" / Segment / "disable") { (tenant, userId) =>
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, enabled = Some(false))))
+      }
+    }
+  }
+
+  @Path("/{tenant}/users/{userId}/enable")
+  @PUT
+  @Operation(
+    summary = "Enable the tenant user",
+    description = "Enable the tenant user",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "userId", description = "Id of user to enable", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "tenant", description = "The tenant in which to enable the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Tenant user enabled successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  def enableTenantUser = put {
+    validUser { tenantOwner =>
+      path(Segment / "users" / Segment / "enable") { (tenant, userId) =>
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, enabled = Some(true))))
       }
     }
   }
