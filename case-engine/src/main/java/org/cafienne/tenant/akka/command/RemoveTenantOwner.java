@@ -25,9 +25,7 @@ public class RemoveTenantOwner extends ExistingUserCommand {
         if (! tenant.isOwner(userId)) {
             throw new TenantException("User '" + userId + "' is not a tenant owner.");
         }
-        if (tenant.getOwnerList().size() == 1) {
-            throw new TenantException("Cannot remove tenant owner. There must be at least one tenant owner.");
-        }
+        validateNotLastOwner(tenant, userId);
     }
 
     @Override

@@ -11,39 +11,50 @@ import org.cafienne.tenant.akka.command.exception.TenantException;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Manifest
-public class UpsertTenantUser extends TenantCommand {
-    private final TenantUserInformation newUser;
+public class ReplaceTenant extends TenantCommand {
+    private final List<TenantUserInformation> users;
 
-    public UpsertTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
+    public ReplaceTenant(TenantUser tenantOwner, List<TenantUserInformation> users) {
         super(tenantOwner);
-        this.newUser = newUser;
+        this.users = users;
     }
 
-    public UpsertTenantUser(ValueMap json) {
+    public ReplaceTenant(ValueMap json) {
         super(json);
-        this.newUser = TenantUserInformation.from(json.with(Fields.newTenantUser));
+        this.users = new ArrayList();
+        json.withArray(Fields.users).forEach(value -> {
+            ValueMap ownerJson = (ValueMap) value;
+            this.users.add(TenantUserInformation.from(ownerJson));
+        });
     }
 
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (newUser.owner().nonEmpty() && !newUser.isOwner()) {
-            validateNotLastOwner(tenant, newUser.id());
+        // Check whether after the filtering there are still owners left. Tenant must have owners.
+        if (users.stream().filter(potentialOwner -> potentialOwner.isOwner()).count() == 0) {
+            throw new TenantException("Cannot update the tenant and remove all tenant owners");
         }
     }
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.upsertUser(newUser);
+        tenant.replaceInstance(users);
         return new TenantResponse(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.newTenantUser, newUser.toValue());
+        generator.writeArrayFieldStart(Fields.users.toString());
+        for (TenantUserInformation user : users) {
+            user.write(generator);
+        }
+        generator.writeEndArray();
     }
 }
+

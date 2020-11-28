@@ -7,22 +7,20 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.akka.command.exception.TenantException;
-import org.cafienne.tenant.akka.command.response.TenantResponse;
+import org.cafienne.tenant.User;
 
 import java.io.IOException;
-import java.util.List;
 
 @Manifest
-public class UpsertTenantUser extends TenantCommand {
+public class ReplaceTenantUser extends ExistingUserCommand {
     private final TenantUserInformation newUser;
 
-    public UpsertTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
-        super(tenantOwner);
+    public ReplaceTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
+        super(tenantOwner, newUser.id());
         this.newUser = newUser;
     }
 
-    public UpsertTenantUser(ValueMap json) {
+    public ReplaceTenantUser(ValueMap json) {
         super(json);
         this.newUser = TenantUserInformation.from(json.with(Fields.newTenantUser));
     }
@@ -30,15 +28,14 @@ public class UpsertTenantUser extends TenantCommand {
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (newUser.owner().nonEmpty() && !newUser.isOwner()) {
+        if (!newUser.isOwner()) {
             validateNotLastOwner(tenant, newUser.id());
         }
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        tenant.upsertUser(newUser);
-        return new TenantResponse(this);
+    protected void updateUser(User user) {
+        user.replaceWith(newUser);
     }
 
     @Override

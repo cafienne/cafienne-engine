@@ -93,16 +93,14 @@ public class User {
         }
 
         // Now check if enabled/disabled changed.
-//        if (this.enabled != newInfo.enabled()) {
-//            if (newInfo.enabled()) enable();
-//            else disable();
-//        }
+        if (newInfo.enabled().nonEmpty()) {
+            updateAccountEnabled(newInfo.isEnabled());
+        }
 
-        // Finally check whether user becomes owner or not
-//        if (this.isOwner != newInfo.isOwner()) {
-//            if (newInfo.isOwner()) makeOwner();
-//            else removeOwnership();
-//        }
+        // Finally check whether ownership must be changed
+        if (newInfo.owner().nonEmpty()) {
+            updateOwnership(newInfo.isOwner());
+        }
     }
 
     public TenantUserRoleRemoved removeRole(String role) {

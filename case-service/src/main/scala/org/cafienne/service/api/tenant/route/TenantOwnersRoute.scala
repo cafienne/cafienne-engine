@@ -19,7 +19,7 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command.{AddTenantOwner, AddTenantUserRole, DisableTenantUser, EnableTenantUser, GetTenantOwners, RemoveTenantOwner, RemoveTenantUserRole, UpsertTenantUser}
+import org.cafienne.tenant.akka.command._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
@@ -30,6 +30,9 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
       removeTenantOwner ~
       getTenantOwners ~
       upsertTenantUser ~
+      updateTenant ~
+      replaceTenantUser ~
+      replaceTenant ~
       addTenantUserRoles ~
       removeTenantUserRole ~
       enableTenantUser ~
@@ -111,11 +114,109 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     }
   }
 
+  @Path("/{tenant}")
+  @POST
+  @Operation(
+    summary = "Replace the tenant",
+    description = "Replace the existing tenant users. Existing user-accounts not in the new list will disabled. New users in the list will be added, others will have their properties and roles replaced with the new information",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "The tenant in which to replace the information", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Tenant replaced successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  @RequestBody(description = "Users to update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UpdateTenantFormat]))))
+  @Consumes(Array("application/json"))
+  def replaceTenant = post {
+    validUser { platformUser =>
+      path(Segment) { tenant =>
+        import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+        import spray.json.DefaultJsonProtocol._
+        implicit val userFormat = jsonFormat6(TenantAPI.UserFormat)
+        implicit val tenantFormat = jsonFormat1(TenantAPI.UpdateTenantFormat)
+        entity(as[TenantAPI.UpdateTenantFormat]) { newTenantInformation =>
+          // Map users from external format to TenantUser case class and convert to java List
+          import scala.jdk.CollectionConverters._
+          val users = seqAsJavaList(newTenantInformation.users.map(user => asTenantUser(user, tenant)))
+          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenant(tenantOwner, users))
+        }
+      }
+    }
+  }
+
+  @Path("/{tenant}")
+  @PUT
+  @Operation(
+    summary = "Bulk update the tenant users",
+    description = "Add or replace the existing tenant users. If the user does not yet exist it will be created. The existing user properties and roles are updated if new information is given",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "The tenant in which to add/update the users", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Tenant updated successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  @RequestBody(description = "Users to update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UpdateTenantFormat]))))
+  @Consumes(Array("application/json"))
+  def updateTenant = put {
+    validUser { platformUser =>
+      path(Segment) { tenant =>
+        import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+        import spray.json.DefaultJsonProtocol._
+        implicit val userFormat = jsonFormat6(TenantAPI.UserFormat)
+        implicit val tenantFormat = jsonFormat1(TenantAPI.UpdateTenantFormat)
+        entity(as[TenantAPI.UpdateTenantFormat]) { newTenantInformation =>
+          // Map users from external format to TenantUser case class and convert to java List
+          import scala.jdk.CollectionConverters._
+          val users = seqAsJavaList(newTenantInformation.users.map(user => asTenantUser(user, tenant)))
+          askTenant(platformUser, tenant, tenantOwner => new UpdateTenant(tenantOwner, users))
+        }
+      }
+    }
+  }
+
+  @Path("/{tenant}/users")
+  @POST
+  @Operation(
+    summary = "Add or replace a tenant user",
+    description = "Replace the properties and roles of a tenant user if it exists, otherwise creates a new user.",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "The tenant in which to add/update the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Tenant user registered successfully", responseCode = "204"),
+      new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UserFormat]))))
+  @Consumes(Array("application/json"))
+  def replaceTenantUser = post {
+    validUser { platformUser =>
+      path(Segment / "users") { tenant =>
+        import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+        import spray.json.DefaultJsonProtocol._
+        implicit val format = jsonFormat6(TenantAPI.UserFormat)
+        entity(as[TenantAPI.UserFormat]) { newUser =>
+          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
+        }
+      }
+    }
+  }
+
   @Path("/{tenant}/users")
   @PUT
   @Operation(
     summary = "Add or update a tenant user",
-    description = "Add or replace a tenant user. If the user does not yet exist it will be created. Otherwise the name, email and roles will be replaced.",
+    description = "Creates or updates a tenant user. Only the properties defined in the request entity will be updated in an existing user; for new users sensible defaults are chosen if the properties are not set",
     tags = Array("tenant"),
     parameters = Array(
       new Parameter(name = "tenant", description = "The tenant in which to add/update the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),

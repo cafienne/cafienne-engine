@@ -22,6 +22,8 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.exception.TenantException;
 
+import java.util.List;
+
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link TenantCommand#process} methods.
@@ -69,6 +71,13 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
 
         if (!tenant.isOwner(this.getUser())) {
             throw new AuthorizationException("You do not have the privileges to perform this action");
+        }
+    }
+
+    protected void validateNotLastOwner(TenantActor tenant, String userId) {
+        List<String> currentOwners = tenant.getOwnerList();
+        if (currentOwners.size() == 1 && currentOwners.contains(userId)) {
+            throw new TenantException("Cannot remove tenant owner. There must be at least one tenant owner.");
         }
     }
 
