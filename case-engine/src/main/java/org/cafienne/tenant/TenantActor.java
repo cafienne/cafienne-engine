@@ -4,6 +4,7 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.tenant.akka.command.TenantCommand;
+import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.event.*;
 import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.platform.TenantDisabled;
@@ -43,34 +44,52 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         return this.creationEvent != null;
     }
 
-    public void setInitialState(TenantCreated tenantCreated) {
+    public void createInstance(List<TenantUserInformation> newUsers) {
+        addEvent(new TenantCreated(this));
+        updateInstance(newUsers);
+    }
+
+    public void replaceInstance(List<TenantUserInformation> newUsers) {
+        new HashMap(users).keySet().forEach(userId -> {
+            if (newUsers.stream().filter(user -> user.id().equals(userId)).count() == 0) {
+                users.get(userId).disable();
+            }
+        });
+        newUsers.forEach(newUser -> getOrCreate(newUser).replaceWith(newUser));
+    }
+
+    public void updateInstance(List<TenantUserInformation> usersToUpdate) {
+        usersToUpdate.forEach(this::upsertUser);
+    }
+
+    public void updateState(TenantCreated tenantCreated) {
         this.setEngineVersion(tenantCreated.engineVersion);
         this.creationEvent = tenantCreated;
     }
 
-    public void setInitialUsers(List<TenantUser> owners) {
-        // Register the owners as TenantUsers with the specified roles
-        owners.forEach(owner -> createUser(owner, owner.isOwner()));
-    }
-
-    private TenantUserCreated createUser(TenantUser user, boolean isOwner) {
-        TenantUserCreated event = addEvent(new TenantUserCreated(this, user.id(), user.name(), user.email()));
-        User newUser = getUser(user.id());
-        user.roles().foreach(role -> newUser.addRole(role));
-        if (isOwner) newUser.makeOwner();
-        return event;
-    }
-
-    public TenantUserCreated createUser(TenantUser user) {
-        return createUser(user, false);
-    }
-
-    public void upsertUser(TenantUser user) {
-        User existingUser = users.get(user.id());
+    private User getOrCreate(TenantUserInformation userInfo) {
+        User existingUser = users.get(userInfo.id());
         if (existingUser == null) {
-            createUser(user);
+            addEvent(new TenantUserCreated(this, userInfo.id(), userInfo.getName(), userInfo.getEmail()));
+            return getUser(userInfo.id());
         } else {
-            existingUser.updateFrom(user);
+            return existingUser;
+        }
+    }
+
+    public void upsertUser(TenantUserInformation newInfo) {
+        getOrCreate(newInfo).upsertWith(newInfo);
+    }
+
+    public void disable() {
+        if (! disabled) {
+            addEvent(new TenantDisabled(this));
+        }
+    }
+
+    public void enable() {
+        if (disabled) {
+            addEvent(new TenantEnabled(this));
         }
     }
 
@@ -100,7 +119,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void updateState(TenantUserCreated event) {
-        users.put(event.userId, new User(this, event));
+        users.put(event.userId, new User(this, event.userId, event.name, event.email));
     }
 
     public void updateState(TenantModified event) {

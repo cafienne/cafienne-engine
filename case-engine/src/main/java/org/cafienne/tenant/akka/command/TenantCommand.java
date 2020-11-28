@@ -22,6 +22,8 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.exception.TenantException;
 
+import java.util.List;
+
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link TenantCommand#process} methods.
@@ -30,12 +32,11 @@ import org.cafienne.tenant.akka.command.exception.TenantException;
 public abstract class TenantCommand extends ModelCommand<TenantActor> {
     /**
      * Create a new command that can be sent to the case.
+     *  @param tenantOwner The user that issues this command.
      *
-     * @param tenantOwner The user that issues this command.
-     * @param tenantId The id of the case in which to perform this command.
      */
-    protected TenantCommand(TenantUser tenantOwner, String tenantId) {
-        super(tenantOwner, tenantId);
+    protected TenantCommand(TenantUser tenantOwner) {
+        super(tenantOwner, tenantOwner.tenant());
     }
 
     protected TenantCommand(ValueMap json) {
@@ -70,6 +71,21 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
 
         if (!tenant.isOwner(this.getUser())) {
             throw new AuthorizationException("You do not have the privileges to perform this action");
+        }
+    }
+
+    protected void validateNotLastOwner(TenantActor tenant, TenantUserInformation newUser) {
+        // If either
+        // 1. ownership is defined and revoked in the new information (needs to be checked like this, because isOwner() defaults to false)
+        // 2. or if the account is no longer enabled (isEnabled defaults to true, so if false it must have been set to change)
+        // Then
+        //  check whether this user is the last man standing in the list of owners. If so, the command cannot be executed.
+        if ((newUser.owner().nonEmpty() && !newUser.isOwner()) || !newUser.isEnabled()) {
+            List<String> currentOwners = tenant.getOwnerList();
+            // If only 1 owner, and newUser has the same id, then throw the exception
+            if (currentOwners.size() == 1 && currentOwners.contains(newUser.id())) {
+                throw new TenantException("Cannot remove tenant ownership or disable the account. There must be at least one tenant owner.");
+            }
         }
     }
 

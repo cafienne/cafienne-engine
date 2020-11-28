@@ -26,7 +26,7 @@ public class TenantCreated extends PlatformEvent {
 
     @Override
     public void updateState(TenantActor tenant) {
-        tenant.setInitialState(this);
+        tenant.updateState(this);
     }
 
     @Override

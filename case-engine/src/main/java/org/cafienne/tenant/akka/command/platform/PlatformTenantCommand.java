@@ -19,7 +19,7 @@ import java.io.IOException;
 @Manifest
 public abstract class PlatformTenantCommand extends TenantCommand {
     protected PlatformTenantCommand(PlatformUser user, String tenantId) {
-        super(TenantUser.fromPlatformOwner(user, tenantId), tenantId);
+        super(TenantUser.fromPlatformOwner(user, tenantId));
     }
 
     protected PlatformTenantCommand(ValueMap json) {

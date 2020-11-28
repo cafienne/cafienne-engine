@@ -24,7 +24,6 @@ import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.query.{CaseQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
-import org.cafienne.service.api.registration.FormerRegistrationRoutes
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.TaskRoutes
 import org.cafienne.service.api.tenant.route.TenantRoutes
@@ -111,9 +110,7 @@ object Main extends App {
         caseServiceRoutes.toArray.apply(6).route ~
 //      mainRoute ~
       // Add the routes for the API documentation frontend.
-      new SwaggerHttpServiceRoute(apiClasses.toSet).route ~
-      // For as long as it is needed... preferably remove them.
-      new FormerRegistrationRoutes(userQueries).route
+      new SwaggerHttpServiceRoute(apiClasses.toSet).route
     }
 
     // UNCLEAR why below does not work. It compiles, it runs, but it does not do what we want it to do (i.e., tests are failing with "route not found 404")

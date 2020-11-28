@@ -8,8 +8,8 @@ import org.cafienne.tenant.User;
 @Manifest
 public class AddTenantUserRole extends RoleCommand {
 
-    public AddTenantUserRole(TenantUser tenantOwner, String tenantId, String userId, String role) {
-        super(tenantOwner, tenantId, userId, role);
+    public AddTenantUserRole(TenantUser tenantOwner, String userId, String role) {
+        super(tenantOwner, userId, role);
     }
 
     public AddTenantUserRole(ValueMap json) {

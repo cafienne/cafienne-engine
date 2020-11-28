@@ -201,11 +201,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         //    c. In all other cases print warn statements, with a special check for other ModelEvents
 
         // Step 1
-        if (tenant == null && event instanceof ModelEvent) {
-            tenant = ((ModelEvent) event).getTenant();
-        }
         // Step 2
         if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
+            if (tenant == null && event instanceof ModelEvent) {
+                tenant = ((ModelEvent) event).getTenant();
+            }
             // Step 2a.
             runHandler(createRecoveryHandler((E) event));
         } else if (event instanceof DebugEvent) {

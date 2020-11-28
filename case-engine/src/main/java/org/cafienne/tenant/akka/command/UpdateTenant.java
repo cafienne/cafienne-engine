@@ -1,66 +1,60 @@
-package org.cafienne.tenant.akka.command.platform;
+package org.cafienne.tenant.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.identity.PlatformUser;
+import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.command.exception.TenantException;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Manifest
-public class CreateTenant extends PlatformTenantCommand implements BootstrapCommand {
-    public final String name;
+public class UpdateTenant extends TenantCommand {
     private final List<TenantUserInformation> users;
 
-    public CreateTenant(PlatformUser user, String tenantId, String name, List<TenantUserInformation> users) {
-        super(user, tenantId);
-        this.name = name;
+    public UpdateTenant(TenantUser tenantOwner, List<TenantUserInformation> users) {
+        super(tenantOwner);
         this.users = users;
-        // Check whether after the filtering there are still owners left. Tenant must have owners.
-        if (this.users.stream().filter(u -> u.isOwner() && u.isEnabled()).count() == 0) {
-            throw new TenantException("Cannot create a tenant without providing tenant owners");
-        }
     }
 
-    public CreateTenant(ValueMap json) {
+    public UpdateTenant(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
         this.users = new ArrayList();
-        json.withArray(Fields.users).forEach(value -> this.users.add(TenantUserInformation.from((ValueMap)value)));
-    }
-
-    @Override
-    public String tenant() {
-        return name;
+        json.withArray(Fields.users).forEach(value -> {
+            ValueMap ownerJson = (ValueMap) value;
+            this.users.add(TenantUserInformation.from(ownerJson));
+        });
     }
 
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        if (tenant.exists()) {
-            throw new TenantException("Tenant already exists");
+        // Check whether after the filtering there are still owners left. Tenant must have owners.
+        Stream<String> currentOwners = tenant.getOwnerList().stream();
+        List<String> userIdsThatWillBeUpdated = this.users.stream().map(user -> user.id()).collect(Collectors.toList());
+        long untouchedOwners = currentOwners.filter(currentOwner -> !userIdsThatWillBeUpdated.contains(currentOwner)).count();
+        if (untouchedOwners == 0 && this.users.stream().filter(u -> u.isOwner() && u.isEnabled()).count() == 0) {
+            throw new TenantException("Cannot update the tenant and remove all tenant owners or disable their accounts");
         }
     }
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.createInstance(users);
+        tenant.updateInstance(users);
         return new TenantResponse(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.name, name);
         generator.writeArrayFieldStart(Fields.users.toString());
         for (TenantUserInformation user : users) {
             user.write(generator);
@@ -68,4 +62,3 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         generator.writeEndArray();
     }
 }
-

@@ -19,7 +19,7 @@ import scala.collection.immutable.Seq
 class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
   val tenantOwnersRoute = new TenantOwnersRoute(userQueries)(userCache)
   val tenantUsersRoute = new TenantUsersRoute(userQueries)(userCache)
-  val formerAddTenantUserRoute = new FormerAddTenantUserRoute(userQueries)(userCache)
+  val formerAddTenantUserRoute = new DeprecatedTenantOwnersRoute(userQueries)(userCache)
 
   override def apiClasses(): Seq[Class[_]] = {
     Seq(classOf[TenantOwnersRoute], classOf[TenantUsersRoute])

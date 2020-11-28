@@ -7,20 +7,20 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.akka.command.response.TenantResponse;
+import org.cafienne.tenant.User;
 
 import java.io.IOException;
 
 @Manifest
-public class UpsertTenantUser extends TenantCommand {
+public class UpdateTenantUser extends ExistingUserCommand {
     private final TenantUserInformation newUser;
 
-    public UpsertTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
-        super(tenantOwner);
+    public UpdateTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
+        super(tenantOwner, newUser.id());
         this.newUser = newUser;
     }
 
-    public UpsertTenantUser(ValueMap json) {
+    public UpdateTenantUser(ValueMap json) {
         super(json);
         this.newUser = TenantUserInformation.from(json.with(Fields.newTenantUser));
     }
@@ -32,9 +32,8 @@ public class UpsertTenantUser extends TenantCommand {
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        tenant.upsertUser(newUser);
-        return new TenantResponse(this);
+    protected void updateUser(User user) {
+        user.upsertWith(newUser);
     }
 
     @Override
