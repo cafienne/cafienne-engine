@@ -111,7 +111,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
           var description = "Description"
           try {
             val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, file)
-            description = definitionsDocument.getFirstCase().getDescription();
+            description = definitionsDocument.getFirstCase().documentation.text
           } catch {
             case i: InvalidDefinitionException => description = i.toString
             case t: Throwable => description = "Could not read definition: " + t.getMessage
