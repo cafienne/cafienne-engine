@@ -8,8 +8,7 @@
 package org.cafienne.cmmn.definition.parameter;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
-import org.cafienne.cmmn.definition.ExpressionDefinition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.w3c.dom.Element;
 
@@ -22,8 +21,8 @@ public class ParameterDefinition extends CMMNElementDefinition {
     private CaseFileItemDefinition binding;
     private final BindingRefinementDefinition bindingRefinement;
 
-    public ParameterDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ParameterDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         bindingRef = parseAttribute("bindingRef", false, "");
         bindingRefinement = parse("bindingRefinement", BindingRefinementDefinition.class, false);
     }
@@ -34,7 +33,7 @@ public class ParameterDefinition extends CMMNElementDefinition {
         if (!bindingRef.isEmpty()) {
             binding = getCaseDefinition().findCaseFileItem(bindingRef);
             if (binding == null) {
-                getDefinition().addReferenceError("The parameter " + getName() + " has a binding to '" + bindingRef + "' but the corresponding case file item cannot be found");
+                getModelDefinition().addReferenceError("The parameter " + getName() + " has a binding to '" + bindingRef + "' but the corresponding case file item cannot be found");
             }
         }
     }

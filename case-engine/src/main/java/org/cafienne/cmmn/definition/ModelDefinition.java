@@ -22,7 +22,7 @@ import java.util.Map;
  * Base class for top-level elements inside the <code>&lt;definitions&gt;</code> tag, such as
  * {@link CaseDefinition}, {@link ProcessDefinition}, {@link CaseFileItemDefinitionDefinition}, etc.
  */
-public class Definition extends CMMNElementDefinition {
+public class ModelDefinition extends CMMNElementDefinition {
     /**
      * Collection with all elements belonging to the case definition.
      */
@@ -35,7 +35,7 @@ public class Definition extends CMMNElementDefinition {
     private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap();
     private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap();
 
-    protected Definition(Element element, DefinitionsDocument document) {
+    protected ModelDefinition(Element element, DefinitionsDocument document) {
         super(element, null, null, true); // All definitions must have an identifier
         this.document = document;
 
@@ -87,8 +87,8 @@ public class Definition extends CMMNElementDefinition {
     }
 
     @Override
-    public Definition getDefinition() {
-        // Note: this override is required, since CMMNElementDefinition needs the Definition in it's constructor, and we cannot pass 'this' when
+    public ModelDefinition getModelDefinition() {
+        // Note: this override is required, since CMMNElementDefinition needs the ModelDefinition in it's constructor, and we cannot pass 'this' when
         // invoking the super constructor
         return this;
     }

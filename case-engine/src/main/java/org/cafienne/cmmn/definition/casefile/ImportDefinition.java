@@ -7,14 +7,14 @@
  */
 package org.cafienne.cmmn.definition.casefile;
 
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.w3c.dom.Element;
 
 /**
  * Implementation of CMMN spec 5.1.3
  */
-public class ImportDefinition extends Definition {
+public class ImportDefinition extends ModelDefinition {
 
     private final String importType;
     private final String location;

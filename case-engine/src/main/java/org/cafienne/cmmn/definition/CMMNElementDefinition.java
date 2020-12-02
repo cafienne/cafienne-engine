@@ -29,7 +29,7 @@ import java.util.Map;
 public abstract class CMMNElementDefinition {
     protected final static String NAMESPACE_URI = "org.cafienne";
 
-    private final Definition definition;
+    private final ModelDefinition modelDefinition;
     private final CMMNElementDefinition parentElement;
     private final String id;
     private final String description;
@@ -38,9 +38,9 @@ public abstract class CMMNElementDefinition {
 
     private static final String EXTENSIONELEMENTS = "extensionElements";
 
-    protected CMMNElementDefinition(Element element, Definition definition, CMMNElementDefinition parentElement, boolean... identifierRequired) {
+    protected CMMNElementDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement, boolean... identifierRequired) {
         this.element = element;
-        this.definition = definition;
+        this.modelDefinition = modelDefinition;
         this.parentElement = parentElement;
 
         this.name = parseAttribute("name", false);
@@ -48,11 +48,11 @@ public abstract class CMMNElementDefinition {
         this.description = parseAttribute("description", false);
         if (identifierRequired.length > 0 && identifierRequired[0] == true) {
             if (this.name.isEmpty() && this.id.isEmpty()) {
-                getDefinition().addDefinitionError("An element of type '" + printElement() + "' does not have an identifier " + XMLHelper.printXMLNode(element));
+                getModelDefinition().addDefinitionError("An element of type '" + printElement() + "' does not have an identifier " + XMLHelper.printXMLNode(element));
             }
         }
-        if (definition != null) {
-            definition.addCMMNElement(this);
+        if (modelDefinition != null) {
+            modelDefinition.addCMMNElement(this);
         }
     }
 
@@ -120,16 +120,16 @@ public abstract class CMMNElementDefinition {
      *
      * @return
      */
-    public Definition getDefinition() {
-        return definition;
+    public ModelDefinition getModelDefinition() {
+        return modelDefinition;
     }
 
     public CaseDefinition getCaseDefinition() {
-        return (CaseDefinition) getDefinition();
+        return (CaseDefinition) getModelDefinition();
     }
 
     public ProcessDefinition getProcessDefinition() {
-        return (ProcessDefinition) getDefinition();
+        return (ProcessDefinition) getModelDefinition();
     }
 
     /**
@@ -176,7 +176,7 @@ public abstract class CMMNElementDefinition {
 
     /**
      * Creates a new instance of class T based on the XML element. If T is of type {@link String}, then it will simply return the text content of the
-     * XML element. Otherwise T is expected to have a constructor with {@link Element}, {@link Definition} and {@link CMMNElementDefinition}.
+     * XML element. Otherwise T is expected to have a constructor with {@link Element}, {@link ModelDefinition} and {@link CMMNElementDefinition}.
      *
      * @param xmlElement
      * @param typeClass
@@ -191,27 +191,27 @@ public abstract class CMMNElementDefinition {
                 return t;
             }
 
-            Constructor<T> tConstructor = typeClass.getConstructor(Element.class, Definition.class, CMMNElementDefinition.class);
-            T childDefinition = tConstructor.newInstance(xmlElement, getDefinition(), this);
+            Constructor<T> tConstructor = typeClass.getConstructor(Element.class, ModelDefinition.class, CMMNElementDefinition.class);
+            T childDefinition = tConstructor.newInstance(xmlElement, getModelDefinition(), this);
             return childDefinition;
         } catch (InstantiationException e) {
             String msg = "The class " + typeClass.getName() + " cannot be instantiated";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         } catch (IllegalAccessException e) {
             String msg = "The class " + typeClass.getName() + " cannot be accessed";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         } catch (IllegalArgumentException e) {
             String msg = "The class " + typeClass.getName() + " cannot be instantiated";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         } catch (InvocationTargetException e) {
             String msg = "The class " + typeClass.getName() + " cannot be instantiated";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         } catch (NoSuchMethodException e) {
             String msg = "The class " + typeClass.getName() + " must have a constructor with 3 arguments: org.w3c.dom.Element, Definition and  CMMNElementDefinition";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         } catch (SecurityException e) {
             String msg = "The class " + typeClass.getName() + " cannot be accessed due to a security exception";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         }
         return null;
     }
@@ -309,7 +309,7 @@ public abstract class CMMNElementDefinition {
         for (Element child : namedChildren) {
             T t = instantiateT(child, typeClass);
             if (t.getName().isEmpty()) {
-                getDefinition().addDefinitionError("The element does not have a name, but it is required in order to be able to look it up\n" + XMLHelper.printXMLNode(child));
+                getModelDefinition().addDefinitionError("The element does not have a name, but it is required in order to be able to look it up\n" + XMLHelper.printXMLNode(child));
             }
             tMap.put(t.getName(), t);
         }
@@ -328,7 +328,7 @@ public abstract class CMMNElementDefinition {
         if (typeClass.equals(String.class)) {
             String value = XMLHelper.getContent(element, childTagName, null);
             if (presenceRequired && value == null) {
-                getDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
+                getModelDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
             }
             @SuppressWarnings("unchecked") // well ... we just checked that T is a String, right?
             T t = (T) value;
@@ -338,7 +338,7 @@ public abstract class CMMNElementDefinition {
         if (child != null) {
             return instantiateT(child, typeClass);
         } else if (presenceRequired) {
-            getDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
+            getModelDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
         }
         return null;
     }
@@ -367,7 +367,7 @@ public abstract class CMMNElementDefinition {
         String implementationClassName = implementationElement.getAttribute("class");
         if (implementationClassName.isEmpty()) {
             if (presenceRequired) {
-                getDefinition().addDefinitionError("A custom " + elementName + " tag does not contain the class attribute in " + printElement() + ", but it is required");
+                getModelDefinition().addDefinitionError("A custom " + elementName + " tag does not contain the class attribute in " + printElement() + ", but it is required");
                 return null;
             }
             return null;
@@ -382,10 +382,10 @@ public abstract class CMMNElementDefinition {
             return implementationObject;
         } catch (ClassNotFoundException e) {
             String msg = "Cannot find class to parse the custom " + elementName + " - " + implementationClassName;
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         } catch (SecurityException e) {
             String msg = "The class " + implementationClassName + " cannot be accessed due to a security exception";
-            getDefinition().fatalError(msg, e);
+            getModelDefinition().fatalError(msg, e);
         }
         // Means we ran into an exception
         return null;
@@ -405,7 +405,7 @@ public abstract class CMMNElementDefinition {
 
         if (extensionsElement == null) {
             if (presenceRequired) {
-                getDefinition().addDefinitionError("'" + EXTENSIONELEMENTS + "' tag is not found in " + printElement() + ", but it is required");
+                getModelDefinition().addDefinitionError("'" + EXTENSIONELEMENTS + "' tag is not found in " + printElement() + ", but it is required");
                 return null;
             }
             return null;
@@ -417,7 +417,7 @@ public abstract class CMMNElementDefinition {
         }
 
         if (implementationElement == null && presenceRequired) {
-            getDefinition().addDefinitionError("A custom " + elementName + " tag is not found in " + printElement() + "/" + EXTENSIONELEMENTS + " in " + NAMESPACE_URI + " namespace, but it is required");
+            getModelDefinition().addDefinitionError("A custom " + elementName + " tag is not found in " + printElement() + "/" + EXTENSIONELEMENTS + " in " + NAMESPACE_URI + " namespace, but it is required");
         }
 
         return implementationElement;
@@ -438,7 +438,7 @@ public abstract class CMMNElementDefinition {
         }
         if (attributeValue.isEmpty()) {
             if (presenceRequired) {
-                getDefinition().addDefinitionError("The attribute " + attributeName + " is missing from the element " + XMLHelper.printXMLNode(element));
+                getModelDefinition().addDefinitionError("The attribute " + attributeName + " is missing from the element " + XMLHelper.printXMLNode(element));
             } else if (defaultValue.length > 0) {
                 attributeValue = defaultValue[0];
             }
@@ -466,7 +466,7 @@ public abstract class CMMNElementDefinition {
         if (identifier == null || identifier.isEmpty()) {
             identifier = this.getName();
         }
-        String source = getDefinition().getDefinitionsDocument().getSource();
+        String source = getModelDefinition().getDefinitionsDocument().getSource();
         ValueMap json = new ValueMap(Fields.elementId, identifier, Fields.source, source);
         return json;
     }

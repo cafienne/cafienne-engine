@@ -14,26 +14,26 @@ public class ItemControlDefinition extends CMMNElementDefinition {
     private ConstraintDefinition repetitionRule;
     private ConstraintDefinition manualActivationRule;
 
-    ItemControlDefinition(Definition definition, CMMNElementDefinition parentElement) {
+    ItemControlDefinition(ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(null, definition, parentElement);
         repetitionRule = new ConstraintDefinition(definition, this, false);
         requiredRule = new ConstraintDefinition(definition, this, false);
         manualActivationRule = new ConstraintDefinition(definition, this, false);
     }
 
-    public ItemControlDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ItemControlDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         repetitionRule = parse("repetitionRule", ConstraintDefinition.class, false);
         if (repetitionRule == null) {
-            repetitionRule = new ConstraintDefinition(definition, this, false);
+            repetitionRule = new ConstraintDefinition(modelDefinition, this, false);
         }
         requiredRule = parse("requiredRule", ConstraintDefinition.class, false);
         if (requiredRule == null) {
-            requiredRule = new ConstraintDefinition(definition, this, false);
+            requiredRule = new ConstraintDefinition(modelDefinition, this, false);
         }
         manualActivationRule = parse("manualActivationRule", ConstraintDefinition.class, false);
         if (manualActivationRule == null) {
-            manualActivationRule = new ConstraintDefinition(definition, this, false);
+            manualActivationRule = new ConstraintDefinition(modelDefinition, this, false);
         }
     }
 

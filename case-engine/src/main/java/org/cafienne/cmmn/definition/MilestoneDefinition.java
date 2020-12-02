@@ -11,8 +11,8 @@ import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
 public class MilestoneDefinition extends PlanItemDefinitionDefinition {
-    public MilestoneDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public MilestoneDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
     }
 
     @Override

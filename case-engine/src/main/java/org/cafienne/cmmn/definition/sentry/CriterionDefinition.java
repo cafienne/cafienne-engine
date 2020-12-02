@@ -1,10 +1,8 @@
 package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 import java.util.stream.Collectors;
@@ -13,8 +11,8 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
     private final String sentryRef;
     private SentryDefinition sentry;
 
-    protected CriterionDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    protected CriterionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.sentryRef = parseAttribute("sentryRef", true);
     }
 

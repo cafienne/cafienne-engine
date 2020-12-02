@@ -16,8 +16,8 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
     private final String caseRef;
     private CaseDefinition subCaseDefinition;
 
-    public CaseTaskDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public CaseTaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.caseRef = parseAttribute("caseRef", true);
     }
 

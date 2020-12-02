@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
@@ -20,8 +20,8 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
     private final String sourceRef;
     private CaseFileItemDefinition source;
 
-    public CaseFileItemOnPartDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public CaseFileItemOnPartDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         String standardEventName = parse("standardEvent", String.class, true);
         standardEvent = CaseFileItemTransition.getEnum(standardEventName);
         if (standardEvent == null) {
@@ -36,7 +36,7 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
         // Add a check that the source only has to be filled if the standardEvent is specified
         source = getCaseDefinition().findCaseFileItem(sourceRef);
         if (source == null) {
-            getDefinition().addReferenceError("A case file item with name '" + sourceRef + "' is referenced from sentry " + getParentElement().getName() + ", but it does not exist in the case file model");
+            getModelDefinition().addReferenceError("A case file item with name '" + sourceRef + "' is referenced from sentry " + getParentElement().getName() + ", but it does not exist in the case file model");
         }
     }
 

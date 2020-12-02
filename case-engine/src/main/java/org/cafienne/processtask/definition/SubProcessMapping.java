@@ -8,9 +8,9 @@
 package org.cafienne.processtask.definition;
 
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.ExpressionDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
@@ -29,8 +29,8 @@ public class SubProcessMapping extends CMMNElementDefinition {
     private ParameterDefinition target;
     private ParameterDefinition source;
     
-	public SubProcessMapping(Element element, Definition definition, CMMNElementDefinition parentElement) {
-		super(element, definition, parentElement);
+	public SubProcessMapping(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.sourceRef = parseAttribute("sourceRef", true);
         this.targetRef = parseAttribute("targetRef", true);
         this.transformation = parse("transformation", ExpressionDefinition.class, false);
@@ -42,13 +42,13 @@ public class SubProcessMapping extends CMMNElementDefinition {
 
 		target = getProcessDefinition().getOutputParameters().get(targetRef);
 		if (target == null) {
-			getDefinition().addReferenceError("Invalid mapping " + getId() + ": target parameter " + targetRef + " is missing");
+			getModelDefinition().addReferenceError("Invalid mapping " + getId() + ": target parameter " + targetRef + " is missing");
 		}
 		
 		SubProcessDefinition spd = getParentElement();
         source = spd.getRawOutputParameters().get(sourceRef);
 		if (source == null) {
-            getDefinition().addReferenceError("Invalid mapping in process definition " + spd.getParentElement().getId() + ": source parameter " + sourceRef + " cannot be used; use one of "+spd.getRawOutputParameterNames());
+            getModelDefinition().addReferenceError("Invalid mapping in process definition " + spd.getParentElement().getId() + ": source parameter " + sourceRef + " cannot be used; use one of "+spd.getRawOutputParameterNames());
 		}
 	}
 

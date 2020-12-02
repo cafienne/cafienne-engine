@@ -32,8 +32,8 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
     private final DueDateDefinition dueDate;
     private final AssignmentDefinition assignment;
 
-    public WorkflowTaskDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public WorkflowTaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
 
         parse("input", InputParameterDefinition.class, inputParameters);
         parse("output", OutputParameterDefinition.class, outputParameters);
@@ -88,7 +88,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
             return JSONReader.parse(taskModelStr);
         } catch (IOException | JSONParseFailure e) {
             logger.error("Cannot parse task model of HumanTask " + getParentElement().getId() + " into json\n" + taskModelStr, e);
-            getDefinition().fatalError("Cannot parse the task-model json from the implementation of HumanTask " + getId() + " (" + getName() + ")", e);
+            getModelDefinition().fatalError("Cannot parse the task-model json from the implementation of HumanTask " + getId() + " (" + getName() + ")", e);
         }
 
         return null;
@@ -104,6 +104,6 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
 
     public static WorkflowTaskDefinition createEmptyDefinition(HumanTaskDefinition taskDefinition) {
         Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(NAMESPACE_URI, "implementation");
-        return new WorkflowTaskDefinition(customTag, taskDefinition.getDefinition(), taskDefinition);
+        return new WorkflowTaskDefinition(customTag, taskDefinition.getModelDefinition(), taskDefinition);
     }
 }

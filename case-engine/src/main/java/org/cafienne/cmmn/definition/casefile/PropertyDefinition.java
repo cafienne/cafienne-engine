@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.definition.casefile;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 /**
@@ -59,12 +59,12 @@ public class PropertyDefinition extends CMMNElementDefinition {
     private final PropertyType type;
     private final boolean isBusinessIdentifier;
 
-    public PropertyDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public PropertyDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         String typeDescription = parseAttribute("type", false, "");
         type = PropertyType.getEnum(typeDescription);
         if (type == null) {
-            getDefinition().addDefinitionError(getParentElement().getType()+" " + getParentElement().getName()+" is invalid, because property "+getName()+" has unrecognized type "+typeDescription);
+            getModelDefinition().addDefinitionError(getParentElement().getType()+" " + getParentElement().getName()+" is invalid, because property "+getName()+" has unrecognized type "+typeDescription);
         }
         isBusinessIdentifier = readBusinessIdentifiership();
     }

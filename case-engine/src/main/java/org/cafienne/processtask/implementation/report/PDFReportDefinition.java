@@ -8,7 +8,7 @@
 package org.cafienne.processtask.implementation.report;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
@@ -28,7 +28,7 @@ public class PDFReportDefinition extends SubProcessDefinition {
     private final Collection<JasperSubReportDefinition> subReportDefinitions = new ArrayList();
     private final ReportDataDefinition reportDataDefinition;
 
-    public PDFReportDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    public PDFReportDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         mainReportDefinition = parse(REPORT_XML_TAG, JasperDefinition.class, true);
         parse(SUBREPORT_XML_TAG, JasperSubReportDefinition.class, subReportDefinitions);

@@ -8,16 +8,16 @@
 package org.cafienne.cmmn.definition.casefile;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 public class CaseFileDefinition extends CaseFileItemCollectionDefinition {
-    public CaseFileDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public CaseFileDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         if (element != null) {
             parse("caseFileItem", CaseFileItemDefinition.class, getChildren());
             if (getChildren().size() < 1) {
-                definition.addDefinitionError("The case file must have at least one case file item");
+                modelDefinition.addDefinitionError("The case file must have at least one case file item");
             }
         }
     }

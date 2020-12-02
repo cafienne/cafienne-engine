@@ -23,8 +23,8 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     private final String taskOutputValidatorRef;
     private TaskOutputValidatorDefinition taskOutputValidator;
 
-    public HumanTaskDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public HumanTaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         planningTable = parse("planningTable", PlanningTableDefinition.class, false);
         performerRef = parseAttribute("performerRef", false, "");
 
@@ -71,7 +71,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
         if (!taskOutputValidatorRef.isEmpty()) {
             ProcessDefinition pd = getCaseDefinition().getDefinitionsDocument().getProcessDefinition(this.taskOutputValidatorRef);
             if (pd == null) {
-                getDefinition().addReferenceError("The task output validator in human task '" + this.getName() + "' refers to a process named " + taskOutputValidatorRef + ", but that definition is not found");
+                getModelDefinition().addReferenceError("The task output validator in human task '" + this.getName() + "' refers to a process named " + taskOutputValidatorRef + ", but that definition is not found");
                 return; // Avoid further checking on this element
             }
             this.taskOutputValidator = new TaskOutputValidatorDefinition(pd);

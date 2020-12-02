@@ -8,11 +8,11 @@
 package org.cafienne.cmmn.instance.process.smtp;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 public class SMTPCallDefinition extends org.cafienne.processtask.implementation.smtp.SMTPCallDefinition {
-    public SMTPCallDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    public SMTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
     }
 }

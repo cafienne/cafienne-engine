@@ -17,8 +17,8 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
     private final String processRef;
     private ProcessDefinition processDefinition;
 
-    public ProcessTaskDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ProcessTaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.processRef = parseAttribute("processRef", true);
     }
 
@@ -27,7 +27,7 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
         super.resolveReferences();
         this.processDefinition = getCaseDefinition().getDefinitionsDocument().getProcessDefinition(this.processRef);
         if (this.processDefinition == null) {
-            getDefinition().addReferenceError("The process task '" + this.getName() + "' refers to a process named " + processRef + ", but that definition is not found");
+            getModelDefinition().addReferenceError("The process task '" + this.getName() + "' refers to a process named " + processRef + ", but that definition is not found");
             return; // Avoid further checking on this element
         }
     }
