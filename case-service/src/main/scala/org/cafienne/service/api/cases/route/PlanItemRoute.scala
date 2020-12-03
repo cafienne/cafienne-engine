@@ -31,6 +31,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   override def routes = {
       getPlanItems ~
       getPlanItem ~
+      getPlanItemDocumentation ~
       planItemTransition ~
       getPlanItemHistory
     }
@@ -82,6 +83,31 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "planitems" / Segment) {
         (_, planItemId) => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
+      }
+    }
+  }
+
+  @Path("/{caseInstanceId}/documentation/planitems/{planItemId}")
+  @GET
+  @Operation(
+    summary = "Get the documentation information from the plan item's definition",
+    description = "Get the documentation information from the plan item's definition",
+    tags = Array("case plan"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "planItemId", description = "Unique id of the planItem", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Plan item documentation found", responseCode = "200"),
+      new ApiResponse(description = "Plan item not found", responseCode = "404")
+    )
+  )
+  @Produces(Array("application/json"))
+  def getPlanItemDocumentation = get {
+    validUser { platformUser =>
+      path(Segment / "documentation" / "planitems" / Segment) {
+        (_, planItemId) => runQuery(caseQueries.getPlanItemDocumentation(planItemId, platformUser))
       }
     }
   }

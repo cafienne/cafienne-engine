@@ -26,6 +26,7 @@ public class PlanItemCreated extends PlanItemEvent {
     public final String createdBy;
     public final String planItemName;
     public final String stageId;
+    public final String definitionId;
 
     public PlanItemCreated(Case caseInstance) {
         this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);
@@ -40,6 +41,7 @@ public class PlanItemCreated extends PlanItemEvent {
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.planItemName = name;
+        this.definitionId = definition.getId();
         this.stageId = stage == null ? "" : stage.getId();
     }
 
@@ -48,6 +50,7 @@ public class PlanItemCreated extends PlanItemEvent {
         this.createdOn = readInstant(json, Fields.createdOn);
         this.createdBy = readField(json, Fields.createdBy);
         this.planItemName = readField(json, Fields.name);
+        this.definitionId = readField(json, Fields.definitionId);
         this.stageId = readField(json, Fields.stageId);
     }
 
@@ -79,6 +82,7 @@ public class PlanItemCreated extends PlanItemEvent {
     public void write(JsonGenerator generator) throws IOException {
         super.writePlanItemEvent(generator);
         writeField(generator, Fields.name, planItemName);
+        writeField(generator, Fields.definitionId, definitionId);
         writeField(generator, Fields.createdOn, createdOn);
         writeField(generator, Fields.createdBy, createdBy);
         writeField(generator, Fields.stageId, stageId);
