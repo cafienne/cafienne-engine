@@ -1,9 +1,9 @@
 package org.cafienne.service.api.projection.table
 
-import org.cafienne.infrastructure.jdbc.QueryDbConfig
 import org.cafienne.service.api.projection.record.{TenantOwnerRecord, TenantRecord, UserRoleRecord}
+import org.cafienne.service.db.querydb.QueryDBSchema
 
-trait TenantTables extends QueryDbConfig {
+trait TenantTables extends QueryDBSchema {
 
   import dbConfig.profile.api._
 

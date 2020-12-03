@@ -1,4 +1,4 @@
-package org.cafienne.service.api.projection.query
+package org.cafienne.infrastructure.jdbc.query
 
 case class Sort(on: Option[String], direction: Option[String] = Some("desc")) {
   lazy val ascending = direction.fold(false)(d => if (d matches "(?i)asc")  true else false)

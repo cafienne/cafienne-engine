@@ -27,7 +27,7 @@ import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.tasks.TaskRoutes
 import org.cafienne.service.api.tenant.route.TenantRoutes
-import org.cafienne.service.db.migration.Migrate
+import org.cafienne.service.db.querydb.QueryDB
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -35,7 +35,7 @@ import scala.util.{Failure, Success} // required for combining routes
 
 object Main extends App {
   try {
-    Migrate.migrateDatabase()
+    QueryDB.verifyConnectivity()
     startup()
   } catch {
     case t: Throwable => stop(t)

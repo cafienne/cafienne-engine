@@ -4,12 +4,12 @@ import java.time.Instant
 
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.infrastructure.jdbc.QueryDbConfig
+import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.projection.TaskSearchFailure
-import org.cafienne.service.api.projection.query.{Area, Sort, TaskFilter, TaskQueriesImpl}
+import org.cafienne.service.api.projection.query.TaskQueriesImpl
 import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, TaskRecord}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
-import org.cafienne.service.db.migration.Migrate
+import org.cafienne.service.db.querydb.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
@@ -17,7 +17,7 @@ import org.scalatest.matchers.must.Matchers
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDbConfig {
+class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDBSchema {
 
   val taskQueries = new TaskQueriesImpl
   val updater = new SlickRecordsPersistence
@@ -31,7 +31,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, List("B", "C"))
 
   override def beforeAll {
-    Migrate.migrateDatabase()
+    QueryDB.verifyConnectivity()
 
     def freshData = Seq(
       TaskRecord( "1", case33, tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now),
@@ -72,7 +72,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   "Create a table" should "succeed the second time as well" in {
-    Migrate.migrateDatabase()
+    QueryDB.verifyConnectivity()
   }
 
   "A query" should "give a search failure when task not found" in {

@@ -1,6 +1,6 @@
 package slick
 package migration.api
-package org.cafienne.service.db.sqlserver
+package org.cafienne.infrastructure.jdbc.sqlserver
 
 import com.typesafe.scalalogging.LazyLogging
 import slick.ast.FieldSymbol

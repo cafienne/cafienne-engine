@@ -15,8 +15,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api
-import org.cafienne.service.api.projection.query.{Area, Sort, TaskCount, TaskFilter, TaskQueries}
+import org.cafienne.service.api.projection.query.{TaskCount, TaskFilter, TaskQueries}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")

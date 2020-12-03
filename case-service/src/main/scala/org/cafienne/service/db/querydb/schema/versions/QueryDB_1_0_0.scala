@@ -1,14 +1,15 @@
-package org.cafienne.service.db.migration.versions
+package org.cafienne.service.db.querydb.schema.versions
 
-import org.cafienne.infrastructure.jdbc.{OffsetStoreTables, QueryDbConfig}
+import org.cafienne.infrastructure.jdbc.OffsetStoreTables
+import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
 import org.cafienne.service.api.projection.record.CaseTeamMemberRecord
 import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
-import org.cafienne.service.db.migration.DbSchemaVersion
+import org.cafienne.service.db.querydb.QueryDBSchema
 import slick.lifted
 import slick.lifted.TableQuery
 import slick.migration.api.TableMigration
 
-trait CafienneTablesV1 extends QueryDbConfig with CaseTables with TenantTables {
+trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables {
 
   import dbConfig.profile.api._
 
@@ -44,7 +45,7 @@ trait CafienneTablesV1 extends QueryDbConfig with CaseTables with TenantTables {
   }
 }
 
-object QueryDB_1_0_0 extends DbSchemaVersion
+object QueryDB_1_0_0 extends DbSchemaVersion with QueryDBSchema
   with TaskTables
   with CafienneTablesV1
   with TenantTables

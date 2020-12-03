@@ -9,7 +9,7 @@ import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
 import org.cafienne.service.api.projection.record.{CaseRecord, PlanItemRecord}
-import org.cafienne.service.db.migration.Migrate
+import org.cafienne.service.db.querydb.QueryDB
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
@@ -26,7 +26,7 @@ class PlanItemWriterTest
     with Eventually {
 
   //Ensure the database is setup completely (including the offset store)
-  Migrate.migrateDatabase()
+  QueryDB.verifyConnectivity()
 
   private val storeEventsActor = system.actorOf(Props(classOf[CreateEventsInStoreActor]), "storeevents-actor")
   private val tp = TestProbe()

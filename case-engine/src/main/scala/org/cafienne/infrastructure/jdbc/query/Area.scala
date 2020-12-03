@@ -1,4 +1,4 @@
-package org.cafienne.service.api.projection.query
+package org.cafienne.infrastructure.jdbc.query
 
 case class Area(offset: Int, numOfResults: Int)
 

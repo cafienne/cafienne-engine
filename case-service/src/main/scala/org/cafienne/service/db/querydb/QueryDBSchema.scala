@@ -1,8 +1,9 @@
-package org.cafienne.service.db.migration.versions
+package org.cafienne.service.db.querydb
 
-import org.cafienne.service.db.migration.QueryDbMigrationConfig
-import slick.migration.api.Migration
-import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
+import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 
 /**
@@ -23,12 +24,6 @@ import slick.migration.api.flyway.{MigrationInfo, VersionedMigration}
    DROP table offset_storage CASCADE;
   */
 
-object CafienneQueryDatabaseSchema extends QueryDbMigrationConfig {
-  def schema(implicit infoProvider: MigrationInfo.Provider[Migration]): Seq[VersionedMigration[String]] = {
-    Seq(
-      QueryDB_1_0_0,
-      QueryDB_1_1_5,
-      QueryDB_1_1_6,
-    ).flatMap(schema => schema.getScript)
-  }
+trait QueryDBSchema extends CafienneJDBCConfig {
+  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", CaseSystem.config.queryDB.config)
 }
