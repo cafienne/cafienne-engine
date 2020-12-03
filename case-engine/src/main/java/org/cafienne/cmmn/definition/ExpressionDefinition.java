@@ -38,6 +38,9 @@ public class ExpressionDefinition extends CMMNElementDefinition {
         super(element, modelDefinition, parentElement);
         language = element.getAttribute("language");
         body = parse("body", String.class, true);
+        if (body == null || body.isBlank()) {
+            getModelDefinition().addDefinitionError(this.getContextDescription() + " has an empty expression");
+        }
         String evaluatorClassName = "org.cafienne.cmmn.expression." + language + ".ExpressionEvaluator";
         try {
             Class<?> evaluatorClass = Class.forName(evaluatorClassName);

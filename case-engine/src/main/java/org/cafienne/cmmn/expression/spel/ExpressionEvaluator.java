@@ -48,10 +48,6 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     private Expression parseExpression() {
-        if (expressionString.trim().isEmpty()) {
-            expressionDefinition.getModelDefinition().addDefinitionError(expressionDefinition.getContextDescription() + " has an empty expression");
-            return null;
-        }
         try {
             return parser.parseExpression(expressionString);
         } catch (SpelParseException spe) {
