@@ -10,7 +10,15 @@
         <humanTask id="ht__jAVt1_1" name="Request" isBlocking="true" performerRef="_jAVt1_0"/>
         <humanTask id="ht__jAVt1_2" name="Assist" isBlocking="true" performerRef="_jAVt1_2"/>
     </casePlanModel>
-    <caseRoles id="_jAVt1_0" name="Requestor"/>
-    <caseRoles id="_jAVt1_1" name="Approver"/>
-    <caseRoles id="_jAVt1_2" name="PersonalAssistant" description="Personal Assistant"/>
+    <caseRoles>
+        <role id="_jAVt1_0" name="Requestor"/>
+        <role id="_jAVt1_1" name="Approver"/>
+        <role id="_jAVt1_2" name="PersonalAssistant">
+            <documentation textFormat="text/plain">
+                <text>
+                    <![CDATA[Personal Assistant]]>
+                </text>
+            </documentation>
+        </role>
+    </caseRoles>
 </case>

@@ -1,5 +1,10 @@
 <humantask>
-    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="SendResponse" description="Sends a response back to the initiator of the hello world case">
+    <cafienne:implementation name="SendResponse" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[Sends a response back to the initiator of the hello world case]]>
+            </text>
+        </documentation>
         <input id="Greeting" name="Greeting"/>
         <output id="Response" name="Response"/>
         <task-model>{

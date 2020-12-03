@@ -13,6 +13,10 @@
             </planItemOnPart>
         </sentry>
         <humanTask id="ht__lSSzB_0" name="Item1" isBlocking="true"/>
+        <humanTask id="ht__lSSzB_1" name="Task1.1" isBlocking="true"/>
+        <humanTask id="ht__lSSzB_2" name="Task1 in Stage 1.2" isBlocking="true"/>
+        <humanTask id="ht__lSSzB_3" name="Task1 in Stage 1.2" isBlocking="true"/>
+        <humanTask id="ht__lSSzB_4" name="Task1 in Stage1.1" isBlocking="true"/>
         <stage id="_lSSzB_3" name="Item4" autoComplete="true">
             <planItem id="pi__lSSzB_5" name="Stage1.1" definitionRef="_lSSzB_5"/>
             <planItem id="pi__lSSzB_7" name="Stage1.2" definitionRef="_lSSzB_7">
@@ -32,12 +36,8 @@
         <stage id="_lSSzB_7" name="Stage1.2" autoComplete="true">
             <planItem id="pi_ht__lSSzB_3" name="Task1 in Stage 1.2" definitionRef="ht__lSSzB_3"/>
         </stage>
-        <humanTask id="ht__lSSzB_1" name="Task1.1" isBlocking="true"/>
         <stage id="_lSSzB_12" name="Stage1.1.2" autoComplete="true">
             <planItem id="pi_ht__lSSzB_2" name="Task1 in Stage 1.2" definitionRef="ht__lSSzB_2"/>
         </stage>
-        <humanTask id="ht__lSSzB_2" name="Task1 in Stage 1.2" isBlocking="true"/>
-        <humanTask id="ht__lSSzB_3" name="Task1 in Stage 1.2" isBlocking="true"/>
-        <humanTask id="ht__lSSzB_4" name="Task1 in Stage1.1" isBlocking="true"/>
     </casePlanModel>
 </case>

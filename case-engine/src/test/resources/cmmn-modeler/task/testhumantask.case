@@ -16,7 +16,6 @@
     <casePlanModel id="cm__kBPkc_0" name="TestHumanTask" autoComplete="true">
         <planItem id="pi_ht__kBPkc_0" name="HumanTask" definitionRef="ht__kBPkc_0"/>
         <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true">
-            <inputs id="_kBPkc_7" name="DueDate" bindingRef="_kBPkc_0"/>
             <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
             <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
             <extensionElements mustUnderstand="false">
@@ -39,6 +38,8 @@
             </extensionElements>
         </humanTask>
     </casePlanModel>
-    <caseRoles id="_kBPkc_17" name="ADMIN"/>
+    <caseRoles id="_kBPkc_17" name="ADMIN">
+        <role id="_kBPkc_17" name="ADMIN"/>
+    </caseRoles>
     <input id="_kBPkc_22" name="TaskInput" bindingRef="_kBPkc_0"/>
 </case>

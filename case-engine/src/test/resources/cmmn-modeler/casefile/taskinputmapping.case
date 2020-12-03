@@ -1,4 +1,9 @@
-<case id="casefile/taskinputmapping.case" name="TaskInputMapping" description="This is a test case for task input mapping from the case file" guid="_ilffQ">
+<case id="casefile/taskinputmapping.case" name="TaskInputMapping" guid="_ilffQ">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[This is a test case for task input mapping from the case file]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="cfi_casefile/testcontext.case_3" name="Container" multiplicity="ExactlyOne" definitionRef="arraycontainer.cfid">
             <children>
@@ -37,12 +42,10 @@
             </planItemOnPart>
         </sentry>
         <humanTask id="pid_cm_casefile/testcontext.case_141" name="Task.AddChild" isBlocking="true">
-            <inputs id="_ilffQ_2" name="Input"/>
             <outputs id="_3X9aF" name="Child" bindingRef="cfi_casefile/testcontext.case_4"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_kHJ0j" sourceRef="_SkQG_Result" targetRef="_3X9aF"/>
-                    <parameterMapping id="_ilffQ_3" sourceRef="_ilffQ_2" targetRef="_Hun3_Input"/>
                     <assignment id="_ilffQ_7">
                         <condition id="_ilffQ_8" language="spel">
                             <body>

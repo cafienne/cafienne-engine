@@ -1,5 +1,10 @@
 <humantask>
-    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="undefined" description="undefined">
+    <cafienne:implementation name="undefined" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[undefined]]>
+            </text>
+        </documentation>
         <input id="Response" name="Response"/>
         <task-model>
 			{
