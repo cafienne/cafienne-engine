@@ -16,12 +16,12 @@ import org.w3c.dom.Element;
 public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition {
     private ItemControlDefinition defaultControl;
 
-    public PlanItemDefinitionDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public PlanItemDefinitionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         defaultControl = parse("defaultControl", ItemControlDefinition.class, false);
         if (defaultControl == null) {
             // Make an item control with the default values
-            defaultControl = new ItemControlDefinition(definition, parentElement);
+            defaultControl = new ItemControlDefinition(modelDefinition, parentElement);
         }
     }
 

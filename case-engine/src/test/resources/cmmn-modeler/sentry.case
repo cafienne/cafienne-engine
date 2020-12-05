@@ -31,9 +31,9 @@
         </planningTable>
         <humanTask id="ht__wbsA2_0" name="Item1" isBlocking="true"/>
         <humanTask id="ht__wbsA2_1" name="Item1.1" isBlocking="true"/>
+        <humanTask id="ht__wbsA2_2" name="Disc1" isBlocking="true"/>
         <stage id="_wbsA2_2" name="Stage1" autoComplete="true">
             <planItem id="pi_ht__wbsA2_1" name="Item1.1" definitionRef="ht__wbsA2_1"/>
         </stage>
-        <humanTask id="ht__wbsA2_2" name="Disc1" isBlocking="true"/>
     </casePlanModel>
 </case>

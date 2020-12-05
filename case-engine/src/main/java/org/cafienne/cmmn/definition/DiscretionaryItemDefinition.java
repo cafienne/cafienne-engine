@@ -24,8 +24,8 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList();
     private final String planItemDefinitionRefValue;
 
-    public DiscretionaryItemDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public DiscretionaryItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.planItemDefinitionRefValue = parseAttribute("definitionRef", true);
 
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);

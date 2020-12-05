@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.definition;
 
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.task.TaskImplementationContract;
 import org.w3c.dom.Element;
@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
  * The engine assumes there is a &lt;implementation&gt; tag inside the process, holding a <code>class</code> attribute.
  * This class attribute is interpreted as a class name for a class that implements the {@link SubProcessDefinition} interface.
  */
-public class ProcessDefinition extends Definition implements TaskImplementationContract {
+public class ProcessDefinition extends ModelDefinition implements TaskImplementationContract {
 	private final SubProcessDefinition subProcessDefinition;
 
 	public ProcessDefinition(Element element, DefinitionsDocument document) {

@@ -3,6 +3,7 @@ package org.cafienne.service.api.projection.record
 import java.time.Instant
 
 import org.cafienne.akka.actor.serialization.json.{JSONReader, Value, ValueList, ValueMap}
+import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
 import org.cafienne.infrastructure.json.CafienneJson
 
 final case class CaseRecord(id: String,
@@ -45,7 +46,10 @@ final case class CaseRecord(id: String,
   }
 }
 
-final case class CaseDefinitionRecord(caseInstanceId: String, name: String, description: String, elementId: String, content: String, tenant: String, lastModified: Instant, modifiedBy: String)
+final case class CaseDefinitionRecord(caseInstanceId: String, name: String, description: String, elementId: String, content: String, tenant: String, lastModified: Instant, modifiedBy: String) {
+  lazy val definitions: DefinitionsDocument = DefinitionsDocument.fromSource(content)
+  lazy val caseDefinition: CaseDefinition = definitions.getCaseDefinition(elementId)
+}
 
 final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: String) {
   def toValueMap: ValueMap = JSONReader.parse(data)
@@ -58,6 +62,7 @@ final case class CaseRoleRecord(caseInstanceId: String, tenant: String, roleName
 final case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)
 
 final case class PlanItemRecord(id: String,
+                                definitionId: String,
                                 stageId: String,
                                 name: String,
                                 index: Int,
@@ -80,15 +85,16 @@ final case class PlanItemRecord(id: String,
 
   def toValueMap: ValueMap = {
     val v = new ValueMap
-    v.putRaw("isRequired", required)
-    v.putRaw("isRepeating", repeating)
-    v.putRaw("caseInstanceId", caseInstanceId)
     v.putRaw("id", id)
+    v.putRaw("caseInstanceId", caseInstanceId)
+    v.putRaw("definitionId", definitionId)
+    v.putRaw("stageId", stageId)
     v.putRaw("name", name)
     v.putRaw("index", index)
-    v.putRaw("stageId", stageId)
     v.putRaw("currentState", currentState)
     v.putRaw("historyState", historyState)
+    v.putRaw("isRequired", required)
+    v.putRaw("isRepeating", repeating)
     v.putRaw("type", planItemType)
     v.putRaw("transition", transition)
     v.putRaw("lastModified", lastModified)

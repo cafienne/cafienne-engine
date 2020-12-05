@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinition;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
@@ -26,8 +26,8 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
     private PlanItemDefinition source;
     private ExitCriterionDefinition exitCriterion;
 
-    public PlanItemOnPartDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public PlanItemOnPartDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         String standardEventName = parse("standardEvent", String.class, true);
         standardEvent = Transition.getEnum(standardEventName);
         if (standardEvent == null) {
@@ -63,7 +63,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
             }
             // Now add a check that the referenced exitCriterion is an Exit exitCriterion
             if (standardEvent != Transition.Exit) {
-                getDefinition().addDefinitionError("The onPart in exitCriterion " + getParentElement().getName() + " must have 'exit' as its standard event, since it has a exitCriterionRef");
+                getModelDefinition().addDefinitionError("The onPart in exitCriterion " + getParentElement().getName() + " must have 'exit' as its standard event, since it has a exitCriterionRef");
             }
         }
     }

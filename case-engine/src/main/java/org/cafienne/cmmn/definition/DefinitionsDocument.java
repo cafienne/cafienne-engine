@@ -35,7 +35,7 @@ public class DefinitionsDocument implements Serializable {
     /**
      * All definition objects, e.g. Case, Process, CaseFileItemDefinition, etc.
      */
-    private transient Collection<Definition> definitions = new ArrayList();
+    private transient Collection<ModelDefinition> definitions = new ArrayList();
     /**
      * All elements is a collection of all the elements across all Definition documents
      */
@@ -107,7 +107,7 @@ public class DefinitionsDocument implements Serializable {
 
         checkForErrors();
 
-        for (Definition definition : getDefinitions()) {
+        for (ModelDefinition definition : getDefinitions()) {
             definition.resolveReferences();
         }
 
@@ -130,7 +130,7 @@ public class DefinitionsDocument implements Serializable {
      * @throws MissingDefinitionException if there is no case definition inside this definitions document.
      */
     public CaseDefinition getFirstCase() throws MissingDefinitionException {
-        for (Definition definition : getDefinitions()) {
+        for (ModelDefinition definition : getDefinitions()) {
             if (definition instanceof CaseDefinition) {
                 return (CaseDefinition) definition;
             }
@@ -141,7 +141,7 @@ public class DefinitionsDocument implements Serializable {
     private void parseImports() {
         Collection<Element> typeElements = XMLHelper.getChildrenWithTagName(getDocument().getDocumentElement(), "import");
         for (Element element : typeElements) {
-            Definition definition = new ImportDefinition(element, this);
+            ModelDefinition definition = new ImportDefinition(element, this);
             getDefinitions().add(definition);
         }
     }
@@ -149,7 +149,7 @@ public class DefinitionsDocument implements Serializable {
     private void parseCaseFileItemDefinitions() {
         Collection<Element> typeElements = XMLHelper.getChildrenWithTagName(getDocument().getDocumentElement(), "caseFileItemDefinition");
         for (Element element : typeElements) {
-            Definition definition = new CaseFileItemDefinitionDefinition(element, this);
+            ModelDefinition definition = new CaseFileItemDefinitionDefinition(element, this);
             getDefinitions().add(definition);
         }
     }
@@ -157,7 +157,7 @@ public class DefinitionsDocument implements Serializable {
     private void parseProcessDefinitions() {
         Collection<Element> typeElements = XMLHelper.getChildrenWithTagName(getDocument().getDocumentElement(), "process");
         for (Element element : typeElements) {
-            Definition definition = new ProcessDefinition(element, this);
+            ModelDefinition definition = new ProcessDefinition(element, this);
             getDefinitions().add(definition);
         }
     }
@@ -165,7 +165,7 @@ public class DefinitionsDocument implements Serializable {
     private void parseCaseDefinitions() {
         Collection<Element> typeElements = XMLHelper.getChildrenWithTagName(getDocument().getDocumentElement(), "case");
         for (Element element : typeElements) {
-            Definition definition = new CaseDefinition(element, this);
+            ModelDefinition definition = new CaseDefinition(element, this);
             getDefinitions().add(definition);
         }
     }
@@ -203,7 +203,7 @@ public class DefinitionsDocument implements Serializable {
         return document;
     }
 
-    private Collection<Definition> getDefinitions() {
+    private Collection<ModelDefinition> getDefinitions() {
         if (null == definitions) {
             definitions = new ArrayList();
             initAfterDeserialization();
@@ -219,10 +219,10 @@ public class DefinitionsDocument implements Serializable {
     /**
      * Returns the element with the given identifier if it exists; does a cast for you.
      *
-     * @param matcher a functional interface {@link Definition.ElementMatcher} providing a boolean filter function on CMMNElementDefinition
+     * @param matcher a functional interface {@link ModelDefinition.ElementMatcher} providing a boolean filter function on CMMNElementDefinition
      * @return
      */
-    public <T extends CMMNElementDefinition> T findElement(Definition.ElementMatcher matcher) {
+    public <T extends CMMNElementDefinition> T findElement(ModelDefinition.ElementMatcher matcher) {
         for (CMMNElementDefinition element : allElements) {
             if (matcher.matches(element)) return (T) element;
         }
@@ -257,8 +257,8 @@ public class DefinitionsDocument implements Serializable {
         return fatals;
     }
 
-    private <T extends Definition> T getDefinition(Class<T> typeClass, String identifier) {
-        for (Definition definition : getDefinitions()) {
+    private <T extends ModelDefinition> T getDefinition(Class<T> typeClass, String identifier) {
+        for (ModelDefinition definition : getDefinitions()) {
             if (definition.getName().equals(identifier) || definition.getId().equals(identifier)) {
                 if (typeClass.isAssignableFrom(definition.getClass())) {
                     @SuppressWarnings("unchecked") // We just did the checking, right?!
@@ -310,11 +310,11 @@ public class DefinitionsDocument implements Serializable {
         return getDefinition(ImportDefinition.class, identifier);
     }
 
-    void addDefinitionError(Definition source, String msg) {
+    void addDefinitionError(ModelDefinition source, String msg) {
         getDefinitionErrors().add(source.getId() + ": " + msg);
     }
 
-    void addFatalError(Definition source, String msg, Throwable t) {
+    void addFatalError(ModelDefinition source, String msg, Throwable t) {
         getFatals().add(new InvalidDefinitionException(source.getId() + ": " + msg, t));
     }
 }

@@ -10,7 +10,7 @@ package org.cafienne.cmmn.definition.casefile;
 import java.util.Collection;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
@@ -27,8 +27,8 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
     private final String targetRefs;
     private CaseFileItemDefinitionDefinition typeDefinition;
 
-    public CaseFileItemDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public CaseFileItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.multiplicity = readMultiplicity();
         this.definitionRef = parseAttribute("definitionRef", true, "");
         this.sourceRef = parseAttribute("sourceRef", false, "");
@@ -52,7 +52,7 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
 
         this.typeDefinition = getCaseDefinition().getDefinitionsDocument().getCaseFileItemDefinition(this.definitionRef);
         if (this.typeDefinition == null) {
-            getDefinition().addReferenceError("The case file item '" + this.getName() + "' refers to a definition named " + definitionRef + ", but that definition is not found");
+            getModelDefinition().addReferenceError("The case file item '" + this.getName() + "' refers to a definition named " + definitionRef + ", but that definition is not found");
             return; // Avoid further checking on this element
         }
 

@@ -1,4 +1,9 @@
-<case id="addChildTest.case" name="addChildTest" description="test for addChild event" guid="_dTzf7">
+<case id="addChildTest.case" name="addChildTest" guid="_dTzf7">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[test for addChild event]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="cfi_addChildTest.case_2" name="test" multiplicity="ZeroOrOne" definitionRef="addchild.cfid">
             <children>

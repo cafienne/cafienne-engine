@@ -21,14 +21,14 @@ public class ConstraintDefinition extends CMMNElementDefinition {
     private CaseFileItemDefinition context;
     private Path pathToContext;
 
-    protected ConstraintDefinition(Definition definition, CMMNElementDefinition parentElement, boolean defaultValue) {
+    protected ConstraintDefinition(ModelDefinition definition, CMMNElementDefinition parentElement, boolean defaultValue) {
         super(null, definition, parentElement);
         this.expression = new ExpressionDefinition(definition, parentElement, defaultValue);
         this.contextRef = "";
     }
 
-    public ConstraintDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ConstraintDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         expression = parse("condition", ExpressionDefinition.class, true);
         this.contextRef = parseAttribute("contextRef", false);
     }

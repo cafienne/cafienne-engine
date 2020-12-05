@@ -19,8 +19,8 @@ import java.util.Collection;
 public class CasePlanDefinition extends StageDefinition implements ItemDefinition {
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList(); // Only in the root stage
 
-    public CasePlanDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public CasePlanDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         super.parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
     }
 

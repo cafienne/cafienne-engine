@@ -1,14 +1,27 @@
-<case id="planning/authorization.case" name="planning/authorization" description="A case that can be used to do authorized planning of discretionary items" guid="_AdNzA">
+<case id="planning/authorization.case" name="planning/authorization" guid="_AdNzA">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[A case that can be used to do authorized planning of discretionary items]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="_AdNzA_4" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__AdNzA_0" name="Planning/Authorization" autoComplete="true">
         <planItem id="pi_ht__AdNzA_0" name="Task" definitionRef="ht__AdNzA_0"/>
         <planningTable id="_AdNzA_2" name="PlanningTable_0">
-            <discretionaryItem id="pi_ht__AdNzA_1" name="PlanMe" definitionRef="ht__AdNzA_1" authorizedRoleRefs="_AdNzA_3"/>
+            <discretionaryItem id="pi_ht__AdNzA_1" name="PlanMe" definitionRef="ht__AdNzA_1"/>
         </planningTable>
         <humanTask id="ht__AdNzA_0" name="Task" isBlocking="true"/>
         <humanTask id="ht__AdNzA_1" name="PlanMe" isBlocking="true"/>
     </casePlanModel>
-    <caseRoles id="_AdNzA_3" name="planner" description="role that is allowed to plan the discretionary task"/>
+    <caseRoles id="_AdNzA_3" name="planner">
+        <role id="_AdNzA_3" name="planner">
+            <documentation textFormat="text/plain">
+                <text>
+                    <![CDATA[role that is allowed to plan the discretionary task]]>
+                </text>
+            </documentation>
+        </role>
+    </caseRoles>
 </case>

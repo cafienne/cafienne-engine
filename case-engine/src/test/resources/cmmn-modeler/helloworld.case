@@ -1,10 +1,22 @@
-<case id="helloworld.case" name="HelloWorld" description="Hello World" guid="_nTPPc">
+<case id="helloworld.case" name="HelloWorld" guid="_nTPPc">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[Hello World]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="cfi_csVQy_0" name="Greeting" multiplicity="ExactlyOne" definitionRef="greeting.cfid"/>
         <caseFileItem id="cfi_csVQy_1" name="Response" multiplicity="ExactlyOne" definitionRef="response.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm_HelloWorld.case_HelloWorld_0" name="HelloWorld" autoComplete="true">
-        <planItem id="cm_csVQy_167" name="Receive Greeting and Send response" description="Receive Greeting&#10;and Send response" definitionRef="pid_cm_csVQy_167"/>
+        <planItem id="cm_csVQy_167" name="Receive Greeting and Send response" definitionRef="pid_cm_csVQy_167">
+            <documentation textFormat="text/plain">
+                <text>
+                    <![CDATA[Receive Greeting
+and Send response]]>
+                </text>
+            </documentation>
+        </planItem>
         <planItem id="cm_cs3hg_196" name="Read response" definitionRef="pid_cm_cs3hg_196">
             <entryCriterion id="_nTPPc_0" name="EntryCriterion_0" sentryRef="cm_cs3hg_198"/>
         </planItem>
@@ -13,7 +25,7 @@
                 <standardEvent>complete</standardEvent>
             </planItemOnPart>
         </sentry>
-        <humanTask id="pid_cm_csVQy_167" name="Receive Greeting and Send response" description="Receive Greeting&#10;and Send response" isBlocking="true">
+        <humanTask id="pid_cm_csVQy_167" name="Receive Greeting and Send response" isBlocking="true">
             <inputs id="inTP_cm_cs2F1_174_1" name="Greeting" bindingRef="cfi_csVQy_0"/>
             <outputs id="outTP_cm_cs2F1_174_1" name="Response" bindingRef="cfi_csVQy_1"/>
             <extensionElements mustUnderstand="false">
@@ -60,7 +72,15 @@
             </extensionElements>
         </humanTask>
     </casePlanModel>
-    <caseRoles id="role_csT3f_0" name="ADMIN" description="admin of the world"/>
+    <caseRoles id="role_csT3f_0" name="ADMIN">
+        <role id="role_csT3f_0" name="ADMIN">
+            <documentation textFormat="text/plain">
+                <text>
+                    <![CDATA[admin of the world]]>
+                </text>
+            </documentation>
+        </role>
+    </caseRoles>
     <input id="csVQy_inCPs_0" name="Greeting" bindingRef="cfi_csVQy_0"/>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{

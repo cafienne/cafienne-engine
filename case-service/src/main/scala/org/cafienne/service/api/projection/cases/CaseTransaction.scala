@@ -51,7 +51,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   private def createCaseInstance(event: CaseDefinitionApplied): Future[Done] = {
     this.caseInstance = Some(CaseInstanceMerger.merge(event))
-    this.caseDefinition = CaseDefinitionRecord(event.getActorId, event.getCaseName, event.getDefinition.getDescription, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.createdOn, event.createdBy)
+    this.caseDefinition = CaseDefinitionRecord(event.getActorId, event.getCaseName, event.getDefinition.documentation.text, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.createdOn, event.createdBy)
     this.caseFile = Some(new ValueMap()) // Always create an empty case file
     CaseInstanceRoleMerger.merge(event).map(role => caseInstanceRoles.put(role.roleName, role))
     Future.successful(Done)
@@ -268,23 +268,9 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
-//  private def addUpdatedCaseFile(records:ListBuffer[AnyRef]) = {
-//    val events = bufferedCaseFileEvents.events()
-//    if (! events.isEmpty) {
-//      var caseFileInProgress = caseFile match {
-//        case Some(valuemap) => valuemap
-//        None
-//      }.getOrElse(new ValueMap())
-//      bufferedCaseFileEvents.events.forEach(event => {
-//        caseFileInProgress = CaseFileMerger.merge(event, caseFileInProgress)
-//      })
-//      records += CaseFileRecord(caseInstanceId, tenant, caseFileInProgress.toString)
-//
-//    }
-//  }
   /**
     * Depending on the presence of CaseFileEvents this will add a new CaseFileRecord
-    * @param records
+    * @param caseFileInProgress
     * @return
     */
   private def getNewCaseFile(caseFileInProgress: ValueMap): CaseFileRecord = {

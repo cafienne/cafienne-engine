@@ -25,8 +25,8 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
     private ParameterDefinition target;
     private boolean isInputMapping;
 
-    public ParameterMappingDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ParameterMappingDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.taskDefinition = findTask(parentElement);
         this.sourceRef = parseAttribute("sourceRef", true);
         this.targetRef = parseAttribute("targetRef", true);
@@ -42,7 +42,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
      */
     private TaskDefinition<?> findTask(CMMNElementDefinition parentElement) {
         if (parentElement == null) {
-            getDefinition().addDefinitionError("The parameter mapping '" + getId()+"' has no surrounding Task element, and can therefore not be used");
+            getModelDefinition().addDefinitionError("The parameter mapping '" + getId()+"' has no surrounding Task element, and can therefore not be used");
             return null;
         }
         if (parentElement instanceof TaskDefinition) {
@@ -75,16 +75,16 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
             target = findParameter(taskDefinition.getOutputParameters(), targetRef);
             if (source == null) {
                 String msg = "The parameter mapping '" + getDescriptionForError() + "' has sourceRef " + sourceRef + ", but that output parameter is not found in "+taskDefinition.getImplementationDefinition().getId();
-                getDefinition().addReferenceError(msg);
+                getModelDefinition().addReferenceError(msg);
                 if (target == null) {
                     if (findParameter(taskImplementationDefinition.getInputParameters(), targetRef) != null) {
                         // Well, apparently the parameter mapping is reversed, and the source ref is not found on the task
-                        getDefinition().addReferenceError("The parameter mapping '" + getDescriptionForError() + "' has invalid sourceRef " + sourceRef + ", because the task does not have this output parameter");
+                        getModelDefinition().addReferenceError("The parameter mapping '" + getDescriptionForError() + "' has invalid sourceRef " + sourceRef + ", because the task does not have this output parameter");
                     }
                 }
             } else if (target == null) {
                 String msg = "The parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but the task does not have this output parameter";
-                getDefinition().addReferenceError(msg);
+                getModelDefinition().addReferenceError(msg);
             }
         } else {
             // Source exists in the input parameters; hence target must also be found there, and it is an input mapping
@@ -92,7 +92,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
             target = findParameter(taskImplementationDefinition.getInputParameters(), targetRef);
             if (target == null) {
                 String msg = "The input parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but that input parameter is not found in " + taskDefinition.getImplementationDefinition().getId();
-                getDefinition().addReferenceError(msg);
+                getModelDefinition().addReferenceError(msg);
             }
         }
     }

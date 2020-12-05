@@ -1,5 +1,10 @@
 <definitions>
-    <case id="addChildTest.case" name="addChildTest" description="test for addChild event">
+    <case id="addChildTest.case" name="addChildTest">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[test for addChild event]]>
+            </text>
+        </documentation>
         <caseFileModel>
             <caseFileItem id="cfi_addChildTest.case_2" name="test" multiplicity="ZeroOrOne" definitionRef="addchild.cfid">
                 <children>

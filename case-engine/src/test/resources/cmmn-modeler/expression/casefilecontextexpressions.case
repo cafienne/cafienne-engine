@@ -1,4 +1,9 @@
-<case id="expression/casefilecontextexpressions.case" name="CaseFileContextExpressions" description="Test case for referencing CaseFileItem from within an expression">
+<case id="expression/casefilecontextexpressions.case" name="CaseFileContextExpressions" guid="_X87XC">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[Test case for referencing CaseFileItem from within an expression]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="cfi_expression/valueowner.case_0" name="Container" multiplicity="ExactlyOne" definitionRef="arraycontainer.cfid">
             <children>
@@ -6,13 +11,13 @@
             </children>
         </caseFileItem>
     </caseFileModel>
-    <casePlanModel id="cm_expression/valueowner.case_0" name="CaseFileContextExpressions">
+    <casePlanModel id="cm_expression/valueowner.case_0" name="CaseFileContextExpressions" autoComplete="true">
         <planItem id="cm_expression/valueowner.case_166" name="TaskWithExpression" definitionRef="pid_cm_expression/valueowner.case_166"/>
         <humanTask id="pid_cm_expression/valueowner.case_166" name="TaskWithExpression" isBlocking="true">
             <inputs id="_E9IZ1" name="inputContainer" bindingRef="cfi_expression/valueowner.case_0"/>
             <outputs id="_iWNoI" name="Result"/>
-            <extensionElements mustUnderstand="false" xmlns:cafienne="org.cafienne">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
+            <extensionElements mustUnderstand="false">
+                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_mMaHf" sourceRef="_E9IZ1" targetRef="_Hun3_Input">
                         <transformation language="spel">
                             <body>
@@ -33,7 +38,7 @@
         </humanTask>
     </casePlanModel>
     <input id="_quBMy_inCPs_0" name="Container" bindingRef="cfi_expression/valueowner.case_0"/>
-    <extensionElements>
+    <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{
     "title": "",

@@ -8,11 +8,11 @@
 package org.cafienne.cmmn.instance.process.http;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 public class HTTPCallDefinition extends org.cafienne.processtask.implementation.http.HTTPCallDefinition {
-    public HTTPCallDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    public HTTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
     }
 }

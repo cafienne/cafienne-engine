@@ -1,7 +1,7 @@
 package org.cafienne.processtask.implementation.report;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.w3c.dom.Element;
 
@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 public class ReportDataDefinition extends CMMNElementDefinition {
     private final String name;
 
-    public ReportDataDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ReportDataDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.name = parseAttribute("name", false);
     }
 

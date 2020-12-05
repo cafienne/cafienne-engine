@@ -11,6 +11,7 @@ object PlanItemMerger {
   def merge(event: PlanItemCreated): PlanItemRecord = {
     PlanItemRecord(
       id = event.getPlanItemId,
+      definitionId = event.definitionId,
       stageId = event.stageId,
       name = event.planItemName,
       index = event.index,

@@ -141,11 +141,9 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
         // Create the child plan items and begin their life-cycle
         getDefinition().getPlanItems().forEach(itemDefinition -> {
-            int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(itemDefinition.getDefinition().getName())).count()).intValue();
-
             // Generate an id for the child item
             String childItemId = new Guid().toString();
-            PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, childItemId, index));
+            PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, childItemId, 0));
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
         });
     }

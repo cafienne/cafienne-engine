@@ -91,6 +91,8 @@ trait CaseTables extends QueryDBSchema {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
+    def definitionId = idColumn[String]("definition_id", O.Default(""))
+
     def stageId = idColumn[String]("stage_id")
 
     def name = column[String]("name")
@@ -129,7 +131,7 @@ trait CaseTables extends QueryDBSchema {
 
     def rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemRecord.tupled, PlanItemRecord.unapply)
+    def * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemRecord.tupled, PlanItemRecord.unapply)
 
     def indexCaseInstanceId = index(caseInstanceId)
   }

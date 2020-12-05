@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.definition.parameter;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.w3c.dom.Element;
 
@@ -20,8 +20,8 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
      */
     private final boolean isMandatory;
 
-    public TaskOutputParameterDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public TaskOutputParameterDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         isMandatory = getMandatoryValue();
     }
 
@@ -41,7 +41,7 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
             return false;
         } else {
             TaskDefinition task = getParentElement();
-            getDefinition().addDefinitionError("Output parameter "+getName()+" in task "+task.getName()+" has an invalid value for the required attribute: '" + isRequired+ "'");
+            getModelDefinition().addDefinitionError("Output parameter "+getName()+" in task "+task.getName()+" has an invalid value for the required attribute: '" + isRequired+ "'");
             return false;
         }
     }

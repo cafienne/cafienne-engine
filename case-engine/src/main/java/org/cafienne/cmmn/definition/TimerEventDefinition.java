@@ -8,7 +8,6 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.w3c.dom.Element;
 
 import java.time.Duration;
@@ -17,8 +16,8 @@ import java.time.Instant;
 public class TimerEventDefinition extends PlanItemDefinitionDefinition {
     private final ExpressionDefinition timerExpression;
 
-    public TimerEventDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public TimerEventDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         timerExpression = parse("timerExpression", ExpressionDefinition.class, true);
     }
 

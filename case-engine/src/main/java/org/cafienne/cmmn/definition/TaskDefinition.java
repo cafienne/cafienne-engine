@@ -25,8 +25,8 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
     private final Map<String, TaskOutputParameterDefinition> outputs = new LinkedHashMap();
     private final Collection<ParameterMappingDefinition> mappings = new ArrayList();
 
-    protected TaskDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    protected TaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         isBlocking = Boolean.valueOf(parseAttribute("isBlocking", false, "true")).booleanValue();
 
         parse("inputs", TaskInputParameterDefinition.class, inputs);

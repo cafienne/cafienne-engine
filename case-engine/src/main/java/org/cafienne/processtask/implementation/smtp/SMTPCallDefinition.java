@@ -8,7 +8,7 @@
 package org.cafienne.processtask.implementation.smtp;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.cafienne.util.StringTemplate;
@@ -34,7 +34,7 @@ public class SMTPCallDefinition extends SubProcessDefinition {
     private final List<Attachment> attachments = new ArrayList();
     private final String bodyType;
 
-    public SMTPCallDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    public SMTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         this.smtpServer = parse("smtp-server", String.class, true);
         this.smtpPort = parse("smtp-port", String.class, true);

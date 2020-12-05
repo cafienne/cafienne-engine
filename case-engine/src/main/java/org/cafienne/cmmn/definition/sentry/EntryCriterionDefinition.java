@@ -1,11 +1,9 @@
 package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinition;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
 
@@ -17,8 +15,8 @@ public class EntryCriterionDefinition extends CriterionDefinition {
      */
     private Transition entryTransition;
 
-    public EntryCriterionDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public EntryCriterionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
     }
 
     /**

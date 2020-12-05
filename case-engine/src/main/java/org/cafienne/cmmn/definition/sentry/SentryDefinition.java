@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 public class SentryDefinition extends CMMNElementDefinition {
     private final Collection<OnPartDefinition> onParts = new ArrayList();
     private IfPartDefinition ifPart;
 
-    public SentryDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
+    public SentryDefinition(Element element, ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement, true);
         // XMLHelper.printXMLNode(element);
         this.ifPart = parse("ifPart", IfPartDefinition.class, false);

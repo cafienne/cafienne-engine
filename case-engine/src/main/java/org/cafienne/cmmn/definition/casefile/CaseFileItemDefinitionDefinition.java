@@ -12,14 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.w3c.dom.Element;
 
 /**
  * Implementation of CMMN spec 5.1.4
  */
-public class CaseFileItemDefinitionDefinition extends Definition {
+public class CaseFileItemDefinitionDefinition extends ModelDefinition {
 
     private final DefinitionType definitionType;
     private final String structureRef;
@@ -45,7 +45,7 @@ public class CaseFileItemDefinitionDefinition extends Definition {
         super.resolveReferences();
 
         if (!importRef.isEmpty()) {
-            importDefinition = getDefinition().getDefinitionsDocument().getImportDefinition(importRef);
+            importDefinition = getModelDefinition().getDefinitionsDocument().getImportDefinition(importRef);
             if (importDefinition == null) {
                 super.addReferenceError("The case file item definition '" + this.getName() + "' refers to an import named " + importRef + ", but that definition is not found");
             }

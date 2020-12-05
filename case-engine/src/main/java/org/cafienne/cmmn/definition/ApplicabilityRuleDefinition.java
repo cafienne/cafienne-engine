@@ -11,8 +11,8 @@ import org.cafienne.cmmn.instance.PlanItem;
 import org.w3c.dom.Element;
 
 public class ApplicabilityRuleDefinition extends ConstraintDefinition {
-    public ApplicabilityRuleDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ApplicabilityRuleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
     }
 
     public boolean evaluate(PlanItem planItem, ApplicabilityRuleDefinition rule, DiscretionaryItemDefinition discretionaryItemDefinition) {

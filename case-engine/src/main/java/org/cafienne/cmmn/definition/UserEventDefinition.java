@@ -8,7 +8,6 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -18,8 +17,8 @@ public class UserEventDefinition extends PlanItemDefinitionDefinition {
     private final String authorizedRoleRefs;
     private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList();
 
-    public UserEventDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public UserEventDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         authorizedRoleRefs = parseAttribute("authorizedRoleRefs", false, "");
     }
 

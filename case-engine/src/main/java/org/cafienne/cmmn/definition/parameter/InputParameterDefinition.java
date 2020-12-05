@@ -8,15 +8,15 @@
 package org.cafienne.cmmn.definition.parameter;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.w3c.dom.Element;
 
 public class InputParameterDefinition extends ParameterDefinition {
-    public InputParameterDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public InputParameterDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
     }
 
     public void validate(Value value) throws CaseFileError {

@@ -20,8 +20,8 @@ public class StageDefinition extends PlanFragmentDefinition {
     private boolean autoComplete;
     private PlanningTableDefinition planningTable;
 
-    public StageDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public StageDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         parse("humanTask", HumanTaskDefinition.class, planItemDefinitions);
         parse("processTask", ProcessTaskDefinition.class, planItemDefinitions);
         parse("caseTask", CaseTaskDefinition.class, planItemDefinitions);

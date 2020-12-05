@@ -9,9 +9,9 @@ package org.cafienne.processtask.definition;
 
 import java.util.*;
 
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.processtask.implementation.SubProcess;
@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * <br/> The class must have a constructor that takes 3 parameters:
  * <ul>
  * <li>{@link org.w3c.dom.Element} - The xml element <code>implementation</code>, containing the content that can be parsed by the implementation.
- * <li>{@link Definition} - The Process definition to which this tag belongs
+ * <li>{@link ModelDefinition} - The Process definition to which this tag belongs
  * <li>{@link CMMNElementDefinition} - The parsed parent element; typically also the process definition
  * </ul>
  * <br/>
@@ -67,7 +67,7 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      */
     public final static String EXCEPTION_PARAMETER = "exception";
 
-    protected SubProcessDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    protected SubProcessDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         isAsync = Boolean.parseBoolean(parseAttribute("async", false, "true")); // By default, processes are executed asynchronously
         parse("parameterMapping", SubProcessMapping.class, mappings);

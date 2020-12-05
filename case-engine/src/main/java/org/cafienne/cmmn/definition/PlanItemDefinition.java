@@ -9,7 +9,6 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.cafienne.cmmn.instance.Milestone;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -22,8 +21,8 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList();
     private final String planItemDefinitionRefValue;
 
-    public PlanItemDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public PlanItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         this.planItemDefinitionRefValue = parseAttribute("definitionRef", true);
 
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);

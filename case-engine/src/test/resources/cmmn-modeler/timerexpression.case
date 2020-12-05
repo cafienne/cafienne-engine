@@ -1,4 +1,9 @@
-<case id="timerexpression.case" name="timerexpression" description="A case that creates a timer with an expression based on the case file contents" guid="_AqPiG">
+<case id="timerexpression.case" name="timerexpression" guid="_AqPiG">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[A case that creates a timer with an expression based on the case file contents]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="_AqPiG_2" name="timer" multiplicity="ExactlyOne" definitionRef="timer.cfid"/>
     </caseFileModel>
@@ -30,11 +35,9 @@
         </sentry>
         <humanTask id="ht__AqPiG_0" name="Task1" isBlocking="true"/>
         <humanTask id="ht__AqPiG_2" name="simplehumantask" isBlocking="true">
-            <inputs id="_AqPiG_12" name="Input"/>
             <outputs id="_AqPiG_14" name="Result" bindingRef="_AqPiG_2"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
-                    <parameterMapping id="_AqPiG_13" sourceRef="_AqPiG_12" targetRef="_Hun3_Input"/>
                     <parameterMapping id="_AqPiG_15" sourceRef="_SkQG_Result" targetRef="_AqPiG_14"/>
                 </cafienne:implementation>
             </extensionElements>

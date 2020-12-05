@@ -8,7 +8,7 @@
 package org.cafienne.processtask.implementation.http;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
@@ -35,7 +35,7 @@ public class HTTPCallDefinition extends SubProcessDefinition {
     public static final String RESPONSE_MESSAGE_PARAMETER = "responseMessage";
     public static final String RESPONSE_HEADERS_PARAMETER = "responseHeaders";
 
-    public HTTPCallDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    public HTTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         this.sourceURL = parse("url", String.class, true);
         this.httpMethod = parse("method", String.class, true);

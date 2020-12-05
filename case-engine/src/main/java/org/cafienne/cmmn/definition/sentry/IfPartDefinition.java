@@ -9,17 +9,17 @@ package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 public class IfPartDefinition extends ConstraintDefinition {
-    public IfPartDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public IfPartDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
     }
 
-    IfPartDefinition(Definition definition, CMMNElementDefinition parentElement) {
-        super(definition, parentElement, true); // Default ifPart: evaluates always to true
+    IfPartDefinition(ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(modelDefinition, parentElement, true); // Default ifPart: evaluates always to true
     }
 
     public boolean evaluate(Criterion criterion) {

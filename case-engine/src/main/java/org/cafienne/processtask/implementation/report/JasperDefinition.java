@@ -4,7 +4,7 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.util.XMLHelper;
@@ -28,8 +28,8 @@ public class JasperDefinition extends CMMNElementDefinition {
             "uuid=\"5a62986f-c97c-4e2f-b4ed-d9f38960dab4\" />";
     private JasperReport preCompiledReport = null;
 
-    public JasperDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public JasperDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
 
         this.name = parseAttribute("name", false);
         this.isStatic = this.name.isEmpty();
@@ -41,7 +41,7 @@ public class JasperDefinition extends CMMNElementDefinition {
             try {
                 preCompiledReport = compile(jasperDefinition);
             } catch (JRException jre) {
-                getDefinition().fatalError("Cannot compile the Jasper report definition", jre);
+                getModelDefinition().fatalError("Cannot compile the Jasper report definition", jre);
             }
         }
     }

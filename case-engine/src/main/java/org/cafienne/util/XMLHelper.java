@@ -7,10 +7,7 @@
  */
 package org.cafienne.util;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -208,11 +205,39 @@ public class XMLHelper {
     public static String getContent(Element element, String localName, String defaultValue) {
         Element child = localName == null ? element : getElement(element, localName);
         if (child != null) {
-            String value = child.getTextContent();
-            if (value != null) {
+            String value = getTextOfChildren(child);
+            if (! value.isBlank()) {
                 return value;
             }
         }
         return defaultValue;
+    }
+
+    /**
+     * Recursive alternative to Element.getTextContent();
+     * Ignores whitespace around CDATASections
+     *
+     * 1. Append CDATASections in their entirety.
+     * 2. Append TextNodes only if non blank.
+     * 3. Recurse into Element type of children
+     * @param element
+     * @return
+     */
+    private static String getTextOfChildren(Element element) {
+        StringBuilder sb = new StringBuilder();
+        NodeList children = element.getChildNodes();
+        int length = children.getLength();
+        for (int i = 0; i < length; i++) {
+            Node node = children.item(i);
+            if (node instanceof CDATASection) {
+                sb.append(node.getNodeValue());
+            } else if (node instanceof Text) {
+                String value = node.getNodeValue();
+                if (! value.isBlank()) sb.append(value);
+            } else if (node instanceof Element) {
+                sb.append(getTextOfChildren((Element)node));
+            }
+        }
+        return sb.toString();
     }
 }

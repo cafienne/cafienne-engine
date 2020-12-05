@@ -1,4 +1,9 @@
-<case id="multiTest.case" name="multiTest" description="Test parent child with multiplicity" guid="_HgC8N">
+<case id="multiTest.case" name="multiTest" guid="_HgC8N">
+    <documentation textFormat="text/plain">
+        <text>
+            <![CDATA[Test parent child with multiplicity]]>
+        </text>
+    </documentation>
     <caseFileModel>
         <caseFileItem id="cfi_multiTest.case_0" name="parent" multiplicity="ExactlyOne" definitionRef="testchild.cfid">
             <children>

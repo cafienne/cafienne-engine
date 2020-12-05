@@ -29,15 +29,18 @@ public class ExpressionDefinition extends CMMNElementDefinition {
     private String body;
     private CMMNExpressionEvaluator evaluator;
 
-    public ExpressionDefinition(Definition definition, CMMNElementDefinition parentElement, boolean defaultValue) {
+    public ExpressionDefinition(ModelDefinition definition, CMMNElementDefinition parentElement, boolean defaultValue) {
         super(null, definition, parentElement);
         this.evaluator = new DefaultValueEvaluator(defaultValue);
     }
 
-    public ExpressionDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public ExpressionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         language = element.getAttribute("language");
         body = parse("body", String.class, true);
+        if (body == null || body.isBlank()) {
+            getModelDefinition().addDefinitionError(this.getContextDescription() + " has an empty expression");
+        }
         String evaluatorClassName = "org.cafienne.cmmn.expression." + language + ".ExpressionEvaluator";
         try {
             Class<?> evaluatorClass = Class.forName(evaluatorClassName);

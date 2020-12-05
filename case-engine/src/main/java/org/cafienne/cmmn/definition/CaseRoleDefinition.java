@@ -27,10 +27,10 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
     private Collection<String> mutexRoleReferences = new ArrayList();
     private final boolean isSingleton;
 
-    public CaseRoleDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         if (getName() == null) {
-            definition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
+            modelDefinition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
         }
 
         // Parse mutex roles.

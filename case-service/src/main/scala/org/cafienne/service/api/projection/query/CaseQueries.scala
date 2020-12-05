@@ -2,10 +2,12 @@ package org.cafienne.service.api.projection.query
 
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
+import org.cafienne.cmmn.definition.{CMMNElementDefinition, DefinitionsDocument}
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.projection.record.{CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
+import org.cafienne.service.api.projection.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
+import org.cafienne.util.XMLHelper
 
 import scala.concurrent.Future
 
@@ -20,11 +22,15 @@ trait CaseQueries {
 
   def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = ???
 
+  def getCaseFileDocumentation(caseInstanceId: String, user: PlatformUser): Future[CaseFileDocumentation] = ???
+
   def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeam] = ???
 
   def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = ???
 
   def getPlanItem(planItemId: String, user: PlatformUser): Future[PlanItem] = ???
+
+  def getPlanItemDocumentation(planItemId: String, user: PlatformUser): Future[Documentation] = ???
 
   def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[PlanItemHistory] = ???
 
@@ -114,6 +120,20 @@ class CaseQueriesImpl
     }
   }
 
+  override def getCaseFileDocumentation(caseInstanceId: String, user: PlatformUser): Future[CaseFileDocumentation] = {
+    val query = for {
+      // Get the case file
+      baseQuery <- caseDefinitionQuery.filter(_.caseInstanceId === caseInstanceId)
+      // Validate team membership
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+    } yield (baseQuery)
+
+    db.run(query.result.headOption).map {
+      case Some(result) => CaseFileDocumentation(result)
+      case None => throw CaseSearchFailure(caseInstanceId)
+    }
+  }
+
   override def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeam] = {
     val query = for {
       // Get the case team
@@ -178,6 +198,29 @@ class CaseQueriesImpl
     db.run(query.result.headOption).map {
       case None => throw PlanItemSearchFailure(planItemId)
       case Some(record) => PlanItem(record)
+    }
+  }
+
+  override def getPlanItemDocumentation(planItemId: String, user: PlatformUser): Future[Documentation] = {
+    val query = for {
+      // Get the item
+      baseQuery <- planItemTableQuery.filter(_.id === planItemId)
+      definitionQuery <- caseDefinitionQuery.filter(_.caseInstanceId === baseQuery.caseInstanceId)
+      // Validate team membership
+      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+    } yield (baseQuery, definitionQuery)
+
+    db.run(query.result.headOption).map {
+      case None => throw PlanItemSearchFailure(planItemId)
+      case Some(record) => {
+        val definitionId = record._1.definitionId
+        val definitionDocument = record._2.definitions
+        val element: CMMNElementDefinition = definitionDocument.findElement(element => definitionId.equals(element.getId))
+        element == null match {
+          case true => Documentation("")
+          case _ => Documentation(element.documentation.text, element.documentation.textFormat)
+        }
+      }
     }
   }
 

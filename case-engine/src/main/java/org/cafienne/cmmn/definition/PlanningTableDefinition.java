@@ -19,8 +19,8 @@ public class PlanningTableDefinition extends TableItemDefinition {
     private final Collection<TableItemDefinition> tableItems = new ArrayList();
     private final Collection<ApplicabilityRuleDefinition> ruleDefinitions = new ArrayList();
 
-    public PlanningTableDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    public PlanningTableDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         parse("discretionaryItem", DiscretionaryItemDefinition.class, tableItems);
         parse("planningTable", PlanningTableDefinition.class, tableItems);
         parse("applicabilityRule", ApplicabilityRuleDefinition.class, ruleDefinitions);
@@ -99,8 +99,8 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
     private final List<ApplicabilityRuleDefinition> applicabilityRules = new ArrayList();
     private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList();
 
-    protected TableItemDefinition(Element element, Definition definition, CMMNElementDefinition parentElement) {
-        super(element, definition, parentElement);
+    protected TableItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        super(element, modelDefinition, parentElement);
         applicabilityRuleRefs = parseAttribute("applicabilityRuleRefs", false, "");
         authorizedRoleRefs = parseAttribute("authorizedRoleRefs", false, "");
     }

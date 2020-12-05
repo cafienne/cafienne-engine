@@ -8,11 +8,11 @@
 package org.cafienne.cmmn.instance.process.report;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.Definition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 public class PDFReportDefinition extends org.cafienne.processtask.implementation.report.PDFReportDefinition {
-    public PDFReportDefinition(Element element, Definition processDefinition, CMMNElementDefinition parentElement) {
+    public PDFReportDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
     }
 }
