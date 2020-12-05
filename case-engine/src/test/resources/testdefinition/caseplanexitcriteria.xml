@@ -1,4 +1,7 @@
 <definitions>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
     <case id="caseplanexitcriteria.case" name="caseplanexitcriteria">
         <caseFileModel>
             <caseFileItem id="_fmPeg_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
@@ -16,9 +19,6 @@
             <humanTask id="ht__fmPeg_1" name="Review2" isBlocking="true"/>
         </casePlanModel>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__fmPeg_0">

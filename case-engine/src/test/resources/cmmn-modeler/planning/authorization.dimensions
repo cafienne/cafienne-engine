@@ -1,19 +1,19 @@
 <CMMNDI>
     <CMMNDiagram>
-        <CMMNShape cmmnElementRef="cm__AdNzA_0" name="Planning/Authorization">
+        <CMMNShape cmmnElementRef="cm__AdNzA_0">
             <Bounds x="10" y="10" width="779" height="634"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="pi_ht__AdNzA_0" name="Task">
+        <CMMNShape cmmnElementRef="pi_ht__AdNzA_0">
             <Bounds x="110" y="110" width="100" height="60"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="pi_ht__AdNzA_1" name="PlanMe">
+        <CMMNShape cmmnElementRef="pi_ht__AdNzA_1">
             <Bounds x="270" y="110" width="100" height="60"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="_AdNzA_2" name="PlanningTable_0">
+        <CMMNShape cmmnElementRef="_AdNzA_2">
             <Bounds x="290" y="23" width="24" height="16"/>
         </CMMNShape>
-        <textbox cmmnElementRef="_AdNzA_shape_4" name="This case provides for a model to test &#10;the authorized roles in planning.&#10;It contains one role (&quot;planner&quot;) and &#10;one discretionary item requiring &quot;planner&quot; as authorized role." parentId="cm__AdNzA_0">
-            <Bounds x="220" y="200" width="240" height="70"/>
-        </textbox>
+        <CMMNShape cmmnElementRef="_AdNzA_shape_4">
+            <Bounds x="220" y="200" width="270" height="100"/>
+        </CMMNShape>
     </CMMNDiagram>
 </CMMNDI>

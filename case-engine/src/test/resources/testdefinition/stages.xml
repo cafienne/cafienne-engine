@@ -1,4 +1,7 @@
 <definitions>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
     <case id="stages.case" name="stages">
         <caseFileModel>
             <caseFileItem id="_lSSzB_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
@@ -14,6 +17,10 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="ht__lSSzB_0" name="Item1" isBlocking="true"/>
+            <humanTask id="ht__lSSzB_1" name="Task1.1" isBlocking="true"/>
+            <humanTask id="ht__lSSzB_2" name="Task1 in Stage 1.2" isBlocking="true"/>
+            <humanTask id="ht__lSSzB_3" name="Task1 in Stage 1.2" isBlocking="true"/>
+            <humanTask id="ht__lSSzB_4" name="Task1 in Stage1.1" isBlocking="true"/>
             <stage id="_lSSzB_3" name="Item4" autoComplete="true">
                 <planItem id="pi__lSSzB_5" name="Stage1.1" definitionRef="_lSSzB_5"/>
                 <planItem id="pi__lSSzB_7" name="Stage1.2" definitionRef="_lSSzB_7">
@@ -33,22 +40,15 @@
             <stage id="_lSSzB_7" name="Stage1.2" autoComplete="true">
                 <planItem id="pi_ht__lSSzB_3" name="Task1 in Stage 1.2" definitionRef="ht__lSSzB_3"/>
             </stage>
-            <humanTask id="ht__lSSzB_1" name="Task1.1" isBlocking="true"/>
             <stage id="_lSSzB_12" name="Stage1.1.2" autoComplete="true">
                 <planItem id="pi_ht__lSSzB_2" name="Task1 in Stage 1.2" definitionRef="ht__lSSzB_2"/>
             </stage>
-            <humanTask id="ht__lSSzB_2" name="Task1 in Stage 1.2" isBlocking="true"/>
-            <humanTask id="ht__lSSzB_3" name="Task1 in Stage 1.2" isBlocking="true"/>
-            <humanTask id="ht__lSSzB_4" name="Task1 in Stage1.1" isBlocking="true"/>
         </casePlanModel>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__lSSzB_0">
-                <Bounds x="20" y="20" width="800" height="560"/>
+                <Bounds x="20" y="20" width="800" height="620"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__lSSzB_0">
                 <Bounds x="640" y="60" width="100" height="60"/>
@@ -57,31 +57,31 @@
                 <Bounds x="674" y="110" width="12" height="20"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi__lSSzB_3">
-                <Bounds x="60" y="110" width="720" height="430"/>
+                <Bounds x="60" y="160" width="720" height="430"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi__lSSzB_5">
-                <Bounds x="120" y="150" width="420" height="160"/>
+                <Bounds x="120" y="200" width="420" height="160"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi__lSSzB_7">
-                <Bounds x="110" y="340" width="420" height="140"/>
+                <Bounds x="110" y="390" width="420" height="140"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__lSSzB_1">
-                <Bounds x="600" y="360" width="100" height="60"/>
+                <Bounds x="600" y="410" width="100" height="60"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="_lSSzB_10">
-                <Bounds x="524" y="390" width="12" height="20"/>
+                <Bounds x="524" y="440" width="12" height="20"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi__lSSzB_12">
-                <Bounds x="350" y="180" width="150" height="110"/>
+                <Bounds x="350" y="230" width="150" height="110"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__lSSzB_2">
-                <Bounds x="370" y="210" width="120" height="60"/>
+                <Bounds x="370" y="260" width="120" height="60"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__lSSzB_3">
-                <Bounds x="250" y="380" width="130" height="60"/>
+                <Bounds x="250" y="430" width="130" height="60"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__lSSzB_4">
-                <Bounds x="180" y="200" width="110" height="60"/>
+                <Bounds x="180" y="250" width="110" height="60"/>
             </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="pi_ht__lSSzB_1" targetCMMNElementRef="_lSSzB_10"/>
             <CMMNEdge sourceCMMNElementRef="pi_ht__lSSzB_1" targetCMMNElementRef="_lSSzB_2"/>

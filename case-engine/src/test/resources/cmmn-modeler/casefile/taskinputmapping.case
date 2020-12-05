@@ -42,10 +42,12 @@
             </planItemOnPart>
         </sentry>
         <humanTask id="pid_cm_casefile/testcontext.case_141" name="Task.AddChild" isBlocking="true">
+            <inputs id="_ilffQ_6" name="Container" bindingRef="cfi_casefile/testcontext.case_3"/>
             <outputs id="_3X9aF" name="Child" bindingRef="cfi_casefile/testcontext.case_4"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_kHJ0j" sourceRef="_SkQG_Result" targetRef="_3X9aF"/>
+                    <parameterMapping id="_ilffQ_4" sourceRef="_ilffQ_6" targetRef="_Hun3_Input"/>
                     <assignment id="_ilffQ_7">
                         <condition id="_ilffQ_8" language="spel">
                             <body>

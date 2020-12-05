@@ -1,5 +1,15 @@
 <definitions>
-    <case id="casefile/getlist_getdetails.case" name="getlist_getdetails" description="list-detail-case">
+    <caseFileItemDefinition name="http" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="http.cfid">
+        <property name="port" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
+    <caseFileItemDefinition name="details" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="details.cfid"/>
+    <case id="casefile/getlist_getdetails.case" name="getlist_getdetails">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[list-detail-case]]>
+            </text>
+        </documentation>
         <caseFileModel>
             <caseFileItem id="_LQXO7_4" name="HTTP-Configuration" multiplicity="ExactlyOne" definitionRef="http.cfid"/>
             <caseFileItem id="_LQXO7_5" name="IdentifierList" multiplicity="ExactlyOne" definitionRef="string.cfid">
@@ -13,9 +23,9 @@
             <planItem id="pi_pt__LQXO7_8" name="GetList" definitionRef="pt__LQXO7_8"/>
             <planItem id="pi_pt__LQXO7_24" name="GetDetails" definitionRef="pt__LQXO7_24">
                 <entryCriterion id="_LQXO7_1" name="EntryCriterion_0" sentryRef="crit__LQXO7_0"/>
-                <itemControl id="_LQXO7_32">
-                    <repetitionRule id="_LQXO7_33">
-                        <condition id="_LQXO7_34" language="spel">
+                <itemControl id="_LQXO7_32" name="ItemControl_1">
+                    <repetitionRule id="_LQXO7_33" name="Constraint_1">
+                        <condition id="_LQXO7_34" name="Expression_1" language="spel">
                             <body>
                                 <![CDATA[<=3]]>
                             </body>
@@ -23,42 +33,13 @@
                     </repetitionRule>
                 </itemControl>
             </planItem>
-            <sentry id="crit__LQXO7_0">
-                <ifPart id="_LQXO7_8" contextRef="_LQXO7_7">
-                    <condition id="_LQXO7_9" language="spel">
-                        <body>
-                            <![CDATA[!DetailsKey.isEmpty()]]>
-                        </body>
-                    </condition>
-                </ifPart>
-                <caseFileItemOnPart id="_LQXO7_0" sourceRef="_LQXO7_7">
+            <sentry id="crit__LQXO7_0" name="Sentry_1">
+                <caseFileItemOnPart id="_LQXO7_0" name="CaseFileItemOnPart_1" sourceRef="_LQXO7_7">
                     <standardEvent>create</standardEvent>
                 </caseFileItemOnPart>
             </sentry>
-            <processTask id="pt__LQXO7_8" name="GetList" isBlocking="true" processRef="GetListWebService.process">
-                <inputs id="_LQXO7_10" name="httpPort"/>
-                <inputs id="_LQXO7_12" name="testParameter"/>
-                <outputs id="_LQXO7_14" name="responseCode"/>
-                <outputs id="_LQXO7_16" name="responseMessage"/>
-                <outputs id="_LQXO7_18" name="output"/>
-                <outputs id="_LQXO7_20" name="detailsIdentifiers" bindingRef="_LQXO7_7"/>
-                <outputs id="_LQXO7_22" name="headerContentLength"/>
-                <parameterMapping id="_LQXO7_11" sourceRef="_LQXO7_10" targetRef="httpPort"/>
-                <parameterMapping id="_LQXO7_13" sourceRef="_LQXO7_12" targetRef="testParameter"/>
-                <parameterMapping id="_LQXO7_15" sourceRef="responseCode" targetRef="_LQXO7_14"/>
-                <parameterMapping id="_LQXO7_17" sourceRef="responseMessage" targetRef="_LQXO7_16"/>
-                <parameterMapping id="_LQXO7_19" sourceRef="output" targetRef="_LQXO7_18"/>
-                <parameterMapping id="_LQXO7_21" sourceRef="detailsIdentifiers" targetRef="_LQXO7_20"/>
-                <parameterMapping id="_LQXO7_23" sourceRef="headerContentLength" targetRef="_LQXO7_22"/>
-            </processTask>
-            <processTask id="pt__LQXO7_24" name="GetDetails" isBlocking="true" processRef="GetDetailsWebService.process">
-                <inputs id="_LQXO7_26" name="httpPort"/>
-                <inputs id="_LQXO7_28" name="detailsId"/>
-                <outputs id="_LQXO7_30" name="details"/>
-                <parameterMapping id="_LQXO7_27" sourceRef="_LQXO7_26" targetRef="httpPort"/>
-                <parameterMapping id="_LQXO7_29" sourceRef="_LQXO7_28" targetRef="detailsId"/>
-                <parameterMapping id="_LQXO7_31" sourceRef="details" targetRef="_LQXO7_30"/>
-            </processTask>
+            <processTask id="pt__LQXO7_8" name="GetList" isBlocking="true" processRef="GetListWebService.process"/>
+            <processTask id="pt__LQXO7_24" name="GetDetails" isBlocking="true" processRef="GetDetailsWebService.process"/>
         </casePlanModel>
     </case>
     <process name="GetListWebService" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified" id="GetListWebService.process">
@@ -90,9 +71,9 @@
         </extensionElements>
     </process>
     <process name="GetDetailsWebService" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified" id="GetDetailsWebService.process">
-        <input id="httpPort" name="httpPort"/>
-        <input id="detailsId" name="detailsId"/>
-        <output id="details" name="details"/>
+        <input name="httpPort"/>
+        <input name="detailsId"/>
+        <output name="details"/>
         <extensionElements>
             <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
                 <url>http://localhost:${httpPort}/details/${detailsId}</url>
@@ -108,11 +89,6 @@
             </cafienne:implementation>
         </extensionElements>
     </process>
-    <caseFileItemDefinition name="http" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="http.cfid">
-        <property name="port" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
-    <caseFileItemDefinition name="details" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="details.cfid"/>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm_casefile/getlist_getdetails.case_0">
@@ -124,15 +100,18 @@
             <CMMNShape cmmnElementRef="pi_pt__LQXO7_24">
                 <Bounds x="350" y="110" width="100" height="60"/>
             </CMMNShape>
+            <CMMNShape cmmnElementRef="crit__LQXO7_0">
+                <Bounds x="444" y="130" width="12" height="20"/>
+            </CMMNShape>
             <CMMNShape cmmnElementRef="_LQXO7_1">
                 <Bounds x="444" y="130" width="12" height="20"/>
             </CMMNShape>
-            <casefileitem cmmnElementRef="_LQXO7_shape_4" parentId="cm_casefile/getlist_getdetails.case_0" contextRef="_LQXO7_7">
+            <CMMNShape cmmnElementRef="_LQXO7_shape_4">
                 <Bounds x="580" y="120" width="25" height="40"/>
-            </casefileitem>
-            <casefileitem cmmnElementRef="_LQXO7_shape_5" parentId="cm_casefile/getlist_getdetails.case_0" contextRef="_LQXO7_7">
-                <Bounds x="120" y="210" width="25" height="40"/>
-            </casefileitem>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_LQXO7_shape_5">
+                <Bounds x="110" y="200" width="25" height="40"/>
+            </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="_LQXO7_shape_4" targetCMMNElementRef="_LQXO7_1"/>
             <CMMNEdge sourceCMMNElementRef="_LQXO7_shape_5" targetCMMNElementRef="pi_pt__LQXO7_8"/>
         </CMMNDiagram>

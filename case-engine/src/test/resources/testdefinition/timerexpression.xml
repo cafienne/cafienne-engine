@@ -1,5 +1,14 @@
 <definitions>
-    <case id="timerexpression.case" name="timerexpression" description="A case that creates a timer with an expression based on the case file contents">
+    <caseFileItemDefinition name="timer" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="timer.cfid">
+        <property name="period" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="dummy" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <case id="timerexpression.case" name="timerexpression">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[A case that creates a timer with an expression based on the case file contents]]>
+            </text>
+        </documentation>
         <caseFileModel>
             <caseFileItem id="_AqPiG_2" name="timer" multiplicity="ExactlyOne" definitionRef="timer.cfid"/>
         </caseFileModel>
@@ -31,14 +40,12 @@
             </sentry>
             <humanTask id="ht__AqPiG_0" name="Task1" isBlocking="true"/>
             <humanTask id="ht__AqPiG_2" name="simplehumantask" isBlocking="true">
-                <inputs id="_AqPiG_12" name="Input"/>
                 <outputs id="_AqPiG_14" name="Result" bindingRef="_AqPiG_2"/>
                 <extensionElements mustUnderstand="false">
                     <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
                         <output id="_SkQG_Result" name="Result"/>
                         <task-model/>
-                        <parameterMapping id="_AqPiG_13" sourceRef="_AqPiG_12" targetRef="_Hun3_Input"/>
                         <parameterMapping id="_AqPiG_15" sourceRef="_SkQG_Result" targetRef="_AqPiG_14"/>
                     </cafienne:implementation>
                 </extensionElements>
@@ -57,10 +64,6 @@
         </casePlanModel>
         <input id="_AqPiG_5" name="timer" bindingRef="_AqPiG_2"/>
     </case>
-    <caseFileItemDefinition name="timer" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="timer.cfid">
-        <property name="period" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="dummy" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__AqPiG_0">

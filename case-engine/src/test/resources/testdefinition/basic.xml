@@ -1,4 +1,7 @@
 <definitions>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
     <case id="basic.case" name="basic">
         <caseFileModel>
             <caseFileItem id="_Jjxp7_17" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
@@ -53,9 +56,6 @@
             </stage>
         </casePlanModel>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__Jjxp7_0">

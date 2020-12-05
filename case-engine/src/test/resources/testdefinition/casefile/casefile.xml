@@ -1,4 +1,16 @@
 <definitions>
+    <caseFileItemDefinition name="rootcasefileitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="rootcasefileitem.cfid">
+        <property name="RootProperty1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="RootProperty2" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="childitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="childitem.cfid">
+        <property name="ChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="ChildAge" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="grandchilditem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="grandchilditem.cfid">
+        <property name="GrandChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="GrandChildBirthDate" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
+    </caseFileItemDefinition>
     <case id="casefile.case" name="casefile">
         <caseFileModel>
             <caseFileItem id="_kWyIV_1" name="RootCaseFileItem" multiplicity="ExactlyOne" definitionRef="rootcasefileitem.cfid">
@@ -24,18 +36,6 @@
             <humanTask id="ht__kWyIV_0" name="Simplistic Unused Task" isBlocking="true"/>
         </casePlanModel>
     </case>
-    <caseFileItemDefinition name="rootcasefileitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="rootcasefileitem.cfid">
-        <property name="RootProperty1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="RootProperty2" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="childitem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="childitem.cfid">
-        <property name="ChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="ChildAge" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="grandchilditem" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="grandchilditem.cfid">
-        <property name="GrandChildName" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="GrandChildBirthDate" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__kWyIV_0">

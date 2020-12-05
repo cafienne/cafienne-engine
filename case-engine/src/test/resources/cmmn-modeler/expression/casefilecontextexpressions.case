@@ -1,4 +1,4 @@
-<case id="expression/casefilecontextexpressions.case" name="CaseFileContextExpressions" guid="_X87XC">
+<case id="expression/casefilecontextexpressions.case" name="CaseFileContextExpressions" expressionLanguage="spel" guid="_X87XC">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[Test case for referencing CaseFileItem from within an expression]]>
@@ -19,14 +19,14 @@
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
                     <parameterMapping id="_mMaHf" sourceRef="_E9IZ1" targetRef="_Hun3_Input">
-                        <transformation language="spel">
+                        <transformation>
                             <body>
                                 <![CDATA[inputContainer.Child.getOwner().getCurrent().getValue()]]>
                             </body>
                         </transformation>
                     </parameterMapping>
-                    <parameterMapping id="_9POJb" sourceRef="_E9IZ1" targetRef="_bpa7_Assignee">
-                        <transformation language="spel">
+                    <parameterMapping id="_9POJb" sourceRef="_E9IZ1">
+                        <transformation>
                             <body>
                                 <![CDATA[inputContainer.Child.getOwner().getValue().size()]]>
                             </body>

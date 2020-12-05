@@ -57,15 +57,15 @@
         <CMMNShape cmmnElementRef="pt_cm_102">
             <Bounds x="345" y="472" width="24" height="16"/>
         </CMMNShape>
-        <textbox cmmnElementRef="cm_cseOt_68" parentId="cm_cseOt_62" content="Stage does not auto complete&#10;It has a required rule on Task1.&#10;Task2 listens to &quot;fail&quot; of Task1&#10;&#10;So it should complete if Task1 is completed,&#10;because Task2 always remains Available.">
+        <CMMNShape cmmnElementRef="cm_cseOt_68">
             <Bounds x="508" y="93" width="280" height="130"/>
-        </textbox>
-        <textbox cmmnElementRef="cm_csrtZ_77" parentId="cm_csRJ5_72" content="Stage2 has a discretionary task.&#10;&#10;So completing Task3 should NOT complete the stage,&#10;because it is not autoComplete enabled">
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csrtZ_77">
             <Bounds x="508" y="303" width="300" height="130"/>
-        </textbox>
-        <textbox cmmnElementRef="cm_cso85_107" parentId="cm_cso85_101" content="Stage3 is similar to Stage2, but autoComplete is enabled.&#10;&#10;Hence completing Task5 should complete the stage,&#10;even though there are discretionary items">
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_cso85_107">
             <Bounds x="510" y="511" width="310" height="120"/>
-        </textbox>
+        </CMMNShape>
         <CMMNEdge sourceCMMNElementRef="cm_cseOt_66" targetCMMNElementRef="_IKPvy_3"/>
         <CMMNEdge sourceCMMNElementRef="cm_cso85_99" targetCMMNElementRef="_IKPvy_1"/>
         <CMMNEdge sourceCMMNElementRef="cm_csXD7_108" targetCMMNElementRef="_IKPvy_2"/>

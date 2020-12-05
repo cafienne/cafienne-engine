@@ -1,4 +1,7 @@
 <definitions>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
     <case id="repeatrule.case" name="repeatrule">
         <caseFileModel>
             <caseFileItem id="_4kpJj_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
@@ -50,9 +53,6 @@
             <milestone id="ms__4kpJj_0" name="RepeatUponCompletion"/>
         </casePlanModel>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__4kpJj_0">

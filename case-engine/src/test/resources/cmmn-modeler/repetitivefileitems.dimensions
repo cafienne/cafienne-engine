@@ -15,12 +15,9 @@
         <CMMNShape cmmnElementRef="cm_cs9KJ_12">
             <Bounds x="542" y="106" width="100" height="60"/>
         </CMMNShape>
-        <textbox cmmnElementRef="cm_cs9KJ_14" parentId="cm_cs9KJ_2">
-            <Bounds x="370" y="246" width="100" height="60"/>
-        </textbox>
-        <casefileitem cmmnElementRef="cm_cs9KJ_11" parentId="cm_cs9KJ_2" contextRef="cfi_csGlQ_0">
+        <CMMNShape cmmnElementRef="cfi_csGlQ_0">
             <Bounds x="115" y="119" width="25" height="40"/>
-        </casefileitem>
-        <CMMNEdge sourceCMMNElementRef="cm_cs9KJ_11" targetCMMNElementRef="_3hEkB_0"/>
+        </CMMNShape>
+        <CMMNEdge sourceCMMNElementRef="cfi_csGlQ_0" targetCMMNElementRef="_3hEkB_0"/>
     </CMMNDiagram>
 </CMMNDI>

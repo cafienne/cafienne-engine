@@ -9,9 +9,9 @@
         <CMMNShape cmmnElementRef="_HgC8N_0">
             <Bounds x="247" y="285" width="12" height="20"/>
         </CMMNShape>
-        <casefileitem cmmnElementRef="cm_multiTest.case_202" parentId="cm_multiTest.case_0" contextRef="cfi_multiTest.case_0">
+        <CMMNShape cmmnElementRef="cfi_multiTest.case_0">
             <Bounds x="391" y="392" width="25" height="40"/>
-        </casefileitem>
-        <CMMNEdge sourceCMMNElementRef="cm_multiTest.case_202" targetCMMNElementRef="_HgC8N_0"/>
+        </CMMNShape>
+        <CMMNEdge sourceCMMNElementRef="cfi_multiTest.case_0" targetCMMNElementRef="_HgC8N_0"/>
     </CMMNDiagram>
 </CMMNDI>

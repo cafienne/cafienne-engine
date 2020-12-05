@@ -1,4 +1,7 @@
 <definitions>
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
     <case id="expression/spelexpressions2.case" name="SpelExpressions" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="cfi_csdZm_0" name="Content" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
@@ -122,9 +125,6 @@ Otherwise testcase will not work.]]>
             </cafienne:start-case-model>
         </extensionElements>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm_SpelExpressions.case_SpelExpressions_0">
