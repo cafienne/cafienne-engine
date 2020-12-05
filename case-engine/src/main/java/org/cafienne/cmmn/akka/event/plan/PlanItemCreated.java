@@ -50,7 +50,7 @@ public class PlanItemCreated extends PlanItemEvent {
         this.createdOn = readInstant(json, Fields.createdOn);
         this.createdBy = readField(json, Fields.createdBy);
         this.planItemName = readField(json, Fields.name);
-        this.definitionId = readField(json, Fields.definitionId);
+        this.definitionId = readField(json, Fields.definitionId, "");
         this.stageId = readField(json, Fields.stageId);
     }
 
