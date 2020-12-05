@@ -139,6 +139,14 @@ public interface CafienneSerializable {
         return json.raw(fieldName);
     }
 
+    default <T extends Object> T readField(ValueMap json, Fields fieldName, T defaultValue) {
+        if (json.has(fieldName)) {
+            return readField(json, fieldName);
+        } else {
+            return defaultValue;
+        }
+    }
+
     default <T extends Enum<?>> T readEnum(ValueMap json, Fields fieldName, Class<T> enumClass) {
         return json.getEnum(fieldName, enumClass);
     }
