@@ -188,11 +188,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   )
   @Produces(Array("application/json"))
   def getCaseDefinition = get {
-    validUser { platformUser =>
-      path(Segment / "definition" ) {
-        caseInstanceId => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, platformUser))
-      }
-    }
+    caseInstanceSubRoute("definition", (platformUser, caseInstanceId) => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, platformUser)))
   }
 
   @POST
@@ -223,7 +219,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
-              askCaseWithValidTeam(platformUser, tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
@@ -251,8 +247,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   )
   @Produces(Array("application/json"))
   def debugCase = put {
-    validUser { platformUser =>
-      path(Segment / "debug" / Segment) { (caseInstanceId, debugMode) =>
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("debug" / Segment) { debugMode =>
         askCase(platformUser, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
       }
     }

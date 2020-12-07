@@ -25,16 +25,11 @@ import org.cafienne.service.api.projection.query.CaseQueries
 @Path("/cases")
 class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  val caseFileRoute = new CaseFileRoute(caseQueries)(userCache)
-  val caseTeamRoute = new CaseTeamRoute(caseQueries)(userCache)
-
   override def routes = {
-      getPlanItems ~
+    getPlanItems ~
       getPlanItem ~
-      getPlanItemDocumentation ~
-      planItemTransition ~
-      getPlanItemHistory
-    }
+      makePlanItemTransition
+  }
 
   @Path("/{caseInstanceId}/planitems")
   @GET
@@ -44,8 +39,6 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      //      new Parameter(name = "planItemType", description = "Type of planItems to get", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      //      new Parameter(name = "status", description = "Status of the planItems to get", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
@@ -55,9 +48,9 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItems = get {
-    validUser { platformUser =>
-      path(Segment / "planitems") {
-        caseInstanceId => runQuery(caseQueries.getPlanItems(caseInstanceId, platformUser))
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("planitems") {
+        runQuery(caseQueries.getPlanItems(caseInstanceId, platformUser))
       }
     }
   }
@@ -80,34 +73,9 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @Produces(Array("application/json"))
   def getPlanItem = get {
-    validUser { platformUser =>
-      path(Segment / "planitems" / Segment) {
-        (_, planItemId) => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
-      }
-    }
-  }
-
-  @Path("/{caseInstanceId}/documentation/planitems/{planItemId}")
-  @GET
-  @Operation(
-    summary = "Get the documentation information from the plan item's definition",
-    description = "Get the documentation information from the plan item's definition",
-    tags = Array("case plan"),
-    parameters = Array(
-      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "planItemId", description = "Unique id of the planItem", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Plan item documentation found", responseCode = "200"),
-      new ApiResponse(description = "Plan item not found", responseCode = "404")
-    )
-  )
-  @Produces(Array("application/json"))
-  def getPlanItemDocumentation = get {
-    validUser { platformUser =>
-      path(Segment / "documentation" / "planitems" / Segment) {
-        (_, planItemId) => runQuery(caseQueries.getPlanItemDocumentation(planItemId, platformUser))
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("planitems" / Segment) {
+        planItemId => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
       }
     }
   }
@@ -131,39 +99,15 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Produces(Array("application/json"))
-  def planItemTransition = post {
-    validUser { platformUser =>
-      path(Segment / "planitems" / Segment / Segment) { (caseInstanceId, planItemId, transitionString) =>
+  def makePlanItemTransition = post {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("planitems" / Segment / Segment) { (planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)
         if (transition == null) {
-          complete(StatusCodes.BadRequest, "Transition " + transition +" is not valid")
+          complete(StatusCodes.BadRequest, "Transition " + transition + " is not valid")
         } else {
           askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
         }
-      }
-    }
-  }
-
-  @Path("/{caseInstanceId}/planitems/{planItemId}/history")
-  @GET
-  @Operation(
-    summary = "Get history of a plan item in a case by planItemId",
-    description = "Get history of a plan item in the specified case instance",
-    tags = Array("case plan"),
-    parameters = Array(
-      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "planItemId", description = "Unique id of the planItem (cannot be the plan item name, must be the id)", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(description = "PlanItem found", responseCode = "200"),
-      new ApiResponse(description = "No PlanItem found", responseCode = "404")
-    )
-  )
-  @Produces(Array("application/json"))
-  def getPlanItemHistory = get {
-    validUser { platformUser =>
-      path(Segment / "planitems" / Segment / "history") {
-        (_, planItemId) => runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))
       }
     }
   }
