@@ -26,11 +26,52 @@ trait CasesRoute extends CommandRoute with QueryRoute {
 
   override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
 
+  /**
+    * Run the sub route with a valid platform user and case instance id
+    * @param subRoute
+    * @return
+    */
+  def caseInstanceRoute(subRoute: (PlatformUser, String) => Route) : Route = {
+    validUser { platformUser =>
+      path(Segment) { caseInstanceId =>
+        pathEndOrSingleSlash {
+          subRoute(platformUser, caseInstanceId)
+        }
+      }
+    }
+  }
+
+  /**
+    * Run the sub route with a valid platform user and case instance id
+    * @param subRoute
+    * @return
+    */
+  def caseInstanceSubRoute(subRoute: (PlatformUser, String) => Route) : Route = {
+    validUser { platformUser =>
+      pathPrefix(Segment) { caseInstanceId =>
+        subRoute(platformUser, caseInstanceId)
+      }
+    }
+  }
+
+  /**
+    * Run the sub route with a valid platform user and case instance id
+    * @param subRoute
+    * @return
+    */
+  def caseInstanceSubRoute(prefix: String, subRoute: (PlatformUser, String) => Route) : Route = {
+    validUser { platformUser =>
+      pathPrefix(Segment / prefix) { caseInstanceId =>
+        subRoute(platformUser, caseInstanceId)
+      }
+    }
+  }
+
   def askCaseWithValidMembers(platformUser: PlatformUser, members: Seq[CaseTeamMember], caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
     readLastModifiedHeader() { caseLastModified =>
       onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
         case Success(tenant) => {
-          askCaseWithValidTeam(platformUser, tenant, members, createCaseCommand.apply(platformUser.getTenantUser(tenant)))
+          askCaseWithValidTeam(tenant, members, createCaseCommand.apply(platformUser.getTenantUser(tenant)))
         }
         case Failure(error) => {
           error match {
@@ -42,7 +83,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def askCaseWithValidTeam(platformUser: PlatformUser, tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
+  def askCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
     val userIds = members.filter(member => member.isTenantUser()).map(member => member.key.id)
     onComplete(userCache.getUsers(userIds, tenant)) {
       case Success(tenantUsers) => {

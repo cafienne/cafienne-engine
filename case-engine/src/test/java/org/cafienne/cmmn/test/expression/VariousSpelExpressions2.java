@@ -75,7 +75,7 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 33;
+            int expectedNumberOfEvents = 32;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
@@ -84,7 +84,7 @@ public class VariousSpelExpressions2 {
                         "CaseFileEvent: 1\n" +
                         "PlanItemCreated: 4\n" +
                         "PlanItemTransitioned: 10\n" +
-                        "RepetitionRuleEvaluated: 4\n" +
+                        "RepetitionRuleEvaluated: 3\n" +
                         "RequiredRuleEvaluated: 3\n" +
                         "TaskInputFilled: 1\n" +
                         "HumanTaskActivated: 1\n" +
@@ -130,7 +130,7 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 33;
+            int expectedNumberOfEvents = 32;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
@@ -139,7 +139,7 @@ public class VariousSpelExpressions2 {
                         "CaseFileEvent: 1\n" +
                         "PlanItemCreated: 4\n" +
                         "PlanItemTransitioned: 10\n" +
-                        "RepetitionRuleEvaluated: 4\n" +
+                        "RepetitionRuleEvaluated: 3\n" +
                         "RequiredRuleEvaluated: 3\n" +
                         "TaskInputFilled: 1\n" +
                         "HumanTaskActivated: 1\n" +

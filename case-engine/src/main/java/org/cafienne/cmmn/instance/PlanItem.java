@@ -136,7 +136,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
         // Re-evaluate the repetition rule, and if the outcome is true, the start the repeat item (but only if it is not a discretionary).
         addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat()");
-        evaluateRepetitionRule();
+        evaluateRepetitionRule(false);
         if (repeats()) {
             if (itemDefinition.isDiscretionary()) {
                 // Means we are discretionary, and adding to the plan must be done manually
@@ -276,9 +276,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Evaluates the repetition rule on the plan item. Typically done when the plan item goes into Active state
      */
-    void evaluateRepetitionRule() {
-        boolean repeats = itemDefinition.getPlanItemControl().getRepetitionRule().evaluate(this);
-        addEvent(new RepetitionRuleEvaluated(this, repeats));
+    void evaluateRepetitionRule(boolean firstEvaluation) {
+        boolean newRuleOutcome = itemDefinition.getPlanItemControl().getRepetitionRule().evaluate(this);
+        if (firstEvaluation || newRuleOutcome != this.repetitionRuleOutcome) {
+            addEvent(new RepetitionRuleEvaluated(this, newRuleOutcome));
+        }
     }
 
     /**

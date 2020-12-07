@@ -7,9 +7,7 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.javadsl.model.StatusCodes
-import akka.http.scaladsl.model.StatusCode
-import akka.http.scaladsl.server.Directives.{Segments, path, _}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -32,7 +30,6 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
 
   override def routes = {
     getCaseFile ~
-      getCaseFileDocumentation ~
       createCaseFileItem ~
       replaceCaseFileItem ~
       updateCaseFileItem ~
@@ -59,30 +56,6 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     validUser { platformUser =>
       path(Segment / "casefile") {
         caseInstanceId => runQuery(caseQueries.getCaseFile(caseInstanceId, platformUser))
-      }
-    }
-  }
-
-  @Path("/{caseInstanceId}/documentation/casefile")
-  @GET
-  @Operation(
-    summary = "Get the casefile",
-    description = "Get the case file from the specified case instance",
-    tags = Array("case file"),
-    parameters = Array(
-      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Case file found", responseCode = "200"),
-      new ApiResponse(description = "No case file found for the case instance", responseCode = "404")
-    )
-  )
-  @Produces(Array("application/json"))
-  def getCaseFileDocumentation = get {
-    validUser { platformUser =>
-      path(Segment / "documentation" / "casefile") {
-        caseInstanceId => runQuery(caseQueries.getCaseFileDocumentation(caseInstanceId, platformUser))
       }
     }
   }

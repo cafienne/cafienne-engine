@@ -158,7 +158,7 @@ class StateMachine {
             if (t == Transition.Create) {
                 p.createInstance();
                 if (p instanceof Milestone) {
-                    p.evaluateRepetitionRule();
+                    p.evaluateRepetitionRule(true);
                     p.evaluateRequiredRule();
                     p.getEntryCriteria().beginLifeCycle(Transition.Occur);
                 }
@@ -190,7 +190,7 @@ class StateMachine {
 
         TaskStage.setAction(State.Available, (PlanItem p, Transition t) -> {
             p.createInstance();
-            p.evaluateRepetitionRule();
+            p.evaluateRepetitionRule(true);
             p.evaluateRequiredRule();
 
             // Now evaluate manual activation and trigger the associated transition on the plan item
