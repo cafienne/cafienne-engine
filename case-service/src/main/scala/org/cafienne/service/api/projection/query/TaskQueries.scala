@@ -135,6 +135,7 @@ class TaskQueriesImpl extends TaskQueries
     val query = for {
       baseQuery <- assignmentFilterQuery
         .filterOpt(filter.tenant)(_.tenant === _)
+        .filterOpt(filter.taskName)(_.taskName === _)
         .filterOpt(filter.taskState)(_.taskState === _)
         .filterOpt(filter.owner)(_.owner === _)
         .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
