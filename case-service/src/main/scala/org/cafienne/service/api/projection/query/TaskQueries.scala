@@ -133,7 +133,10 @@ class TaskQueriesImpl extends TaskQueries
     }
 
     val query = for {
+      caseNameFilter <- caseInstanceQuery.filterOpt(filter.caseName)(_.caseName === _)
+
       baseQuery <- assignmentFilterQuery
+        .filter(_.caseInstanceId === caseNameFilter.id)
         .filterOpt(filter.tenant)(_.tenant === _)
         .filterOpt(filter.taskName)(_.taskName === _)
         .filterOpt(filter.taskState)(_.taskState === _)
