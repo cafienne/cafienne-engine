@@ -133,8 +133,12 @@ class TaskQueriesImpl extends TaskQueries
     }
 
     val query = for {
+      caseNameFilter <- caseInstanceQuery.filterOpt(filter.caseName)(_.caseName === _)
+
       baseQuery <- assignmentFilterQuery
+        .filter(_.caseInstanceId === caseNameFilter.id)
         .filterOpt(filter.tenant)(_.tenant === _)
+        .filterOpt(filter.taskName)(_.taskName === _)
         .filterOpt(filter.taskState)(_.taskState === _)
         .filterOpt(filter.owner)(_.owner === _)
         .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
@@ -174,6 +178,8 @@ class TaskQueriesImpl extends TaskQueries
     val unclaimedTasksQuery = for {
       // Select all unassigned tasks (optionally from the specified tenant)
       unclaimedTasks <- TableQuery[TaskTable].filter(_.assignee === "").filterOpt(tenant)(_.tenant === _)
+        // And only active tasks, not completed or terminated
+        .filterNot(_.taskState === "Completed").filterNot(_.taskState === "Terminated")
       // In tenants where i am a user
       tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === unclaimedTasks.tenant)
       // Where my case team roles map to the task role
@@ -195,9 +201,9 @@ class TaskQueriesImpl extends TaskQueries
     } yield unclaimedTasks
 
     val count = for {
-      claimTasks <- db.run(claimedTasksQuery.distinct.length.result)
+      claimedTasks <- db.run(claimedTasksQuery.distinct.length.result)
       unclaimedTasks <- db.run(unclaimedTasksQuery.distinct.length.result)
-    } yield (claimTasks, unclaimedTasks)
+    } yield (claimedTasks, unclaimedTasks)
 
     count.map(c => {
       val tc = TaskCount(c._1, c._2)

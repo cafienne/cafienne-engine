@@ -60,12 +60,12 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
   def getAllTasks = get {
     validUser { platformUser =>
       pathEndOrSingleSlash {
-        parameters('tenant ?, 'identifiers ?, 'caseName ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
-          (tenant, identifiers, caseName, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
+        parameters('tenant ?, 'identifiers ?, 'caseName ?, 'taskName ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
+          (tenant, identifiers, caseName, taskName, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
             optionalHeaderValueByName("timeZone") { timeZone =>
               val area = Area(offset, numberOfResults)
               val sort = Sort.withDefault(sortBy, sortOrder, "lastModified")
-              val taskFilter = TaskFilter(tenant = tenant, identifiers = identifiers, caseName = caseName, taskState = taskState, assignee = assignee, owner = owner, dueOn = dueOn, dueBefore = dueBefore, dueAfter = dueAfter, timeZone = timeZone)
+              val taskFilter = TaskFilter(tenant = tenant, identifiers = identifiers, caseName = caseName, taskName = taskName, taskState = taskState, assignee = assignee, owner = owner, dueOn = dueOn, dueBefore = dueBefore, dueAfter = dueAfter, timeZone = timeZone)
               runListQuery(taskQueries.getAllTasks(platformUser, taskFilter, area, sort))
             }
         }
