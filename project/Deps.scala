@@ -5,7 +5,8 @@ object Deps {
     "maven repo"          at "https://repo.maven.apache.org/maven2",
     "typesafe releases"   at "https://repo.typesafe.com/typesafe/releases",
     "typesafe snapshots"  at "https://repo.typesafe.com/typesafe/snapshots",
-    "akka repo"           at "https://repo.akka.io/"
+    "akka repo"           at "https://repo.akka.io/",
+    "ibm fhir server"     at "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases/"
   )
 
   def compile   (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "compile")
@@ -45,6 +46,8 @@ object Deps {
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.2"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
   val joseJwt               = "com.nimbusds"            % "nimbus-jose-jwt"                       % "9.1.2"
+
+  val ibmFhirPath           = "com.ibm.fhir"            % "fhir-path"                             % "4.5.2"
 
   val akkaHttp              = "com.typesafe.akka"       %% "akka-http"                            % V.akkaHttp
   val akkaHttpXml            = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
