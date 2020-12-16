@@ -23,6 +23,7 @@ import java.util.Map;
  * {@link CaseDefinition}, {@link ProcessDefinition}, {@link CaseFileItemDefinitionDefinition}, etc.
  */
 public class ModelDefinition extends CMMNElementDefinition {
+    private final String defaultExpressionLanguage;
     /**
      * Collection with all elements belonging to the case definition.
      */
@@ -38,10 +39,21 @@ public class ModelDefinition extends CMMNElementDefinition {
     protected ModelDefinition(Element element, DefinitionsDocument document) {
         super(element, null, null, true); // All definitions must have an identifier
         this.document = document;
+        // Yes, we know, it is not supposed to be defined at the individual case definition level, but that is way more handy when e.g. the processes use a different language...
+        this.defaultExpressionLanguage = parseAttribute("expressionLanguage", false, document.getDefaultExpressionLanguage());
 
         parse("input", InputParameterDefinition.class, inputParameters);
         parse("output", OutputParameterDefinition.class, outputParameters);
         document.addElement(this);
+    }
+
+    /**
+     * Returns the default expression language used in this model.
+     * If that is not defined, it will take if from the DefinitionsDocument;
+     * @return
+     */
+    public String getDefaultExpressionLanguage() {
+        return defaultExpressionLanguage;
     }
 
     public DefinitionsDocument getDefinitionsDocument() {

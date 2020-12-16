@@ -28,6 +28,8 @@ public class DefinitionsDocument implements Serializable {
     private final static Logger logger = LoggerFactory.getLogger(DefinitionsDocument.class);
 
     private final String sourceDocument;
+    private String defaultExpressionLanguage;
+
     /**
      * XML Parsed version of the source document string.
      */
@@ -98,6 +100,9 @@ public class DefinitionsDocument implements Serializable {
             }
         }
 
+        // Parse the default expression language. If the attribute is not defined, then it will set an empty string
+        this.defaultExpressionLanguage = document.getDocumentElement().getAttribute("expressionLanguage");
+
         allElements = new ArrayList();
 
         parseImports();
@@ -114,12 +119,21 @@ public class DefinitionsDocument implements Serializable {
         checkForErrors();
     }
 
+    /**
+     * Returns the default expression language used in this set of models.
+     * If not defined, it returns an empty string.
+     * @return
+     */
+    public String getDefaultExpressionLanguage() {
+        return defaultExpressionLanguage;
+    }
+
     private void initAfterDeserialization() {
         try {
             init();
         } catch (InvalidDefinitionException e) {
             logger.error("Could not parse a definitions document that has been parsed before?!", e);
-            throw new RuntimeException("Could not parese the XML that was parsable before!?", e);
+            throw new RuntimeException("Could not parse the XML that was parsable before!?", e);
         }
     }
 

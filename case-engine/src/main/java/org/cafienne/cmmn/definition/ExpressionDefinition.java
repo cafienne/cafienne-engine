@@ -36,7 +36,7 @@ public class ExpressionDefinition extends CMMNElementDefinition {
 
     public ExpressionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        language = element.getAttribute("language");
+        language = parseAttribute("language", false, modelDefinition.getDefaultExpressionLanguage());
         body = parse("body", String.class, true);
         if (body == null || body.isBlank()) {
             getModelDefinition().addDefinitionError(this.getContextDescription() + " has an empty expression");
