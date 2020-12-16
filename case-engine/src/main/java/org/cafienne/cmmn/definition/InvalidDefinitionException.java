@@ -33,6 +33,7 @@ public class InvalidDefinitionException extends Exception {
         super(msg, t);
         this.definitionErrors = new ArrayList();
         definitionErrors.add(msg);
+        definitionErrors.add("details: " + t.toString());
     }
 
     public String toString() {

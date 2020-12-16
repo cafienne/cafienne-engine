@@ -36,7 +36,7 @@ public class ExpressionDefinition extends CMMNElementDefinition {
 
     public ExpressionDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        language = element.getAttribute("language");
+        language = parseAttribute("language", false, modelDefinition.getDefaultExpressionLanguage());
         body = parse("body", String.class, true);
         if (body == null || body.isBlank()) {
             getModelDefinition().addDefinitionError(this.getContextDescription() + " has an empty expression");
@@ -45,29 +45,25 @@ public class ExpressionDefinition extends CMMNElementDefinition {
         try {
             Class<?> evaluatorClass = Class.forName(evaluatorClassName);
             if (!CMMNExpressionEvaluator.class.isAssignableFrom(evaluatorClass)) {
-                throw new RuntimeException("The class " + evaluatorClassName + " must implement " + CMMNExpressionEvaluator.class.getName() + ", but it does not");
+                throw new NoSuchMethodException("The class " + evaluatorClassName + " must implement " + CMMNExpressionEvaluator.class.getName() + ", but it does not");
             }
             Constructor<?> implementationConstructor = evaluatorClass.getConstructor(ExpressionDefinition.class);
-            // TODO: do better type checking, such that we can overcome this warning?
             this.evaluator = (CMMNExpressionEvaluator) implementationConstructor.newInstance(this);
         }
-
-        // TODO for all exceptions: raise and log the error within the engine?
-
         catch (ClassNotFoundException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " cannot be found", e);
+            getModelDefinition().fatalError("The expression language '" + language +"' is not supported", e);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " does not have a constructor that takes " + ExpressionDefinition.class.getName() + " as an argument", e);
+            getModelDefinition().fatalError("The class " + evaluatorClassName + " does not have a constructor that takes " + ExpressionDefinition.class.getName() + " as an argument", e);
         } catch (SecurityException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " cannot be instantiated", e);
+            getModelDefinition().fatalError("The class " + evaluatorClassName + " cannot be instantiated", e);
         } catch (InstantiationException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " cannot be instantiated", e);
+            getModelDefinition().fatalError("The class " + evaluatorClassName + " cannot be instantiated", e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " cannot be instantiated", e);
+            getModelDefinition().fatalError("The class " + evaluatorClassName + " cannot be instantiated", e);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " cannot be instantiated", e);
+            getModelDefinition().fatalError("The class " + evaluatorClassName + " cannot be instantiated", e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException("The class " + evaluatorClassName + " cannot be instantiated", e);
+            getModelDefinition().fatalError("The class " + evaluatorClassName + " cannot be instantiated", e);
         }
     }
 
