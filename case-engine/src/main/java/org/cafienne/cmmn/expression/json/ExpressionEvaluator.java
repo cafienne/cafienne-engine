@@ -7,9 +7,6 @@
  */
 package org.cafienne.cmmn.expression.json;
 
-import java.time.Duration;
-import java.time.format.DateTimeParseException;
-
 import com.jayway.jsonpath.JsonPathException;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
@@ -21,6 +18,7 @@ import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,18 +57,8 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public Value<?> evaluateOutputParameterTransformation(ModelActor caseInstance, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition, Task<?> task) {
-        return evaluateJSON(caseInstance, value);
-    }
-
-    @Override
-    public Duration evaluateTimerExpression(TimerEvent timerEvent, TimerEventDefinition definition) {
-        // No further context usage right now, just plain string evaluation.
-        try {
-            return Duration.parse(definition.getTimerExpression().getBody().trim());
-        } catch (DateTimeParseException dtpe) {
-            throw new InvalidExpressionException("The timer expression " + definition.getTimerExpression().getBody() + " in " + definition.getName() + " cannot be parsed into a Duration", dtpe);
-        }
+    public Value<?> evaluateOutputParameterTransformation(ProcessTaskActor processTaskActor, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition) {
+        return evaluateJSON(processTaskActor, value);
     }
 
     private Value<?> evaluateJSON(ModelActor caseInstance, Value<?> value) {

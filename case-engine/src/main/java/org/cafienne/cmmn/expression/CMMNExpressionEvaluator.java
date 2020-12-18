@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.expression;
 
-import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
@@ -19,9 +18,11 @@ import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.processtask.instance.ProcessTaskActor;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 
 /**
  * Interface to be implemented by language specific expressions in CMMN. The expression evaluator
@@ -73,7 +74,13 @@ public interface CMMNExpressionEvaluator {
      * @param definition The context of the definition for the expression.
      * @return
      */
-    Duration evaluateTimerExpression(TimerEvent timerEvent, TimerEventDefinition definition) throws InvalidExpressionException;
+    default Duration evaluateTimerExpression(TimerEvent timerEvent, TimerEventDefinition definition) throws InvalidExpressionException {
+        try {
+            return Duration.parse(definition.getTimerExpression().getBody().trim());
+        } catch (DateTimeParseException dtpe) {
+            throw new InvalidExpressionException("The timer expression " + definition.getTimerExpression().getBody() + " in " + definition.getName() + " cannot be parsed into a Duration", dtpe);
+        }
+    }
 
     /**
      * Evaluate the mapping of an input parameter of a Task into the input parameter of a TaskImplementation.
@@ -98,7 +105,7 @@ public interface CMMNExpressionEvaluator {
      */
     Value<?> evaluateOutputParameterTransformation(Case caseInstance, Value<?> rawOutputParameterValue, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetParameterDefinition, Task<?> task) throws InvalidExpressionException;
 
-    default Value<?> evaluateOutputParameterTransformation(ModelActor caseInstance, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition, Task<?> task) {
+    default Value<?> evaluateOutputParameterTransformation(ProcessTaskActor processTaskActor, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition) {
         return Value.NULL;
     }
 
