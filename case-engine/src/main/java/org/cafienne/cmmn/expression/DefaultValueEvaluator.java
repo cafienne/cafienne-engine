@@ -47,15 +47,6 @@ public class DefaultValueEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public Duration evaluateTimerExpression(TimerEvent timerEvent, TimerEventDefinition definition) {
-        try {
-            return Duration.parse(definition.getTimerExpression().getBody().trim());
-        } catch (DateTimeParseException dtpe) {
-            throw new InvalidExpressionException("The timer expression " + definition.getTimerExpression().getBody() + " in " + definition.getName() + " cannot be parsed into a Duration", dtpe);
-        }
-    }
-
-    @Override
     public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
         return defaultValue;
     }
