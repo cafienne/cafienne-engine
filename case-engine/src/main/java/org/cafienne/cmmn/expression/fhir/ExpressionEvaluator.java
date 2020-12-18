@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,15 +8,21 @@
 package org.cafienne.cmmn.expression.fhir;
 
 import com.ibm.fhir.model.format.Format;
+import com.ibm.fhir.model.generator.FHIRGenerator;
+import com.ibm.fhir.model.generator.exception.FHIRGeneratorException;
 import com.ibm.fhir.model.parser.FHIRParser;
 import com.ibm.fhir.model.parser.exception.FHIRParserException;
 import com.ibm.fhir.model.resource.Resource;
+import com.ibm.fhir.model.util.JsonSupport;
+import com.ibm.fhir.model.visitor.Visitable;
 import com.ibm.fhir.path.FHIRPathNode;
 import com.ibm.fhir.path.FHIRPathParser;
+import com.ibm.fhir.path.FHIRPathSystemValue;
 import com.ibm.fhir.path.evaluator.FHIRPathEvaluator;
 import com.ibm.fhir.path.exception.FHIRPathException;
 import com.ibm.fhir.path.util.FHIRPathUtil;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.serialization.json.*;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
@@ -29,7 +35,9 @@ import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.String;
 import java.util.Collection;
 
@@ -55,32 +63,29 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         }
     }
 
-    private Collection<FHIRPathNode> evaluateExpression(Case caseInstance, ConstraintDefinition constraint, String contextDescription) {
-        caseInstance.addDebugInfo(() -> contextDescription +": evaluating the expression " + expressionString);
+    private Collection<FHIRPathNode> evaluateExpression(ModelActor modelInstance, Value context, String contextDescription) {
+        modelInstance.addDebugInfo(() -> contextDescription + ": evaluating the expression " + expressionString);
 
-        FHIRPathEvaluator ev = FHIRPathEvaluator.evaluator();
         try {
-            CaseFileItem item = constraint.resolveContext(caseInstance);
-            String json = item.getValue().toString();
+            String json = context.toString();
             Resource fhirResourceInstance = FHIRParser.parser(Format.JSON).parse(new StringReader(json));
 
             FHIRPathEvaluator.EvaluationContext evaluationContext = new FHIRPathEvaluator.EvaluationContext(fhirResourceInstance);
             Collection<FHIRPathNode> result = FHIRPathEvaluator.evaluator().evaluate(evaluationContext, expressionString);
-            System.out.println("REsult: " + result);
             return result;
         } catch (FHIRPathException e) {
-            caseInstance.addDebugInfo(() -> "Failure in evaluating ifPart with expression "+ expressionString.trim(), e);
+            modelInstance.addDebugInfo(() -> "Failure in evaluating ifPart with expression " + expressionString.trim(), e);
             throw new InvalidExpressionException("Could not evaluate " + expressionString + "\n" + e.getLocalizedMessage(), e);
         } catch (FHIRParserException e) {
-            caseInstance.addDebugInfo(() -> "Failure in evaluating ifPart with expression "+ expressionString.trim(), e);
+            modelInstance.addDebugInfo(() -> "Failure in evaluating ifPart with expression " + expressionString.trim(), e);
             throw new InvalidExpressionException("Could not evaluate " + expressionString + "\n" + e.getLocalizedMessage(), e);
         }
     }
 
 
     private boolean evaluateConstraint(Case caseInstance, ConstraintDefinition constraint, String contextDescription) {
-        Collection<FHIRPathNode> result = evaluateExpression(caseInstance, constraint, contextDescription);
-        System.out.println("FHIRPathUtil.isTrue(result): " + FHIRPathUtil.isTrue(result));
+        CaseFileItem item = constraint.resolveContext(caseInstance);
+        Collection<FHIRPathNode> result = evaluateExpression(caseInstance, item.getValue(), contextDescription);
         return FHIRPathUtil.isTrue(result);
     }
 
@@ -100,18 +105,77 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         return evaluateConstraint(containingPlanItem.getCaseInstance(), ruleDefinition, description);
     }
 
+    private Value<?> evaluateToValueObject(ModelActor actor, Value context, String contextDescription) {
+        Collection<FHIRPathNode> result = evaluateExpression(actor, context, contextDescription);
+        Value v;
+        if (result.size() > 1) {
+            ValueList list = new ValueList();
+            result.forEach(node -> list.add(nodeConverter(node)));
+            v = list;
+        } else {
+            v = nodeConverter(result.stream().findFirst().orElse(null));
+        }
+//
+//        System.out.println("REsult with type " + v.getClass().getSimpleName() + ": " + v);
+
+        return v;
+    }
+
+    private Value nodeConverter(FHIRPathNode node) {
+        if (node == null) {
+            // TODO: figure out how to make this happen. Will expression always result in at least 1 node???
+            System.out.println("Returning a nul node");
+            return Value.NULL;
+        }
+        if (node.isElementNode() || node.isResourceNode()) {
+            if (node.isElementNode()) {
+                System.out.println("Converting element node of type " + node.asElementNode().type());
+            } else {
+                System.out.println("Converting resource node of type " + node.asResourceNode().type());
+            }
+            Visitable v = node.isElementNode() ? node.asElementNode().element() : node.asResourceNode().resource();
+            StringWriter writer = new StringWriter();
+            try {
+                FHIRGenerator.generator(Format.JSON).generate(v, writer);
+                return JSONReader.parse(writer.toString());
+            } catch (FHIRGeneratorException | JSONParseFailure | IOException wePromiseWeWillNotOccurOrOurUnderlyingLibrariesAreReallyMissingThePointOfJson) {
+                wePromiseWeWillNotOccurOrOurUnderlyingLibrariesAreReallyMissingThePointOfJson.printStackTrace();
+            }
+        } else if (node.isSystemValue()) {
+            return convertSystemValue(node.asSystemValue());
+        } else {
+            System.out.println("Cannot (yet) convert nodes of type " + node.getClass().getName());
+        }
+        return Value.NULL;
+    }
+
+    private Value convertSystemValue(FHIRPathSystemValue node) {
+        if (node.isStringValue()) {
+            return new StringValue(node.asStringValue().string());
+        } else if (node.isBooleanValue()) {
+            return new BooleanValue(node.asBooleanValue()._boolean());
+        } else if (node.isNumberValue()) {
+            return new LongValue(node.asNumberValue().integer());
+        } else if (node.isTemporalValue()) {
+            System.out.println("Cannot (yet) convert nodes of type " + node.getClass().getName());
+            node.asTemporalValue().temporal();
+        }
+        System.out.println("Cannot (yet) convert nodes of type " + node.getClass().getName());
+        return Value.NULL;
+    }
+
     @Override
     public Value<?> evaluateInputParameterTransformation(Case caseInstance, TaskInputParameter from, ParameterDefinition to, Task<?> task) {
-        return Value.NULL;
+        return evaluateToValueObject(caseInstance, from.getValue(), "Mapping to task input parameter '" + to.getName() + "'");
     }
 
     @Override
     public Value<?> evaluateOutputParameterTransformation(Case caseInstance, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition, Task<?> task) {
-        return Value.NULL;
+        return evaluateToValueObject(caseInstance, value, "Mapping to task output parameter '" + targetOutputParameterDefinition.getName() + "'");
     }
 
     @Override
     public Value<?> evaluateOutputParameterTransformation(ProcessTaskActor processTaskActor, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition) {
-        return Value.NULL;
+        return evaluateToValueObject(processTaskActor, value, "Mapping to implementation output parameter '" + targetOutputParameterDefinition.getName() + "'");
     }
 }
