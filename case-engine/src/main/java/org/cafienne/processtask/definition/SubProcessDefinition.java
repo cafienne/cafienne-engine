@@ -60,6 +60,8 @@ import org.w3c.dom.Element;
 public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
     private final Collection<SubProcessMapping> mappings = new ArrayList();
+    private final Collection<SubProcessMapping> successMappings = new ArrayList();
+    private final Collection<SubProcessMapping> failureMappings = new ArrayList();
     private final boolean isAsync;
     /**
      * Default exception parameter, can be used to store Throwables.
@@ -71,6 +73,10 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
         super(element, processDefinition, parentElement);
         isAsync = Boolean.parseBoolean(parseAttribute("async", false, "true")); // By default, processes are executed asynchronously
         parse("parameterMapping", SubProcessMapping.class, mappings);
+        successMappings.addAll(mappings);
+        failureMappings.addAll(mappings);
+        parseGrandChildren("success", "parameterMapping", SubProcessMapping.class, successMappings);
+        parseGrandChildren("failure", "parameterMapping", SubProcessMapping.class, failureMappings);
     }
 
     /**
@@ -83,11 +89,22 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
     /**
      * Gets the parameter mappings for the sub-process
+     * that must be executed when the subprocess succesfully completes
      *
      * @return parameter mapping
      */
-    public Collection<SubProcessMapping> getParameterMappings() {
-        return mappings;
+    public Collection<SubProcessMapping> getSuccessMappings() {
+        return successMappings;
+    }
+
+    /**
+     * Gets the parameter mappings for the sub-process
+     * that must be executed upon a failing subprocess
+     *
+     * @return parameter mapping
+     */
+    public Collection<SubProcessMapping> getFailureMappings() {
+        return failureMappings;
     }
 
     /**

@@ -157,6 +157,14 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
     }
 
     /**
+     * Returns true if the mapping has a transformation element with an actual expression in it.
+     * @return
+     */
+    public boolean hasTransformation() {
+        return transformation != null && !transformation.getBody().isBlank();
+    }
+
+    /**
      * Indicates whether this mapping is to be executed before or after the Task is executed. This is determined automagically based on the parameter references. They must either both refer to input
      * parameters or to output parameters. Also, in case the sourceRef and targetRef refer to input parameters this means the mapping is to be executed before the task is executed. If they refer to
      * output parameters, the mapping is executed after the task has been completed.
@@ -191,7 +199,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
      */
     public Value<?> transformOutput(Task<?> task, Value<?> value) {
         Value<?> targetValue = value;
-        if (transformation != null && !transformation.getBody().isEmpty()) {
+        if (this.hasTransformation()) {
             targetValue = transformation.getEvaluator().evaluateOutputParameterTransformation(task.getCaseInstance(), value, source, target, task);
         }
         return targetValue;

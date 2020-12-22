@@ -15,6 +15,7 @@ import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.parameter.TaskOutputParameter;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
@@ -196,9 +197,26 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
             if (!mapping.isInputParameterMapping()) {
                 String rawOutputParameterName = mapping.getSource().getName();
                 String taskOutputParameterName = mapping.getTarget().getName();
-                Value<?> rawValue = implementationOutput.get(rawOutputParameterName);
-                Value<?> taskOutputParameterValue = mapping.transformOutput(this, rawValue);
-                newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
+                // If the raw output parameter is missing, it makes no sense to execute a mapping
+                //  This is typically the case for e.g. failing process tasks
+                //  Note that there is an exception for mappings that have a "static" expression, i.e.,
+                //  an expression that does not rely on the raw output parameter.
+                if (implementationOutput.has(rawOutputParameterName)) {
+                    Value<?> rawValue = implementationOutput.get(rawOutputParameterName);
+                    Value<?> taskOutputParameterValue = mapping.transformOutput(this, rawValue);
+                    newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
+                } else if (mapping.hasTransformation()) {
+                    // If the raw output parameter is missing, but a transformation is defined,
+                    //  let's try to execute the transformation with a null value.
+                    // If a null value is returned, then we should not create a new output parameter.
+                    // However, for "static" expressions, e.g. that return a task.name or case.id without needing a value,
+                    // an outcome different than Value.NULL may come. In such cases, we will also create the output
+                    // parameter with that new value.
+                    Value<?> taskOutputParameterValue = mapping.transformOutput(this, Value.NULL);
+                    if (! Value.NULL.equals(taskOutputParameterValue)) {
+                        newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
+                    }
+                }
             }
         }
 
@@ -253,15 +271,11 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     public void updateState(TaskOutputFilled event) {
         this.implementationOutput = event.getRawOutputParameters();
         this.taskOutput = event.getTaskOutputParameters();
-
-        Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
-        for (ParameterMappingDefinition mapping : mappings) {
-            if (!mapping.isInputParameterMapping()) {
-                String taskOutputParameterName = mapping.getTarget().getName();
-                Value<?> taskOutputParameterValue = taskOutput.get(taskOutputParameterName);
-                TaskOutputParameter outputParameter = new TaskOutputParameter(mapping.getTarget(), getCaseInstance(), taskOutputParameterValue);
-                outputParameter.bind();
-            }
-        }
+        this.taskOutput.getValue().forEach((name, value) -> {
+            // Note, this code assumes all task output keys have a correspondingly defined parameter.
+            ParameterDefinition definition = getDefinition().getOutputParameters().get(name);
+            TaskOutputParameter outputParameter = new TaskOutputParameter(definition, getCaseInstance(), value);
+            outputParameter.bind();
+        });
     }
 }
