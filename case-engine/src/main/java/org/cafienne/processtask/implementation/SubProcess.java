@@ -44,13 +44,23 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
     }
 
     protected final void raiseComplete() {
-        transformRawParametersToProcessOutputParameters();
+        transformRawParametersToProcessOutputParameters(definition.getSuccessMappings());
         processTaskActor.completed(processOutputParameters);
     }
 
     protected final void raiseFault(String description) {
-        transformRawParametersToProcessOutputParameters();
+        transformRawParametersToProcessOutputParameters(definition.getFailureMappings());
         processTaskActor.failed(description, processOutputParameters);
+    }
+
+    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessMapping> mappings) {
+        processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
+        for (SubProcessMapping mapping : mappings) {
+            String outputParameterName = mapping.getTarget().getName();
+            processTaskActor.addDebugInfo(() -> "Mapping " + mapping.getSource().getName() +" to " + mapping.getTarget().getName());
+            Value<?> outputParameterValue = mapping.transformOutput(processTaskActor, rawOutputParameters);
+            setProcessOutputParameter(outputParameterName, outputParameterValue);
+        }
     }
 
     /**
@@ -111,18 +121,6 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         return processOutputParameters;
     }
     
-    private void transformRawParametersToProcessOutputParameters() {
-        // TODO: this code belongs in the custom Process implementations, they only should provide the process output
-        Collection<SubProcessMapping> mappings = definition.getParameterMappings();
-        processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
-        for (SubProcessMapping mapping : mappings) {
-            String outputParameterName = mapping.getTarget().getName();
-            processTaskActor.addDebugInfo(() -> "Mapping " + mapping.getSource().getName() +" to " + mapping.getTarget().getName());
-            Value<?> outputParameterValue = mapping.transformOutput(processTaskActor, rawOutputParameters);
-            setProcessOutputParameter(outputParameterName, outputParameterValue);
-        }
-    }
-
     /**
      * Start is invoked when the Task has become {@link State#Active}, either through {@link Transition#Start} or {@link Transition#ManualStart}
      */
