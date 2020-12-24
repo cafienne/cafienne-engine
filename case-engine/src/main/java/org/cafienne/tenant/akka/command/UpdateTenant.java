@@ -28,10 +28,7 @@ public class UpdateTenant extends TenantCommand {
     public UpdateTenant(ValueMap json) {
         super(json);
         this.users = new ArrayList();
-        json.withArray(Fields.users).forEach(value -> {
-            ValueMap ownerJson = (ValueMap) value;
-            this.users.add(TenantUserInformation.from(ownerJson));
-        });
+        json.withArray(Fields.users).forEach(user -> this.users.add(TenantUserInformation.from(user.asMap())));
     }
 
     @Override

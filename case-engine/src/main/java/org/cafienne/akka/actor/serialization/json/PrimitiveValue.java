@@ -42,7 +42,7 @@ public abstract class PrimitiveValue<T> extends Value<T> {
     }
 
     @Override
-    public Value<?> merge(Value<?> withValue) {
+    public <T extends Value> T merge(T withValue) {
         // Primitives cannot merge, so we always return the other value; it simply overwrites our value.
         return withValue;
     }

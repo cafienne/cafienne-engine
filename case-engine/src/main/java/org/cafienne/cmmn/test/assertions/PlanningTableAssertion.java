@@ -20,10 +20,7 @@ public class PlanningTableAssertion extends ModelTestCommandAssertion {
     public PlanningTableAssertion(CaseAssertion response) {
         super(response.getTestCommand());
         this.response = response.getTestCommand().getActualResponse();
-        this.response.getItems().withArray("discretionaryItems").forEach(value -> {
-            ValueMap item = (ValueMap) value;
-            discretionaries.add(new DiscretionaryItemAssertion(response.getTestCommand(), item));
-        });
+        this.response.getItems().withArray("discretionaryItems").forEach(value -> discretionaries.add(new DiscretionaryItemAssertion(response.getTestCommand(), value.asMap())));
     }
 
     @Override

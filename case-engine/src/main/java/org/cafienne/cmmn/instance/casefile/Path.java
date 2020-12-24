@@ -228,7 +228,7 @@ public class Path implements Serializable {
         } else {
             ValueMap myMap = new ValueMap();
             if (myValue.isMap()) {
-                myMap = (ValueMap) myValue;
+                myMap = myValue.asMap();
             } else {
                 // This replaces the old value with a new Map.
                 parent.put(name, myMap);

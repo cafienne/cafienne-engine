@@ -203,15 +203,35 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      */
     public ValueMap with(String fieldName) {
         Value<?> v = value.get(fieldName);
-        if (! (v instanceof ValueMap)) {
+        if (!(v instanceof ValueMap)) {
             v = new ValueMap();
             value.put(fieldName, v);
         }
-        return (ValueMap) v;
+        return v.asMap();
     }
 
     public ValueMap with(Fields fieldName) {
         return with(fieldName.toString());
+    }
+
+    /**
+     * Similar to {@link #with(String)} method, except that it now works for array objects: if a field with the specified name is
+     * not found or it is not an array, then it will be replaced with an empty array.
+     *
+     * @param fieldName
+     * @return
+     */
+    public ValueList withArray(String fieldName) {
+        Value<?> v = value.get(fieldName);
+        if (!(v instanceof ValueList)) {
+            v = new ValueList();
+            value.put(fieldName, v);
+        }
+        return v.asList();
+    }
+
+    public ValueList withArray(Fields fieldName) {
+        return withArray(fieldName.toString());
     }
 
     /**
@@ -295,26 +315,6 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
     }
 
-    /**
-     * Similar to {@link #with(String)} method, except that it now works for array objects: if a field with the specified name is
-     * not found or it is not an array, then it will be replaced with an empty array.
-     *
-     * @param fieldName
-     * @return
-     */
-    public ValueList withArray(String fieldName) {
-        Value<?> v = value.get(fieldName);
-        if (!(v instanceof ValueList)) {
-            v = new ValueList();
-            value.put(fieldName, v);
-        }
-        return (ValueList) v;
-    }
-
-    public ValueList withArray(Fields fieldName) {
-        return withArray(fieldName.toString());
-    }
-
     @Override
     public boolean canRead(String propertyName) {
         // Initially this code was delegating to owner if available, but spec says we should always return "something"
@@ -355,12 +355,11 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     @Override
-    public Value<?> merge(Value<?> withValue) {
-        if (!(withValue instanceof ValueMap)) {
+    public <T extends Value> T merge(T withValue) {
+        if (!(withValue.isMap())) {
             return withValue;
         }
-        ValueMap fromObject = (ValueMap) withValue;
-        fromObject.value.forEach((fieldName, fromFieldValue) -> {
+        withValue.asMap().value.forEach((fieldName, fromFieldValue) -> {
             Value<?> myFieldValue = this.value.get(fieldName);
             // If we have a value, we ought to merge the other value into it.
             if (myFieldValue != null) {
@@ -369,6 +368,6 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
             // And now overwrite our value
             this.value.put(fieldName, fromFieldValue);
         });
-        return this;
+        return (T) this;
     }
 }

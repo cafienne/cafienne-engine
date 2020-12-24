@@ -45,7 +45,7 @@ public class BasicTypes {
 
     private ValueMap getContents(ValueMap... inputs) {
         if (inputs.length > 0) {
-            return (ValueMap) inputs[0].get(inputParameterName);
+            return inputs[0].get(inputParameterName).asMap();
         }
         ValueMap contents = new ValueMap();
         // Put some contents in the input parameter
@@ -185,7 +185,7 @@ public class BasicTypes {
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
-        final ValueMap expectedChildContent = (ValueMap) childItemClone.merge(updatedContent);
+        final ValueMap expectedChildContent = childItemClone.merge(updatedContent).asMap();
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(expectedChildContent));
@@ -288,7 +288,7 @@ public class BasicTypes {
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
-        final ValueMap expectedChildContent = (ValueMap) childItemClone.merge(updatedContent);
+        final ValueMap expectedChildContent = childItemClone.merge(updatedContent);
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), child0);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(expectedChildContent));
@@ -348,7 +348,7 @@ public class BasicTypes {
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
-        final ValueMap expectedChildContent = (ValueMap) childItemClone.merge(updatedContent);
+        final ValueMap expectedChildContent = childItemClone.merge(updatedContent);
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), child0);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(expectedChildContent));

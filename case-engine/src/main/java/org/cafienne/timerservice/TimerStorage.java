@@ -23,7 +23,7 @@ public class TimerStorage implements ModelActorSnapshot {
     }
 
     public TimerStorage(ValueMap json) {
-        json.withArray(Fields.timers).forEach(value -> addTimer(new TimerJob((ValueMap) value)));
+        json.withArray(Fields.timers).forEach(value -> addTimer(new TimerJob(value.asMap())));
     }
 
     Collection<TimerJob> getTimers() {

@@ -100,8 +100,8 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
             Value<?> output = Value.convert(result); // Typically a ValueMap or a ValueList
             // JsonPath returns single element results sometimes in an array; then we'll return that value instead.
             if (output.isList()) {
-                if (((ValueList) output).size() == 1) {
-                    output = ((ValueList) output).get(0);
+                if (output.asList().size() == 1) {
+                    output = output.asList().get(0);
                     String outputClassName = output.getClass().getSimpleName();
                     caseInstance.addDebugInfo(() -> "Resulting array structure has only one element; returning element instead of array. Element has type " + outputClassName);
                 }
