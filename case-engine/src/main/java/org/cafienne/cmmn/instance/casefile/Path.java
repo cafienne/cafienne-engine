@@ -367,7 +367,7 @@ public class Path implements Serializable {
      * @return
      */
     public boolean hasChild(Path otherPath) {
-        if (this.depth > otherPath.depth) {
+        if (this.depth >= otherPath.depth) {
             return false;
         }
         while (otherPath.depth > this.depth) {
