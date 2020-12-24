@@ -214,50 +214,72 @@ public class Path implements Serializable {
         return item;
     }
 
-    public Value resolve(ValueMap casefile) {
-        if (isEmpty()) {
+    /**
+     * Returns the parent map of this path from the case file json object
+     * If the path does not yet exist inside the case file, it will be created.
+     * Array elements inside the case file that do not have values and are not part of the path will get a null value.
+     * E.g., for a path /root/child-array[3]/item/element, this method will resolve to a ValueMap for /item/
+     * If child-array does not yet exist in the case file, then the json structure will look like:
+     * root: {
+     *     child-array:[ null, null, null, {
+     *          // this is the json object representing the item
+     *     }]
+     * }
+     *
+     * Also, suppose the case file passed contains a structure like
+     * root: {
+     *     child-array:[ null, null, null, "SOME-STRING-VALUE"]
+     * }
+     * Then the 4th (string) object in the child-array will be replaced with a new ValueMap (i.e., an empty json object)
+     *
+     * Note: this method is invoked currently only from CaseFileMerger, so in practice, the child-array will have values.
+     *
+     * @param casefile
+     * @return
+     */
+    public ValueMap resolveParent(ValueMap casefile) {
+        Path parentPath = getParent();
+        if (parentPath.isEmpty()) {
             return casefile;
         }
-        return root.travel(casefile);
+        return parentPath.root.travel(casefile);
     }
 
-    private Value travel(ValueMap parent) {
-        Value myValue = getCurrentValue(parent);
+    private ValueMap travel(ValueMap parent) {
+        ValueMap myValue = getCurrentValue(parent);
         if (child == null) {
             return myValue;
         } else {
-            ValueMap myMap = new ValueMap();
-            if (myValue.isMap()) {
-                myMap = (ValueMap) myValue;
-            } else {
-                // This replaces the old value with a new Map.
-                parent.put(name, myMap);
-            }
-            return child.travel(myMap);
+            return child.travel(myValue);
         }
     }
 
-    private Value getCurrentValue(ValueMap parent) {
+    private ValueMap getCurrentValue(ValueMap parent) {
         if (this.isArrayElement()) {
             ValueList list = parent.withArray(this.name);
             if (list.size() > this.index) {
-                return list.get(this.index);
+                Value value = list.get(this.index);
+                if (value.isMap()) {
+                    return value.asMap();
+                } else {
+                    /// That's really weird! Let's replace the value with a map
+                    ValueMap replacement = new ValueMap();
+                    list.set(this.index, replacement);
+                    return replacement;
+                }
             } else {
                 // Now what? Let's increase list to proper size with NULL values ...
                 for (int i = list.size(); i < this.index; i++) {
                     list.add(Value.NULL);
                 }
                 // ... but the last one as a ValueMap, so that we can fill it
-                Value<?> value = new ValueMap();
+                ValueMap value = new ValueMap();
                 list.add(value);
                 return value;
             }
         } else {
-            if (parent.has(this.name)) {
-                return parent.get(this.name);
-            } else {
-                return parent.with(this.name);
-            }
+            // Note: this will replace an existing non-map element in our parent with a new ValueMap.
+            return parent.with(this.name);
         }
     }
 
@@ -345,7 +367,7 @@ public class Path implements Serializable {
      * @return
      */
     public boolean hasChild(Path otherPath) {
-        if (this.depth > otherPath.depth) {
+        if (this.depth >= otherPath.depth) {
             return false;
         }
         while (otherPath.depth > this.depth) {

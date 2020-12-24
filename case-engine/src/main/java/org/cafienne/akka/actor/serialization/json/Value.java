@@ -137,8 +137,16 @@ public abstract class Value<T> implements Serializable {
         return false;
     }
 
+    public ValueList asList() {
+        return (ValueList) this;
+    }
+
     public boolean isMap() {
         return false;
+    }
+
+    public ValueMap asMap() {
+        return (ValueMap) this;
     }
 
     public void print(JsonGenerator generator) throws IOException {
@@ -164,7 +172,7 @@ public abstract class Value<T> implements Serializable {
      *
      * @param withValue - Value to be merged into this
      */
-    public abstract Value<?> merge(Value<?> withValue);
+    public abstract <T extends Value> T merge(T withValue);
 
     /**
      * Converts a (possibly not-Serializable) value to something that can be serialized.

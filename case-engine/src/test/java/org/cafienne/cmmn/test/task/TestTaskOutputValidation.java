@@ -105,12 +105,11 @@ public class TestTaskOutputValidation {
              */
             testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
-                Object object = taskAssertion.getValidationResponse().value();
-                if (!(object instanceof ValueMap)) {
-                    throw new AssertionError("Expecting a ValueMap response from Task Validation, but received something of type " + object.getClass().getName());
+                Value jsonResponse = taskAssertion.getValidationResponse().value();
+                if (!(jsonResponse.isMap())) {
+                    throw new AssertionError("Expecting a ValueMap response from Task Validation, but received something of type " + jsonResponse.getClass().getName());
                 }
-                ValueMap jsonResponse = (ValueMap) object;
-                if (!jsonResponse.equals(invalidDecisionResponse)) {
+                if (!jsonResponse.asMap().equals(invalidDecisionResponse)) {
                     TestScript.debugMessage("Would expect an OK Status in\n" + jsonResponse);
                     throw new AssertionError("Would expect a OK here");
                 }
@@ -127,11 +126,10 @@ public class TestTaskOutputValidation {
              */
             testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
-                Object object = taskAssertion.getValidationResponse().value();
-                if (!(object instanceof ValueMap)) {
-                    throw new AssertionError("Expecting a ValueMap response from Task Validation, but received something of type " + object.getClass().getName());
+                Value jsonResponse = taskAssertion.getValidationResponse().value();
+                if (!(jsonResponse.isMap())) {
+                    throw new AssertionError("Expecting a ValueMap response from Task Validation, but received something of type " + jsonResponse.getClass().getName());
                 }
-                ValueMap jsonResponse = (ValueMap) object;
                 if (!jsonResponse.equals(validDecisionResponse)) {
                     TestScript.debugMessage("Would expect a OK Status in\n" + jsonResponse);
                     throw new AssertionError("Would expect a OK here");

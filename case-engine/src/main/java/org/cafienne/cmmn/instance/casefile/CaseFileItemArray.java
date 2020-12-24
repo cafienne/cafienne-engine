@@ -121,7 +121,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     @Override
     public void createContent(Value<?> newContent) {
-        ValueList valueList = newContent.isList() ? (ValueList) newContent : new ValueList(newContent);
+        ValueList valueList = newContent.isList() ? newContent.asList() : new ValueList(newContent);
         for (Value<?> newChildValue : valueList) {
             createNewItem(newChildValue);
         }
@@ -139,7 +139,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             }
             return;
         }
-        ValueList valueList = (ValueList) newContent;
+        ValueList valueList = newContent.asList();
         int numberToUpdate = valueList.size();
         for (int i = 0; i<numberToUpdate; i++) {
             Value<?> newChildValue = valueList.get(i);
@@ -164,7 +164,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
             }
             return;
         }
-        ValueList valueList = (ValueList) newContent;
+        ValueList valueList = newContent.asList();
         int numberToReplace = valueList.size();
         int numberToRemove = actualArrayItems.size() - numberToReplace;
         for (int i = 0; i<numberToReplace; i++) {

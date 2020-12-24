@@ -38,14 +38,13 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
     }
 
     private ValueMap validateValueMap(Value<?> newContent) {
-        if (newContent instanceof ValueMap) {
-            ValueMap items = (ValueMap) newContent;
-            items.fieldNames().forEachRemaining(name -> {
+        if (newContent.isMap()) {
+            newContent.asMap().fieldNames().forEachRemaining(name -> {
                 if (getItem(name) == null) {
                     throw new InvalidCommandException("A case file item with name '" + name + "' is not defined");
                 }
             });
-            return (ValueMap) newContent;
+            return newContent.asMap();
         }
         throw new InvalidCommandException("Operations on entire case file need a JSON object structure");
     }

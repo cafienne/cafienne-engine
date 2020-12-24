@@ -216,7 +216,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     private void addCaseFileEvent(CaseFileEvent event) {
         if (event.getValue().isMap()) {
-            this.businessIdentifiers.values().forEach(bi -> bi.update((ValueMap) event.getValue()));
+            this.businessIdentifiers.values().forEach(bi -> bi.update(event.getValue().asMap()));
         }
         super.addEvent(event);
     }
@@ -256,8 +256,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         generateContentWarnings(newContent, "Create");
         addCaseFileEvent(new CaseFileItemCreated(this, newContent));
         if (newContent.isMap()) {
-            ValueMap map = (ValueMap) newContent;
-            map.getValue().forEach((name, newChildValue) -> {
+            newContent.asMap().getValue().forEach((name, newChildValue) -> {
                 CaseFileItem child = getItem(name);
                 if (child != null) {
                     child.createContent(newChildValue.cloneValueNode());
@@ -284,7 +283,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 }
             });
         } else if (newContent.isMap()) {
-            ValueMap map = (ValueMap) newContent;
+            ValueMap map = newContent.asMap();
             // Replace new content found in the map
             getDefinition().getChildren().forEach(childDefinition -> {
                 String childName = childDefinition.getName();
@@ -308,7 +307,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         addDebugInfo(() -> {
             if (newContent.isMap()) {
                 // Filter properties that are not defined
-                List<String> undefinedProperties = ((ValueMap) newContent).getValue().keySet().stream().filter(this::isUndefined).collect(Collectors.toList());
+                List<String> undefinedProperties = newContent.asMap().getValue().keySet().stream().filter(this::isUndefined).collect(Collectors.toList());
                 if (undefinedProperties.size() == 1) {
                     return op + " on CaseFileItem[" + getPath() + "] contains undefined property '" + undefinedProperties.get(0) + "'";
                 } else if (undefinedProperties.size() > 1) {
@@ -363,8 +362,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             return;
         }
 
-        ValueMap newMap = (ValueMap) newContent;
-        ValueMap ourMap = (ValueMap) value;
+        ValueMap newMap = newContent.asMap();
+        ValueMap ourMap = value.asMap();
 
         // Now iterate our children and check if the newContent has values for them as well, and if
         //  they are changed, then we will first update those children.
@@ -468,7 +467,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             } else if (parent.value.isMap()) {
                 // Check whether we need to change our value in the parent. E.g. for arrays, if a new item is added
                 //  to the array, the value in the parent will not change (it is same ValueList - with new item)
-                ValueMap parentMap = (ValueMap) parent.value;
+                ValueMap parentMap = parent.value.asMap();
                 if (parentMap.get(childName) != childValue) {
                     // Ah. We have a real new value. Let's update it in our parent
                     parentMap.put(childName, childValue);

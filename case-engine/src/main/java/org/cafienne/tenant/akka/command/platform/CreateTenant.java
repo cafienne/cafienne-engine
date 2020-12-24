@@ -35,7 +35,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         super(json);
         this.name = readField(json, Fields.name);
         this.users = new ArrayList();
-        json.withArray(Fields.users).forEach(value -> this.users.add(TenantUserInformation.from((ValueMap)value)));
+        json.withArray(Fields.users).forEach(user -> this.users.add(TenantUserInformation.from(user.asMap())));
     }
 
     @Override

@@ -14,7 +14,6 @@ public class JSONType extends DefinitionType {
     @Override
     public void validate(CaseFileItemDefinition itemDefinition, Value value, boolean onlyProperties) throws CaseFileError {
         if (value.isMap()) {
-            final ValueMap object = (ValueMap) value;
             Map<String, PropertyDefinition> properties = itemDefinition.getCaseFileItemDefinition().getProperties();
             if (properties.isEmpty()) {
                 // Simply allow to dump the contents and don't do any further validation.
@@ -22,7 +21,7 @@ public class JSONType extends DefinitionType {
             }
 
             // Now iterate the object fields and validate each item.
-            object.getValue().forEach((fieldName, fieldValue) -> {
+            value.asMap().getValue().forEach((fieldName, fieldValue) -> {
 
                 // First check to see if it matches one of the properties,
                 // and if not, go check for a child item.

@@ -100,7 +100,7 @@ public class NewCaseFileTest {
         childItem.putRaw("ChildName", "First name update");
         childItem.putRaw("ChildAge", 33);
         ValueList grandChildArray = childItem.withArray("GrandChildArray");
-        ValueMap firstGrandChildFromArray = (ValueMap) grandChildArray.get(0);
+        ValueMap firstGrandChildFromArray = grandChildArray.get(0).asMap();
         firstGrandChildFromArray.putRaw("GrandChildName", "Second name update");
 
         testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, updateDeeperProperty, rootPath), result -> {

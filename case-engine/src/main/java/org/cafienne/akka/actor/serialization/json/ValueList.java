@@ -50,7 +50,7 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
         if (otherValue == null || !otherValue.isList()) {
             return false;
         }
-        ValueList otherList = (ValueList) otherValue;
+        ValueList otherList = otherValue.asList();
         // Compare sizes
         if (otherList.size() > this.size()) {
             return false;
@@ -227,11 +227,11 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
     }
 
     @Override
-    public Value<?> merge(Value<?> withValue) {
-        if (! (withValue instanceof ValueList)) {
+    public <T extends Value> T merge(T withValue) {
+        if (! (withValue.isList())) {
             return withValue;
         }
-        ValueList fromList = (ValueList) withValue;
+        ValueList fromList = withValue.asList();
         for (int i = 0; i < fromList.size(); i++) {
             Value fromValue = fromList.get(i);
             if (i < this.size()) {
@@ -242,6 +242,6 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
                 this.add(fromValue);
             }
         }
-        return this;
+        return (T) this;
     }
 }

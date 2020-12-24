@@ -9,11 +9,12 @@ object CaseFileMerger extends LazyLogging {
 
   def merge(event: CaseFileEvent, currentCaseFile: ValueMap): Unit = {
     val path: Path = event.getPath
+    val parentValue = path.resolveParent(currentCaseFile)
+    val itemName = path.getName
+    val itemValue = event.getValue
     if (path.isArrayElement) {
-      val parentValue = path.getParent.resolve(currentCaseFile).asInstanceOf[ValueMap]
-      val arrayValue = parentValue.withArray(path.getName)
+      val arrayValue = parentValue.withArray(itemName)
       val itemIndex = path.index
-      val itemValue = event.getValue
       event.getTransition match { // Matching on transition instead of event class, because classes only introduced in 1.1.9
         case CaseFileItemTransition.Delete => arrayValue.getValue.remove(event.getIndex)
         case CaseFileItemTransition.Replace => arrayValue.set(itemIndex, itemValue)
@@ -28,9 +29,6 @@ object CaseFileMerger extends LazyLogging {
         }
       }
     } else {
-      val parentValue = path.getParent.resolve(currentCaseFile).asInstanceOf[ValueMap]
-      val itemName = path.getName
-      val itemValue = event.getValue
       event.getTransition match { // Matching on transition instead of event class, because classes only introduced in 1.1.9
         case CaseFileItemTransition.Delete => parentValue.getValue.remove(itemName)
         case CaseFileItemTransition.Replace => parentValue.put(itemName, itemValue)
