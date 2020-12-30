@@ -1,4 +1,4 @@
-<case id="expression/spelexpressions.case" name="SpelExpressions" guid="_p61kw">
+<case id="expression/spelexpressions.case" name="SpelExpressions" expressionLanguage="spel" guid="_p61kw">
     <caseFileModel>
         <caseFileItem id="cfi_csdZm_0" name="Content" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
         <caseFileItem id="cfi_csY4k_2" name="Output" multiplicity="ZeroOrMore" definitionRef="root.cfid"/>
@@ -15,7 +15,7 @@
             <exitCriterion id="_p61kw_0" name="ExitCriterion_0" sentryRef="cm_csd7G_39"/>
             <itemControl>
                 <repetitionRule id="cm_csdZm_17_repetitionRule" contextRef="cfi_csY4k_2">
-                    <condition language="spel">
+                    <condition>
                         <body>
                             <![CDATA[planItem.index < 2]]>
                         </body>
@@ -29,7 +29,7 @@
             <entryCriterion id="_p61kw_3" name="EntryCriterion_2" sentryRef="cm_cs9mu_47"/>
             <itemControl>
                 <repetitionRule id="cm_csd7G_38_repetitionRule">
-                    <condition language="spel">
+                    <condition>
                         <body>
                             <![CDATA[true]]>
                         </body>
@@ -44,7 +44,7 @@
         </sentry>
         <sentry id="cm_csd7G_40">
             <ifPart contextRef="cfi_csdZm_0">
-                <condition language="spel">
+                <condition>
                     <body>
                         <![CDATA[Content != "basic"]]>
                     </body>
@@ -56,9 +56,9 @@
         </sentry>
         <sentry id="cm_csvwt_46">
             <ifPart contextRef="cfi_csY4k_2">
-                <condition language="spel">
+                <condition>
                     <body>
-                        <![CDATA[caseInstance.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
+                        <![CDATA[case.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
                     </body>
                 </condition>
             </ifPart>
@@ -68,7 +68,7 @@
         </sentry>
         <sentry id="cm_cs9mu_47">
             <ifPart contextRef="cfi_cstko_5">
-                <condition language="spel">
+                <condition>
                     <body>
                         <![CDATA[caseFileItem.current.index > 2]]>
                     </body>
@@ -88,36 +88,36 @@
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="expression/spelexpressionstask.humantask">
                     <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
                     <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
-                    <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
-                        <transformation language="spel">
+                    <parameterMapping id="outPM_cm_csTql_4_1" targetRef="outTP_cm_csTql_4_4" sourceRef="">
+                        <transformation>
                             <body>
                                 <![CDATA[task.name]]>
                             </body>
                         </transformation>
                     </parameterMapping>
-                    <parameterMapping id="outPM_cm_csTql_4_2" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_5">
-                        <transformation language="spel">
-                            <body>
-                                <![CDATA[caseInstance.id]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
                     <parameterMapping id="outPM_cm_cstko_4_3" sourceRef="_x59I_SpecialOutput" targetRef="outTP_cm_cstko_4_3">
-                        <transformation language="spel">
+                        <transformation>
                             <body>
                                 <![CDATA[SpecialOutput.Multi]]>
                             </body>
                         </transformation>
                     </parameterMapping>
+                    <parameterMapping id="outPM_cm_csTql_4_2" targetRef="outTP_cm_csTql_4_5" sourceRef="">
+                        <transformation>
+                            <body>
+                                <![CDATA[case.id]]>
+                            </body>
+                        </transformation>
+                    </parameterMapping>
                     <assignment id="_p61kw_5">
-                        <condition id="_p61kw_6" language="spel">
+                        <condition id="_p61kw_6">
                             <body>
                                 <![CDATA[user.id]]>
                             </body>
                         </condition>
                     </assignment>
                     <duedate id="_p61kw_7">
-                        <condition id="_p61kw_8" language="spel">
+                        <condition id="_p61kw_8">
                             <body>
                                 <![CDATA[T(java.time.Instant).now()]]>
                             </body>
@@ -129,6 +129,30 @@
         <milestone id="pid_cm_csd7G_38" name="Milestone"/>
     </casePlanModel>
     <input id="csdZm_inCPs_0" name="InputContent" bindingRef="cfi_csdZm_0"/>
+    <textAnnotation id="cm_csdZm_19">
+        <text>
+            <![CDATA[This case shows various SPEL
+expressions that can be used]]>
+        </text>
+    </textAnnotation>
+    <textAnnotation id="cm_csvwt_44">
+        <text>
+            <![CDATA[Repetition Rule in HumanTask refers to 'context', which is the associated case file item.
+It takes the index to determine that there are not more than 3 outputs.
+
+
+Human Task input just wires the Content from the case file.
+The output of the task is put back into 'Output' case file item, but it is extended with two parameters
+referencing task.name and case.id
+Furthermore there can be an output of type "SpecialOutput" which is put in the "Multi" caseFileItem.
+
+The Milestone has various entry criteria with ifPart expressions, it responds to either:
+- Content!="basic"
+- Output=="stop now"
+- more than 2 plan items HumanTask
+- more than 2 occurences of Multi]]>
+        </text>
+    </textAnnotation>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{
