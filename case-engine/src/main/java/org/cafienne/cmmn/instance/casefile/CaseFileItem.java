@@ -18,8 +18,6 @@ import org.cafienne.cmmn.definition.parameter.BindingOperation;
 import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.util.*;
@@ -163,7 +161,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param p
      * @param parameterValue
      */
-    public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
+    public void bindParameter(Parameter<?> p, Value<?> parameterValue, Task task) {
         getDefinition().validatePropertyTypes(parameterValue);
         // Spec says (table 5.3.4, page 36): just trigger the proper transition, as that will be obvious. But is it?
         //  We have implemented specific type of BindingRefinement to make more predictable what to do
@@ -184,7 +182,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 BindingRefinementDefinition refinement = p.getDefinition().getBindingRefinement();
                 BindingOperation operation = refinement != null ? refinement.getRefinementOperation() : this.defaultBindingOperation;
                 addDebugInfo(() -> {
-                    if (refinement == null) {
+                    if (refinement == null || operation == BindingOperation.None) {
                         return "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] is done with default operation " + operation;
                     } else {
                         return "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] is done with operation " + operation;
@@ -207,6 +205,24 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                     }
                     case Update: {
                         updateContent(parameterValue);
+                        break;
+                    }
+                    case ReplaceIndexed: {
+                        if (this.isArray()) {
+                            this.getArrayElement(task.getRepeatIndex()).replaceContent(parameterValue);
+                        } else {
+                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; updating content instead");
+                            replaceContent(parameterValue);
+                        }
+                        break;
+                    }
+                    case UpdateIndexed: {
+                        if (this.isArray()) {
+                            this.getArrayElement(task.getRepeatIndex()).updateContent(parameterValue);
+                        } else {
+                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; updating content instead");
+                            updateContent(parameterValue);
+                        }
                         break;
                     }
                 }

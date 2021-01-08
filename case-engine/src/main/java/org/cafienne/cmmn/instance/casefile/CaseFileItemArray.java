@@ -48,7 +48,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     }
 
     @Override
-    protected CaseFileItem getItem(int index) {
+    public CaseFileItem getArrayElement(int index) {
         if (index < 0 || index >= actualArrayItems.size()) {
 
             // Special case here. If recovery is running, then this code is being invoked from CaseFileEvent.recover()
@@ -223,7 +223,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
     public CaseFileItem getCurrent() {
         // Override from CaseFileItem.current(); returns the most recently changed case file item.
         if (current == null) {
-            current = getItem(-1); // Get -1 will return EmptyCaseFileItem
+            current = getArrayElement(-1); // Get -1 will return EmptyCaseFileItem
         }
         return current;
     }

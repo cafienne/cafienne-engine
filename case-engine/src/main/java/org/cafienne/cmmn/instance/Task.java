@@ -134,13 +134,13 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
 
     protected void transformInputParameters() {
         ValueMap mappedInputParameters = new ValueMap();
-        ValueMap taskInputParameters = new ValueMap();
+        ValueMap inputParametersValues = new ValueMap();
 
         Map<String, TaskInputParameter> inputParameters = new LinkedHashMap();
         getDefinition().getInputParameters().forEach((name, inputParameterDefinition) -> {
-            TaskInputParameter inputParameter = new TaskInputParameter(inputParameterDefinition, getCaseInstance());
+            TaskInputParameter inputParameter = new TaskInputParameter(inputParameterDefinition, this);
             inputParameters.put(name, inputParameter);
-            taskInputParameters.put(name, inputParameter.getValue());
+            inputParametersValues.put(name, inputParameter.getValue());
         });
 
         final Collection<ParameterMappingDefinition> mappings = this.getDefinition().getParameterMappings();
@@ -153,7 +153,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
             }
         }
 
-        addEvent(new TaskInputFilled(this, taskInputParameters, mappedInputParameters));
+        addEvent(new TaskInputFilled(this, inputParametersValues, mappedInputParameters));
     }
 
     /**
@@ -274,7 +274,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         this.taskOutput.getValue().forEach((name, value) -> {
             // Note, this code assumes all task output keys have a correspondingly defined parameter.
             ParameterDefinition definition = getDefinition().getOutputParameters().get(name);
-            TaskOutputParameter outputParameter = new TaskOutputParameter(definition, getCaseInstance(), value);
+            TaskOutputParameter outputParameter = new TaskOutputParameter(definition, this, value);
             outputParameter.bind();
         });
     }

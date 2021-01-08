@@ -325,7 +325,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         inputParameters.getValue().forEach((name, externalParameter) -> {
             InputParameterDefinition inputParameterDefinition = definition.getInputParameters().get(name);
             CaseInputParameter parameter = new CaseInputParameter(inputParameterDefinition, this, externalParameter);
-            parameter.bindParameterToCaseFile();
+            parameter.bindParameterToCaseFile(null);
         });
     }
 
