@@ -1,4 +1,4 @@
-<case id="expression/spelexpressions2.case" name="SpelExpressions" guid="_lRFiK">
+<case id="expression/spelexpressions2.case" name="SpelExpressions" expressionLanguage="spel" guid="_lRFiK">
     <caseFileModel>
         <caseFileItem id="cfi_csdZm_0" name="Content" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
         <caseFileItem id="cfi_csY4k_2" name="Output" multiplicity="ZeroOrMore" definitionRef="root.cfid"/>
@@ -15,7 +15,7 @@
         </planItem>
         <sentry id="cm_csd7G_40">
             <ifPart contextRef="cfi_csdZm_0">
-                <condition language="spel">
+                <condition>
                     <body>
                         <![CDATA[Content != "basic"]]>
                     </body>
@@ -27,9 +27,9 @@
         </sentry>
         <sentry id="cm_csvwt_46">
             <ifPart contextRef="cfi_csY4k_2">
-                <condition language="spel">
+                <condition>
                     <body>
-                        <![CDATA[caseInstance.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
+                        <![CDATA[case.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
                     </body>
                 </condition>
             </ifPart>
@@ -51,29 +51,29 @@
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="expression/spelexpressionstask.humantask">
                     <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
                     <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
-                    <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
-                        <transformation language="spel">
+                    <parameterMapping id="outPM_cm_csTql_4_1" targetRef="outTP_cm_csTql_4_4" sourceRef="">
+                        <transformation>
                             <body>
                                 <![CDATA[task.name]]>
                             </body>
                         </transformation>
                     </parameterMapping>
-                    <parameterMapping id="outPM_cm_csTql_4_2" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_5">
-                        <transformation language="spel">
+                    <parameterMapping id="outPM_cm_csTql_4_2" targetRef="outTP_cm_csTql_4_5" sourceRef="">
+                        <transformation>
                             <body>
-                                <![CDATA[caseInstance.id]]>
+                                <![CDATA[case.id]]>
                             </body>
                         </transformation>
                     </parameterMapping>
                     <assignment id="_lRFiK_5">
-                        <condition id="_lRFiK_6" language="spel">
+                        <condition id="_lRFiK_6">
                             <body>
                                 <![CDATA[user.id]]>
                             </body>
                         </condition>
                     </assignment>
                     <duedate id="_lRFiK_7">
-                        <condition id="_lRFiK_8" language="spel">
+                        <condition id="_lRFiK_8">
                             <body>
                                 <![CDATA[T(java.time.Instant).now()]]>
                             </body>
@@ -87,7 +87,7 @@
             <planItem id="cm_csdZm_17" name="HumanTask" definitionRef="pid_cm_csdZm_17">
                 <itemControl>
                     <repetitionRule id="cm_csdZm_17_repetitionRule" contextRef="cfi_csY4k_2">
-                        <condition language="spel">
+                        <condition>
                             <body>
                                 <![CDATA[planItem.index < 2]]>
                             </body>
@@ -98,6 +98,13 @@
         </stage>
     </casePlanModel>
     <input id="csdZm_inCPs_0" name="InputContent" bindingRef="cfi_csdZm_0"/>
+    <textAnnotation id="_lRFiK_shape_7">
+        <text>
+            <![CDATA[Note: Stage must be activated prior to Milestone.
+This order can be determined in CasePlan properties.
+Otherwise testcase will not work.]]>
+        </text>
+    </textAnnotation>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{
