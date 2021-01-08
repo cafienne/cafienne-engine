@@ -184,7 +184,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
      */
     public Value<?> transformInput(Task<?> task, TaskInputParameter sourceParameter) {
         Value<?> targetValue = sourceParameter.getValue();
-        if (transformation != null && !transformation.getBody().isEmpty()) {
+        if (this.hasTransformation()) {
             targetValue = transformation.getEvaluator().evaluateInputParameterTransformation(task.getCaseInstance(), sourceParameter, target, task);
         }
         return targetValue;
