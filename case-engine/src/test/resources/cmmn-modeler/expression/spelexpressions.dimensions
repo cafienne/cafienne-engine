@@ -21,24 +21,24 @@
         <CMMNShape cmmnElementRef="_p61kw_3">
             <Bounds x="514" y="200" width="12" height="20"/>
         </CMMNShape>
-        <textbox cmmnElementRef="cm_csdZm_19" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="This case shows various SPEL&#10;expressions that can be used">
-            <Bounds x="99" y="49" width="245" height="84"/>
-        </textbox>
-        <textbox cmmnElementRef="cm_csvwt_44" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Repetition Rule in HumanTask refers to 'context', which is the associated case file item.&#10;It takes the index to determine that there are not more than 3 outputs.&#10;&#10;&#10;Human Task input just wires the Content from the case file.&#10;The output of the task is put back into 'Output' case file item, but it is extended with two parameters&#10;referencing task.name and caseInstance.id&#10;Furthermore there can be an output of type &quot;SpecialOutput&quot; which is put in the &quot;Multi&quot; caseFileItem.&#10;&#10;The Milestone has various entry criteria with ifPart expressions, it responds to either:&#10;- Content!=&quot;basic&quot;&#10;- Output==&quot;stop now&quot;&#10;- more than 2 plan items HumanTask&#10;- more than 2 occurences of Multi">
-            <Bounds x="49" y="329" width="630" height="200"/>
-        </textbox>
-        <casefileitem cmmnElementRef="cm_csvwt_45" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_csdZm_0">
+        <CMMNShape cmmnElementRef="cfi_csdZm_0">
             <Bounds x="480" y="70" width="25" height="40"/>
-        </casefileitem>
-        <casefileitem cmmnElementRef="cm_cs9mu_49" parentId="cm_SpelExpressions.case_SpelExpressions_0" contextRef="cfi_cstko_5">
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cfi_cstko_5">
             <Bounds x="510" y="240" width="25" height="40"/>
-        </casefileitem>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csdZm_19">
+            <Bounds x="99" y="49" width="245" height="84"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="cm_csvwt_44">
+            <Bounds x="49" y="329" width="630" height="200"/>
+        </CMMNShape>
         <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_p61kw_0"/>
-        <CMMNEdge sourceCMMNElementRef="_p61kw_1" targetCMMNElementRef="cm_csvwt_45"/>
+        <CMMNEdge sourceCMMNElementRef="_p61kw_1" targetCMMNElementRef="cfi_csdZm_0"/>
         <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_p61kw_2">
             <waypoint x="274" y="251"/>
             <waypoint x="470" y="250"/>
         </CMMNEdge>
-        <CMMNEdge sourceCMMNElementRef="cm_cs9mu_49" targetCMMNElementRef="_p61kw_3"/>
+        <CMMNEdge sourceCMMNElementRef="cfi_cstko_5" targetCMMNElementRef="_p61kw_3"/>
     </CMMNDiagram>
 </CMMNDI>

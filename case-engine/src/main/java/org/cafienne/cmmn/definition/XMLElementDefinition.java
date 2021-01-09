@@ -353,7 +353,7 @@ public abstract class XMLElementDefinition {
     }
 
     /**
-     * Parses the attribute name into a string, or provides the default value if the attribute is not found
+     * Parses the attribute name into a string, or provides the default value if the attribute is not found.
      *
      * @param attributeName
      * @param presenceRequired
@@ -361,18 +361,25 @@ public abstract class XMLElementDefinition {
      * @return
      */
     protected String parseAttribute(String attributeName, boolean presenceRequired, String... defaultValue) {
-        String attributeValue = "";
-        if (element != null) {
-            attributeValue = element.getAttribute(attributeName);
+        if (element != null && element.hasAttribute(attributeName)) {
+            return element.getAttribute(attributeName);
         }
-        if (attributeValue.isEmpty()) {
-            if (presenceRequired) {
+
+        // If the attribute is required, add an error message
+        if (presenceRequired) {
+            if (element == null) {
+                getModelDefinition().addDefinitionError("The attribute " + attributeName + " cannot be found, because an XML element is missing in " + this.getType());
+            } else {
                 getModelDefinition().addDefinitionError("The attribute " + attributeName + " is missing from the element " + XMLHelper.printXMLNode(element));
-            } else if (defaultValue.length > 0) {
-                attributeValue = defaultValue[0];
             }
         }
-        return attributeValue;
+
+        // Return the (optional) default value or an empty string
+        if (defaultValue.length > 0) {
+            return defaultValue[0];
+        } else {
+            return "";
+        }
     }
 
     public String getName() {

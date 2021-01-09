@@ -21,9 +21,9 @@
         <CMMNShape cmmnElementRef="_lRFiK_0">
             <Bounds x="494" y="168" width="12" height="20"/>
         </CMMNShape>
-        <textbox cmmnElementRef="_lRFiK_shape_7" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Note: Stage must be activated prior to Milestone.&#10;This order can be determined in CasePlan properties.&#10;Otherwise testcase will not work.">
+        <CMMNShape cmmnElementRef="_lRFiK_shape_7">
             <Bounds x="140" y="330" width="330" height="100"/>
-        </textbox>
+        </CMMNShape>
         <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_lRFiK_2"/>
         <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_lRFiK_1">
             <waypoint x="274" y="250"/>

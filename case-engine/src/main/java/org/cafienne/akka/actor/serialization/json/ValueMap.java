@@ -324,22 +324,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
 
     @Override
     public Value<?> read(String propertyName) {
-        // If there is an owner, we check whether the property is one of it's CaseFileItem children.
-        if (getOwner() != null) {
-            // Bit of tricky code here.
-            // Basic idea: property is either a child case file item, or one of the properties of the case file item, _OR_ it is in the raw content of the
-            // case file item.
-            // Properties are stored in the raw content as well, so we only have to check whether there is a child item with the specified property name,
-            // if so, we search further in the child. Else we default to go lookup the property in our raw value structure
-            CaseFileItem child = getOwner().getItem(propertyName);
-            if (child != null) {
-                return child.getValue();
-            }
-        }
-
-        // Otherwise we read through our getter. If it doesn't contain the property, then it returns a null wrapper, rather than null, in order
-        // not to 'crash' any expressions; CMMN spec says we should return empty rather than null elements.
-        //  NOTE: in some cases still the expression may crash, e.g. if the NullValue is compared to an int or so...
+        // Simply "get". If it is a case file item child, then it's value will also be in the parent's valuemap with the same name.
         return get(propertyName);
     }
 

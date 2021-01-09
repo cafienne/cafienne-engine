@@ -1,5 +1,5 @@
 <definitions>
-    <case id="expression/spelexpressions2.case" name="SpelExpressions">
+    <case id="expression/spelexpressions2.case" name="SpelExpressions" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="cfi_csdZm_0" name="Content" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
             <caseFileItem id="cfi_csY4k_2" name="Output" multiplicity="ZeroOrMore" definitionRef="root.cfid"/>
@@ -16,7 +16,7 @@
             </planItem>
             <sentry id="cm_csd7G_40">
                 <ifPart contextRef="cfi_csdZm_0">
-                    <condition language="spel">
+                    <condition>
                         <body>
                             <![CDATA[Content != "basic"]]>
                         </body>
@@ -28,9 +28,9 @@
             </sentry>
             <sentry id="cm_csvwt_46">
                 <ifPart contextRef="cfi_csY4k_2">
-                    <condition language="spel">
+                    <condition>
                         <body>
-                            <![CDATA[caseInstance.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
+                            <![CDATA[case.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
                         </body>
                     </condition>
                 </ifPart>
@@ -55,14 +55,14 @@
                         <output id="_x59I_SpecialOutput" name="SpecialOutput"/>
                         <task-model/>
                         <duedate id="_lRFiK_5">
-                            <condition id="_lRFiK_6" language="spel">
+                            <condition id="_lRFiK_6">
                                 <body>
                                     <![CDATA[T(java.time.Instant).now()]]>
                                 </body>
                             </condition>
                         </duedate>
                         <assignment id="_lRFiK_12">
-                            <condition id="_lRFiK_13" language="spel">
+                            <condition id="_lRFiK_13">
                                 <body>
                                     <![CDATA[user.id]]>
                                 </body>
@@ -70,17 +70,17 @@
                         </assignment>
                         <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
                         <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
-                        <parameterMapping id="outPM_cm_csTql_4_1" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_4">
-                            <transformation language="spel">
+                        <parameterMapping id="outPM_cm_csTql_4_1" targetRef="outTP_cm_csTql_4_4" sourceRef="">
+                            <transformation>
                                 <body>
                                     <![CDATA[task.name]]>
                                 </body>
                             </transformation>
                         </parameterMapping>
-                        <parameterMapping id="outPM_cm_csTql_4_2" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_5">
-                            <transformation language="spel">
+                        <parameterMapping id="outPM_cm_csTql_4_2" targetRef="outTP_cm_csTql_4_5" sourceRef="">
+                            <transformation>
                                 <body>
-                                    <![CDATA[caseInstance.id]]>
+                                    <![CDATA[case.id]]>
                                 </body>
                             </transformation>
                         </parameterMapping>
@@ -92,7 +92,7 @@
                 <planItem id="cm_csdZm_17" name="HumanTask" definitionRef="pid_cm_csdZm_17">
                     <itemControl>
                         <repetitionRule id="cm_csdZm_17_repetitionRule" contextRef="cfi_csY4k_2">
-                            <condition language="spel">
+                            <condition>
                                 <body>
                                     <![CDATA[planItem.index < 2]]>
                                 </body>
@@ -103,6 +103,13 @@
             </stage>
         </casePlanModel>
         <input id="csdZm_inCPs_0" name="InputContent" bindingRef="cfi_csdZm_0"/>
+        <textAnnotation id="_lRFiK_shape_7">
+            <text>
+                <![CDATA[Note: Stage must be activated prior to Milestone.
+This order can be determined in CasePlan properties.
+Otherwise testcase will not work.]]>
+            </text>
+        </textAnnotation>
         <extensionElements mustUnderstand="false">
             <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{
@@ -141,11 +148,9 @@
             <CMMNShape cmmnElementRef="_lRFiK_0">
                 <Bounds x="494" y="168" width="12" height="20"/>
             </CMMNShape>
-            <textbox cmmnElementRef="_lRFiK_shape_7" parentId="cm_SpelExpressions.case_SpelExpressions_0" content="Note: Stage must be activated prior to Milestone.
-This order can be determined in CasePlan properties.
-Otherwise testcase will not work.">
+            <CMMNShape cmmnElementRef="_lRFiK_shape_7">
                 <Bounds x="140" y="330" width="330" height="100"/>
-            </textbox>
+            </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="cm_csd7G_38" targetCMMNElementRef="_lRFiK_2"/>
             <CMMNEdge sourceCMMNElementRef="cm_csdZm_17" targetCMMNElementRef="_lRFiK_1">
                 <waypoint x="274" y="250"/>

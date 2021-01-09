@@ -31,6 +31,15 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
         this.sourceRef = parseAttribute("sourceRef", true);
         this.targetRef = parseAttribute("targetRef", true);
         this.transformation = parse("transformation", ExpressionDefinition.class, false);
+
+        if (sourceRef.isBlank() && targetRef.isBlank()) {
+            // Well, apparently the parameter mapping is reversed, and the source ref is not found on the task
+            getModelDefinition().addReferenceError("The parameter mapping '" + getDescriptionForError() + "' misses both sourceRef and targetRef attributes");
+        } else if (sourceRef.isBlank()) {
+            // If source ref is blank, then the target ref is not blank, hence this is an output mapping.
+            //  In that case, we will create an empty source parameter. Note, this must be done in constructor to avoid concurrent modification exception during resolveReferences
+            source = new ParameterDefinition(null, getModelDefinition(), taskDefinition);
+        }
     }
     
     /**
@@ -68,31 +77,47 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
             //  No need to throw an error here, simply return and do not continue (as it leads to NullPointerException)
             return;
         }
-        source = findParameter(taskDefinition.getInputParameters(), sourceRef);
-        if (source == null) {
-            isInputMapping = false;
-            source = findParameter(taskImplementationDefinition.getOutputParameters(), sourceRef);
+
+        if (sourceRef.isBlank()) {
+            // It is possible to do mapping to an output parameter without having an output implementation parameter, but then the transformation must be filled
             target = findParameter(taskDefinition.getOutputParameters(), targetRef);
-            if (source == null) {
-                String msg = "The parameter mapping '" + getDescriptionForError() + "' has sourceRef " + sourceRef + ", but that output parameter is not found in "+taskDefinition.getImplementationDefinition().getId();
+            if (target == null) {
+                String msg = "The output mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but the task does not have this output parameter";
                 getModelDefinition().addReferenceError(msg);
-                if (target == null) {
-                    if (findParameter(taskImplementationDefinition.getInputParameters(), targetRef) != null) {
-                        // Well, apparently the parameter mapping is reversed, and the source ref is not found on the task
-                        getModelDefinition().addReferenceError("The parameter mapping '" + getDescriptionForError() + "' has invalid sourceRef " + sourceRef + ", because the task does not have this output parameter");
-                    }
-                }
-            } else if (target == null) {
-                String msg = "The parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but the task does not have this output parameter";
+                return;
+            }
+            if (transformation == null) {
+                String msg = "The output mapping '" + getDescriptionForError() + "' has no sourceRef attribute and also no transformation. At least one of them must be present";
                 getModelDefinition().addReferenceError(msg);
+                return;
             }
         } else {
-            // Source exists in the input parameters; hence target must also be found there, and it is an input mapping
-            isInputMapping = true;
-            target = findParameter(taskImplementationDefinition.getInputParameters(), targetRef);
-            if (target == null) {
-                String msg = "The input parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but that input parameter is not found in " + taskDefinition.getImplementationDefinition().getId();
-                getModelDefinition().addReferenceError(msg);
+            source = findParameter(taskDefinition.getInputParameters(), sourceRef);
+            if (source == null) {
+                isInputMapping = false;
+                source = findParameter(taskImplementationDefinition.getOutputParameters(), sourceRef);
+                target = findParameter(taskDefinition.getOutputParameters(), targetRef);
+                if (source == null) {
+                    String msg = "The parameter mapping '" + getDescriptionForError() + "' has sourceRef " + sourceRef + ", but that output parameter is not found in " + taskDefinition.getImplementationDefinition().getId();
+                    getModelDefinition().addReferenceError(msg);
+                    if (target == null) {
+                        if (findParameter(taskImplementationDefinition.getInputParameters(), targetRef) != null) {
+                            // Well, apparently the parameter mapping is reversed, and the source ref is not found on the task
+                            getModelDefinition().addReferenceError("The parameter mapping '" + getDescriptionForError() + "' has invalid sourceRef " + sourceRef + ", because the task does not have this output parameter");
+                        }
+                    }
+                } else if (target == null) {
+                    String msg = "The parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but the task does not have this output parameter";
+                    getModelDefinition().addReferenceError(msg);
+                }
+            } else {
+                // Source exists in the input parameters; hence target must also be found there, and it is an input mapping
+                isInputMapping = true;
+                target = findParameter(taskImplementationDefinition.getInputParameters(), targetRef);
+                if (target == null) {
+                    String msg = "The input parameter mapping '" + getDescriptionForError() + "' has targetRef " + targetRef + ", but that input parameter is not found in " + taskDefinition.getImplementationDefinition().getId();
+                    getModelDefinition().addReferenceError(msg);
+                }
             }
         }
     }
@@ -184,7 +209,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
      */
     public Value<?> transformInput(Task<?> task, TaskInputParameter sourceParameter) {
         Value<?> targetValue = sourceParameter.getValue();
-        if (transformation != null && !transformation.getBody().isEmpty()) {
+        if (this.hasTransformation()) {
             targetValue = transformation.getEvaluator().evaluateInputParameterTransformation(task.getCaseInstance(), sourceParameter, target, task);
         }
         return targetValue;
