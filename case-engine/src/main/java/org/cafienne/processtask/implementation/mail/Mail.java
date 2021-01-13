@@ -31,14 +31,9 @@ import java.util.stream.Collectors;
 public class Mail extends SubProcess<MailDefinition> {
     private final static Logger logger = LoggerFactory.getLogger(Mail.class);
 
-    private ValueMap input;
-    private String mailServer;
-    private Session mailSession;
-    private MimeMessage mailMessage;
-
     public Mail(ProcessTaskActor processTask, MailDefinition definition) {
         super(processTask, definition);
-        logger.warn("\tSENDING MAIL\t" + processTask.getId() + "\n");
+//        logger.warn("\tSENDING MAIL\t" + processTask.getId() + "\n");
     }
 
     @Override
@@ -46,33 +41,56 @@ public class Mail extends SubProcess<MailDefinition> {
         start(); // Just do the call again.
     }
 
-    private void createSession() {
-        Properties mailServerProperties = new Properties();
-        String port = definition.getSMTPPort();
-        mailServer = definition.getSMTPServer();
+    private Session mailSession;
+    private Transport transport;
 
-        mailServerProperties.put("mail.host", mailServer);
-        mailServerProperties.put("mail.smtp.port", port);
-        mailSession = Session.getDefaultInstance(mailServerProperties, null);
-        mailMessage = new MimeMessage(mailSession);
+    private void connectMailServer() throws MessagingException {
+        processTaskActor.addDebugInfo(() -> "Connecting to mail server");
+        long now = System.currentTimeMillis();
+
+        Properties mailServerProperties = definition.getMailProperties();
+        String userName = mailServerProperties.get("authentication.user").toString();
+        String password = mailServerProperties.get("authentication.password").toString();
+        mailSession = Session.getDefaultInstance(mailServerProperties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(userName, password);
+            }
+        });
+
+        transport = mailSession.getTransport();
+        transport.connect();
+        long done = System.currentTimeMillis();
+//        System.out.println("Connect took " + (done - now) + " milliseconds");
+        processTaskActor.addDebugInfo(() -> "Connect to mail server took " + (done - now) + " milliseconds");
+    }
+
+    private void disconnectMailServer() throws MessagingException {
+        long now = System.currentTimeMillis();
+        transport.close();
+        long done = System.currentTimeMillis();
+        processTaskActor.addDebugInfo(() -> "Disconnecting from mail server took " + (done - now) + " milliseconds");
     }
 
     @Override
     public void start() {
-        this.input = processTaskActor.getMappedInputParameters();
-
-        // Create a mail session and message to fill.
-        createSession();
+        // Get the input parameters
+        ValueMap input = processTaskActor.getMappedInputParameters();
 
         // Setup email message and recipients
         try {
+            connectMailServer();
+
+            // Create a mail session and message to fill.
+            MimeMessage mailMessage = new MimeMessage(mailSession);
+
             // First validate the recipient list.
             try {
                 mailMessage.setRecipients(Message.RecipientType.TO, getAddresses(input.get("to"), "To"));
                 mailMessage.setRecipients(Message.RecipientType.CC, getAddresses(input.get("cc"), "Cc"));
                 mailMessage.setRecipients(Message.RecipientType.BCC, getAddresses(input.get("bcc"), "Bcc"));
             } catch (InvalidMailException ime) {
-                raiseFault("Failed to set recipients for SMTP call", ime.getCause());
+                raiseFault("Failed to set recipients for mail message", ime.getCause());
                 return;
             }
 
@@ -98,14 +116,14 @@ public class Mail extends SubProcess<MailDefinition> {
             String body = input.raw("body");
             processTaskActor.addDebugInfo(() -> "Body: " + body);
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setContent(body, "text/plain");
+            messageBodyPart.setContent(body, "text/html");
             multipart.addBodyPart(messageBodyPart);
 
             // Add the attachments if any
             ValueList attachments = input.withArray("attachments");
-            processTaskActor.addDebugInfo(() -> "Adding " + attachments.size() +" attachments");
+            processTaskActor.addDebugInfo(() -> "Adding " + attachments.size() + " attachments");
             attachments.forEach(attachment -> {
-                if (! attachment.isMap()) {
+                if (!attachment.isMap()) {
                     processTaskActor.addDebugInfo(() -> "Attachment must be a json object with 'content' (base64 coded) and optional 'fileName' and 'mimeType'; found json content of type  " + attachment.getClass().getSimpleName());
                     return;
                 }
@@ -134,6 +152,15 @@ public class Mail extends SubProcess<MailDefinition> {
 
             mailMessage.setContent(multipart);
 
+            processTaskActor.addDebugInfo(() -> "Sending message to mail server");
+            long now = System.currentTimeMillis();
+            Address[] recipients = mailMessage.getAllRecipients();
+            transport.sendMessage(mailMessage, recipients);
+            long done = System.currentTimeMillis();
+//            System.out.println("Completed sending email in " + (done - now) + " milliseconds");
+
+            processTaskActor.addDebugInfo(() -> "Completed sending email in " + (done - now) + " milliseconds");
+            disconnectMailServer();
         } catch (AddressException aex) {
             raiseFault("Invalid email address in from and/or replyTo", aex);
             return;
@@ -142,30 +169,8 @@ public class Mail extends SubProcess<MailDefinition> {
             return;
         }
 
-        // Setup connection and send mail
-        try {
-            processTaskActor.addDebugInfo(() -> "Sending message to mail server");
-            long now = System.currentTimeMillis();
-            Transport transport = mailSession.getTransport("smtp");
-            transport.connect("", "");
-            Address[] recipients = mailMessage.getAllRecipients();
-            transport.sendMessage(mailMessage, recipients);
-            transport.close();
-            long done = System.currentTimeMillis();
-            processTaskActor.addDebugInfo(() -> "Completed sending email in " + (done - now) + " milliseconds");
-        } catch (NoSuchProviderException ex) {
-            // we should never get here since provider is set hardcoded to "smtp"
-            raiseFault("No such provider", ex);
-            return;
-        } catch (MessagingException mex) {
-            processTaskActor.addDebugInfo(() -> "Unable to process and send SMTP message", mex);
-            raiseFault("Unable to process and send SMTP message", mex);
-            return;
-        }
-
         // Set processTaskActor to completed
         raiseComplete();
-
     }
 
     @Override

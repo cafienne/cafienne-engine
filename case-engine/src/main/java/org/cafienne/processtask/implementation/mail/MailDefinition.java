@@ -7,6 +7,7 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
@@ -19,13 +20,8 @@ import java.util.Set;
 /**
  */
 public class MailDefinition extends SubProcessDefinition {
-    private final String smtpServer;
-    private final String smtpPort;
-
     public MailDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        this.smtpServer = parse("smtp-server", String.class, true);
-        this.smtpPort = parse("smtp-port", String.class, true);
     }
 
     @Override
@@ -34,16 +30,8 @@ public class MailDefinition extends SubProcessDefinition {
         return super.getExceptionParameterNames();
     }
 
-    String getSMTPServer() {
-        return this.smtpServer;
-    }
-
-    String getSMTPPort() {
-        return this.smtpPort;
-    }
-
     Properties getMailProperties() {
-        Properties properties = new Properties();
+        Properties properties = CaseSystem.config().engine().mailService().asProperties();
         return properties;
     }
 
