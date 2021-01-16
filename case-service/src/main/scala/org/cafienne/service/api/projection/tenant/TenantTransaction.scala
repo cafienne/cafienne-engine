@@ -32,6 +32,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     evt match {
       case p: PlatformEvent => handlePlatformEvent(p)
       case t: TenantUserEvent => handleUserEvent(t)
+      case u: TenantAppliedPlatformUpdate => updateUserIds(u)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -62,6 +63,11 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
       }
       Done
     })
+  }
+
+  def updateUserIds(event: TenantAppliedPlatformUpdate): Future[Done] = {
+    import scala.collection.JavaConverters._
+    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.asScala)
   }
 
   override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {

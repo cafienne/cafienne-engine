@@ -17,6 +17,7 @@ import org.cafienne.tenant.akka.command.*;
 import org.cafienne.tenant.akka.command.platform.CreateTenant;
 import org.cafienne.tenant.akka.command.platform.DisableTenant;
 import org.cafienne.tenant.akka.command.platform.EnableTenant;
+import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
 import org.cafienne.timerservice.akka.command.CancelTimer;
 import org.cafienne.timerservice.akka.command.SetTimer;
 import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
@@ -89,6 +90,7 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(GetTenantOwners.class, GetTenantOwners::new);
         addManifestWrapper(ReplaceTenant.class, ReplaceTenant::new);
         addManifestWrapper(UpdateTenant.class, UpdateTenant::new);
+        addManifestWrapper(UpdateTenantWithPlatformInformation.class, UpdateTenantWithPlatformInformation::new);
     }
 
     private static void addPlatformCommands() {

@@ -1,6 +1,7 @@
 package org.cafienne.service.api.projection.slick
 
 import akka.Done
+import org.cafienne.cmmn.akka.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.projection.RecordsPersistence
@@ -63,6 +64,14 @@ class SlickRecordsPersistence
   override def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]] = {
     db.run(TableQuery[UserRoleTable].filter(record => record.userId === key.userId && record.tenant === key.tenant && record.role_name === key.role_name).result.headOption)
   }
+
+  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation]): Future[Done] = {
+    val updateQueries = info.map(user => {
+      (for { c <- TableQuery[UserRoleTable].filter(r => r.userId === user.existingUserId && r.tenant === tenant) } yield c.userId).update(user.newUserId)
+    })
+    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
+  }
+
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {
     db.run(TableQuery[CaseInstanceTable].filter(_.id === id).result.headOption)
