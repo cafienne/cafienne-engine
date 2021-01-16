@@ -7,7 +7,8 @@
  */
 package org.cafienne.service.api.platform
 
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives.{onComplete, _}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -16,20 +17,23 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.service.api.projection.query.PlatformQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.tenant.akka.command.platform.{DisableTenant, EnableTenant}
 
+import scala.util.{Failure, Success}
+
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute()(override implicit val userCache: IdentityProvider) extends CommandRoute with TenantRoute {
+class PlatformRoute(platformQueries: PlatformQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   override def routes = {
       createTenant ~
       disableTenant ~
       enableTenant ~
-      getUserInformation
+      getUserInformation ~
+      updateUserInformation
   }
 
   @Path("/")
@@ -125,6 +129,67 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider) extends
       pathEndOrSingleSlash {
         validUser { platformUser =>
           completeJsonValue(platformUser.toValue)
+        }
+      }
+    }
+  }
+
+  @Path("/user")
+  @PUT
+  @Operation(
+    summary = "Update user information across the platform",
+    description = "Update user information across the platform",
+    tags = Array("platform"),
+    responses = Array(
+      new ApiResponse(description = "User information update in progress", responseCode = "204"),
+      new ApiResponse(description = "User information is invalid", responseCode = "400"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  @RequestBody(description = "List of new user information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUsersUpdateFormat]))))
+  @Consumes(Array("application/json"))
+  def updateUserInformation = put {
+    validUser { platformOwner =>
+      pathPrefix("user") {
+        pathEndOrSingleSlash {
+          import spray.json.DefaultJsonProtocol._
+          import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+
+          implicit val userFormat = jsonFormat2(TenantAPI.PlatformUserUpdateFormat)
+          implicit val listFormat = jsonFormat1(TenantAPI.PlatformUsersUpdateFormat)
+          entity(as[TenantAPI.PlatformUsersUpdateFormat]) { list =>
+            readLastModifiedHeader() { lastModified =>
+              println("\n New attempt to update " + list.users.size +" users\n")
+              val newUserIds = list.users.map(u => u.newUserId)
+              val existingUserIds = list.users.map(u => u.existingUserId)
+              onComplete(handleSyncedQuery(() => platformQueries.hasExistingUserIds(newUserIds), lastModified)) {
+                case Success(value) => value.size match {
+                  case 0 => {
+                    val now = System.currentTimeMillis()
+                    val queries = for {
+                      tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
+                      casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
+                    } yield (tenantsByUser, casesByUser)
+                    onComplete(queries) {
+                      case Success(value) => {
+                        val done = System.currentTimeMillis()
+                        println("Found existing tenants: " + value._1)
+                        println("\nAfter " + (done - now) + "Found existing cases: " + value._2)
+                        complete(StatusCodes.BadRequest, "Not yet implemented, dear onwer " + platformOwner.userId)
+                      }
+                      case Failure(t) => handleFailure(t)
+                    }
+                  }
+                  case _ => {
+                    val error = "Cannot apply new user ids; found existing ids: " + value.mkString(", ")
+                    println(error)
+                    complete(StatusCodes.BadRequest, error)
+                  }
+                }
+                case Failure(t) => handleFailure(t)
+              }
+            }
+          }
         }
       }
     }
