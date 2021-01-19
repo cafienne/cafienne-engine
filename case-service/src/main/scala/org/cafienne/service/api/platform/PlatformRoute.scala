@@ -15,8 +15,12 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
+import org.cafienne.cmmn.akka.command.platform.{CaseUpdate, NewUserInformation, PlatformUpdate, TenantUpdate}
+
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.platform.akka.command.UpdatePlatformInformation
 import org.cafienne.service.api.projection.query.PlatformQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
@@ -141,7 +145,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     description = "Update user information across the platform",
     tags = Array("platform"),
     responses = Array(
-      new ApiResponse(description = "User information update in progress", responseCode = "204"),
+      new ApiResponse(description = "User information update in progress", responseCode = "202"),
       new ApiResponse(description = "User information is invalid", responseCode = "400"),
       new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
@@ -159,30 +163,45 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
           implicit val listFormat = jsonFormat1(TenantAPI.PlatformUsersUpdateFormat)
           entity(as[TenantAPI.PlatformUsersUpdateFormat]) { list =>
             readLastModifiedHeader() { lastModified =>
-              println("\n New attempt to update " + list.users.size +" users\n")
               val newUserIds = list.users.map(u => u.newUserId)
               val existingUserIds = list.users.map(u => u.existingUserId)
               onComplete(handleSyncedQuery(() => platformQueries.hasExistingUserIds(newUserIds), lastModified)) {
                 case Success(value) => value.size match {
                   case 0 => {
-                    val now = System.currentTimeMillis()
                     val queries = for {
                       tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
                       casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
                     } yield (tenantsByUser, casesByUser)
                     onComplete(queries) {
                       case Success(value) => {
-                        val done = System.currentTimeMillis()
-                        println("Found existing tenants: " + value._1)
-                        println("\nAfter " + (done - now) + "Found existing cases: " + value._2)
-                        complete(StatusCodes.BadRequest, "Not yet implemented, dear onwer " + platformOwner.userId)
+                        val newUserInfo = list.users.map(user => NewUserInformation(user.existingUserId, user.newUserId))
+                        import scala.collection.mutable.Buffer
+
+                        val tenantsToUpdate = value._1.map(tenant => {
+                          val name = tenant._1
+                          val users = newUserInfo.filter(info => tenant._2.contains(info.existingUserId))
+                          TenantUpdate(name, PlatformUpdate(users))
+                        })
+                        val casesToUpdate = Buffer[CaseUpdate]()
+                        value._2.map(tenant => {
+                          val name = tenant._1
+                          tenant._2.map(caseId => {
+                            val caseUsers = newUserInfo.filter(info => caseId._2.contains(info.existingUserId))
+                            casesToUpdate += CaseUpdate(caseId._1, name,  PlatformUpdate(caseUsers))
+                          })
+                        })
+
+                        import scala.collection.JavaConverters._
+                        val tenants = seqAsJavaList(tenantsToUpdate.toSeq)
+                        val cases = seqAsJavaList(casesToUpdate)
+                        askModelActor(new UpdatePlatformInformation(platformOwner, PlatformUpdate(newUserInfo), tenants, cases))
                       }
                       case Failure(t) => handleFailure(t)
                     }
                   }
                   case _ => {
                     val error = "Cannot apply new user ids; found existing ids: " + value.mkString(", ")
-                    println(error)
+//                    println(error)
                     complete(StatusCodes.BadRequest, error)
                   }
                 }

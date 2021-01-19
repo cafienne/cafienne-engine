@@ -6,6 +6,8 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.platform.NewUserInformation;
+import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
+import org.cafienne.cmmn.akka.command.platform.TenantUpdate;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
@@ -14,16 +16,16 @@ import java.util.List;
 
 @Manifest
 public class UpdateTenantWithPlatformInformation extends PlatformTenantCommand {
-    private final List<NewUserInformation> newUserInformation;
+    private final PlatformUpdate newUserInformation;
 
-    public UpdateTenantWithPlatformInformation(PlatformUser user, String tenantId, List<NewUserInformation> newUserInformation) {
-        super(user, tenantId);
-        this.newUserInformation = newUserInformation;
+    public UpdateTenantWithPlatformInformation(PlatformUser user, TenantUpdate action) {
+        super(user, action.tenant());
+        this.newUserInformation = action.platformUpdate();
     }
 
     public UpdateTenantWithPlatformInformation(ValueMap json) {
         super(json);
-        newUserInformation = NewUserInformation.deserialize(json.withArray(Fields.users));
+        newUserInformation = PlatformUpdate.deserialize(json.withArray(Fields.users));
     }
 
     @Override
@@ -35,7 +37,7 @@ public class UpdateTenantWithPlatformInformation extends PlatformTenantCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeListField(generator, Fields.users, newUserInformation);
+        writeField(generator, Fields.users, newUserInformation.toValue());
     }
 }
 

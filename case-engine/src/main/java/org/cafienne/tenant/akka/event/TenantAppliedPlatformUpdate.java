@@ -6,6 +6,7 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.platform.NewUserInformation;
+import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
 import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;
@@ -14,16 +15,16 @@ import java.util.List;
 
 @Manifest
 public class TenantAppliedPlatformUpdate extends TenantEvent {
-    public final List<NewUserInformation> newUserInformation;
+    public final PlatformUpdate newUserInformation;
 
-    public TenantAppliedPlatformUpdate(TenantActor tenant, List<NewUserInformation> newUserInformation) {
+    public TenantAppliedPlatformUpdate(TenantActor tenant, PlatformUpdate newUserInformation) {
         super(tenant);
         this.newUserInformation = newUserInformation;
     }
 
     public TenantAppliedPlatformUpdate(ValueMap json) {
         super(json);
-        newUserInformation = NewUserInformation.deserialize(json.withArray(Fields.users));
+        newUserInformation = PlatformUpdate.deserialize(json.withArray(Fields.users));
     }
 
     @Override
@@ -34,6 +35,6 @@ public class TenantAppliedPlatformUpdate extends TenantEvent {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeListField(generator, Fields.users, newUserInformation);
+        writeField(generator, Fields.users, newUserInformation.toValue());
     }
 }

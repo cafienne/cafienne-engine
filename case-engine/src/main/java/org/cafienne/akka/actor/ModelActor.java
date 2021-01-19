@@ -420,7 +420,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         askModel(command, left, right);
     }
 
-    private void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
+    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
         if (recoveryRunning()) {
 //            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
             return;

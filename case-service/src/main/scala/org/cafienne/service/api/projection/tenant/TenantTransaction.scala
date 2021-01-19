@@ -66,8 +66,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
   }
 
   def updateUserIds(event: TenantAppliedPlatformUpdate): Future[Done] = {
-    import scala.collection.JavaConverters._
-    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.asScala)
+    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info)
   }
 
   override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {

@@ -6,6 +6,7 @@ import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.cmmn.akka.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
+import org.cafienne.platform.akka.command.PlatformCommand
 import org.cafienne.processtask.akka.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.tenant.TenantActor
@@ -37,6 +38,7 @@ class ClusterRouter extends CaseMessageRouter {
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
       case _: TimerServiceCommand => CaseSystem.timerService
+      case _: PlatformCommand => CaseSystem.platformService
     }
     shardRouter.forward(m)
   }

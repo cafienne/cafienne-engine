@@ -12,6 +12,7 @@ import org.cafienne.cmmn.akka.command.team.PutTeamMember;
 import org.cafienne.cmmn.akka.command.team.RemoveTeamMember;
 import org.cafienne.cmmn.akka.command.team.SetCaseTeam;
 import org.cafienne.humantask.akka.command.*;
+import org.cafienne.platform.akka.command.UpdatePlatformInformation;
 import org.cafienne.processtask.akka.command.*;
 import org.cafienne.tenant.akka.command.*;
 import org.cafienne.tenant.akka.command.platform.CreateTenant;
@@ -97,6 +98,7 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(CreateTenant.class, CreateTenant::new);
         addManifestWrapper(DisableTenant.class, DisableTenant::new);
         addManifestWrapper(EnableTenant.class, EnableTenant::new);
+        addManifestWrapper(UpdatePlatformInformation.class, UpdatePlatformInformation::new);
     }
 
     private static void addTimerServiceCommands() {

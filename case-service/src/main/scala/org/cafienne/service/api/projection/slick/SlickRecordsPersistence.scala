@@ -66,10 +66,14 @@ class SlickRecordsPersistence
   }
 
   override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation]): Future[Done] = {
+    System.out.println("\n\tNice to be here :)")
     val updateQueries = info.map(user => {
       (for { c <- TableQuery[UserRoleTable].filter(r => r.userId === user.existingUserId && r.tenant === tenant) } yield c.userId).update(user.newUserId)
     })
-    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
+    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => {
+      System.out.println("\n\nKaching kaboom!!!!\n\n")
+      Done
+    } }
   }
 
 

@@ -34,6 +34,7 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
     protected void process() {
         Responder handler = actor.getResponseListener(msg.getMessageId());
         if (handler == null) {
+            System.out.println(" DID NOT FIND HANDLER FOR RESPONSE TO MESSAGE WITH ID: " + msg.getMessageId());
             // For all commands that are sent to another case via us, a listener is registered.
             // If that listener is null, we set a default listener ourselves.
             // So if we still do not find a listener, it means that we received a response to a command that we never submitted,
@@ -41,10 +42,10 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
             // which is strange.
             logger.warn(actor.getClass().getSimpleName() + " " + actor.getId() + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
         } else {
-            if (msg instanceof CaseResponse) {
-                handler.right.handleResponse((CaseResponse) msg);
-            } else if (msg instanceof CommandFailure) {
+            if (msg instanceof CommandFailure) {
                 handler.left.handleFailure((CommandFailure) msg);
+            } else if (msg instanceof ModelResponse) {
+                handler.right.handleResponse(msg);
             }
         }
     }

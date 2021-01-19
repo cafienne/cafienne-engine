@@ -4,6 +4,7 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.platform.NewUserInformation;
+import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
 import org.cafienne.tenant.akka.command.TenantCommand;
 import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.event.*;
@@ -64,9 +65,10 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void updateState(TenantAppliedPlatformUpdate event) {
-        event.newUserInformation.forEach(userInfo -> {
+        event.newUserInformation.info().foreach(userInfo -> {
             User user = users.remove(userInfo.existingUserId());
             users.put(userInfo.newUserId(), user);
+            return userInfo;
         });
     }
 
@@ -134,7 +136,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         setLastModified(event.lastModified());
     }
 
-    public void updatePlatformInformation(List<NewUserInformation> newUserInformation) {
+    public void updatePlatformInformation(PlatformUpdate newUserInformation) {
         addEvent(new TenantAppliedPlatformUpdate(this, newUserInformation));
     }
 }
