@@ -10,11 +10,8 @@ case class PlatformUpdate(info: Seq[NewUserInformation]) extends CafienneJson {
     list
   }
 
-  def filter(userIds: ValueList): PlatformUpdate = {
-    val list = scala.collection.mutable.Buffer[String]()
-    userIds.getValue.forEach(v => list += v.getValue.toString)
-    new PlatformUpdate(info.filter(user => list.contains(user.existingUserId)))
-  }
+  /** Returns new user info for the specified id if it is present, or else null */
+  def getUserUpdate(userId: String): NewUserInformation = info.find(i => i.existingUserId == userId).getOrElse(null)
 }
 
 object PlatformUpdate {
@@ -23,6 +20,4 @@ object PlatformUpdate {
     list.forEach(map => users += NewUserInformation(map.asMap().raw("existingUserId"), map.asMap().raw("newUserId")))
     PlatformUpdate(users)
   }
-
-
 }

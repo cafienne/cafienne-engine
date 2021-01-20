@@ -20,4 +20,6 @@ trait RecordsPersistence {
   def getTask(taskId: String): Future[Option[TaskRecord]]
 
   def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation]): Future[Done]
+
+  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation]): Future[Done]
 }

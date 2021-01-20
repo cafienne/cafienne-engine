@@ -3,7 +3,6 @@ package org.cafienne.tenant;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.platform.NewUserInformation;
 import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
 import org.cafienne.tenant.akka.command.TenantCommand;
 import org.cafienne.tenant.akka.command.TenantUserInformation;

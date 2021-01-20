@@ -39,6 +39,7 @@ public class CommandSerializer extends CafienneSerializer {
     private static void addCaseCommands() {
         addManifestWrapper(StartCase.class, StartCase::new);
         addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
+        addManifestWrapper(UpdateCaseWithPlatformInformation.class, UpdateCaseWithPlatformInformation::new);
     }
 
     private static void addCasePlanCommands() {

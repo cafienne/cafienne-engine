@@ -1,35 +1,45 @@
-package org.cafienne.tenant.akka.command.platform;
+package org.cafienne.cmmn.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.PlatformUser;
+import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.akka.command.platform.CaseUpdate;
 import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.akka.command.platform.TenantUpdate;
+import org.cafienne.cmmn.akka.command.response.CaseResponse;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.akka.command.platform.PlatformTenantCommand;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
 
 import java.io.IOException;
 
 @Manifest
-public class UpdateTenantWithPlatformInformation extends PlatformTenantCommand {
+public class UpdateCaseWithPlatformInformation extends CaseCommand {
     private final PlatformUpdate newUserInformation;
 
-    public UpdateTenantWithPlatformInformation(PlatformUser user, TenantUpdate action) {
-        super(user, action.tenant());
+    public UpdateCaseWithPlatformInformation(PlatformUser user, CaseUpdate action) {
+        super(TenantUser.fromPlatformOwner(user, action.tenant()), action.caseId());
         this.newUserInformation = action.platformUpdate();
     }
 
-    public UpdateTenantWithPlatformInformation(ValueMap json) {
+    public UpdateCaseWithPlatformInformation(ValueMap json) {
         super(json);
         newUserInformation = PlatformUpdate.deserialize(json.withArray(Fields.users));
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        tenant.updatePlatformInformation(this.newUserInformation);
-        return new TenantResponse(this);
+    public void validate(Case caseInstance) throws InvalidCommandException {
+    }
+
+    @Override
+    public CaseResponse process(Case caseInstance) {
+        caseInstance.updatePlatformInformation(this.newUserInformation);
+        return new CaseResponse(this);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package org.cafienne.humantask.instance;
 
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.cmmn.akka.command.platform.NewUserInformation;
+import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.task.AssignmentDefinition;
@@ -183,6 +186,19 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
 
     public void saveOutput(ValueMap taskOutput) {
         addEvent(new HumanTaskOutputSaved(task, taskOutput));
+    }
+
+    public void updateState(CaseAppliedPlatformUpdate event) {
+        NewUserInformation updatedAssignee = event.newUserInformation.getUserUpdate(this.assignee);
+        if (updatedAssignee != null) {
+            addDebugInfo(() -> "Updating assignee of " + this.task + " with new user id " + updatedAssignee.newUserId());
+            this.assignee = updatedAssignee.newUserId();
+        }
+        NewUserInformation updatedOwner = event.newUserInformation.getUserUpdate(this.owner);
+        if (updatedOwner != null) {
+            addDebugInfo(() -> "Updating owner of " + this.task + " with new user id " + updatedOwner.newUserId());
+            this.owner = updatedOwner.newUserId();
+        }
     }
 
     //

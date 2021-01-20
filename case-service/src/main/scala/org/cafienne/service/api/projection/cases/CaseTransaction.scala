@@ -42,7 +42,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case event: HumanTaskCreated => deprecatedCreateTask(event)
       case event: HumanTaskActivated => createTask(event)
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
-
+      case event: CaseAppliedPlatformUpdate => updateUserIds(event)
       case event: CaseModified => updateCaseInstance(event)
       case event: BusinessIdentifierEvent => handleBusinessIdentifierEvent(event)
       case _ => Future.successful(Done) // Ignore other events
@@ -257,6 +257,10 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case _ => logger.error("Could not find task with id " + event.taskId + " in the current database. This may lead to problems. Ignoring event of type " + event.getClass.getName)
     }.flatMap(_ => Future.successful(Done))
 
+  }
+
+  def updateUserIds(event: CaseAppliedPlatformUpdate): Future[Done] = {
+    persistence.updateCaseUserInformation(event.getCaseInstanceId, event.newUserInformation.info)
   }
 
   private def fetchTask(taskId: String) = {

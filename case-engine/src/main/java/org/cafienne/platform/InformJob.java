@@ -3,6 +3,7 @@ package org.cafienne.platform;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.akka.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.cmmn.akka.command.platform.CaseUpdate;
 import org.cafienne.cmmn.akka.command.platform.TenantUpdate;
 import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
@@ -31,7 +32,7 @@ class InformCaseJob extends InformJob {
 
     @Override
     ModelCommand getCommand() {
-        return null;
+        return new UpdateCaseWithPlatformInformation(PlatformUser.from(user), action);
     }
 
     @Override

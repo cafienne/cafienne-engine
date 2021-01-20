@@ -42,6 +42,17 @@ public class Member extends CMMNElement<CaseDefinition> {
         this.key = key;
     }
 
+    private Member(MemberKey key, Member source) {
+        this.key = key;
+        this.team = source.team;
+        this.roles.addAll(source.roles);
+        this.isOwner = source.isOwner;
+    }
+
+    Member cloneMember(MemberKey newKey) {
+        return new Member(newKey, this);
+    }
+
     boolean isUser() {
         return key.type().equals("user");
     }

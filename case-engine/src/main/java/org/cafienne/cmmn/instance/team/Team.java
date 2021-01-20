@@ -5,11 +5,13 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
+import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.akka.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.tenant.User;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -298,5 +300,18 @@ public class Team extends CMMNElement<CaseDefinition> {
                 }
             }
         }
+    }
+
+    public void updateState(CaseAppliedPlatformUpdate event) {
+        event.newUserInformation.info().foreach(userInfo -> {
+            Member member = getMember(new MemberKey(userInfo.existingUserId(), "user"));
+            if (member != null) {
+                addDebugInfo(() -> "Replace case team member user id from " + userInfo.existingUserId() + " to " + userInfo.newUserId());
+                Member clone = member.cloneMember(new MemberKey(userInfo.newUserId(), "user"));
+                members.remove(member);
+                members.add(clone);
+            }
+            return userInfo;
+        });
     }
 }

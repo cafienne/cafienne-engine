@@ -22,5 +22,6 @@ class TestPersistence() extends RecordsPersistence {
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] =  Future.successful(None)
   override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = Future.successful(None)
 
+  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation]): Future[Done] = Future.successful(Done)
   override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation]): Future[Done] = Future.successful(Done)
 }

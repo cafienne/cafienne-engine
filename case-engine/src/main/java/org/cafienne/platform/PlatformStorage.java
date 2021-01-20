@@ -44,25 +44,17 @@ public class PlatformStorage implements ModelActorSnapshot {
 
     List<InformJob> getJobs() {
         List<InformJob> jobs = new ArrayList();
-        tenantsToUpdate.forEach(tenant -> {
-            jobs.add(new InformTenantJob(user, tenant));
-            casesToUpdate.forEach(update -> {
-                if (update.tenant().equals(tenant.tenant())) {
-                    jobs.add(new InformCaseJob(user, update));
-                }
-            });
-        });
-
+        tenantsToUpdate.forEach(tenant -> jobs.add(new InformTenantJob(user, tenant)));
+        casesToUpdate.forEach(update -> jobs.add(new InformCaseJob(user, update)));
         return jobs;
     }
 
     void removeTenant(Object tenant) {
-        System.out.println("REMOVEING !!!!! " + tenant);
         tenantsToUpdate.remove(tenant);
         changed = true;
     }
 
-    void removeCase(String caseId) {
+    void removeCase(Object caseId) {
         casesToUpdate.remove(caseId);
         changed = true;
     }
