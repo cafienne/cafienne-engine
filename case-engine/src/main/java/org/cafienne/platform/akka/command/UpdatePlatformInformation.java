@@ -19,8 +19,8 @@ import java.util.List;
 @Manifest
 public class UpdatePlatformInformation extends PlatformCommand {
     private final PlatformUpdate platformUpdate;
-    private final List<TenantUpdate> tenants;
-    private final List<CaseUpdate> cases;
+    public final List<TenantUpdate> tenants;
+    public final List<CaseUpdate> cases;
 
     public UpdatePlatformInformation(PlatformUser user, PlatformUpdate platformUpdate, List<TenantUpdate> tenants, List<CaseUpdate> cases) {
         super(TenantUser.fromPlatformOwner(user, "PLATFORM"));
@@ -40,12 +40,7 @@ public class UpdatePlatformInformation extends PlatformCommand {
 
     @Override
     public PlatformResponse process(PlatformService platform) {
-        try {
-            platform.handleNewInformation(this.user, this.platformUpdate, this.tenants, this.cases);
-
-        } catch (Throwable t) {
-            t.printStackTrace();;
-        }
+        platform.handleUpdate(this);
         return new PlatformResponse(this);
     }
 

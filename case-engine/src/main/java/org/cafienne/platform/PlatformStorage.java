@@ -1,96 +1,70 @@
 package org.cafienne.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.snapshot.ModelActorSnapshot;
-import org.cafienne.cmmn.akka.command.platform.CaseUpdate;
-import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
-import org.cafienne.cmmn.akka.command.platform.TenantUpdate;
+import org.cafienne.akka.actor.snapshot.RelaxedSnapshot;
+import org.cafienne.platform.akka.command.UpdatePlatformInformation;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Object that can be saved as snapshot offer for the TimerService persistent actor
  */
 @Manifest
-public class PlatformStorage implements ModelActorSnapshot {
-    private List<TenantUpdate> tenantsToUpdate = new ArrayList();
-    private List<CaseUpdate> casesToUpdate = new ArrayList();
-    private TenantUser user;
+public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
+    private final List<UpdatePlatformInformation> updates = new ArrayList();
+    private final List<UpdatePlatformInformation> pendingUpdates = new ArrayList();
 
-    public PlatformStorage() {
+    public PlatformStorage(PlatformService service) {
+        super(service, getDuration());
+    }
+
+    private static FiniteDuration getDuration() {
+        return Duration.create(CaseSystem.config().engine().platformServiceConfig().persistDelay(), TimeUnit.SECONDS);
     }
 
     public PlatformStorage(ValueMap json) {
-        json.withArray(Fields.tenants).forEach(value -> add(TenantUpdate.deserialize(value.asMap())));
-        json.withArray(Fields.cases).forEach(value -> add(CaseUpdate.deserialize(value.asMap())));
-        if (json.has(Fields.user)) {
-            this.user = TenantUser.from(json.with(Fields.user));
-        }
+        // This is a snapshot being deserialized. Does not have a job queue and will be merged into the one and only later
+        super();
+        json.withArray(Fields.update).forEach(value -> updates.add(new UpdatePlatformInformation(value.asMap())));
     }
 
-    private boolean changed = false;
-
-    boolean changed() {
-        return changed;
+    void merge(PlatformStorage snapshot) {
+        snapshot.updates.forEach(this::registerUpdate);
     }
 
-    List<InformJob> getJobs() {
-        List<InformJob> jobs = new ArrayList();
-        tenantsToUpdate.forEach(tenant -> jobs.add(new InformTenantJob(user, tenant)));
-        casesToUpdate.forEach(update -> jobs.add(new InformCaseJob(user, update)));
-        return jobs;
+    private void registerUpdate(UpdatePlatformInformation updatePlatformInformation) {
+        pendingUpdates.add(updatePlatformInformation);
+        updates.add(updatePlatformInformation);
     }
 
-    void removeTenant(Object tenant) {
-        tenantsToUpdate.remove(tenant);
-        changed = true;
+    List<UpdatePlatformInformation> getPendingUpdates() {
+        List<UpdatePlatformInformation> penders = new ArrayList<>(pendingUpdates);
+        pendingUpdates.clear();
+        return penders;
     }
 
-    void removeCase(Object caseId) {
-        casesToUpdate.remove(caseId);
-        changed = true;
+    void changed() {
+        enableTimedSnapshotSaver();
     }
 
-    void saved() {
-        changed = false;
+    void addUpdate(UpdatePlatformInformation updatePlatformInformation) {
+        registerUpdate(updatePlatformInformation);
+        save("Received new information to handle");
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        generator.writeArrayFieldStart(Fields.tenants.toString());
-        for (TenantUpdate update : tenantsToUpdate) update.toValue().print(generator);
+        generator.writeArrayFieldStart(Fields.update.toString());
+        for (UpdatePlatformInformation update : updates) update.writeThisObject(generator);
         generator.writeEndArray();
-        generator.writeArrayFieldStart(Fields.cases.toString());
-        for (CaseUpdate update : casesToUpdate) update.toValue().print(generator);
-        generator.writeEndArray();
-        if (this.user != null) {
-            writeField(generator, Fields.user, user);
-        }
-    }
-
-    void add(TenantUpdate tenantUpdate) {
-        tenantsToUpdate.add(tenantUpdate);
-        changed = true;
-    }
-
-    void add(CaseUpdate caseUpdate) {
-        casesToUpdate.add(caseUpdate);
-        changed = true;
-    }
-
-    public void setNewInformation(PlatformUpdate newUserInformation) {
-    }
-
-    public void setUser(TenantUser user) {
-        this.user = user;
-        this.changed = true;
     }
 }
