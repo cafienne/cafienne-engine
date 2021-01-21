@@ -77,13 +77,11 @@ public class PlatformStorage implements ModelActorSnapshot {
     }
 
     void add(TenantUpdate tenantUpdate) {
-        System.out.println("Adding tenant update for tenant " + tenantUpdate.tenant());
         tenantsToUpdate.add(tenantUpdate);
         changed = true;
     }
 
     void add(CaseUpdate caseUpdate) {
-        System.out.println("Adding case update for case " + caseUpdate.caseId() +" in tenant " + caseUpdate.tenant());
         casesToUpdate.add(caseUpdate);
         changed = true;
     }

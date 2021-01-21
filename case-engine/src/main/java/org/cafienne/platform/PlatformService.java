@@ -22,7 +22,6 @@ import scala.concurrent.duration.FiniteDuration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -33,8 +32,7 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
     private final static Logger logger = LoggerFactory.getLogger(PlatformService.class);
     public static final String CAFIENNE_PLATFORM_SERVICE = "cafienne-platform-service";
     private PlatformStorage storage = new PlatformStorage();
-    private BlockingQueue<InformJob> jobs = new SynchronousQueue();
-    private BlockingQueue<Boolean> hasChanges = new SynchronousQueue();
+    private BlockingQueue<InformJob> jobQueue = new SynchronousQueue();
 
     public PlatformService() {
         super(PlatformCommand.class, ModelEvent.class);
@@ -44,8 +42,12 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
         // TODO: this thread runs continuously; should be started only when there is something to be saved!
         addPeriodicSnapshotSaver();
 
-        // A thread that nicely awaits work
-        startJobHandler();
+        // Start 5 threads that nicely await work
+        startJobHandler(1);
+        startJobHandler(2);
+        startJobHandler(3);
+        startJobHandler(4);
+        startJobHandler(5);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
             SaveSnapshotFailure failure = (SaveSnapshotFailure) message;
             // How to go about this?
             logger.error("PLATFORM SERVICE ERROR: Could not save snapshot for platform service", failure.cause());
-        } else if (message instanceof SaveSnapshotSuccess){
+        } else if (message instanceof SaveSnapshotSuccess) {
             refreshStorageObject(this.storage);
         }
         return super.createAkkaSystemMessageHandler(message);
@@ -102,21 +104,23 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
 
     private void refreshStorageObject(PlatformStorage storage) {
         this.storage = storage;
-        System.out.println("CLEARING " + jobs.size() +" jobs !!!");
-        jobs.clear();
+        jobQueue.clear(); // Avoid queueing same job multiple times
         new Thread(() -> {
-            System.out.println("Running new thread to fill queue");
-            storage.getJobs().forEach(job -> {
-                System.out.println("Adding " + job);
+            List<InformJob> jobs = storage.getJobs();
+            if (jobs.isEmpty()) {
+                // No need to run and print log messages for an empty queue
+                return;
+            }
+            logger.debug("Running new thread to fill queue with " + jobs.size() + " jobs");
+            jobs.forEach(job -> {
+                logger.debug("Queueing " + job);
                 try {
-                    jobs.put(job);
-                    System.out.println("Added " + job);
+                    jobQueue.put(job);
                 } catch (InterruptedException e) {
-                    System.out.println("Failure while adding " + job);
-                    e.printStackTrace();
+                    logger.debug("Failure while adding " + job, e);
                 }
             });
-            System.out.println("Completed thread that filled queue");
+            logger.debug("Completed thread that filled queue");
         }).start();
     }
 
@@ -149,24 +153,44 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
         new Thread(saveJob).start();
     }
 
-    private void startJobHandler() {
+    void log(int nr, String msg) {
+        logger.debug("Handler[" + nr + "]: " + msg);
+    }
+
+    private void startJobHandler(int nr) {
         Runnable jobHandler = () -> {
+            BlockingQueue<Boolean> availability = new SynchronousQueue();
             try {
                 while (true) {
-                    System.out.println("Awaiting new job...");
-                    InformJob job = jobs.take();
-                    System.out.println("Received job " + job);
+                    log(nr, "Awaiting new job...");
+                    InformJob job = jobQueue.take();
+                    log(nr, "Running job " + job);
                     ModelCommand command = job.getCommand();
                     if (command != null) {
                         super.askModel(command, left -> {
-                            System.out.println("Failure while sending command to actor! " + left.exception());
+                            log(nr, "Failure while sending command to actor! " + left.exception());
+                            log(nr, "Releasing handler for next job");
+                            try {
+                                availability.take();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }, right -> {
+                            log(nr, "Completed job " + job);
                             if (job instanceof InformCaseJob) {
                                 storage.removeCase(job.action());
                             } else {
                                 storage.removeTenant(job.action());
                             }
+                            log(nr, "Releasing handler for next job");
+                            try {
+                                availability.take();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         });
+                        log(nr, "Blocking handler until job is completed");
+                        availability.put(false);
                     }
                 }
             } catch (InterruptedException e) {
