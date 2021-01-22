@@ -64,6 +64,8 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
     */
   lazy val repository: RepositoryConfig = new RepositoryConfig(this)
 
+  lazy val engine: EngineConfig = new EngineConfig(this)
+
   /**
     * Returns true of the debug route is open (for developers using IDE to do debugging)
     */
