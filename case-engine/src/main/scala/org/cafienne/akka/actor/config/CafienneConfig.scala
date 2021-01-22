@@ -45,11 +45,6 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
   lazy val actor: ModelActorConfig = new ModelActorConfig(this)
 
   /**
-    * Returns configuration options for the Timer Service
-    */
-  lazy val timerService = new TimerServiceConfig(this)
-
-  /**
     * Returns configuration options for the HTTP APIs
     */
   lazy val api: ApiConfig = new ApiConfig(this)
@@ -64,6 +59,9 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
     */
   lazy val repository: RepositoryConfig = new RepositoryConfig(this)
 
+  /**
+    * Returns configuration options for the engine and it's internal services
+    */
   lazy val engine: EngineConfig = new EngineConfig(this)
 
   /**

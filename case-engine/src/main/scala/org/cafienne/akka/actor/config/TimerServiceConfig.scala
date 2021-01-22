@@ -1,6 +1,6 @@
 package org.cafienne.akka.actor.config
 
-class TimerServiceConfig(val parent: CafienneConfig) extends CafienneBaseConfig {
+class TimerServiceConfig(val parent: EngineConfig) extends CafienneBaseConfig {
   val path = "timer-service"
 
   lazy val persistDelay: Long = {
