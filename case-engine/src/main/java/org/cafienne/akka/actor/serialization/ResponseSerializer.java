@@ -10,6 +10,7 @@ import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.command.response.HumanTaskValidationResponse;
 import org.cafienne.platform.akka.response.PlatformResponse;
+import org.cafienne.platform.akka.response.PlatformUpdateStatus;
 import org.cafienne.processtask.akka.command.response.ProcessResponse;
 import org.cafienne.tenant.akka.command.response.TenantOwnersResponse;
 import org.cafienne.tenant.akka.command.response.TenantResponse;
@@ -53,5 +54,6 @@ public class ResponseSerializer extends CafienneSerializer {
 
     private static void addPlatformResponses() {
         addManifestWrapper(PlatformResponse.class, PlatformResponse::new);
+        addManifestWrapper(PlatformUpdateStatus.class, PlatformUpdateStatus::new);
     }
 }

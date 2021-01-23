@@ -8,8 +8,11 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
+import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.platform.akka.command.PlatformCommand;
 import org.cafienne.platform.akka.command.UpdatePlatformInformation;
+import org.cafienne.platform.akka.response.PlatformResponse;
+import org.cafienne.platform.akka.response.PlatformUpdateStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,5 +95,13 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
 
     public void handleUpdate(UpdatePlatformInformation updatePlatformInformation) {
         storage.addUpdate(updatePlatformInformation);
+    }
+
+    public int getPendingUpdates() {
+        return storage.numPendingUpdates();
+    }
+
+    public ValueList getFailures() {
+        return storage.getFailures();
     }
 }

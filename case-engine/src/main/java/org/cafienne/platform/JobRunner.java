@@ -13,7 +13,7 @@ class JobRunner extends Thread {
     private final int identifier;
     private final BlockingQueue<Boolean> availability = new SynchronousQueue();
 
-    public JobRunner(PlatformService service, JobScheduler jobScheduler, int identifier) {
+    JobRunner(PlatformService service, JobScheduler jobScheduler, int identifier) {
         this.service = service;
         this.jobScheduler = jobScheduler;
         this.identifier = identifier;
@@ -41,8 +41,7 @@ class JobRunner extends Thread {
     }
 
     void finished(InformJob job) {
-        log("Finished job " + job +", making myself available again");
-        jobScheduler.jobFinished(job);
+        log("Finished job " + job + ", making myself available again");
         try {
             availability.take();
         } catch (InterruptedException e) {

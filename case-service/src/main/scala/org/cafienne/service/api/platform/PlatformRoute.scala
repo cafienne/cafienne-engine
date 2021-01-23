@@ -20,7 +20,7 @@ import org.cafienne.cmmn.akka.command.platform.{CaseUpdate, NewUserInformation, 
 
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.platform.akka.command.UpdatePlatformInformation
+import org.cafienne.platform.akka.command.{GetUpdateStatus, UpdatePlatformInformation}
 import org.cafienne.service.api.projection.query.PlatformQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
@@ -37,7 +37,8 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
       disableTenant ~
       enableTenant ~
       getUserInformation ~
-      updateUserInformation
+      updateUserInformation ~
+      getUpdateStatus
   }
 
   @Path("/")
@@ -209,6 +210,29 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
               }
             }
           }
+        }
+      }
+    }
+  }
+
+  @Path("/update-status")
+  @GET
+  @Operation(
+    summary = "Get user information of current user",
+    description = "Retrieves the user information of current user",
+    tags = Array("platform"),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUserFormat])))),
+      new ApiResponse(responseCode = "400", description = "Invalid request"),
+      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+    )
+  )
+  @Produces(Array("application/json"))
+  def getUpdateStatus = get {
+    pathPrefix("update-status") {
+      pathEndOrSingleSlash {
+        validUser { platformOwner =>
+          askModelActor(new GetUpdateStatus(platformOwner))
         }
       }
     }

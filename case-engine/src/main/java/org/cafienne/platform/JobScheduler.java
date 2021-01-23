@@ -46,8 +46,8 @@ class JobScheduler {
         // Convert PlatformUpdates into InformJobs
         new ArrayList<>(pendingUpdates).forEach(command -> {
             PlatformUser user = PlatformUser.from(command.getUser());
-            command.tenants.forEach(update -> pendingJobs.add(new InformJob(command.tenants, update, new UpdateTenantWithPlatformInformation(user, update))));
-            command.cases.forEach(update -> pendingJobs.add(new InformJob(command.cases, update, new UpdateCaseWithPlatformInformation(user, update))));
+            command.tenants.forEach(update -> pendingJobs.add(new InformJob(storage, command.tenants, update, new UpdateTenantWithPlatformInformation(user, update))));
+            command.cases.forEach(update -> pendingJobs.add(new InformJob(storage, command.cases, update, new UpdateCaseWithPlatformInformation(user, update))));
         });
 
         // Start a new thread to put the pending jobs into the queue, to avoid blocking this thread
@@ -59,10 +59,6 @@ class JobScheduler {
                 logger.warn("Scheduling next pending job was interrupted (perhaps shutting down?)", e);
             }
         })).start();
-    }
-
-    void jobFinished(InformJob job) {
-        storage.changed();
     }
 
     /**

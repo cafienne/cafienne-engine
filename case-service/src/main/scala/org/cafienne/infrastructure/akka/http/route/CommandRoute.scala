@@ -11,7 +11,7 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse
 import org.cafienne.humantask.akka.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.platform.akka.response.PlatformResponse
+import org.cafienne.platform.akka.response.{PlatformResponse, PlatformUpdateStatus}
 import org.cafienne.service.{Main, api}
 import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
 
@@ -45,6 +45,10 @@ trait CommandRoute extends AuthenticatedRoute {
             writeLastModifiedHeader(value) {
               complete(StatusCodes.OK, value)
             }
+          case value: PlatformUpdateStatus => {
+            // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
+            complete(StatusCodes.OK, value.getValue)
+          }
           case _: PlatformResponse => {
             // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
             complete(StatusCodes.Accepted, "Handling is in progress")
