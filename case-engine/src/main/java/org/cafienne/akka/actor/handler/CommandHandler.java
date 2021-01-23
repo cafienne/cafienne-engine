@@ -143,7 +143,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
 
             // Change the last modified moment of this case; update it in the response, and publish an event about it
             Instant lastModified = actor.getTransactionTimestamp();
-            TransactionEvent lastModifiedEvent = actor.createTransactionEvent();
+            TransactionEvent lastModifiedEvent = command.createTransactionEvent(actor);
             if (lastModifiedEvent != null) {
                 addModelEvent(lastModifiedEvent);
             }

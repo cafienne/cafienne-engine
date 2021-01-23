@@ -1,6 +1,7 @@
 package org.cafienne.tenant.akka.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
@@ -24,6 +25,11 @@ public class UpdateTenantWithPlatformInformation extends PlatformTenantCommand {
     public UpdateTenantWithPlatformInformation(ValueMap json) {
         super(json);
         newUserInformation = PlatformUpdate.deserialize(json.withArray(Fields.users));
+    }
+
+    @Override
+    public TransactionEvent createTransactionEvent(TenantActor actor) {
+        return null;
     }
 
     @Override

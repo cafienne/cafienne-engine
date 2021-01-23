@@ -1,7 +1,9 @@
 package org.cafienne.cmmn.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
@@ -34,6 +36,11 @@ public class UpdateCaseWithPlatformInformation extends CaseCommand {
 
     @Override
     public void validate(Case caseInstance) throws InvalidCommandException {
+    }
+
+    @Override
+    public TransactionEvent createTransactionEvent(Case actor) {
+        return null;
     }
 
     @Override
