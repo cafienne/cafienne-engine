@@ -1,6 +1,7 @@
 package org.cafienne.service.api.projection.slick
 
 import akka.Done
+import org.cafienne.cmmn.akka.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.service.api.projection.RecordsPersistence
@@ -63,6 +64,49 @@ class SlickRecordsPersistence
   override def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]] = {
     db.run(TableQuery[UserRoleTable].filter(record => record.userId === key.userId && record.tenant === key.tenant && record.role_name === key.role_name).result.headOption)
   }
+
+  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation]): Future[Done] = {
+    val updateQueries = info.map(user => {
+      (for {c <- TableQuery[UserRoleTable].filter(r => r.userId === user.existingUserId && r.tenant === tenant)} yield c.userId).update(user.newUserId)
+    })
+    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
+  }
+
+  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation]): Future[Done] = {
+    val updateQueries = info.map(user => {
+      // Update 'createdBy' field in case instance table
+      (for {cases <- TableQuery[CaseInstanceTable].filter(r => r.id === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'modifiedBy' field in case instance table
+      (for {cases <- TableQuery[CaseInstanceTable].filter(r => r.id === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'createdBy' field in planitem table
+      (for {cases <- TableQuery[PlanItemTable].filter(r => r.id === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'modifiedBy' field in planitem table
+      (for {cases <- TableQuery[PlanItemTable].filter(r => r.id === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'modifiedBy' field in planitemhistory table
+      (for {cases <- TableQuery[PlanItemHistoryTable].filter(r => r.id === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'createdBy' field in task table
+      (for {cases <- TableQuery[TaskTable].filter(r => r.id === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'modifiedBy' field in task table
+      (for {cases <- TableQuery[TaskTable].filter(r => r.id === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'assignee' field in task table
+      (for {cases <- TableQuery[TaskTable].filter(r => r.id === caseId && r.assignee === user.existingUserId)} yield cases.assignee).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'owner' field in task table
+      (for {cases <- TableQuery[TaskTable].filter(r => r.id === caseId && r.owner === user.existingUserId)} yield cases.owner).update(user.newUserId)
+    }) ++ info.map(user => {
+      // Update 'memberId' field in team table
+      (for {cases <- TableQuery[CaseInstanceTeamMemberTable].filter(r => r.isTenantUser && r.memberId === user.existingUserId)} yield cases.memberId).update(user.newUserId)
+    })
+    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
+  }
+
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {
     db.run(TableQuery[CaseInstanceTable].filter(_.id === id).result.headOption)

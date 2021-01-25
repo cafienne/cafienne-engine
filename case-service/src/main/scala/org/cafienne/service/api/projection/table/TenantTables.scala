@@ -18,7 +18,7 @@ trait TenantTables extends QueryDBSchema {
 
     def tenant = idColumn[String]("tenant")
 
-    def userId = idColumn[String]("userId")
+    def userId = userColumn[String]("userId")
   }
 
   // Schema for the "tenant" table:
@@ -38,7 +38,7 @@ trait TenantTables extends QueryDBSchema {
 
     def * = (userId, tenant, role_name, name, email, isOwner, enabled) <> (UserRoleRecord.tupled, UserRoleRecord.unapply)
 
-    def userId = idColumn[String]("user_id")
+    def userId = userColumn[String]("user_id")
 
     def tenant = idColumn[String]("tenant")
 

@@ -27,5 +27,9 @@ object TenantAPI {
 
   case class PlatformUserFormat(userId: String, tenants: Seq[TenantUserFormat])
 
+  case class PlatformUserUpdateFormat(existingUserId: String, newUserId: String)
+
+  case class PlatformUsersUpdateFormat(users: Seq[PlatformUserUpdateFormat])
+
   case class BackwardsCompatibleTenantFormat(name: String, owners: Option[Seq[UserFormat]] = None, users: Option[Seq[UserFormat]] = None)
 }

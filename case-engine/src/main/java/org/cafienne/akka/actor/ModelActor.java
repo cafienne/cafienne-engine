@@ -384,7 +384,9 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     public abstract TransactionEvent createTransactionEvent();
 
     public Responder getResponseListener(String msgId) {
-        return responseListeners.get(msgId);
+        synchronized (responseListeners) {
+            return responseListeners.remove(msgId);
+        }
     }
 
     /**
@@ -420,12 +422,14 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         askModel(command, left, right);
     }
 
-    private void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
+    public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
         if (recoveryRunning()) {
 //            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
             return;
         }
-        responseListeners.put(command.getMessageId(), new Responder(left, right));
+        synchronized (responseListeners) {
+            responseListeners.put(command.getMessageId(), new Responder(left, right));
+        }
         CaseSystem.router().tell(command, self());
     }
 

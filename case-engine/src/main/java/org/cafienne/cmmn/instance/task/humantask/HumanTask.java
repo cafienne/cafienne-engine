@@ -7,6 +7,8 @@
  */
 package org.cafienne.cmmn.instance.task.humantask;
 
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.instance.*;
@@ -186,4 +188,8 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 //		super.goComplete(workflow.saveOutput(rawOutput));
 //		workflow.goComplete();
 //	}
+
+    public void updateState(CaseAppliedPlatformUpdate event) {
+        this.workflow.updateState(event);
+    }
 }

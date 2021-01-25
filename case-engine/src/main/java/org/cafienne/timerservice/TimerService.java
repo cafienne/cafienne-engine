@@ -148,7 +148,7 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         Runnable saveJob = () -> {
             try {
                 while (true) {
-                    FiniteDuration duration = Duration.create(CaseSystem.config().timerService().persistDelay(), TimeUnit.SECONDS);
+                    FiniteDuration duration = Duration.create(CaseSystem.config().engine().timerService().persistDelay(), TimeUnit.SECONDS);
                     Thread.sleep(duration.toMillis());
                     saveTimerStorage("after period of " + duration);
 //                    if (logger.isDebugEnabled())

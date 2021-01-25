@@ -9,10 +9,8 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.event.CaseEvent;
-import org.cafienne.cmmn.akka.event.CaseModified;
-import org.cafienne.cmmn.akka.event.DebugDisabled;
-import org.cafienne.cmmn.akka.event.DebugEnabled;
+import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
+import org.cafienne.cmmn.akka.event.*;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
@@ -397,5 +395,14 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
             if (newDebugMode) addEvent(new DebugEnabled(this));
             else addEvent(new DebugDisabled(this));
         }
+    }
+
+    public void updatePlatformInformation(PlatformUpdate newUserInformation) {
+        addEvent(new CaseAppliedPlatformUpdate(this, newUserInformation));
+    }
+
+    public void updateState(CaseAppliedPlatformUpdate event) {
+        getCaseTeam().updateState(event);
+        getCasePlan().updateState(event);
     }
 }

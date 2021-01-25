@@ -65,3 +65,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
     throw AuthorizationException(message)
   })
 }
+
+object PlatformUser {
+  def from(tenantUser: TenantUser) = new PlatformUser(tenantUser.id, Seq())
+}

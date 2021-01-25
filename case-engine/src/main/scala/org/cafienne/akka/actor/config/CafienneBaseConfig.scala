@@ -1,10 +1,9 @@
 package org.cafienne.akka.actor.config
 
-import java.util.concurrent.TimeUnit
-
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 
 trait MandatoryConfig extends CafienneBaseConfig {
@@ -26,7 +25,8 @@ trait CafienneBaseConfig extends LazyLogging {
     if (parent.config.hasPath(path)) {
       parent.config.getConfig(path)
     } else {
-      null
+      // Base config is not mandatary, so return an empty object
+      ConfigFactory.empty()
     }
   }
   val parent: CafienneBaseConfig

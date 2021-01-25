@@ -17,5 +17,5 @@ public interface CommandResponseListener {
      * The handleResponse method can be implemented to handle a valid {@link CaseResponse} coming back as a result of sending a command to another model.
      * @param response
      */
-    void handleResponse(CaseResponse response);
+    void handleResponse(ModelResponse response);
 }

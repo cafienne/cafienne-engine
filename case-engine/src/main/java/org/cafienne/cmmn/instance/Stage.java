@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.ItemDefinition;
@@ -256,5 +257,10 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
             //  Otherwise the start transition will be generated when this stage becomes active.
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
         }
+    }
+
+    @Override
+    public void updateState(CaseAppliedPlatformUpdate event) {
+        planItems.forEach(item -> item.updateState(event));
     }
 }

@@ -1,6 +1,5 @@
 package org.cafienne.tenant;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.event.*;
 import scala.collection.Seq;

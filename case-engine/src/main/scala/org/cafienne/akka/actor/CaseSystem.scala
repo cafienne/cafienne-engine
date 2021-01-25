@@ -8,7 +8,6 @@
 package org.cafienne.akka.actor
 
 import java.time.Instant
-
 import akka.actor._
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
@@ -16,6 +15,7 @@ import org.cafienne.akka.actor.config.CafienneConfig
 import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
+import org.cafienne.platform.PlatformService
 import org.cafienne.timerservice.TimerService
 
 /**
@@ -52,6 +52,7 @@ object CaseSystem extends LazyLogging {
     */
   val health = new HealthMonitor
   var messageRouterService: ActorRef = _
+  var platformService: ActorRef = _
   var timerService: ActorRef = _
   var system: ActorSystem = null
 
@@ -76,6 +77,7 @@ object CaseSystem extends LazyLogging {
     }
 
     // Always immediately create a TimerService
+    platformService = system.actorOf(Props.create(classOf[PlatformService]), PlatformService.CAFIENNE_PLATFORM_SERVICE);
     timerService = system.actorOf(Props.create(classOf[TimerService]), TimerService.CAFIENNE_TIMER_SERVICE);
 
     messageRouterService = system.actorOf(Props.create(routerClazz))

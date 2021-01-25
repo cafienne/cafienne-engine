@@ -247,7 +247,7 @@ trait CaseTables extends QueryDBSchema {
 
     def caseRole = idColumn[String]("case_role")
 
-    def memberId = idColumn[String]("member_id")
+    def memberId = userColumn[String]("member_id")
 
     def isTenantUser = column[Boolean]("isTenantUser")
 

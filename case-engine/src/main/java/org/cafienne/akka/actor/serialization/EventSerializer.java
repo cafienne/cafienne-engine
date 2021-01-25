@@ -42,6 +42,7 @@ public class EventSerializer extends CafienneSerializer {
     private static void registerCaseEvents() {
         addManifestWrapper(CaseDefinitionApplied.class, CaseDefinitionApplied::new);
         addManifestWrapper(CaseModified.class, CaseModified::new);
+        addManifestWrapper(CaseAppliedPlatformUpdate.class, CaseAppliedPlatformUpdate::new);
         addManifestWrapper(EngineVersionChanged.class, EngineVersionChanged::new);
         registerCaseTeamEvents();
         registerCasePlanEvents();
@@ -118,6 +119,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(OwnerRemoved.class, OwnerRemoved::new);
         addManifestWrapper(TenantOwnersRequested.class, TenantOwnersRequested::new);
         addManifestWrapper(TenantModified.class, TenantModified::new);
+        addManifestWrapper(TenantAppliedPlatformUpdate.class, TenantAppliedPlatformUpdate::new);
     }
 
     private static void registerPlatformEvents() {

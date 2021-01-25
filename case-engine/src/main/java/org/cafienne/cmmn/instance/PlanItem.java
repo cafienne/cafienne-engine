@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.akka.event.plan.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
@@ -526,5 +527,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     final Transition getTerminationTransition() {
         return stateMachine.terminationTransition;
+    }
+
+    public void updateState(CaseAppliedPlatformUpdate event) {
     }
 }
