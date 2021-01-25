@@ -22,6 +22,7 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -150,6 +151,28 @@ public class Mail extends SubProcess<MailDefinition> {
                 }
             });
 
+            ValueMap invite = input.with("invite");
+            if (!invite.getValue().isEmpty()) {
+                BodyPart attachmentPart = new MimeBodyPart();
+                try {
+                    if (! invite.has("required") && ! invite.has("optional")) {
+                        invite.put("required", input.get("to"));
+                        invite.put("optional", input.get("cc"));
+                    }
+                    if (!invite.has("meetingName")) invite.putRaw("meetingName", subject);
+                    String content = new CalendarInvite(invite).invite;
+                    String fileName = "invite.ics";
+                    String mimeType = "text/calendar";
+                    DataSource source = new ByteArrayDataSource(content.getBytes(StandardCharsets.UTF_8), mimeType);
+                    attachmentPart.setDataHandler(new DataHandler(source));
+                    attachmentPart.setFileName(fileName);
+                    multipart.addBodyPart(attachmentPart);
+                    processTaskActor.addDebugInfo(() -> "Added calendar invite");
+                } catch (MessagingException e) {
+                    throw new InvalidMailException("Cannot add the invite attachment", e);
+                }
+            }
+
             mailMessage.setContent(multipart);
 
             processTaskActor.addDebugInfo(() -> "Sending message to mail server");
@@ -232,7 +255,8 @@ public class Mail extends SubProcess<MailDefinition> {
             throw new InvalidMailAddressException("Missing email address in object of type " + value.getClass().getSimpleName());
         }
         try {
-            return new InternetAddress(email, name);
+            InternetAddress ia = new InternetAddress(email, name);
+            return ia;
         } catch (UnsupportedEncodingException ex) {
             throw new InvalidMailAddressException("Invalid email address " + email + " " + ex.getMessage(), ex);
         }
