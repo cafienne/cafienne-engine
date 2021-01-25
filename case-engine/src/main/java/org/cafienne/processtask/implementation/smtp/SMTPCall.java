@@ -58,7 +58,7 @@ public class SMTPCall extends SubProcess<SMTPCallDefinition> {
 
         // Generate mail to send
 
-        mailSession = Session.getDefaultInstance(mailServerProperties, null);
+        mailSession = Session.getInstance(mailServerProperties, null);
         mailMessage = new MimeMessage(mailSession);
 
         // Setup email message and recipients
