@@ -12,8 +12,7 @@ public class CMMNDocumentationDefinition extends XMLElementDefinition {
     public CMMNDocumentationDefinition(Element element, ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
         this.textFormat = parseAttribute("textFormat", false, "text/plain");
-        String text = parse("text", String.class, false);
-        this.text = text == null ? "" : text;
+        this.text = parseString("text", false, "");
     }
 
     /**

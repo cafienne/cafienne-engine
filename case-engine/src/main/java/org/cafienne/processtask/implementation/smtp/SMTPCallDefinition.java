@@ -26,27 +26,27 @@ import java.util.Set;
 public class SMTPCallDefinition extends SubProcessDefinition {
     private final String smtpServer;
     private final String smtpPort;
-    private final String subject;
-    private final String bodyTemplate;
-    private final String sender;
-    private final String replyTo;
+    private final StringTemplate subject;
+    private final StringTemplate bodyTemplate;
+    private final String bodyType;
+    private final StringTemplate from;
+    private final StringTemplate replyTo;
     private final List<Recipient> recipients = new ArrayList();
     private final List<Attachment> attachments = new ArrayList();
-    private final String bodyType;
 
     public SMTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        this.smtpServer = parse("smtp-server", String.class, true);
-        this.smtpPort = parse("smtp-port", String.class, true);
-        this.subject = parse("subject", String.class, true);
+        this.smtpServer = parseString("smtp-server", true);
+        this.smtpPort = parseString("smtp-port", true);
+        this.subject = parseTemplate("subject", true);
 
         // Get the mail body
         Element body = XMLHelper.getElement(element, "mail-body");
-        this.bodyTemplate = XMLHelper.getContent(body, null, "");
+        this.bodyTemplate = new StringTemplate(XMLHelper.getContent(body, null, ""));
         this.bodyType = body.getAttribute("type");
 
-        this.sender = parse("from", String.class, true);
-        this.replyTo = parse("reply-to", String.class, false);
+        this.from = parseTemplate("from", true);
+        this.replyTo = parseTemplate("reply-to", false);
 
         // Get the recipients
         Element toElement = XMLHelper.getElement(element, "to");
@@ -80,11 +80,11 @@ public class SMTPCallDefinition extends SubProcessDefinition {
     }
 
     StringTemplate getMailFrom() {
-        return new StringTemplate(sender);
+        return from;
     }
 
     StringTemplate getMailReplyTo() {
-        return new StringTemplate(replyTo);
+        return replyTo;
     }
 
     List<Recipient> getRecipients() {
@@ -92,11 +92,11 @@ public class SMTPCallDefinition extends SubProcessDefinition {
     }
 
     StringTemplate getMailSubject() {
-        return new StringTemplate(subject);
+        return subject;
     }
 
     StringTemplate getMailBody() {
-        return new StringTemplate(bodyTemplate);
+        return bodyTemplate;
     }
 
     String getMailBodyType() {

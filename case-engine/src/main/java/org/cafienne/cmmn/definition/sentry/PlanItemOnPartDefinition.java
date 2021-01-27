@@ -28,7 +28,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
 
     public PlanItemOnPartDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        String standardEventName = parse("standardEvent", String.class, true);
+        String standardEventName = parseString("standardEvent", true);
         standardEvent = Transition.getEnum(standardEventName);
         if (standardEvent == null) {
             getCaseDefinition().addDefinitionError("A standard event named " + standardEventName + " does not exist for plan items");

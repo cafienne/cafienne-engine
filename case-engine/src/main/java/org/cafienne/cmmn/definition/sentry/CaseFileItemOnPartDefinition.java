@@ -22,7 +22,7 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
 
     public CaseFileItemOnPartDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        String standardEventName = parse("standardEvent", String.class, true);
+        String standardEventName = parseString("standardEvent", true);
         standardEvent = CaseFileItemTransition.getEnum(standardEventName);
         if (standardEvent == null) {
             getCaseDefinition().addDefinitionError("A standard event named " + standardEventName + " does not exist for case file items");
