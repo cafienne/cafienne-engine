@@ -73,10 +73,15 @@ public class Mail extends SubProcess<MailDefinition> {
         processTaskActor.addDebugInfo(() -> "Disconnecting from mail server took " + (done - now) + " milliseconds");
     }
 
+    private ValueMap getParameters() {
+        ValueMap input = processTaskActor.getMappedInputParameters();
+        return definition.convert(input);
+    }
+
     @Override
     public void start() {
         // Get the input parameters
-        ValueMap input = processTaskActor.getMappedInputParameters();
+        ValueMap input = getParameters();
 
         // Setup email message and recipients
         try {
