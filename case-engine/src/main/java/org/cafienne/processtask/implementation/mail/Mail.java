@@ -29,10 +29,10 @@ import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class Mail extends SubProcess<MailDefinition> {
+public class Mail<D extends MailDefinition> extends SubProcess<D> {
     private final static Logger logger = LoggerFactory.getLogger(Mail.class);
 
-    public Mail(ProcessTaskActor processTask, MailDefinition definition) {
+    public Mail(ProcessTaskActor processTask, D definition) {
         super(processTask, definition);
 //        logger.warn("\tSENDING MAIL\t" + processTask.getId() + "\n");
     }
@@ -52,7 +52,7 @@ public class Mail extends SubProcess<MailDefinition> {
         Properties mailServerProperties = definition.getMailProperties();
         String userName = mailServerProperties.get("authentication.user").toString();
         String password = mailServerProperties.get("authentication.password").toString();
-        mailSession = Session.getDefaultInstance(mailServerProperties, new Authenticator() {
+        mailSession = Session.getInstance(mailServerProperties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(userName, password);

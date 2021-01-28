@@ -54,7 +54,7 @@ public class MailDefinition extends SubProcessDefinition {
         return super.getExceptionParameterNames();
     }
 
-    Properties getMailProperties() {
+    public Properties getMailProperties() {
         Properties properties = CaseSystem.config().engine().mailService().asProperties();
         return properties;
     }
