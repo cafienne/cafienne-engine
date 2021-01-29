@@ -37,9 +37,9 @@ public class HTTPCallDefinition extends SubProcessDefinition {
 
     public HTTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        this.sourceURL = parse("url", String.class, true);
-        this.httpMethod = parse("method", String.class, true);
-        this.contentTemplate = parse("post-content", String.class, false);
+        this.sourceURL = parseString("url", true);
+        this.httpMethod = parseString("method", true);
+        this.contentTemplate = parseString("post-content", false);
         Element httpHeadersElement = XMLHelper.getElement(element, "http-headers");
         if (httpHeadersElement != null) {
             Collection<Element> headerElements = XMLHelper.getChildrenWithTagName(httpHeadersElement, "http-header");

@@ -53,16 +53,6 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         processTaskActor.failed(description, processOutputParameters);
     }
 
-    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessMapping> mappings) {
-        processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
-        for (SubProcessMapping mapping : mappings) {
-            String outputParameterName = mapping.getTarget().getName();
-            processTaskActor.addDebugInfo(() -> "Mapping " + mapping.getSource().getName() +" to " + mapping.getTarget().getName());
-            Value<?> outputParameterValue = mapping.transformOutput(processTaskActor, rawOutputParameters);
-            setProcessOutputParameter(outputParameterName, outputParameterValue);
-        }
-    }
-
     /**
      * Store an exception in the process output parameters (and in the raw parameters),
      * under the name {@link SubProcessDefinition#EXCEPTION_PARAMETER}, and raise fault for the task.
@@ -74,16 +64,6 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
     }
 
     /**
-     * Sets a raw process parameter value; this may serve as input for a mapping
-     * into the process output parameters.
-     * @param name
-     * @param value
-     */
-    protected void setRawOutputParameter(String name, Value<?> value) {
-        rawOutputParameters.put(name, value);
-    }
-
-    /**
      * Stores the value as an output parameter both in the raw and in the process output parameters.
      * This enables propagating faults back into the process task without any in-process mappings defined.
      * @param value
@@ -92,6 +72,26 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         String name = SubProcessDefinition.EXCEPTION_PARAMETER;
         rawOutputParameters.put(name, value);
         processOutputParameters.put(name, value);
+    }
+
+    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessMapping> mappings) {
+        processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
+        for (SubProcessMapping mapping : mappings) {
+            String outputParameterName = mapping.getTarget().getName();
+            processTaskActor.addDebugInfo(() -> "Mapping " + mapping.getSource().getName() +" to " + mapping.getTarget().getName());
+            Value<?> outputParameterValue = mapping.transformOutput(processTaskActor, rawOutputParameters);
+            setProcessOutputParameter(outputParameterName, outputParameterValue);
+        }
+    }
+
+    /**
+     * Sets a raw process parameter value; this may serve as input for a mapping
+     * into the process output parameters.
+     * @param name
+     * @param value
+     */
+    protected void setRawOutputParameter(String name, Value<?> value) {
+        rawOutputParameters.put(name, value);
     }
 
     /**

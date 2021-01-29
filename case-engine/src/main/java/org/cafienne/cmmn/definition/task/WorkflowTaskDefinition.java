@@ -79,8 +79,8 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
     }
 
     private ValueMap parseTaskModel() {
-        String taskModelStr = parse("task-model", String.class, false);
-        if (taskModelStr == null || taskModelStr.trim().isEmpty()) {
+        String taskModelStr = parseString("task-model", false, "{}");
+        if (taskModelStr.trim().isEmpty()) {
             taskModelStr = "{}";
         }
 

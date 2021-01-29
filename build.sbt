@@ -74,6 +74,7 @@ lazy val engine = project("case-engine")
       Deps.jasperReports,
       Deps.jasperReportFonts,
       Deps.javaMail,
+      Deps.ical4j,
       Deps.javaxws,
       Deps.jsonJava,
       Deps.jsonPath,

@@ -1,4 +1,4 @@
-package org.cafienne.processtask.implementation.smtp;
+package org.cafienne.processtask.implementation.mail;
 
 import org.cafienne.util.StringTemplate;
 

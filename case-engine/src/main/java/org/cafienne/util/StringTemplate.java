@@ -17,15 +17,23 @@ import java.net.URL;
 public class StringTemplate {
 
     private final String sourceString;
+    private String result;
     private StringSubstitutor strSubstitutor;
 
     public StringTemplate(String string) {
         this.sourceString = string;
     }
 
+    public String getResult() {
+        if (result == null) {
+            result = strSubstitutor.replace(sourceString);
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
-        return strSubstitutor.replace(sourceString);
+        return getResult();
     }
 
     /**

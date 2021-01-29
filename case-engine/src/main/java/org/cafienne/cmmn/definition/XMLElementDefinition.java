@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.processtask.definition.ProcessDefinition;
+import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
@@ -248,15 +249,6 @@ public abstract class XMLElementDefinition {
      * @return
      */
     protected <T> T parse(String childTagName, Class<? extends T> typeClass, boolean presenceRequired) {
-        if (typeClass.equals(String.class)) {
-            String value = XMLHelper.getContent(element, childTagName, null);
-            if (presenceRequired && value == null) {
-                getModelDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
-            }
-            @SuppressWarnings("unchecked") // well ... we just checked that T is a String, right?
-            T t = (T) value;
-            return t;
-        }
         if (element == null) {
             if (presenceRequired) {
                 getModelDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the class " + getClass().getName() + ", because there is no XML element defined");
@@ -270,6 +262,29 @@ public abstract class XMLElementDefinition {
             getModelDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
         }
         return null;
+    }
+
+    protected String parseString(String childTagName, boolean presenceRequired, String... defaultValue) {
+        String value = XMLHelper.getContent(element, childTagName, null);
+        if (presenceRequired && value == null) {
+            getModelDefinition().addDefinitionError("A '" + childTagName + "' cannot be found in the element " + printElement() + ", but it is required");
+            return null;
+        }
+
+        // If value is null, we may set it to the (optional) default value
+        if (value == null && defaultValue.length > 0) {
+            value = defaultValue[0];
+        }
+
+        return value;
+    }
+
+    protected StringTemplate parseTemplate(String childTagName, boolean presenceRequired) {
+        String string = parseString(childTagName, presenceRequired);
+        if (string == null) {
+            return null;
+        }
+        return new StringTemplate(string);
     }
 
     protected String printElement() {

@@ -78,6 +78,7 @@ object Deps {
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.4.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
+  val ical4j                = "org.mnode.ical4j"        % "ical4j"                                % "3.0.21"
   val jasperReports         = "net.sf.jasperreports"    % "jasperreports"                         % V.jasper
   val jasperReportFonts     = "net.sf.jasperreports"    % "jasperreports-fonts"                   % V.jasper
   // Lowagie is for PDF document generation with Jasper. It must remain fixed on 2.1.7, because that is what Jasper needs.
