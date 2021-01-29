@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
 import org.cafienne.cmmn.akka.command.platform.{CaseUpdate, NewUserInformation, PlatformUpdate, TenantUpdate}
 
 import javax.ws.rs._
@@ -57,7 +56,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
   @Consumes(Array("application/json"))
   def createTenant = post {
     pathEndOrSingleSlash {
-      validUser { platformOwner =>
+      validOwner { platformOwner =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
 
@@ -86,7 +85,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     )
   )
   def disableTenant = put {
-    validUser { platformOwner =>
+    validOwner { platformOwner =>
       path(Segment / "disable") { tenant =>
         askPlatform(new DisableTenant(platformOwner, tenant.name))
       }
@@ -109,7 +108,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     )
   )
   def enableTenant = put {
-    validUser { platformOwner =>
+    validOwner { platformOwner =>
       path(Segment / "enable") { tenant =>
         askPlatform(new EnableTenant(platformOwner, tenant.name))
       }
@@ -154,7 +153,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
   @RequestBody(description = "List of new user information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUsersUpdateFormat]))))
   @Consumes(Array("application/json"))
   def updateUserInformation = put {
-    validUser { platformOwner =>
+    validOwner { platformOwner =>
       pathPrefix("user") {
         pathEndOrSingleSlash {
           import spray.json.DefaultJsonProtocol._
@@ -231,7 +230,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
   def getUpdateStatus = get {
     pathPrefix("update-status") {
       pathEndOrSingleSlash {
-        validUser { platformOwner =>
+        validOwner { platformOwner =>
           askModelActor(new GetUpdateStatus(platformOwner))
         }
       }
