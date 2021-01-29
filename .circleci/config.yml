@@ -47,12 +47,13 @@ jobs:
           name: Docker login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       - run:
-          name: Pull DB and IDP docker images
+          name: Pull DB, Mailcatcher and IDP docker images
           command: |
             docker pull cassandra:3.11
             docker pull postgres:12.1-alpine
             docker pull batav/circle-ci:postgres-event-data
             docker pull batav/circle-ci:sqlserver-event-data
+            docker pull schickling/mailcatcher:latest
             docker pull spectare/oidc-token-test-service:latest
       - run:
           name: Build cafienne docker image
@@ -207,8 +208,10 @@ jobs:
           name: Docker login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       - run:
-          name: Pull IDP docker image
-          command: docker pull spectare/oidc-token-test-service:latest
+          name: Pull Mailcatcher and IDP docker images
+          command: |
+            docker pull schickling/mailcatcher:latest
+            docker pull spectare/oidc-token-test-service:latest
       - run:
           name: Build cafienne docker image
           command: sbt docker:publishLocal
@@ -294,11 +297,12 @@ jobs:
           name: Docker login
           command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       - run:
-          name: Pull DB and IDP docker images
+          name: Pull DB, Mailcatcher and IDP docker images
           command: |
             docker pull cassandra:3.11
             docker pull postgres:12.1-alpine
             docker pull batav/circle-ci:sqlserver
+            docker pull schickling/mailcatcher:latest
             docker pull spectare/oidc-token-test-service:latest
       - run:
           name: Build cafienne docker image
