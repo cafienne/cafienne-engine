@@ -25,8 +25,10 @@ class PlatformQueriesImpl extends PlatformQueries with LazyLogging
   implicit val ec = db.ioExecutionContext
 
   override def hasExistingUserIds(newUserIds: Seq[String]): Future[Seq[String]] = {
-    val query = TableQuery[UserRoleTable].filter(_.userId.inSet(newUserIds)).distinctOn(_.userId)
-    db.run(query.result).map(records => records.map(record => record.userId))
+    val query = for {
+      existingUser <- TableQuery[UserRoleTable].filter(_.role_name === "").filter(_.userId.inSet(newUserIds)).distinctOn(_.userId)
+    } yield existingUser.userId // Only select userId and not all fields
+    db.run(query.result)
   }
 
   override def whereUsedInTenants(userIds: Seq[String]): Future[Map[String, Set[String]]] = {
