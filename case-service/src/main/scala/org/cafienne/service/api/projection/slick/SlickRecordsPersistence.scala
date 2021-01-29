@@ -1,6 +1,7 @@
 package org.cafienne.service.api.projection.slick
 
 import akka.Done
+import akka.persistence.query.Offset
 import org.cafienne.cmmn.akka.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
@@ -65,14 +66,21 @@ class SlickRecordsPersistence
     db.run(TableQuery[UserRoleTable].filter(record => record.userId === key.userId && record.tenant === key.tenant && record.role_name === key.role_name).result.headOption)
   }
 
-  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation]): Future[Done] = {
-    val updateQueries = info.map(user => {
+  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = {
+    val updateQueries = info.filter(u => u.newUserId != u.existingUserId).map(user => {
       (for {c <- TableQuery[UserRoleTable].filter(r => r.userId === user.existingUserId && r.tenant === tenant)} yield c.userId).update(user.newUserId)
-    })
+    }) ++ getOffsetRecord(offsetName, offset)
     db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
   }
 
-  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation]): Future[Done] = {
+//  var nr = 0L
+  def getOffsetRecord(offsetName: String, offset: Offset) = {
+//    println(s"$nr: Updating $offsetName to $offset")
+//    nr += 1
+    Seq(offsetQuery.insertOrUpdate(OffsetRecord(offsetName, offset)))
+  }
+
+  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = {
     val updateQueries = info.map(user => {
       // Update 'createdBy' field in case instance table
       (for {cases <- TableQuery[CaseInstanceTable].filter(r => r.id === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
@@ -103,7 +111,7 @@ class SlickRecordsPersistence
     }) ++ info.map(user => {
       // Update 'memberId' field in team table
       (for {cases <- TableQuery[CaseInstanceTeamMemberTable].filter(r => r.isTenantUser && r.memberId === user.existingUserId)} yield cases.memberId).update(user.newUserId)
-    })
+    }) ++ getOffsetRecord(offsetName, offset)
     db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
   }
 
