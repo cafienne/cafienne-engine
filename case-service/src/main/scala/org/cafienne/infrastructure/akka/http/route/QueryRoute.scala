@@ -70,6 +70,7 @@ trait QueryRoute extends AuthenticatedRoute {
       case notAllowed: AuthorizationException => complete(StatusCodes.Unauthorized, notAllowed.getMessage)
       case notAllowed: SecurityException => complete(StatusCodes.Unauthorized, notAllowed.getMessage)
       case error => {
+        logger.warn("Bumped into an exception " + t.getMessage)
         logger.whenDebugEnabled(() => logger.debug("Failure while handling query", error))
         complete(StatusCodes.InternalServerError)
       }
