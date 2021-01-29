@@ -165,18 +165,21 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
             readLastModifiedHeader() { lastModified =>
               val newUserIds = list.users.map(u => u.newUserId)
               val existingUserIds = list.users.map(u => u.existingUserId)
+              logger.warn("Received request to update platform users " + list)
               onComplete(handleSyncedQuery(() => platformQueries.hasExistingUserIds(newUserIds), lastModified)) {
                 case Success(value) => value.size match {
                   case 0 => {
+                    logger.warn("New user ids are not in use; retrieving where used information across the system for the existing users ids")
                     val queries = for {
                       tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
                       casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
                     } yield (tenantsByUser, casesByUser)
                     onComplete(queries) {
                       case Success(value) => {
+                        logger.warn(s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases")
                         val newUserInfo = list.users.map(user => NewUserInformation(user.existingUserId, user.newUserId))
+                        // Convert query results to command objects for inside the engine
                         import scala.collection.mutable.Buffer
-
                         val tenantsToUpdate = value._1.map(tenant => {
                           val name = tenant._1
                           val users = newUserInfo.filter(info => tenant._2.contains(info.existingUserId))
@@ -190,7 +193,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
                             casesToUpdate += CaseUpdate(caseId._1, name,  PlatformUpdate(caseUsers))
                           })
                         })
-
+                        // Make it Java-ish and inform the platform
                         import scala.collection.JavaConverters._
                         val tenants = seqAsJavaList(tenantsToUpdate.toSeq)
                         val cases = seqAsJavaList(casesToUpdate)
@@ -202,6 +205,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
                   case _ => {
                     val error = "Cannot apply new user ids; found existing ids: " + value.mkString(", ")
 //                    println(error)
+                    logger.warn(error)
                     complete(StatusCodes.BadRequest, error)
                   }
                 }
