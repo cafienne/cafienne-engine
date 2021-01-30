@@ -170,33 +170,38 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
                 case Success(value) => value.size match {
                   case 0 => {
                     logger.warn("New user ids are not in use; retrieving where used information across the system for the existing users ids")
+                    val startWhereUsedQueries = System.currentTimeMillis()
                     val queries = for {
                       tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
                       casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
                     } yield (tenantsByUser, casesByUser)
                     onComplete(queries) {
                       case Success(value) => {
-                        logger.warn(s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases")
+                        val finishedWhereUsedQueries = System.currentTimeMillis()
+                        logger.warn(s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases; query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis")
+
+                        // Create a base list of NewUserInformation from which a selection will be added to each TenantUpdate and CaseUpdate
                         val newUserInfo = list.users.map(user => NewUserInformation(user.existingUserId, user.newUserId))
+
                         // Convert query results to command objects for inside the engine
-                        import scala.collection.mutable.Buffer
-                        val tenantsToUpdate = value._1.map(tenant => {
-                          val name = tenant._1
-                          val users = newUserInfo.filter(info => tenant._2.contains(info.existingUserId))
-                          TenantUpdate(name, PlatformUpdate(users))
+                        val tenantsToUpdate = value._1.map(tenantUserInfo => {
+                          val tenant = tenantUserInfo._1
+                          val tenantUsers = newUserInfo.filter(info => tenantUserInfo._2.contains(info.existingUserId))
+                          TenantUpdate(tenant, PlatformUpdate(tenantUsers))
                         })
-                        val casesToUpdate = Buffer[CaseUpdate]()
-                        value._2.map(tenant => {
-                          val name = tenant._1
-                          tenant._2.map(caseId => {
-                            val caseUsers = newUserInfo.filter(info => caseId._2.contains(info.existingUserId))
-                            casesToUpdate += CaseUpdate(caseId._1, name,  PlatformUpdate(caseUsers))
-                          })
+
+                        val casesToUpdate = value._2.map(caseUserInfo => {
+                          val caseId = caseUserInfo._1._1
+                          val tenant = caseUserInfo._1._2
+                          val users = caseUserInfo._2
+                          val caseUsers = newUserInfo.filter(info => users.contains(info.existingUserId))
+                          CaseUpdate(caseId, tenant, PlatformUpdate(caseUsers))
                         })
+
                         // Make it Java-ish and inform the platform
                         import scala.collection.JavaConverters._
                         val tenants = seqAsJavaList(tenantsToUpdate.toSeq)
-                        val cases = seqAsJavaList(casesToUpdate)
+                        val cases = seqAsJavaList(casesToUpdate.toSeq)
                         askModelActor(new UpdatePlatformInformation(platformOwner, PlatformUpdate(newUserInfo), tenants, cases))
                       }
                       case Failure(t) => handleFailure(t)
@@ -204,7 +209,6 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
                   }
                   case _ => {
                     val error = "Cannot apply new user ids; found existing ids: " + value.mkString(", ")
-//                    println(error)
                     logger.warn(error)
                     complete(StatusCodes.BadRequest, error)
                   }

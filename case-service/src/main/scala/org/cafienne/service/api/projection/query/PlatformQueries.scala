@@ -13,7 +13,7 @@ trait PlatformQueries {
 
   def whereUsedInTenants(userIds: Seq[String]): Future[Map[String, Set[String]]] = ???
 
-  def whereUsedInCases(userIds: Seq[String]): Future[Map[String, Map[String, Set[String]]]] = ???
+  def whereUsedInCases(userIds: Seq[String]): Future[Map[(String, String), Set[String]]] = ???
 }
 
 
@@ -40,12 +40,12 @@ class PlatformQueriesImpl extends PlatformQueries with LazyLogging
     })
   }
 
-  override def whereUsedInCases(userIds: Seq[String]): Future[Map[String, Map[String, Set[String]]]] = {
-    val usersPerCasePerTenant = Map[String, Map[String, Set[String]]]()
+  override def whereUsedInCases(userIds: Seq[String]): Future[Map[(String, String), Set[String]]] = {
+    val usersPerCasePerTenant = Map[(String, String), Set[String]]()
 
     // Method to register a case id, but only if the user is in the list of incoming userIds (this skips users that have also been active in a matching case of task, but then on a different field (modifiedBy vs createdBy)
     // This gives faster queries than doing multiple queries on each column in a for-loop (although that is preciser in it's results)
-    def register(id: String, tenant: String, users: Seq[String]) = users.filter(userIds.contains(_)).map(usersPerCasePerTenant.getOrElseUpdate(tenant, Map()).getOrElseUpdate(id, Set[String]()).add(_))
+    def register(id: String, tenant: String, users: Seq[String]) = users.filter(userIds.contains(_)).map(usersPerCasePerTenant.getOrElseUpdate((id, tenant), Set[String]()).add(_))
 
     val caseQuery = for {
       cases <- TableQuery[CaseInstanceTable].filter(record => record.modifiedBy.inSet(userIds) || record.createdBy.inSet(userIds))
