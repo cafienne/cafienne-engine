@@ -37,6 +37,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
       enableTenant ~
       getUserInformation ~
       updateUserInformation ~
+      getWhereUsedInformation ~
       getUpdateStatus
   }
 
@@ -215,6 +216,56 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
                 }
                 case Failure(t) => handleFailure(t)
               }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Path("/where-used-info")
+  @POST
+  @Operation(
+    summary = "Get where used information across the platform for a list of users to be updated",
+    description = "Get where used information across the platform for a list of users to be updated",
+    tags = Array("platform"),
+    responses = Array(
+      new ApiResponse(description = "String message with the usage statistics", responseCode = "200"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  @RequestBody(description = "List of new user information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUsersUpdateFormat]))))
+  @Consumes(Array("application/json"))
+  def getWhereUsedInformation = post {
+    validOwner { _ =>
+      pathPrefix("where-used-info") {
+        pathEndOrSingleSlash {
+          import spray.json.DefaultJsonProtocol._
+          import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+
+          implicit val userFormat = jsonFormat2(TenantAPI.PlatformUserUpdateFormat)
+          implicit val listFormat = jsonFormat1(TenantAPI.PlatformUsersUpdateFormat)
+          entity(as[TenantAPI.PlatformUsersUpdateFormat]) { list =>
+            val newUserIds = list.users.map(u => u.newUserId)
+            val existingUserIds = list.users.map(u => u.existingUserId)
+            val startWhereUsedQueries = System.currentTimeMillis()
+            val queries = for {
+              tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
+              casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
+              tenantsByNewUser <- platformQueries.whereUsedInTenants(newUserIds)
+              casesByNewUser <- platformQueries.whereUsedInCases(newUserIds)
+            } yield (tenantsByUser, casesByUser, tenantsByNewUser, casesByNewUser)
+            onComplete(queries) {
+              case Success(value) => {
+                val finishedWhereUsedQueries = System.currentTimeMillis()
+                val queryTimingMsg = s"Query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis"
+                val existingMsg = s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases; query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis"
+                val newMsg = s"New user ids are found in ${value._3.size} tenants and ${value._4.size} cases"
+
+                val msg = s"$queryTimingMsg\n$existingMsg\n$newMsg"
+                complete(StatusCodes.OK, msg)
+              }
+              case Failure(t) => handleFailure(t)
             }
           }
         }
