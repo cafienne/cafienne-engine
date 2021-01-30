@@ -32,7 +32,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   var caseDefinition: CaseDefinitionRecord = null
   var caseFile: Option[ValueMap] = None
 
-  override def handleEvent(evt: CaseEvent): Future[Done] = {
+  override def handleEvent(evt: CaseEvent, offsetName: String, offset: Offset): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " in case " + caseInstanceId)
     evt match {
       case event: CaseDefinitionApplied => createCaseInstance(event)
@@ -42,7 +42,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case event: HumanTaskCreated => deprecatedCreateTask(event)
       case event: HumanTaskActivated => createTask(event)
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
-      case event: CaseAppliedPlatformUpdate => updateUserIds(event)
+      case event: CaseAppliedPlatformUpdate => updateUserIds(event, offsetName, offset)
       case event: CaseModified => updateCaseInstance(event)
       case event: BusinessIdentifierEvent => handleBusinessIdentifierEvent(event)
       case _ => Future.successful(Done) // Ignore other events
@@ -259,8 +259,8 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   }
 
-  def updateUserIds(event: CaseAppliedPlatformUpdate): Future[Done] = {
-    persistence.updateCaseUserInformation(event.getCaseInstanceId, event.newUserInformation.info)
+  def updateUserIds(event: CaseAppliedPlatformUpdate, offsetName: String, offset: Offset): Future[Done] = {
+    persistence.updateCaseUserInformation(event.getCaseInstanceId, event.newUserInformation.info, offsetName, offset)
   }
 
   private def fetchTask(taskId: String) = {

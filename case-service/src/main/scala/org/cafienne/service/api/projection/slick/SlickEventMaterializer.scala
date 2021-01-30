@@ -23,7 +23,7 @@ trait SlickEventMaterializer[M <: ModelEvent[_], T <: SlickTransaction[M]] exten
     modelEvent match {
       case evt: M => {
         val transaction = getTransaction(evt.getActorId, evt.tenant)
-        transaction.handleEvent(evt).flatMap(_ => {
+        transaction.handleEvent(evt, offsetStorage.name, newOffset).flatMap(_ => {
           evt match {
             case commitEvent: TransactionEvent[_] => {
               transactionCache.remove(evt.getActorId)

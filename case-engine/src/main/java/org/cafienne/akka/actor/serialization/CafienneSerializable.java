@@ -103,19 +103,18 @@ public interface CafienneSerializable {
     }
 
     default void writeField(JsonGenerator generator, Fields fieldName, String value) throws IOException {
-        generator.writeStringField(fieldName.toString(), String.valueOf(value));
-    }
-
-    default void writeField(JsonGenerator generator, Fields fieldName, Path value) throws IOException {
-        generator.writeStringField(fieldName.toString(), String.valueOf(value));
-    }
-
-    default void writeField(JsonGenerator generator, Fields fieldName, CafienneSerializable value) throws IOException {
         if (value == null) {
             generator.writeNullField(fieldName.toString());
         } else {
-            generator.writeFieldName(fieldName.toString());
-            value.write(generator);
+            generator.writeStringField(fieldName.toString(), value);
+        }
+    }
+
+    default void writeField(JsonGenerator generator, Fields fieldName, Path value) throws IOException {
+        if (value == null) {
+            generator.writeNullField(fieldName.toString());
+        } else {
+            generator.writeStringField(fieldName.toString(), String.valueOf(value));
         }
     }
 
@@ -132,6 +131,15 @@ public interface CafienneSerializable {
             generator.writeNullField(fieldName.toString());
         } else {
             generator.writeStringField(fieldName.toString(), String.valueOf(value));
+        }
+    }
+
+    default void writeField(JsonGenerator generator, Fields fieldName, CafienneSerializable value) throws IOException {
+        if (value == null) {
+            generator.writeNullField(fieldName.toString());
+        } else {
+            generator.writeFieldName(fieldName.toString());
+            value.write(generator);
         }
     }
 

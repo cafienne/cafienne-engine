@@ -62,6 +62,8 @@ trait CaseTables extends QueryDBSchema {
     def indexTenant = index(tenant)
     def indexRootCaseId = index(rootCaseId)
     def indexCaseName = index(caseName)
+    def indexCreatedBy = index(createdBy)
+    def indexModifiedBy = index(modifiedBy)
 
     def * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
   }
@@ -134,6 +136,8 @@ trait CaseTables extends QueryDBSchema {
     def * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemRecord.tupled, PlanItemRecord.unapply)
 
     def indexCaseInstanceId = index(caseInstanceId)
+    def indexCreatedBy = index(createdBy)
+    def indexModifiedBy = index(modifiedBy)
   }
 
   final class PlanItemHistoryTable(tag: Tag) extends CafienneTable[PlanItemHistoryRecord](tag, "plan_item_history") {
@@ -183,6 +187,7 @@ trait CaseTables extends QueryDBSchema {
     def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemHistoryRecord.tupled, PlanItemHistoryRecord.unapply)
 
     def idx = index("idx_plan_item_history__plain_item_id", planItemId)
+    def indexModifiedBy = index(modifiedBy)
   }
 
   class CaseFileTable(tag: Tag) extends CafienneTable[CaseFileRecord](tag, "case_file") {
@@ -260,5 +265,6 @@ trait CaseTables extends QueryDBSchema {
     def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
 
     val indexCaseInstanceId = index(caseInstanceId)
+    def indexMemberId = index(generateIndexName(memberId), (memberId, isTenantUser))
   }
 }

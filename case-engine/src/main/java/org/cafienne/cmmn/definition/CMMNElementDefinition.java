@@ -7,11 +7,14 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.akka.actor.serialization.CafienneSerializer;
 import org.cafienne.akka.actor.serialization.DeserializationError;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.util.XMLHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -22,6 +25,7 @@ import java.io.IOException;
  * Base class for parsing XML elements defined in the CMMN specification.
  */
 public abstract class CMMNElementDefinition extends XMLElementDefinition {
+    private final static Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
     public final CMMNDocumentationDefinition documentation;
     private final String id;
     private String name;
@@ -145,11 +149,17 @@ public abstract class CMMNElementDefinition extends XMLElementDefinition {
             DefinitionsDocument def = new DefinitionsDocument(XMLHelper.loadXML(source));
             T element = def.getElement(guid, tClass);
             return element;
-        } catch (InvalidDefinitionException | IOException | ParserConfigurationException | SAXException e) {
+        } catch (InvalidDefinitionException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Encountered invalid definition during deserialization; probably content from a newer or older version", e);
+            } else {
+                logger.warn("Encountered invalid definition during deserialization; probably content from a newer or older version.\nEnable debug logging for full stacktrace. Error messages: " + e.getErrors());
+            }
+            throw new DeserializationError("Invalid Definition Failure while deserializing an instance of " + sourceClassName, e);
+        } catch (IOException | ParserConfigurationException | SAXException e) {
             // TTD we need to come up with a more suitable exception, since this logic is typically also
             //  invoked when recovering from events.
-
-            throw new DeserializationError("Failure while deserializing an instance of " + sourceClassName, e);
+            throw new DeserializationError("Parsing Failure while deserializing an instance of " + sourceClassName, e);
         }
     }
 

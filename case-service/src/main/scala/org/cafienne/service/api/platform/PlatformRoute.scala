@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
 import org.cafienne.cmmn.akka.command.platform.{CaseUpdate, NewUserInformation, PlatformUpdate, TenantUpdate}
 
 import javax.ws.rs._
@@ -38,6 +37,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
       enableTenant ~
       getUserInformation ~
       updateUserInformation ~
+      getWhereUsedInformation ~
       getUpdateStatus
   }
 
@@ -57,7 +57,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
   @Consumes(Array("application/json"))
   def createTenant = post {
     pathEndOrSingleSlash {
-      validUser { platformOwner =>
+      validOwner { platformOwner =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
 
@@ -86,7 +86,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     )
   )
   def disableTenant = put {
-    validUser { platformOwner =>
+    validOwner { platformOwner =>
       path(Segment / "disable") { tenant =>
         askPlatform(new DisableTenant(platformOwner, tenant.name))
       }
@@ -109,7 +109,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     )
   )
   def enableTenant = put {
-    validUser { platformOwner =>
+    validOwner { platformOwner =>
       path(Segment / "enable") { tenant =>
         askPlatform(new EnableTenant(platformOwner, tenant.name))
       }
@@ -154,7 +154,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
   @RequestBody(description = "List of new user information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUsersUpdateFormat]))))
   @Consumes(Array("application/json"))
   def updateUserInformation = put {
-    validUser { platformOwner =>
+    validOwner { platformOwner =>
       pathPrefix("user") {
         pathEndOrSingleSlash {
           import spray.json.DefaultJsonProtocol._
@@ -166,35 +166,43 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
             readLastModifiedHeader() { lastModified =>
               val newUserIds = list.users.map(u => u.newUserId)
               val existingUserIds = list.users.map(u => u.existingUserId)
+              logger.warn("Received request to update platform users " + list)
               onComplete(handleSyncedQuery(() => platformQueries.hasExistingUserIds(newUserIds), lastModified)) {
                 case Success(value) => value.size match {
                   case 0 => {
+                    logger.warn("New user ids are not in use; retrieving where used information across the system for the existing users ids")
+                    val startWhereUsedQueries = System.currentTimeMillis()
                     val queries = for {
                       tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
                       casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
                     } yield (tenantsByUser, casesByUser)
                     onComplete(queries) {
                       case Success(value) => {
+                        val finishedWhereUsedQueries = System.currentTimeMillis()
+                        logger.warn(s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases; query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis")
+
+                        // Create a base list of NewUserInformation from which a selection will be added to each TenantUpdate and CaseUpdate
                         val newUserInfo = list.users.map(user => NewUserInformation(user.existingUserId, user.newUserId))
-                        import scala.collection.mutable.Buffer
 
-                        val tenantsToUpdate = value._1.map(tenant => {
-                          val name = tenant._1
-                          val users = newUserInfo.filter(info => tenant._2.contains(info.existingUserId))
-                          TenantUpdate(name, PlatformUpdate(users))
-                        })
-                        val casesToUpdate = Buffer[CaseUpdate]()
-                        value._2.map(tenant => {
-                          val name = tenant._1
-                          tenant._2.map(caseId => {
-                            val caseUsers = newUserInfo.filter(info => caseId._2.contains(info.existingUserId))
-                            casesToUpdate += CaseUpdate(caseId._1, name,  PlatformUpdate(caseUsers))
-                          })
+                        // Convert query results to command objects for inside the engine
+                        val tenantsToUpdate = value._1.map(tenantUserInfo => {
+                          val tenant = tenantUserInfo._1
+                          val tenantUsers = newUserInfo.filter(info => tenantUserInfo._2.contains(info.existingUserId))
+                          TenantUpdate(tenant, PlatformUpdate(tenantUsers))
                         })
 
+                        val casesToUpdate = value._2.map(caseUserInfo => {
+                          val caseId = caseUserInfo._1._1
+                          val tenant = caseUserInfo._1._2
+                          val users = caseUserInfo._2
+                          val caseUsers = newUserInfo.filter(info => users.contains(info.existingUserId))
+                          CaseUpdate(caseId, tenant, PlatformUpdate(caseUsers))
+                        })
+
+                        // Make it Java-ish and inform the platform
                         import scala.collection.JavaConverters._
                         val tenants = seqAsJavaList(tenantsToUpdate.toSeq)
-                        val cases = seqAsJavaList(casesToUpdate)
+                        val cases = seqAsJavaList(casesToUpdate.toSeq)
                         askModelActor(new UpdatePlatformInformation(platformOwner, PlatformUpdate(newUserInfo), tenants, cases))
                       }
                       case Failure(t) => handleFailure(t)
@@ -202,12 +210,62 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
                   }
                   case _ => {
                     val error = "Cannot apply new user ids; found existing ids: " + value.mkString(", ")
-//                    println(error)
+                    logger.warn(error)
                     complete(StatusCodes.BadRequest, error)
                   }
                 }
                 case Failure(t) => handleFailure(t)
               }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Path("/where-used-info")
+  @POST
+  @Operation(
+    summary = "Get where used information across the platform for a list of users to be updated",
+    description = "Get where used information across the platform for a list of users to be updated",
+    tags = Array("platform"),
+    responses = Array(
+      new ApiResponse(description = "String message with the usage statistics", responseCode = "200"),
+      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+    )
+  )
+  @RequestBody(description = "List of new user information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUsersUpdateFormat]))))
+  @Consumes(Array("application/json"))
+  def getWhereUsedInformation = post {
+    validOwner { _ =>
+      pathPrefix("where-used-info") {
+        pathEndOrSingleSlash {
+          import spray.json.DefaultJsonProtocol._
+          import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+
+          implicit val userFormat = jsonFormat2(TenantAPI.PlatformUserUpdateFormat)
+          implicit val listFormat = jsonFormat1(TenantAPI.PlatformUsersUpdateFormat)
+          entity(as[TenantAPI.PlatformUsersUpdateFormat]) { list =>
+            val newUserIds = list.users.map(u => u.newUserId)
+            val existingUserIds = list.users.map(u => u.existingUserId)
+            val startWhereUsedQueries = System.currentTimeMillis()
+            val queries = for {
+              tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds)
+              casesByUser <- platformQueries.whereUsedInCases(existingUserIds)
+              tenantsByNewUser <- platformQueries.whereUsedInTenants(newUserIds)
+              casesByNewUser <- platformQueries.whereUsedInCases(newUserIds)
+            } yield (tenantsByUser, casesByUser, tenantsByNewUser, casesByNewUser)
+            onComplete(queries) {
+              case Success(value) => {
+                val finishedWhereUsedQueries = System.currentTimeMillis()
+                val queryTimingMsg = s"Query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis"
+                val existingMsg = s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases; query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis"
+                val newMsg = s"New user ids are found in ${value._3.size} tenants and ${value._4.size} cases"
+
+                val msg = s"$queryTimingMsg\n$existingMsg\n$newMsg"
+                complete(StatusCodes.OK, msg)
+              }
+              case Failure(t) => handleFailure(t)
             }
           }
         }
@@ -231,7 +289,7 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
   def getUpdateStatus = get {
     pathPrefix("update-status") {
       pathEndOrSingleSlash {
-        validUser { platformOwner =>
+        validOwner { platformOwner =>
           askModelActor(new GetUpdateStatus(platformOwner))
         }
       }

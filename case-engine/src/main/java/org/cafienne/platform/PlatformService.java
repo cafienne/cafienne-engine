@@ -5,10 +5,13 @@ import akka.persistence.SaveSnapshotSuccess;
 import akka.persistence.SnapshotOffer;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
+import org.cafienne.akka.actor.handler.ResponseHandler;
 import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.platform.akka.command.GetUpdateStatus;
 import org.cafienne.platform.akka.command.PlatformCommand;
 import org.cafienne.platform.akka.command.UpdatePlatformInformation;
 import org.cafienne.platform.akka.response.PlatformResponse;
@@ -40,8 +43,7 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
 
     @Override
     protected AkkaSystemMessageHandler createAkkaSystemMessageHandler(Object message) {
-        // Typically invoked upon succesful snapshot saving.
-
+        // Typically invoked upon successful snapshot saving.
         if (message instanceof SaveSnapshotFailure) {
             SaveSnapshotFailure failure = (SaveSnapshotFailure) message;
             // How to go about this?
@@ -74,14 +76,21 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
     }
 
     @Override
+    protected void recoveryCompleted() {
+        // Note: the job schedule should only be woken up upon recovery completion,
+        // instead of after successful snapshot offer recovery
+        logger.info("Platform service snapshot recovered, waking up job scheduler");
+        jobScheduler.wakeUp();
+    }
+
+    @Override
     protected void handleRecovery(Object event) {
         if (event instanceof SnapshotOffer) {
             SnapshotOffer offer = (SnapshotOffer) event;
             Object snapshot = offer.snapshot();
             if (snapshot instanceof PlatformStorage) {
                 storage.merge((PlatformStorage) snapshot);
-                jobScheduler.wakeUp();
-            }
+             }
         } else {
             super.handleRecovery(event);
         }
@@ -97,11 +106,7 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
         storage.addUpdate(updatePlatformInformation);
     }
 
-    public int getPendingUpdates() {
-        return storage.numPendingUpdates();
-    }
-
-    public ValueList getFailures() {
-        return storage.getFailures();
+    public PlatformUpdateStatus getUpdateStatus(GetUpdateStatus command) {
+        return new PlatformUpdateStatus(command, storage.getStatus());
     }
 }

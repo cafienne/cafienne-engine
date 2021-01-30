@@ -26,13 +26,13 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     users.keySet.map(key => key.userId).toSet
   }
   
-  def handleEvent(evt: TenantEvent): Future[Done] = {
+  def handleEvent(evt: TenantEvent, offsetName: String, offset: Offset): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " on tenant " + tenant)
 
     evt match {
       case p: PlatformEvent => handlePlatformEvent(p)
       case t: TenantUserEvent => handleUserEvent(t)
-      case u: TenantAppliedPlatformUpdate => updateUserIds(u)
+      case u: TenantAppliedPlatformUpdate => updateUserIds(u, offsetName, offset)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -65,8 +65,8 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     })
   }
 
-  def updateUserIds(event: TenantAppliedPlatformUpdate): Future[Done] = {
-    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info)
+  def updateUserIds(event: TenantAppliedPlatformUpdate, offsetName: String, offset: Offset): Future[Done] = {
+    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, offsetName, offset)
   }
 
   override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {

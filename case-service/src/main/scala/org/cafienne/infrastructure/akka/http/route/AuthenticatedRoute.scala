@@ -94,6 +94,15 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
+  def validOwner(subRoute: PlatformUser => Route): Route = {
+    validUser { platformUser =>
+      platformUser.isPlatformOwner match {
+        case true => subRoute(platformUser)
+        case false => complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
+      }
+    }
+  }
+
   def caseSystemMustBeHealthy = {
     if (!CaseSystem.health.ok) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
