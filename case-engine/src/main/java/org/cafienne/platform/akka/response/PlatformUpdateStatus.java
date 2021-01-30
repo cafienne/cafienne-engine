@@ -10,7 +10,6 @@ package org.cafienne.platform.akka.response;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.platform.akka.command.PlatformCommand;
 
@@ -22,9 +21,9 @@ import java.io.IOException;
 public class PlatformUpdateStatus extends PlatformResponse {
     private final ValueMap map;
 
-    public PlatformUpdateStatus(PlatformCommand command, int pendingUpdates, ValueList failures) {
+    public PlatformUpdateStatus(PlatformCommand command, ValueMap map) {
         super(command);
-        map = new ValueMap("updates-in-progress", pendingUpdates, "failures", failures);
+        this.map = map;
     }
 
     public PlatformUpdateStatus(ValueMap json) {

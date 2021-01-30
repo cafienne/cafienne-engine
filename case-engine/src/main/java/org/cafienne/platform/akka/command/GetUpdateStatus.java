@@ -20,7 +20,7 @@ public class GetUpdateStatus extends PlatformCommand {
 
     @Override
     public PlatformUpdateStatus process(PlatformService platform) {
-        return new PlatformUpdateStatus(this, platform.getPendingUpdates(), platform.getFailures());
+        return platform.getUpdateStatus(this);
     }
 }
 

@@ -1,10 +1,6 @@
 package org.cafienne.platform;
 
 import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.identity.PlatformUser;
-import org.cafienne.cmmn.akka.command.UpdateCaseWithPlatformInformation;
-import org.cafienne.platform.akka.command.UpdatePlatformInformation;
-import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,23 +32,16 @@ class JobScheduler {
         }
 
         // Now schedule pending updates one at a time as a job (if there are any).
-        //  Note that storage.getPendingUpdates is expected to clear the list, otherwise we keep sending same job over and over again.
-        List<UpdatePlatformInformation> pendingUpdates = storage.getPendingUpdates();
-        if (pendingUpdates.isEmpty()) {
+        //  Note that storage.getBatches is expected to ony give new batches, otherwise we keep sending same job over and over again.
+        List<BatchJob> newBatchJobs = storage.getNewBatches();
+        List<InformJob> jobs = new ArrayList();
+        newBatchJobs.forEach(batch -> jobs.addAll(batch.getJobs()));
+        if (jobs.isEmpty()) {
             return;
         }
-
-        final List<InformJob> pendingJobs = new ArrayList<>();
-        // Convert PlatformUpdates into InformJobs
-        new ArrayList<>(pendingUpdates).forEach(command -> {
-            PlatformUser user = PlatformUser.from(command.getUser());
-            command.tenants.forEach(update -> pendingJobs.add(new InformJob(storage, command.tenants, update, new UpdateTenantWithPlatformInformation(user, update))));
-            command.cases.forEach(update -> pendingJobs.add(new InformJob(storage, command.cases, update, new UpdateCaseWithPlatformInformation(user, update))));
-        });
-
         // Start a new thread to put the pending jobs into the queue, to avoid blocking this thread
         //  Note:
-        new Thread(() -> pendingJobs.forEach(job -> {
+        new Thread(() -> jobs.forEach(job -> {
             try {
                 jobQueue.put(job);
             } catch (InterruptedException e) {
@@ -63,6 +52,7 @@ class JobScheduler {
 
     /**
      * Invoked by JobRunners to get the next job to run
+     *
      * @return
      * @throws InterruptedException
      */

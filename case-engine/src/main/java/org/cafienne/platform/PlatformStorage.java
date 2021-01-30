@@ -8,8 +8,6 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.akka.actor.snapshot.RelaxedSnapshot;
-import org.cafienne.cmmn.akka.command.platform.CaseUpdate;
-import org.cafienne.cmmn.akka.command.platform.TenantUpdate;
 import org.cafienne.platform.akka.command.UpdatePlatformInformation;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
@@ -18,15 +16,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Object that can be saved as snapshot offer for the TimerService persistent actor
  */
 @Manifest
 public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
-    private final List<UpdatePlatformInformation> updates = new ArrayList();
-    private final List<UpdatePlatformInformation> pendingUpdates = new ArrayList();
-    private final ValueList failures;
+    private final List<BatchJob> batches = new ArrayList();
+    private final List<String> pendingBatches = new ArrayList();
+    private final ValueList history;
 
     private static FiniteDuration getDuration() {
         return Duration.create(CaseSystem.config().engine().platformServiceConfig().persistDelay(), TimeUnit.SECONDS);
@@ -34,14 +33,15 @@ public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
 
     PlatformStorage(PlatformService service) {
         super(service, getDuration());
-        failures = new ValueList();
+        this.history = new ValueList();
     }
 
     public PlatformStorage(ValueMap json) {
         // This is a snapshot being deserialized. Does not have a job queue and will be merged into the one and only later
         super();
-        json.withArray(Fields.update).forEach(value -> updates.add(new UpdatePlatformInformation(value.asMap())));
-        failures = json.withArray(Fields.exception);
+//        getLogger().warn("\n\n\t\tRECOVERING PLATFORM STORAGE WITH JSON " + json + "\n\n\n");
+        json.withArray(Fields.update).forEach(value -> batches.add(new BatchJob(this, value.asMap())));
+        this.history = json.withArray(Fields.historyState);
     }
 
     /**
@@ -49,53 +49,58 @@ public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
      * @param snapshot
      */
     void merge(PlatformStorage snapshot) {
-        snapshot.updates.forEach(this::registerUpdate);
-        failures.addAll(snapshot.failures.getValue());
+        snapshot.batches.forEach(batch -> registerBatch(batch));
+        this.history.merge(snapshot.history);
     }
 
-    private void registerUpdate(UpdatePlatformInformation updatePlatformInformation) {
-        pendingUpdates.add(updatePlatformInformation);
-        updates.add(updatePlatformInformation);
+    private void registerBatch(BatchJob batch) {
+        // This is needed to move snapshot deserialized batches into the main PlatformStorage object of the service.
+        batch.adoptStorage(this);
+        batches.add(batch);
+        pendingBatches.add(batch.batchIdentifier);
     }
 
-    List<UpdatePlatformInformation> getPendingUpdates() {
-        List<UpdatePlatformInformation> penders = new ArrayList<>(pendingUpdates);
-        pendingUpdates.clear();
-        return penders;
+    List<BatchJob> getNewBatches() {
+        List<String> newBatches = new ArrayList<>(pendingBatches);
+        pendingBatches.clear();
+        return this.batches.stream().filter(batch -> newBatches.contains(batch.batchIdentifier)).collect(Collectors.toList());
     }
 
-    void reportFailure(InformJob job, CommandFailure failure) {
-        if (job.action instanceof CaseUpdate) {
-            failures.add(new ValueMap("action", ((CaseUpdate) job.action).toValue(), "failure", failure.exception()));
-        } else if (job.action instanceof TenantUpdate) {
-            failures.add(new ValueMap("action", ((TenantUpdate) job.action).toValue(), "failure", failure.exception()));
+    void batchCompleted(BatchJob batch) {
+        synchronized (batches) {
+            if (batches.remove(batch)) {
+                // Remove the batch from the list of in-progress batches, and add it to our history
+                history.add(batch.getHistory());
+            }
         }
+        enableTimedSnapshotSaver();
+    }
+
+    void reportFailure(CommandFailure failure) {
         save("encountered failure " + failure.exception().getMessage());
     }
 
-    void reportSuccess(InformJob job) {
+    void reportSuccess() {
         // Save the snapshot
         enableTimedSnapshotSaver();
     }
 
     void addUpdate(UpdatePlatformInformation updatePlatformInformation) {
-        registerUpdate(updatePlatformInformation);
+        registerBatch(new BatchJob(this, updatePlatformInformation));
         save("received new information to handle");
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         generator.writeArrayFieldStart(Fields.update.toString());
-        for (UpdatePlatformInformation update : updates) update.writeThisObject(generator);
+        for (BatchJob batch : batches) batch.writeThisObject(generator);
         generator.writeEndArray();
-        writeField(generator, Fields.exception, failures);
+        writeField(generator, Fields.historyState, history);
     }
 
-    int numPendingUpdates() {
-        return pendingUpdates.size();
-    }
-
-    ValueList getFailures() {
-        return failures;
+    public ValueMap getStatus() {
+        ValueList batchStatus = new ValueList();
+        for (BatchJob batch : batches) batchStatus.add(batch.getStatus());
+        return new ValueMap("history", history, "batches", batchStatus);
     }
 }
