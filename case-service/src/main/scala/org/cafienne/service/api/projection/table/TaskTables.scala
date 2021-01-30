@@ -61,6 +61,9 @@ trait TaskTables extends QueryDBSchema {
     def indexCaseInstanceId = index(caseInstanceId)
     def indexTaskState = index(taskState)
     def indexAssignee = index(assignee)
+    def indexOwner = index(owner)
+    def indexCreatedBy = index(createdBy)
+    def indexModifiedBy = index(modifiedBy)
     def indexTenant = index(tenant)
     def indexDueDate = index(generateIndexName(dueDate), dueDate)
 

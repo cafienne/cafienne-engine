@@ -53,6 +53,8 @@ trait TenantTables extends QueryDBSchema {
     // By default when inserting a user or role, enabled is true;
     //  right now, it does not make sense to enter a user without enabling it
     def enabled = column[Boolean]("enabled", O.Default(true))
+
+    def indexOwnership = index(generateIndexName(isOwner), (userId, tenant, role_name, isOwner))
   }
 
 }
