@@ -101,7 +101,7 @@ public class BatchJob implements CafienneSerializable {
     }
 
     ValueMap getHistory() {
-        return new ValueMap(Fields.identifier, batchIdentifier, "started", createdOn, "completed", completedOn, Fields.jobCount, jobCount);
+        return new ValueMap(Fields.identifier, batchIdentifier, "started", createdOn, "completed", completedOn, Fields.jobCount, jobCount, "failures", failures);
     }
 
     public ValueMap getStatus() {
@@ -110,7 +110,7 @@ public class BatchJob implements CafienneSerializable {
         status.putRaw(Fields.jobCount.toString(), jobCount);
         status.putRaw("active", jobs.stream().filter(InformJob::active).count());
         status.putRaw("pending", jobs.stream().filter(InformJob::pending).count());
-        status.putRaw("failures", failures.size());
+        status.putRaw("failures", failures);
         return status;
     }
 }
