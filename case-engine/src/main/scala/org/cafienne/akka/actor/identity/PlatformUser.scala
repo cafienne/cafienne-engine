@@ -60,7 +60,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
   final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse({
     val message = tenants.isEmpty match {
       case true => s"User '$userId' is not registered in a tenant"
-      case false => s"User '$userId' is not registered in tenant '$tenant'; tenants are: "+tenants.map(tenant => s"'$tenant'").mkString(",")
+      case false => s"User '$userId' is not registered in tenant '$tenant'; user is registered in ${tenants.size} other tenant(s) "
     }
     throw AuthorizationException(message)
   })
