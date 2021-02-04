@@ -12,6 +12,7 @@ import net.fortuna.ical4j.util.UidGenerator;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.util.Guid;
 
 import java.net.SocketException;
 import java.net.URI;
@@ -30,9 +31,13 @@ public class CalendarInvite {
         String meetingName = input.raw("meetingName");
         String description = input.has("description") ? input.raw("description") : "";
         String location = input.has("location") ? input.raw("location") : "";
+
+        // Take meeting id from input if defined, or generate a unique identifier..
+        String meetingId = input.has("uid") ? input.raw("uid") : new RandomUidGenerator().generateUid().toString();
+
+        // Convert timezone
         try {
             ZoneId.of(timeZone);
-
         } catch (DateTimeException invalidTimeZone) {
 
         }
@@ -54,10 +59,7 @@ public class CalendarInvite {
         meeting.getProperties().add(tz);
 
 
-        // generate unique identifier..
-        UidGenerator ug = new RandomUidGenerator();
-        Uid uid = ug.generateUid();
-        meeting.getProperties().add(uid);
+        meeting.getProperties().add(new Uid(meetingId));
 
 
         // add attendees..
