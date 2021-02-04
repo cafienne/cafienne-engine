@@ -26,8 +26,8 @@ public class SMTPCallDefinition extends MailDefinition {
 
     public SMTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        this.smtpServer = parseString("smtp-server", true);
-        this.smtpPort = parseString("smtp-port", true);
+        this.smtpServer = parseString("smtp-server", false);
+        this.smtpPort = parseString("smtp-port", false);
     }
 
     public Properties getMailProperties() {
@@ -36,9 +36,13 @@ public class SMTPCallDefinition extends MailDefinition {
         Properties defaultProperties = super.getMailProperties();
         Properties properties = new Properties();
         properties.putAll(defaultProperties);
-        properties.put("mail.host", smtpServer);
-        properties.put("mail.smtp.host", smtpServer);
-        properties.put("mail.smtp.port", smtpPort);
+        if (this.smtpServer != null) {
+            properties.put("mail.host", smtpServer);
+            properties.put("mail.smtp.host", smtpServer);
+        }
+        if (this.smtpPort != null) {
+            properties.put("mail.smtp.port", smtpPort);
+        }
         return properties;
     }
 }
