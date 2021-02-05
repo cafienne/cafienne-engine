@@ -21,12 +21,7 @@ import org.cafienne.tenant.akka.command._
 class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
   // POST Method has been replaced with PUT method. Keeping this for compatibility
-  override def routes = {
-    addTenantOwner ~
-      removeTenantOwner ~
-      enableTenantUser ~
-      disableTenantUser
-  }
+  override def routes = concat(addTenantOwner, removeTenantOwner, enableTenantUser, disableTenantUser)
 
   @Path("/{tenant}/owners/{userId}")
   @PUT

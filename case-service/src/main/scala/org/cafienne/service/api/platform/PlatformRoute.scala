@@ -31,15 +31,7 @@ import scala.util.{Failure, Success}
 @Path("/platform")
 class PlatformRoute(platformQueries: PlatformQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
-  override def routes = {
-      createTenant ~
-      disableTenant ~
-      enableTenant ~
-      getUserInformation ~
-      updateUserInformation ~
-      getWhereUsedInformation ~
-      getUpdateStatus
-  }
+  override def routes = concat(createTenant, disableTenant, enableTenant, getUserInformation, updateUserInformation, getWhereUsedInformation, getUpdateStatus)
 
   @Path("/")
   @POST

@@ -28,10 +28,7 @@ import scala.util.{Failure, Success}
 @Path("/tenant")
 class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
-  override def routes = {
-      getTenantUsers ~
-      getTenantUser
-  }
+  override def routes = concat(getTenantUsers, getTenantUser)
 
   @Path("/{tenant}/users")
   @GET

@@ -25,10 +25,7 @@ import org.cafienne.service.api.projection.query.CaseQueries
 @Path("/cases")
 class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  override def routes = {
-    retrieveDiscretionaryItem ~
-    planDiscretionaryItem
-  }
+  override def routes = concat(retrieveDiscretionaryItem, planDiscretionaryItem)
 
   @Path("/{caseInstanceId}/discretionaryitems")
   @GET

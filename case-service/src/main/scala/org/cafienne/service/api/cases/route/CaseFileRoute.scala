@@ -28,13 +28,7 @@ import org.cafienne.service.api.projection.query.CaseQueries
 @Path("/cases")
 class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  override def routes = {
-    getCaseFile ~
-      createCaseFileItem ~
-      replaceCaseFileItem ~
-      updateCaseFileItem ~
-      deleteCaseFileItem
-  }
+  override def routes = concat(getCaseFile, createCaseFileItem, replaceCaseFileItem, updateCaseFileItem, deleteCaseFileItem)
 
   @Path("/{caseInstanceId}/casefile")
   @GET

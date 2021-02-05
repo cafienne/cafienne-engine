@@ -34,17 +34,9 @@ import scala.collection.immutable.Seq
 @Path("/repository")
 class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
 
-  override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[RepositoryRoute])
-  }
+  override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
 
-  override def routes: Route =
-    pathPrefix("repository") {
-      loadModel ~
-        listModels ~
-        validateModel ~
-        deployModel
-    }
+  override def apiClasses(): Seq[Class[_]] = Seq(classOf[RepositoryRoute])
 
   @Path("load/{fileName}")
   @GET

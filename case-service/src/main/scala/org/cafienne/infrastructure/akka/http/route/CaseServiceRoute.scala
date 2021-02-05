@@ -34,14 +34,14 @@ trait CaseServiceRoute extends LazyLogging {
   val route: Route = handleErrors {
     extractExecutionContext { implicit executor =>
       cors(corsSettings) {
-        handleErrors { req => {
+        handleErrors { req =>
           //          println("Asking "+req.request.uri)
-          routes(req).map(resp => {
-            //            println("Responding to "+req.request.uri+": "+resp)
-            //            println(""+resp)
-            resp
-          })
-        }
+          routes(req)
+//            .map(resp => {
+//              println("Responding to " + req.request.uri + ": " + resp)
+//              println("" + resp)
+//              resp
+//            })
         }
       }
     }
@@ -53,12 +53,12 @@ trait CaseServiceRoute extends LazyLogging {
       .handle {
         case MalformedRequestContentRejection(errorMessage, e) =>
           extractUri { uri =>
-            logger.debug("Exception of type " + e.getClass.getName + " occured in handling HTTP request " + uri.path + " - " + errorMessage)
-            complete(StatusCodes.BadRequest, "The request content was malformed:\n" + errorMessage)
+            logger.debug(s"Exception of type ${e.getClass.getName} occurred in handling HTTP request ${uri.path} - $errorMessage")
+            complete(StatusCodes.BadRequest, s"The request content was malformed:\n$errorMessage")
           }
       }
       .handle {
-        case AuthorizationFailedRejection ⇒ complete(StatusCodes.Forbidden)
+        case AuthorizationFailedRejection => complete(StatusCodes.Forbidden)
       }
       .result()
 

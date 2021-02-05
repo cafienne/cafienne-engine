@@ -22,10 +22,7 @@ import org.cafienne.service.api.projection.query.CaseQueries
 @Path("/cases")
 class CaseHistoryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  override def routes = {
-      getPlanHistory ~
-      getPlanItemHistory
-    }
+  override def routes = concat(getPlanHistory, getPlanItemHistory)
 
   @Path("/{caseInstanceId}/history/planitems")
   @GET

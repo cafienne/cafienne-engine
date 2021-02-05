@@ -8,7 +8,6 @@
 package org.cafienne.service.api.cases.route
 
 import java.util.UUID
-
 import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -19,7 +18,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.exception.MissingTenantException
 import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.akka.command.team.CaseTeam
@@ -37,15 +35,7 @@ import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
 @Path("/cases")
 class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  override def routes = {
-    getCases ~
-      getUserCases ~
-      stats ~
-      getCase ~
-      getCaseDefinition ~
-      startCase ~
-      debugCase
-  }
+  override def routes = concat(getCase, getCases, getUserCases, stats, getCaseDefinition, startCase, debugCase)
 
   @GET
   @Operation(

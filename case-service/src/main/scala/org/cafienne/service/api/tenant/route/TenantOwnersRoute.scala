@@ -25,16 +25,8 @@ import org.cafienne.tenant.akka.command._
 @Path("/tenant")
 class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
 
-  override def routes = {
-      getTenantOwners ~
-      upsertTenantUser ~
-      updateTenant ~
-      replaceTenantUser ~
-      replaceTenant ~
-      addTenantUserRoles ~
-      removeTenantUserRole ~
-      getDisabledUserAccounts
-  }
+  override def routes =
+    concat(getTenantOwners, upsertTenantUser, updateTenant, replaceTenantUser, replaceTenant, addTenantUserRoles, removeTenantUserRole, getDisabledUserAccounts)
 
   @Path("/{tenant}/owners")
   @GET
