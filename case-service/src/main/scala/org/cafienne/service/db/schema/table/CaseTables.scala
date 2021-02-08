@@ -12,7 +12,7 @@ trait CaseTables extends QueryDBSchema {
 
   //TODO: add lowercase index on definition in Postgresql to allow case insensitive searching
 
-  class CaseInstanceTable(tag: Tag) extends CafienneTable[CaseRecord](tag, "case_instance") {
+  class CaseInstanceTable(tag: Tag) extends CafienneTenantTable[CaseRecord](tag, "case_instance") {
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "id" => id
       case "definition" => caseName // Backwards compatibility; column name before was "definition"
@@ -32,8 +32,6 @@ trait CaseTables extends QueryDBSchema {
     }
 
     def id = idColumn[String]("id", O.PrimaryKey)
-
-    def tenant = idColumn[String]("tenant")
 
     def caseName = idColumn[String]("case_name")
 
@@ -68,7 +66,7 @@ trait CaseTables extends QueryDBSchema {
     def * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
   }
 
-  final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTable[CaseDefinitionRecord](tag, "case_instance_definition") {
+  final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTenantTable[CaseDefinitionRecord](tag, "case_instance_definition") {
 
     def caseInstanceId = idColumn[String]("caseInstanceId", O.PrimaryKey)
 
@@ -80,8 +78,6 @@ trait CaseTables extends QueryDBSchema {
 
     def content = column[String]("content")
 
-    def tenant = idColumn[String]("tenant")
-
     def lastModified = column[Instant]("last_modified")
 
     def modifiedBy = userColumn[String]("modified_by")
@@ -89,7 +85,7 @@ trait CaseTables extends QueryDBSchema {
     def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseDefinitionRecord.tupled, CaseDefinitionRecord.unapply)
   }
 
-  class PlanItemTable(tag: Tag) extends CafienneTable[PlanItemRecord](tag, "plan_item") {
+  class PlanItemTable(tag: Tag) extends CafienneTenantTable[PlanItemRecord](tag, "plan_item") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -102,8 +98,6 @@ trait CaseTables extends QueryDBSchema {
     def index = column[Int]("index")
 
     def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
 
     def currentState = stateColumn[String]("current_state")
 
@@ -140,7 +134,7 @@ trait CaseTables extends QueryDBSchema {
     def indexModifiedBy = index(modifiedBy)
   }
 
-  final class PlanItemHistoryTable(tag: Tag) extends CafienneTable[PlanItemHistoryRecord](tag, "plan_item_history") {
+  final class PlanItemHistoryTable(tag: Tag) extends CafienneTenantTable[PlanItemHistoryRecord](tag, "plan_item_history") {
 
     def id = idColumn[String]("id", O.PrimaryKey)
 
@@ -153,8 +147,6 @@ trait CaseTables extends QueryDBSchema {
     def index = column[Int]("index")
 
     def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
 
     def currentState = stateColumn[String]("current_state")
 
@@ -190,11 +182,9 @@ trait CaseTables extends QueryDBSchema {
     def indexModifiedBy = index(modifiedBy)
   }
 
-  class CaseFileTable(tag: Tag) extends CafienneTable[CaseFileRecord](tag, "case_file") {
+  class CaseFileTable(tag: Tag) extends CafienneTenantTable[CaseFileRecord](tag, "case_file") {
 
     def caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
-
-    def tenant = idColumn[String]("tenant")
 
     def data = jsonColumn[String]("data")
 
@@ -203,7 +193,7 @@ trait CaseTables extends QueryDBSchema {
     val indexCaseInstanceId = index(caseInstanceId)
   }
 
-  final class CaseBusinessIdentifierTable(tag: Tag) extends CafienneTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
+  final class CaseBusinessIdentifierTable(tag: Tag) extends CafienneTenantTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "name" => name
       case "tenant" => tenant
@@ -213,8 +203,6 @@ trait CaseTables extends QueryDBSchema {
     }
 
     def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
 
     def name = idColumn[String]("name")
 
@@ -234,11 +222,9 @@ trait CaseTables extends QueryDBSchema {
     val indexName = index(name)
   }
 
-  class CaseInstanceRoleTable(tag: Tag) extends CafienneTable[CaseRoleRecord](tag, "case_instance_role") {
+  class CaseInstanceRoleTable(tag: Tag) extends CafienneTenantTable[CaseRoleRecord](tag, "case_instance_role") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
 
     def roleName = idColumn[String]("role_name")
 
@@ -251,11 +237,9 @@ trait CaseTables extends QueryDBSchema {
     val indexCaseInstanceId = index(caseInstanceId)
   }
 
-  class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
+  class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
 
     def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
 
     def caseRole = idColumn[String]("case_role")
 
