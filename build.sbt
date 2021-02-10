@@ -116,7 +116,7 @@ lazy val engine = project("case-engine")
   .enablePlugins(GitVersioning, GitBranchPrompt)
   .settings(
     git.gitTagToVersionNumber := { tag: String =>
-      val splittedTag = tag.split("-");
+      val splittedTag = tag.split("-")
       splittedTag.length match {
         case 0 => Some(tag)
         case 1 => Some(tag)
@@ -156,6 +156,7 @@ lazy val service = project("case-service")
     version in Docker := "latest",
     maintainer in Docker := """Cafienne <info@cafienne.io>""",
     defaultLinuxInstallLocation in Docker := "/opt/cafienne",
+    scriptClasspath in bashScriptDefines := Seq("../lib_ext/*","*"),
     bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml"""",
     bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",
     dockerExposedPorts := Seq(2027, 9999),
@@ -165,8 +166,6 @@ lazy val service = project("case-service")
   )
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(UniversalPlugin)
-  .enablePlugins(ClasspathJarPlugin)
-  .enablePlugins(LauncherJarPlugin)
   .enablePlugins(DockerPlugin)
   .configs(MultiJvm)
 
