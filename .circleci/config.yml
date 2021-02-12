@@ -42,6 +42,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
+            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -65,7 +66,7 @@ jobs:
           command: |
             docker-compose -f .circleci/docker-test-jdbc-master.yml up -d sql-server cafienne-event-db cafienne-query-db
             docker-compose -f .circleci/docker-test-cassandra.yml up -d cassandra postgres
-            docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne-test-token-service
+            docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne-test-token-service mailcatcher
 
       # Starting docker environment for In-memory testing
       - run:
@@ -292,6 +293,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
+            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -314,7 +316,7 @@ jobs:
           command: |
             docker-compose -f .circleci/docker-test-jdbc-release.yml up -d sql-server cafienne-event-db cafienne-query-db
             docker-compose -f .circleci/docker-test-cassandra.yml up -d cassandra postgres
-            docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne-test-token-service
+            docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne-test-token-service mailcatcher
 
       # Starting docker environment for In-memory testing
       - run:
