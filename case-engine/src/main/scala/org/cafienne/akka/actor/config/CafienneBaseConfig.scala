@@ -2,9 +2,11 @@ package org.cafienne.akka.actor.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.identity.TenantUser
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
+import scala.jdk.CollectionConverters.asScalaBufferConverter
 
 trait MandatoryConfig extends CafienneBaseConfig {
   override lazy val config = {
@@ -80,4 +82,13 @@ trait CafienneBaseConfig extends LazyLogging {
       default
     }
   }
+
+  def readStringList(path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
+    if (config.hasPath(path)) {
+      config.getStringList(path).asScala
+    } else {
+      defaultValue
+    }
+  }
+
 }

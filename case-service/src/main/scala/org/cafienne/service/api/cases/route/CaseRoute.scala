@@ -162,7 +162,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @Produces(Array("application/json"))
   def startCase = post {
     pathEndOrSingleSlash {
-      validUser { platformUser =>
+      anonymousOrAuthenticatedUser { platformUser =>
         post {
           entity(as[StartCaseFormat]) { payload =>
             try {
@@ -174,7 +174,27 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
               val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
-              askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              val tenantUser = platformUser.getTenantUser(tenant)
+              val errorMsg: String = tenantUser.isAnonymous match {
+                case false => ""
+                case true => {
+                  // There must be a case team
+                  if (caseTeam.members.isEmpty) "Starting cases in anonymous mode requires case team members"
+                  // ... it cannot contain the anonymous user ...
+                  else if (caseTeam.members.filter(m => m.isTenantUser() && m.key.id == tenantUser.id).nonEmpty) "Starting cases in anonymous mode cannot have the anonymous user in the case team"
+                  // ... there must be owners
+                  else if (caseTeam.owners.isEmpty) "Starting cases in anonymous mode requires at least one case owner"
+                  // ... the anonymous user cannot be an owner
+                  else if (caseTeam.owners.exists(m => m.isTenantUser() && m.key.id == tenantUser.id)) "Anonymous user cannot be a case owner"
+                  // other than that we're good to go
+                  else ""
+                }
+              }
+              // If there is no error message, then we're fine
+              errorMsg.isEmpty match {
+                case true => askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+                case false => complete(StatusCodes.BadRequest, errorMsg)
+              }
             } catch {
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)

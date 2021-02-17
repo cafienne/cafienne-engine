@@ -122,7 +122,7 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", false, "", "", true);
+        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", false, "", "", true, false);
     }
 
     /**

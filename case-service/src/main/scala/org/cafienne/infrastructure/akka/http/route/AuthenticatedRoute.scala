@@ -85,6 +85,20 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
+  def anonymousOrAuthenticatedUser(subRoute: PlatformUser => Route): Route = {
+    // If Authorization header is not present, we can see if an anonymous user is enabled, and if so, run that route
+    //  Otherwise just take the normal validation.
+    //  Note: if anonymous user is not enabled, we follow normal validation, giving normal failures, instead of our
+    //  own type of failure
+    optionalHeaderValueByName("Authorization") {
+      case None => CaseSystem.config.api.anonymousUser match {
+        case None => validUser(subRoute)
+        case Some(user) => subRoute(user)
+      }
+      case Some(_) => validUser(subRoute)
+    }
+  }
+
   def validUser(subRoute: PlatformUser => Route): Route = {
     optionalHeaderValueByName(api.TENANT_LAST_MODIFIED) { tlm =>
       OIDCAuthentication.user(tlm) { platformUser =>

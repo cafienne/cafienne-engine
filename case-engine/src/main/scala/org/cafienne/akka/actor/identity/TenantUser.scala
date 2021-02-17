@@ -9,7 +9,7 @@ import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
 
-final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneSerializable with CafienneJson {
+final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true, isAnonymous: Boolean = false) extends CafienneSerializable with CafienneJson {
 
   import scala.collection.JavaConverters._
 
