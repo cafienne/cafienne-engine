@@ -1,7 +1,4 @@
 lazy val basicSettings = {
-  val currentScalaVersion = "2.12.7"
-  val scala211Version = "2.11.11"
-
 
   Seq(
     organization := "org.cafienne",
@@ -19,7 +16,24 @@ lazy val basicSettings = {
     parallelExecution in Compile := true,
     parallelExecution in Test := false,
     fork in Test := true,
-    sources in doc in Compile := List()
+    sources in doc in Compile := List(),
+    homepage := Some(url("https://cafienne.org")),
+    scmInfo := Some(ScmInfo(url("https://github.com/cafienne/cafienne-engine.git"), "git@github.com:cafienne/cafienne-engine.git")),
+    licenses += ("Apache-2.0", url("https://www.mozilla.org/en-US/MPL/2.0/")),
+    publishMavenStyle := true,
+
+    // disable publishw ith scala version, otherwise artifact name will include scala version
+    // e.g cassper_2.11
+    //crossPaths := false,
+    // add sonatype repository settings
+    // snapshot versions publish to sonatype snapshot repository
+    // other versions publish to sonatype staging repository
+    publishTo := Some(
+      if (isSnapshot.value)
+        Opts.resolver.sonatypeSnapshots
+      else
+        Opts.resolver.sonatypeStaging
+    ),
   )
 }
 
@@ -115,6 +129,7 @@ lazy val engine = project("case-engine")
   .enablePlugins(GitPlugin)
   .enablePlugins(GitVersioning, GitBranchPrompt)
   .settings(
+    git.gitUncommittedChanges := git.gitCurrentTags.value.isEmpty,
     git.gitTagToVersionNumber := { tag: String =>
       val splittedTag = tag.split("-")
       splittedTag.length match {
