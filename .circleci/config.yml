@@ -418,12 +418,14 @@ workflows:
               only:
                 - master
                 - dependency-updates
+                - run-compatibility-checks
       - branch-build:
           filters:
             branches:
               ignore:
                 - master
                 - dependency-updates
+                - run-compatibility-checks
       - release-build:
           filters:
             tags:
