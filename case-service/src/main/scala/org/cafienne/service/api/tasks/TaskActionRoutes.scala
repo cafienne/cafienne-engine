@@ -29,15 +29,7 @@ import org.cafienne.service.api.projection.query.{TaskCount, TaskQueries}
 @Path("/tasks")
 class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends TaskRoute {
 
-  override def routes = {
-    validateTaskOutput ~
-      saveTaskOutput ~
-      claimTaskRoute ~
-      revokeTaskRoute ~
-      assignTaskRoute ~
-      delegateTaskRoute ~
-      completeTaskRoute
-  }
+  override def routes = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)
 
   @Path("/user/count")
   @GET

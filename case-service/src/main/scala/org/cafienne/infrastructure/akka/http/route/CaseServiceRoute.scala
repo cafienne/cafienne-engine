@@ -34,14 +34,14 @@ trait CaseServiceRoute extends LazyLogging {
   val route: Route = handleErrors {
     extractExecutionContext { implicit executor =>
       cors(corsSettings) {
-        handleErrors { req => {
+        handleErrors { req =>
           //          println("Asking "+req.request.uri)
-          routes(req).map(resp => {
-            //            println("Responding to "+req.request.uri+": "+resp)
-            //            println(""+resp)
-            resp
-          })
-        }
+          routes(req)
+//            .map(resp => {
+//              println("Responding to " + req.request.uri + ": " + resp)
+//              println("" + resp)
+//              resp
+//            })
         }
       }
     }
@@ -53,12 +53,12 @@ trait CaseServiceRoute extends LazyLogging {
       .handle {
         case MalformedRequestContentRejection(errorMessage, e) =>
           extractUri { uri =>
-            logger.debug("Exception of type " + e.getClass.getName + " occured in handling HTTP request " + uri.path + " - " + errorMessage)
-            complete(StatusCodes.BadRequest, "The request content was malformed:\n" + errorMessage)
+            logger.debug(s"Exception of type ${e.getClass.getName} occurred in handling HTTP request ${uri.path} - $errorMessage")
+            complete(StatusCodes.BadRequest, s"The request content was malformed:\n$errorMessage")
           }
       }
       .handle {
-        case AuthorizationFailedRejection ⇒ complete(StatusCodes.Forbidden)
+        case AuthorizationFailedRejection => complete(StatusCodes.Forbidden)
       }
       .result()
 
@@ -93,14 +93,46 @@ trait CaseServiceRoute extends LazyLogging {
     complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, v.toString))
   }
 
-  def routes: Route
+  private var concatenatedSubRoutes: Route = null
 
   /**
-    * Override this method in your route to expose the Swagger API classes
-    *
+    * Register a sub route; note: this requires an override of the prefix value as well,
+    * and additionally the routes method should not be overridden
+    * @param subRoute
+    */
+  def addSubRoute(subRoute: CaseServiceRoute) = {
+    registerAPIRoute(subRoute)
+    if (concatenatedSubRoutes == null) concatenatedSubRoutes = subRoute.routes
+    else concatenatedSubRoutes = concat(concatenatedSubRoutes, subRoute.routes)
+  }
+
+  val prefix: String = "/"
+
+  def routes: Route = {
+    pathPrefix(prefix) {
+      concatenatedSubRoutes
+    }
+  }
+
+  def apiClasses(): Seq[Class[_]] = {
+    swaggerClasses.to[Seq]
+  }
+
+  /**
+    * Override this value and set to false if a route should not end up in Swagger
+    */
+  val addToSwaggerRoutes = true
+
+  /**
+    * Invoke this method to add it to the Swagger API classes
+    * @param route
     * @return
     */
-  def apiClasses(): Seq[Class[_]] = {
-    Seq()
+  def registerAPIRoute(route: CaseServiceRoute) = {
+    if (route.addToSwaggerRoutes) {
+      swaggerClasses += route.getClass
+    }
   }
+
+  private val swaggerClasses = scala.collection.mutable.Buffer[Class[_]]()
 }

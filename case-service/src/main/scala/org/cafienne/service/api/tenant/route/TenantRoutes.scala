@@ -7,28 +7,15 @@
  */
 package org.cafienne.service.api.tenant.route
 
-import akka.http.scaladsl.server.Directives._
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
 
-import scala.collection.immutable.Seq
-
-
 @Path("/tenant")
 class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
-  val tenantOwnersRoute = new TenantOwnersRoute(userQueries)(userCache)
-  val tenantUsersRoute = new TenantUsersRoute(userQueries)(userCache)
-  val formerAddTenantUserRoute = new DeprecatedTenantOwnersRoute(userQueries)(userCache)
+  override val prefix: String = "tenant"
 
-  override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[TenantOwnersRoute], classOf[TenantUsersRoute])
-  }
-
-  override def routes = pathPrefix("tenant") {
-    tenantOwnersRoute.routes ~
-    tenantUsersRoute.routes ~
-    formerAddTenantUserRoute.routes
-  }
-
+  addSubRoute(new TenantOwnersRoute(userQueries)(userCache))
+  addSubRoute(new TenantUsersRoute(userQueries)(userCache))
+  addSubRoute(new DeprecatedTenantOwnersRoute(userQueries)(userCache))
 }

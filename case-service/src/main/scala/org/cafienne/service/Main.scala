@@ -10,6 +10,7 @@ package org.cafienne.service
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.BuildInfo
@@ -84,8 +85,6 @@ object Main extends App {
 
     // Some routes assume the above created implicit writers
     val caseServiceRoutes: Seq[CaseServiceRoute] = Seq(
-
-      // BE CAREFUL WHEN ADDING / REMOVING ROUTES: it also must be done in below apiRoutes statements!
       new CaseEngineHealthRoute(),
       new CasesRoutes(caseQueries),
       new TaskRoutes(taskQueries),
@@ -93,39 +92,21 @@ object Main extends App {
       new PlatformRoutes(platformQueries),
       new RepositoryRoute(),
       new DebugRoute()
-      // BE CAREFUL WHEN ADDING / REMOVING ROUTES: it also must be done in below apiRoutes statements!
-      
     )
 
-    // Find the API classes of the routes and pass the to Swagger
+    // Find the API classes of the routes and pass them to Swagger
     val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses)
 
-    // For unclear reasons we cannot map the Seq(CaseServiceRoute)
+    // Create the route tree
     val apiRoutes = {
-      caseServiceRoutes.toArray.apply(0).route ~
-        caseServiceRoutes.toArray.apply(1).route ~
-        caseServiceRoutes.toArray.apply(2).route ~
-        caseServiceRoutes.toArray.apply(3).route ~
-        caseServiceRoutes.toArray.apply(4).route ~
-        caseServiceRoutes.toArray.apply(5).route ~
-        caseServiceRoutes.toArray.apply(6).route ~
-//      mainRoute ~
-      // Add the routes for the API documentation frontend.
-      new SwaggerHttpServiceRoute(apiClasses.toSet).route
+      var mainRoute = new SwaggerHttpServiceRoute(apiClasses.toSet).route
+      caseServiceRoutes.map(c => c.route).foreach(route => mainRoute = concat(mainRoute, route))
+      mainRoute
     }
-
-    // UNCLEAR why below does not work. It compiles, it runs, but it does not do what we want it to do (i.e., tests are failing with "route not found 404")
-    //    caseServiceRoutes.foreach(route => apiRoutes ~ {
-    //      println("\n\nAdding route from "+route.getClass.getSimpleName)
-    //      val r = route.route
-    //      println("it is: "+r)
-    //      route.route
-    //    })
-
 
     val apiHost = CaseSystem.config.api.bindHost
     val apiPort = CaseSystem.config.api.bindPort
-    val httpServer = Http().bindAndHandle(apiRoutes, apiHost, apiPort)
+    val httpServer = Http().newServerAt(apiHost, apiPort).bindFlow(apiRoutes)
     httpServer onComplete {
       case Success(answer) ⇒ {
         system.log.info(s"service is done: $answer")
