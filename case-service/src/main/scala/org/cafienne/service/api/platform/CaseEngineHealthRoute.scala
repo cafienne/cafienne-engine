@@ -26,7 +26,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   //  Otherwise, routes are not available when case system is not healthy (because platform routes are AuthenticatedRoute)
   override def routes = concat(health, version, status)
 
-  override def apiClasses(): Seq[Class[_]] = Seq(classOf[CaseEngineHealthRoute])
+  registerAPIRoute(this)
 
   @Path("/status")
   @GET

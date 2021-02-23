@@ -7,40 +7,22 @@
  */
 package org.cafienne.service.api.cases.route
 
-import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.CaseQueries
 
-import scala.collection.immutable.Seq
-
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
+  override val prefix = "cases"
 
-  val caseRoute = new CaseRoute(caseQueries)(userCache)
-  val caseFileRoute = new CaseFileRoute(caseQueries)(userCache)
-  val caseTeamRoute = new CaseTeamRoute(caseQueries)(userCache)
-  val casePlanRoute = new PlanItemRoute(caseQueries)(userCache)
-  val discretionaryRoute = new DiscretionaryRoute(caseQueries)(userCache)
-  val caseDocumentationRoute = new CaseDocumentationRoute(caseQueries)(userCache)
-  val caseHistoryRoute = new CaseHistoryRoute(caseQueries)(userCache)
-  val deprecatedPlanItemHistoryRoute = new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache)
-
-  override def routes =
-    pathPrefix("cases") {
-      caseRoute.routes ~
-      caseFileRoute.routes ~
-      casePlanRoute.routes ~
-      caseTeamRoute.routes ~
-      discretionaryRoute.routes ~
-      caseDocumentationRoute.routes ~
-      caseHistoryRoute.routes ~
-      deprecatedPlanItemHistoryRoute.routes
-    }
-
-  override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[CaseRoute], classOf[CaseFileRoute], classOf[CaseTeamRoute], classOf[PlanItemRoute], classOf[DiscretionaryRoute], classOf[CaseDocumentationRoute], classOf[CaseHistoryRoute])
-  }
+  addSubRoute(new CaseRoute(caseQueries)(userCache))
+  addSubRoute(new CaseFileRoute(caseQueries)(userCache))
+  addSubRoute(new CaseTeamRoute(caseQueries)(userCache))
+  addSubRoute(new PlanItemRoute(caseQueries)(userCache))
+  addSubRoute(new DiscretionaryRoute(caseQueries)(userCache))
+  addSubRoute(new CaseDocumentationRoute(caseQueries)(userCache))
+  addSubRoute(new CaseHistoryRoute(caseQueries)(userCache))
+  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache))
 }

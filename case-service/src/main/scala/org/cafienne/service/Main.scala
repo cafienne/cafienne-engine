@@ -100,13 +100,13 @@ object Main extends App {
     // Create the route tree
     val apiRoutes = {
       var mainRoute = new SwaggerHttpServiceRoute(apiClasses.toSet).route
-      caseServiceRoutes.map(c => c.route).foreach(route => mainRoute = mainRoute ~ route)
+      caseServiceRoutes.map(c => c.route).foreach(route => mainRoute = concat(mainRoute, route))
       mainRoute
     }
 
     val apiHost = CaseSystem.config.api.bindHost
     val apiPort = CaseSystem.config.api.bindPort
-    val httpServer = Http().bindAndHandle(apiRoutes, apiHost, apiPort)
+    val httpServer = Http().newServerAt(apiHost, apiPort).bindFlow(apiRoutes)
     httpServer onComplete {
       case Success(answer) ⇒ {
         system.log.info(s"service is done: $answer")

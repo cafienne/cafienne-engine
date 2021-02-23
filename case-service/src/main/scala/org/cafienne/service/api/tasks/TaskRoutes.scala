@@ -7,25 +7,16 @@
  */
 package org.cafienne.service.api.tasks
 
-import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import javax.ws.rs.Path
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.TaskQueries
 
-import scala.collection.immutable.Seq
-
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
 class TaskRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider) extends TaskRoute {
-  val taskQueryRoute = new TaskQueryRoutes(taskQueries)(userCache)
-  val taskActionRoute = new TaskActionRoutes(taskQueries)(userCache)
+  override val prefix = "tasks"
 
-  override def routes = pathPrefix("tasks") {
-    taskQueryRoute.routes ~ taskActionRoute.routes
-  }
-
-  override def apiClasses(): Seq[Class[_]] = {
-    Seq(classOf[TaskQueryRoutes], classOf[TaskActionRoutes])
-  }
+  addSubRoute(new TaskQueryRoutes(taskQueries)(userCache))
+  addSubRoute(new TaskActionRoutes(taskQueries)(userCache))
 }

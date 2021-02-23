@@ -36,7 +36,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
 
-  override def apiClasses(): Seq[Class[_]] = Seq(classOf[RepositoryRoute])
+  registerAPIRoute(this)
 
   @Path("load/{fileName}")
   @GET
