@@ -9,6 +9,7 @@ package org.cafienne.cmmn.akka.command.plan.eventlistener;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.CommandException;
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
@@ -56,6 +57,11 @@ public class RaiseEvent extends CaseCommand {
     @Override
     public String toString() {
         return identifier + ".Occur";
+    }
+
+    @Override
+    public void validate(Case caseInstance) throws InvalidCommandException {
+        // Disable case team membership, similar to the logic in CompleteTask.validate
     }
 
     @Override
