@@ -35,7 +35,7 @@ import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
 @Path("/cases")
 class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  override def routes = concat(getCase, getCases, getUserCases, stats, getCaseDefinition, startCase, debugCase)
+  override def routes = concat(getCase, getCases, stats, getCaseDefinition, startCase, debugCase)
 
   @GET
   @Operation(
@@ -66,41 +66,6 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
             runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
-        }
-      }
-    }
-  }
-
-  @Path("/user")
-  @GET
-  @Operation(
-    summary = "Get a list of current user cases",
-    description = "Returns a list of case instances which the current user started or is a participant",
-    tags = Array("case"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the cases from", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0")),
-      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100")),
-      new Parameter(name = "identifiers", description = "Comma separated string of business identifiers with values", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "state", description = "Get cases with this state, e.g. Active or Completed", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = "sortOrder", description = "Sort direction", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Cases found", responseCode = "200"),
-      new ApiResponse(description = "No cases found based on query params", responseCode = "404")
-    )
-  )
-  @Produces(Array("application/json"))
-  def getUserCases = get {
-    path("user") {
-      validUser { platformUser =>
-        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
-          (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
-            val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
-            val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
-            runListQuery(caseQueries.getMyCases(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
         }
       }
     }
