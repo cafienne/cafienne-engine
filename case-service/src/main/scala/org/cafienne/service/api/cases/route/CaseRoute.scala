@@ -35,7 +35,7 @@ import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
 @Path("/cases")
 class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
 
-  override def routes = concat(getCase, getCases, stats, getCaseDefinition, startCase, debugCase)
+  override def routes = concat(getCases, stats, getCase, getCaseDefinition, startCase, debugCase)
 
   @GET
   @Operation(
