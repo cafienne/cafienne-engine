@@ -1,8 +1,7 @@
 package org.cafienne.timerservice;
 
 import akka.actor.Cancellable;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.akka.command.plan.eventlistener.RaiseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
@@ -19,7 +18,7 @@ class ScheduledTimer {
     ScheduledTimer(TimerService timerService, TimerJob request) {
         this.timerService = timerService;
         this.request = request;
-        MakePlanItemTransition command = new MakePlanItemTransition(request.user, request.caseInstanceId, request.timerId, Transition.Occur);
+        RaiseEvent command = new RaiseEvent(request.user, request.caseInstanceId, request.timerId);
 
         // Note: this code needs some refactoring
         // - We should not use the system scheduler (dispatcher), but create our own (?)

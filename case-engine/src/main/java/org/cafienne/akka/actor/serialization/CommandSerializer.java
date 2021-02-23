@@ -10,6 +10,7 @@ import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
 import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.eventlistener.RaiseEvent;
 import org.cafienne.cmmn.akka.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.plan.task.FailTask;
 import org.cafienne.cmmn.akka.command.team.PutTeamMember;
@@ -54,6 +55,7 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(MakePlanItemTransition.class, MakePlanItemTransition::new);
         addManifestWrapper(CompleteTask.class, CompleteTask::new);
         addManifestWrapper(FailTask.class, FailTask::new);
+        addManifestWrapper(RaiseEvent.class, RaiseEvent::new);
     }
 
     private static void addCaseFileCommands() {
