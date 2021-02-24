@@ -147,7 +147,7 @@ trait BaseQueryImpl
         if (rawFilter.isBlank) NoFilter()
         else if (rawFilter.startsWith("!")) NotFieldFilter(rawFilter.substring(1))
         else if (rawFilter.indexOf("!=") > 0) NotValueFilter(rawFilter)
-        else if (rawFilter.indexOf("=") > 0) ValueFilter(rawFilter)
+        else if (rawFilter.indexOf("=") >= 0) ValueFilter(rawFilter)
         else FieldFilter(rawFilter) // Well, with all options coming
       })
 
