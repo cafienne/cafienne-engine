@@ -18,13 +18,16 @@ import org.cafienne.akka.actor.serialization.json.Value;
  * That is, if a {@link Task} assigns input parameters, the value of that parameter is typically retrieved from the case file.
  */
 public class TaskInputParameter extends Parameter<InputParameterDefinition> {
-    public TaskInputParameter(InputParameterDefinition definition, Case caseInstance) {
-        super(definition, caseInstance, null);
+    private final Task task;
+
+    public TaskInputParameter(InputParameterDefinition definition, Task task) {
+        super(definition, task.getCaseInstance(), null);
+        this.task = task;
     }
 
     @Override
     public Value<?> getValue() {
-        super.bindCaseFileToParameter();
+        super.bindCaseFileToParameter(task);
         return super.getValue();
     }
 }

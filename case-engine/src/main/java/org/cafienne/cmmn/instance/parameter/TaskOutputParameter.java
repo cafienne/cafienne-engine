@@ -12,14 +12,18 @@ import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.Task;
 
 /**
  * A TaskOutputParameter is created right before a task completes.
  * If its value is set (after it is mapped from the raw output of the task), it is bound to the case file.
  */
 public class TaskOutputParameter extends Parameter<ParameterDefinition> {
-    public TaskOutputParameter(ParameterDefinition definition, Case caseInstance, Value value) {
-        super(definition, caseInstance, value);
+    private final Task task;
+
+    public TaskOutputParameter(ParameterDefinition definition, Task task, Value value) {
+        super(definition, task.getCaseInstance(), value);
+        this.task = task;
     }
 
     @Override
@@ -31,6 +35,6 @@ public class TaskOutputParameter extends Parameter<ParameterDefinition> {
      * Binding to case file must not be done upon task output validation, only upon task completion.
      */
     public void bind() {
-        super.bindParameterToCaseFile();
+        super.bindParameterToCaseFile(task);
     }
 }

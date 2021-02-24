@@ -25,13 +25,10 @@ import java.util.stream.Collectors;
 public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
     private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap();
     private final String name;
-    public final int instanceNumber;
-    private static int instanceCounter = 0;
 
     protected CaseFileItemCollection(Case caseInstance, T definition, String name) {
         super(caseInstance, definition);
         this.name = name;
-        this.instanceNumber = instanceCounter++;
     }
 
     /**
@@ -62,23 +59,12 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     }
 
     /**
-     * Return the child item with the name and specified index. Only works for case file items that have a multiplicity {@link Multiplicity#ZeroOrMore} or {@link Multiplicity#OneOrMore},
-     * will throw an {@link InvalidPathException} for the other types.
-     * @param childName
-     * @param index
-     * @return
-     */
-    public CaseFileItem getItem(String childName, int index) {
-        return getItem(childName).getItem(index); // By default return the item; array will overwrite this method
-    }
-
-    /**
      * Returns the case file item with the specified index. Default implementation throws an exception, i.e., invoking this method
      * on a plain case file item will result in an {@link InvalidPathException}. It can only be invoked properly on a CaseFileItemArray.
      * @param index
      * @return
      */
-    protected CaseFileItem getItem(int index) {
+    public CaseFileItem getArrayElement(int index) {
         throw new InvalidPathException("This is not an iterable case file item");
     }
 

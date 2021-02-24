@@ -3,6 +3,7 @@ package org.cafienne.cmmn.instance.casefile;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.Parameter;
+import org.cafienne.cmmn.instance.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ class EmptyCaseFileItem extends CaseFileItem {
     }
 
     @Override
-    public void bindParameter(Parameter<?> p, Value<?> parameterValue) {
+    public void bindParameter(Parameter<?> p, Value<?> parameterValue, Task task) {
         logger.warn("Binding parameter to EmptyCaseFileItem " + getPath());
     }
 }

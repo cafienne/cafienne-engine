@@ -12,12 +12,13 @@ public class BindingRefinementDefinition extends ExpressionDefinition {
     }
 
     public BindingOperation getRefinementOperation() {
-        String body = getBody() != null ? getBody().trim() : "";
+        // Replace dashes --> Reference-Indexed and Update-Indexed, Replace-Indexed become as the enum requires them
+        String body = (getBody() != null ? getBody().trim() : "").replace("-", "");
         for (BindingOperation operation : BindingOperation.values()) {
             if (operation.toString().equalsIgnoreCase(body)) {
                 return operation;
             }
         }
-        return BindingOperation.Replace;
+        return BindingOperation.None;
     }
 }

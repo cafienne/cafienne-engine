@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -80,6 +80,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Constructor for CasePlan (and Stages also use it)
+     *
      * @param id
      * @param index
      * @param itemDefinition
@@ -98,7 +99,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.index = index;
         this.stateMachine = stateMachine;
 
-        addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (stage == null ? " in case" : " in "+stage));
+        addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (stage == null ? " in case" : " in " + stage));
 
         // Register at case level
         getCaseInstance().registerPlanItem(this);
@@ -146,7 +147,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             // Generate an id for the repeat item
             String repeatItemId = new Guid().toString();
             // Create a new plan item
-            addDebugInfo(() -> this + ": creating repeat item " + (index + 1) +" with id " + repeatItemId);
+            addDebugInfo(() -> this + ": creating repeat item " + (index + 1) + " with id " + repeatItemId);
             PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
             addEvent(pic);
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
@@ -200,15 +201,15 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public void makeTransition(Transition transition) {
         if (!hasLock(transition)) { // First check to determine whether we are allowed to make this transition.
-            addDebugInfo(() -> "StateMachine-"+this+": cannot acquire lock for transition " + transition + " since currently transitioning " + nextTransition);
+            addDebugInfo(() -> "StateMachine-" + this + ": cannot acquire lock for transition " + transition + " since currently transitioning " + nextTransition);
             return;
         }
         PlanItemTransitioned event = stateMachine.transition(this, transition);
         if (event != null) { // means, a transition happened.
-            addDebugInfo(() -> "StateMachine-"+this+": allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
+            addDebugInfo(() -> "StateMachine-" + this + ": allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
             addEvent(event);
         } else {
-            addDebugInfo(() -> "StateMachine-"+this+": transition " + transition + " has no effect, current state remains " + getState());
+            addDebugInfo(() -> "StateMachine-" + this + ": transition " + transition + " has no effect, current state remains " + getState());
         }
     }
 
@@ -333,7 +334,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
         // First execute the related state machine action (e.g., activating a timer, releasing a subprocess, suspending, etc.etc.)
         StateMachine.Action action = stateMachine.getAction(newState);
-        addDebugInfo(() -> "StateMachine-"+this+": running action for state '"+newState+"'");
+        addDebugInfo(() -> "StateMachine-" + this + ": running action for state '" + newState + "'");
         action.execute(this, transition);
     }
 
@@ -357,7 +358,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         // Finally iterate the terminating sentries and inform them
         transitionPublisher.informExitCriteria(event);
 
-        addDebugInfo(() -> this + ": completed handling transition '"+event.getTransition().getValue()+"' from " + event.getHistoryState() + " to " + event.getCurrentState());
+        addDebugInfo(() -> this + ": completed handling transition '" + event.getTransition().getValue() + "' from " + event.getHistoryState() + " to " + event.getCurrentState());
     }
 
     /**
@@ -380,6 +381,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the name of the instance (which is the plan item name).
+     *
      * @return
      */
     public String getName() {
@@ -387,11 +389,12 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-      * Returns getName() + dot + getIndex() in single quotes
-      * @return
-      */
+     * Returns getName() + dot + getIndex() in single quotes
+     *
+     * @return
+     */
     public String getPath() {
-        return "'" + this.name +"." + this.index +"'";
+        return "'" + this.name + "." + this.index + "'";
     }
 
     /**
@@ -401,6 +404,30 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public int getIndex() {
         return index;
+    }
+
+    /**
+     * Returns the index of this plan item if it repeats, or else the plan item of the first surrounding stage that
+     * repeats, or else 0.
+     *
+     * @return
+     */
+    public int getRepeatIndex() {
+        return getRepeatIndex("");
+    }
+
+    protected int getRepeatIndex(String ancestorTree) {
+        if (this.getItemDefinition().getPlanItemControl().getRepetitionRule().isDefault()) {
+            if (this.getStage() != null) {
+                return this.getStage().getRepeatIndex(this.getName() + "." + ancestorTree);
+            } else {
+                addDebugInfo(() -> "There is no repeating plan item in tree '" + this.getName() + "." + ancestorTree + "', returning index 0");
+                return 0;
+            }
+        } else {
+            addDebugInfo(() -> "Found repeat index '" + this.getName() + "[" + this.index + "]" + (ancestorTree.isBlank() ? "" : "." + ancestorTree) + "'");
+            return this.index;
+        }
     }
 
     /**
@@ -422,7 +449,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     final String toDescription() {
-        return getType() + "[" + getName() +"|index=" + getIndex()+"|state="+getState()+"|required="+isRequired()+"|repeating="+repeats()+"]";
+        return getType() + "[" + getName() + "|index=" + getIndex() + "|state=" + getState() + "|required=" + isRequired() + "|repeating=" + repeats() + "]";
     }
 
     public String toString() {
@@ -442,7 +469,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         }
 
         // Print the repeat attribute if there is a repetition rule defined for this plan item.
-        if (! (this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+        if (!(this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
             planItemXML.setAttribute("repeat", "" + repeats());
         }
 
@@ -497,6 +524,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Indicates whether discretionary items are available for planning (applicable only for Stages and HumanTasks)
+     *
      * @return false if it is a milestone or eventlistener
      */
     protected boolean hasDiscretionaryItems() {
@@ -506,6 +534,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Returns the entry transition (trigger when EntryCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Start}, and
      * Milestone overrides this by returning {@link Transition#Occur}
+     *
      * @return
      */
     final Transition getEntryTransition() {
@@ -515,6 +544,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Returns the exit transition (trigger when ExitCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Exit}, and
      * CasePlan overrides this by returning {@link Transition#Terminate}
+     *
      * @return
      */
     final Transition getExitTransition() {
@@ -523,6 +553,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Transition to be made when parent stage terminates
+     *
      * @return
      */
     final Transition getTerminationTransition() {

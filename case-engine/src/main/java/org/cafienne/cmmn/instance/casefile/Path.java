@@ -202,7 +202,7 @@ public class Path implements Serializable {
                 // Ok, that part is ok, but now check whether the index element exists
                 CaseFileItemArray array = item.getContainer();
                 if (item.getCaseInstance().recoveryRunning()) {
-                    return array.getItem(index);
+                    return array.getArrayElement(index);
                 }
                 if (array.size() < index) {
                     throw new InvalidPathException("The array " + array.getPath() + " has only " + array.size() + " items; cannot access " + originalPath);

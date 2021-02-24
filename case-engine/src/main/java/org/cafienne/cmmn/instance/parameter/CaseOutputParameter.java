@@ -22,7 +22,7 @@ public class CaseOutputParameter extends Parameter<OutputParameterDefinition> {
 
     @Override
     public Value<?> getValue() {
-        super.bindCaseFileToParameter();
+        super.bindCaseFileToParameter(null);
         return super.getValue();
     }
 }
