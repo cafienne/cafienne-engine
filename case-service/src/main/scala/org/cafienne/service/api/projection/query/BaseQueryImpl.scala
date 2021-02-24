@@ -253,17 +253,28 @@ trait BaseQueryImpl
   }
 
   case class OrFilter(rawFieldName: String, values: Seq[String]) extends ParsedFilter {
-    override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = values.length match {
-      case 1 => {
-        logger.whenDebugEnabled{logger.debug(s"Adding 'Field-has-value' filter $field == ${values(0)}")}
-        TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field && identifier.value === values(0))
+    override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {
+      val query = {
+        values.length match {
+          case 1 => {
+            logger.whenDebugEnabled {
+              logger.debug(s"Adding 'Field-has-value' filter $field == ${values(0)}")
+            }
+            TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.value === values(0))
+          }
+          case _ => {
+            logger.whenDebugEnabled {
+              logger.debug(s"Adding 'Value-in-set' filter for field $field on values $values")
+            }
+            TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.value.inSet(values))
+          }
+        }
       }
-      case _ => {
-        logger.whenDebugEnabled{logger.debug(s"Adding 'Value-in-set' filter for field $field on values $values")}
-        TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field && identifier.value.inSet(values))
+      rawFieldName.isBlank match {
+        case true => query
+        case false => query.filter(_.name === field)
       }
     }
   }
-
 }
 
