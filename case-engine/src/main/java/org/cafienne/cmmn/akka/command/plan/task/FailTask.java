@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.akka.command.task;
+package org.cafienne.cmmn.akka.command.plan.task;
 
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;

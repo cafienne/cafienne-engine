@@ -5,18 +5,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command;
+package org.cafienne.cmmn.akka.command.plan.eventlistener;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.command.exception.CommandException;
+import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +28,8 @@ import java.util.List;
  * A command to have a plan item make a certain transition. E.g. complete a task in a case, or suspend a subprocess.
  */
 @Manifest
-public class MakePlanItemTransition extends CaseCommand {
+public class RaiseEvent extends CaseCommand {
     private final String identifier;
-    private final Transition transition;
 
     /**
      * Create a command to transition the plan item with the specified id or name. Note, if only the name is specified, then the command will work on
@@ -38,31 +39,29 @@ public class MakePlanItemTransition extends CaseCommand {
      * @param identifier     Either planItemId or planItemName. When only the name is specified, then the transition will be made on _all_ plan items within the case having this name, in reverse
      *                       order. If the transition of such a plan item results in a new plan item in the case with the same name, then the command will _not_ be
      *                       invoked on the new plan item.
-     * @param transition     The transition to make on the plan item(s)
      */
-    public MakePlanItemTransition(TenantUser user, String caseInstanceId, String identifier, Transition transition) {
+    public RaiseEvent(TenantUser user, String caseInstanceId, String identifier) {
         super(user, caseInstanceId);
         this.identifier = identifier;
-        this.transition = transition;
     }
 
-    public MakePlanItemTransition(ValueMap json) {
+    public RaiseEvent(ValueMap json) {
         super(json);
         this.identifier = readField(json, Fields.identifier);
-        this.transition = readEnum(json, Fields.transition, Transition.class);
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public Transition getTransition() {
-        return transition;
+    @Override
+    public String toString() {
+        return identifier + ".Occur";
     }
 
     @Override
-    public String toString() {
-        return "Transition " + identifier + "." + transition;
+    public void validate(Case caseInstance) throws InvalidCommandException {
+        // Disable case team membership, similar to the logic in CompleteTask.validate
     }
 
     @Override
@@ -71,7 +70,7 @@ public class MakePlanItemTransition extends CaseCommand {
             PlanItem planItem = caseInstance.getPlanItemById(identifier);
             if (planItem != null) {
                 // When Plan item exists by id
-                caseInstance.makePlanItemTransition(planItem, transition);
+                caseInstance.makePlanItemTransition(planItem, Transition.Occur);
                 return new CaseResponse(this);
             }
         }
@@ -83,7 +82,7 @@ public class MakePlanItemTransition extends CaseCommand {
             throw new CommandException("There is no plan item with identifier " + identifier + " in case " + caseInstance.getId());
         }
         for (int i = planItemsByName.size() - 1; i >= 0; i--) {
-            caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
+            caseInstance.makePlanItemTransition(planItemsByName.get(i), Transition.Occur);
         }
         return new CaseResponse(this);
     }
@@ -92,6 +91,5 @@ public class MakePlanItemTransition extends CaseCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.identifier, identifier);
-        writeField(generator, Fields.transition, transition);
     }
 }

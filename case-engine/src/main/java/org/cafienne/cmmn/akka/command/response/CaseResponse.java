@@ -11,7 +11,7 @@ import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.command.GetDiscretionaryItems;
+import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 
 /**

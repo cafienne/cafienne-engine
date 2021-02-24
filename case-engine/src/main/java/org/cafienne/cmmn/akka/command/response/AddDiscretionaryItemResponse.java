@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.akka.command.response;
 
-import org.cafienne.cmmn.akka.command.AddDiscretionaryItem;
-import org.cafienne.cmmn.akka.command.GetDiscretionaryItems;
+import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 

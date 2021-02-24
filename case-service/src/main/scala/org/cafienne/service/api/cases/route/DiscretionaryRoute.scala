@@ -15,7 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
-import org.cafienne.cmmn.akka.command.{AddDiscretionaryItem, CaseCommandModels, GetDiscretionaryItems}
+import org.cafienne.cmmn.akka.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
+import org.cafienne.cmmn.akka.command.CaseCommandModels
 import org.cafienne.cmmn.akka.response.CaseResponseModels
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._

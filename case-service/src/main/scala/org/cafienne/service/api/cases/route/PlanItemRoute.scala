@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import javax.ws.rs._
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api

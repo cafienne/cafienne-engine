@@ -9,8 +9,8 @@
 package org.cafienne.cmmn.test.planning;
 
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.AddDiscretionaryItem;
-import org.cafienne.cmmn.akka.command.GetDiscretionaryItems;
+import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;

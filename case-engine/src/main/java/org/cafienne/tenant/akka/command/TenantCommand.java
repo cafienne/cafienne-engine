@@ -14,7 +14,7 @@ import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.command.MakePlanItemTransition;
+import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.event.CaseEvent;

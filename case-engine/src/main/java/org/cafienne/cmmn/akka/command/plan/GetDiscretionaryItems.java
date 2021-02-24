@@ -5,9 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.akka.command;
+package org.cafienne.cmmn.akka.command.plan;
 
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
