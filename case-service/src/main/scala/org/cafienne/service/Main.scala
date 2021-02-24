@@ -10,7 +10,6 @@ package org.cafienne.service
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.BuildInfo
@@ -22,7 +21,7 @@ import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
-import org.cafienne.service.api.projection.query.{CaseQueriesImpl, PlatformQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
+import org.cafienne.service.api.projection.query.{CaseQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.repository.RepositoryRoute
@@ -71,7 +70,6 @@ object Main extends App {
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl
     val userQueries = new TenantQueriesImpl
-    val platformQueries = new PlatformQueriesImpl
     val updater = new SlickRecordsPersistence
     val offsetStorage = new JDBCBasedOffsetStorageProvider
 
@@ -89,7 +87,7 @@ object Main extends App {
       new CasesRoutes(caseQueries),
       new TaskRoutes(taskQueries),
       new TenantRoutes(userQueries),
-      new PlatformRoutes(platformQueries),
+      new PlatformRoutes(),
       new RepositoryRoute(),
       new DebugRoute()
     )
