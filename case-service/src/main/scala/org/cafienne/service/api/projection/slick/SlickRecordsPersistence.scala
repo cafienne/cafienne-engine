@@ -88,6 +88,9 @@ class SlickRecordsPersistence
       // Update 'modifiedBy' field in case instance table
       (for {cases <- TableQuery[CaseInstanceTable].filter(r => r.id === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
     }) ++ info.map(user => {
+      // Update 'modifiedBy' field in case instance definition table
+      (for {cases <- TableQuery[CaseInstanceDefinitionTable].filter(r => r.caseInstanceId === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
+    }) ++ info.map(user => {
       // Update 'createdBy' field in planitem table
       (for {cases <- TableQuery[PlanItemTable].filter(r => r.caseInstanceId === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
     }) ++ info.map(user => {
