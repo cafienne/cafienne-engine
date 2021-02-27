@@ -84,7 +84,7 @@ trait CaseTables extends QueryDBSchema {
 
     def lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = idColumn[String]("modified_by")
+    def modifiedBy = userColumn[String]("modified_by")
 
     def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseDefinitionRecord.tupled, CaseDefinitionRecord.unapply)
   }
