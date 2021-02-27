@@ -11,6 +11,7 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.serialization.json.LongValue;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
@@ -23,6 +24,7 @@ import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.processtask.instance.ProcessTaskActor;
+import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelEvaluationException;
@@ -191,5 +193,12 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
             return null;
         }
         return outcome.toString();
+    }
+
+    @Override
+    public Value runCalculationStep(Calculation calculation, ValueMap sources) throws InvalidExpressionException {
+        CalculationContext context = new CalculationContext(calculation, sources);
+        Object result = evaluateExpression(calculation.getTask(), context, "calculation step");
+        return Value.convert(result);
     }
 }

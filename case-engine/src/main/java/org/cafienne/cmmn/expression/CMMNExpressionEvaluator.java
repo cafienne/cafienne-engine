@@ -7,17 +7,21 @@
  */
 package org.cafienne.cmmn.expression;
 
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Task;
+import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 import java.time.Duration;
@@ -127,5 +131,16 @@ public interface CMMNExpressionEvaluator {
      */
     default Instant evaluateDueDate(HumanTask task, DueDateDefinition definition) throws InvalidExpressionException {
         return null;
+    }
+
+    /**
+     * Evaluate a single step in a calculation task.
+     * @param calculation
+     * @param sources
+     * @return
+     * @throws InvalidExpressionException
+     */
+    default Value runCalculationStep(Calculation calculation, ValueMap sources) throws InvalidExpressionException {
+        return sources;
     }
 }
