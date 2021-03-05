@@ -1,9 +1,9 @@
 <CMMNDI>
     <CMMNDiagram>
-        <CMMNShape cmmnElementRef="cm_expression/valueowner.case_0">
+        <CMMNShape cmmnElementRef="cm_X87XC_0">
             <Bounds x="10" y="9" width="797" height="585"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="cm_expression/valueowner.case_166">
+        <CMMNShape cmmnElementRef="cm__X87XC_1">
             <Bounds x="190" y="110" width="164" height="60"/>
         </CMMNShape>
     </CMMNDiagram>
