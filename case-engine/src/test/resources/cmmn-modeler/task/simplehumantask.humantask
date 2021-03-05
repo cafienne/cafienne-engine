@@ -1,7 +1,7 @@
 <humantask>
-    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="">
+    <cafienne:implementation name="simplehumantask" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition">
         <input id="_Hun3_Input" name="Input"/>
+        <input id="_sr1Z_Input2" name="Input2"/>
         <output id="_SkQG_Result" name="Result"/>
-        <task-model/>
     </cafienne:implementation>
 </humantask>

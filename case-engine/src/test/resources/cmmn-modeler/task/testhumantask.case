@@ -38,7 +38,7 @@
             </extensionElements>
         </humanTask>
     </casePlanModel>
-    <caseRoles id="_kBPkc_17" name="ADMIN">
+    <caseRoles>
         <role id="_kBPkc_17" name="ADMIN"/>
     </caseRoles>
     <input id="_kBPkc_22" name="TaskInput" bindingRef="_kBPkc_0"/>

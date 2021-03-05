@@ -1,4 +1,15 @@
 <definitions>
+    <caseFileItemDefinition name="Greeting" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="greeting.cfid">
+        <property name="Message" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="To" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="From" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="Response" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="response.cfid">
+        <property name="Message" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="Date" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
+        <property name="Time" type="http://www.omg.org/spec/CMMN/PropertyType/time"/>
+        <property name="SomeBoolean" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
+    </caseFileItemDefinition>
     <case id="helloworld.case" name="HelloWorld">
         <documentation textFormat="text/plain">
             <text>
@@ -187,7 +198,7 @@ and Send response]]>
                 </extensionElements>
             </humanTask>
         </casePlanModel>
-        <caseRoles id="role_csT3f_0" name="ADMIN">
+        <caseRoles>
             <role id="role_csT3f_0" name="ADMIN">
                 <documentation textFormat="text/plain">
                     <text>
@@ -237,17 +248,6 @@ and Send response]]>
 }</cafienne:start-case-model>
         </extensionElements>
     </case>
-    <caseFileItemDefinition name="Greeting" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="greeting.cfid">
-        <property name="Message" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="To" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="From" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="Response" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="response.cfid">
-        <property name="Message" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="Date" type="http://www.omg.org/spec/CMMN/PropertyType/date"/>
-        <property name="Time" type="http://www.omg.org/spec/CMMN/PropertyType/time"/>
-        <property name="SomeBoolean" type="http://www.omg.org/spec/CMMN/PropertyType/boolean"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm_HelloWorld.case_HelloWorld_0">

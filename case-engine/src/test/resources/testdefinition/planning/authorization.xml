@@ -1,34 +1,56 @@
 <definitions>
-    <case description="A case that can be used to do authorized planning of discretionary items" id="planning/authorization.case" name="planning/authorization">
-        <caseFileModel>
-            <caseFileItem definitionRef="root.cfid" id="_AdNzA_4" multiplicity="ExactlyOne" name="Root" />
-        </caseFileModel>
-        <casePlanModel autoComplete="true" id="cm__AdNzA_0" name="Planning/Authorization">
-            <planItem definitionRef="ht__AdNzA_0" id="pi_ht__AdNzA_0" name="Task" />
-            <planningTable id="_AdNzA_2" name="PlanningTable_0">
-                <discretionaryItem authorizedRoleRefs="_AdNzA_3" definitionRef="ht__AdNzA_1" id="pi_ht__AdNzA_1" name="PlanMe" />
-            </planningTable>
-            <humanTask id="ht__AdNzA_0" isBlocking="true" name="Task" />
-            <humanTask id="ht__AdNzA_1" isBlocking="true" name="PlanMe" />
-        </casePlanModel>
-        <caseRoles description="role that is allowed to plan the discretionary task" id="_AdNzA_3" name="planner" />
-    </case>
-    <caseFileItemDefinition definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid" name="root">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer" />
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
     </caseFileItemDefinition>
+    <case id="planning/authorization.case" name="planning/authorization" expressionLanguage="spel">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[A case that can be used to do authorized planning of discretionary items]]>
+            </text>
+        </documentation>
+        <caseFileModel>
+            <caseFileItem id="_AdNzA_4" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__AdNzA_0" name="Planning/Authorization" autoComplete="true">
+            <planItem id="pi_ht__AdNzA_0" name="Task" definitionRef="ht__AdNzA_0"/>
+            <planningTable id="_AdNzA_2" name="PlanningTable_0">
+                <discretionaryItem id="pi_ht__AdNzA_1" name="PlanMe" definitionRef="ht__AdNzA_1" authorizedRoleRefs="_AdNzA_3"/>
+            </planningTable>
+            <humanTask id="ht__AdNzA_0" name="Task" isBlocking="true"/>
+            <humanTask id="ht__AdNzA_1" name="PlanMe" isBlocking="true"/>
+        </casePlanModel>
+        <caseRoles>
+            <role id="_AdNzA_3" name="planner">
+                <documentation textFormat="text/plain">
+                    <text>
+                        <![CDATA[role that is allowed to plan the discretionary task]]>
+                    </text>
+                </documentation>
+            </role>
+        </caseRoles>
+        <textAnnotation id="_AdNzA_shape_4">
+            <text>
+                <![CDATA[This case provides for a model to test the authorized roles in planning.
+It contains one role ("planner") and one discretionary item requiring "planner" as authorized role.]]>
+            </text>
+        </textAnnotation>
+    </case>
     <CMMNDI>
         <CMMNDiagram>
-            <CMMNShape cmmnElementRef="cm__AdNzA_0" name="Planning/Authorization">
-                <Bounds height="634" width="779" x="10" y="10" />
+            <CMMNShape cmmnElementRef="cm__AdNzA_0">
+                <Bounds x="10" y="10" width="779" height="634"/>
             </CMMNShape>
-            <CMMNShape cmmnElementRef="pi_ht__AdNzA_0" name="Task">
-                <Bounds height="60" width="100" x="110" y="110" />
+            <CMMNShape cmmnElementRef="pi_ht__AdNzA_0">
+                <Bounds x="110" y="110" width="100" height="60"/>
             </CMMNShape>
-            <CMMNShape cmmnElementRef="pi_ht__AdNzA_1" name="PlanMe">
-                <Bounds height="60" width="100" x="270" y="110" />
+            <CMMNShape cmmnElementRef="pi_ht__AdNzA_1">
+                <Bounds x="270" y="110" width="100" height="60"/>
             </CMMNShape>
-            <CMMNShape cmmnElementRef="_AdNzA_2" name="PlanningTable_0">
-                <Bounds height="16" width="24" x="290" y="23" />
+            <CMMNShape cmmnElementRef="_AdNzA_2">
+                <Bounds x="290" y="23" width="24" height="16"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_AdNzA_shape_4">
+                <Bounds x="220" y="200" width="270" height="100"/>
             </CMMNShape>
         </CMMNDiagram>
     </CMMNDI>

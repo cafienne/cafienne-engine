@@ -72,7 +72,7 @@ and Send response]]>
             </extensionElements>
         </humanTask>
     </casePlanModel>
-    <caseRoles id="role_csT3f_0" name="ADMIN">
+    <caseRoles>
         <role id="role_csT3f_0" name="ADMIN">
             <documentation textFormat="text/plain">
                 <text>

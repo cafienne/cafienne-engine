@@ -1,5 +1,10 @@
 <definitions>
-    <case id="taskoutputvalidation.case" name="taskoutputvalidation">
+    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
+    <caseFileItemDefinition name="http" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="http.cfid">
+        <property name="port" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="mockresponsecode" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="mockresponsecode.cfid"/>
+    <case id="taskoutputvalidation.case" name="taskoutputvalidation" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="_qgYaQ_0" name="TaskInput" multiplicity="ExactlyOne" definitionRef="string.cfid">
                 <children>
@@ -32,9 +37,7 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="ht__qgYaQ_0" name="HumanTask" isBlocking="true">
-                <inputs id="_qgYaQ_7" name="DueDate" bindingRef="_qgYaQ_0"/>
                 <inputs id="_qgYaQ_18" name="TaskInputParameter"/>
-                <inputs id="_qgYaQ_9" name="Owner"/>
                 <outputs id="_qgYaQ_15" name="TaskOutputParameter" bindingRef="_qgYaQ_5">
                     <extensionElements mustUnderstand="false">
                         <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
@@ -47,27 +50,24 @@
                         <output id="_DtOu_Decision" name="Decision"/>
                         <task-model> { "JSONSchema" : "Some schema in here" }</task-model>
                         <duedate id="_qgYaQ_10">
-                            <condition id="_qgYaQ_24" language="spel">
+                            <condition id="_qgYaQ_24">
                                 <body>
                                     <![CDATA["2016-06-10T08:16:34.048792086Z"]]>
                                 </body>
                             </condition>
                         </duedate>
                         <parameterMapping id="_qgYaQ_14" sourceRef="_qgYaQ_18" targetRef="_67M8_Content">
-                            <transformation id="_qgYaQ_12" language="spel">
+                            <transformation id="_qgYaQ_12">
                                 <body>
                                     <![CDATA[TaskInputParameter.Content]]>
                                 </body>
                             </transformation>
                         </parameterMapping>
                         <parameterMapping id="_qgYaQ_16" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_15"/>
-                        <parameterMapping id="_qgYaQ_11" sourceRef="_qgYaQ_9" targetRef="_ydL3_Owner"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="ht__qgYaQ_1" name="HumanTask2" isBlocking="true">
-                <inputs id="_qgYaQ_50" name="Owner"/>
-                <inputs id="_qgYaQ_52" name="Content"/>
                 <outputs id="_qgYaQ_54" name="Decision">
                     <extensionElements mustUnderstand="false">
                         <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
@@ -79,15 +79,12 @@
                         <input id="_67M8_Content" name="Content"/>
                         <output id="_DtOu_Decision" name="Decision"/>
                         <task-model> { "JSONSchema" : "Some schema in here" }</task-model>
-                        <parameterMapping id="_qgYaQ_51" sourceRef="_qgYaQ_50" targetRef="_ydL3_Owner"/>
-                        <parameterMapping id="_qgYaQ_53" sourceRef="_qgYaQ_52" targetRef="_67M8_Content"/>
                         <parameterMapping id="_qgYaQ_55" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_54"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="ht__qgYaQ_2" name="HumanTask_0" isBlocking="true"/>
             <processTask id="pt__qgYaQ_0" name="AssertMockServiceIsRunning" isBlocking="true" processRef="AssertMockServiceIsRunning.process">
-                <inputs id="_qgYaQ_28" name="httpPort" bindingRef="_qgYaQ_32"/>
                 <inputs id="_qgYaQ_34" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
                 <outputs id="_qgYaQ_30" name="responseCode" bindingRef="_qgYaQ_37">
                     <extensionElements mustUnderstand="false">
@@ -96,7 +93,7 @@
                 </outputs>
                 <parameterMapping id="_qgYaQ_31" sourceRef="_Wddw_responseCode" targetRef="_qgYaQ_30"/>
                 <parameterMapping id="_qgYaQ_33" sourceRef="_qgYaQ_34" targetRef="_FC9h_httpPort">
-                    <transformation id="_qgYaQ_41" language="spel">
+                    <transformation id="_qgYaQ_41">
                         <body>
                             <![CDATA[HTTPConfig.port]]>
                         </body>
@@ -108,6 +105,12 @@
         <input id="_qgYaQ_23" name="DueDate" bindingRef="_qgYaQ_1"/>
         <input id="_qgYaQ_36" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
         <output id="_qgYaQ_26" name="Content" bindingRef="_qgYaQ_3"/>
+        <textAnnotation id="_qgYaQ_shape_4">
+            <text>
+                <![CDATA[HumanTask has a custom web service validator
+HumanTask2 has default validation and a mandatory output parameter]]>
+            </text>
+        </textAnnotation>
     </case>
     <process name="AssertMockServiceIsRunning" description="" id="AssertMockServiceIsRunning.process">
         <output id="_Wddw_responseCode" name="responseCode"/>
@@ -135,11 +138,6 @@
             </cafienne:implementation>
         </extensionElements>
     </process>
-    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
-    <caseFileItemDefinition name="http" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="http.cfid">
-        <property name="port" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="mockresponsecode" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="mockresponsecode.cfid"/>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__qgYaQ_0">
@@ -157,12 +155,11 @@
             <CMMNShape cmmnElementRef="pi_ht__qgYaQ_1">
                 <Bounds x="420" y="320" width="160" height="60"/>
             </CMMNShape>
-            <textbox cmmnElementRef="_qgYaQ_shape_4" parentId="cm__qgYaQ_0" content="HumanTask has a custom web service validator
-HumanTask2 has default validation and a mandatory output parameter">
-                <Bounds x="160" y="220" width="450" height="60"/>
-            </textbox>
             <CMMNShape cmmnElementRef="pi_ht__qgYaQ_2">
                 <Bounds x="150" y="320" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_qgYaQ_shape_4">
+                <Bounds x="160" y="220" width="450" height="60"/>
             </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="pi_pt__qgYaQ_0" targetCMMNElementRef="_qgYaQ_25"/>
         </CMMNDiagram>

@@ -39,10 +39,10 @@ public class CaseFileContextExpressions {
                 if (! expectingChild2.getValue().equals("child2")) {
                     throw new AssertionError("Expecting child2 inside arrayProp1, but found " + expectingChild2);
                 }
-                Value arrayLength = taskInput.get("Assignee");
+                Value arrayLength = taskInput.get("Input2");
                 Object arrayLengthValue = arrayLength.getValue();
                 if (!arrayLength.getValue().equals(2L)) {
-                    throw new AssertionError("Expecting 2L to be the value of Assignee, but found " + arrayLength);
+                    throw new AssertionError("Expecting 2L to be the value of Input2, but found " + arrayLength);
                 }
                 return true;
             });

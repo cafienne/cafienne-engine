@@ -1,4 +1,5 @@
 <definitions>
+    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
     <case id="TestHumanTask.case" name="TestHumanTask">
         <caseFileModel>
             <caseFileItem id="_kBPkc_0" name="TaskInput" multiplicity="ExactlyOne" definitionRef="string.cfid">
@@ -17,7 +18,6 @@
         <casePlanModel id="cm__kBPkc_0" name="TestHumanTask" autoComplete="true">
             <planItem id="pi_ht__kBPkc_0" name="HumanTask" definitionRef="ht__kBPkc_0"/>
             <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true">
-                <inputs id="_kBPkc_7" name="DueDate" bindingRef="_kBPkc_0"/>
                 <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
                 <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
                 <extensionElements mustUnderstand="false">
@@ -44,17 +44,18 @@
                 </extensionElements>
             </humanTask>
         </casePlanModel>
-        <caseRoles id="_kBPkc_17" name="ADMIN"/>
+        <caseRoles>
+            <role id="_kBPkc_17" name="ADMIN"/>
+        </caseRoles>
         <input id="_kBPkc_22" name="TaskInput" bindingRef="_kBPkc_0"/>
     </case>
-    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__kBPkc_0">
-                <Bounds x="20" y="20" width="800" height="500"/>
+                <Bounds x="20" y="20" width="530" height="230"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__kBPkc_0">
-                <Bounds x="240" y="110" width="100" height="60"/>
+                <Bounds x="120" y="90" width="100" height="60"/>
             </CMMNShape>
         </CMMNDiagram>
     </CMMNDI>

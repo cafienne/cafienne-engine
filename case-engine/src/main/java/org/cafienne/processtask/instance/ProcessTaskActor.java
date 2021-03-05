@@ -74,6 +74,7 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     public ProcessResponse reactivate(ReactivateProcess command) {
         addEvent(new ProcessReactivated(this, command));
         addDebugInfo(() -> "Reactivating process " + getName());
+        taskImplementation.resetOutput();
         taskImplementation.reactivate();
         return new ProcessResponse(command);
     }

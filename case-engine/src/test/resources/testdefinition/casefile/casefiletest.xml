@@ -1,4 +1,13 @@
 <definitions>
+    <caseFileItemDefinition name="aaa" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="aaa.cfid">
+        <property name="aaa1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="aaa2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="x" type="http://www.omg.org/spec/CMMN/PropertyType/Unspecified"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="child_of_aaa" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="child_of_aaa.cfid">
+        <property name="child_of_aaa_1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+        <property name="child_of_aaa_2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
     <case id="casefile/casefiletest.case" name="CaseFileTest">
         <caseFileModel>
             <caseFileItem id="_6KUSu_4" name="aaa" multiplicity="ExactlyOne" definitionRef="aaa.cfid">
@@ -50,15 +59,6 @@
         </casePlanModel>
         <input id="_6KUSu_3" name="aaa" bindingRef="_6KUSu_4"/>
     </case>
-    <caseFileItemDefinition name="aaa" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="aaa.cfid">
-        <property name="aaa1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="aaa2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="x" type="http://www.omg.org/spec/CMMN/PropertyType/Unspecified"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="child_of_aaa" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="child_of_aaa.cfid">
-        <property name="child_of_aaa_1" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-        <property name="child_of_aaa_2" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__6KUSu_0">

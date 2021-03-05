@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,6 +12,7 @@ import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.akka.command.StartCase;
 import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
@@ -20,11 +21,12 @@ import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.processtask.akka.event.ProcessCompleted;
+import org.cafienne.processtask.akka.event.ProcessFailed;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -45,11 +47,13 @@ public class TestGetListGetDetails {
     // The identifiers that the backend contains; used to compose the mock response
     private static final String[] KEY_LIST = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
+    private String getListId = "";
+
     @Test
     public void testGetListGetDetails() {
         String caseInstanceId = "GetListGetDetailsTest";
         TestScript testCase = new TestScript(caseInstanceId);
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/getlist-getdetail.xml");
+        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/casefile/getlist_getdetails.xml");
 
         TenantUser user = TestScript.getTestUser("anonymous");
 
@@ -59,11 +63,11 @@ public class TestGetListGetDetails {
         StartCase startCase = new StartCase(user, caseInstanceId, xml, null, null);
 
         /**
-         *  When the case starts, GetCasesList & GetFirstCase tasks will be in available state
+         *  When the case` starts, GetCasesList & GetFirstCase tasks will be in available state
          */
         testCase.addStep(startCase, casePlan -> {
-            casePlan.print();
-            casePlan.assertPlanItem("GetList").assertLastTransition(Transition.Create, State.Available, State.Null);
+//            casePlan.print();
+            getListId = casePlan.assertPlanItem("GetList").assertLastTransition(Transition.Create, State.Available, State.Null).getId();
             casePlan.assertPlanItem("GetDetails").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
 
@@ -74,23 +78,31 @@ public class TestGetListGetDetails {
         // So GetList goes to Failed state & GetDetails remains in Available state
         ValueMap requestObject = new ValueMap();
         requestObject.putRaw("port", PORT_NUMBER);
-        CreateCaseFileItem createChild = new CreateCaseFileItem(user, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTP-Configuration"));
+        CreateCaseFileItem createChild = new CreateCaseFileItem(user, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTPConfiguration"));
         testCase.addStep(createChild, casePlan -> {
-            casePlan.print();
+//            casePlan.print();
 
             // Now wait for the first failure event
             testCase.getEventListener().awaitPlanItemTransitioned("GetList", filterForGetListFailures);
+
+            // Assert that ProcessFailed once and not yet completed
+            testCase.getEventListener().getEvents().filter(getListId).filter(ProcessFailed.class).assertSize(1);
+            testCase.getEventListener().getEvents().filter(getListId).filter(ProcessCompleted.class).assertSize(0);
         });
 
         // Reactivate the GetCasesList task; but since the backend is not yet up, it should again lead to failure of GetList
         testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "GetList", Transition.Reactivate), casePlan -> {
-            casePlan.print();
+//            casePlan.print();
 
             // Wait for the second failure event
             testCase.getEventListener().awaitPlanItemTransitioned("GetList", filterForGetListFailures);
 
             casePlan.assertPlanItem("GetList").assertLastTransition(Transition.Fault, State.Failed, State.Active);
             casePlan.assertPlanItem("GetDetails").assertLastTransition(Transition.Create, State.Available, State.Null);
+
+            // Assert that ProcessFailed twice and not yet completed
+            testCase.getEventListener().getEvents().filter(getListId).filter(ProcessFailed.class).assertSize(2);
+            testCase.getEventListener().getEvents().filter(getListId).filter(ProcessCompleted.class).assertSize(0);
 
             // Now add the stubs, so that we can re-activate the GetList task.
             startWiremock();
@@ -100,10 +112,27 @@ public class TestGetListGetDetails {
         // This should also lead to 3 times GetDetails task being activated and completed.
         MakePlanItemTransition reactivateCase = new MakePlanItemTransition(user, caseInstanceId, "GetList", Transition.Reactivate);
         testCase.addStep(reactivateCase, casePlan -> {
-            casePlan.print();
+//            casePlan.print();
 
             // First wait until the GetList task has become completed
             testCase.getEventListener().awaitPlanItemState("GetList", State.Completed);
+
+            // Assert that ProcessFailed twice and then completed
+            testCase.getEventListener().getEvents().filter(getListId).filter(ProcessFailed.class).assertSize(2);
+            testCase.getEventListener().getEvents().filter(getListId).filter(ProcessCompleted.class).assertSize(1).filter(event -> {
+                ProcessCompleted completedEvent = (ProcessCompleted) event;
+                if (! completedEvent.output.has("detailsIdentifiers")) {
+                    throw new AssertionError("Complete Process task misses 'detailsIdentifiers' output");
+                }
+                if (!completedEvent.output.withArray("detailsIdentifiers").getValue().equals(Arrays.asList(KEY_LIST))) {
+                    throw new AssertionError("Complete Process task does not have the proper key list");
+                }
+                if (completedEvent.output.has("exception")) {
+                    throw new AssertionError("Complete Process task should not have exception output");
+                }
+                return true;
+            });
+
 
             // Now wait until we have the 3 GetDetails tasks getting completed; we keep track of them in a Set
             final Set<PlanItemTransitioned> completedGetDetailsTasks = new HashSet();
@@ -151,7 +180,7 @@ public class TestGetListGetDetails {
     }
 
     private void startWiremock() {
-         wireMockRule = new WireMockRule(PORT_NUMBER);
+        wireMockRule = new WireMockRule(PORT_NUMBER);
         //Start wireMock service for mocking process service calls
         wireMockRule.stubFor(get(urlEqualTo("/getListWebService"))
                 .withHeader("Accept", equalTo("application/json"))
@@ -166,15 +195,13 @@ public class TestGetListGetDetails {
     }
 
 
-
-
     private void getStubForDetails(String detailsKey) {
         String detailsBody = ("{ '_2' : { 'description': 'details of " + detailsKey + "', 'id':'" + detailsKey + "'}}");
         wireMockRule.stubFor(get(urlMatching("/details/" + detailsKey))
                 .willReturn(aResponse()
-                    .withStatus(200)
-                    .withHeader("Content-Type", "application/json")
-                    .withBody(detailsBody)));
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(detailsBody)));
     }
 
     private String getJsonList() {

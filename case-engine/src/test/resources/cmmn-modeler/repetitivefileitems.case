@@ -1,4 +1,4 @@
-<case id="repetitivefileitems.case" name="casefile" guid="_3hEkB">
+<case id="repetitivefileitems.case" name="casefile" expressionLanguage="spel" guid="_3hEkB">
     <caseFileModel>
         <caseFileItem id="cfi_csGlQ_0" name="Request" multiplicity="ZeroOrOne" definitionRef="root.cfid">
             <children>
@@ -32,7 +32,7 @@
             <planItem id="cm_cs9KJ_9" name="ReviewRequest" definitionRef="pid_cm_cs9KJ_9">
                 <itemControl>
                     <repetitionRule id="cm_cs9KJ_9_repetitionRule" contextRef="cfi_csGlQ_0">
-                        <condition language="spel">
+                        <condition>
                             <body>
                                 <![CDATA[Request.Customer[0]=="Joost"]]>
                             </body>

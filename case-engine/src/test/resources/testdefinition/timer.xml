@@ -1,5 +1,8 @@
 <definitions>
-    <case id="timer.case" name="timer">
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <case id="timer.case" name="timer" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="_TLYHe_3" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
         </caseFileModel>
@@ -15,7 +18,7 @@
             </sentry>
             <humanTask id="ht__TLYHe_0" name="Task1" isBlocking="true"/>
             <timerEvent id="tmr__TLYHe_0" name="PeriodWaiter">
-                <timerExpression id="_TLYHe_4" language="spel">
+                <timerExpression id="_TLYHe_4">
                     <body>
                         <![CDATA[P0DT0H0M3S]]>
                     </body>
@@ -25,10 +28,12 @@
                 </planItemStartTrigger>
             </timerEvent>
         </casePlanModel>
+        <textAnnotation id="_TLYHe_shape_4">
+            <text>
+                <![CDATA[This case activates Task1 only after 3 seconds]]>
+            </text>
+        </textAnnotation>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__TLYHe_0">
@@ -43,9 +48,9 @@
             <CMMNShape cmmnElementRef="_TLYHe_1">
                 <Bounds x="244" y="140" width="12" height="20"/>
             </CMMNShape>
-            <textbox cmmnElementRef="_TLYHe_shape_4" parentId="cm__TLYHe_0" content="This case activates Task1 only after 3 seconds">
-                <Bounds x="140" y="220" width="100" height="60"/>
-            </textbox>
+            <CMMNShape cmmnElementRef="_TLYHe_shape_4">
+                <Bounds x="140" y="220" width="160" height="70"/>
+            </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="pi_tmr__TLYHe_0" targetCMMNElementRef="_TLYHe_1"/>
         </CMMNDiagram>
     </CMMNDI>

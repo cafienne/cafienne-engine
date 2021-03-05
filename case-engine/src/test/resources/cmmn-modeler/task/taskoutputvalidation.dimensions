@@ -15,11 +15,11 @@
         <CMMNShape cmmnElementRef="pi_ht__qgYaQ_1">
             <Bounds x="420" y="320" width="160" height="60"/>
         </CMMNShape>
-        <textbox cmmnElementRef="_qgYaQ_shape_4" parentId="cm__qgYaQ_0" content="HumanTask has a custom web service validator&#10;HumanTask2 has default validation and a mandatory output parameter">
-            <Bounds x="160" y="220" width="450" height="60"/>
-        </textbox>
         <CMMNShape cmmnElementRef="pi_ht__qgYaQ_2">
             <Bounds x="150" y="320" width="100" height="60"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_qgYaQ_shape_4">
+            <Bounds x="160" y="220" width="450" height="60"/>
         </CMMNShape>
         <CMMNEdge sourceCMMNElementRef="pi_pt__qgYaQ_0" targetCMMNElementRef="_qgYaQ_25"/>
     </CMMNDiagram>

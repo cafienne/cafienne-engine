@@ -1,4 +1,4 @@
-<case id="eventlistener.case" name="eventlistener" guid="_vdfDP">
+<case id="eventlistener.case" name="eventlistener" expressionLanguage="spel" guid="_vdfDP">
     <caseFileModel>
         <caseFileItem id="_vdfDP_15" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
@@ -36,7 +36,7 @@
         <humanTask id="ht__vdfDP_2" name="naTimer" isBlocking="true"/>
         <userEvent id="ue__vdfDP_0" name="UserEvent"/>
         <timerEvent id="tmr__vdfDP_0" name="CodeBasedWaiter">
-            <timerExpression id="_vdfDP_3" language="spel">
+            <timerExpression id="_vdfDP_3">
                 <body>
                     <![CDATA[P0DT0H1M]]>
                 </body>
@@ -46,7 +46,7 @@
             </planItemStartTrigger>
         </timerEvent>
         <timerEvent id="tmr__vdfDP_1" name="DateWaiter">
-            <timerExpression id="_vdfDP_5" language="spel">
+            <timerExpression id="_vdfDP_5">
                 <body>
                     <![CDATA[P0DT0H1M]]>
                 </body>
@@ -56,7 +56,7 @@
             </planItemStartTrigger>
         </timerEvent>
         <timerEvent id="tmr__vdfDP_2" name="PeriodWaiter">
-            <timerExpression id="_vdfDP_7" language="spel">
+            <timerExpression id="_vdfDP_7">
                 <body>
                     <![CDATA[P0DT0H1M]]>
                 </body>

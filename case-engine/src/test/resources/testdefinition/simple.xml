@@ -1,4 +1,5 @@
 <definitions>
+    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
     <case id="simple.case" name="simple">
         <caseFileModel>
             <caseFileItem id="_A2ZWU_1" name="test" multiplicity="ExactlyOne" definitionRef="string.cfid"/>
@@ -7,13 +8,12 @@
             <planItem id="pi_ht__A2ZWU_0" name="Item1" definitionRef="ht__A2ZWU_0"/>
             <planItem id="pi__A2ZWU_2" name="Stage1" definitionRef="_A2ZWU_2"/>
             <humanTask id="ht__A2ZWU_0" name="Item1" isBlocking="true"/>
+            <humanTask id="ht__A2ZWU_1" name="Item1.1" isBlocking="true"/>
             <stage id="_A2ZWU_2" name="Stage1" autoComplete="true">
                 <planItem id="pi_ht__A2ZWU_1" name="Item1.1" definitionRef="ht__A2ZWU_1"/>
             </stage>
-            <humanTask id="ht__A2ZWU_1" name="Item1.1" isBlocking="true"/>
         </casePlanModel>
     </case>
-    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm__A2ZWU_0">

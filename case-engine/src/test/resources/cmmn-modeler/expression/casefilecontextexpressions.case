@@ -1,43 +1,43 @@
-<case id="expression/casefilecontextexpressions.case" name="CaseFileContextExpressions" guid="_X87XC">
+<case id="expression/casefilecontextexpressions.case" name="CaseFileContextExpressions" expressionLanguage="spel" guid="_X87XC">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[Test case for referencing CaseFileItem from within an expression]]>
         </text>
     </documentation>
     <caseFileModel>
-        <caseFileItem id="cfi_expression/valueowner.case_0" name="Container" multiplicity="ExactlyOne" definitionRef="arraycontainer.cfid">
+        <caseFileItem id="cfi_X87XC_0" name="Container" multiplicity="ExactlyOne" definitionRef="arraycontainer.cfid">
             <children>
-                <caseFileItem id="cfi_expression/valueowner.case_1" name="Child" multiplicity="ZeroOrMore" definitionRef="arraynode.cfid"/>
+                <caseFileItem id="cfi_X87XC_1" name="Child" multiplicity="ZeroOrMore" definitionRef="arraynode.cfid"/>
             </children>
         </caseFileItem>
     </caseFileModel>
-    <casePlanModel id="cm_expression/valueowner.case_0" name="CaseFileContextExpressions" autoComplete="true">
-        <planItem id="cm_expression/valueowner.case_166" name="TaskWithExpression" definitionRef="pid_cm_expression/valueowner.case_166"/>
-        <humanTask id="pid_cm_expression/valueowner.case_166" name="TaskWithExpression" isBlocking="true">
-            <inputs id="_E9IZ1" name="inputContainer" bindingRef="cfi_expression/valueowner.case_0"/>
+    <casePlanModel id="cm_X87XC_0" name="CaseFileContextExpressions" autoComplete="true">
+        <planItem id="cm__X87XC_1" name="TaskWithExpression" definitionRef="pid_cm__X87XC_1"/>
+        <humanTask id="pid_cm__X87XC_1" name="TaskWithExpression" isBlocking="true">
+            <inputs id="_X87XC_4" name="Container" bindingRef="cfi_X87XC_0"/>
             <outputs id="_iWNoI" name="Result"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="task/simplehumantask.humantask">
-                    <parameterMapping id="_mMaHf" sourceRef="_E9IZ1" targetRef="_Hun3_Input">
-                        <transformation language="spel">
+                    <parameterMapping id="_mMaHf" sourceRef="_X87XC_4" targetRef="_Hun3_Input">
+                        <transformation>
                             <body>
-                                <![CDATA[inputContainer.Child.getOwner().getCurrent().getValue()]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
-                    <parameterMapping id="_9POJb" sourceRef="_E9IZ1" targetRef="_bpa7_Assignee">
-                        <transformation language="spel">
-                            <body>
-                                <![CDATA[inputContainer.Child.getOwner().getValue().size()]]>
+                                <![CDATA[Container.Child.getOwner().getCurrent().getValue()]]>
                             </body>
                         </transformation>
                     </parameterMapping>
                     <parameterMapping id="_7tWc3" sourceRef="_SkQG_Result" targetRef="_iWNoI"/>
+                    <parameterMapping id="_X87XC_2" sourceRef="_X87XC_4" targetRef="_sr1Z_Input2">
+                        <transformation id="_X87XC_3">
+                            <body>
+                                <![CDATA[Container.Child.getOwner().getValue().size()]]>
+                            </body>
+                        </transformation>
+                    </parameterMapping>
                 </cafienne:implementation>
             </extensionElements>
         </humanTask>
     </casePlanModel>
-    <input id="_quBMy_inCPs_0" name="Container" bindingRef="cfi_expression/valueowner.case_0"/>
+    <input id="_quBMy_inCPs_0" name="Container" bindingRef="cfi_X87XC_0"/>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{

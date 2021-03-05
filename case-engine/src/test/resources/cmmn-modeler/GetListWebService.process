@@ -1,11 +1,11 @@
 <process name="GetListWebService" implementationType="http://www.omg.org/spec/CMMN/ProcessType/Unspecified">
-    <input name="httpPort"/>
-    <input name="testParameter"/>
-    <output name="responseCode"/>
-    <output name="responseMessage"/>
-    <output name="output"/>
-    <output name="detailsIdentifiers"/>
-    <output name="headerContentLength"/>
+    <input id="a" name="httpPort"/>
+    <input id="b" name="testParameter"/>
+    <output id="o_1" name="responseCode"/>
+    <output id="o_2" name="responseMessage"/>
+    <output id="o_3" name="output"/>
+    <output id="o_4" name="detailsIdentifiers"/>
+    <output id="o_5" name="headerContentLength"/>
     <extensionElements>
         <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.processtask.implementation.http.HTTPCallDefinition">
             <url>http://localhost:${httpPort}/getListWebService</url>

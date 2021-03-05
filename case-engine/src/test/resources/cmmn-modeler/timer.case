@@ -1,4 +1,4 @@
-<case id="timer.case" name="timer" guid="_TLYHe">
+<case id="timer.case" name="timer" expressionLanguage="spel" guid="_TLYHe">
     <caseFileModel>
         <caseFileItem id="_TLYHe_3" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
@@ -14,7 +14,7 @@
         </sentry>
         <humanTask id="ht__TLYHe_0" name="Task1" isBlocking="true"/>
         <timerEvent id="tmr__TLYHe_0" name="PeriodWaiter">
-            <timerExpression id="_TLYHe_4" language="spel">
+            <timerExpression id="_TLYHe_4">
                 <body>
                     <![CDATA[P0DT0H0M3S]]>
                 </body>
@@ -24,4 +24,9 @@
             </planItemStartTrigger>
         </timerEvent>
     </casePlanModel>
+    <textAnnotation id="_TLYHe_shape_4">
+        <text>
+            <![CDATA[This case activates Task1 only after 3 seconds]]>
+        </text>
+    </textAnnotation>
 </case>

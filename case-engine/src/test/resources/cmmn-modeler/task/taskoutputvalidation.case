@@ -1,4 +1,4 @@
-<case id="taskoutputvalidation.case" name="taskoutputvalidation" guid="_qgYaQ">
+<case id="taskoutputvalidation.case" name="taskoutputvalidation" expressionLanguage="spel" guid="_qgYaQ">
     <caseFileModel>
         <caseFileItem id="_qgYaQ_0" name="TaskInput" multiplicity="ExactlyOne" definitionRef="string.cfid">
             <children>
@@ -40,7 +40,7 @@
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask" validatorRef="humantaskvalidator.process">
                     <parameterMapping id="_qgYaQ_14" sourceRef="_qgYaQ_18" targetRef="_67M8_Content">
-                        <transformation id="_qgYaQ_12" language="spel">
+                        <transformation id="_qgYaQ_12">
                             <body>
                                 <![CDATA[TaskInputParameter.Content]]>
                             </body>
@@ -48,7 +48,7 @@
                     </parameterMapping>
                     <parameterMapping id="_qgYaQ_16" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_15"/>
                     <duedate id="_qgYaQ_10">
-                        <condition id="_qgYaQ_24" language="spel">
+                        <condition id="_qgYaQ_24">
                             <body>
                                 <![CDATA["2016-06-10T08:16:34.048792086Z"]]>
                             </body>
@@ -79,7 +79,7 @@
             </outputs>
             <parameterMapping id="_qgYaQ_31" sourceRef="_Wddw_responseCode" targetRef="_qgYaQ_30"/>
             <parameterMapping id="_qgYaQ_33" sourceRef="_qgYaQ_34" targetRef="_FC9h_httpPort">
-                <transformation id="_qgYaQ_41" language="spel">
+                <transformation id="_qgYaQ_41">
                     <body>
                         <![CDATA[HTTPConfig.port]]>
                     </body>
@@ -91,4 +91,10 @@
     <input id="_qgYaQ_23" name="DueDate" bindingRef="_qgYaQ_1"/>
     <input id="_qgYaQ_36" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
     <output id="_qgYaQ_26" name="Content" bindingRef="_qgYaQ_3"/>
+    <textAnnotation id="_qgYaQ_shape_4">
+        <text>
+            <![CDATA[HumanTask has a custom web service validator
+HumanTask2 has default validation and a mandatory output parameter]]>
+        </text>
+    </textAnnotation>
 </case>

@@ -1,5 +1,19 @@
 <definitions>
-    <case id="multiTest.case" name="multiTest" description="Test parent child with multiplicity">
+    <caseFileItemDefinition name="testchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="testchild.cfid">
+        <property name="world" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="mchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="mchild.cfid">
+        <property name="mprop" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <caseFileItemDefinition name="child" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="child.cfid">
+        <property name="myprop" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
+    </caseFileItemDefinition>
+    <case id="multiTest.case" name="multiTest">
+        <documentation textFormat="text/plain">
+            <text>
+                <![CDATA[Test parent child with multiplicity]]>
+            </text>
+        </documentation>
         <caseFileModel>
             <caseFileItem id="cfi_multiTest.case_0" name="parent" multiplicity="ExactlyOne" definitionRef="testchild.cfid">
                 <children>
@@ -30,15 +44,6 @@
 }</cafienne:start-case-model>
         </extensionElements>
     </case>
-    <caseFileItemDefinition name="testchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="testchild.cfid">
-        <property name="world" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="mchild" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="mchild.cfid">
-        <property name="mprop" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-    </caseFileItemDefinition>
-    <caseFileItemDefinition name="child" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="child.cfid">
-        <property name="myprop" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm_multiTest.case_0">
@@ -50,10 +55,10 @@
             <CMMNShape cmmnElementRef="_HgC8N_0">
                 <Bounds x="247" y="285" width="12" height="20"/>
             </CMMNShape>
-            <casefileitem cmmnElementRef="cm_multiTest.case_202" parentId="cm_multiTest.case_0" contextRef="cfi_multiTest.case_0">
+            <CMMNShape cmmnElementRef="cfi_multiTest.case_0">
                 <Bounds x="391" y="392" width="25" height="40"/>
-            </casefileitem>
-            <CMMNEdge sourceCMMNElementRef="cm_multiTest.case_202" targetCMMNElementRef="_HgC8N_0"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="cfi_multiTest.case_0" targetCMMNElementRef="_HgC8N_0"/>
         </CMMNDiagram>
     </CMMNDI>
 </definitions>

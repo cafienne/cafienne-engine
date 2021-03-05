@@ -1,5 +1,8 @@
 <definitions>
-    <case id="stageCompletion.case" name="stageCompletion">
+    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
+        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
+    </caseFileItemDefinition>
+    <case id="stageCompletion.case" name="stageCompletion" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="cfi_cseOt_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
         </caseFileModel>
@@ -47,7 +50,7 @@
                 <planItem id="cm_cseOt_66" name="Task1" definitionRef="pid_cm_cseOt_66">
                     <itemControl>
                         <requiredRule id="cm_cseOt_66_requiredRule">
-                            <condition language="spel">
+                            <condition>
                                 <body>
                                     <![CDATA[true]]>
                                 </body>
@@ -74,6 +77,32 @@
                 </planningTable>
             </stage>
         </casePlanModel>
+        <textAnnotation id="cm_cseOt_68">
+            <text>
+                <![CDATA[Stage does not auto complete
+It has a required rule on Task1.
+Task2 listens to "fail" of Task1
+
+So it should complete if Task1 is completed,
+because Task2 always remains Available.]]>
+            </text>
+        </textAnnotation>
+        <textAnnotation id="cm_csrtZ_77">
+            <text>
+                <![CDATA[Stage2 has a discretionary task.
+
+So completing Task3 should NOT complete the stage,
+because it is not autoComplete enabled]]>
+            </text>
+        </textAnnotation>
+        <textAnnotation id="cm_cso85_107">
+            <text>
+                <![CDATA[Stage3 is similar to Stage2, but autoComplete is enabled.
+
+Hence completing Task5 should complete the stage,
+even though there are discretionary items]]>
+            </text>
+        </textAnnotation>
         <extensionElements mustUnderstand="false">
             <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{
@@ -85,9 +114,6 @@
 }</cafienne:start-case-model>
         </extensionElements>
     </case>
-    <caseFileItemDefinition name="root" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="root.cfid">
-        <property name="Outcome" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
-    </caseFileItemDefinition>
     <CMMNDI>
         <CMMNDiagram>
             <CMMNShape cmmnElementRef="cm_stageCompletion.case_stageCompletion_0">
@@ -147,26 +173,15 @@
             <CMMNShape cmmnElementRef="pt_cm_102">
                 <Bounds x="345" y="472" width="24" height="16"/>
             </CMMNShape>
-            <textbox cmmnElementRef="cm_cseOt_68" parentId="cm_cseOt_62" content="Stage does not auto complete
-It has a required rule on Task1.
-Task2 listens to &quot;fail&quot; of Task1
-
-So it should complete if Task1 is completed,
-because Task2 always remains Available.">
+            <CMMNShape cmmnElementRef="cm_cseOt_68">
                 <Bounds x="508" y="93" width="280" height="130"/>
-            </textbox>
-            <textbox cmmnElementRef="cm_csrtZ_77" parentId="cm_csRJ5_72" content="Stage2 has a discretionary task.
-
-So completing Task3 should NOT complete the stage,
-because it is not autoComplete enabled">
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_csrtZ_77">
                 <Bounds x="508" y="303" width="300" height="130"/>
-            </textbox>
-            <textbox cmmnElementRef="cm_cso85_107" parentId="cm_cso85_101" content="Stage3 is similar to Stage2, but autoComplete is enabled.
-
-Hence completing Task5 should complete the stage,
-even though there are discretionary items">
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="cm_cso85_107">
                 <Bounds x="510" y="511" width="310" height="120"/>
-            </textbox>
+            </CMMNShape>
             <CMMNEdge sourceCMMNElementRef="cm_cseOt_66" targetCMMNElementRef="_IKPvy_3"/>
             <CMMNEdge sourceCMMNElementRef="cm_cso85_99" targetCMMNElementRef="_IKPvy_1"/>
             <CMMNEdge sourceCMMNElementRef="cm_csXD7_108" targetCMMNElementRef="_IKPvy_2"/>

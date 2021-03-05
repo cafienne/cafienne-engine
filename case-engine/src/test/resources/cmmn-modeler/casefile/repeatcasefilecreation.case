@@ -31,4 +31,11 @@
         </sentry>
         <humanTask id="ht__vr0Df_0" name="Review" isBlocking="true"/>
     </casePlanModel>
+    <textAnnotation id="_vr0Df_shape_4">
+        <text>
+            <![CDATA[Repeat the ReviewTask as long as 
+there are not more than 2 'Items' 
+created in the case file]]>
+        </text>
+    </textAnnotation>
 </case>

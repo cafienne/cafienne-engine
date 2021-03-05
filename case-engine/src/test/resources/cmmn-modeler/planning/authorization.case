@@ -1,4 +1,4 @@
-<case id="planning/authorization.case" name="planning/authorization" guid="_AdNzA">
+<case id="planning/authorization.case" name="planning/authorization" expressionLanguage="spel" guid="_AdNzA">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[A case that can be used to do authorized planning of discretionary items]]>
@@ -10,12 +10,12 @@
     <casePlanModel id="cm__AdNzA_0" name="Planning/Authorization" autoComplete="true">
         <planItem id="pi_ht__AdNzA_0" name="Task" definitionRef="ht__AdNzA_0"/>
         <planningTable id="_AdNzA_2" name="PlanningTable_0">
-            <discretionaryItem id="pi_ht__AdNzA_1" name="PlanMe" definitionRef="ht__AdNzA_1"/>
+            <discretionaryItem id="pi_ht__AdNzA_1" name="PlanMe" definitionRef="ht__AdNzA_1" authorizedRoleRefs="_AdNzA_3"/>
         </planningTable>
         <humanTask id="ht__AdNzA_0" name="Task" isBlocking="true"/>
         <humanTask id="ht__AdNzA_1" name="PlanMe" isBlocking="true"/>
     </casePlanModel>
-    <caseRoles id="_AdNzA_3" name="planner">
+    <caseRoles>
         <role id="_AdNzA_3" name="planner">
             <documentation textFormat="text/plain">
                 <text>
@@ -24,4 +24,10 @@
             </documentation>
         </role>
     </caseRoles>
+    <textAnnotation id="_AdNzA_shape_4">
+        <text>
+            <![CDATA[This case provides for a model to test the authorized roles in planning.
+It contains one role ("planner") and one discretionary item requiring "planner" as authorized role.]]>
+        </text>
+    </textAnnotation>
 </case>

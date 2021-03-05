@@ -1,4 +1,4 @@
-<case id="stageCompletion.case" name="stageCompletion" guid="_IKPvy">
+<case id="stageCompletion.case" name="stageCompletion" expressionLanguage="spel" guid="_IKPvy">
     <caseFileModel>
         <caseFileItem id="cfi_cseOt_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
@@ -46,7 +46,7 @@
             <planItem id="cm_cseOt_66" name="Task1" definitionRef="pid_cm_cseOt_66">
                 <itemControl>
                     <requiredRule id="cm_cseOt_66_requiredRule">
-                        <condition language="spel">
+                        <condition>
                             <body>
                                 <![CDATA[true]]>
                             </body>
@@ -73,6 +73,32 @@
             </planningTable>
         </stage>
     </casePlanModel>
+    <textAnnotation id="cm_cseOt_68">
+        <text>
+            <![CDATA[Stage does not auto complete
+It has a required rule on Task1.
+Task2 listens to "fail" of Task1
+
+So it should complete if Task1 is completed,
+because Task2 always remains Available.]]>
+        </text>
+    </textAnnotation>
+    <textAnnotation id="cm_csrtZ_77">
+        <text>
+            <![CDATA[Stage2 has a discretionary task.
+
+So completing Task3 should NOT complete the stage,
+because it is not autoComplete enabled]]>
+        </text>
+    </textAnnotation>
+    <textAnnotation id="cm_cso85_107">
+        <text>
+            <![CDATA[Stage3 is similar to Stage2, but autoComplete is enabled.
+
+Hence completing Task5 should complete the stage,
+even though there are discretionary items]]>
+        </text>
+    </textAnnotation>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{
