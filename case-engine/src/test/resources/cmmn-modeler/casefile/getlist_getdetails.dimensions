@@ -15,13 +15,16 @@
         <CMMNShape cmmnElementRef="_LQXO7_1">
             <Bounds x="444" y="130" width="12" height="20"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="_LQXO7_shape_4">
+        <CMMNShape cmmnElementRef="_LQXO7_7">
             <Bounds x="580" y="120" width="25" height="40"/>
         </CMMNShape>
-        <CMMNShape cmmnElementRef="_LQXO7_shape_5">
-            <Bounds x="110" y="200" width="25" height="40"/>
+        <CMMNShape cmmnElementRef="_LQXO7_4">
+            <Bounds x="120" y="210" width="25" height="40"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_LQXO7_11">
+            <Bounds x="134" y="154" width="12" height="20"/>
         </CMMNShape>
         <CMMNEdge sourceCMMNElementRef="_LQXO7_shape_4" targetCMMNElementRef="_LQXO7_1"/>
-        <CMMNEdge sourceCMMNElementRef="_LQXO7_shape_5" targetCMMNElementRef="pi_pt__LQXO7_8"/>
+        <CMMNEdge sourceCMMNElementRef="_LQXO7_4" targetCMMNElementRef="_LQXO7_11"/>
     </CMMNDiagram>
 </CMMNDI>

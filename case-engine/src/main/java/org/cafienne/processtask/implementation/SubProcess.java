@@ -74,6 +74,14 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         processOutputParameters.put(name, value);
     }
 
+    /**
+     * Invoked before reactive is invoked. Clears output parameters of earlier failures.
+     */
+    public void resetOutput() {
+        rawOutputParameters.getValue().clear();
+        processOutputParameters.getValue().clear();
+    }
+
     protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessMapping> mappings) {
         processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
         for (SubProcessMapping mapping : mappings) {
