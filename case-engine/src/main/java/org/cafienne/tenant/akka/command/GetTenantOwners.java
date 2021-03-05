@@ -23,8 +23,6 @@ public class GetTenantOwners extends TenantCommand {
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        // We add this event to enable some form of audit logging
-        tenant.addEvent(new TenantOwnersRequested(tenant));
         return new TenantOwnersResponse(this, tenant.getId(), tenant.getOwnerList());
     }
 
