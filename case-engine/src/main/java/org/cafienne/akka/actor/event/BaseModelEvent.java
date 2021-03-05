@@ -120,6 +120,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
      */
     public final void recover(M actor) {
         this.actor = actor;
+        if (logger.isDebugEnabled()) logger.debug("Recovery in " + actor.getDescription() + ": " + timestamp +" - " + this.getDescription());
         this.updateState(actor);
     }
 

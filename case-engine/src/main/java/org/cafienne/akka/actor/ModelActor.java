@@ -216,15 +216,15 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             recoveryCompleted();
         } else if (event instanceof ModelEvent) {
             // Step 2c. Weird: ModelEvents in recovery of other models??
-            logger.warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
+            getLogger().warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
         } else {
             // Step 2c.
-            logger.warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
+            getLogger().warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
         }
     }
 
     protected void recoveryCompleted() {
-        logger.info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
+        getLogger().info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
     }
 
     @Override
@@ -258,7 +258,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         long idlePeriod = CaseSystem.config().actor().idlePeriod();
         FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
         selfCleaner = getScheduler().schedule(duration, () -> {
-            logger.debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
+            getLogger().debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
 //            System.out.println("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
             self().tell(PoisonPill.getInstance(), self());
         });
@@ -458,9 +458,9 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param response
      */
     public void reply(ModelResponse response) {
-        if (logger.isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+        if (getLogger().isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
-            logger.debug(msg);
+            getLogger().debug(msg);
             currentMessageHandler.debugIndentedConsoleLogging(msg);
         }
         response.getRecipient().tell(response, self());
@@ -474,7 +474,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param <T>
      */
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
-        if (logger.isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+        if (getLogger().isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
             StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
             events.forEach(e -> {
                 msg.append("\n\t");
@@ -486,7 +486,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                     msg.append(e.getClass().getSimpleName() + ", ");
                 }
             });
-            logger.debug(msg + "\n");
+            getLogger().debug(msg + "\n");
             currentMessageHandler.debugIndentedConsoleLogging(msg + "\n");
         }
         if (events.isEmpty()) {
@@ -495,8 +495,8 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         T lastEvent = events.get(events.size() - 1);
         persistAll(events, e -> {
             CaseSystem.health().writeJournal().isOK();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
             }
             if (e == lastEvent && response != null) {
                 reply(response);
@@ -514,10 +514,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     public void failedWithInvalidState(CommandHandler handler, Throwable exception) {
         this.getScheduler().clearSchedules(); // Remove all schedules.
         if (exception instanceof CommandException) {
-            logger.error("Restarting " + this + ". Handling msg of type " + handler.msg.getClass().getName() + " resulted in invalid state.");
-            logger.error("  Cause: "+exception.getClass().getSimpleName()+" - " + exception.getMessage());
+            getLogger().error("Restarting " + this + ". Handling msg of type " + handler.msg.getClass().getName() + " resulted in invalid state.");
+            getLogger().error("  Cause: "+exception.getClass().getSimpleName()+" - " + exception.getMessage());
         } else {
-            logger.error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
+            getLogger().error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
         }
         this.supervisorStrategy().restartChild(self(), exception, true);
     }
@@ -528,7 +528,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
         CaseSystem.health().writeJournal().hasFailed(cause);
-        logger.error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
+        getLogger().error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
         if (currentMessageHandler instanceof CommandHandler) {
             ModelCommand command = ((CommandHandler) currentMessageHandler).getCommand();
             reply(new CommandFailure(command, new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
@@ -609,8 +609,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         return logger;
     }
 
+    public String getDescription() {
+        return this.getClass().getSimpleName() + "[" + getId() + "]";
+    }
+
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "[" + getId() + "]";
+        return this.getDescription();
     }
 }
