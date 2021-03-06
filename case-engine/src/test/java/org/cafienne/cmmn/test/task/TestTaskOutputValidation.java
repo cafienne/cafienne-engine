@@ -75,10 +75,12 @@ public class TestTaskOutputValidation {
             TestScript.debugMessage("Ping mock service gave response code " + responseCode);
 
             /**
-             * SaveTaskOutput - User should not be able to save the task output for Unassigned task
+             * SaveTaskOutput - User should be able to save the task output for Unassigned task
              */
-            testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("You do not have permission to perform this operation"));
+            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+                action.getEvents().assertEventType(HumanTaskOutputSaved.class, 1);
+                action.getEvents().assertNotEmpty();
+            });
 
             /**
              * ClaimTask - User should be able to claim the task

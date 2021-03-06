@@ -35,12 +35,16 @@ public class TestHumanTask {
         TenantUser pete = TestScript.getTestUser("pete");
         TenantUser gimy = TestScript.getTestUser("gimy");
         TenantUser tom = TestScript.getTestUser("tom");
+        TenantUser notInTeam = TestScript.getTestUser("not-in-team");
         CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
 
         testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), caseStarted -> {
             caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
             TestScript.debugMessage("Task ID: " + taskId);
+
+            String adminTaskId = testCase.getEventListener().awaitPlanItemState("AdminTask", State.Available).getPlanItemId();
+            TestScript.debugMessage("Admin task ID: " + taskId);
 
             ValueMap taskOutputDecisionCanceled = new ValueMap("Decision", "Cancel the order");
             ValueMap taskOutputDecisionApproved = new ValueMap("Decision", "Order Approved");
@@ -59,22 +63,44 @@ public class TestHumanTask {
             });
 
             /**
-             * SaveTaskOutput - User should not be able to save the task output for Unassigned task
+             * SaveTaskOutput - pete should not be able to save the task output for Unassigned AdminTask (lack of appropriate role)
              */
-            testCase.assertStepFails(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+            testCase.assertStepFails(new SaveTaskOutput(pete, caseInstanceId, adminTaskId, taskOutputDecisionCanceled.cloneValueNode()),
                     failure -> failure.assertException("You do not have permission to perform this operation"));
+
+            /**
+             * CompleteTask - pete should not be able to complete AdminTask (lack of appropriate role)
+             */
+            testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, adminTaskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("You do not have permission to perform this operation"));
+
+            /**
+             * SaveTaskOutput - Although tom doesn't have appropriate role, can save output for Unassigned AdminTask (as tom is case team owner)
+             */
+            testCase.addStep(new SaveTaskOutput(tom, caseInstanceId, adminTaskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                taskAssertion.assertTaskOutput(taskOutputDecisionCanceled);
+            });
+
+            /**
+             * SaveTaskOutput - User should be able to save the task output for Unassigned task
+             */
+            testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
+                HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
+                taskAssertion.assertTaskOutput(taskOutputDecisionCanceled);
+            });
 
             /**
              * DelegateTask - Only Assigned task can be delegated
              */
             testCase.assertStepFails(new DelegateTask(gimy, caseInstanceId, taskId, pete),
-                    failure -> failure.assertException("You do not have permission to perform this operation"));
+                    failure -> failure.assertException("Cannot be done because the task is in Unassigned state, but should be in any of [Assigned] state"));
 
             /**
-             * CompleteTask - Only Assigned or Delegated task can be completed
+             * CompleteTask - Outside of case team members cannot take actions on task
              */
-            testCase.assertStepFails(new CompleteHumanTask(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("You do not have permission to perform this operation"));
+            testCase.assertStepFails(new CompleteHumanTask(notInTeam, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
+                    failure -> failure.assertException("User not-in-team is not part of the case team"));
 
             /**
              * ClaimTask - User should be able to claim the task
@@ -141,7 +167,7 @@ public class TestHumanTask {
              * RevokeTask - Only Assigned or Delegated task can be revoked
              */
             testCase.assertStepFails(new RevokeTask(gimy, caseInstanceId, taskId),
-                    failure -> failure.assertException("You do not have permission to perform this operation"));
+                    failure -> failure.assertException("Cannot be done because the task is in Unassigned state, but should be in any of [Assigned, Delegated] state"));
 
             /**
              * AssignTask - User should be able to assign the task to another user

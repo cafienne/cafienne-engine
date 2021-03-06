@@ -1,6 +1,6 @@
 <definitions>
     <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
-    <case id="TestHumanTask.case" name="TestHumanTask">
+    <case id="TestHumanTask.case" name="TestHumanTask" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="_kBPkc_0" name="TaskInput" multiplicity="ExactlyOne" definitionRef="string.cfid">
                 <children>
@@ -17,6 +17,7 @@
         </caseFileModel>
         <casePlanModel id="cm__kBPkc_0" name="TestHumanTask" autoComplete="true">
             <planItem id="pi_ht__kBPkc_0" name="HumanTask" definitionRef="ht__kBPkc_0"/>
+            <planItem id="pi_ht__kBPkc_1" name="AdminTask" definitionRef="ht__kBPkc_1"/>
             <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true">
                 <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
                 <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
@@ -27,14 +28,14 @@
                         <output id="_DtOu_Decision" name="Decision"/>
                         <task-model> { "JSONSchema" : "Some schema in here" }</task-model>
                         <parameterMapping id="_kBPkc_14" sourceRef="_kBPkc_18" targetRef="_67M8_Content">
-                            <transformation id="_kBPkc_20" language="spel">
+                            <transformation id="_kBPkc_20">
                                 <body>
                                     <![CDATA[TaskInputParameter.Content]]>
                                 </body>
                             </transformation>
                         </parameterMapping>
                         <parameterMapping id="_kBPkc_16" sourceRef="_DtOu_Decision" targetRef="_kBPkc_15">
-                            <transformation id="_kBPkc_21" language="spel">
+                            <transformation id="_kBPkc_21">
                                 <body>
                                     <![CDATA[Decision]]>
                                 </body>
@@ -43,11 +44,17 @@
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
+            <humanTask id="ht__kBPkc_1" name="AdminTask" isBlocking="true" performerRef="_kBPkc_17"/>
         </casePlanModel>
         <caseRoles>
             <role id="_kBPkc_17" name="ADMIN"/>
         </caseRoles>
         <input id="_kBPkc_22" name="TaskInput" bindingRef="_kBPkc_0"/>
+        <textAnnotation id="_kBPkc_9">
+            <text>
+                <![CDATA[Only ADMIN role is authorized to perform this task]]>
+            </text>
+        </textAnnotation>
     </case>
     <CMMNDI>
         <CMMNDiagram>
@@ -56,6 +63,12 @@
             </CMMNShape>
             <CMMNShape cmmnElementRef="pi_ht__kBPkc_0">
                 <Bounds x="120" y="90" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__kBPkc_1">
+                <Bounds x="310" y="90" width="100" height="60"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_kBPkc_9">
+                <Bounds x="300" y="160" width="120" height="60"/>
             </CMMNShape>
         </CMMNDiagram>
     </CMMNDI>

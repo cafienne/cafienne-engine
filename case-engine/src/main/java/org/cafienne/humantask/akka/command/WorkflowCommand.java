@@ -138,9 +138,13 @@ public abstract class WorkflowCommand extends CaseCommand {
         }
 
         String currentTaskAssignee = task.getImplementation().getAssignee();
-        String currentUserId = getUser().id();
-        if (!currentUserId.equals(currentTaskAssignee)) {
-            raiseAuthorizationException("You do not have permission to perform this operation");
+        if (currentTaskAssignee == null || currentTaskAssignee.isEmpty()) {
+            validateProperCaseRole(task);
+        } else {
+            String currentUserId = getUser().id();
+            if (!currentUserId.equals(currentTaskAssignee)) {
+                raiseAuthorizationException("You do not have permission to perform this operation");
+            }
         }
     }
 
