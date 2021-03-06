@@ -18,12 +18,13 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
     protected final C command;
-    protected ModelResponse response;
 
     public CommandHandler(A actor, C msg) {
         super(actor, msg);
@@ -100,18 +101,11 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         // 3. The message resulted in state changes, so the new events need to be persisted, and after persistence the response is sent back to the client.
 
         if (hasFailures()) { // Means there is a response AND it is of type CommandFailure
-            if (actor.getLastModified() != null) {
-                response.setLastModified(actor.getLastModified());
-            }
-
             // Inform the sender about the failure
-            actor.reply(response);
-
             // In case of failure we still want to store the debug events. Actually, mostly we need this in case of failure (what else are we debugging for)
             Object[] debugEvents = events.stream().filter(e -> e instanceof DebugEvent).toArray();
-            if (debugEvents.length > 0) {
-                actor.persistEvents(Arrays.asList(debugEvents));
-            }
+            actor.replyAndThenPersistEvents(Arrays.asList(debugEvents), response);
+
 
             // If we have created events (other than debug events) from the failure, then we are in inconsistent state and need to restart the actor.
             if (events.size() > debugEvents.length) {
@@ -124,34 +118,9 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
                 addDebugInfo(() -> exception, logger);
                 actor.failedWithInvalidState(this, exception);
             }
-
-            actor.resetTransactionTimestamp();
-
-        } else if (hasOnlyDebugEvents()) { // Nothing to persist, just respond to the client if there is something to say
-            if (response != null) {
-                response.setLastModified(actor.getLastModified());
-                actor.resetTransactionTimestamp();
-                // Now tell the sender about the response
-                actor.reply(response);
-                // Also store the debug events if there are
-                actor.persistEvents(events);
-            }
         } else {
-            // We have events to persist.
-            //  Add a "transaction" event at the last moment
-            checkEngineVersion();
-
-            // Change the last modified moment of this case; update it in the response, and publish an event about it
-            Instant lastModified = actor.getTransactionTimestamp();
-            TransactionEvent lastModifiedEvent = command.createTransactionEvent(actor);
-            if (lastModifiedEvent != null) {
-                addModelEvent(lastModifiedEvent);
-            }
-            if (response != null) {
-                response.setLastModified(lastModified);
-            }
-            actor.resetTransactionTimestamp();
-            actor.persistEventsAndThenReply(events, response);
+            // Follow regular procedure
+            super.complete();
         }
     }
 

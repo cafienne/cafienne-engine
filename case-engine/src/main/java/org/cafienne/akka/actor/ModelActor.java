@@ -458,16 +458,30 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param response
      */
     public void reply(ModelResponse response) {
+        // Always reset the transaction timestamp before replying. Even if there is no reply.
+        resetTransactionTimestamp();
+        if (response == null) {
+            // Double check there is a response.
+            return;
+        }
+
         if (getLogger().isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
             getLogger().debug(msg);
             currentMessageHandler.debugIndentedConsoleLogging(msg);
         }
+        response.setLastModified(getLastModified());
         response.getRecipient().tell(response, self());
     }
 
+    public <T> void replyAndThenPersistEvents(List<T> events, ModelResponse response) {
+        reply(response);
+        persistEvents(events);
+    }
+
     /**
-     * Method for a MessageHandler to persist it's events, and be called back after all events have been persisted
+     * Method for a MessageHandler to persist it's events, and after that send the (optional) reply.
+     * If there are no events, the reply will be sent immediately.
      *
      * @param events
      * @param response
@@ -489,19 +503,22 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             getLogger().debug(msg + "\n");
             currentMessageHandler.debugIndentedConsoleLogging(msg + "\n");
         }
+        resetTransactionTimestamp();
         if (events.isEmpty()) {
+            reply(response);
             return;
+        } else {
+            T lastEvent = events.get(events.size() - 1);
+            persistAll(events, e -> {
+                CaseSystem.health().writeJournal().isOK();
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug(this.getDescription() + " - persisted event [" + lastSequenceNr() +"] of type " + e.getClass().getName());
+                }
+                if (e == lastEvent) {
+                    reply(response);
+                }
+            });
         }
-        T lastEvent = events.get(events.size() - 1);
-        persistAll(events, e -> {
-            CaseSystem.health().writeJournal().isOK();
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug("Persisted an event of type " + e.getClass().getName() + " in actor " + this);
-            }
-            if (e == lastEvent && response != null) {
-                reply(response);
-            }
-        });
     }
 
     /**

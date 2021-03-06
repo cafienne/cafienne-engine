@@ -34,7 +34,6 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
     protected void process() {
         Responder handler = actor.getResponseListener(msg.getMessageId());
         if (handler == null) {
-            System.out.println(" DID NOT FIND HANDLER FOR RESPONSE TO MESSAGE WITH ID: " + msg.getMessageId());
             // For all commands that are sent to another case via us, a listener is registered.
             // If that listener is null, we set a default listener ourselves.
             // So if we still do not find a listener, it means that we received a response to a command that we never submitted,
@@ -47,27 +46,6 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
             } else if (msg instanceof ModelResponse) {
                 handler.right.handleResponse(msg);
             }
-        }
-    }
-
-    protected void complete() {
-        // First check the engine version.
-        checkEngineVersion();
-
-        // If there are only debug events, then were done, otherwise add a last modified event.
-        if (!events.isEmpty()) {
-
-            // We have events to persist, but let's check if it is only debug events or more.
-            if (! hasOnlyDebugEvents()) {
-                // Change the last modified moment of this actor and publish an event about it
-                ModelEvent lastModifiedEvent = msg.createTransactionEvent(actor);
-                if (lastModifiedEvent != null) {
-                    addModelEvent(lastModifiedEvent);
-                }
-            }
-
-            // Now persist the events in one shot
-            actor.persistEvents(events);
         }
     }
 }
