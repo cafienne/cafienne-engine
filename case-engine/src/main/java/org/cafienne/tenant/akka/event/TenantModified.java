@@ -28,7 +28,7 @@ public class TenantModified extends TenantEvent implements TransactionEvent<Tena
     public TenantModified(ValueMap json) {
         super(json);
         this.lastModified = json.rawInstant(Fields.lastModified);
-        this.source = readField(json, Fields.source);
+        this.source = readField(json, Fields.source, "unknown message");
     }
 
     /**

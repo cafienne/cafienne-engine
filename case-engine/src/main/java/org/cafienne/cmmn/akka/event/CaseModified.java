@@ -37,7 +37,7 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
         this.lastModified = readInstant(json, Fields.lastModified);
         this.numFailures = json.rawInt(Fields.numFailures);
         this.state = readEnum(json, Fields.state, State.class);
-        this.source = readField(json, Fields.source);
+        this.source = readField(json, Fields.source, "unknown message");
     }
 
     /**
