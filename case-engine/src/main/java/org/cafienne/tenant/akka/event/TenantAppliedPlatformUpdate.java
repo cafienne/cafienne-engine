@@ -28,6 +28,11 @@ public class TenantAppliedPlatformUpdate extends TenantEvent {
     }
 
     @Override
+    public String getDescription() {
+        return super.getDescription() + " on " + newUserInformation.info().size() +" users";
+    }
+
+    @Override
     public void updateState(TenantActor actor) {
         actor.updateState(this);
     }

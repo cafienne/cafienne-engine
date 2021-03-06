@@ -35,10 +35,15 @@ public abstract class TenantUserEvent extends TenantEvent {
     public void updateState(TenantActor actor) {
         User user = actor.getUser(userId);
         if (user == null) {
-            logger.error("Cannot apply event of type " + getClass().getName() + ", because user with id " + userId + " has not (yet) been registered");
+            logger.error("Ignoring event of type " + getClass().getName() + ", because user with id " + userId + " does not exist in tenant " + actor.getId());
         } else {
             updateUserState(actor.getUser(userId));
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return super.getDescription() +" on user " + userId;
     }
 
     protected abstract void updateUserState(User user);

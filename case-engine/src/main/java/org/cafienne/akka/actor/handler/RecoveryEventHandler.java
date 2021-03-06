@@ -14,7 +14,6 @@ public class RecoveryEventHandler<C extends ModelCommand, E extends ModelEvent, 
     }
 
     protected void process() {
-        logger.debug("Recovery in " + actor.getClass().getSimpleName() + " " + actor.getId() + ": recovering " + msg);
         msg.recover(actor);
     }
 

@@ -17,6 +17,11 @@ public class TenantUserRoleRemoved extends TenantUserRoleEvent {
     }
 
     @Override
+    public String getDescription() {
+        return super.getDescription() +" - removed role " + role;
+    }
+
+    @Override
     protected void updateUserState(User user) {
         user.updateState(this);
     }

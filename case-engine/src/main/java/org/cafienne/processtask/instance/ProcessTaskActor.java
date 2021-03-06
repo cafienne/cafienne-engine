@@ -79,8 +79,14 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
         return new ProcessResponse(command);
     }
 
-    public Logger getLogger() {
+    @Override
+    protected Logger getLogger() {
         return logger;
+    }
+
+    @Override
+    public String getDescription() {
+        return "ProcessTask[" + getId() + "]";
     }
 
     public void completed(ValueMap processOutputParameters) {

@@ -88,7 +88,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         logger.info("Recovering/creating case " + this.getId() + " with path " + self().path());
     }
 
-    public Logger getLogger() {
+    @Override
+    protected Logger getLogger() {
         return logger;
     }
 

@@ -46,7 +46,6 @@ public class ModelResponse implements CafienneSerializable, TenantUserMessage {
         // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
         //  the actor will not be available. Checking that here. Required for CommandFailure.
         this.lastModified = command.getActor() != null ? command.getActor().getLastModified() : null;
-        this.lastModified = command.getActor() != null ? command.getActor().getLastModified() : null;
         this.user = command.getUser();
         this.commandType = command.getClass().getName();
     }

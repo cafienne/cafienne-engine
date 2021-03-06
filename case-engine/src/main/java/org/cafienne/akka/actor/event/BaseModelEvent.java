@@ -78,6 +78,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
 
     /**
      * UpdateState will be invoked when an event is added or recovered.
+     *
      * @param actor
      */
     public abstract void updateState(M actor);
@@ -116,10 +117,14 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
 
     /**
      * Internal framework method
+     *
      * @param actor
      */
     public final void recover(M actor) {
         this.actor = actor;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Recovery in " + actor.getDescription() + "[" + actor.lastSequenceNr() + "]: " + timestamp + " - " + this.getDescription());
+        }
         this.updateState(actor);
     }
 
@@ -137,6 +142,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     /**
      * Override this method to make a description of the event that is based on it's content.
      * This method is invoked from toString().
+     *
      * @return
      */
     public String getDescription() {

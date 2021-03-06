@@ -18,15 +18,17 @@ import java.time.Instant;
 @Manifest
 public class TenantModified extends TenantEvent implements TransactionEvent<TenantActor> {
     private final Instant lastModified;
+    private String source;
 
     public TenantModified(TenantActor actor, Instant lastModified) {
         super(actor);
         this.lastModified = lastModified;
     }
 
-    public TenantModified(ValueMap value) {
-        super(value);
-        this.lastModified = value.rawInstant(Fields.lastModified);
+    public TenantModified(ValueMap json) {
+        super(json);
+        this.lastModified = json.rawInstant(Fields.lastModified);
+        this.source = readField(json, Fields.source, "unknown message");
     }
 
     /**
@@ -37,6 +39,15 @@ public class TenantModified extends TenantEvent implements TransactionEvent<Tena
         return lastModified;
     }
 
+    @Override
+    public void setCause(String source) {
+        this.source = source;
+    }
+
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + " upon " + source;
+    }
 
     @Override
     public String toString() {
@@ -47,6 +58,7 @@ public class TenantModified extends TenantEvent implements TransactionEvent<Tena
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
         writeField(generator, Fields.lastModified, lastModified);
+        writeField(generator, Fields.source, source);
     }
 
     @Override

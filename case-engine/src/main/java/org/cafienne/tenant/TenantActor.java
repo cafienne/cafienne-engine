@@ -4,12 +4,15 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.tenant.akka.command.TenantCommand;
 import org.cafienne.tenant.akka.command.TenantUserInformation;
 import org.cafienne.tenant.akka.event.*;
 import org.cafienne.tenant.akka.event.platform.TenantCreated;
 import org.cafienne.tenant.akka.event.platform.TenantDisabled;
 import org.cafienne.tenant.akka.event.platform.TenantEnabled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
  * TenantActor manages users and their roles inside a tenant.
  */
 public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
+    private final static Logger logger = LoggerFactory.getLogger(TenantActor.class);
+
     private TenantCreated creationEvent;
     private Map<String, User> users = new HashMap();
     private boolean disabled = false; // TODO: we can add some behavior behind this...
@@ -34,6 +39,16 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     @Override
     public String getRootActorId() {
         return getId();
+    }
+
+    @Override
+    public String getDescription() {
+        return "Tenant[" + getId() + "]";
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return logger;
     }
 
     @Override
