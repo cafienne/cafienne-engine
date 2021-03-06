@@ -8,6 +8,7 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.serialization.json.{JSONReader, ValueMap}
 import org.cafienne.cmmn.akka.event._
 import org.cafienne.cmmn.akka.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
+import org.cafienne.cmmn.akka.event.migration.CaseDefinitionMigrated
 import org.cafienne.cmmn.akka.event.plan._
 import org.cafienne.cmmn.akka.event.team._
 import org.cafienne.humantask.akka.event._
@@ -45,6 +46,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case event: CaseAppliedPlatformUpdate => updateUserIds(event, offsetName, offset)
       case event: CaseModified => updateCaseInstance(event)
       case event: BusinessIdentifierEvent => handleBusinessIdentifierEvent(event)
+      case event: CaseDefinitionMigrated => migrateCaseDefinition(event)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -54,6 +56,11 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     this.caseDefinition = CaseDefinitionRecord(event.getActorId, event.getCaseName, event.getDefinition.documentation.text, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.createdOn, event.createdBy)
     this.caseFile = Some(new ValueMap()) // Always create an empty case file
     CaseInstanceRoleMerger.merge(event).map(role => caseInstanceRoles.put(role.roleName, role))
+    Future.successful(Done)
+  }
+
+  private def migrateCaseDefinition(event: CaseDefinitionMigrated): Future[Done] = {
+    this.caseDefinition = CaseDefinitionRecord(event.getActorId, event.getDefinition.getName, event.getDefinition.documentation.text, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.getTimestamp, event.getUser.id)
     Future.successful(Done)
   }
 

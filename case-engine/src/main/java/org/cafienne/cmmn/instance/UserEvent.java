@@ -8,6 +8,9 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.serialization.json.StringValue;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
@@ -59,5 +62,13 @@ public class UserEvent extends PlanItem<UserEventDefinition> {
             planItemXML.appendChild(roleElement);
             roleElement.setAttribute("name", roleName);
         }
+    }
+
+    public Value<?> getStateAsValueMap() {
+        ValueMap state = super.getStateAsValueMap().asMap();
+        for (CaseRoleDefinition role : getAuthorizedRoles()) {
+            state.withArray("authorizedRoles").add(new StringValue(role.getName()));
+        }
+        return state;
     }
 }

@@ -8,6 +8,8 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.plan.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
@@ -456,34 +458,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         return type + "[" + getName() + "." + index + "]";
     }
 
-    protected void dumpImplementationToXML(Element planItemXML) {
-    }
-
-    protected void dumpMemoryStateToXML(Element parentElement) {
-        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
-        parentElement.appendChild(planItemXML);
-        planItemXML.setAttribute("_id", this.getId());
-        planItemXML.setAttribute("name", this.getName());
-        if (repeats() || index > 0) {
-            planItemXML.setAttribute("index", "" + index);
-        }
-
-        // Print the repeat attribute if there is a repetition rule defined for this plan item.
-        if (!(this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
-            planItemXML.setAttribute("repeat", "" + repeats());
-        }
-
-        planItemXML.setAttribute("state", "" + this.getState());
-        planItemXML.setAttribute("transition", "" + this.getLastTransition());
-        planItemXML.setAttribute("history", "" + this.getHistoryState());
-
-        // Let instance append it's information.
-        dumpImplementationToXML(planItemXML);
-
-        entryCriteria.dumpMemoryStateToXML(planItemXML);
-        exitCriteria.dumpMemoryStateToXML(planItemXML);
-    }
-
     /**
      * Default Guard implementation for an intended transition on the plan item. Typical implementation inside a Stage to check whether completion is allowed, or in HumanTask to check whether the
      * current user has sufficient roles to e.g. complete a task.
@@ -561,5 +535,51 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void updateState(CaseAppliedPlatformUpdate event) {
+    }
+
+    protected void dumpImplementationToXML(Element planItemXML) {
+    }
+
+    protected void dumpMemoryStateToXML(Element parentElement) {
+        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
+        parentElement.appendChild(planItemXML);
+        planItemXML.setAttribute("_id", this.getId());
+        planItemXML.setAttribute("name", this.getName());
+        if (repeats() || index > 0) {
+            planItemXML.setAttribute("index", "" + index);
+        }
+
+        // Print the repeat attribute if there is a repetition rule defined for this plan item.
+        if (! (this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+            planItemXML.setAttribute("repeat", "" + repeats());
+        }
+
+        planItemXML.setAttribute("state", "" + this.getState());
+        planItemXML.setAttribute("transition", "" + this.getLastTransition());
+        planItemXML.setAttribute("history", "" + this.getHistoryState());
+
+        // Let instance append it's information.
+        dumpImplementationToXML(planItemXML);
+
+        entryCriteria.dumpMemoryStateToXML(planItemXML);
+        exitCriteria.dumpMemoryStateToXML(planItemXML);
+    }
+
+    public Value<?> getStateAsValueMap() {
+        ValueMap state = new ValueMap("type", getType(), "id", this.getId(), "name", this.getName(), "definitionId", getDefinition().getId(),  "state", getState(), "transition", getLastTransition(), "history", getHistoryState());
+        if (repeats() || index > 0) {
+            state.putRaw("index", index);
+        }
+        if (!itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+            state.putRaw("repeat", repeats());
+        }
+        if (!itemDefinition.getPlanItemControl().getRequiredRule().isDefault()) {
+            state.putRaw("required", isRequired());
+        }
+
+        state.put("entryCriteria", entryCriteria.getStateAsValueMap());
+        state.put("exitCriteria", exitCriteria.getStateAsValueMap());
+
+        return state;
     }
 }

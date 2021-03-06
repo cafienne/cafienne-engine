@@ -10,7 +10,7 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.akka.actor.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
 import org.cafienne.cmmn.akka.command.CaseCommandModels
-import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, StartCaseFormat}
+import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, MigrationDefinitionFormat, StartCaseFormat}
 
 /**
   * This file contains some marshallers and unmarshallers for the engine
@@ -36,6 +36,10 @@ object CommandMarshallers {
 
   implicit val DiscretionaryItemUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
     JsonUtil.fromJson[CaseCommandModels.PlanDiscretionaryItem](data)
+  })
+
+  implicit val StartMigrationUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
+    JsonUtil.fromJson[MigrationDefinitionFormat](data)
   })
 }
 

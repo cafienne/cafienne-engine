@@ -7,6 +7,7 @@ import org.cafienne.cmmn.akka.event.DebugDisabled;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.cmmn.akka.event.file.*;
+import org.cafienne.cmmn.akka.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
@@ -44,6 +45,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseModified.class, CaseModified::new);
         addManifestWrapper(CaseAppliedPlatformUpdate.class, CaseAppliedPlatformUpdate::new);
         addManifestWrapper(EngineVersionChanged.class, EngineVersionChanged::new);
+        addManifestWrapper(CaseDefinitionMigrated.class, CaseDefinitionMigrated::new);
         registerCaseTeamEvents();
         registerCasePlanEvents();
         registerCaseFileEvents();

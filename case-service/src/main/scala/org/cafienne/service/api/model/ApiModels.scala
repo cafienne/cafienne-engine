@@ -198,3 +198,18 @@ case class CaseFileItemFormat(id: String,
 //base types
 // Property of a caseFileItem
 case class PropertyFormat(name: String, `type`: String, value: String)
+
+@Schema(description = "Migrate definition of a case")
+case class MigrationDefinitionFormat(@(Schema @field)(
+                                   description = "New definition of the case to be migrated",
+                                   required = true,
+                                   example = "Depending on the internally configured DefinitionProvider this can be a file name or the case model itself.",
+                                   implementation = classOf[String])
+                                 newDefinition: String = "", // by default an empty string to avoid nullpointers down the line
+                                     @(Schema @field)(
+                                       description = "Script to run upon migration",
+                                       required = true,
+                                       example = "Just make sure you really know what to do here",
+                                       implementation = classOf[String])
+                                     migrationScript: String = "",
+                                    )

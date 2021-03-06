@@ -127,4 +127,8 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
         String caseFileString = XMLHelper.printXMLNode(xmlDocument.getDocumentElement().getFirstChild());
         return caseFileString;
     }
+
+    public Value<?> getStateAsValueMap() {
+        return toJson();
+    }
 }

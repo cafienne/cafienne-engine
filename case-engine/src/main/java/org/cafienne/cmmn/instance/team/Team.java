@@ -2,6 +2,9 @@ package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
@@ -313,5 +316,11 @@ public class Team extends CMMNElement<CaseDefinition> {
             }
             return userInfo;
         });
+    }
+    
+    public Value<?> getStateAsValueMap() {
+        ValueList state = new ValueList();
+        members.forEach(member -> state.add(member.getStateAsValueMap()));
+        return state;
     }
 }

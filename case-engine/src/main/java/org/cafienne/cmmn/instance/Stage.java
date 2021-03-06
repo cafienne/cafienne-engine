@@ -8,6 +8,9 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.ItemDefinition;
@@ -216,18 +219,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         }
     }
 
-    @Override
-    protected void dumpImplementationToXML(Element stageXML) {
-        super.dumpImplementationToXML(stageXML);
-        for (PlanItem child : planItems) {
-            child.dumpMemoryStateToXML(stageXML);
-        }
-
-        if (this.getDefinition().getPlanningTable() != null) {
-            stageXML.appendChild(stageXML.getOwnerDocument().createComment(" Planning table "));
-            this.getDefinition().getPlanningTable().dumpMemoryStateToXML(stageXML, this);
-        }
-    }
 
     /**
      * Determines whether the plan item is contained within this stage or one of it's child stages.
@@ -263,5 +254,25 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     @Override
     public void updateState(CaseAppliedPlatformUpdate event) {
         planItems.forEach(item -> item.updateState(event));
+    }
+    
+    protected void dumpImplementationToXML(Element stageXML) {
+        super.dumpImplementationToXML(stageXML);
+        for (PlanItem child : planItems) {
+            child.dumpMemoryStateToXML(stageXML);
+        }
+
+        if (this.getDefinition().getPlanningTable() != null) {
+            stageXML.appendChild(stageXML.getOwnerDocument().createComment(" Planning table "));
+            this.getDefinition().getPlanningTable().dumpMemoryStateToXML(stageXML, this);
+        }
+    }
+
+    public Value<?> getStateAsValueMap() {
+        ValueMap state = super.getStateAsValueMap().asMap();
+        ValueList children = new ValueList();
+        planItems.forEach(item -> children.add(item.getStateAsValueMap()));
+        state.put("items", children);
+        return state;
     }
 }

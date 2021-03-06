@@ -77,6 +77,14 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     }
 
     /**
+     * Returns the event timestamp
+     * @return
+     */
+    public final Instant getTimestamp() {
+        return timestamp;
+    }
+
+    /**
      * UpdateState will be invoked when an event is added or recovered.
      *
      * @param actor

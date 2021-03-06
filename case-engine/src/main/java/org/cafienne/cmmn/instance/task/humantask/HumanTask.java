@@ -9,6 +9,8 @@ package org.cafienne.cmmn.instance.task.humantask;
 
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.instance.*;
@@ -174,6 +176,15 @@ public class HumanTask extends Task<HumanTaskDefinition> {
             planItemXML.appendChild(roleElement);
             roleElement.setAttribute("name", roleName);
         }
+    }
+
+    public Value<?> getStateAsValueMap() {
+        ValueMap state = super.getStateAsValueMap().asMap();
+        CaseRoleDefinition performer = getPerformer();
+        if (performer != null) {
+            state.putRaw("performer", performer.getName());
+        }
+        return state;
     }
 
 //	public void goComplete(ValueMap rawOutput) {

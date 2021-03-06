@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
@@ -184,5 +185,9 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     public void release() {
         getCaseInstance().getSentryNetwork().remove(this);
         onParts.values().forEach(onPart -> onPart.releaseFromCase());
+    }
+
+    public Value<?> getStateAsValueMap() {
+        return toJson();
     }
 }

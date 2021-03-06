@@ -11,6 +11,7 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.akka.event.*;
+import org.cafienne.cmmn.akka.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
@@ -404,5 +405,22 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     public void updateState(CaseAppliedPlatformUpdate event) {
         getCaseTeam().updateState(event);
         getCasePlan().updateState(event);
+    }
+
+    public ValueMap getStateAsValueMap() {
+        ValueMap state = new ValueMap("caseInstanceId", this.getId(), "name", definition.getName(), "definition", definition.toJSON());
+        state.put("team", caseTeam.getStateAsValueMap());
+        state.put("file", caseFile.getStateAsValueMap());
+        state.put("plan", casePlan.getStateAsValueMap());
+        return state;
+    }
+
+    public void migrate(CaseDefinition definition, String migrationScript) {
+        System.out.println("Migrating case to new definition " + definition.getName() +" with id " + definition.getId() +" and script " + migrationScript);
+        addEvent(new CaseDefinitionMigrated(this, definition));
+    }
+
+    public void migrateCaseDefinition(CaseDefinition definition) {
+        System.out.println("Applying migrated case definition " + definition.getName() +" with id " + definition.getId());
     }
 }

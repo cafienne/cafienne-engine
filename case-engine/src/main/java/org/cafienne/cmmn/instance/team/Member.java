@@ -1,5 +1,8 @@
 package org.cafienne.cmmn.instance.team;
 
+import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueList;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.team.MemberKey;
 import org.cafienne.cmmn.akka.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -179,6 +182,11 @@ public class Member extends CMMNElement<CaseDefinition> {
         return team;
     }
 
+    @Override
+    public CaseDefinition getDefinition() {
+        return getCaseInstance().getDefinition();
+    }
+
     public void dumpMemoryStateToXML(Element parentElement) {
         Element memberXML = parentElement.getOwnerDocument().createElement("Member");
         parentElement.appendChild(memberXML);
@@ -191,8 +199,8 @@ public class Member extends CMMNElement<CaseDefinition> {
         // });
     }
 
-    @Override
-    public CaseDefinition getDefinition() {
-        return getCaseInstance().getDefinition();
+    public Value<?> getStateAsValueMap() {
+        ValueMap state = new ValueMap("id", getMemberId(), "type", key.type(), "isOwner", isOwner, "roles", roles.stream().map(r -> r.getName()).toArray());
+        return state;
     }
 }

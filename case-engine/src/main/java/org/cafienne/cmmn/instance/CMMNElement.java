@@ -65,4 +65,8 @@ public class CMMNElement<T extends CMMNElementDefinition> {
     protected <T extends CaseEvent> T addEvent(T event) {
         return getCaseInstance().addEvent(event);
     }
+
+    public Value<?> getStateAsValueMap() {
+        return Value.NULL;
+    }
 }
