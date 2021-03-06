@@ -46,6 +46,7 @@ abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelC
     protected TransactionEvent createTransactionEvent() {
         TransactionEvent transactionEvent = msg.createTransactionEvent(actor);
         if (transactionEvent != null) {
+            transactionEvent.setCause(msg.getClass().getName());
             addModelEvent(transactionEvent);
         }
         return transactionEvent;

@@ -23,6 +23,7 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
     private final Instant lastModified;
     private final int numFailures;
     private final State state;
+    private String source;
 
     public CaseModified(Case caseInstance, Instant lastModified, int numFailures) {
         super(caseInstance);
@@ -36,6 +37,7 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
         this.lastModified = readInstant(json, Fields.lastModified);
         this.numFailures = json.rawInt(Fields.numFailures);
         this.state = readEnum(json, Fields.state, State.class);
+        this.source = readField(json, Fields.source);
     }
 
     /**
@@ -44,6 +46,16 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
      */
     public Instant lastModified() {
         return lastModified;
+    }
+
+    @Override
+    public void setCause(String source) {
+        this.source = source;
+    }
+
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + " upon " + source;
     }
 
     /**
@@ -78,5 +90,6 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
         writeField(generator, Fields.numFailures, new LongValue(numFailures));
         writeField(generator, Fields.state, state);
         writeField(generator, Fields.lastModified, lastModified);
+        writeField(generator, Fields.source, source);
     }
 }
