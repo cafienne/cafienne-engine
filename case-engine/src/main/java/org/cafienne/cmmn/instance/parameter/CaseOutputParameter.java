@@ -23,7 +23,7 @@ public class CaseOutputParameter extends Parameter<OutputParameterDefinition> {
         // perhaps generate a debug statement if a case output parameter does not bind to case file?
         if (binding != null) {
             CaseFileItem item = binding.getPath().resolve(getCaseInstance());
-            this.value = item.getCurrent().getValue();
+            this.value = item.getValue();
         }
     }
 }
