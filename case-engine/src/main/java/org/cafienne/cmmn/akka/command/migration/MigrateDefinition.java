@@ -26,6 +26,7 @@ import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.migration.MigrationScript;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,8 @@ import java.io.IOException;
 
 @Manifest
 public class MigrateDefinition extends CaseCommand {
-    private transient CaseDefinition definition;
-    private final String migrationScript;
+    private final CaseDefinition definition;
+    private final MigrationScript migrationScript;
 
     /**
      * Migrate the definition of a case.
@@ -43,7 +44,7 @@ public class MigrateDefinition extends CaseCommand {
      * @param caseInstanceId      The instance identifier of the case
      * @param definition          The case definition (according to the CMMN xsd) to be updated to
      */
-    public MigrateDefinition(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, String migrationScript) {
+    public MigrateDefinition(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, MigrationScript migrationScript) {
         super(tenantUser, caseInstanceId);
         this.definition = definition;
         this.migrationScript = migrationScript;
@@ -52,17 +53,12 @@ public class MigrateDefinition extends CaseCommand {
     public MigrateDefinition(ValueMap json) {
         super(json);
         this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
-        this.migrationScript = readField(json, Fields.source);
+        this.migrationScript = new MigrationScript(json.with(Fields.script));
     }
 
     @Override
     public String toString() {
         return "Migrate Case Definition '" + definition.getName() + "'";
-    }
-
-    @Override
-    public void validate(Case caseInstance) {
-        // Should we also check whether all parameters have been made available in the input list? Not sure ...
     }
 
     @Override
@@ -76,6 +72,6 @@ public class MigrateDefinition extends CaseCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
         writeField(generator, Fields.definition, definition);
-        writeField(generator, Fields.source, migrationScript);
+        writeField(generator, Fields.script, migrationScript);
     }
 }

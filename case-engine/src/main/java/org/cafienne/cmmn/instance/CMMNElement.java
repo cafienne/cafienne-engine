@@ -11,6 +11,7 @@ import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.migration.MigrationScript;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 
 public class CMMNElement<T extends CMMNElementDefinition> {
@@ -51,6 +52,10 @@ public class CMMNElement<T extends CMMNElementDefinition> {
 
     public T getDefinition() {
         return definition;
+    }
+
+    public void migrateDefinition(T newDefinition, MigrationScript migrationScript) {
+
     }
 
     public Case getCaseInstance() {

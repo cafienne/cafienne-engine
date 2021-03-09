@@ -66,6 +66,7 @@ public enum Fields {
     role,
     elementId,
     source,
+    script,
     waitTime,
     assignee,
     dueDate,

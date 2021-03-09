@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.command.migration.{CompleteMigration, MigrateDefinition}
+import org.cafienne.cmmn.instance.migration.MigrationScript
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api
@@ -53,7 +54,7 @@ class CaseMigrationRoute(val caseQueries: CaseQueries)(override implicit val use
         entity(as[MigrationDefinitionFormat]) { migrateDefinition =>
           val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser, "", migrateDefinition.newDefinition)
           val caseDefinition = definitionsDocument.getFirstCase
-          askCase(platformUser, caseInstanceId, tenantUser => new MigrateDefinition(tenantUser, caseInstanceId, caseDefinition, migrateDefinition.migrationScript))
+          askCase(platformUser, caseInstanceId, tenantUser => new MigrateDefinition(tenantUser, caseInstanceId, caseDefinition, new MigrationScript(migrateDefinition.migrationScript)))
         }
       }
     }

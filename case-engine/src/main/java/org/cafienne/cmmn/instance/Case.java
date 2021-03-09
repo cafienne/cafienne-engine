@@ -20,6 +20,7 @@ import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.CaseFile;
+import org.cafienne.cmmn.instance.migration.MigrationScript;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
@@ -415,12 +416,13 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         return state;
     }
 
-    public void migrate(CaseDefinition definition, String migrationScript) {
+    public void migrate(CaseDefinition definition, MigrationScript migrationScript) {
         System.out.println("Migrating case to new definition " + definition.getName() +" with id " + definition.getId() +" and script " + migrationScript);
-        addEvent(new CaseDefinitionMigrated(this, definition));
+        addEvent(new CaseDefinitionMigrated(this, definition, migrationScript));
     }
 
-    public void migrateCaseDefinition(CaseDefinition definition) {
-        System.out.println("Applying migrated case definition " + definition.getName() +" with id " + definition.getId());
+    public void migrateCaseDefinition(CaseDefinition definition, MigrationScript migrationScript) {
+        getCasePlan().migrateDefinition(definition.getCasePlanModel(), migrationScript);
+        System.out.println("Applying migrated case definition " + definition.getName() +" with id " + definition.getId() + " and script " + migrationScript);
     }
 }

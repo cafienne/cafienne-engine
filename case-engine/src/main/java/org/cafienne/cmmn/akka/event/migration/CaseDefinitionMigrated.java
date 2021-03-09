@@ -16,22 +16,26 @@ import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.migration.MigrationScript;
 
 import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
 public class CaseDefinitionMigrated extends CaseEvent {
-    private final transient CaseDefinition definition;
+    private final CaseDefinition definition;
+    private final MigrationScript migrationScript;
 
-    public CaseDefinitionMigrated(Case caseInstance, CaseDefinition definition) {
+    public CaseDefinitionMigrated(Case caseInstance, CaseDefinition definition, MigrationScript migrationScript) {
         super(caseInstance);
         this.definition = definition;
+        this.migrationScript = migrationScript;
     }
 
     public CaseDefinitionMigrated(ValueMap json) {
         super(json);
         this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
+        this.migrationScript = new MigrationScript(json.with(Fields.script));
     }
 
     /**
@@ -43,12 +47,13 @@ public class CaseDefinitionMigrated extends CaseEvent {
     }
 
     public void updateState(Case caseInstance) {
-        caseInstance.migrateCaseDefinition(this.definition);
+        caseInstance.migrateCaseDefinition(this.definition, this.migrationScript);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeCaseInstanceEvent(generator);
         writeField(generator, Fields.definition, definition);
+        writeField(generator, Fields.script, migrationScript);
     }
 }
