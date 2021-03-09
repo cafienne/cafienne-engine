@@ -7,10 +7,11 @@
  */
 package org.cafienne.cmmn.instance.parameter;
 
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 /**
  * CaseInputParameters are passed upon Case creation. They are then bound to the case file (possibly triggering sentries in the case).
@@ -18,5 +19,14 @@ import org.cafienne.akka.actor.serialization.json.Value;
 public class CaseInputParameter extends Parameter<InputParameterDefinition> {
     public CaseInputParameter(InputParameterDefinition definition, Case caseInstance, Value value) {
         super(definition, caseInstance, value);
+        // Now do the binding to the case file, if it is defined
+        if (binding != null) {
+            CaseFileItem item = binding.getPath().resolve(getCaseInstance());
+            // Validate proper types
+            item.getDefinition().validatePropertyTypes(value);
+
+            addDebugInfo(() -> "Binding parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "] (transition -> Create)");
+            item.createContent(value);
+        }
     }
 }

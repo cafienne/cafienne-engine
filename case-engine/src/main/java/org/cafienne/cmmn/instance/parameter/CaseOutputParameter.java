@@ -10,7 +10,7 @@ package org.cafienne.cmmn.instance.parameter;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 /**
  * CaseOutputParameters are bound to the case file. They are filled at the moment the CasePlan completes.
@@ -18,11 +18,12 @@ import org.cafienne.akka.actor.serialization.json.Value;
 public class CaseOutputParameter extends Parameter<OutputParameterDefinition> {
     public CaseOutputParameter(OutputParameterDefinition definition, Case caseInstance) {
         super(definition, caseInstance, null);
-    }
 
-    @Override
-    public Value<?> getValue() {
-        super.bindCaseFileToParameter(null);
-        return super.getValue();
+        // If we have a binding defined, link this parameter to the case file via that binding
+        // perhaps generate a debug statement if a case output parameter does not bind to case file?
+        if (binding != null) {
+            CaseFileItem item = binding.getPath().resolve(getCaseInstance());
+            this.value = item.getCurrent().getValue();
+        }
     }
 }

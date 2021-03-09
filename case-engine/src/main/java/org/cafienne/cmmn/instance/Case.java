@@ -323,10 +323,10 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         // TODO: figure out whether we should actually re-use the CaseParameter objects, or
         // copy them. Currently we copy the parameters.
         CaseDefinition definition = getDefinition();
-        inputParameters.getValue().forEach((name, externalParameter) -> {
+        inputParameters.getValue().forEach((name, value) -> {
             InputParameterDefinition inputParameterDefinition = definition.getInputParameters().get(name);
-            CaseInputParameter parameter = new CaseInputParameter(inputParameterDefinition, this, externalParameter);
-            parameter.bindParameterToCaseFile(null);
+            // Creating the CaseInputParameter binds it to the case file
+            new CaseInputParameter(inputParameterDefinition, this, value);
         });
     }
 
@@ -350,7 +350,6 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         ValueMap outputParameters = new ValueMap();
         getDefinition().getOutputParameters().forEach((name, outputParameterDefinition) -> {
             CaseOutputParameter outputParameter = new CaseOutputParameter(outputParameterDefinition, this);
-            // Doing getValue() forces the parameter to take it's value from the case file (if bound to it)
             outputParameters.put(name, outputParameter.getValue());
         });
         return outputParameters;
