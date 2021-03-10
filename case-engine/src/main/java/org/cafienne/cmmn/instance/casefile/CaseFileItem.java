@@ -14,13 +14,16 @@ import org.cafienne.cmmn.akka.event.file.*;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.definition.parameter.BindingOperation;
-import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
-import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.State;
+import org.cafienne.cmmn.instance.TransitionPublisher;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.w3c.dom.Element;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -51,8 +54,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     private final boolean isArray;
 
-    private final BindingOperation defaultBindingOperation;
-
     private CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent, CaseFileItemArray array, int indexInArray, boolean isArray) {
         super(caseInstance, definition, definition.getName());
         this.parent = parent instanceof CaseFileItem ? (CaseFileItem) parent : null;
@@ -60,7 +61,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.indexInArray = indexInArray;
         this.transitionPublisher = createTransitionPublisher();
         this.isArray = isArray;
-        this.defaultBindingOperation = isArray ? BindingOperation.Add : BindingOperation.Update;
         for (PropertyDefinition property : definition.getBusinessIdentifiers()) {
             businessIdentifiers.put(property.getName(), new BusinessIdentifier(this, property));
         }
@@ -153,81 +153,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void releaseOnPart(CaseFileItemOnPart onPart) {
         transitionPublisher.releaseOnPart(onPart);
-    }
-
-    /**
-     * Framework method that allows parameters to be bound back to the case file
-     *
-     * @param p
-     * @param parameterValue
-     */
-    public void bindParameter(Parameter<?> p, Value<?> parameterValue, Task task) {
-        getDefinition().validatePropertyTypes(parameterValue);
-        // Spec says (table 5.3.4, page 36): just trigger the proper transition, as that will be obvious. But is it?
-        //  We have implemented specific type of BindingRefinement to make more predictable what to do
-
-        switch (getState()) {
-            case Discarded: {
-                addDebugInfo(() -> "Cannot bind parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "], since the item is in state Discarded");
-                throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
-            }
-            case Null: {
-                // In all cases we will try to create content if state is Null;
-                //  If we are an array, then an item in the array is created. Else we ourselves are created
-                addDebugInfo(() -> "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] will create new content (transition -> Create)");
-                this.container.createContent(parameterValue);
-                break;
-            }
-            case Available: {
-                BindingRefinementDefinition refinement = p.getDefinition().getBindingRefinement();
-                BindingOperation operation = refinement != null ? refinement.getRefinementOperation() : this.defaultBindingOperation;
-                addDebugInfo(() -> {
-                    if (refinement == null || operation == BindingOperation.None) {
-                        return "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] is done with default operation " + operation;
-                    } else {
-                        return "Binding parameter '" + p.getDefinition().getName() + "' to CaseFileItem[" + this.getPath() + "] is done with operation " + operation;
-                    }
-                });
-
-                switch (operation) {
-                    case Add: {
-                        if (this.isArray) {
-                            createContent(parameterValue);
-                        } else {
-                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; updating content instead");
-                            updateContent(parameterValue);
-                        }
-                        break;
-                    }
-                    case Replace: {
-                        replaceContent(parameterValue);
-                        break;
-                    }
-                    case Update: {
-                        updateContent(parameterValue);
-                        break;
-                    }
-                    case ReplaceIndexed: {
-                        if (this.isArray()) {
-                            this.getArrayElement(task.getRepeatIndex()).replaceContent(parameterValue);
-                        } else {
-                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; updating content instead");
-                            replaceContent(parameterValue);
-                        }
-                        break;
-                    }
-                    case UpdateIndexed: {
-                        if (this.isArray()) {
-                            this.getArrayElement(task.getRepeatIndex()).updateContent(parameterValue);
-                        } else {
-                            addDebugInfo(() -> "Unexpected task output operation '" + operation + "' on value of parameter '" + p.getDefinition().getName() + "' because case file item already exists; updating content instead");
-                            updateContent(parameterValue);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
     }
 
     private void addCaseFileEvent(CaseFileEvent event) {

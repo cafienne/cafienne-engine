@@ -22,13 +22,13 @@ import javax.xml.xpath.XPathFactory;
 
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.akka.actor.serialization.json.BooleanValue;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.util.XMLHelper;
 import org.cafienne.cmmn.definition.*;
@@ -131,7 +131,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public Value<?> evaluateInputParameterTransformation(Case caseInstance, Parameter<InputParameterDefinition> from, ParameterDefinition to, Task<?> task) {
+    public Value<?> evaluateInputParameterTransformation(Case caseInstance, TaskInputParameter from, ParameterDefinition to, Task<?> task) {
         // TODO Auto-generated method stub
         return new BooleanValue(evaluateConstraint(from, "x"));
     }

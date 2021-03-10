@@ -136,6 +136,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         ValueMap mappedInputParameters = new ValueMap();
         ValueMap inputParametersValues = new ValueMap();
 
+        // First, create and set the parameter value based on the case file bindings
         Map<String, TaskInputParameter> inputParameters = new LinkedHashMap();
         getDefinition().getInputParameters().forEach((name, inputParameterDefinition) -> {
             TaskInputParameter inputParameter = new TaskInputParameter(inputParameterDefinition, this);
@@ -143,6 +144,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
             inputParametersValues.put(name, inputParameter.getValue());
         });
 
+        // Next, run the transformations on the parameters to fill the values for the task implementation parameters.
         final Collection<ParameterMappingDefinition> mappings = this.getDefinition().getParameterMappings();
         for (ParameterMappingDefinition mapping : mappings) {
             if (mapping.isInputParameterMapping()) {

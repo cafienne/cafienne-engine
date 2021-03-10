@@ -16,6 +16,7 @@ import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 
@@ -83,7 +84,7 @@ public interface CMMNExpressionEvaluator {
      * @return The value that goes into the new Parameter instance for the task implementation parameter
      * @throws InvalidExpressionException
      */
-    Value<?> evaluateInputParameterTransformation(Case caseInstance, Parameter<InputParameterDefinition> from, ParameterDefinition targetDefinition, Task<?> task) throws InvalidExpressionException;
+    Value<?> evaluateInputParameterTransformation(Case caseInstance, TaskInputParameter from, ParameterDefinition targetDefinition, Task<?> task) throws InvalidExpressionException;
 
     /**
      * Evaluate the mapping of a TaskImplementation output parameter to the Task's output parameter.
