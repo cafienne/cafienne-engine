@@ -13,6 +13,7 @@ import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.plan.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
+import org.cafienne.cmmn.instance.migration.MigrationScript;
 import org.cafienne.cmmn.instance.sentry.*;
 import org.cafienne.util.Guid;
 import org.slf4j.Logger;
@@ -31,10 +32,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     private final int index;
     /**
-     * Name of the plan item, taken from the ItemDefinition
-     */
-    private final String name;
-    /**
      * Type of plan item, taken from the PlanItemDefinitionDefinition (HumanTask, Stage, CaseTask, Milestone, etc)
      */
     private final String type;
@@ -45,7 +42,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * The actual plan item definition (or discretionary item definition, or caseplan definition).
      */
-    private final ItemDefinition itemDefinition;
+    private ItemDefinition itemDefinition;
     /**
      * State machine that executes behavior
      */
@@ -96,7 +93,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.id = id;
         this.itemDefinition = itemDefinition;
         this.stage = parent;
-        this.name = itemDefinition.getName();
         this.type = definition.getType();
         this.index = index;
         this.stateMachine = stateMachine;
@@ -387,7 +383,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public String getName() {
-        return name;
+        return itemDefinition.getName();
     }
 
     /**
@@ -396,7 +392,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public String getPath() {
-        return "'" + this.name + "." + this.index + "'";
+        return "'" + this.getName() + "." + this.index + "'";
     }
 
     /**
@@ -581,5 +577,16 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         state.put("exitCriteria", exitCriteria.getStateAsValueMap());
 
         return state;
+    }
+
+    protected void migrateItemDefinition(ItemDefinition newDefinition) {
+        System.out.println("Giving " + this.getClass().getSimpleName() +" a new item definition!!!");
+        this.itemDefinition = newDefinition;
+    }
+
+    @Override
+    public void migrateDefinition(T newDefinition, MigrationScript migrationScript) {
+        System.out.println("Giving " + this.getClass().getSimpleName() +" a new definition");
+        super.migrateDefinition(newDefinition, migrationScript);
     }
 }

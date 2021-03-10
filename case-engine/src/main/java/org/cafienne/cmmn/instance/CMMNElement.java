@@ -16,7 +16,7 @@ import org.cafienne.cmmn.instance.sentry.Criterion;
 
 public class CMMNElement<T extends CMMNElementDefinition> {
     private final Case caseInstance;
-    private final T definition;
+    private T definition;
 
     protected CMMNElement() {
         // NOTE: this constructor is added to overcome serialization issues for task parameters. To be reviewed when we review the whole serialization structure again.
@@ -55,7 +55,8 @@ public class CMMNElement<T extends CMMNElementDefinition> {
     }
 
     public void migrateDefinition(T newDefinition, MigrationScript migrationScript) {
-
+        System.out.println(getClass().getSimpleName() +": Migrating definition '"+definition.getName() +"' to " + newDefinition.getName());
+        this.definition = newDefinition;
     }
 
     public Case getCaseInstance() {

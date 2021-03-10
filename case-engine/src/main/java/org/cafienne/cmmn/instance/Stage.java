@@ -13,9 +13,8 @@ import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.PlanningTableDefinition;
-import org.cafienne.cmmn.definition.StageDefinition;
+import org.cafienne.cmmn.definition.*;
+import org.cafienne.cmmn.instance.migration.MigrationScript;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
@@ -274,5 +273,25 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         planItems.forEach(item -> children.add(item.getStateAsValueMap()));
         state.put("items", children);
         return state;
+    }
+
+    @Override
+    public void migrateDefinition(T newDefinition, MigrationScript migrationScript) {
+        super.migrateDefinition(newDefinition, migrationScript);
+        this.getPlanItems().forEach(child -> {
+            ItemDefinition currentChildItemDefinition = child.getItemDefinition();
+            CMMNElementDefinition currentChildDefinition = child.getDefinition();
+
+            CMMNElementDefinition newChildItemDefinition = newDefinition.getModelDefinition().getElement(currentChildItemDefinition.getId());
+            CMMNElementDefinition newChildDefinition = newDefinition.getModelDefinition().getElement(currentChildDefinition.getId());
+
+            child.migrateDefinition((PlanItemDefinitionDefinition) newChildDefinition, migrationScript);
+            child.migrateItemDefinition((ItemDefinition) newChildItemDefinition);
+        });
+    }
+
+    @Override
+    protected void migrateItemDefinition(ItemDefinition newDefinition) {
+        super.migrateItemDefinition(newDefinition);
     }
 }
