@@ -1,13 +1,15 @@
 package org.cafienne.akka.actor.config
 
-class PlatformServiceConfig(val parent: EngineConfig) extends CafienneBaseConfig {
+import org.cafienne.akka.actor.config.util.ChildConfigReader
+
+class PlatformServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
   val path = "platform-service"
 
   lazy val workers: Int = {
     val default = 5
     val numWorkers = readInt("workers", default)
     if (numWorkers <= 0 || numWorkers > 100) {
-      throw ConfigurationException(s"Workers in platform service must be more than 0 and less than 100; value '$numWorkers' is invalid.")
+      fail(s"Workers in platform service must be more than 0 and less than 100; value '$numWorkers' is invalid.")
     }
     numWorkers
   }

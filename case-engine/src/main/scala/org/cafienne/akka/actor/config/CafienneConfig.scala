@@ -1,20 +1,20 @@
 package org.cafienne.akka.actor.config
 
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.config.util.ConfigReader
 
 /**
   * Configuration settings of this Cafienne Case System Platform
   * @param systemConfig
   */
-class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
-  val parent = null
+class CafienneConfig(val systemConfig: Config) extends ConfigReader with LazyLogging {
   val path = "cafienne"
-
   override lazy val config = {
     if (systemConfig.hasPath(path)) {
       systemConfig.getConfig(path)
     } else {
-      throw ConfigurationException("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
+      fail("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
     }
   }
 
@@ -28,7 +28,7 @@ class CafienneConfig(val systemConfig: Config) extends CafienneBaseConfig {
     */
   lazy val readJournal = {
     if (config.hasPath("read-journal")) {
-      readString("read-journal", "")
+      readString("read-journal")
     } else {
       queryDB.readJournal
     }

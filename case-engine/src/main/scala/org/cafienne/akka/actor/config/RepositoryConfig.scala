@@ -1,10 +1,11 @@
 package org.cafienne.akka.actor.config
 
+import org.cafienne.akka.actor.config.util.MandatoryConfig
 import org.cafienne.cmmn.repository.DefinitionProvider
 
 class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
   val path = "definitions"
-  override val exception = ConfigurationException("Cafienne Repository is not configured. Check local.conf for 'cafienne.definitions' settings")
+  override val msg = "Cafienne Repository is not configured. Check for 'cafienne.definitions' settings"
 
   /**
     * DefinitionProvider provides an interface for loading Case Definitions
