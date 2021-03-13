@@ -17,13 +17,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.serialization.json.ValueMap
-import org.cafienne.cmmn.akka.command.CaseCommand
+import org.cafienne.cmmn.akka.command.StartCase
+import org.cafienne.cmmn.akka.command.response.CaseStartedResponse
 import org.cafienne.cmmn.akka.command.team.CaseTeamMember
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
-import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.service.api.anonymous.CaseRequestRoute.AnonymousStartCaseFormat
 import org.cafienne.util.Guid
 
@@ -33,7 +33,7 @@ import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class CaseRequestRoute(implicit val userCache: IdentityProvider) extends CommandRoute {
+class CaseRequestRoute(implicit val userCache: IdentityProvider) extends AnonymousRoute {
 
   // Reading the definitions executes certain validations immediately
   val configuredCaseDefinitions = CaseSystem.config.api.anonymousConfig.definitions
@@ -84,7 +84,7 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider) extends Command
     path("case" / Remaining) { rawPath => subRoute(rawPath) })
   }
 
-  def createCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
+  def createCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: StartCase): Route = {
     val userIds = members.filter(member => member.isTenantUser()).map(member => member.key.id)
     onComplete(userCache.getUsers(userIds, tenant)) {
       case Success(tenantUsers) => {
@@ -97,21 +97,15 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider) extends Command
           }
           fail(msg)
         } else {
-          askModelActor(command)
+          sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
+            writeLastModifiedHeader(response) {
+              complete(StatusCodes.OK, s"""{\n  "caseInstanceId": "${response.getActorId}"\n}""")
+            }
+          })
         }
       }
-      case Failure(t: Throwable) => fail(t, "")
+      case Failure(t: Throwable) => fail(t)
     }
-  }
-
-  private def fail(t: Throwable, msg: String) = {
-    logger.warn("Anonymous route encountered a failure; user is informed with msg " + msg, t)
-    complete(StatusCodes.InternalServerError, msg)
-  }
-
-  private def fail(msg: String) = {
-    logger.warn("Anonymous route encountered a failure: " + msg)
-    complete(StatusCodes.InternalServerError, "Your request bumped into an internal configuration issue and cannot be handled")
   }
 }
 
