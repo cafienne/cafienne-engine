@@ -67,23 +67,30 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     }
   }
 
+  /**
+    * Check existence of case, access of the platform user to that case, existence of the given team members
+    * in the tenant of the case, and then create the command and send it to the case
+    * @param platformUser
+    * @param members
+    * @param caseInstanceId
+    * @param createCaseCommand
+    * @return
+    */
   def askCaseWithValidMembers(platformUser: PlatformUser, members: Seq[CaseTeamMember], caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
-    readLastModifiedHeader() { caseLastModified =>
-      onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
-        case Success(tenant) => {
-          askCaseWithValidTeam(tenant, members, createCaseCommand.apply(platformUser.getTenantUser(tenant)))
-        }
-        case Failure(error) => {
-          error match {
-            case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-            case _ => throw error
-          }
-        }
-      }
-    }
+    validateCaseAccess(platformUser, caseInstanceId, tenantUser => {
+      askCaseWithValidTeam(tenantUser, members, createCaseCommand)
+    })
   }
 
-  def askCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
+  /**
+    * Validate that the members exist in the tenant of the tenantUser, and, if so, create and send the command to the case
+    * @param tenantUser
+    * @param members
+    * @param command
+    * @return
+    */
+  def askCaseWithValidTeam(tenantUser: TenantUser, members: Seq[CaseTeamMember], command: CreateCaseCommand): Route = {
+    val tenant = tenantUser.tenant
     val userIds = members.filter(member => member.isTenantUser()).map(member => member.key.id)
     onComplete(userCache.getUsers(userIds, tenant)) {
       case Success(tenantUsers) => {
@@ -96,17 +103,39 @@ trait CasesRoute extends CommandRoute with QueryRoute {
           }
           complete(StatusCodes.NotFound, msg)
         } else {
-          askModelActor(command)
+          askModelActor(command(tenantUser))
         }
       }
       case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
     }
   }
 
+  /**
+    * Check that the platform user is part of the case team for the given case instance id, and then
+    * create the command and send it to the case
+    * @param platformUser
+    * @param caseInstanceId
+    * @param createCaseCommand
+    * @return
+    */
   def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
+    validateCaseAccess(platformUser, caseInstanceId, tenantUser => {
+      askModelActor(createCaseCommand.apply(tenantUser))
+    })
+  }
+
+  /**
+    * Validate that the platform user is part of the case team for the given case instance id, and if so,
+    * invoke the sub route with the proper tenant user
+    * @param platformUser
+    * @param caseInstanceId
+    * @param subRoute
+    * @return
+    */
+  def validateCaseAccess(platformUser: PlatformUser, caseInstanceId: String, subRoute: TenantUser => Route): Route = {
     readLastModifiedHeader() { caseLastModified =>
       onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
-        case Success(tenant) => askModelActor(createCaseCommand.apply(platformUser.getTenantUser(tenant)))
+        case Success(tenant) => subRoute(platformUser.getTenantUser(tenant))
         case Failure(error) => {
           error match {
             case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
@@ -117,6 +146,9 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     }
   }
 
+  /**
+    * Simple trait (functional interface) to create a case command given a tenant user
+    */
   trait CreateCaseCommand {
     def apply(user: TenantUser): CaseCommand
   }
