@@ -35,9 +35,18 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   val config: Config = myConfig.toConfig
   requires("Case Definition for anonymous creation misses properties: ", "definition", "url", "caseTeam")
 
-  val tenant: String = readString("tenant", CaseSystem.config.platform.defaultTenant)
+  // Validate url, definition and tenant contents; definition and tenant cannot be blank.
+  val url: String = readString("url")
   val definition: String = readString("definition")
-  val url: String = readString("url", definition)
+  if (definition.isBlank) {
+    fail(s"Definition cannot be empty in anonymous case definition on url '/request/case/$url' --> '$definition'")
+  }
+  val tenant: String = readString("tenant", CaseSystem.config.platform.defaultTenant)
+  if (tenant.isBlank) {
+    fail(s"Tenant is missing in anonymous case definition on url '/request/case/$url' --> '$definition'; also default tenant is empty")
+  }
+  val anonymousPlatformUser = userConfig.asUser(tenant)
+  val anonymousTenantUser = anonymousPlatformUser.getTenantUser(tenant)
   val team: CaseTeam = {
     val members: Seq[CaseTeamMember] = getConfigReader("caseTeam").readConfigList("members").map(reader => {
       reader.requires("Case Team member for definition " + definition, "memberId", "memberType")
@@ -55,8 +64,8 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   }
 
   def createStartCaseCommand(newCaseId: String, inputParameters: ValueMap, debugMode: Boolean) = {
-    val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(userConfig.asUser, tenant, definition)
-    val sc = new StartCase(tenant, userConfig.asUser.getTenantUser(tenant), newCaseId, definitionsDocument.getFirstCase, inputParameters, team, debugMode)
+    val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definition)
+    val sc = new StartCase(tenant, anonymousTenantUser, newCaseId, definitionsDocument.getFirstCase, inputParameters, team, debugMode)
     sc
   }
 
@@ -73,21 +82,13 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
 
 class AnonymousUserConfig(val config: Config) extends ConfigReader {
   requires("Anonymous user ", "id")
-  val asUser: PlatformUser = {
-    val userId = readString("id")
-    userId.isBlank match {
-      case true => fail("Anonymous user configuration must have a valid user id")
-      case false => {
-        val tenant = readString("tenant", CaseSystem.config.platform.defaultTenant)
-        tenant.isBlank match {
-          case true => fail("Anonymous user configuration must have a tenant defined")
-          case false =>
-            val roles = readStringList("roles")
-            val name = readString("name")
-            val email = readString("email")
-            PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, false, name, email)))
-        }
-      }
-    }
+  val userId = readString("id")
+  if (userId.isBlank) {
+    fail("Anonymous user configuration must have a valid user id")
   }
+  val roles = readStringList("roles")
+  val name = readString("name")
+  val email = readString("email")
+
+  def asUser(tenant: String): PlatformUser = PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, false, name, email)))
 }
