@@ -13,5 +13,9 @@ class ApiConfig(val parent: CafienneConfig) extends MandatoryConfig {
     config.getInt("bindport")
   }
 
+  val anonymousConfig: AnonymousConfig = {
+    new AnonymousConfig(this)
+  }
+
   lazy val security: SecurityConfig = new SecurityConfig(this)
 }
