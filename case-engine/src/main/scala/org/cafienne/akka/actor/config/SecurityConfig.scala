@@ -1,8 +1,9 @@
 package org.cafienne.akka.actor.config
 
+import org.cafienne.akka.actor.config.util.MandatoryConfig
+
 class SecurityConfig(val parent: ApiConfig) extends MandatoryConfig {
   val path = "security"
-  override val exception = ConfigurationException("Cafienne Security is not configured. Check local.conf for 'cafienne.api.security' settings")
 
   lazy val oidc: OIDCConfig = new OIDCConfig(this)
 

@@ -1,6 +1,8 @@
 package org.cafienne.akka.actor.config
 
-class ModelActorConfig(val parent: CafienneConfig) extends CafienneBaseConfig {
+import org.cafienne.akka.actor.config.util.ChildConfigReader
+
+class ModelActorConfig(val parent: CafienneConfig) extends ChildConfigReader {
   val path = "actor"
 
   lazy val idlePeriod: Long = {

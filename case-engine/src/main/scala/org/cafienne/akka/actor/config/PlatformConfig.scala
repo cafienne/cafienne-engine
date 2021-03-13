@@ -1,29 +1,27 @@
 package org.cafienne.akka.actor.config
 
-import java.util
-
-import com.typesafe.config.Config
-import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.config.util.MandatoryConfig
 import org.cafienne.akka.actor.identity.TenantUser
+
+import java.util.List
 
 class PlatformConfig(val parent: CafienneConfig) extends MandatoryConfig {
   val path = "platform"
-  override val exception = ConfigurationException("Check configuration property 'cafienne.platform'. This must be available")
 
-  val platformOwners: util.List[String] = config.getStringList("owners")
+  val platformOwners: List[String] = config.getStringList("owners")
   if (platformOwners.isEmpty) {
-    throw ConfigurationException("Platform owners cannot be an empty list. Check configuration property cafienne.platform.owners")
+    fail("Platform owners cannot be an empty list. Check configuration property cafienne.platform.owners")
   }
 
   lazy val defaultTenant = {
-    val configuredDefaultTenant = readString("default-tenant", "")
+    val configuredDefaultTenant = readString("default-tenant")
     configuredDefaultTenant
   }
 
   /**
     * Config property for reading a specific file with bootstrap tenant setup
     */
-  lazy val bootstrapFile = readString("bootstrap-file", "")
+  lazy val bootstrapFile = readString("bootstrap-file")
 
   def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
 

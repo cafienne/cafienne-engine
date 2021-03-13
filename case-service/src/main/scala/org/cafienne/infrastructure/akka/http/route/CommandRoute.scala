@@ -57,8 +57,4 @@ trait CommandRoute extends AuthenticatedRoute {
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
     }
   }
-
-  def writeLastModifiedHeader(response: ModelResponse, headerName: String = api.CASE_LAST_MODIFIED): Directive0 = {
-    respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
-  }
 }

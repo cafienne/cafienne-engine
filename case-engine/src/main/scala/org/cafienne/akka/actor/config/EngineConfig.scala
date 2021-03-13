@@ -1,6 +1,8 @@
 package org.cafienne.akka.actor.config
 
-class EngineConfig(val parent: CafienneConfig) extends CafienneBaseConfig {
+import org.cafienne.akka.actor.config.util.ChildConfigReader
+
+class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
   val path = "engine"
 
   /**

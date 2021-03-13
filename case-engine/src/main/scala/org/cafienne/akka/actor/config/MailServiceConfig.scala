@@ -1,10 +1,11 @@
 package org.cafienne.akka.actor.config
 
+import org.cafienne.akka.actor.config.util.MandatoryConfig
+
 import java.util.Properties
 
 class MailServiceConfig(val parent: EngineConfig) extends MandatoryConfig {
   val path = "mail-service"
-  override val exception = ConfigurationException("Check configuration property 'cafienne.engine.mail-service'. This must be available")
 
   lazy val asProperties: Properties = {
     val mailProperties = new Properties

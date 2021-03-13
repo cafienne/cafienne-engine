@@ -90,6 +90,28 @@ jobs:
           name: Stop the cafienne container
           command: docker rm -f cafienne
 
+      # Starting docker environment for anonymous start case testing
+      - run:
+          name: Up the containers for anonymous start case testing
+          command: |
+            docker-compose -f .circleci/docker-test-anonymous.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test StartCase anonymously
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev TestAnonymousStartCase
+      - run:
+          name: Stop the cafienne container
+          command: docker rm -f cafienne
+
       # Starting docker environment for Postgresql testing against latest engine
       - run:
           name: Up the containers for backwards compatibility Postgresql testing
@@ -149,7 +171,7 @@ jobs:
           when: on_fail
       - run:
           name: Stop the containers
-          command: docker rm -f cafienne cassandra postgres cafienne-test-token-service
+          command: docker rm -f cafienne cassandra postgres cafienne-test-token-service mailcatcher
       - run:
           name: Push cafienne image to docker hub
           command: |
@@ -216,6 +238,28 @@ jobs:
       - run:
           name: Build cafienne docker image
           command: sbt docker:publishLocal
+
+      # Starting docker environment for anonymous start case testing
+      - run:
+          name: Up the containers for anonymous start case testing
+          command: |
+            docker-compose -f .circleci/docker-test-anonymous.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test StartCase anonymously
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev TestAnonymousStartCase
+      - run:
+          name: Stop the cafienne container
+          command: docker rm -f cafienne
 
       # Starting docker environment for In-memory testing
       - run:
@@ -336,6 +380,28 @@ jobs:
             cd ..
             cd ./cmmn-test-framework
             npm run dev
+      - run:
+          name: Stop the cafienne container
+          command: docker rm -f cafienne
+
+      # Starting docker environment for anonymous start case testing
+      - run:
+          name: Up the containers for anonymous memory testing
+          command: |
+            docker-compose -f .circleci/docker-test-anonymous.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Give permissions
+          command: sudo chmod -R 777 ./
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne

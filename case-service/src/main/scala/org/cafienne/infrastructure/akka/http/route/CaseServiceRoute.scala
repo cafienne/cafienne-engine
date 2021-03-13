@@ -2,11 +2,13 @@ package org.cafienne.infrastructure.akka.http.route
 
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.command.response.ModelResponse
 import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
@@ -77,12 +79,16 @@ trait CaseServiceRoute extends LazyLogging {
           } else if (logger.underlying.isInfoEnabled()) {
             logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t)
           } else {
-            logger.warn(s"Bumped into ${t.getClass.getName} in ${this.getClass().getSimpleName} on ${method.name} $uri - enable debug logging for stack trace")
+            logger.warn(s"Bumped into ${t.getClass.getName} in ${this.getClass().getSimpleName} on ${method.name} $uri - enable debug logging for stack trace; msg: " + t.getMessage)
           }
           complete(HttpResponse(StatusCodes.InternalServerError))
         }
       }
     }
+  }
+
+  def writeLastModifiedHeader(response: ModelResponse, headerName: String = api.CASE_LAST_MODIFIED): Directive0 = {
+    respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
   }
 
   def completeCafienneJSONSeq(seq: Seq[CafienneJson]) = {
