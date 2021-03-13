@@ -50,18 +50,23 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
 
+  // Give more information back to client on various types of rejections
+  //  Also do some server side logging when in debug mode
   def requestServiceRejectionHandler =
     RejectionHandler
       .newBuilder()
       .handle {
         case MalformedRequestContentRejection(errorMessage, e) =>
-          extractUri { uri =>
-            logger.debug(s"Exception of type ${e.getClass.getName} occurred in handling HTTP request ${uri.path} - $errorMessage")
+          extractRequest { request =>
+            logger.whenDebugEnabled(() => logger.debug(s"HTTP request ${request.method.value} ${request.uri} has malformed content (${e.getClass.getName} - '$errorMessage')"))
             complete(StatusCodes.BadRequest, s"The request content was malformed:\n$errorMessage")
           }
-      }
-      .handle {
-        case AuthorizationFailedRejection => complete(StatusCodes.Forbidden)
+        case a: UnsupportedRequestContentTypeRejection => {
+          extractRequest { request =>
+            logger.whenDebugEnabled(() => logger.debug(s"HTTP request ${request.method.value} ${request.uri} comes with unsupported content type '${a.contentType.getOrElse("")}'; it needs one of ${a.supported}"))
+            complete(StatusCodes.BadRequest, s"The request content type ${a.contentType} is not supported, provide one of ${a.supported}")
+          }
+        }
       }
       .result()
 
