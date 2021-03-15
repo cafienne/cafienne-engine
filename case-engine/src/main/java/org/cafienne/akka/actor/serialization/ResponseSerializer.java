@@ -8,6 +8,8 @@ import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
 import org.cafienne.cmmn.akka.command.response.file.CaseFileResponse;
+import org.cafienne.cmmn.akka.command.response.file.DownloadInformation;
+import org.cafienne.cmmn.akka.command.response.file.UploadInformation;
 import org.cafienne.humantask.akka.command.response.HumanTaskResponse;
 import org.cafienne.humantask.akka.command.response.HumanTaskValidationResponse;
 import org.cafienne.platform.akka.response.PlatformResponse;
@@ -32,6 +34,8 @@ public class ResponseSerializer extends CafienneSerializer {
         addManifestWrapper(CaseStartedResponse.class, CaseStartedResponse::new);
         addManifestWrapper(CaseResponse.class, CaseResponse::new);
         addManifestWrapper(CaseFileResponse.class, CaseFileResponse::new);
+        addManifestWrapper(UploadInformation.class, UploadInformation::new);
+        addManifestWrapper(DownloadInformation.class, DownloadInformation::new);
     }
 
     private static void addHumanTaskResponses() {

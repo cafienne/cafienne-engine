@@ -7,6 +7,7 @@ import org.cafienne.cmmn.akka.event.DebugDisabled;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.cmmn.akka.event.file.*;
+import org.cafienne.cmmn.akka.event.file.document.StorageResultAdded;
 import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
@@ -76,6 +77,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseFileItemChildRemoved.class, CaseFileItemChildRemoved::new);
         // Note: CaseFileEvent event cannot be deleted, since sub class events above were introduced only in 1.1.9
         addManifestWrapper(CaseFileEvent.class, CaseFileEvent::new);
+        addManifestWrapper(StorageResultAdded.class, StorageResultAdded::new);
         addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
         addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);
     }

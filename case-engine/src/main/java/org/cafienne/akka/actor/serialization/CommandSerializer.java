@@ -5,6 +5,9 @@ import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
+import org.cafienne.cmmn.akka.command.casefile.document.AddDocumentInformation;
+import org.cafienne.cmmn.akka.command.casefile.document.GetDownloadInformation;
+import org.cafienne.cmmn.akka.command.casefile.document.GetUploadInformation;
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode;
 import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
@@ -63,6 +66,9 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(DeleteCaseFileItem.class, DeleteCaseFileItem::new);
         addManifestWrapper(ReplaceCaseFileItem.class, ReplaceCaseFileItem::new);
         addManifestWrapper(UpdateCaseFileItem.class, UpdateCaseFileItem::new);
+        addManifestWrapper(AddDocumentInformation.class, AddDocumentInformation::new);
+        addManifestWrapper(GetUploadInformation.class, GetUploadInformation::new);
+        addManifestWrapper(GetDownloadInformation.class, GetDownloadInformation::new);
     }
 
     private static void addCaseTeamCommands() {

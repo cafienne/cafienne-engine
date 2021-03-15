@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,10 @@ import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
+import org.cafienne.cmmn.instance.casefile.document.StorageResult;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,9 +44,10 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
 
     /**
      * Returns the items within this container.
+     *
      * @return
      */
-    protected Map<CaseFileItemDefinition, CaseFileItem> getItems() {
+    public Map<CaseFileItemDefinition, CaseFileItem> getItems() {
         return items;
     }
 
@@ -61,6 +64,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     /**
      * Returns the case file item with the specified index. Default implementation throws an exception, i.e., invoking this method
      * on a plain case file item will result in an {@link InvalidPathException}. It can only be invoked properly on a CaseFileItemArray.
+     *
      * @param index
      * @return
      */
@@ -69,10 +73,11 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     }
 
     /**
-    * Returns the case file item with the specified name, or null if it does not exist
-    * @param childName
-    * @return
-    */
+     * Returns the case file item with the specified name, or null if it does not exist
+     *
+     * @param childName
+     * @return
+     */
     public CaseFileItem getItem(String childName) {
         CaseFileItemDefinition childDefinition = getChildDefinition(childName);
         if (childDefinition == null) {
@@ -83,6 +88,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
 
     /**
      * Returns true if the an item (or property) is undefined.
+     *
      * @param identifier
      * @return
      */
@@ -102,6 +108,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
 
     /**
      * Returns a child definition that has the specified name or identifier if it exists for this case file item.
+     *
      * @param childName
      * @return
      */
@@ -110,11 +117,14 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     }
 
     public abstract void createContent(Value<?> newContent);
+
     public abstract void deleteContent();
+
     public abstract void replaceContent(Value<?> newContent);
 
     /**
      * When replacing existing content with the map, it should generate removeChild events for existing children not in map.
+     *
      * @param map
      */
     protected void removeReplacedItems(ValueMap map) {
@@ -138,6 +148,10 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     }
 
     public abstract void updateContent(Value<?> newContent);
+
+    public void addStorageResult(Value<?> content, List<StorageResult> storageResult) {
+        addDebugInfo(() -> "Ignoring storage result in " + this + "; cannot be handled. Note: this makes the documents '" + storageResult + "' lost in space ... ");
+    }
 
     public abstract void validateTransition(CaseFileItemTransition intendedTransition, Value<?> newContent);
 

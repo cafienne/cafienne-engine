@@ -11,19 +11,18 @@ import org.cafienne.akka.actor.command.exception.InvalidCommandException;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.event.file.*;
+import org.cafienne.cmmn.akka.event.file.document.StorageResultAdded;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.TransitionPublisher;
+import org.cafienne.cmmn.definition.parameter.BindingOperation;
+import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
+import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.casefile.document.StorageResult;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.w3c.dom.Element;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -179,6 +178,20 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void updateState(BusinessIdentifierEvent event) {
         businessIdentifiers.get(event.name).updateState(event);
     }
+
+    public void updateState(StorageResultAdded event) {
+        attachments.addAll(event.storageResult);
+    }
+
+    public boolean hasStorageInformation() {
+        return !attachments.isEmpty();
+    }
+
+    public List<StorageResult> getStorageInformation() {
+        return attachments;
+    }
+
+    private List<StorageResult> attachments = new ArrayList();
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
         // Inform the activating sentries
@@ -345,6 +358,21 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         } else {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] has no property changes");
         }
+    }
+
+    public void addStorageResult(Value<?> content, List<StorageResult> storageResult) {
+        switch (this.getState()) {
+            case Null: {
+                createContent(content);
+                break;
+            }
+            case Available: {
+                updateContent(content);
+                break;
+            }
+            case Discarded: throw new InvalidCommandException("Cannot upload document(s), since case file item is in Discarded state");
+        }
+        addEvent(new StorageResultAdded(this, storageResult));
     }
 
     @Override

@@ -8,4 +8,8 @@ public class DeserializationError extends RuntimeException {
     public DeserializationError(String msg, Throwable cause) {
         super(msg, cause);
     }
+
+    public DeserializationError(String msg) {
+        super(msg);
+    }
 }
