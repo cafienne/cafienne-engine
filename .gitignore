@@ -18,6 +18,7 @@ docker-image/target/
 /run/**/snapshots
 /run/**/snapshot
 /run/**/definitions
+/run/**/documents
 /run/**/avatars
 /run/**/testdefinition
 /run/**/local.conf
