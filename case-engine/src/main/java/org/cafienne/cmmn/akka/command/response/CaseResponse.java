@@ -10,6 +10,7 @@ package org.cafienne.cmmn.akka.command.response;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -31,6 +32,10 @@ public class CaseResponse extends ModelResponse {
 
     public CaseResponse(ValueMap json) {
         super(json);
+    }
+
+    public Value getResponse() {
+        return new ValueMap();
     }
 
     @Override

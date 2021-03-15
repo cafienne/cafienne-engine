@@ -14,23 +14,14 @@ object ResponseMarshallers {
     * Simple CaseResponse converter to JSON
     */
   implicit val caseResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: CaseResponse =>
-    value match {
-      case s: CaseResponseWithValueMap => {
-        HttpEntity(ContentTypes.`application/json`, s.getResponse().toString)
-      }
-      case _ => {
-        // TODO: extend this code to include case-last-modified header?!
-        HttpEntity(ContentTypes.`application/json`, "{}")
-      }
-    }
+    HttpEntity(ContentTypes.`application/json`, value.getResponse.toString)
   }
 
   /**
     * Simple CaseResponse converter to JSON
     */
   implicit val taskResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: HumanTaskResponse =>
-    // TODO: extend this code to include case-last-modified header?!
-    HttpEntity(ContentTypes.`application/json`, "{}")
+    HttpEntity(ContentTypes.`application/json`, value.getResponse.toString)
   }
 
   /**

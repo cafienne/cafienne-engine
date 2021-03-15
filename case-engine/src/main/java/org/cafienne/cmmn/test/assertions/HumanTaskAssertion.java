@@ -40,7 +40,7 @@ public class HumanTaskAssertion extends CaseAssertion {
     }
 
     public HumanTaskValidationResponse getValidationResponse() {
-        return (HumanTaskValidationResponse) this.testCommand.getActualResponse();
+        return this.testCommand.getActualResponse();
     }
 
     /**
