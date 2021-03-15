@@ -448,7 +448,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param events
      * @param <T>
      */
-    public <T> void persistEvents(List<T> events) {
+    public <T extends ModelEvent> void persistEvents(List<T> events) {
         persistEventsAndThenReply(events, null);
     }
 
@@ -474,7 +474,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         response.getRecipient().tell(response, self());
     }
 
-    public <T> void replyAndThenPersistEvents(List<T> events, ModelResponse response) {
+    public <T extends ModelEvent> void replyAndThenPersistEvents(List<T> events, ModelResponse response) {
         reply(response);
         persistEvents(events);
     }
@@ -487,19 +487,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param response
      * @param <T>
      */
-    public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
+    public <T extends ModelEvent> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
         if (getLogger().isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
             StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
-            events.forEach(e -> {
-                msg.append("\n\t");
-                if (e instanceof PlanItemEvent) {
-                    msg.append(e.toString());
-                } else if (e instanceof CaseFileEvent) {
-                    msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
-                } else {
-                    msg.append(e.getClass().getSimpleName() + ", ");
-                }
-            });
+            events.forEach(e -> msg.append("\n\t" + e.getDescription()));
             getLogger().debug(msg + "\n");
             currentMessageHandler.debugIndentedConsoleLogging(msg + "\n");
         }

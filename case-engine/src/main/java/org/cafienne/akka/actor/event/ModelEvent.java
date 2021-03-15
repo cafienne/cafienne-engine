@@ -46,7 +46,14 @@ public interface ModelEvent<M extends ModelActor> extends CafienneSerializable, 
 
     String getActorId();
 
-    String getDescription();
+    /**
+     * Override this method to make a description of the event that is based on it's content.
+     *
+     * @return
+     */
+    default String getDescription() {
+        return getClass().getSimpleName();
+    }
 
     ValueMap rawJson();
 }

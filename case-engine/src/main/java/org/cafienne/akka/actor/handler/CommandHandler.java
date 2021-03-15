@@ -103,12 +103,12 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         if (hasFailures()) { // Means there is a response AND it is of type CommandFailure
             // Inform the sender about the failure
             // In case of failure we still want to store the debug events. Actually, mostly we need this in case of failure (what else are we debugging for)
-            Object[] debugEvents = events.stream().filter(e -> e instanceof DebugEvent).toArray();
-            actor.replyAndThenPersistEvents(Arrays.asList(debugEvents), response);
+            List<ModelEvent> debugEvents = events.stream().filter(e -> e instanceof DebugEvent).collect(Collectors.toList());
+            actor.replyAndThenPersistEvents(debugEvents, response);
 
 
             // If we have created events (other than debug events) from the failure, then we are in inconsistent state and need to restart the actor.
-            if (events.size() > debugEvents.length) {
+            if (events.size() > debugEvents.size()) {
                 Throwable exception = ((CommandFailure) response).internalException();
                 addDebugInfo(() -> {
                     StringBuilder msg = new StringBuilder("\n------------------------ SKIPPING PERSISTENCE OF " + events.size() + " EVENTS IN " + this);
