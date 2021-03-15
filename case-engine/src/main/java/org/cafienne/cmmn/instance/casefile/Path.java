@@ -7,6 +7,8 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -14,12 +16,12 @@ import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 
-import java.io.Serializable;
+import java.io.IOException;
 
 /**
  * Represents a path into the case file to find a specific case file item
  */
-public class Path implements Serializable {
+public class Path implements CafienneSerializable {
 
     /**
      * The name of the case file item (relative to it's parent (or -1 if it is not an iterable case file item)
@@ -448,5 +450,10 @@ public class Path implements Serializable {
             pathElements[i] = pathElements[i].trim();
         }
         return pathElements;
+    }
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        generator.writeString(originalPath);
     }
 }
