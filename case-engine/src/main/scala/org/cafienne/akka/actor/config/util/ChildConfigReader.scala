@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
   */
 trait ChildConfigReader extends ConfigReader with LazyLogging {
   val parent: ConfigReader
-  val path: String
+  def path: String
   val exception: ConfigurationException = null
   lazy val config: Config = {
     parent.config.hasPath(path) match {

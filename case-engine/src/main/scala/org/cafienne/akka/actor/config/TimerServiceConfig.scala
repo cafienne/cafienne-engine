@@ -3,7 +3,7 @@ package org.cafienne.akka.actor.config
 import org.cafienne.akka.actor.config.util.ChildConfigReader
 
 class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
-  val path = "timer-service"
+  override def path = "timer-service"
 
   lazy val persistDelay: Long = {
     val default = 60

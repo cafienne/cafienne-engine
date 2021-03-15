@@ -3,7 +3,7 @@ package org.cafienne.akka.actor.config
 import org.cafienne.akka.actor.config.util.ChildConfigReader
 
 class ModelActorConfig(val parent: CafienneConfig) extends ChildConfigReader {
-  val path = "actor"
+  override def path = "actor"
 
   lazy val idlePeriod: Long = {
     val default = 60 * 10

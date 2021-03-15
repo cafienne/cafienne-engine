@@ -6,7 +6,7 @@ import org.cafienne.akka.actor.identity.TenantUser
 import java.util.List
 
 class PlatformConfig(val parent: CafienneConfig) extends MandatoryConfig {
-  val path = "platform"
+  override def path = "platform"
 
   val platformOwners: List[String] = config.getStringList("owners")
   if (platformOwners.isEmpty) {

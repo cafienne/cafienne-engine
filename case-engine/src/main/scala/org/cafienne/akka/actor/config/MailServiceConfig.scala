@@ -5,7 +5,7 @@ import org.cafienne.akka.actor.config.util.MandatoryConfig
 import java.util.Properties
 
 class MailServiceConfig(val parent: EngineConfig) extends MandatoryConfig {
-  val path = "mail-service"
+  override def path = "mail-service"
 
   lazy val asProperties: Properties = {
     val mailProperties = new Properties

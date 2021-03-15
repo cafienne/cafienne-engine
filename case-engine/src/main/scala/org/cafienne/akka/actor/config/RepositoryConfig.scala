@@ -4,7 +4,7 @@ import org.cafienne.akka.actor.config.util.MandatoryConfig
 import org.cafienne.cmmn.repository.DefinitionProvider
 
 class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
-  val path = "definitions"
+  override def path = "definitions"
   override val msg = "Cafienne Repository is not configured. Check for 'cafienne.definitions' settings"
 
   /**

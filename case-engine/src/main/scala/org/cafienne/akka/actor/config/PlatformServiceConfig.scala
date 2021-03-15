@@ -3,7 +3,7 @@ package org.cafienne.akka.actor.config
 import org.cafienne.akka.actor.config.util.ChildConfigReader
 
 class PlatformServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
-  val path = "platform-service"
+  override def path = "platform-service"
 
   lazy val workers: Int = {
     val default = 5

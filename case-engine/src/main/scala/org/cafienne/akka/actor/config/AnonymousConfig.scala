@@ -9,7 +9,7 @@ import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 
 class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
-  val path = "anonymous-access"
+  override def path = "anonymous-access"
 
   val enabled = readBoolean("enabled", false)
   if (enabled) {
