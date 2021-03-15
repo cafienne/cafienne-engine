@@ -53,6 +53,7 @@ services:
     volumes:
       - /home/circleci/cafienne-engine/.circleci/run/cafienne/journal:/opt/cafienne/journal
       - /home/circleci/cafienne-engine/.circleci/target/definitions:/opt/cafienne/definitions
+      - /home/circleci/cafienne-engine/.circleci/target/documents:/opt/cafienne/documents
       - /home/circleci/cafienne-engine/.circleci/src/inmemory-conf:/opt/cafienne/conf
       - /home/circleci/cafienne-engine/.circleci/src/bootstrap:/opt/cafienne/bootstrap
     depends_on:
