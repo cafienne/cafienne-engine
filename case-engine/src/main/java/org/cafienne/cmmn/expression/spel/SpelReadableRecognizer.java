@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.expression.spel;
 
+import org.cafienne.akka.actor.ModelActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.expression.AccessException;
@@ -14,12 +15,25 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
 
-class ContextReader implements PropertyAccessor {
-    private final static Logger logger = LoggerFactory.getLogger(ContextReader.class);
+/**
+ * Hook for Spel through which we can read Cafienne specific API properties in expressions.
+ */
+public class SpelReadableRecognizer implements PropertyAccessor {
+    private final static Logger logger = LoggerFactory.getLogger(SpelReadableRecognizer.class);
+
+    public final ModelActor model;
+
+    SpelReadableRecognizer(ModelActor model) {
+        this.model = model;
+    }
 
     @Override
-    public void write(EvaluationContext arg0, Object object, String propertyName, Object propertyValue) throws AccessException {
-        logger.warn("Not supported: writing into property " + propertyName + " with value " + propertyValue);
+    public boolean canRead(EvaluationContext context, Object object, String propertyName) throws AccessException {
+        boolean canRead = false;
+        if (object instanceof SpelReadable) {
+            canRead = ((SpelReadable) object).canRead(propertyName);
+        }
+        return canRead;
     }
 
     @Override
@@ -31,13 +45,15 @@ class ContextReader implements PropertyAccessor {
             if (value instanceof SpelPropertyValueProvider) {
                 value = ((SpelPropertyValueProvider) value).getValue();
             }
-            logger.debug("Reading property " + propertyName + " results in value " + value);
+            final Object valueLog = value; // Must be final for logging.
+            model.addDebugInfo(() -> "Reading property '" + propertyName + "' results in value: " + valueLog);
             return new TypedValue(value);
         } else {
+            // It is actually weird if we end up in this code. Since it means that on 'canRead' we have returned true...
             if (object == null) {
-                logger.error("Cannot read property " + propertyName + " from null object");
+                model.addDebugInfo(() -> "Cannot read property " + propertyName + " from null object");
             } else {
-                logger.error("Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName() + ": with value " + object);
+                model.addDebugInfo(() -> "Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName() + ": with value " + object);
             }
             return null;
         }
@@ -56,12 +72,8 @@ class ContextReader implements PropertyAccessor {
     }
 
     @Override
-    public boolean canRead(EvaluationContext context, Object object, String propertyName) throws AccessException {
-        boolean canRead = false;
-        if (object instanceof SpelReadable) {
-            canRead = ((SpelReadable) object).canRead(propertyName);
-        }
-        return canRead;
+    public void write(EvaluationContext arg0, Object object, String propertyName, Object propertyValue) throws AccessException {
+        logger.warn("Not supported: writing into property " + propertyName + " with value " + propertyValue);
     }
 }
 

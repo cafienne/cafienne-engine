@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.expression.spel;
+package org.cafienne.cmmn.expression.spel.api;
 
 import org.cafienne.akka.actor.identity.TenantUser;
 
@@ -8,13 +8,13 @@ import java.util.Set;
 /**
  * Wrapper around TenantUser, so that user can be accessed from spel expressions
  */
-class UserWrapper {
+public class UserContext {
     public final String id;
     public final String name;
     public final Set<String> roles;
     public final String email;
 
-    UserWrapper(TenantUser user) {
+    public UserContext(TenantUser user) {
         this.id = user.id();
         this.name = user.name();
         this.roles = new HashSet(scala.collection.JavaConverters.seqAsJavaList(user.roles()));
