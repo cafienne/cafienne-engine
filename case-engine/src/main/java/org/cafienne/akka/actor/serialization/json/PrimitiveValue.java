@@ -9,12 +9,13 @@ package org.cafienne.akka.actor.serialization.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
+import org.cafienne.cmmn.expression.spel.SpelPropertyValueProvider;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.IOException;
 
-public abstract class PrimitiveValue<T> extends Value<T> {
+public abstract class PrimitiveValue<T> extends Value<T> implements SpelPropertyValueProvider {
     public PrimitiveValue(T value) {
         super(value);
     }

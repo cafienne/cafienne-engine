@@ -8,11 +8,14 @@
 package org.cafienne.cmmn.expression.spel;
 
 /**
- * Interface to make case file values readable for the spel engine.
- *
+ * Interface that is implemented by objects that can return the value from their own defined location,
+ * instead of treating the object itself.
  */
-public interface SpelReadable {
-    Object read(String propertyName);
-
-    boolean canRead(String propertyName);
+@FunctionalInterface
+public interface SpelPropertyValueProvider {
+    /**
+     * Get the value of the property
+     * @return
+     */
+    Object getValue();
 }

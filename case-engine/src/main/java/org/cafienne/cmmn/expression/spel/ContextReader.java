@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.expression.spel;
 
-import org.cafienne.akka.actor.serialization.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.expression.AccessException;
@@ -15,8 +14,8 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
 
-class CaseFileAccessor implements PropertyAccessor {
-    private final static Logger logger = LoggerFactory.getLogger(CaseFileAccessor.class);
+class ContextReader implements PropertyAccessor {
+    private final static Logger logger = LoggerFactory.getLogger(ContextReader.class);
 
     @Override
     public void write(EvaluationContext arg0, Object object, String propertyName, Object propertyValue) throws AccessException {
@@ -26,14 +25,19 @@ class CaseFileAccessor implements PropertyAccessor {
     @Override
     public TypedValue read(EvaluationContext arg0, Object object, String propertyName) throws AccessException {
         if (object instanceof SpelReadable) {
-            Value<?> value = ((SpelReadable) object).read(propertyName);
-            logger.debug("Reading property "+propertyName+" results in value "+value);
-            return new TypedValueWrapper(value);
+            // Read the value
+            Object value = ((SpelReadable) object).read(propertyName);
+            // Check if it is the native value itself, or that the object is an indirect reference to the value.
+            if (value instanceof SpelPropertyValueProvider) {
+                value = ((SpelPropertyValueProvider) value).getValue();
+            }
+            logger.debug("Reading property " + propertyName + " results in value " + value);
+            return new TypedValue(value);
         } else {
             if (object == null) {
                 logger.error("Cannot read property " + propertyName + " from null object");
             } else {
-                logger.error("Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName()+": with value " + object);
+                logger.error("Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName() + ": with value " + object);
             }
             return null;
         }

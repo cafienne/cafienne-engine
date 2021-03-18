@@ -37,7 +37,7 @@ import java.time.format.DateTimeParseException;
 public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     private final ExpressionParser parser;
     private final Expression spelExpression;
-    private final CaseFileAccessor caseFileAccessor = new CaseFileAccessor();
+    private final ContextReader contextReader = new ContextReader();
     private final String expressionString;
     private final ExpressionDefinition expressionDefinition;
 
@@ -61,7 +61,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         // System.out.println("Now evaluating the expression " + definition.getBody());
         StandardEvaluationContext context = new StandardEvaluationContext(contextObject);
         // The case file accessor can be used to dynamically resolve properties that belong to the case file
-        context.addPropertyAccessor(caseFileAccessor);
+        context.addPropertyAccessor(contextReader);
 
         // TODO: improve the type checking and raise better error message if we're getting back the wrong type.
 

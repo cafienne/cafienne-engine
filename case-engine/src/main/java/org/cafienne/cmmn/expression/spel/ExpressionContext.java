@@ -30,7 +30,7 @@ abstract class ExpressionContext implements SpelReadable {
      * Set of accessible property names. Case sensitive, and does not contain deprecated properties
      */
     private final Set<String> propertyNames = new HashSet();
-    private final Map<String, PropertyAccessor> readers = new HashMap();
+    private final Map<String, ExpressionContextPropertyReader> readers = new HashMap();
 
     // Perhaps extend later with other information, such as CaseTeam or current user?
     // but for now, caseInstance is sufficient as a starting path to fetch any required information
@@ -59,14 +59,14 @@ abstract class ExpressionContext implements SpelReadable {
         return new ValueList(args);
     }
 
-    protected void addPropertyReader(String propertyName, PropertyAccessor reader) {
+    protected void addPropertyReader(String propertyName, ExpressionContextPropertyReader reader) {
         if (propertyName != null) {
             propertyNames.add(propertyName); // The case-sensitive version
             readers.put(propertyName.toLowerCase(), reader);
         }
     }
 
-    protected void addDeprecatedReader(String deprecatedName, String newPropertyName, PropertyAccessor reader) {
+    protected void addDeprecatedReader(String deprecatedName, String newPropertyName, ExpressionContextPropertyReader reader) {
         readers.put(deprecatedName.toLowerCase(), () -> {
             model.addDebugInfo(() -> "Expression contains deprecated property '" + deprecatedName + "'; please use property '" + newPropertyName + "' instead");
             return reader.get();
