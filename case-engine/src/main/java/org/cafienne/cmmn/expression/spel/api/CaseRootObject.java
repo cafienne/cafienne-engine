@@ -22,6 +22,11 @@ public abstract class CaseRootObject extends APIRootObject<Case> {
         return getActor();
     }
 
+    public CaseAPI getCaseInstance() {
+        warnDeprecation("getCaseInstance()", "case");
+        return context;
+    }
+
     protected void registerPlanItem(PlanItem item) {
         final PlanItemAPI itemContext = this.context.find(item);
         addContextProperty(itemContext, itemContext.getName(), "planItem");

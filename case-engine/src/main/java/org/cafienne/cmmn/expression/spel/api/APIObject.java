@@ -3,6 +3,8 @@ package org.cafienne.cmmn.expression.spel.api;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.cmmn.instance.Case;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +25,8 @@ import java.util.Set;
  * See {@link Case} itself for it's members.
  */
 public abstract class APIObject<T extends ModelActor> implements SpelReadable {
+    private final static Logger logger = LoggerFactory.getLogger(APIObject.class);
+
     /**
      * Set of accessible property names. Case sensitive, and does not contain deprecated properties
      */
@@ -61,12 +65,12 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     }
 
     protected void warnDeprecation(String deprecatedName, String newPropertyName) {
-        getActor().addDebugInfo(() -> "Expression contains deprecated property '" + deprecatedName + "'; please use property '" + newPropertyName + "' instead");
+        String msg = "Expression contains deprecated property '" + deprecatedName + "'; please use property '" + newPropertyName + "' instead";
+        logger.warn(msg);
+        getActor().addDebugInfo(() -> msg);
     }
 
     protected void addDeprecatedReader(String deprecatedName, String newPropertyName, ExpressionObjectPropertyReader reader) {
-        System.out.println("REGISTER DEPRECATED READER " + deprecatedName +" of type " + reader);
-
         addReader(deprecatedName, () -> {
             warnDeprecation(deprecatedName, newPropertyName);
             return reader.get();
@@ -75,7 +79,6 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
 
     @Override
     public boolean canRead(String propertyName) {
-        System.out.println("Checking " + propertyName +" on " + this.getClass().getSimpleName() +" with props : " + propertyNames);
         boolean found = readers.keySet().contains(propertyName.toLowerCase());
         if (!found) {
             getActor().addDebugInfo(() -> "Property " + propertyName + " is not available on the " + getClass().getSimpleName() + "; available properties: " + propertyNames);

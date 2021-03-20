@@ -37,8 +37,23 @@ public class CaseAPI extends APIObject<Case> {
     }
 
     public Collection<PlanItem> getPlanItems(String identifier) {
-        warnDeprecation("getPlanItems(String identifier)", "plan");
+        warnDeprecation("getPlanItemByName(\"" + identifier + "\")", "plan");
         return actor.getPlanItems(identifier);
+    }
+
+    public PlanItemAPI getPlanItemByName(String identifier) {
+        warnDeprecation("getPlanItemByName(\"" + identifier + "\")", "plan");
+        return find(actor.getPlanItemByName(identifier));
+    }
+
+    public CaseTeamAPI getCaseTeam() {
+        warnDeprecation("getCaseTeam()", "team");
+        return caseTeam;
+    }
+
+    public CaseFile getCaseFile() {
+        warnDeprecation("getCaseFile()", "file");
+        return caseFile;
     }
 
     public PlanItemAPI find(PlanItem item) {

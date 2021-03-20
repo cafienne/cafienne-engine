@@ -36,4 +36,8 @@ public class PlanItemAPI<P extends PlanItem> extends APIObject<Case> {
         addPropertyReader("stage", () -> stage);
     }
 
+    public String getId() {
+        warnDeprecation("getId()", "id");
+        return item.getId();
+    }
 }
