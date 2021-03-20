@@ -19,11 +19,9 @@ import org.cafienne.cmmn.instance.Case;
  * See {@link Case} itself for it's members.
  */
 public abstract class APIRootObject<T extends ModelActor> extends APIObject<T> {
-
     protected APIRootObject(T model) {
         super(model);
     }
-
 
     public ValueMap map(Object... args) {
         return this.Map(args);
@@ -41,4 +39,5 @@ public abstract class APIRootObject<T extends ModelActor> extends APIObject<T> {
         return new ValueList(args);
     }
 
+    public abstract String getDescription();
 }

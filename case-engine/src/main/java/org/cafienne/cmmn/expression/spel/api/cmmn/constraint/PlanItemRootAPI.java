@@ -11,8 +11,14 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItem;
  * custom HumanTask settings on Assignment and DueDate.
  */
 public class PlanItemRootAPI<T extends ConstraintDefinition> extends CaseRootObject {
+
+
+    private final T constraintDefinition;
+
     public PlanItemRootAPI(T constraintDefinition, PlanItem planItem) {
         super(planItem.getCaseInstance());
+        this.constraintDefinition = constraintDefinition;
+
         // Make sure we can directly access the task or stage or milestone; e.g. "task.index < 3"
         registerPlanItem(planItem);
 
@@ -26,5 +32,10 @@ public class PlanItemRootAPI<T extends ConstraintDefinition> extends CaseRootObj
 
         // TODO: remove, definition is already clear at design time (i.e., when writing the expression itself)
         addPropertyReader("definition", () -> constraintDefinition);
+    }
+
+    @Override
+    public String getDescription() {
+        return constraintDefinition.getContextDescription();
     }
 }

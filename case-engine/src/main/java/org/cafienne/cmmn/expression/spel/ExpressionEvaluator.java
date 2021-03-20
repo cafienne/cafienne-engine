@@ -22,9 +22,12 @@ import org.cafienne.cmmn.expression.spel.api.APIRootObject;
 import org.cafienne.cmmn.expression.spel.api.cmmn.constraint.ApplicabilityRuleAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.constraint.IfPartAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.constraint.PlanItemRootAPI;
-import org.cafienne.cmmn.expression.spel.api.cmmn.plan.TaskParameterAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.plan.TimerExpressionAPI;
-import org.cafienne.cmmn.expression.spel.api.process.ProcessParameterRootObject;
+import org.cafienne.cmmn.expression.spel.api.cmmn.mapping.TaskInputMappingAPI;
+import org.cafienne.cmmn.expression.spel.api.cmmn.mapping.TaskOutputMappingAPI;
+import org.cafienne.cmmn.expression.spel.api.cmmn.workflow.AssignmentAPI;
+import org.cafienne.cmmn.expression.spel.api.cmmn.workflow.DueDateAPI;
+import org.cafienne.cmmn.expression.spel.api.process.ProcessMappingRootObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
@@ -69,10 +72,9 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     /**
      * @param <T>
      * @param rootObject
-     * @param contextDescription
      * @return
      */
-    private <T> T evaluateExpression(APIRootObject rootObject, String contextDescription) {
+    private <T> T evaluateExpression(APIRootObject rootObject) {
         ModelActor actor = rootObject.getActor();
         // System.out.println("Now evaluating the expression " + definition.getBody());
         StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
@@ -83,24 +85,24 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         // TODO: improve the type checking and raise better error message if we're getting back the wrong type.
 
         try {
-            actor.addDebugInfo(() -> "Evaluating " + contextDescription + ": " + expressionString.trim());
+            actor.addDebugInfo(() -> "Evaluating " + rootObject.getDescription() + ": " + expressionString.trim());
             // Not checking it. If it fails, it really fails.
             @SuppressWarnings("unchecked")
             T value = (T) spelExpression.getValue(context);
             actor.addDebugInfo(() -> "Outcome: " + value);
             return value;
         } catch (EvaluationException invalidExpression) {
-            actor.addDebugInfo(() -> "Failure in evaluating " + contextDescription + ", with expression " + expressionString.trim(), invalidExpression);
+            actor.addDebugInfo(() -> "Failure in evaluating " + rootObject.getDescription() + ", with expression " + expressionString.trim(), invalidExpression);
             throw new InvalidExpressionException("Could not evaluate " + spelExpression.getExpressionString() + "\n" + invalidExpression.getLocalizedMessage(), invalidExpression);
         }
     }
 
-    private boolean evaluateConstraint(PlanItemRootAPI contextObject, String constraintDescription) {
-        Object outcome = evaluateExpression(contextObject, constraintDescription);
+    private boolean evaluateConstraint(PlanItemRootAPI contextObject) {
+        Object outcome = evaluateExpression(contextObject);
         if (outcome instanceof Boolean) {
             return (boolean) outcome;
         } else {
-            contextObject.getActor().addDebugInfo(() -> "Failure in evaluating " + constraintDescription + ", with expression "
+            contextObject.getActor().addDebugInfo(() -> "Failure in evaluating " + contextObject.getDescription() + ", with expression "
                     + expressionString.trim()
                     + "\nIt should return something of type boolean instead of type " + outcome.getClass().getName()
                     + "\nReturning result 'false'");
@@ -108,26 +110,21 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         }
     }
 
-    private Value<?> evaluateParameterTransformation(Case caseInstance, String parameterName, Value<?> parameterValue, Task<?> task) {
-        TaskParameterAPI contextObject = new TaskParameterAPI(parameterName, parameterValue, task);
-        Object result = evaluateExpression(contextObject, "parameter transformation");
-        return Value.convert(result);
-    }
-
     @Override
     public Value<?> evaluateInputParameterTransformation(Case caseInstance, TaskInputParameter from, ParameterDefinition to, Task<?> task) {
-        return evaluateParameterTransformation(caseInstance, from.getDefinition().getName(), from.getValue(), task);
+        return Value.convert(evaluateExpression(new TaskInputMappingAPI(from, to, task)));
     }
 
     @Override
     public Value<?> evaluateOutputParameterTransformation(Case caseInstance, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition, Task<?> task) {
-        return evaluateParameterTransformation(caseInstance, rawOutputParameterDefinition.getName(), value, task);
+        return Value.convert(evaluateExpression(new TaskOutputMappingAPI(rawOutputParameterDefinition, targetOutputParameterDefinition, value, task)));
+//        return evaluateParameterTransformation(rawOutputParameterDefinition.getName(), value, task);
     }
 
     @Override
     public Value<?> evaluateOutputParameterTransformation(ProcessTaskActor processTaskActor, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition) {
-        ProcessParameterRootObject contextObject = new ProcessParameterRootObject(rawOutputParameterDefinition.getName(), value, processTaskActor);
-        Object result = evaluateExpression(contextObject, "parameter transformation");
+        ProcessMappingRootObject contextObject = new ProcessMappingRootObject(rawOutputParameterDefinition, value, targetOutputParameterDefinition, processTaskActor);
+        Object result = evaluateExpression(contextObject);
         return Value.convert(result);
     }
 
@@ -139,7 +136,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
             // Failed to do default parsing. Let's try to put a SPEL onto it....
         }
         // If the result is an actual Duration instance we are done. Otherwise we will try to parse the result as Duration
-        Object result = evaluateExpression(new TimerExpressionAPI(timerEvent), "timer event duration");
+        Object result = evaluateExpression(new TimerExpressionAPI(timerEvent));
         if (result instanceof Duration) {
             return (Duration) result;
         }
@@ -153,23 +150,22 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
-        return evaluateConstraint(new PlanItemRootAPI(ruleDefinition, planItem), ruleDefinition.getContextDescription());
+        return evaluateConstraint(new PlanItemRootAPI(ruleDefinition, planItem));
     }
 
     @Override
     public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
-        return evaluateConstraint(new IfPartAPI(ifPartDefinition, criterion), "ifPart in sentry");
+        return evaluateConstraint(new IfPartAPI(ifPartDefinition, criterion));
     }
 
     @Override
     public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
-        String description = "applicability rule '" + ruleDefinition.getName() + "' for discretionary item " + discretionaryItemDefinition;
-        return evaluateConstraint(new ApplicabilityRuleAPI(containingPlanItem, discretionaryItemDefinition, ruleDefinition), description);
+        return evaluateConstraint(new ApplicabilityRuleAPI(containingPlanItem, discretionaryItemDefinition, ruleDefinition));
     }
 
     @Override
     public Instant evaluateDueDate(HumanTask task, DueDateDefinition definition) throws InvalidExpressionException {
-        Object outcome = evaluateExpression(new PlanItemRootAPI(definition, task), "due date expression");
+        Object outcome = evaluateExpression(new DueDateAPI(definition, task));
         if (outcome == null || outcome == Value.NULL) {
             return null;
         }
@@ -207,7 +203,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public String evaluateAssignee(HumanTask task, AssignmentDefinition definition) throws InvalidExpressionException {
-        Object outcome = evaluateExpression(new PlanItemRootAPI(definition, task), "assignment expression");
+        Object outcome = evaluateExpression(new AssignmentAPI(definition, task));
         if (outcome == null || outcome == Value.NULL) {
             return null;
         }

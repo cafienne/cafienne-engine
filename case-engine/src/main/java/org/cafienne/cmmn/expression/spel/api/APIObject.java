@@ -78,7 +78,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
         System.out.println("Checking " + propertyName +" on " + this.getClass().getSimpleName() +" with props : " + propertyNames);
         boolean found = readers.keySet().contains(propertyName.toLowerCase());
         if (!found) {
-            getActor().addDebugInfo(() -> "Property " + propertyName + " is not available on the " + getDescription() + "; available properties: " + propertyNames);
+            getActor().addDebugInfo(() -> "Property " + propertyName + " is not available on the " + getClass().getSimpleName() + "; available properties: " + propertyNames);
         }
         return found;
     }
@@ -86,10 +86,6 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     @Override
     public Object read(String propertyName) {
         return readers.getOrDefault(propertyName.toLowerCase(), () -> null).get();
-    }
-
-    protected String getDescription() {
-        return getClass().getSimpleName();
     }
 }
 

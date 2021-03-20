@@ -13,4 +13,9 @@ public class IfPartAPI extends PlanItemRootAPI<IfPartDefinition> {
         addPropertyReader("criterion", () -> criterion);
         addDeprecatedReader("sentry", "criterion", () -> criterion); // Compatibility
     }
+
+    @Override
+    public String getDescription() {
+        return "ifPart in sentry";
+    }
 }

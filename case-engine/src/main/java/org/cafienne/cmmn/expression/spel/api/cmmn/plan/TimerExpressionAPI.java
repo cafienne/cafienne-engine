@@ -11,4 +11,9 @@ public class TimerExpressionAPI extends CaseRootObject {
     public TimerExpressionAPI(TimerEvent timer) {
         super(timer.getCaseInstance());
     }
+
+    @Override
+    public String getDescription() {
+        return "timer event duration";
+    }
 }
