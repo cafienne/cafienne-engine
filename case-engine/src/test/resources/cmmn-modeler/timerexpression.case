@@ -1,4 +1,4 @@
-<case id="timerexpression.case" name="timerexpression" guid="_AqPiG">
+<case id="timerexpression.case" name="timerexpression" expressionLanguage="spel" guid="_AqPiG">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[A case that creates a timer with an expression based on the case file contents]]>
@@ -23,9 +23,9 @@
         </sentry>
         <sentry id="crit__AqPiG_1">
             <ifPart id="_AqPiG_8">
-                <condition id="_AqPiG_16" language="spel">
+                <condition id="_AqPiG_16">
                     <body>
-                        <![CDATA[caseInstance.nullpointerException]]>
+                        <![CDATA[case.nullpointerException]]>
                     </body>
                 </condition>
             </ifPart>
@@ -44,9 +44,9 @@
         </humanTask>
         <humanTask id="ht__AqPiG_1" name="HumanTask_0" isBlocking="true"/>
         <timerEvent id="tmr__AqPiG_0" name="AfterPeriod">
-            <timerExpression id="_AqPiG_1" language="spel">
+            <timerExpression id="_AqPiG_1">
                 <body>
-                    <![CDATA[caseInstance.caseFile.timer.period]]>
+                    <![CDATA[case.file.timer.period]]>
                 </body>
             </timerExpression>
             <planItemStartTrigger id="_AqPiG_0">

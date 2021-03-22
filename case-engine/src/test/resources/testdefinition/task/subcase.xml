@@ -35,7 +35,7 @@
 				<inputs name="customerName"/>
 				<parameterMapping sourceRef="customerName" targetRef="inputCustomer">
 					<transformation language="spel">
-						<body>"test customer in case "+caseInstance.getId()</body>
+						<body>"test customer in case "+case.id</body>
 					</transformation>
 				</parameterMapping>
 				<outputs name="outputCustomerName" bindingRef="Description"/>
@@ -54,7 +54,7 @@
 				<inputs name="customerName"/>
 				<parameterMapping sourceRef="customerName" targetRef="inputCustomer">
 					<transformation language="spel">
-						<body>"test customer in case "+caseInstance.getId()</body>
+						<body>"test customer in case "+case.id</body>
 					</transformation>
 				</parameterMapping>
 			</caseTask>

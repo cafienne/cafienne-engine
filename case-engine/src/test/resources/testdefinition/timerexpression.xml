@@ -3,7 +3,7 @@
         <property name="period" type="http://www.omg.org/spec/CMMN/PropertyType/string"/>
         <property name="dummy" type="http://www.omg.org/spec/CMMN/PropertyType/integer"/>
     </caseFileItemDefinition>
-    <case id="timerexpression.case" name="timerexpression">
+    <case id="timerexpression.case" name="timerexpression" expressionLanguage="spel">
         <documentation textFormat="text/plain">
             <text>
                 <![CDATA[A case that creates a timer with an expression based on the case file contents]]>
@@ -28,9 +28,9 @@
             </sentry>
             <sentry id="crit__AqPiG_1">
                 <ifPart id="_AqPiG_8">
-                    <condition id="_AqPiG_16" language="spel">
+                    <condition id="_AqPiG_16">
                         <body>
-                            <![CDATA[caseInstance.nullpointerException]]>
+                            <![CDATA[case.nullpointerException]]>
                         </body>
                     </condition>
                 </ifPart>
@@ -42,19 +42,19 @@
             <humanTask id="ht__AqPiG_2" name="simplehumantask" isBlocking="true">
                 <outputs id="_AqPiG_14" name="Result" bindingRef="_AqPiG_2"/>
                 <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" name="simplehumantask" description="" humanTaskRef="task/simplehumantask.humantask">
+                    <cafienne:implementation name="simplehumantask" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
                         <input id="_Hun3_Input" name="Input"/>
+                        <input id="_sr1Z_Input2" name="Input2"/>
                         <output id="_SkQG_Result" name="Result"/>
-                        <task-model/>
                         <parameterMapping id="_AqPiG_15" sourceRef="_SkQG_Result" targetRef="_AqPiG_14"/>
                     </cafienne:implementation>
                 </extensionElements>
             </humanTask>
             <humanTask id="ht__AqPiG_1" name="HumanTask_0" isBlocking="true"/>
             <timerEvent id="tmr__AqPiG_0" name="AfterPeriod">
-                <timerExpression id="_AqPiG_1" language="spel">
+                <timerExpression id="_AqPiG_1">
                     <body>
-                        <![CDATA[caseInstance.caseFile.timer.period]]>
+                        <![CDATA[case.file.timer.period]]>
                     </body>
                 </timerExpression>
                 <planItemStartTrigger id="_AqPiG_0">

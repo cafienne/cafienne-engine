@@ -11,7 +11,7 @@
                 <repetitionRule id="_4kpJj_3" name="Constraint_0">
                     <condition id="_4kpJj_4" name="Expression_0" language="spel">
                         <body>
-                            <![CDATA[planItem.index < 10]]>
+                            <![CDATA[task.index < 10]]>
                         </body>
                     </condition>
                 </repetitionRule>
