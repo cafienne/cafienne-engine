@@ -31,9 +31,6 @@ public class PlanItemRootAPI<T extends ConstraintDefinition> extends CaseRootObj
             // Also add the API reference to the case file item object itself
             addPropertyReader("caseFileItem", () -> new CaseFileItemAPI(item));
         }
-
-        // TODO: remove, definition is already clear at design time (i.e., when writing the expression itself)
-        addPropertyReader("definition", () -> constraintDefinition);
     }
 
     @Override
