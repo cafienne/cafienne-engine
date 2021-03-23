@@ -68,7 +68,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     db.run(users.result).map(records => {
       // First sort and store all roles by user-id
       val userRecords = records.filter(record => record.role_name.isBlank)
-      val roleRecords = records.filter(record => !record.role_name.isBlank)
+      val roleRecords = records.filter(record => !record.role_name.isBlank && record.enabled)
 
       val users = userRecords.map(user => {
         val roles = roleRecords.filter(role => role.userId == user.userId)
