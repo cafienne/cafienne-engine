@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.plan;
 
 import org.cafienne.cmmn.expression.spel.api.APIObject;
+import org.cafienne.cmmn.expression.spel.api.cmmn.file.CaseFileAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.team.CaseTeamAPI;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -11,13 +12,13 @@ import java.util.Collection;
 public class CaseAPI extends APIObject<Case> {
     private final StageAPI casePlan;
     private final CaseTeamAPI caseTeam;
-    private final CaseFile caseFile;
+    private final CaseFileAPI caseFile;
 
     public CaseAPI(Case actor) {
         super(actor);
         this.casePlan = new StageAPI(actor.getCasePlan(), null);
         this.caseTeam = new CaseTeamAPI(actor.getCaseTeam());
-        this.caseFile = actor.getCaseFile();
+        this.caseFile = new CaseFileAPI(actor.getCaseFile());
         addPropertyReader("plan", () -> casePlan);
         addPropertyReader("file", () -> caseFile);
         addPropertyReader("team", () -> caseTeam);
@@ -28,7 +29,7 @@ public class CaseAPI extends APIObject<Case> {
         addPropertyReader("root", actor::getRootCaseId);
         addPropertyReader("createdOn", actor::getCreatedOn);
         addPropertyReader("lastModified", actor::getLastModified);
-        addDeprecatedReader("caseFile", "file", actor::getCaseFile);
+        addDeprecatedReader("caseFile", "file", () -> caseFile);
     }
 
     public String getId() {
@@ -51,7 +52,7 @@ public class CaseAPI extends APIObject<Case> {
         return caseTeam;
     }
 
-    public CaseFile getCaseFile() {
+    public CaseFileAPI getCaseFile() {
         warnDeprecation("getCaseFile()", "file");
         return caseFile;
     }

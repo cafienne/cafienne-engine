@@ -1,7 +1,9 @@
 package org.cafienne.cmmn.test.expression;
 
 
+import org.cafienne.akka.actor.serialization.json.LongValue;
 import org.cafienne.cmmn.akka.command.StartCase;
+import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -10,6 +12,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.event.TaskOutputAssertion;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -55,6 +58,40 @@ public class VariousSpelExpressions {
 
                 testCase.getEventListener().awaitPlanItemEvent("HumanTask", PlanItemTransitioned.class, e -> e.getTransition().equals(Transition.Complete));
             });
+        });
+
+        testCase.runTest();
+    }
+
+    @Test
+    public void testMilestoneTerminationOnMultipleMulti() {
+        TestScript testCase = new TestScript("expressions");
+        // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
+        testCase.addStep(new StartCase(user, caseInstanceId, xml, null, null), caseStarted -> {
+            caseStarted.print();
+            // Milestone must have occured, causing stage and task to be terminated
+            testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active);
+        });
+
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(1), new Path("SpecialOutput/Multi")), result -> {
+            result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
+            result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
+        });
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(2), new Path("SpecialOutput/Multi")), result -> {
+            result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
+            result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
+        });
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(3), new Path("SpecialOutput/Multi")), result -> {
+            result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
+            result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
+        });
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(4), new Path("SpecialOutput/Multi")), result -> {
+            result.assertPlanItems("HumanTask").assertSize(2).assertStates(State.Terminated, State.Active);
+            result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Completed);
+        });
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(5), new Path("SpecialOutput/Multi")), result -> {
+            result.assertPlanItems("HumanTask").assertSize(3).assertStates(State.Terminated, State.Active);
+            result.assertPlanItems("Milestone").assertSize(2).assertStates(State.Completed);
         });
 
         testCase.runTest();
