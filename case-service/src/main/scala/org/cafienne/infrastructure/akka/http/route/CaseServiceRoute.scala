@@ -27,6 +27,7 @@ trait CaseServiceRoute extends LazyLogging {
   val corsSettings = CorsSettings.defaultSettings
     .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", api.CASE_LAST_MODIFIED, api.TENANT_LAST_MODIFIED, "accept", "origin"))
     .withAllowedMethods(Seq(GET, POST, HEAD, OPTIONS, PUT, DELETE))
+    .withExposedHeaders(Seq(api.CASE_LAST_MODIFIED, api.TENANT_LAST_MODIFIED))
     .withMaxAge(Some(200L)
     )
 
