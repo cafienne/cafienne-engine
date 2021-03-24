@@ -23,7 +23,7 @@ import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> implements SpelReadable {
+public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
     public CaseFile(Case caseInstance, CaseFileDefinition definition) {
         super(caseInstance, definition, "CASEFILE " + definition.getName());
     }
@@ -94,16 +94,6 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> impleme
         ValueMap caseFileJson = new ValueMap();
         getItems().values().forEach(item -> caseFileJson.put(item.getName(), item.getValue()));
         return caseFileJson;
-    }
-
-    @Override
-    public Value<?> read(String propertyName) {
-        return getItem(propertyName).getValue();
-    }
-
-    @Override
-    public boolean canRead(String propertyName) {
-        return getChildDefinition(propertyName) != null;
     }
 
     public void dumpMemoryStateToXML(Element parentElement) {

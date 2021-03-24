@@ -53,7 +53,7 @@ public class Member extends CMMNElement<CaseDefinition> {
         return new Member(newKey, this);
     }
 
-    boolean isUser() {
+    public boolean isUser() {
         return key.type().equals("user");
     }
 

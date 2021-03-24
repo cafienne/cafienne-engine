@@ -44,7 +44,7 @@
                 <applicabilityRule id="rule_csQA1_1" name="isValid">
                     <condition>
                         <body>
-                            <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.planItems.?[name=='T2'].size() > 0 && stage.planItems.?[name=='T2'][0].state == T(org.cafienne.cmmn.instance.State).Active)]]>
+                            <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.T2 != null && stage.T2.state == T(org.cafienne.cmmn.instance.State).Active)]]>
                         </body>
                     </condition>
                 </applicabilityRule>

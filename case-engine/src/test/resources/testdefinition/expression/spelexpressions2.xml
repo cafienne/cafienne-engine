@@ -33,7 +33,7 @@
                 <ifPart contextRef="cfi_csY4k_2">
                     <condition>
                         <body>
-                            <![CDATA[case.getPlanItems("HumanTask").size()>2 || Output == "stop now"]]>
+                            <![CDATA[case.plan.Stage.HumanTask.size()>2 || Output == "stop now"]]>
                         </body>
                     </condition>
                 </ifPart>
@@ -97,7 +97,7 @@
                         <repetitionRule id="cm_csdZm_17_repetitionRule" contextRef="cfi_csY4k_2">
                             <condition>
                                 <body>
-                                    <![CDATA[planItem.index < 2]]>
+                                    <![CDATA[task.index < 2]]>
                                 </body>
                             </condition>
                         </repetitionRule>
@@ -143,7 +143,7 @@ Otherwise testcase will not work.]]>
                 <Bounds x="225" y="156" width="100" height="60"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="_lRFiK_1">
-                <Bounds x="486" y="208" width="12" height="20"/>
+                <Bounds x="484" y="208" width="12" height="20"/>
             </CMMNShape>
             <CMMNShape cmmnElementRef="_lRFiK_0">
                 <Bounds x="494" y="168" width="12" height="20"/>
