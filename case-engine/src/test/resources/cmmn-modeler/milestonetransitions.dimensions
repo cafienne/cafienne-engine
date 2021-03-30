@@ -1,0 +1,21 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm__zITLt_0">
+            <Bounds x="20" y="20" width="480" height="370"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ms__zITLt_0">
+            <Bounds x="110" y="140" width="100" height="40"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ms__zITLt_1">
+            <Bounds x="110" y="240" width="100" height="40"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__zITLt_0">
+            <Bounds x="290" y="180" width="140" height="80"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="_zITLt_3">
+            <Bounds x="284" y="210" width="12" height="20"/>
+        </CMMNShape>
+        <CMMNEdge sourceCMMNElementRef="pi_ms__zITLt_0" targetCMMNElementRef="_zITLt_3"/>
+        <CMMNEdge sourceCMMNElementRef="pi_ms__zITLt_1" targetCMMNElementRef="_zITLt_3"/>
+    </CMMNDiagram>
+</CMMNDI>

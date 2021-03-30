@@ -1,0 +1,23 @@
+<case id="milestonetransitions.case" name="milestonetransitions" expressionLanguage="spel" guid="_zITLt">
+    <caseFileModel>
+        <caseFileItem id="_zITLt_6" name="root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__zITLt_0" name="milestonetransitions" autoComplete="true">
+        <planItem id="pi_ms__zITLt_0" name="Milestone_0" definitionRef="ms__zITLt_0"/>
+        <planItem id="pi_ms__zITLt_1" name="Milestone_1" definitionRef="ms__zITLt_1"/>
+        <planItem id="pi_ht__zITLt_0" name="HumanTask" definitionRef="ht__zITLt_0">
+            <entryCriterion id="_zITLt_3" name="EntryCriterion_0" sentryRef="crit__zITLt_0"/>
+        </planItem>
+        <sentry id="crit__zITLt_0">
+            <planItemOnPart id="_zITLt_4" sourceRef="pi_ms__zITLt_0">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+            <planItemOnPart id="_zITLt_5" sourceRef="pi_ms__zITLt_1">
+                <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <milestone id="ms__zITLt_0" name="Milestone_0"/>
+        <milestone id="ms__zITLt_1" name="Milestone_1"/>
+        <humanTask id="ht__zITLt_0" name="HumanTask" isBlocking="true"/>
+    </casePlanModel>
+</case>
