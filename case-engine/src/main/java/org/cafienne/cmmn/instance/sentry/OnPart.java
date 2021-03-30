@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class OnPart<T extends OnPartDefinition, I extends CMMNElement<?>> extends CMMNElement<T> {
+public abstract class OnPart<T extends OnPartDefinition, I extends TransitionGenerator> extends CMMNElement<T> {
     protected final Criterion criterion;
     protected Collection<I> connectedItems = new ArrayList();
 
