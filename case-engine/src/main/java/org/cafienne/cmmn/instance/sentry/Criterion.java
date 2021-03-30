@@ -67,7 +67,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     void activate(OnPart<?, ?> activator) {
         inactiveOnParts.remove(activator);
         if (inactiveOnParts.isEmpty()) {
-            addDebugInfo(() -> this + " has become active");
+            addDebugInfo(() -> this + " has become active", this);
         } else {
             addDebugInfo(() -> this + " has "+inactiveOnParts.size()+" remaining inactive on parts", this);
         }
