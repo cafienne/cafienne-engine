@@ -1,7 +1,7 @@
 package org.cafienne.akka.actor
 
 object EngineDeveloperConsole {
-  val enabled = true // Potentially make this a config setting, but better not. Note, if enabling probably switch off logback.xml logging
+  val enabled = false // Potentially make this a config setting, but better not. Note, if enabling probably switch off logback.xml logging
   private var currentIndent = 0
 
   def debugIndentedConsoleLogging(any: Any): Unit = {
