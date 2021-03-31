@@ -5,8 +5,8 @@ import org.cafienne.cmmn.instance.Milestone;
 /**
  */
 public class MilestoneAPI extends PlanItemAPI<Milestone> {
-    MilestoneAPI(Milestone milestone, StageAPI stage) {
-        super(milestone, stage);
+    MilestoneAPI(CaseAPI caseAPI, Milestone milestone, StageAPI stage) {
+        super(caseAPI, milestone, stage);
     }
 
     @Override

@@ -11,8 +11,8 @@ import java.util.*;
 public class StageAPI extends PlanItemAPI<Stage> {
     private final List<PlanItemAPI> children = new ArrayList();
 
-    protected StageAPI(Stage stage, StageAPI parent) {
-        super(stage, parent);
+    protected StageAPI(CaseAPI caseAPI, Stage stage, StageAPI parent) {
+        super(caseAPI, stage, parent);
         Collection<PlanItem> items = stage.getPlanItems();
         Map<String, Object> itemAccessorsByName = new HashMap();
         for (PlanItem item : items) {
@@ -34,16 +34,16 @@ public class StageAPI extends PlanItemAPI<Stage> {
 
     private PlanItemAPI createPlanItemContext(PlanItem item) {
         if (item instanceof Stage) {
-            return new StageAPI((Stage) item, this);
+            return new StageAPI(caseAPI, (Stage) item, this);
         } else if (item instanceof Task) {
-            return new TaskAPI((Task) item, this);
+            return new TaskAPI(caseAPI, (Task) item, this);
         } else if (item instanceof Milestone) {
-            return new MilestoneAPI((Milestone) item, this);
+            return new MilestoneAPI(caseAPI, (Milestone) item, this);
         } else if (item instanceof TimerEvent) {
-            return new TimerEventAPI((TimerEvent) item, this);
+            return new TimerEventAPI(caseAPI, (TimerEvent) item, this);
         } else {
             // Hmmm... a not yet supported type of plan item? That's ok.
-            return new PlanItemAPI(item, this);
+            return new PlanItemAPI(caseAPI, item, this);
         }
     }
 
@@ -52,17 +52,4 @@ public class StageAPI extends PlanItemAPI<Stage> {
         return "stage";
     }
 
-    protected PlanItemAPI find(PlanItem item) {
-        if (this.item == item) {
-            return this;
-        } else {
-            for (PlanItemAPI child : this.children) {
-                PlanItemAPI found = child.find(item);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return createPlanItemContext(item);
-    }
 }
