@@ -84,38 +84,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     public abstract void updateState(M actor);
 
     /**
-     * Events can implement behavior to be run after the event has updated it's state.
-     * This method will only be invoked when the model actor is not running in recovery mode.
-     * This method will be invoked immediately after the event has updated it's state.
-     * ImmediateBehavior in itself may also generate new events. If behavior must be executed
-     * after the immediate behavior of those new events is generated, then the method
-     * runDelayedBehavior can be implemented with it.
-     */
-    public void runImmediateBehavior() {
-        // Default behavior is none
-    }
-
-    /**
-     * Override this method and return true if the ModelEvent subclass has
-     * particular implementations for {@link ModelEvent#runImmediateBehavior()} or {@link ModelEvent#runDelayedBehavior()}
-     *
-     * @return
-     */
-    public boolean hasBehavior() {
-        return false;
-    }
-
-    /**
-     * Events can implement behavior to be run after the event has updated it's state.
-     * This method will only be invoked when the model actor is not running in recovery mode.
-     * DelayedBehavior is executed after any events generated during immediate behavior have executed
-     * their immediate behavior
-     */
-    public void runDelayedBehavior() {
-        // Default behavior is none
-    }
-
-    /**
      * Internal framework method
      *
      * @param actor

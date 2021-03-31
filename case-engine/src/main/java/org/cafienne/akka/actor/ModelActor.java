@@ -465,10 +465,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             return;
         }
 
-        if (getLogger().isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+        if (getLogger().isDebugEnabled() || CaseSystem.devDebugLogger().enabled()) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
             getLogger().debug(msg);
-            currentMessageHandler.debugIndentedConsoleLogging(msg);
+            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(msg);
         }
         response.setLastModified(getLastModified());
         response.getRecipient().tell(response, self());
@@ -488,7 +488,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param <T>
      */
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
-        if (getLogger().isDebugEnabled() || currentMessageHandler.indentedConsoleLoggingEnabled) {
+        if (getLogger().isDebugEnabled() || CaseSystem.devDebugLogger().enabled()) {
             StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
             events.forEach(e -> {
                 msg.append("\n\t");
@@ -501,7 +501,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                 }
             });
             getLogger().debug(msg + "\n");
-            currentMessageHandler.debugIndentedConsoleLogging(msg + "\n");
+            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(msg + "\n");
         }
         resetTransactionTimestamp();
         if (events.isEmpty()) {

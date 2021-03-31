@@ -34,6 +34,11 @@ object CaseSystem extends LazyLogging {
   val startupMoment = Instant.now
 
   /**
+    * Special logger for engine developers to print indented logging for SentryNetwork executions
+    */
+  val devDebugLogger = EngineDeveloperConsole
+
+  /**
     * Configuration settings of this Cafienne Platform
     */
   val config = {

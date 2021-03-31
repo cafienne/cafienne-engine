@@ -18,6 +18,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.TransitionPublisher;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
+import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
@@ -27,7 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> {
+public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> implements TransitionGenerator<CaseFileItem, CaseFileEvent> {
     /**
      * History of events on this item
      */
@@ -170,10 +171,17 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void updateState(CaseFileEvent event) {
         addDebugInfo(() -> "CaseFile[" + getName() + "]: updating CaseFileItem state based on CaseFileEvent");
         this.transitionPublisher.addEvent(event);
-        this.setState(event.getState());
-        this.indexInArray = event.getIndex();
-        this.lastTransition = event.getTransition();
-        this.setValue(event.getValue());
+    }
+
+    public void updateState(CaseFileEvent event, TransitionPublisher publisher) {
+        // Hack to make sure that we use the right case file item in case of BootstrapPublisher,
+        // as that is registered on the array instead of the item that received the event.
+        CaseFileItem item = this instanceof CaseFileItemArray ? ((CaseFileItemArray) this).get(event.getIndex()) : this;
+
+        item.setState(event.getState());
+        item.indexInArray = event.getIndex();
+        item.lastTransition = event.getTransition();
+        item.setValue(event.getValue());
     }
 
     public void updateState(BusinessIdentifierEvent event) {
@@ -466,6 +474,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     protected void setState(State newState) {
         this.state = newState;
+    }
+
+    public String getDescription() {
+        return "CaseFileItem["+getPath()+"]";
     }
 
     @Override

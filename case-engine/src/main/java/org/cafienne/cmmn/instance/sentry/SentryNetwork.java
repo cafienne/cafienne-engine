@@ -2,8 +2,9 @@ package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.TransitionPublisher;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.Collection;
  */
 public class SentryNetwork {
     private final Case caseInstance;
+    private final TransitionCallStack callStack = new TransitionCallStack(this);
     /**
      * List of sentries active within the case.
      */
@@ -84,5 +86,12 @@ public class SentryNetwork {
         // Pretty weird, not sure what to do here. Probably we need to make it such that when the
         // exit criterion is created, it will also connect to those entry criteria that relate to it.
         return null;
+    }
+
+    public void handleTransition(StandardEvent event, TransitionPublisher publisher) {
+        if (caseInstance.recoveryRunning()) {
+            return;
+        }
+        callStack.pushEvent(event);
     }
 }

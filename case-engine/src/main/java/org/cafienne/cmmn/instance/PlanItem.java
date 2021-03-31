@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 
 import java.util.Collection;
 
-public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> {
+public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> implements TransitionGenerator<PlanItem<T>, PlanItemTransitioned> {
     /**
      * Unique identifier of the plan item, typically a guid
      */
@@ -321,6 +321,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     public void updateState(PlanItemTransitioned event) {
         this.transitionPublisher.addEvent(event);
+    }
+
+    public void updateState(PlanItemTransitioned event, TransitionPublisher publisher) {
         this.state = event.getCurrentState();
         this.historyState = event.getHistoryState();
         this.lastTransition = event.getTransition();
@@ -446,6 +449,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public Stage getStage() {
         return stage;
+    }
+
+    @Override
+    public String getDescription() {
+        return toString();
     }
 
     final String toDescription() {

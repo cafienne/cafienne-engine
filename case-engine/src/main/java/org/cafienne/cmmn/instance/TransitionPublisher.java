@@ -3,13 +3,16 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.OnPart;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
+import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>> {
+public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart<?,I>> {
     protected final I item;
     private final List<StandardEvent> transitions = new ArrayList();
+    private final List<P> connectedEntryCriteria = new ArrayList();
+    private final List<P> connectedExitCriteria = new ArrayList();
 
     public TransitionPublisher(I item) {
         this.item = item;
@@ -31,6 +34,17 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
 
     public void addEvent(StandardEvent event) {
         transitions.add(0, event);
+        updateItemState(event);
+        informSentryNetwork(event);
+    }
+
+    protected void updateItemState(StandardEvent event) {
+        item.updateState(event, this);
+    }
+
+    protected void informSentryNetwork(StandardEvent event) {
+        addDebugInfo(() -> "Informing sentry network about " + event.getTransition() +" in " + item.getDescription());
+        item.getCaseInstance().getSentryNetwork().handleTransition(event, this);
     }
 
     /**
@@ -38,12 +52,6 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
      */
     public void releaseBootstrapEvents() {
     }
-
-    /**
-     * Outgoing criteria (i.e., for plan items interested in our transitions)
-     */
-    private final List<P> connectedEntryCriteria = new ArrayList();
-    private final List<P> connectedExitCriteria = new ArrayList();
 
     public void connectOnPart(P onPart) {
         if (onPart.getCriterion().isEntryCriterion()) {
@@ -103,6 +111,6 @@ public class TransitionPublisher<I extends CMMNElement<?>, P extends OnPart<?,I>
     }
 
     protected void addDebugInfo(DebugStringAppender appender) {
-        item.addDebugInfo(appender);
+        item.getCaseInstance().addDebugInfo(appender);
     }
 }

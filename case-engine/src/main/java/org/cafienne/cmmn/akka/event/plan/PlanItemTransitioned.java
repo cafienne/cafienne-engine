@@ -19,7 +19,7 @@ import org.cafienne.cmmn.instance.sentry.StandardEvent;
 import java.io.IOException;
 
 @Manifest
-public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent<Transition> {
+public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent<Transition, PlanItem> {
     private final State currentState;
     private final State historyState;
     private final Transition transition;
@@ -36,6 +36,11 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
         this.currentState = json.getEnum(Fields.currentState, State.class);
         this.historyState = json.getEnum(Fields.historyState, State.class);
         this.transition = json.getEnum(Fields.transition, Transition.class);
+    }
+
+    @Override
+    public PlanItem getSource() {
+        return planItem;
     }
 
     public State getCurrentState() {
