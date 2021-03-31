@@ -476,6 +476,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         this.state = newState;
     }
 
+    public String getDescription() {
+        return "CaseFileItem["+getPath()+"]";
+    }
+
     @Override
     public String toString() {
         return getName() + " : " + value;

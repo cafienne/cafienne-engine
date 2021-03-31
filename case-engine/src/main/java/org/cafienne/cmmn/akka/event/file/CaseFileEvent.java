@@ -25,13 +25,15 @@ import java.io.IOException;
  * Event caused by a transition on a CaseFileItem
  */
 @Manifest
-public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition> {
+public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition, CaseFileItem> {
     protected final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
     private final CaseFileItemTransition transition;
     private final Value<?> value;
     protected final Path path;
     private final State state;
+
+    protected transient CaseFileItem caseFileItem;
 
     public CaseFileEvent(CaseFileItemCollection<?> item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
         super(item.getCaseInstance());
@@ -47,6 +49,11 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         this.value = json.get(Fields.value.toString());
         this.path = readPath(json, Fields.path);
         this.state = readEnum(json, Fields.state, State.class);
+    }
+
+    @Override
+    public CaseFileItem getSource() {
+        return caseFileItem;
     }
 
     @Override
@@ -101,8 +108,6 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
     public Path getPath() {
         return path;
     }
-
-    protected transient CaseFileItem caseFileItem;
 
     @Override
     public void updateState(Case caseInstance) {

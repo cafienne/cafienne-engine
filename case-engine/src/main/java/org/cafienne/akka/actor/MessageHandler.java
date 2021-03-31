@@ -93,29 +93,14 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         return addModelEvent(event);
     }
 
-    private EventBehaviorCallStack behaviorCallStack = new EventBehaviorCallStack();
-    private boolean addingEvent = false;
-
     protected <ME extends ModelEvent> ME addModelEvent(ME event) {
         return addModelEvent(events.size(), event);
     }
 
     protected <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
         events.add(index, event);
-
         addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);
-        if (addingEvent) {
-            // TODO: This is a print statement to show where the engine still runs old style
-            if (CaseSystem.devDebugLogger().enabled() && !(event instanceof DebugEvent)) {
-//                addDebugInfo(() -> new Exception("Adding event while updating state?!"), logger);
-                addDebugInfo(() -> "Adding event while updating state?!", logger);
-            }
-        }
-        addingEvent = true;
         event.updateState(actor);
-        addingEvent = false;
-        // Now run the behavior that comes with the event, if any
-        behaviorCallStack.pushEvent(event);
         return event;
     }
 

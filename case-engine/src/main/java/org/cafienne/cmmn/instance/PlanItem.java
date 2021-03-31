@@ -451,6 +451,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         return stage;
     }
 
+    @Override
+    public String getDescription() {
+        return toString();
+    }
+
     final String toDescription() {
         return getType() + "[" + getName() + "|index=" + getIndex() + "|state=" + getState() + "|required=" + isRequired() + "|repeating=" + repeats() + "]";
     }
