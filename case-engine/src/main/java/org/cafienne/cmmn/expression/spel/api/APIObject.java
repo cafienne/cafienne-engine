@@ -90,5 +90,10 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     public Object read(String propertyName) {
         return readers.getOrDefault(propertyName.toLowerCase(), () -> null).get();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }
 

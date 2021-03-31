@@ -74,8 +74,7 @@ public class ConstraintDefinition extends CMMNElementDefinition {
         if (context == null) {
             return null;
         }
-        CaseFileItem caseFileContainer = pathToContext.resolve(caseInstance);
-        return caseFileContainer.getCurrent();
+        return pathToContext.resolve(caseInstance);
     }
 
     public ExpressionDefinition getExpressionDefinition() {
