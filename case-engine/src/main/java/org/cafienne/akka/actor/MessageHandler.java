@@ -93,7 +93,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         return addModelEvent(event);
     }
 
-    private EventBehaviorCallStack behaviorCallStack = new EventBehaviorCallStack(this);
+    private EventBehaviorCallStack behaviorCallStack = new EventBehaviorCallStack();
     private boolean addingEvent = false;
 
     protected <ME extends ModelEvent> ME addModelEvent(ME event) {
@@ -106,7 +106,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);
         if (addingEvent) {
             // TODO: This is a print statement to show where the engine still runs old style
-            if (indentedConsoleLoggingEnabled && !(event instanceof DebugEvent)) {
+            if (CaseSystem.devDebugLogger().enabled() && !(event instanceof DebugEvent)) {
 //                addDebugInfo(() -> new Exception("Adding event while updating state?!"), logger);
                 addDebugInfo(() -> "Adding event while updating state?!", logger);
             }
@@ -158,7 +158,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
             String logMessage = appender.debugInfo();
             if (! logMessage.isBlank()) { // Ignore blank messages
                 logger.debug(logMessage); // plain log4j
-                debugIndentedConsoleLogging(logMessage); // special dev indentation in console
+                CaseSystem.devDebugLogger().debugIndentedConsoleLogging(logMessage); // special dev indentation in console
                 getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
             }
         }
@@ -168,7 +168,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             Value json = appender.info();
             logger.debug(json.toString());
-            debugIndentedConsoleLogging(json);
+            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(json);
             getDebugEvent().addMessage(json);
         }
     }
@@ -177,7 +177,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             Throwable t = appender.exceptionInfo();
             logger.debug(t.getMessage(), t);
-            debugIndentedConsoleLogging(t);
+            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(t);
             getDebugEvent().addMessage(t);
         }
     }
@@ -189,36 +189,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * @return
      */
     private boolean logDebugMessages() {
-        return indentedConsoleLoggingEnabled || actor.debugMode() || logger.isDebugEnabled();
-    }
-
-    /**
-     * Making package private so that EventBehaviorRunner can read it
-     */
-    final boolean indentedConsoleLoggingEnabled = false;
-
-    /**
-     * Internal framework method only.
-     * Making package private so that EventBehaviorRunner can read it
-     */
-    final void debugIndentedConsoleLogging(Object object) {
-        if (! indentedConsoleLoggingEnabled) return;
-
-        if (object instanceof Throwable) {
-            // Print exception with newline before and after it. Will not be indented
-            System.out.println("\n");
-            ((Throwable) object).printStackTrace(System.out);
-            System.out.println("\n");
-        } else {
-            // Convert Value to String if required
-            String logMessage = String.valueOf(object);
-            // Now get current level of indent from current behavior (recursive method)
-            String indent = behaviorCallStack == null ? "" : behaviorCallStack.getIndent();
-            // Make sure if it is a message with newlines, the new lines also get indented
-            logMessage = logMessage.replaceAll("\n", "\n" + indent);
-            // Print to console.
-            System.out.println(indent + logMessage);
-        }
+        return CaseSystem.devDebugLogger().enabled() || actor.debugMode() || logger.isDebugEnabled();
     }
 
     /**
