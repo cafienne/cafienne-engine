@@ -5,8 +5,8 @@ import org.cafienne.cmmn.instance.TimerEvent;
 /**
  */
 public class TimerEventAPI extends PlanItemAPI<TimerEvent> {
-    TimerEventAPI(TimerEvent timerEvent, StageAPI stage) {
-        super(timerEvent, stage);
+    TimerEventAPI(CaseAPI caseAPI, TimerEvent timerEvent, StageAPI stage) {
+        super(caseAPI, timerEvent, stage);
     }
 
     @Override

@@ -8,15 +8,19 @@ import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.CaseFile;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CaseAPI extends APIObject<Case> {
     private final StageAPI casePlan;
     private final CaseTeamAPI caseTeam;
     private final CaseFileAPI caseFile;
 
+    private final Map<String, PlanItemAPI> planItems = new HashMap();
+
     public CaseAPI(Case actor) {
         super(actor);
-        this.casePlan = new StageAPI(actor.getCasePlan(), null);
+        this.casePlan = new StageAPI(this, actor.getCasePlan(), null);
         this.caseTeam = new CaseTeamAPI(actor.getCaseTeam());
         this.caseFile = new CaseFileAPI(actor.getCaseFile());
         addPropertyReader("plan", () -> casePlan);
@@ -30,6 +34,10 @@ public class CaseAPI extends APIObject<Case> {
         addPropertyReader("createdOn", actor::getCreatedOn);
         addPropertyReader("lastModified", actor::getLastModified);
         addDeprecatedReader("caseFile", "file", () -> caseFile);
+    }
+
+    protected void register(PlanItemAPI item) {
+        planItems.put(item.item.getId(), item);
     }
 
     public String getId() {
@@ -58,6 +66,10 @@ public class CaseAPI extends APIObject<Case> {
     }
 
     public PlanItemAPI find(PlanItem item) {
-        return casePlan.find(item);
+        PlanItemAPI api = planItems.get(item.getId());
+        if (api == null) {
+            getActor().addDebugInfo(() -> "ERROR: Unexpectedly cannot find a PlanItemAPI object for " + item);
+        }
+        return api;
     }
 }

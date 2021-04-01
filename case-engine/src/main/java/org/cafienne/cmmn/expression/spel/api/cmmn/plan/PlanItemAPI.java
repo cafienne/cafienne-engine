@@ -11,6 +11,8 @@ import java.util.HashMap;
  */
 public class PlanItemAPI<P extends PlanItem> extends APIObject<Case> {
     protected final P item;
+    protected final StageAPI parent;
+    protected final CaseAPI caseAPI;
 
     private static HashMap<PlanItem, Integer> map = new HashMap();
 
@@ -18,26 +20,32 @@ public class PlanItemAPI<P extends PlanItem> extends APIObject<Case> {
         return item.getType().toLowerCase();
     }
 
-    protected PlanItemAPI find(PlanItem item) {
-        if (this.item == item) {
-            return this;
-        } else {
-            return null;
-        }
-    }
-
-    protected PlanItemAPI(P item, StageAPI stage) {
+    protected PlanItemAPI(CaseAPI caseAPI, P item, StageAPI parent) {
         super(item.getCaseInstance());
         this.item = item;
+        this.caseAPI = caseAPI;
+        this.parent = parent;
         addPropertyReader("id", () -> item.getId());
         addPropertyReader("name", () -> item.getName());
         addPropertyReader("index", () -> item.getIndex());
         addPropertyReader("state", () -> item.getState());
-        addPropertyReader("stage", () -> stage);
+        addPropertyReader("stage", () -> parent);
+        this.caseAPI.register(this);
     }
 
     public String getId() {
         warnDeprecation("getId()", "id");
         return item.getId();
+    }
+
+    protected String getPath() {
+        String indexString = item.getItemDefinition().getPlanItemControl().getRepetitionRule().isDefault() ? "" : "." + item.getIndex();
+        String pathString = "/" + item.getName() + indexString;
+        return parent == null ? "CasePlan" : parent.getPath() + pathString;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + getPath() + "][" + item.getId() + "]";
     }
 }
