@@ -11,6 +11,7 @@ import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.serialization.json.LongValue;
 import org.cafienne.akka.actor.serialization.json.StringValue;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
@@ -27,6 +28,7 @@ import org.cafienne.cmmn.expression.spel.api.cmmn.mapping.TaskInputMappingAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.mapping.TaskOutputMappingAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.workflow.AssignmentAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.workflow.DueDateAPI;
+import org.cafienne.cmmn.expression.spel.api.process.CalculationAPI;
 import org.cafienne.cmmn.expression.spel.api.process.ProcessMappingRootObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -35,8 +37,12 @@ import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.processtask.implementation.calculation.definition.CalculationExpressionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
+import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.springframework.expression.EvaluationException;
+import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelParseException;
@@ -51,12 +57,20 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     private final ExpressionParser parser;
     private final Expression spelExpression;
     private final String expressionString;
-    private final ExpressionDefinition expressionDefinition;
+    private final CMMNElementDefinition expressionDefinition;
 
     public ExpressionEvaluator(ExpressionDefinition expressionDefinition) {
+        this(expressionDefinition, expressionDefinition.getBody());
+    }
+
+    public ExpressionEvaluator(CalculationExpressionDefinition expressionDefinition) {
+        this(expressionDefinition, expressionDefinition.getExpression());
+    }
+
+    private ExpressionEvaluator(CMMNElementDefinition expressionDefinition, String expressinoString) {
         this.parser = new SpelExpressionParser();
-        this.expressionString = expressionDefinition.getBody();
         this.expressionDefinition = expressionDefinition;
+        this.expressionString = expressinoString;
         this.spelExpression = parseExpression();
     }
 
@@ -208,5 +222,19 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
             return null;
         }
         return outcome.toString();
+    }
+
+    /**
+     * Evaluate a single step in a calculation task.
+     * @param calculation
+     * @param step
+     * @param sources
+     * @return
+     * @throws InvalidExpressionException
+     */
+    public Value runCalculationStep(Calculation calculation, CalculationStep step, ValueMap sources) throws InvalidExpressionException {
+        CalculationAPI context = new CalculationAPI(calculation, step, sources);
+        Object result = evaluateExpression(context);
+        return Value.convert(result);
     }
 }
