@@ -9,7 +9,10 @@ package org.cafienne.processtask.implementation.calculation;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
+import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.cafienne.processtask.definition.InlineSubProcessDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
+import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.implementation.calculation.definition.InputParameterSourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
@@ -18,7 +21,7 @@ import org.w3c.dom.Element;
 
 import java.util.*;
 
-public class CalculationDefinition extends SubProcessDefinition {
+public class CalculationDefinition extends InlineSubProcessDefinition {
     private final Collection<StepDefinition> steps = new ArrayList();
     private final Map<String, SourceDefinition> sources = new HashMap();
 
@@ -47,7 +50,7 @@ public class CalculationDefinition extends SubProcessDefinition {
     }
 
     @Override
-    public Calculation createInstance(ProcessTaskActor processTaskActor) {
+    public Calculation createInstance(ProcessTask processTaskActor) {
         return new Calculation(processTaskActor, this);
     }
 

@@ -10,7 +10,9 @@ package org.cafienne.processtask.implementation.calculation;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
+import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.definition.ProcessDefinition;
+import org.cafienne.processtask.implementation.InlineSubProcess;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
@@ -19,15 +21,15 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Calculation extends SubProcess<CalculationDefinition> {
+public class Calculation extends InlineSubProcess<CalculationDefinition> {
     private final Map<String, Source> sourceMap = new HashMap();
 
-    public Calculation(ProcessTaskActor processTask, CalculationDefinition definition) {
+    public Calculation(ProcessTask processTask, CalculationDefinition definition) {
         super(processTask, definition);
     }
 
-    public ProcessTaskActor getTask() {
-        return super.processTaskActor;
+    public ProcessTask getTask() {
+        return super.task;
     }
 
     @Override
@@ -40,18 +42,18 @@ public class Calculation extends SubProcess<CalculationDefinition> {
         // Print debug information
         ProcessDefinition processDefinition = this.definition.getProcessDefinition();
         Map<String, OutputParameterDefinition> outputs = processDefinition.getOutputParameters();
-        processTaskActor.addDebugInfo(() -> processDefinition.getName() + ": running " + outputs.size() + " calculations for output parameters");
+        addDebugInfo(() -> processDefinition.getName() + ": running " + outputs.size() + " calculations for output parameters");
         try {
             outputs.forEach((name, parameter) -> {
-                processTaskActor.addDebugInfo(() -> "Calculating value for " + name);
+                addDebugInfo(() -> "Calculating value for " + name);
                 Source step = getInstance(name);
                 if (step.isValid()) {
                     Result result = step.getResult();
                     Value output = result.getValue();
-                    getTask().addDebugInfo(() -> "Result for '" + name + "': ", output);
+                    getTask().getCaseInstance().addDebugInfo(() -> "Result for '" + name + "': ", output);
                     setProcessOutputParameter(name, output);
                 } else {
-                    processTaskActor.addDebugInfo(() -> "Result for '" + name + "' is not applicable, hence not added to the output parameters");
+                    addDebugInfo(() -> "Result for '" + name + "' is not applicable, hence not added to the output parameters");
                 }
             });
             raiseComplete();

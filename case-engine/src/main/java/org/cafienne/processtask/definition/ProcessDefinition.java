@@ -32,4 +32,8 @@ public class ProcessDefinition extends ModelDefinition implements TaskImplementa
     public SubProcessDefinition getImplementation() {
         return subProcessDefinition;
     }
+
+    public InlineSubProcessDefinition getInlineImplementation() {
+    	return (InlineSubProcessDefinition) subProcessDefinition;
+	}
 }
