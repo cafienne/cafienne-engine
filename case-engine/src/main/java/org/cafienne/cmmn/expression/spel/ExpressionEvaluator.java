@@ -37,8 +37,7 @@ import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.processtask.implementation.calculation.definition.CalculationExpressionDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.springframework.expression.EvaluationException;
@@ -67,17 +66,23 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         this(expressionDefinition, expressionDefinition.getExpression());
     }
 
-    private ExpressionEvaluator(CMMNElementDefinition expressionDefinition, String expressinoString) {
+    private ExpressionEvaluator(CMMNElementDefinition expressionDefinition, String expressionString) {
         this.parser = new SpelExpressionParser();
         this.expressionDefinition = expressionDefinition;
-        this.expressionString = expressinoString;
+        this.expressionString = expressionString;
         this.spelExpression = parseExpression();
     }
 
     private Expression parseExpression() {
+        if (expressionString.isBlank()) {
+            // Empty expressions lead to IllegalStateException("no node") --> checking here gives a somewhat more understandable error ...
+            expressionDefinition.getModelDefinition().addDefinitionError(expressionDefinition.getContextDescription() + " has no expression");
+            return null;
+        }
+
         try {
             return parser.parseExpression(expressionString);
-        } catch (SpelParseException spe) {
+        } catch (Exception spe) { // Parser uses Assert class of Spring, which raises also exceptions like IllegalStateException
             expressionDefinition.getModelDefinition().addDefinitionError(expressionDefinition.getContextDescription() + " has an invalid expression:\n" + spe.getMessage());
             return null;
         }
