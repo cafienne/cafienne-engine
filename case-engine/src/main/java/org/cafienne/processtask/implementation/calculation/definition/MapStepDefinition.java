@@ -10,16 +10,17 @@ package org.cafienne.processtask.implementation.calculation.definition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.expression.FilterExpressionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.expression.MapExpressionDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.w3c.dom.Element;
 
-public class FilterStepDefinition extends StepDefinition {
-    public FilterStepDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
-        super(element, processDefinition, parentElement, FilterExpressionDefinition.class);
+public class MapStepDefinition extends StepDefinition {
+    public MapStepDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
+        super(element, processDefinition, parentElement, MapExpressionDefinition.class);
     }
 
     @Override
     public String getType() {
-        return "Filter";
+        return "Mapping step";
     }
 }

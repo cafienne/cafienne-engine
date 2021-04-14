@@ -12,6 +12,7 @@ import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.definition.InlineSubProcessDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.FilterStepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.MapStepDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
@@ -27,6 +28,7 @@ public class CalculationDefinition extends InlineSubProcessDefinition {
         super(element, processDefinition, parentElement);
         parse("step", StepDefinition.class, steps);
         parse("filter", FilterStepDefinition.class, steps);
+        parse("map", MapStepDefinition.class, steps);
 
         // Now, build the mapping chain; sources can be input parameters and also the mappings themselves
         getProcessDefinition().getInputParameters().forEach((name, parameter) -> sources.put(name, new InputParameterSourceDefinition(parameter)));

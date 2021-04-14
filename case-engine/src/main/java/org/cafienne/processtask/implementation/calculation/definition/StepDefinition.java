@@ -49,6 +49,17 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
         this.condition = parse("condition", ConditionDefinition.class, false);
     }
 
+    /**
+     * Utility method for stream steps. Assures a single input only and returns that name
+     * @return
+     */
+    public String assertOneInput() {
+        if (inputReferences.size() != 1) {
+            this.getProcessDefinition().addDefinitionError(this.getDescription() + " must have precisely 1 input reference; found " + inputReferences.size() + " inputs");
+        }
+        return inputReferences.get(0);
+    }
+
     @Override
     protected void resolveReferences() {
         super.resolveReferences();

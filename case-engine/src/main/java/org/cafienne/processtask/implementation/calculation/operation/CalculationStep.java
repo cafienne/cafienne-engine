@@ -7,14 +7,12 @@
  */
 package org.cafienne.processtask.implementation.calculation.operation;
 
-import org.cafienne.akka.actor.serialization.json.BooleanValue;
-import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
+import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 
 public class CalculationStep extends Source<StepDefinition> {
     private ValueMap inputs = null;

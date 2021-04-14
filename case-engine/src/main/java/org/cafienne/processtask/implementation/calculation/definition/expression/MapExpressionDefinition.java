@@ -7,17 +7,17 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.FilterStepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.MapStepDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.w3c.dom.Element;
 
-public class FilterExpressionDefinition extends ConditionDefinition {
+public class MapExpressionDefinition extends CalculationExpressionDefinition {
     private final String inputName;
     private final String elementName;
 
-    public FilterExpressionDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
+    public MapExpressionDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        FilterStepDefinition parent = getParentElement();
+        MapStepDefinition parent = getParentElement();
         inputName = parent.assertOneInput();
         elementName = parseAttribute("element", false, inputName);
     }
@@ -29,7 +29,7 @@ public class FilterExpressionDefinition extends ConditionDefinition {
 
     @Override
     public String getType() {
-        return "Filter";
+        return "Mapping step";
     }
 
     class ResultCreator {
@@ -41,31 +41,26 @@ public class FilterExpressionDefinition extends ConditionDefinition {
         ResultCreator(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
             this.calculation = calculation;
             this.step = step;
-            this.input = sourceMap.get(inputName);
-            this.result = new Result(calculation, step, getFilteredValue());
+            this.input = sourceMap.get(inputName); // Take the input by it's original name
+            this.result = new Result(calculation, step, getMappedValue());
         }
 
-        private Value getFilteredValue() {
+        private Value getMappedValue() {
             if (input.isList()) {
-                // Filter the list and return a list with the filtered items only.
-                Object[] items = input.asList().stream().filter(this::isFilteredItem).toArray();
-                // Note: "items" is always an array of type Value
+                // Map the list and return a list with the mapped items.
+                Object[] items = input.asList().stream().map(this::mapItem).toArray();
+                // Note: items is always an array of type Value
                 return new ValueList(items);
             } else {
-                // Instead of the list, we will only check if the given input object matches the filter.
-                // If so, then we return that object, otherwise we return a null value (is that the best choice?)
-                if (isFilteredItem(input)) {
-                    return input;
-                } else {
-                    return Value.NULL;
-                }
+                // Instead of the list, we will only map the given input object.
+                return mapItem(input);
             }
         }
 
-        private boolean isFilteredItem(Value item) {
+        private Value mapItem(Value item) {
             // In the expression, the input element can only be accessed through the element name
             ValueMap sourceMap = new ValueMap(elementName, item);
-            return getBooleanResult(calculation, step, sourceMap);
+            return evaluateExpression(calculation, step, sourceMap);
         }
     }
 }
