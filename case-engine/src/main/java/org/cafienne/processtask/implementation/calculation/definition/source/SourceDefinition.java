@@ -1,6 +1,7 @@
-package org.cafienne.processtask.implementation.calculation.definition;
+package org.cafienne.processtask.implementation.calculation.definition.source;
 
 import org.cafienne.processtask.implementation.calculation.Calculation;
+import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
 
 import java.util.Collection;

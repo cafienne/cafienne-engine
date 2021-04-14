@@ -11,12 +11,10 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.definition.InlineSubProcessDefinition;
-import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.implementation.calculation.definition.InputParameterSourceDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.FilterStepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
-import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 import java.util.*;
@@ -28,6 +26,7 @@ public class CalculationDefinition extends InlineSubProcessDefinition {
     public CalculationDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         parse("step", StepDefinition.class, steps);
+        parse("filter", FilterStepDefinition.class, steps);
 
         // Now, build the mapping chain; sources can be input parameters and also the mappings themselves
         getProcessDefinition().getInputParameters().forEach((name, parameter) -> sources.put(name, new InputParameterSourceDefinition(parameter)));

@@ -12,8 +12,8 @@ import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.ConditionDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 
 public class CalculationStep extends Source<StepDefinition> {
@@ -40,18 +40,11 @@ public class CalculationStep extends Source<StepDefinition> {
         if (condition == null) {
             return true;
         }
-        Value validity = condition.getResult(calculation, this, getInputs()).getValue();
-        if (validity instanceof BooleanValue) {
-            return ((BooleanValue) validity).getValue();
-        } else {
-            // Now what?!
-            calculation.getTask().getCaseInstance().addDebugInfo(() -> "Condition in " + definition.getDescription() + " does not return a boolean value. Returning false");
-            return false;
-        }
+        return condition.getBooleanResult(calculation, this, getInputs());
     }
 
     protected Result calculateResult() {
         // Let the expression create a result for us
-        return definition.getExpression().getResult(calculation, this, getInputs());
+        return definition.getResult(calculation, this, getInputs());
     }
 }

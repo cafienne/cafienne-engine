@@ -3,7 +3,7 @@ package org.cafienne.processtask.implementation.calculation.operation;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.InputParameterSourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
 
 public class InputSource extends Source {
     private final InputParameterDefinition parameter;

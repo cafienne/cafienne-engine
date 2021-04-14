@@ -3,10 +3,8 @@ package org.cafienne.cmmn.expression.spel.api.process;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
-import org.cafienne.cmmn.expression.spel.api.ProcessActorRootObject;
-import org.cafienne.cmmn.expression.spel.api.cmmn.constraint.PlanItemRootAPI;
 import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 
 import java.util.stream.Collectors;

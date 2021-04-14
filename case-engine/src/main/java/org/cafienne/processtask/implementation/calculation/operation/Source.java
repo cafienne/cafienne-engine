@@ -2,7 +2,7 @@ package org.cafienne.processtask.implementation.calculation.operation;
 
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 
 public abstract class Source<D extends SourceDefinition> {
     private Result result;

@@ -13,10 +13,8 @@ import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.InlineSubProcess;
-import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.processtask.implementation.calculation.definition.SourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
-import org.cafienne.processtask.instance.ProcessTaskActor;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -7,10 +7,15 @@
  */
 package org.cafienne.processtask.implementation.calculation.definition;
 
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.CalculationDefinition;
+import org.cafienne.processtask.implementation.calculation.Result;
+import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
 import org.cafienne.util.XMLHelper;
@@ -32,11 +37,15 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
     private final ConditionDefinition condition;
 
     public StepDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
+        this(element, processDefinition, parentElement, CalculationExpressionDefinition.class);
+    }
+
+    protected StepDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement, Class<? extends CalculationExpressionDefinition> expresssionType) {
         super(element, processDefinition, parentElement);
         this.inputReferences = XMLHelper.getChildrenWithTagName(element, "input").stream().map(child -> XMLHelper.getContent(child, null, "")).filter(ref -> !ref.isBlank()).collect(Collectors.toList());
         this.identifier = parseAttribute("output", true);
         this.parent = (CalculationDefinition) parentElement; // Should not fail, otherwise structure has changed...
-        this.expression = parse("expression", CalculationExpressionDefinition.class, true);
+        this.expression = parse("expression", expresssionType, true);
         this.condition = parse("condition", ConditionDefinition.class, false);
     }
 
@@ -73,8 +82,8 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
         return condition;
     }
 
-    public CalculationExpressionDefinition getExpression() {
-        return expression;
+    public Result getResult(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
+        return expression.getResult(calculation, step, sourceMap);
     }
 
     public Collection<SourceDefinition> getSources() {
