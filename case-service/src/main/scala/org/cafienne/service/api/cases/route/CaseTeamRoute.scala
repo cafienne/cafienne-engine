@@ -68,7 +68,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
-  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[Examples.StartCaseTeamMemberFormat])))))
+  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.StartCaseTeamFormat]))))
   @Consumes(Array("application/json"))
   def setCaseTeam = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
