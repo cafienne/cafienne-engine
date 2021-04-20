@@ -56,7 +56,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
         for (int i = 0; i < rawInputs.length; i += 2) {
             if (!(rawInputs[i] instanceof String || rawInputs[i] instanceof Fields)) {
-                throw new IllegalArgumentException("Field name of parameter " + (i % 2) + " is not of type String or Fields, but it must be; found type " + rawInputs[i].getClass().getName());
+                throw new IllegalArgumentException("Field name of parameter " + (i % 2) + " is not of type String or Fields, but it must be; found type " + (rawInputs[i] == null ? "null" : rawInputs[i].getClass().getName()));
             }
             putRaw(String.valueOf(rawInputs[i]), rawInputs[i + 1]);
         }

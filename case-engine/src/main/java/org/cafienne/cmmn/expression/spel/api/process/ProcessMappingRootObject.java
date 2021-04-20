@@ -2,7 +2,7 @@ package org.cafienne.cmmn.expression.spel.api.process;
 
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.expression.spel.api.APIRootObject;
+import org.cafienne.cmmn.expression.spel.api.ProcessActorRootObject;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 /**
@@ -10,7 +10,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
  * Can read the parameter name in the expression and resolve it to the parameter value.
  * Contains furthermore a task property, to provide for the task context for which this parameter transformation is being executed.
  */
-public class ProcessMappingRootObject extends APIRootObject<ProcessTaskActor> {
+public class ProcessMappingRootObject extends ProcessActorRootObject {
 
     private final ParameterDefinition rawParameter;
     private final ParameterDefinition targetParameter;
@@ -20,7 +20,6 @@ public class ProcessMappingRootObject extends APIRootObject<ProcessTaskActor> {
         this.rawParameter = rawParameter;
         this.targetParameter = targetParameter;
         addPropertyReader(rawParameter.getName(), () -> parameterValue);
-        addPropertyReader("task", () -> processTaskActor);
     }
 
     @Override

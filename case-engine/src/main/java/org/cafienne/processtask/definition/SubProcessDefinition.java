@@ -14,6 +14,7 @@ import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
@@ -77,6 +78,17 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
         failureMappings.addAll(mappings);
         parseGrandChildren("success", "parameterMapping", SubProcessMapping.class, successMappings);
         parseGrandChildren("failure", "parameterMapping", SubProcessMapping.class, failureMappings);
+    }
+
+    /**
+     * If the SubProcessDefinition can be run _within_ the Case, then override this method to return true.
+     * Note, and inline SubProcessDefinition is ran within the thread of the creation of the task in the case.
+     * Also, the createInstance() method will be invoked with the Task as parameter, instead of the ProcessTaskActor.
+     * This method returns false by default - every process runs within it's own Akka Actor context.
+     * @return
+     */
+    public boolean isInline() {
+        return false;
     }
 
     /**

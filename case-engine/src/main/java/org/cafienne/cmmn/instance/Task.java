@@ -29,7 +29,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     private ValueMap taskInput = new ValueMap();
     private ValueMap implementationInput = new ValueMap();
 
-    private ValueMap implementationOutput = new ValueMap();
+    private ValueMap givenOutput = new ValueMap();
     private ValueMap taskOutput = new ValueMap();
 
     protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage stage) {
@@ -74,64 +74,6 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         // Hmmm... can only be invoked by the implementation.
     }
 
-    public ValidationResponse validateOutput(ValueMap potentialRawOutput) {
-        // Create maps to store the values that must be validated.
-        ValueMap implementationOutput = potentialRawOutput == null ? new ValueMap() : potentialRawOutput;
-        ValueMap potentialTaskOutput = new ValueMap();
-        Vector<String> validationErrors = new Vector();
-
-        Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
-        for (ParameterMappingDefinition mapping : mappings) {
-            if (!mapping.isInputParameterMapping()) {
-                String implementationOutputParameterName = mapping.getSource().getName();
-                Value<?> implementationOutputParameterValue = implementationOutput.get(implementationOutputParameterName);
-                Value<?> outputParameter = mapping.transformOutput(this, implementationOutputParameterValue);
-                potentialTaskOutput.put(mapping.getTarget().getName(), outputParameter);
-            }
-        }
-
-        getDefinition().getOutputParameters().forEach((name, parameterDefinition) -> {
-            if (parameterDefinition.isMandatory()) {
-                Value<?> parameterValue = potentialTaskOutput.get(name);
-                if (parameterValue.equals(Value.NULL)) {
-                    validationErrors.add("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
-                }
-            }
-        });
-
-        if (validationErrors.size() > 0) {
-            throw new InvalidCommandException(validationErrors.toString());
-        }
-
-        // Everything went ok, let's return an empty value map
-        return new ValidationResponse(new ValueMap());
-    }
-
-    /**
-     * This method is called to complete a task
-     * @param rawOutputParameters
-     */
-    public void goComplete(ValueMap rawOutputParameters) {
-        makeTransitionWithOutput(rawOutputParameters, Transition.Complete);
-    }
-
-    /**
-     * This method is called when a task fails
-     * @param rawOutputParameters
-     */
-    public void goFault(ValueMap rawOutputParameters) {
-        makeTransitionWithOutput(rawOutputParameters, Transition.Fault);
-    }
-
-    private void makeTransitionWithOutput(ValueMap rawOutputParameters, Transition transition) {
-        prepareTransition(transition);
-        if (rawOutputParameters == null) {
-            rawOutputParameters = new ValueMap();
-        }
-        transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
-        makeTransition(transition);
-    }
-
     protected void transformInputParameters() {
         ValueMap mappedInputParameters = new ValueMap();
         ValueMap inputParametersValues = new ValueMap();
@@ -158,19 +100,52 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         addEvent(new TaskInputFilled(this, inputParametersValues, mappedInputParameters));
     }
 
+    public ValidationResponse validateOutput(ValueMap implementationOutput) {
+        // Run mappings will throw the InvalidCommandException if there are errors.
+        transformOutputParameters(implementationOutput, true);
+        // Everything went ok, let's return an empty value map
+        return new ValidationResponse(new ValueMap());
+    }
+
+    /**
+     * This method is called to complete a task
+     * @param rawOutputParameters
+     */
+    public void goComplete(ValueMap rawOutputParameters) {
+        makeTransitionWithOutput(rawOutputParameters, Transition.Complete);
+    }
+
+    /**
+     * This method is called when a task fails
+     * @param rawOutputParameters
+     */
+    public void goFault(ValueMap rawOutputParameters) {
+        makeTransitionWithOutput(rawOutputParameters, Transition.Fault);
+    }
+
+    private void makeTransitionWithOutput(ValueMap rawOutputParameters, Transition transition) {
+        prepareTransition(transition);
+        ValueMap newTaskOutput = transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
+        addEvent(new TaskOutputFilled(this, newTaskOutput, rawOutputParameters));
+        makeTransition(transition);
+    }
+
     /**
      * Fill the output parameters of the task, based on the output parameters of the implementation
      * of the task (i.e., based on the output of the sub process or sub case that was invoked).
      *
-     * @param implementationOutput
+     * @param output
      * @param validateOutput Indicates whether a check on mandatory parameter values must be done
      */
-    protected void transformOutputParameters(ValueMap implementationOutput, boolean validateOutput) {
+    protected ValueMap transformOutputParameters(ValueMap output, boolean validateOutput) {
+        ValueMap taskImplementationOutput = output == null ? new ValueMap() : output;
+
+        // Create maps to store the values that must be validated.
         Collection<ParameterMappingDefinition> mappings = getDefinition().getParameterMappings();
 
-        // Check on missing raw parameters
+        // Check on missing raw parameters and log debug information for that.
         addDebugInfo(() -> {
-            List<ParameterMappingDefinition> missingParameters = mappings.stream().filter(m -> !m.isInputParameterMapping() && !implementationOutput.has(m.getSource().getName())).collect(Collectors.toList());
+            List<ParameterMappingDefinition> missingParameters = mappings.stream().filter(m -> !m.isInputParameterMapping() && !taskImplementationOutput.has(m.getSource().getName())).collect(Collectors.toList());
             if (missingParameters.isEmpty()) {
                 return "";
             } else if (missingParameters.size() == 1) {
@@ -183,7 +158,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         });
         // Check on raw parameters that have no matching definition
         addDebugInfo(() -> {
-            List<String> undefinedParameters = implementationOutput.getValue().keySet().stream().filter(rawOutputParameterName -> mappings.stream().filter(m -> m.getSource().getName().equals(rawOutputParameterName)).count() == 0).collect(Collectors.toList());
+            List<String> undefinedParameters = taskImplementationOutput.getValue().keySet().stream().filter(rawOutputParameterName -> mappings.stream().filter(m -> m.getSource().getName().equals(rawOutputParameterName)).count() == 0).collect(Collectors.toList());
             if (undefinedParameters.isEmpty()) {
                 return "";
             } else if (undefinedParameters.size() == 1) {
@@ -203,8 +178,8 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
                 //  This is typically the case for e.g. failing process tasks
                 //  Note that there is an exception for mappings that have a "static" expression, i.e.,
                 //  an expression that does not rely on the raw output parameter.
-                if (implementationOutput.has(rawOutputParameterName)) {
-                    Value<?> rawValue = implementationOutput.get(rawOutputParameterName);
+                if (taskImplementationOutput.has(rawOutputParameterName)) {
+                    Value<?> rawValue = taskImplementationOutput.get(rawOutputParameterName);
                     Value<?> taskOutputParameterValue = mapping.transformOutput(this, rawValue);
                     newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
                 } else if (mapping.hasTransformation()) {
@@ -218,24 +193,34 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
                     if (! Value.NULL.equals(taskOutputParameterValue)) {
                         newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
                     }
+                } else {
+                    // In this case, the expected raw output parameter is not available with a value,
+                    //  and there is also no static expression to fill the target task output parameter.
+                    // Therefore, we will omit the target task output parameter (i.e., we do NOT pass e.g. a null value)
+                    // The consequence is that the case file will not be filled/overwritten with e.g. unexpected null values.
                 }
             }
         }
 
         // Now check that all mandatory parameters have a non-null value
         if (validateOutput) {
+            Vector<String> validationErrors = new Vector();
             getDefinition().getOutputParameters().forEach((name, parameterDefinition) -> {
                 if (parameterDefinition.isMandatory()) {
 //                    System.out.println("Validating mandatory output parameter "+name);
                     Value<?> parameterValue = newTaskOutput.get(name);
                     if (parameterValue.equals(Value.NULL)) {
-                        throw new InvalidCommandException("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
+                        validationErrors.add("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
                     }
                 }
             });
+
+            if (validationErrors.size() > 0) {
+                throw new InvalidCommandException(validationErrors.toString());
+            }
         }
 
-        addEvent(new TaskOutputFilled(this, newTaskOutput, implementationOutput));
+        return newTaskOutput;
     }
 
     protected ValueMap getInputParameters() {
@@ -271,7 +256,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     }
 
     public void updateState(TaskOutputFilled event) {
-        this.implementationOutput = event.getRawOutputParameters();
+        this.givenOutput = event.getRawOutputParameters();
         this.taskOutput = event.getTaskOutputParameters();
         this.taskOutput.getValue().forEach((name, value) -> {
             // Note, this code assumes all task output keys have a correspondingly defined parameter.
