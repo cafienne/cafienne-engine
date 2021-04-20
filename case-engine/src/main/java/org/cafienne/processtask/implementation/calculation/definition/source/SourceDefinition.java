@@ -5,6 +5,7 @@ import org.cafienne.processtask.implementation.calculation.definition.StepDefini
 import org.cafienne.processtask.implementation.calculation.operation.Source;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public interface SourceDefinition {
     /**
@@ -23,9 +24,15 @@ public interface SourceDefinition {
         return this.getClass().getSimpleName();
     }
 
-    Collection<SourceDefinition> getSources();
-
     default String getDescription() {
         return this.getType() + " '" + getIdentifier() + "'";
+    }
+
+    /**
+     * Return sources that this source is dependent on.
+     * @return
+     */
+    default Collection<InputReference> getInputs() {
+        return Collections.emptySet();
     }
 }

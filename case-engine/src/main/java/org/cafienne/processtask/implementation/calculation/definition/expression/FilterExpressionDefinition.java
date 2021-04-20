@@ -2,29 +2,30 @@ package org.cafienne.processtask.implementation.calculation.definition.expressio
 
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.FilterStepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.w3c.dom.Element;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FilterExpressionDefinition extends ConditionDefinition {
-    private final String inputName;
-    private final String elementName;
+    private final InputReference inputReference;
 
     public FilterExpressionDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         FilterStepDefinition parent = getParentElement();
-        inputName = parent.assertOneInput();
-        elementName = parseAttribute("element", false, inputName);
+        inputReference = parent.assertOneInput();
     }
 
     @Override
-    public Result getResult(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
-        return new ResultCreator(calculation, step, sourceMap).result;
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> inputs) {
+        return new ResultCreator(calculation, step, inputs.get(inputReference)).result;
     }
 
     @Override
@@ -38,10 +39,10 @@ public class FilterExpressionDefinition extends ConditionDefinition {
         private final Value input;
         private final Result result;
 
-        ResultCreator(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
+        ResultCreator(Calculation calculation, CalculationStep step, Value input) {
             this.calculation = calculation;
             this.step = step;
-            this.input = sourceMap.get(inputName);
+            this.input = input;
             this.result = new Result(calculation, step, getFilteredValue());
         }
 
@@ -64,8 +65,9 @@ public class FilterExpressionDefinition extends ConditionDefinition {
 
         private boolean isFilteredItem(Value item) {
             // In the expression, the input element can only be accessed through the element name
-            ValueMap sourceMap = new ValueMap(elementName, item);
-            return getBooleanResult(calculation, step, sourceMap);
+            Map<InputReference, Value> filteredInputs = new HashMap();
+            filteredInputs.put(inputReference, item);
+            return getBooleanResult(calculation, step, filteredInputs);
         }
     }
 }

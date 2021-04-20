@@ -8,15 +8,16 @@
 package org.cafienne.processtask.implementation.calculation.definition.expression;
 
 import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.expression.spel.ExpressionEvaluator;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
-import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.w3c.dom.Element;
+
+import java.util.Map;
 
 public class CalculationExpressionDefinition extends CMMNElementDefinition {
     private final ExpressionEvaluator evaluator;
@@ -28,16 +29,12 @@ public class CalculationExpressionDefinition extends CMMNElementDefinition {
         this.evaluator = new ExpressionEvaluator(this);
     }
 
-    public Result getResult(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
         // If there is an expression, execute it on the incoming values, otherwise just return the incoming values
-        if (expression.isEmpty()) {
-            return new Result(calculation, step, sourceMap);
-        } else {
-            return new Result(calculation, step, evaluateExpression(calculation, step, sourceMap));
-        }
+        return new Result(calculation, step, evaluateExpression(calculation, step, sourceMap));
     }
 
-    protected Value evaluateExpression(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
+    protected Value evaluateExpression(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
         return evaluator.runCalculationStep(calculation, step, sourceMap);
     }
 

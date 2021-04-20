@@ -2,29 +2,30 @@ package org.cafienne.processtask.implementation.calculation.definition.expressio
 
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.MapStepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.w3c.dom.Element;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MapExpressionDefinition extends CalculationExpressionDefinition {
-    private final String inputName;
-    private final String elementName;
+    private final InputReference inputReference;
 
     public MapExpressionDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         MapStepDefinition parent = getParentElement();
-        inputName = parent.assertOneInput();
-        elementName = parseAttribute("element", false, inputName);
+        inputReference = parent.assertOneInput();
     }
 
     @Override
-    public Result getResult(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
-        return new ResultCreator(calculation, step, sourceMap).result;
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
+        return new ResultCreator(calculation, step, sourceMap.get(inputReference)).result;
     }
 
     @Override
@@ -38,10 +39,10 @@ public class MapExpressionDefinition extends CalculationExpressionDefinition {
         private final Value input;
         private final Result result;
 
-        ResultCreator(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
+        ResultCreator(Calculation calculation, CalculationStep step, Value input) {
             this.calculation = calculation;
             this.step = step;
-            this.input = sourceMap.get(inputName); // Take the input by it's original name
+            this.input = input;
             this.result = new Result(calculation, step, getMappedValue());
         }
 
@@ -59,8 +60,9 @@ public class MapExpressionDefinition extends CalculationExpressionDefinition {
 
         private Value mapItem(Value item) {
             // In the expression, the input element can only be accessed through the element name
-            ValueMap sourceMap = new ValueMap(elementName, item);
-            return evaluateExpression(calculation, step, sourceMap);
+            Map<InputReference, Value> mappableInput = new HashMap();
+            mappableInput.put(inputReference, item);
+            return evaluateExpression(calculation, step, mappableInput);
         }
     }
 }

@@ -9,19 +9,21 @@ package org.cafienne.processtask.implementation.calculation.definition.expressio
 
 import org.cafienne.akka.actor.serialization.json.BooleanValue;
 import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.w3c.dom.Element;
+
+import java.util.Map;
 
 public class ConditionDefinition extends CalculationExpressionDefinition {
     public ConditionDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
     }
 
-    public boolean getBooleanResult(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
+    public boolean getBooleanResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
         Value validity = super.evaluateExpression(calculation, step, sourceMap);
         if (validity instanceof BooleanValue) {
             return ((BooleanValue) validity).getValue();

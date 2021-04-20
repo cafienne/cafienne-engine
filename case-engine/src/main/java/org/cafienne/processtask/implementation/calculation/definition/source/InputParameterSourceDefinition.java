@@ -3,12 +3,8 @@ package org.cafienne.processtask.implementation.calculation.definition.source;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.InputSource;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
-
-import java.util.Collection;
-import java.util.Collections;
 
 public class InputParameterSourceDefinition implements SourceDefinition {
     private final InputParameterDefinition parameter;
@@ -35,10 +31,5 @@ public class InputParameterSourceDefinition implements SourceDefinition {
     @Override
     public String getType() {
         return "Input parameter";
-    }
-
-    @Override
-    public Collection<SourceDefinition> getSources() {
-        return Collections.emptySet();
     }
 }

@@ -13,9 +13,9 @@ import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.definition.InlineSubProcessDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.FilterStepDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.MapStepDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 import org.w3c.dom.Element;
 
 import java.util.*;

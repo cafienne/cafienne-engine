@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Calculation extends InlineSubProcess<CalculationDefinition> {
-    private final Map<String, Source> sourceMap = new HashMap();
+    private final Map<SourceDefinition, Source> sources = new HashMap();
 
     public Calculation(ProcessTask processTask, CalculationDefinition definition) {
         super(processTask, definition);
@@ -44,7 +44,7 @@ public class Calculation extends InlineSubProcess<CalculationDefinition> {
         try {
             outputs.forEach((name, parameter) -> {
                 addDebugInfo(() -> "Calculating value for " + name);
-                Source step = getInstance(name);
+                Source step = getSource(name);
                 if (step.isValid()) {
                     Result result = step.getResult();
                     Value output = result.getValue();
@@ -60,13 +60,16 @@ public class Calculation extends InlineSubProcess<CalculationDefinition> {
         }
     }
 
-    Source getInstance(String target) {
-        return getInstance(definition.getTarget(target));
+    Source getSource(String target) {
+        return getSource(definition.getTarget(target));
     }
 
-    public Source getInstance(SourceDefinition definition) {
-        Source source = sourceMap.getOrDefault(definition.getIdentifier(), definition.createInstance(this));
-        sourceMap.put(definition.getIdentifier(), source);
+    public Source getSource(SourceDefinition definition) {
+        Source source = sources.get(definition);
+        if (source == null) {
+            source = definition.createInstance(this);
+            sources.put(definition, source);
+        }
         return source;
     }
 

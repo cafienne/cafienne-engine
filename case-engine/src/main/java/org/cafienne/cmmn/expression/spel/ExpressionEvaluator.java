@@ -38,6 +38,7 @@ import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.springframework.expression.EvaluationException;
@@ -51,6 +52,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     private final ExpressionParser parser;
@@ -237,7 +239,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
      * @return
      * @throws InvalidExpressionException
      */
-    public Value runCalculationStep(Calculation calculation, CalculationStep step, ValueMap sources) throws InvalidExpressionException {
+    public Value runCalculationStep(Calculation calculation, CalculationStep step, Map<InputReference, Value> sources) throws InvalidExpressionException {
         CalculationAPI context = new CalculationAPI(calculation, step, sources);
         Object result = evaluateExpression(context);
         return Value.convert(result);

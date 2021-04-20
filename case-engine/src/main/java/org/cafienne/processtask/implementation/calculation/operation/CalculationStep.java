@@ -7,15 +7,18 @@
  */
 package org.cafienne.processtask.implementation.calculation.operation;
 
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CalculationStep extends Source<StepDefinition> {
-    private ValueMap inputs = null;
+    private Map<InputReference, Value> inputs = null;
     private final ConditionDefinition condition;
 
     public CalculationStep(Calculation calculation, StepDefinition definition) {
@@ -23,12 +26,12 @@ public class CalculationStep extends Source<StepDefinition> {
         this.condition = definition.getCondition();
     }
 
-    protected ValueMap getInputs() {
+    protected Map<InputReference, Value> getInputs() {
         if (inputs == null) {
-            inputs = new ValueMap();
-            for (SourceDefinition sourceDefinition : definition.getSources()) {
-                Source source = calculation.getInstance(sourceDefinition);
-                inputs.put(sourceDefinition.getIdentifier(), source.getResult().getValue());
+            inputs = new HashMap();
+            for (InputReference input : definition.getInputs()) {
+                Source source = calculation.getSource(input.getSource());
+                inputs.put(input, source.getResult().getValue());
             }
         }
         return inputs;

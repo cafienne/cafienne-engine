@@ -7,33 +7,32 @@
  */
 package org.cafienne.processtask.implementation.calculation.definition;
 
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;
-import org.cafienne.processtask.implementation.calculation.CalculationDefinition;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
+import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StepDefinition extends CMMNElementDefinition implements SourceDefinition {
-    private final CalculationDefinition parent;
     private final CalculationExpressionDefinition expression;
 
-    private final List<String> inputReferences;
+    private final List<String> inputs;
+    private final List<InputReference> inputReferences = new ArrayList();
     private final String identifier;
-    private final Map<String, SourceDefinition> sources = new HashMap();
     private final ConditionDefinition condition;
 
     public StepDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
@@ -42,9 +41,9 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
 
     protected StepDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement, Class<? extends CalculationExpressionDefinition> expresssionType) {
         super(element, processDefinition, parentElement);
-        this.inputReferences = XMLHelper.getChildrenWithTagName(element, "input").stream().map(child -> XMLHelper.getContent(child, null, "")).filter(ref -> !ref.isBlank()).collect(Collectors.toList());
+        this.inputs = XMLHelper.getChildrenWithTagName(element, "input").stream().map(child -> XMLHelper.getContent(child, null, "")).filter(ref -> !ref.isBlank()).collect(Collectors.toList());
+        parse("input", InputReference.class, inputReferences);
         this.identifier = parseAttribute("output", true);
-        this.parent = (CalculationDefinition) parentElement; // Should not fail, otherwise structure has changed...
         this.expression = parse("expression", expresssionType, true);
         this.condition = parse("condition", ConditionDefinition.class, false);
     }
@@ -53,35 +52,16 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
      * Utility method for stream steps. Assures a single input only and returns that name
      * @return
      */
-    public String assertOneInput() {
+    public InputReference assertOneInput() {
         if (inputReferences.size() != 1) {
-            this.getProcessDefinition().addDefinitionError(this.getDescription() + " must have precisely 1 input reference; found " + inputReferences.size() + " inputs");
+            this.getProcessDefinition().addDefinitionError(this.getDescription() + " must have precisely 1 input reference; found " + inputs.size() + " inputs");
         }
         return inputReferences.get(0);
     }
 
     @Override
-    protected void resolveReferences() {
-        super.resolveReferences();
-        // Parse the incoming sources and validate that there are no recursive dependencies with other steps
-        this.inputReferences.forEach(sourceReference -> {
-            SourceDefinition source = parent.getSource(sourceReference);
-            // Make sure source is defined
-            if (source == null) {
-                this.getProcessDefinition().addDefinitionError("Cannot find input '" + sourceReference + "' in step['" + identifier + "']");
-            }
-            // Make sure source is not dependent on us too
-            if (source.hasDependency(this)) {
-                this.getProcessDefinition().addDefinitionError(this.getDescription() + " has a recursive reference to " + source.getDescription());
-            }
-            // That's a valid source then, add it to our incoming dependencies
-            sources.put(sourceReference, source);
-        });
-    }
-
-    @Override
     public boolean hasDependency(StepDefinition stepDefinition) {
-        return this.sources.containsKey(stepDefinition.identifier);
+        return this.inputReferences.stream().filter(step -> step.getSourceReference().equals(stepDefinition.identifier)).count() > 0;
     }
 
     @Override
@@ -93,12 +73,12 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
         return condition;
     }
 
-    public Result getResult(Calculation calculation, CalculationStep step, ValueMap sourceMap) {
-        return expression.getResult(calculation, step, sourceMap);
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> inputs) {
+        return expression.getResult(calculation, step, inputs);
     }
 
-    public Collection<SourceDefinition> getSources() {
-        return sources.values();
+    public Collection<InputReference> getInputs() {
+        return inputReferences;
     }
 
     public String getIdentifier() {

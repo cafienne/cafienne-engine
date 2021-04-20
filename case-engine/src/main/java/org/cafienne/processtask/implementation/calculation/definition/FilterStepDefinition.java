@@ -10,7 +10,6 @@ package org.cafienne.processtask.implementation.calculation.definition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.expression.FilterExpressionDefinition;
-import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.w3c.dom.Element;
 
 public class FilterStepDefinition extends StepDefinition {
