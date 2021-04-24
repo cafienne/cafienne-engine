@@ -20,6 +20,16 @@ lazy val basicSettings = {
     homepage := Some(url("https://cafienne.org")),
     scmInfo := Some(ScmInfo(url("https://github.com/cafienne/cafienne-engine.git"), "git@github.com:cafienne/cafienne-engine.git")),
     licenses += ("Apache-2.0", url("https://www.mozilla.org/en-US/MPL/2.0/")),
+    developers := List(Developer(
+      "tpetter",
+      "Thijs Petter",
+      "tpetter@cafienne.io",
+      url("https://github.com/tpetter")),
+      Developer("olger",
+      "Olger Warnier",
+      "olger@spectare.nl",
+      url("https://github.com/olger"))
+    ),
     publishMavenStyle := true,
 
     // disable publishw ith scala version, otherwise artifact name will include scala version
@@ -56,6 +66,9 @@ lazy val cafienne = Project("cafienne-engine", file(""))
   .aggregate(
     engine,
     service
+  )
+  .settings(
+    skip in publish := true
   )
   .settings(basicSettings: _*)
 
@@ -177,7 +190,8 @@ lazy val service = project("case-service")
     dockerExposedPorts := Seq(2027, 9999),
     dockerBaseImage := "cafienne/base:openjdk-11-buster",
     name in Universal := "cafienne",
-    packageName in Universal := "cafienne"
+    packageName in Universal := "cafienne",
+    skip in publish := true
   )
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(UniversalPlugin)
