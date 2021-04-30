@@ -74,9 +74,12 @@ class CaseQueriesImpl
       casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map {
         CasePlan
       }
-    } yield (caseInstance, caseTeam, caseFile, casePlan)
+      identifiers <- db.run(caseIdentifiersQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map {
+        CaseIdentifiers
+      }
+    } yield (caseInstance, caseTeam, caseFile, casePlan, identifiers)
 
-    result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4)))
+    result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4, identifiers = x._5)))
   }
 
   override def getCaseDefinition(caseInstanceId: String, user: PlatformUser): Future[CaseDefinitionDocument] = {
@@ -163,12 +166,9 @@ class CaseQueriesImpl
     val roles = records.filterNot(record => record.caseRole.isBlank)
 
     CaseTeam(members.map(member => {
-      val key = MemberKey(member.memberId, member.isTenantUser match { case true => {
-        "user"
-      }
-      case false => {
-        "role"
-      }
+      val key = MemberKey(member.memberId, member.isTenantUser match {
+        case true => "user"
+        case false => "role"
       })
       val memberRoles = roles.filter(role => role.memberId == member.memberId && role.isTenantUser == member.isTenantUser).map(role => role.caseRole)
       new CaseTeamMember(key, memberRoles, Some(member.isOwner))

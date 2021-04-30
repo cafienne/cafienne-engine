@@ -4,10 +4,10 @@ import org.cafienne.akka.actor.serialization.json.{Value, ValueList, ValueMap}
 import org.cafienne.cmmn.akka.command.team.CaseTeam
 import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
 import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api.projection.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.service.api.projection.record.{CaseBusinessIdentifierRecord, CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 
-final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan) extends CafienneJson {
-  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.members, "file", file.toValue, "planitems", planitems.toValue))
+final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan, identifiers: CaseIdentifiers) extends CafienneJson {
+  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.members, "file", file.toValue, "planitems", planitems.toValue, "identifiers", identifiers.toValue))
 }
 
 final case class CaseDefinitionDocument(record: CaseDefinitionRecord) {
@@ -18,6 +18,14 @@ final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {
   override def toValue: Value[_] = {
     val list = new ValueList
     items.foreach(item => list.add(item.toValueMap))
+    list
+  }
+}
+
+final case class CaseIdentifiers(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
+  override def toValue(): Value[_] = {
+    val list = new ValueList
+    records.foreach(record => list.add(new ValueMap("name", record.name, "value", record.value.getOrElse(null))))
     list
   }
 }
