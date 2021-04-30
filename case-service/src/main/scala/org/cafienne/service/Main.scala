@@ -20,9 +20,10 @@ import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.anonymous.AnonymousRequestRoutes
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
+import org.cafienne.service.api.identifiers.route.IdentifierRoutes
 import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
-import org.cafienne.service.api.projection.query.{CaseQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
+import org.cafienne.service.api.projection.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
 import org.cafienne.service.api.projection.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.repository.RepositoryRoute
@@ -70,6 +71,7 @@ object Main extends App {
 
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl
+    val identifierQueries = new IdentifierQueriesImpl
     val userQueries = new TenantQueriesImpl
     val updater = new SlickRecordsPersistence
     val offsetStorage = new JDBCBasedOffsetStorageProvider
@@ -87,6 +89,7 @@ object Main extends App {
       val fixedRoutes = Seq(
         new CaseEngineHealthRoute(),
         new CasesRoutes(caseQueries),
+        new IdentifierRoutes(identifierQueries),
         new TaskRoutes(taskQueries),
         new TenantRoutes(userQueries),
         new PlatformRoutes(),

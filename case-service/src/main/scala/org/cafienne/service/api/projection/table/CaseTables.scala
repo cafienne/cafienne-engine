@@ -204,6 +204,13 @@ trait CaseTables extends QueryDBSchema {
   }
 
   final class CaseBusinessIdentifierTable(tag: Tag) extends CafienneTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
+    override def getSortColumn(field: String): ColumnOrdered[_] = field match {
+      case "name" => name
+      case "tenant" => tenant
+      case "value" => value
+      case "caseInstanceId" => caseInstanceId
+      case _ => name
+    }
 
     def caseInstanceId = idColumn[String]("case_instance_id")
 
