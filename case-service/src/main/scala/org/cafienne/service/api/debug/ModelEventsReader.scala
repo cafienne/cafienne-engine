@@ -7,7 +7,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
-import org.cafienne.infrastructure.cqrs.ReadJournalProvider
+import org.cafienne.infrastructure.cqrs.{OffsetRecord, ReadJournalProvider}
 
 import scala.concurrent.Future
 
@@ -15,16 +15,15 @@ class ModelEventsReader()(implicit override val system: ActorSystem) extends Laz
 
   implicit val executionContext = system.dispatcher
 
-  def getEvents(user: PlatformUser, actorId: String): Future[ValueList] = {
+  def getEvents(user: PlatformUser, actorId: String, from: Long, to: Long): Future[ValueList] = {
     val eventList = new ValueList
-    val source: Source[EventEnvelope, akka.NotUsed] = journal.currentEventsByPersistenceId(actorId, 0L, Long.MaxValue)
+    val source: Source[EventEnvelope, akka.NotUsed] = journal.currentEventsByPersistenceId(actorId, from, to)
     source.runForeach {
-      case EventEnvelope(_, _, sequenceNr: Long, event: ModelEvent[_]) => {
+      case EventEnvelope(offset, _, sequenceNr: Long, event: ModelEvent[_]) => {
         if (user == null || user.tenants.contains(event.tenant) || user.isPlatformOwner) {
           val eventNr = sequenceNr.asInstanceOf[java.lang.Long]
           val eventType = event.getClass.getSimpleName
-          val rawJson = event.rawJson
-          eventList.add(new ValueMap("nr", eventNr, "type", eventType, "content", rawJson))
+          eventList.add(new ValueMap("nr", eventNr, "offset", OffsetRecord("", offset).offsetValue, "type", eventType, "content", event.rawJson))
         }
       }
       case _ => {
