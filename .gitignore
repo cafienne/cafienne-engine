@@ -5,6 +5,7 @@ docker-image/target/
 /journal
 .settings
 .project
+.run
 .classpath
 .idea/
 .tags
