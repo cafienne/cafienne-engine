@@ -81,7 +81,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     public void updateState(TenantAppliedPlatformUpdate event) {
         event.newUserInformation.info().foreach(userInfo -> {
             User user = users.remove(userInfo.existingUserId());
-            users.put(userInfo.newUserId(), user);
+            users.put(userInfo.newUserId(), user.copy(userInfo.newUserId()));
             return userInfo;
         });
     }

@@ -27,6 +27,19 @@ public class User {
         this.email = email;
     }
 
+    /**
+     * Create an exact copy of the user, but then with the new user id.
+     * @param newUserId
+     * @return
+     */
+    User copy(String newUserId) {
+        User copy = new User(this.tenant, newUserId, this.name, this.email);
+        copy.roles.addAll(this.roles);
+        copy.enabled = this.enabled;
+        copy.isOwner = this.isOwner;
+        return copy;
+    }
+
     public boolean isOwner() {
         return isOwner && enabled;
     }
