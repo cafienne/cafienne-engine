@@ -93,6 +93,7 @@ lazy val engine = project("case-engine")
       Deps.akkaStream,
       Deps.apacheCommonsText,
       Deps.cassandraPersistence,
+      Deps.cassandraExtras,
       Deps.config,
       Deps.enumeratum,
       Deps.flyway,
