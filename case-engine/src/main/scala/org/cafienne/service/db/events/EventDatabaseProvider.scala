@@ -1,25 +1,27 @@
 package org.cafienne.service.db.events
 
-import java.io.PrintWriter
-import java.sql.Connection
-import java.util.logging.Logger
-
 import akka.actor.ActorSystem
 import akka.persistence.jdbc.db.{DefaultSlickDatabaseProvider, SlickDatabase}
 import com.typesafe.config.Config
-import javax.sql.DataSource
 import org.flywaydb.core.Flyway
-import slick.jdbc.JdbcBackend
+import slick.jdbc._
+
+import java.io.PrintWriter
+import java.sql.Connection
+import java.util.logging.Logger
+import javax.sql.DataSource
 
 class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabaseProvider(system) {
 
-  private def createOrMigrate(db: JdbcBackend.Database): Unit = {
-    val dbScriptsLocation = Option(system.settings.config.getString("akka-persistence-jdbc.shared-databases.slick.profile")) match {
-      case None => throw new IllegalArgumentException("Cannot start EventDatabaseProvider, no database setup found at akka-persistence-jdbc.shared-databases")
-      //case Some("slick.jdbc.H2Profile$") => "h2"
-      case Some("slick.jdbc.PostgresProfile$") => "postgres"
-      case Some("slick.jdbc.SQLServerProfile$") => "sqlserver"
-      case Some(other) => throw new IllegalArgumentException(s"Cannot start EventDatabase provider $other is not supported as event database type")
+  private def createOrMigrate(db: JdbcBackend.Database, profile: JdbcProfile) = {
+    val dbScriptsLocation = {
+      profile match {
+        case _: PostgresProfile => "postgres"
+        case _: SQLServerProfile => "sqlserver"
+        case _: H2Profile => "h2"
+//        case _: HsqldbProfile => "hsql" // not yet supported
+        case _ => throw new IllegalArgumentException(s"Cannot start EventDatabase provider for unsupported JDBC profile of type ${profile.getClass.getName}")
+      }
     }
 
     val flyway = Flyway
@@ -32,7 +34,7 @@ class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabasePro
 
   override def database(config: Config): SlickDatabase = {
     val db = super.database(config)
-    createOrMigrate(db.database)
+    createOrMigrate(db.database, db.profile)
     db
   }
 }
