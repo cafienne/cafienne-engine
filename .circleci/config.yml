@@ -53,6 +53,7 @@ jobs:
             docker pull cassandra:3.11
             docker pull postgres:12.1-alpine
             docker pull batav/circle-ci:postgres-event-data
+            docker pull batav/circle-ci:sqlserver
             docker pull batav/circle-ci:sqlserver-event-data
             docker pull schickling/mailcatcher:latest
             docker pull spectare/oidc-token-test-service:latest
@@ -74,6 +75,7 @@ jobs:
           command: |
             docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne
             sleep 10
+            docker logs sql-server
       - run:
           name: Give permissions
           command: sudo chmod -R 777 ./
@@ -112,7 +114,7 @@ jobs:
           name: Stop the cafienne container
           command: docker rm -f cafienne
 
-      # Starting docker environment for Postgresql testing against latest engine
+      # Starting docker environment for backwards compatibility Postgresql testing against latest engine
       - run:
           name: Up the containers for backwards compatibility Postgresql testing
           command: |
@@ -131,7 +133,7 @@ jobs:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
 
-      # Starting docker environment for Sqlserver testing against latest engine
+      # Starting docker environment for backwards compatibility Sqlserver testing against latest engine
       - run:
           name: Up the containers for backwards compatibility Sqlserver testing
           command: |
@@ -166,12 +168,55 @@ jobs:
             cd ./cmmn-test-framework
             npm run dev
       - run:
+          name: Stop the containers
+          command: docker rm -f cafienne cassandra postgres
+
+      # Starting plain Postgresql and Sqlserver DBs
+      - run:
+          name: Start DB and IDP containers
+          command: docker-compose -f .circleci/docker-test-jdbc-release.yml up -d sql-server cafienne-event-db cafienne-query-db
+
+      # Starting docker environment for Postgresql testing
+      - run:
+          name: Up the containers for Postgresql testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-jdbc-release.yml up -d cafienne-postgres
+            sleep 10
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: docker rm -f cafienne cafienne-event-db cafienne-query-db
+
+      # Starting docker environment for Sqlserver testing
+      - run:
+          name: Up the containers for Sqlserver testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-jdbc-release.yml up -d cafienne-sqlserver
+            sleep 10
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
           name: Docker logs of engine
           command: docker logs cafienne
           when: on_fail
       - run:
           name: Stop the containers
-          command: docker rm -f cafienne cassandra postgres cafienne-test-token-service mailcatcher
+          command: docker rm -f cafienne sql-server cafienne-test-token-service
       - run:
           name: Push cafienne image to docker hub
           command: |
@@ -347,7 +392,9 @@ jobs:
           command: |
             docker pull cassandra:3.11
             docker pull postgres:12.1-alpine
+            docker pull batav/circle-ci:postgres-event-data
             docker pull batav/circle-ci:sqlserver
+            docker pull batav/circle-ci:sqlserver-event-data
             docker pull schickling/mailcatcher:latest
             docker pull spectare/oidc-token-test-service:latest
       - run:
@@ -358,7 +405,7 @@ jobs:
       - run:
           name: Start DB and IDP containers
           command: |
-            docker-compose -f .circleci/docker-test-jdbc-release.yml up -d sql-server cafienne-event-db cafienne-query-db
+            docker-compose -f .circleci/docker-test-jdbc-master.yml up -d sql-server cafienne-event-db cafienne-query-db
             docker-compose -f .circleci/docker-test-cassandra.yml up -d cassandra postgres
             docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne-test-token-service mailcatcher
 
@@ -368,6 +415,7 @@ jobs:
           command: |
             docker-compose -f .circleci/docker-test-inmemory.yml up -d cafienne
             sleep 10
+            docker logs sql-server
       - run:
           name: Give permissions
           command: sudo chmod -R 777 ./
@@ -406,6 +454,68 @@ jobs:
           name: Stop the cafienne container
           command: docker rm -f cafienne
 
+      # Starting docker environment for backwards compatibility Postgresql testing against latest engine
+      - run:
+          name: Up the containers for backwards compatibility Postgresql testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-jdbc-master.yml up -d cafienne-postgres
+            sleep 10
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: docker rm -f cafienne cafienne-event-db cafienne-query-db
+
+      # Starting docker environment for backwards compatibility Sqlserver testing against latest engine
+      - run:
+          name: Up the containers for backwards compatibility Sqlserver testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-jdbc-master.yml up -d cafienne-sqlserver
+            sleep 10
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: docker rm -f cafienne sql-server
+
+      # Starting docker environment for Cassandra testing
+      - run:
+          name: Up the containers for Cassandra testing
+          command: |
+            sudo docker-compose -f .circleci/docker-test-cassandra.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Docker logs of engine
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run dev
+      - run:
+          name: Stop the containers
+          command: docker rm -f cafienne cassandra postgres
+
+      # Starting plain Postgresql and Sqlserver DBs
+      - run:
+          name: Start DB and IDP containers
+          command: docker-compose -f .circleci/docker-test-jdbc-release.yml up -d sql-server cafienne-event-db cafienne-query-db
+
       # Starting docker environment for Postgresql testing
       - run:
           name: Up the containers for Postgresql testing
@@ -441,31 +551,12 @@ jobs:
             cd ./cmmn-test-framework
             npm run dev
       - run:
-          name: Stop the containers
-          command: docker rm -f cafienne sql-server
-
-      # Starting docker environment for Cassandra testing
-      - run:
-          name: Up the containers for Cassandra testing
-          command: |
-            sudo docker-compose -f .circleci/docker-test-cassandra.yml up -d cafienne
-            sleep 10
-      - run:
-          name: Docker logs of engine
-          command: docker logs cafienne
-      - run:
-          name: Test engine against framework
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run dev
-      - run:
           name: Docker logs of engine
           command: docker logs cafienne
           when: on_fail
       - run:
           name: Stop the containers
-          command: docker rm -f cafienne cassandra postgres cafienne-test-token-service
+          command: docker rm -f cafienne sql-server cafienne-test-token-service
       - run:
           name: Push cafienne image to docker hub
           command: |
