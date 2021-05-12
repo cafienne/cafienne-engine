@@ -13,10 +13,10 @@ lazy val basicSettings = {
       "-deprecation",
       "-Xlog-reflective-calls"
     ),
-    parallelExecution in Compile := true,
-    parallelExecution in Test := false,
-    fork in Test := true,
-    sources in doc in Compile := List(),
+    Compile / parallelExecution := true,
+    Compile / doc / sources := List(),
+    Test / parallelExecution  := false,
+    Test / fork := true,
     homepage := Some(url("https://cafienne.org")),
     scmInfo := Some(ScmInfo(url("https://github.com/cafienne/cafienne-engine.git"), "git@github.com:cafienne/cafienne-engine.git")),
     licenses += ("Apache-2.0", url("https://www.mozilla.org/en-US/MPL/2.0/")),
@@ -68,7 +68,7 @@ lazy val cafienne = Project("cafienne-engine", file(""))
     service
   )
   .settings(
-    skip in publish := true
+    publish / skip := true
   )
   .settings(basicSettings: _*)
 
@@ -180,18 +180,18 @@ lazy val service = project("case-service")
       )
   )
   .settings(
-    packageName in Docker := "cafienne/engine",
-    version in Docker := "latest",
-    maintainer in Docker := """Cafienne <info@cafienne.io>""",
-    defaultLinuxInstallLocation in Docker := "/opt/cafienne",
-    scriptClasspath in bashScriptDefines := Seq("../lib_ext/*","*"),
+    Docker / packageName := "cafienne/engine",
+    Docker / version := "latest",
+    Docker / maintainer := """Cafienne <info@cafienne.io>""",
+    Docker / defaultLinuxInstallLocation := "/opt/cafienne",
+    bashScriptDefines / scriptClasspath := Seq("../lib_ext/*","*"),
     bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml"""",
     bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",
     dockerExposedPorts := Seq(2027, 9999),
     dockerBaseImage := "cafienne/base:openjdk-11-buster",
-    name in Universal := "cafienne",
-    packageName in Universal := "cafienne",
-    skip in publish := true
+    Universal / name := "cafienne",
+    Universal / packageName := "cafienne",
+    publish / skip := true
   )
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(UniversalPlugin)

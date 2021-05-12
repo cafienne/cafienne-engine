@@ -15,7 +15,7 @@ object Deps {
   def container (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "container")
 
   object V {
-    val scala       = "2.12.11"
+    val scala       = "2.12.13"
     val spray       = "1.3.5"
     val akkaHttp    = "10.2.1"
     val akka        = "2.6.10"
