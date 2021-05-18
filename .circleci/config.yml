@@ -570,18 +570,21 @@ workflows:
   ci:
     jobs:
       - master-build:
+          context: automation-context
           filters:
             branches:
               only:
                 - master
                 - dependency-updates
       - branch-build:
+          context: automation-context
           filters:
             branches:
               ignore:
                 - master
                 - dependency-updates
       - release-build:
+          context: automation-context
           filters:
             tags:
               only: /.*/
