@@ -18,6 +18,7 @@ trait BaseQueryImpl
   val caseInstanceQuery = TableQuery[CaseInstanceTable]
   val caseDefinitionQuery = TableQuery[CaseInstanceDefinitionTable]
   val caseFileQuery = TableQuery[CaseFileTable]
+  val caseIdentifiersQuery = TableQuery[CaseBusinessIdentifierTable]
 
   val planItemTableQuery = TableQuery[PlanItemTable]
   val taskQuery = TableQuery[TaskTable]

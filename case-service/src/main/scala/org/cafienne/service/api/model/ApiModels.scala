@@ -198,3 +198,5 @@ case class CaseFileItemFormat(id: String,
 //base types
 // Property of a caseFileItem
 case class PropertyFormat(name: String, `type`: String, value: String)
+
+case class BusinessIdentifierFormat(caseInstanceId: String, tenant: String, name: String, value: String)
