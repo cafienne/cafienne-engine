@@ -27,13 +27,13 @@ class OffsetStorageImpl(override val name: String) extends OffsetStorage with Of
   override def getOffset(): Future[Offset] = {
     val query = offsetQuery
       .filter(_.name === name)
-    db.run(query.result.headOption).map(o => o match {
-      case Some(value) => value.asOffset
+    db.run(query.result.headOption).map {
+      case Some(value) => value.asOffset()
       case None => {
-        logger.debug("An offset for "+name+" has not been found. Starting with default 'no offset'")
+        logger.debug("An offset for " + name + " has not been found. Starting with default 'no offset'")
         Offset.noOffset
       }
-    })
+    }
   }
 }
 

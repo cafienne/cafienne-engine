@@ -48,7 +48,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
   )
 
   override def verifyToken(token: String): Future[ServiceUserContext] = Future {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     var claimsSet: Option[JWTClaimsSet] = None
     if (token.isEmpty) {
       throw MissingTokenException
@@ -59,7 +59,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
       claimsSet = Some(jwtProcessor.process(token, ctx))
       claimsSet.fold(throw new TokenVerificationException("Unable to create claimSet for " + token))(
         cS => {
-          CaseSystem.health.idp.isOK
+          CaseSystem.health.idp.isOK()
           ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
         }
       )
@@ -72,7 +72,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
         throw  failure
       }
       case other: Throwable => {
-        CaseSystem.health.idp.isOK
+        CaseSystem.health.idp.isOK()
         other match {
           case nje: BadJWTException =>
             //        nje.printStackTrace()

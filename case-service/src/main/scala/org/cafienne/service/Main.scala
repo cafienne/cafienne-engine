@@ -103,7 +103,7 @@ object Main extends App {
     }
 
     // Find the API classes of the routes and pass them to Swagger
-    val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses)
+    val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses())
 
     // Create the route tree
     val apiRoutes = {

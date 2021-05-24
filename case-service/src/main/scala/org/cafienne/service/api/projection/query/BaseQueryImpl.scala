@@ -146,7 +146,7 @@ trait BaseQueryImpl
 
     def parseFilters(query: String): Seq[ParsedFilter] = {
       // First, create a raw list of all filters given.
-      val rawFilters: Seq[RawFilter] = query.split(',').map(rawFilter => {
+      val rawFilters: Seq[RawFilter] = query.split(',').toSeq.map(rawFilter => {
         if (rawFilter.isBlank) NoFilter()
         else if (rawFilter.startsWith("!")) NotFieldFilter(rawFilter.substring(1))
         else if (rawFilter.indexOf("!=") > 0) NotValueFilter(rawFilter)

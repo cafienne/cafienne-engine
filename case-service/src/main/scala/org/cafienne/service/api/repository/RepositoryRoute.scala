@@ -95,7 +95,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
   def listModels = get {
     path("list") {
       userWithTenant { (platformUser, tenant) => {
-        import scala.collection.JavaConverters._
+        import scala.jdk.CollectionConverters._
 
         val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
         for (file <- CaseSystem.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {

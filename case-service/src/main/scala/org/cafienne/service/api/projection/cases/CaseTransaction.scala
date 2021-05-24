@@ -136,10 +136,10 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     event match {
       case event: DeprecatedCaseTeamEvent => {
         // Deprecated case team events have all member roles in them; these members are always of type user; all those users become owner and active;
-        import scala.collection.JavaConverters._
+        import scala.jdk.CollectionConverters._
         // We need to add the empty role (if not yet there),
         //  in order to have member table also populated when a member has no roles but still is part of the team
-        val roles = event.getRoles.asScala ++ Seq("")
+        val roles = event.getRoles().asScala ++ Seq("")
         // Now determine whether the user (and it's roles) become active (and then also owner) or de-activated
         val enabled = if (event.isInstanceOf[TeamMemberAdded]) true else false // Both for ownership and active
         // For reach role add a record.

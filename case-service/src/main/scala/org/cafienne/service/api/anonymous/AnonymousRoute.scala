@@ -37,7 +37,7 @@ class AnonymousRoute extends CaseServiceRoute {
   def sendCommand[T](command: StartCase, expectedResponseClass: Class[T], expectedResponseHandler: T => Route): Route = {
     import akka.pattern.ask
     implicit val timeout = Main.caseSystemTimeout
-    onComplete(CaseSystem.router ? command) {
+    onComplete(CaseSystem.router() ? command) {
       case Success(value) =>
         value.getClass.isAssignableFrom(expectedResponseClass) match {
           case true => expectedResponseHandler(value.asInstanceOf[T])

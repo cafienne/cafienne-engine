@@ -104,7 +104,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   }
 
   def caseSystemMustBeHealthy = {
-    if (!CaseSystem.health.ok) {
+    if (!CaseSystem.health.ok()) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
     }
   }

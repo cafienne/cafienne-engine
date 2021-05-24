@@ -15,7 +15,7 @@ final case class CaseDefinitionDocument(record: CaseDefinitionRecord) {
 }
 
 final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {
-  override def toValue = {
+  override def toValue: Value[_] = {
     val list = new ValueList
     items.foreach(item => list.add(item.toValueMap))
     list
@@ -23,7 +23,7 @@ final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {
 }
 
 final case class CaseIdentifiers(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
-  override def toValue(): Value[_] = {
+  override def toValue: Value[_] = {
     val list = new ValueList
     records.foreach(record => list.add(new ValueMap("name", record.name, "value", record.value.getOrElse(null))))
     list

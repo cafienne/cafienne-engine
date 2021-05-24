@@ -7,7 +7,7 @@ import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.projection.record.{CaseBusinessIdentifierRecord, CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 
 final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
-  override def toValue(): Value[_] = {
+  override def toValue: Value[_] = {
     val list = new ValueList
     records.foreach(record => list.add(new ValueMap("caseInstanceId", record.caseInstanceId, "tenant", record.tenant, "name", record.name, "value", record.value.getOrElse(null))))
     list

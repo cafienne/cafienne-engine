@@ -42,7 +42,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def status = get {
     pathPrefix("status") {
       pathEndOrSingleSlash {
-        if (CaseSystem.health.ok) {
+        if (CaseSystem.health.ok()) {
           complete(StatusCodes.OK)
         } else {
           complete(StatusCodes.ServiceUnavailable)
