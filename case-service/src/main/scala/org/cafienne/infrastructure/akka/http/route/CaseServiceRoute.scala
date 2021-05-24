@@ -14,8 +14,6 @@ import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 /**
   * Base class for Case Service APIs. All cors enabled

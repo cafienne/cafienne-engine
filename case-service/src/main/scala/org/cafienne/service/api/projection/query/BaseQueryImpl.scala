@@ -5,8 +5,6 @@ import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.api.projection.record.CaseBusinessIdentifierRecord
 import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 
-import scala.collection.mutable.ArrayBuffer
-
 trait BaseQueryImpl
   extends CaseTables
     with TaskTables

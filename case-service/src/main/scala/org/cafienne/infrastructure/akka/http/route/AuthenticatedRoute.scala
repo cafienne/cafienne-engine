@@ -88,7 +88,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   def validUser(subRoute: PlatformUser => Route): Route = {
     optionalHeaderValueByName(api.TENANT_LAST_MODIFIED) { tlm =>
       OIDCAuthentication.user(tlm) { platformUser =>
-        caseSystemMustBeHealthy
+        caseSystemMustBeHealthy()
         subRoute(platformUser)
       }
     }
@@ -103,7 +103,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
-  def caseSystemMustBeHealthy = {
+  def caseSystemMustBeHealthy(): Unit = {
     if (!CaseSystem.health.ok()) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
     }

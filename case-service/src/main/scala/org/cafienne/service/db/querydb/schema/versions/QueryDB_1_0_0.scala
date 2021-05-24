@@ -2,7 +2,6 @@ package org.cafienne.service.db.querydb.schema.versions
 
 import org.cafienne.infrastructure.jdbc.OffsetStoreTables
 import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.service.api.projection.record.CaseTeamMemberRecord
 import org.cafienne.service.api.projection.table.{CaseTables, TaskTables, TenantTables}
 import org.cafienne.service.db.querydb.QueryDBSchema
 import slick.lifted

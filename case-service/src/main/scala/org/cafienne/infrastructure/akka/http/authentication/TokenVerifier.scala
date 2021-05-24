@@ -1,15 +1,14 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import java.text.ParseException
-
-import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.{BadJOSEException, BadJWEException, BadJWSException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.proc.{BadJOSEException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 
+import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenVerifier[T] {
@@ -101,7 +100,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
           case e: ParseException => {
             throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
           }
-          case e: Exception => {
+          case e: Throwable => {
             logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
             throw new TokenVerificationException("Token verification failure of type " + e.getClass.getSimpleName, e)
           }

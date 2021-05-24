@@ -1,18 +1,17 @@
 package org.cafienne.service.api.platform
 
 import akka.util.Timeout
-
-import java.io.File
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.Main
 import org.cafienne.tenant.akka.command.TenantUserInformation
 import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
+import java.io.File
 import scala.concurrent.ExecutionContextExecutor
 import scala.jdk.CollectionConverters._
 

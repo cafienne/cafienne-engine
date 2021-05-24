@@ -29,7 +29,7 @@ trait TenantTables extends QueryDBSchema {
     def enabled = column[Boolean]("enabled", O.Default(true))
 
     // Constraints
-    def pk = primaryKey("pk_tenant", (name))
+    def pk = primaryKey("pk_tenant", name)
     def * = (name, enabled) <> (TenantRecord.tupled, TenantRecord.unapply)
   }
 

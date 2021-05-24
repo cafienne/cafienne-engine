@@ -9,7 +9,7 @@ package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
+import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement

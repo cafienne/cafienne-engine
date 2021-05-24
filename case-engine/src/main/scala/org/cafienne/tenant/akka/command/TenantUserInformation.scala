@@ -65,7 +65,6 @@ object TenantUserInformation {
     }
 
     val userId: String = json.raw(Fields.userId)
-    val tenant: String = json.raw(Fields.tenant)
     val roles = readOptionalStringList(Fields.roles)
     val name = readOptionalString(Fields.name)
     val email = readOptionalString(Fields.email)

@@ -2,12 +2,11 @@ package org.cafienne.service.api.projection.query
 
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
-import org.cafienne.cmmn.definition.{CMMNElementDefinition, DefinitionsDocument}
+import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.projection.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
+import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord}
 import org.cafienne.service.api.projection.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
-import org.cafienne.util.XMLHelper
 
 import scala.concurrent.Future
 

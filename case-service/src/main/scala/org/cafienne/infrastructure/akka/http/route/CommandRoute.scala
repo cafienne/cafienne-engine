@@ -1,12 +1,11 @@
 package org.cafienne.infrastructure.akka.http.route
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHeader}
-import akka.http.scaladsl.server.{Directive0, Route}
+import akka.http.scaladsl.server.Directives.{complete, onComplete}
+import akka.http.scaladsl.server.Route
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
+import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
 import org.cafienne.cmmn.akka.command.response.CaseResponse
 import org.cafienne.humantask.akka.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
@@ -52,6 +51,10 @@ trait CommandRoute extends AuthenticatedRoute {
           case _: PlatformResponse => {
             // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
             complete(StatusCodes.Accepted, "Handling is in progress")
+          }
+          case other => { // Unknown new type of response that is not handled
+            logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
+            complete(StatusCodes.OK)
           }
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)

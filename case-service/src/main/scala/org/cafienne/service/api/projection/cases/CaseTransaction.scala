@@ -73,6 +73,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
               case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RepetitionRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RequiredRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
+              case _ => // Nothing to do for the other events
             }
             Done
           case None =>
@@ -102,6 +103,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     event match {
       case event: BusinessIdentifierSet => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
       case event: BusinessIdentifierCleared => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
+      case _ => // Ignore other events
     }
     Future.successful(Done)
   }
@@ -160,8 +162,10 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
           case _: TeamRoleCleared => caseInstanceTeamMembers.put(key, member.copy(active = false))
           case _: CaseOwnerAdded => caseInstanceTeamMembers.put(key, member.copy(isOwner = true))
           case _: CaseOwnerRemoved => caseInstanceTeamMembers.put(key, member.copy(isOwner = false))
+          case _ => // Ignore other events
         }
       }
+      case _ => // Ignore other events
     }
     Future.successful(Done)
   }
@@ -249,6 +253,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
             }
           }
         }))
+        case _ => Future.successful(None) // Ignore and error on other events
       }
     }
 
@@ -285,7 +290,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   override def commit(offsetName: String, offset: Offset, caseModified: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
 
-    var records = ListBuffer.empty[AnyRef]
+    val records = ListBuffer.empty[AnyRef]
     this.caseInstance.foreach(instance => records += instance)
     records += this.caseDefinition
     this.caseFile.foreach { caseFile =>
