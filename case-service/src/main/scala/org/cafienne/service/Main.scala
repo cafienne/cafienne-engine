@@ -56,7 +56,6 @@ object Main extends App {
     CaseSystem.start()
 
     // Take some implicits from the case system
-    implicit val timeout = httpRoutesTimeout
     implicit val system = CaseSystem.system
     implicit val ec = system.dispatcher
 

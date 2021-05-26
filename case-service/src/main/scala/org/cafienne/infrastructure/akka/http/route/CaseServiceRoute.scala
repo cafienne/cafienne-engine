@@ -33,7 +33,7 @@ trait CaseServiceRoute extends LazyLogging {
   val handleErrors = handleRejections(rejectionHandler) & handleExceptions(exceptionHandler)
 
   val route: Route = handleErrors {
-    extractExecutionContext { implicit executor =>
+    //extractExecutionContext { implicit executor =>
       cors(corsSettings) {
         handleErrors { req =>
           //          println("Asking "+req.request.uri)
@@ -45,7 +45,7 @@ trait CaseServiceRoute extends LazyLogging {
 //            })
         }
       }
-    }
+   // }
   }
 
   def requestServiceRejectionHandler =

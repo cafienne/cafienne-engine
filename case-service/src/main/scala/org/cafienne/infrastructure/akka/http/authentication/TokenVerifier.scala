@@ -78,8 +78,6 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
             val exceptionMessage = nje.getMessage
             val missingClaimsMsg = """JWT missing required claims"""
             val invalidIssuerMsg = """JWT "iss" claim doesn't match expected value: """
-            val jwtAudienceRejected = """JWT audience rejected"""
-            val badJson = """Payload of JWS object is not a valid JSON object"""
             if (nje.getCause.isInstanceOf[ParseException]) {
               //          println("Failure in parsing token")
               throw new TokenVerificationException("Token parse failure: " + nje.getCause.getLocalizedMessage)

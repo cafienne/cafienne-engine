@@ -53,7 +53,7 @@ trait OffsetStoreTables extends QueryDBSchema {
 
     def timestamp = column[Timestamp]("timestamp")
 
-    def * = (name, offsetType, offsetValue, timestamp) <> (create, OffsetRecord.unapply)
+    def * = (name, offsetType, offsetValue, timestamp).<>(create, OffsetRecord.unapply)
 
     def create(t: (String, String, String, Timestamp)): OffsetRecord = OffsetRecord(t._1, t._2, t._3, t._4)
   }
