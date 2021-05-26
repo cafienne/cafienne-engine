@@ -69,7 +69,7 @@ class ClusterRouter extends CaseMessageRouter {
     case pl: TenantCommand => (pl.actorId, pl)
   }
 
-  private val shardResolver: ShardRegion.ExtractShardId = msg ⇒ msg match {
+  private val shardResolver: ShardRegion.ExtractShardId = msg => msg match {
     case m: ModelCommand[_] => {
       val pidHashKey: Long = m.actorId.hashCode()
       val shard = ((localSystemKey + pidHashKey) % numberOfPartitions).toString

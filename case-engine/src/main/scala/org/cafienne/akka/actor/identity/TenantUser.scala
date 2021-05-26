@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneSerializable with CafienneJson {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   /**
     * Serializes the user information to JSON

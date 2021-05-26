@@ -42,6 +42,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
       case newTenant: TenantCreated => tenants.put(newTenant.tenantName, TenantRecord(newTenant.tenantName()))
       case disabledTenant: TenantDisabled => tenants.put(disabledTenant.tenantName(), TenantRecord(disabledTenant.tenantName(), false))
       case enabledTenant: TenantEnabled => tenants.put(enabledTenant.tenantName(), TenantRecord(enabledTenant.tenantName(), true))
+      case _ => Future.successful(Done) // Ignore other events
     }
     Future.successful(Done)
   }
@@ -60,6 +61,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
         case _: OwnerRemoved => users.put(key, user.copy(isOwner = false))
         case _: TenantUserDisabled => users.put(key, user.copy(enabled = false))
         case _: TenantUserEnabled => users.put(key, user.copy(enabled = true))
+        case _ => // Others not known currently
       }
       Done
     })
@@ -71,14 +73,14 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
 
   override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
-    var records = ListBuffer.empty[AnyRef]
+    val records = ListBuffer.empty[AnyRef]
     this.users.values.foreach(role => records += role)
     records ++= tenants.values
 
     // Even if there are no new records, we will still update the offset store
     records += OffsetRecord(offsetName, offset)
 
-    persistence.bulkUpdate(records.filter(r => r != null))
+    persistence.bulkUpdate(records.filter(r => r != null).toSeq)
   }
 
   private def getUserRoleRecord(key: UserRoleKey): Future[UserRoleRecord] = {

@@ -1,18 +1,19 @@
 package org.cafienne.service.api.platform
 
-import java.io.File
-
+import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.Main
 import org.cafienne.tenant.akka.command.TenantUserInformation
 import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
-import scala.collection.JavaConverters._
+import java.io.File
+import scala.concurrent.ExecutionContextExecutor
+import scala.jdk.CollectionConverters._
 
 /**
   * The platform can be configured with a default tenant setup.
@@ -23,7 +24,7 @@ import scala.collection.JavaConverters._
 object BootstrapPlatformConfiguration extends LazyLogging {
   def run(): Unit = {
     try {
-      findConfigFile.map{parseConfigFile}.map{sendCommand}
+      findConfigFile().map{parseConfigFile}.map{sendCommand}
     } catch {
       case b: BootstrapFailure => throw b
       case t: Throwable => throw new BootstrapFailure("Unexpected error while reading bootstrap configuration", t)
@@ -81,7 +82,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("Bootstrap file should contain a list of owners, with at least one owner for the tenant")
       }
 
-      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.map(user => {
+      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.toSeq.map(user => {
         val userId = user.getString("id")
         val roles = readStringList(user, "roles")
         val name = readStringOr(user, "name", "")
@@ -114,7 +115,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def readStringList(config: Config, path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
     if (config.hasPath(path)) {
-      config.getStringList(path).asScala
+      config.getStringList(path).asScala.toSeq
     } else {
       defaultValue
     }
@@ -122,24 +123,22 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def sendCommand(bootstrapTenant: CreateTenant) = {
     import akka.pattern.ask
-    implicit val timeout = Main.caseSystemTimeout
-    implicit val ec = scala.concurrent.ExecutionContext.global
+    implicit val timeout: Timeout = Main.caseSystemTimeout
+    implicit val ec: ExecutionContextExecutor = scala.concurrent.ExecutionContext.global
 
-    CaseSystem.router.ask(bootstrapTenant).map(response =>
-      response match {
-        case e: CommandFailure => {
-          if (e.exception().getMessage.toLowerCase().contains("already exists")) {
-            logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
-          } else {
-            logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
-          }
+    CaseSystem.router().ask(bootstrapTenant).map {
+      case e: CommandFailure => {
+        if (e.exception().getMessage.toLowerCase().contains("already exists")) {
+          logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
+        } else {
+          logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
         }
-        case t: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
-        case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
-        case t: Throwable => throw t
-        case other => logger.error("Unexpected response during creation of bootstrap tenant, of type " + other.getClass.getName)
       }
-    )
+      case _: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
+      case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
+      case t: Throwable => throw t
+      case other => logger.error("Unexpected response during creation of bootstrap tenant, of type " + other.getClass.getName)
+    }
   }
 }
 

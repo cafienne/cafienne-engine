@@ -6,7 +6,7 @@ import org.cafienne.service.api.projection.UserSearchFailure
 import org.cafienne.service.api.projection.record.UserRoleRecord
 import org.cafienne.service.api.projection.table.TenantTables
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait UserQueries {
   def getPlatformUser(userId: String) : Future[PlatformUser] = ???
@@ -26,12 +26,11 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
 
   import dbConfig.profile.api._
 
-  implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
+  implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
   val rolesQuery = TableQuery[UserRoleTable]
 
-
-  final case class User(id: String, tenant: String, name: String, email: String = "", isOwner: Boolean, enabled: Boolean)
+  case class User(id: String, tenant: String, name: String, email: String = "", isOwner: Boolean, enabled: Boolean)
 
 
   override def getPlatformUser(userId: String): Future[PlatformUser] = {

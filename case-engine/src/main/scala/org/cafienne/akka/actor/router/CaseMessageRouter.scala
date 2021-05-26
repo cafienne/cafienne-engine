@@ -7,11 +7,10 @@
  */
 package org.cafienne.akka.actor.router
 
-import akka.actor.{Actor, ActorPath, ActorRef, InvalidActorNameException, Props, Terminated}
+import akka.actor.{Actor, ActorPath, InvalidActorNameException, Terminated}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.akka.actor.command.response.CommandFailure
-import org.cafienne.timerservice.TimerService
 
 /**
   * Base class for routing model commands into the case system
@@ -61,5 +60,5 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
     }
   }
 
-  def forwardMessage(m: ModelCommand[_])
+  def forwardMessage(m: ModelCommand[_]): Unit
 }

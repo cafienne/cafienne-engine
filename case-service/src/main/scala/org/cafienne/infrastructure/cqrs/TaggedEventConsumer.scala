@@ -1,8 +1,8 @@
 package org.cafienne.infrastructure.cqrs
 
-import akka.{Done, NotUsed}
 import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
+import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.event.ModelEvent
@@ -54,7 +54,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   def runStream(): Future[Done] = {
     restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1) {
       element => {
-        CaseSystem.health.readJournal.isOK
+        CaseSystem.health.readJournal.isOK()
         handleSourceElement(element)
       }
     }.runWith(Sink.ignore)
@@ -85,26 +85,15 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   }
 
   private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
-    RestartSource.withBackoff(
-      minBackoff = CaseSystem.config.queryDB.restartSettings.minBackoff,
-      maxBackoff = CaseSystem.config.queryDB.restartSettings.maxBackoff,
-      randomFactor = CaseSystem.config.queryDB.restartSettings.randomFactor,
-      maxRestarts = CaseSystem.config.queryDB.restartSettings.maxRestarts
-    ) { () =>
+    RestartSource.withBackoff(CaseSystem.config.queryDB.restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
         //  consuming that were consumed already successfully before the source had to be restarted.
-        offsetStorage.getOffset.map {
-          case offset: Offset => {
-            logger.debug("Starting from offset " + offset)
-            journal.eventsByTag(tag, offset)
-          }
-          case err: Throwable => {
-            logger.error("Received an error while asking for offset; start reading from offset 0; error was: ", err)
-            journal.eventsByTag(tag, Offset.noOffset)
-          }
-        }
+        offsetStorage.getOffset().map(offset => {
+          logger.debug("Starting from offset " + offset)
+          journal().eventsByTag(tag, offset)
+        })
       })
     }
   }

@@ -51,7 +51,7 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
     if (fileStream == null) {
       throw new IllegalArgumentException("The file with name "+fileName+" cannot be loaded from the classpath")
     }
-    val fileBytes = Stream.continually(fileStream.read).takeWhile(-1 !=).map(_.toByte).toArray
+    val fileBytes = Stream.continually(fileStream.read).takeWhile(b => b != -1).map(_.toByte).toArray
     HttpEntity(ValueMarshallers.`application/xml`, fileBytes)
   }
 }

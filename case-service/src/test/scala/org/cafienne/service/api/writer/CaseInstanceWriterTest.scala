@@ -1,7 +1,6 @@
 package org.cafienne.service.api.writer
 
 import java.time.Instant
-
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
@@ -34,7 +33,7 @@ class CaseInstanceWriterTest
     interval = scaled(Span(5, Millis)))
 
   private def sendEvent(evt: Any) = {
-    within(10 seconds) {
+    within(10.seconds) {
       tp.send(storeEventsActor, evt)
       tp.expectMsg(evt)
     }

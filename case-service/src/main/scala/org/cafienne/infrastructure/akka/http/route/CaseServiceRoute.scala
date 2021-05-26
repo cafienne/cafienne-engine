@@ -14,8 +14,6 @@ import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 /**
   * Base class for Case Service APIs. All cors enabled
@@ -35,7 +33,7 @@ trait CaseServiceRoute extends LazyLogging {
   val handleErrors = handleRejections(rejectionHandler) & handleExceptions(exceptionHandler)
 
   val route: Route = handleErrors {
-    extractExecutionContext { implicit executor =>
+    //extractExecutionContext { implicit executor =>
       cors(corsSettings) {
         handleErrors { req =>
           //          println("Asking "+req.request.uri)
@@ -47,7 +45,7 @@ trait CaseServiceRoute extends LazyLogging {
 //            })
         }
       }
-    }
+   // }
   }
 
   def requestServiceRejectionHandler =
@@ -122,7 +120,7 @@ trait CaseServiceRoute extends LazyLogging {
   }
 
   def apiClasses(): Seq[Class[_]] = {
-    swaggerClasses.to[Seq]
+    swaggerClasses.toSeq
   }
 
   /**

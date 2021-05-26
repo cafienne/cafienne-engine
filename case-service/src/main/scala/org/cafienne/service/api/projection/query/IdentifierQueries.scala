@@ -4,7 +4,6 @@ import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.{StringValue, Value}
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api.cases.CaseIdentifiers
 import org.cafienne.service.api.identifiers.route.IdentifierSet
 
 import scala.concurrent.Future

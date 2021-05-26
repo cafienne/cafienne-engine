@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import javax.ws.rs.{Consumes, DELETE, PUT, Path}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
-import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.akka.command._
 
 class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
