@@ -85,12 +85,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   }
 
   private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
-    RestartSource.withBackoff(
-      minBackoff = CaseSystem.config.queryDB.restartSettings.minBackoff,
-      maxBackoff = CaseSystem.config.queryDB.restartSettings.maxBackoff,
-      randomFactor = CaseSystem.config.queryDB.restartSettings.randomFactor,
-      maxRestarts = CaseSystem.config.queryDB.restartSettings.maxRestarts
-    ) { () =>
+    RestartSource.withBackoff(CaseSystem.config.queryDB.restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
