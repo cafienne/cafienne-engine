@@ -21,7 +21,7 @@ trait ReadJournalProvider extends LazyLogging {
     * @return
     */
   def journal() = {
-    PersistenceQuery(system).readJournalFor[ReadJournal with EventsByTagQuery with CurrentEventsByPersistenceIdQuery](readJournalSetting)
+    PersistenceQuery(system).readJournalFor[ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery](readJournalSetting)
   }
 
   private def findReadJournalSetting(): String = {

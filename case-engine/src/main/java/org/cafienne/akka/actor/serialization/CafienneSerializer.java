@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         return manifests.get(manifestString);
     }
 
-    static void addManifestWrapper(Class<?> eventClass, ValueMapDeserializer<?> deserializer) {
+    public static void addManifestWrapper(Class<?> eventClass, ValueMapDeserializer<?> deserializer) {
         ManifestWrapper manifest = new ManifestWrapper(eventClass, deserializer);
         manifestsByClass.put(manifest.eventClass, manifest);
         // Now register manifest strings of all versions, starting from the current
@@ -43,36 +44,67 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         }
     }
 
+    public static String getManifestString(Object o) {
+        if (o instanceof CafienneSerializable) {
+            ManifestWrapper manifest = manifestsByClass.get(o.getClass());
+            if (manifest != null) {
+                return manifest.toString();
+            } else {
+                throw new RuntimeException("A manifest wrapper for class " + o.getClass().getName() + " has not been registered");
+            }
+        }
+        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing CafienneSerializable");
+    }
+
     protected CafienneSerializer() {
     }
 
     protected CafienneSerializer(ExtendedActorSystem system) {
     }
 
+    @FunctionalInterface // Simplistic interface to avoid an if statement in the deserialize function
+    interface ValueMapProvider {
+        ValueMap giveJson() throws IOException, JSONParseFailure;
+    }
+
+    @FunctionalInterface // Simplistic interface to avoid an if statement in the deserialize function
+    interface EventBlobProvider {
+        byte[] giveMeTheBytes();
+    }
+
+    private Object deserialize(String manifestString, ValueMapProvider jsonProvider, EventBlobProvider bytesProvider) {
+        // Get the right manifest
+        ManifestWrapper manifest = getManifest(manifestString);
+        if (manifest == null) {
+            // This is an unrecognized event.
+            logger.warn("Manifest " + manifestString + " cannot be converted to one of the registered event types. Generating 'UnrecognizedManifest' object instead");
+            return new UnrecognizedManifest(manifestString, bytesProvider.giveMeTheBytes());
+        }
+        try {
+            // Run migrators on the json AST
+            ValueMap value = jsonProvider.giveJson();
+            value = manifest.migrate(value, manifestString);
+            // Invoke the deserializer
+            ValueMapDeserializer<?> deserializer = manifest.deserializer;
+            return deserializer.deserialize(value);
+        } catch (IOException | JSONParseFailure | DeserializationError e) {
+            return new DeserializationFailure(manifestString, e, bytesProvider.giveMeTheBytes());
+        }
+    }
+
+    /**
+     * Deserialize an already parsed json structure into the object described by the manifest string
+     * @param json
+     * @param manifestString
+     * @return
+     */
+    public Object fromJson(ValueMap json, String manifestString) {
+        return deserialize(manifestString, () -> json, () -> json.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
     public Object fromBinary(byte[] eventBlob, String manifestString) {
-        try {
-            // Get the right manifest
-            ManifestWrapper manifest = getManifest(manifestString);
-            if (manifest == null) {
-                // This is an unrecognized event.
-                logger.warn("Manifest " + manifestString +" cannot be converted to one of the registered event types. Generating 'UnrecognizedManifest' object instead");
-                return new UnrecognizedManifest(manifestString, eventBlob);
-            }
-            try {
-                ValueMap value = JSONReader.parse(eventBlob);
-                // Run migrators on the json AST
-                value = manifest.migrate(value, manifestString);
-                // Invoke the deserializer
-                ValueMapDeserializer<?> deserializer = manifest.deserializer;
-                return deserializer.deserialize(value);
-            } catch (IOException | JSONParseFailure | DeserializationError e) {
-                return new DeserializationFailure(manifestString, e, eventBlob);
-            }
-        } catch (Throwable t) {
-            logger.error("Deserialization failure (manifest " + manifestString + ")", t);
-            throw t;
-        }
+        return deserialize(manifestString, () -> JSONReader.parse(eventBlob), () -> eventBlob);
     }
 
     @Override
@@ -82,15 +114,7 @@ public class CafienneSerializer extends SerializerWithStringManifest {
 
     @Override
     public String manifest(Object o) {
-        if (o instanceof CafienneSerializable) {
-            ManifestWrapper manifest = manifestsByClass.get(o.getClass());
-            if (manifest != null) {
-                return manifest.toString();
-            } else {
-                throw new RuntimeException("A manifest wrapper for class "+o.getClass().getName()+" has not been registered");
-            }
-        }
-        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing CafienneSerializable");
+        return getManifestString(o);
     }
 
     @Override
@@ -101,6 +125,5 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         }
         throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing CafienneSerializable");
     }
-
 }
 
