@@ -26,7 +26,7 @@ final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOw
     writeField(generator, Fields.isOwner, isOwner)
   }
 
-  override def toValue = new ValueMap(
+  override def toValue: Value[_] = new ValueMap(
     Fields.userId, id,
     Fields.roles, roles.toArray,
     Fields.tenant, tenant,

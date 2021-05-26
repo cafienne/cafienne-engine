@@ -5,17 +5,16 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.json.{JSONReader, ValueMap}
-import org.cafienne.json.JSONReader
 import org.cafienne.cmmn.actorapi.event._
 import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.json.{JSONReader, ValueMap}
 import org.cafienne.service.db.materializer.RecordsPersistence
-import org.cafienne.service.db.record._
 import org.cafienne.service.db.materializer.slick.SlickTransaction
+import org.cafienne.service.db.record._
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
@@ -60,7 +59,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   private def handlePlanItemEvent(event: PlanItemEvent): Future[Done] = {
     // Always insert new items into history, no need to first fetch them from db.
-    planItemsHistory += PlanItemHistoryMerger.mapEventToHistory(event)
+    PlanItemHistoryMerger.mapEventToHistory(event).foreach(item => planItemsHistory += item)
 
     event match {
       case evt: PlanItemCreated =>
@@ -68,12 +67,13 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
         planItems.put(planItem.id, planItem)
         Future.successful(Done)
       case other: PlanItemEvent => {
-        getPlanItem(event.getCaseInstanceId, event.getPlanItemId, event.getUser) map {
+        getPlanItem(event.getPlanItemId) map {
           case Some(planItem) =>
             other match {
               case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RepetitionRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RequiredRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
+              case _ => // Nothing to do for the other events
             }
             Done
           case None =>
@@ -88,13 +88,13 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
-  private def getPlanItem(caseInstanceId: String, planItemId: String, user: TenantUser): Future[Option[PlanItemRecord]] = {
+  private def getPlanItem(planItemId: String) = {
     planItems.get(planItemId) match {
       case Some(value) =>
-        logger.debug("Retrieved planitem caseinstanceid={} id={} from current transaction cache", caseInstanceId, planItemId)
+        logger.debug(s"Found plan item $planItemId in current transaction cache")
         Future.successful(Some(value))
       case None =>
-        logger.debug("Retrieving planitem " + planItemId + " from database")
+        logger.debug(s"Retrieving plan item $planItemId from database")
         persistence.getPlanItem(planItemId)
     }
   }
@@ -103,6 +103,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     event match {
       case event: BusinessIdentifierSet => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
       case event: BusinessIdentifierCleared => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
+      case _ => // Ignore other events
     }
     Future.successful(Done)
   }
@@ -137,10 +138,10 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     event match {
       case event: DeprecatedCaseTeamEvent => {
         // Deprecated case team events have all member roles in them; these members are always of type user; all those users become owner and active;
-        import scala.collection.JavaConverters._
+        import scala.jdk.CollectionConverters._
         // We need to add the empty role (if not yet there),
         //  in order to have member table also populated when a member has no roles but still is part of the team
-        val roles = event.getRoles.asScala ++ Seq("")
+        val roles = event.getRoles().asScala ++ Seq("")
         // Now determine whether the user (and it's roles) become active (and then also owner) or de-activated
         val enabled = if (event.isInstanceOf[TeamMemberAdded]) true else false // Both for ownership and active
         // For reach role add a record.
@@ -161,8 +162,10 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
           case _: TeamRoleCleared => caseInstanceTeamMembers.put(key, member.copy(active = false))
           case _: CaseOwnerAdded => caseInstanceTeamMembers.put(key, member.copy(isOwner = true))
           case _: CaseOwnerRemoved => caseInstanceTeamMembers.put(key, member.copy(isOwner = false))
+          case _ => // Ignore other events
         }
       }
+      case _ => // Ignore other events
     }
     Future.successful(Done)
   }
@@ -250,6 +253,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
             }
           }
         }))
+        case _ => Future.successful(None) // Ignore and error on other events
       }
     }
 
@@ -286,7 +290,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   override def commit(offsetName: String, offset: Offset, caseModified: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
 
-    var records = ListBuffer.empty[AnyRef]
+    val records = ListBuffer.empty[AnyRef]
     this.caseInstance.foreach(instance => records += instance)
     records += this.caseDefinition
     this.caseFile.foreach { caseFile =>

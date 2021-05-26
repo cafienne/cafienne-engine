@@ -32,7 +32,7 @@ import org.cafienne.service.api.tenant.route.TenantRoutes
 import org.cafienne.service.db.schema.QueryDB
 import org.cafienne.system.CaseSystem
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success} // required for combining routes
 
@@ -54,10 +54,9 @@ object Main extends App {
 
   def startup(): Unit = {
     // Take some implicits from the case system
-    implicit val caseSystem = new CaseSystem
-    implicit val timeout = httpRoutesTimeout
-    implicit val system = caseSystem.system
-    implicit val ec = system.dispatcher
+    implicit val caseSystem: CaseSystem = new CaseSystem
+    implicit val system: ActorSystem = caseSystem.system
+    implicit val ec: ExecutionContextExecutor = system.dispatcher
 
     // Tell akka when we're going down.
     sys addShutdownHook {
@@ -102,7 +101,7 @@ object Main extends App {
     }
 
     // Find the API classes of the routes and pass them to Swagger
-    val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses)
+    val apiClasses = caseServiceRoutes.flatMap(route => route.apiClasses())
 
     // Create the route tree
     val apiRoutes = {

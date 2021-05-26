@@ -3,9 +3,9 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
+import akka.util.Timeout
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
-import org.cafienne.actormodel.command.response.SecurityFailure
 import org.cafienne.cmmn.actorapi.response.CaseResponse
 import org.cafienne.humantask.actorapi.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
@@ -20,10 +20,11 @@ import scala.util.{Failure, Success}
 trait CommandRoute extends AuthenticatedRoute {
 
   import akka.pattern.ask
-  implicit val timeout = Main.caseSystemTimeout
+
+  implicit val timeout: Timeout = Main.caseSystemTimeout
 
   def askModelActor(command: ModelCommand[_]): Route = {
-    onComplete(caseSystem.router ? command) {
+    onComplete(caseSystem.router() ? command) {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
@@ -52,6 +53,10 @@ trait CommandRoute extends AuthenticatedRoute {
           case _: PlatformResponse => {
             // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
             complete(StatusCodes.Accepted, "Handling is in progress")
+          }
+          case other => { // Unknown new type of response that is not handled
+            logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
+            complete(StatusCodes.OK)
           }
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)

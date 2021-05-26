@@ -13,7 +13,6 @@ import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.actormodel.command.exception.SerializedException
 import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure}
-import org.cafienne.actormodel.command.response.CommandFailure
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.service.Main
@@ -31,7 +30,7 @@ class AnonymousRoute(override implicit val caseSystem: CaseSystem) extends CaseS
   def sendCommand[T](command: StartCase, expectedResponseClass: Class[T], expectedResponseHandler: T => Route): Route = {
     import akka.pattern.ask
     implicit val timeout = Main.caseSystemTimeout
-    onComplete(caseSystem.router ? command) {
+    onComplete(caseSystem.router() ? command) {
       case Success(value) =>
         value.getClass.isAssignableFrom(expectedResponseClass) match {
           case true => expectedResponseHandler(value.asInstanceOf[T])

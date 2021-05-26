@@ -17,11 +17,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.command.TerminateModelActor
-import org.cafienne.actormodel.command.response.SecurityFailure
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.route.{AuthenticatedRoute, CommandRoute}
-import org.cafienne.service.Main
+import org.cafienne.infrastructure.akka.http.route.CommandRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.{GET, PATCH, Path, Produces}
@@ -93,7 +91,7 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
         if (! Cafienne.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          caseSystem.router ! new TerminateModelActor(modelId)
+          caseSystem.router() ! new TerminateModelActor(modelId)
           complete(StatusCodes.OK, s"Forced recovery of $modelId")
         }
       }

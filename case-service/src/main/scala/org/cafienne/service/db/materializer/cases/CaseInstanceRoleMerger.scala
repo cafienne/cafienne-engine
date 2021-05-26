@@ -5,11 +5,11 @@ import org.cafienne.service.db.record.CaseRoleRecord
 
 object CaseInstanceRoleMerger {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   def merge(event: CaseDefinitionApplied): Seq[CaseRoleRecord] = {
     val caseDefinition = event.getDefinition()
-    caseDefinition.getCaseTeamModel().getCaseRoles().asScala.map(role => CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false)).toSeq
+    caseDefinition.getCaseTeamModel().getCaseRoles().asScala.toSeq.map(role => CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false))
   }
 
 }

@@ -1,10 +1,9 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.json.{ValueList, ValueMap}
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.cmmn.actorapi.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
-import org.cafienne.json.CafienneJson
 
 import scala.jdk.CollectionConverters._
 
@@ -45,7 +44,7 @@ case class CaseTeam(members: Seq[CaseTeamMember] = Seq(), caseRoles: Seq[String]
 
   def getMembers() = members.asJava
 
-  override def toValue = {
+  override def toValue: Value[_] = {
     new ValueMap("caseRoles", caseRoles, "members", members, "unassignedRoles", unassignedRoles)
   }
 }

@@ -43,7 +43,7 @@ class CaseEngineHealthRoute(override implicit val caseSystem: CaseSystem) extend
   def status = get {
     pathPrefix("status") {
       pathEndOrSingleSlash {
-        if (HealthMonitor.ok) {
+        if (HealthMonitor.ok()) {
           complete(StatusCodes.OK)
         } else {
           complete(StatusCodes.ServiceUnavailable)

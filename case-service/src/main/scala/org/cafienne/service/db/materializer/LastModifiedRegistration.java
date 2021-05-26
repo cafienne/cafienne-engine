@@ -106,11 +106,7 @@ public class LastModifiedRegistration {
 
     private void addWaiter(Waiter waiter) {
         synchronized (waiters) {
-            List<Waiter> waiterList = waiters.get(waiter.id());
-            if (waiterList == null) {
-                waiterList = new ArrayList();
-                waiters.put(waiter.id(), waiterList);
-            }
+            List<Waiter> waiterList = waiters.computeIfAbsent(waiter.id(), k -> new ArrayList<Waiter>());
             waiterList.add(waiter);
         }
     }

@@ -11,7 +11,6 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}

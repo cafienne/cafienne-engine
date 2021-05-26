@@ -2,9 +2,8 @@ package org.cafienne.service.db.schema.versions
 
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.service.db.record.CaseTeamMemberRecord
-import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
 import org.cafienne.service.db.schema.QueryDBSchema
+import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
 import slick.lifted
 import slick.lifted.TableQuery
 import slick.migration.api.TableMigration

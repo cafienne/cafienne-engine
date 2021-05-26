@@ -6,13 +6,12 @@ import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
 import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.actormodel.command.exception.{AuthorizationException, InvalidCommandException}
-import org.cafienne.system.health.HealthMonitor
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.command.exception.InvalidCommandException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
 import org.cafienne.service.api.Headers
+import org.cafienne.system.health.HealthMonitor
 
 import java.net.URL
 import scala.concurrent.ExecutionContext
@@ -89,7 +88,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   def validUser(subRoute: PlatformUser => Route): Route = {
     optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { tlm =>
       OIDCAuthentication.user(tlm) { platformUser =>
-        caseSystemMustBeHealthy
+        caseSystemMustBeHealthy()
         subRoute(platformUser)
       }
     }
@@ -104,8 +103,8 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
-  def caseSystemMustBeHealthy = {
-    if (!HealthMonitor.ok) {
+  def caseSystemMustBeHealthy() = {
+    if (!HealthMonitor.ok()) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
     }
   }

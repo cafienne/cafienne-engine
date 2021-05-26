@@ -16,5 +16,6 @@ class CaseEventPublisher(listener: CaseEventListener, implicit val system: Actor
       listener.handle(evt)
       Future.successful(Done)
     }
+    case _ => Future.successful(Done) // Ignore other events
   }.runWith(Sink.ignore)
 }

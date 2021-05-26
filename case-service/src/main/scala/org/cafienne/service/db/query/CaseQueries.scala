@@ -2,14 +2,12 @@ package org.cafienne.service.db.query
 
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
-import org.cafienne.cmmn.definition.{CMMNElementDefinition, DefinitionsDocument}
+import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
-import org.cafienne.service.db.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
-import org.cafienne.service.db.query.exception.PlanItemSearchFailure
 import org.cafienne.service.db.query.exception.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.db.query.filter.CaseFilter
-import org.cafienne.util.XMLHelper
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord}
 
 import scala.concurrent.Future
 

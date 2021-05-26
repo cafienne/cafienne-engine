@@ -34,7 +34,7 @@ case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwne
     removeRoles.asJava
   }
 
-  override def toValue = {
+  override def toValue: Value[_] = {
     val json = new ValueMap("memberId", key.id,
       "memberType", key.`type`,
       "isOwner", isOwner.fold(Value.NULL.asInstanceOf[Value[Any]])(b => new BooleanValue(b).asInstanceOf[Value[Any]]),

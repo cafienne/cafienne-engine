@@ -3,11 +3,11 @@ package org.cafienne.timerservice.persistence.inmemory
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.timerservice.{Timer, TimerStorage}
+import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
 
 import scala.collection.mutable
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class InMemoryStore extends TimerStore with LazyLogging {
   val timers = new mutable.HashMap[String, Timer]()
