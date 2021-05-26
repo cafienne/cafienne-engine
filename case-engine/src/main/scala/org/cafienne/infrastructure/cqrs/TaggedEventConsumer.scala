@@ -86,12 +86,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   }
 
   private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
-    RestartSource.withBackoff(
-      minBackoff = Cafienne.config.queryDB.restartSettings.minBackoff,
-      maxBackoff = Cafienne.config.queryDB.restartSettings.maxBackoff,
-      randomFactor = Cafienne.config.queryDB.restartSettings.randomFactor,
-      maxRestarts = Cafienne.config.queryDB.restartSettings.maxRestarts
-    ) { () =>
+    RestartSource.withBackoff(Cafienne.config.queryDB.restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
