@@ -4,7 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.asScalaBufferConverter
 
 /**
   * Some utility methods to easily read properties from a scala Config object with e.g. default values
@@ -66,7 +66,7 @@ trait ConfigReader {
 
   def readStringList(path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
     if (config.hasPath(path)) {
-      config.getStringList(path).asScala.toSeq
+      config.getStringList(path).asScala
     } else {
       defaultValue
     }
@@ -90,7 +90,7 @@ trait ConfigReader {
     } else {
       defaultValue
     }
-    list.map(c => ConfigReader(c)).toSeq
+    list.map(c => ConfigReader(c))
   }
 
   def requires(errorPrefixMessage: String, paths: String*) = {

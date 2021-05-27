@@ -22,11 +22,11 @@ object QueryDB_1_1_11 extends DbSchemaVersion with QueryDBSchema
 
   import dbConfig.profile.api._
 
-  def addPlanItemIndices = TableMigration(TableQuery[PlanItemTable]).addIndexes(_.indexCreatedBy, _.indexModifiedBy)
-  def addPlanItemHistoryIndex = TableMigration(TableQuery[PlanItemHistoryTable]).addIndexes(_.indexModifiedBy)
-  def addCaseIndices = TableMigration(TableQuery[CaseInstanceTable]).addIndexes(_.indexCreatedBy, _.indexModifiedBy)
-  def addCaseTeamIndex = TableMigration(TableQuery[CaseInstanceTeamMemberTable]).addIndexes(_.indexMemberId)
-  def addTaskIndices = TableMigration(TableQuery[TaskTable]).addIndexes(_.indexOwner, _.indexCreatedBy, _.indexModifiedBy)
-  def addUserRoleIndex = TableMigration(TableQuery[UserRoleTable]).addIndexes(_.indexOwnership)
+  def addPlanItemIndices = TableMigration(TableQuery[PlanItemTable])addIndexes(_.indexCreatedBy, _.indexModifiedBy)
+  def addPlanItemHistoryIndex = TableMigration(TableQuery[PlanItemHistoryTable])addIndexes(_.indexModifiedBy)
+  def addCaseIndices = TableMigration(TableQuery[CaseInstanceTable])addIndexes(_.indexCreatedBy, _.indexModifiedBy)
+  def addCaseTeamIndex = TableMigration(TableQuery[CaseInstanceTeamMemberTable])addIndexes(_.indexMemberId)
+  def addTaskIndices = TableMigration(TableQuery[TaskTable])addIndexes(_.indexOwner, _.indexCreatedBy, _.indexModifiedBy)
+  def addUserRoleIndex = TableMigration(TableQuery[UserRoleTable])addIndexes(_.indexOwnership)
 
 }

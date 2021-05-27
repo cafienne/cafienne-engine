@@ -7,6 +7,7 @@
  */
 package org.cafienne.service.api.cases.route
 
+import java.util.UUID
 import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
@@ -28,9 +30,6 @@ import org.cafienne.service.api
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCaseFormat
 import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
-
-import java.util.UUID
-import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -62,7 +61,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def getCases = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
-        parameters("tenant".?,"identifiers".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?, "sortBy".?, "sortOrder".?) {
+        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
@@ -94,7 +93,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def stats = get {
     path("stats") {
       validUser { platformUser =>
-        parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
+        parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?
         ) { (tenant, offset, numOfResults, caseName, definition, status) =>
           val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
           runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))

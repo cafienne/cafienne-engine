@@ -55,7 +55,7 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
   def getEvents = get {
     path(Segment) { modelId =>
       optionalUser { platformUser =>
-        parameters("from".?(0L), "to".?(Long.MaxValue)) { (from: Long, to: Long) => {
+        parameters('from ? 0L, 'to ? Long.MaxValue) { (from: Long, to: Long) => {
           onComplete(modelEventsReader.getEvents(platformUser, modelId, from, to)) {
             case Success(value) => completeJsonValue(value)
             case Failure(err) => complete(StatusCodes.NotFound, err)

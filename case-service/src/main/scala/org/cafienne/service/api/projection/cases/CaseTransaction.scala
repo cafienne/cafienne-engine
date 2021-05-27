@@ -73,7 +73,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
               case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RepetitionRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RequiredRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
-              case _ => // Nothing to do for the other events
             }
             Done
           case None =>
@@ -103,7 +102,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     event match {
       case event: BusinessIdentifierSet => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
       case event: BusinessIdentifierCleared => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
-      case _ => // Ignore other events
     }
     Future.successful(Done)
   }
@@ -138,10 +136,10 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     event match {
       case event: DeprecatedCaseTeamEvent => {
         // Deprecated case team events have all member roles in them; these members are always of type user; all those users become owner and active;
-        import scala.jdk.CollectionConverters._
+        import scala.collection.JavaConverters._
         // We need to add the empty role (if not yet there),
         //  in order to have member table also populated when a member has no roles but still is part of the team
-        val roles = event.getRoles().asScala ++ Seq("")
+        val roles = event.getRoles.asScala ++ Seq("")
         // Now determine whether the user (and it's roles) become active (and then also owner) or de-activated
         val enabled = if (event.isInstanceOf[TeamMemberAdded]) true else false // Both for ownership and active
         // For reach role add a record.
@@ -162,10 +160,8 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
           case _: TeamRoleCleared => caseInstanceTeamMembers.put(key, member.copy(active = false))
           case _: CaseOwnerAdded => caseInstanceTeamMembers.put(key, member.copy(isOwner = true))
           case _: CaseOwnerRemoved => caseInstanceTeamMembers.put(key, member.copy(isOwner = false))
-          case _ => // Ignore other events
         }
       }
-      case _ => // Ignore other events
     }
     Future.successful(Done)
   }
@@ -253,7 +249,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
             }
           }
         }))
-        case _ => Future.successful(None) // Ignore and error on other events
       }
     }
 
@@ -290,7 +285,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   override def commit(offsetName: String, offset: Offset, caseModified: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
 
-    val records = ListBuffer.empty[AnyRef]
+    var records = ListBuffer.empty[AnyRef]
     this.caseInstance.foreach(instance => records += instance)
     records += this.caseDefinition
     this.caseFile.foreach { caseFile =>
@@ -309,6 +304,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
     //    println("Committing "+records.size+" records into the database for "+offset)
 
-    persistence.bulkUpdate(records.toSeq.filter(r => r != null))
+    persistence.bulkUpdate(records.filter(r => r != null))
   }
 }

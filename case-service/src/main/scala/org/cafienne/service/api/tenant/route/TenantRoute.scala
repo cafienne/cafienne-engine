@@ -36,7 +36,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
   }
 
   def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenantFormat) = {
-    import scala.jdk.CollectionConverters._
+    import scala.collection.JavaConverters._
 
     val users = convertToTenant(newTenant).asJava
     if (users.isEmpty) {

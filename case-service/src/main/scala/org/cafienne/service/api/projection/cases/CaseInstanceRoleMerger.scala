@@ -5,7 +5,7 @@ import org.cafienne.service.api.projection.record.CaseRoleRecord
 
 object CaseInstanceRoleMerger {
 
-  import scala.jdk.CollectionConverters._
+  import scala.collection.JavaConverters._
 
   def merge(event: CaseDefinitionApplied): Seq[CaseRoleRecord] = {
     val caseDefinition = event.getDefinition()

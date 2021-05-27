@@ -27,7 +27,7 @@ trait ReadJournalProvider extends LazyLogging {
   private def findReadJournalSetting(): String = {
 
     val explicitReadJournal = CaseSystem.config.readJournal
-    if (explicitReadJournal.nonEmpty) {
+    if (!explicitReadJournal.isEmpty) {
       return explicitReadJournal
     }
 

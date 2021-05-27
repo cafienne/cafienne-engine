@@ -11,8 +11,6 @@ lazy val basicSettings = {
       "-encoding", "UTF-8",
       "-unchecked",
       "-deprecation",
-      "-Xlint","deprecation",
-      "-Xlint","unchecked",
       "-Xlog-reflective-calls"
     ),
     Compile / parallelExecution := true,

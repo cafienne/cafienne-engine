@@ -1,14 +1,15 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.{BadJOSEException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import java.text.ParseException
+
 import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
+import com.nimbusds.jose.jwk.source.JWKSource
+import com.nimbusds.jose.proc.{BadJOSEException, BadJWEException, BadJWSException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 
-import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenVerifier[T] {
@@ -47,7 +48,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
   )
 
   override def verifyToken(token: String): Future[ServiceUserContext] = Future {
-    import scala.jdk.CollectionConverters._
+    import scala.collection.JavaConverters._
     var claimsSet: Option[JWTClaimsSet] = None
     if (token.isEmpty) {
       throw MissingTokenException
@@ -58,7 +59,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
       claimsSet = Some(jwtProcessor.process(token, ctx))
       claimsSet.fold(throw new TokenVerificationException("Unable to create claimSet for " + token))(
         cS => {
-          CaseSystem.health.idp.isOK()
+          CaseSystem.health.idp.isOK
           ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
         }
       )
@@ -71,13 +72,15 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
         throw  failure
       }
       case other: Throwable => {
-        CaseSystem.health.idp.isOK()
+        CaseSystem.health.idp.isOK
         other match {
           case nje: BadJWTException =>
             //        nje.printStackTrace()
             val exceptionMessage = nje.getMessage
             val missingClaimsMsg = """JWT missing required claims"""
             val invalidIssuerMsg = """JWT "iss" claim doesn't match expected value: """
+            val jwtAudienceRejected = """JWT audience rejected"""
+            val badJson = """Payload of JWS object is not a valid JSON object"""
             if (nje.getCause.isInstanceOf[ParseException]) {
               //          println("Failure in parsing token")
               throw new TokenVerificationException("Token parse failure: " + nje.getCause.getLocalizedMessage)
@@ -98,7 +101,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
           case e: ParseException => {
             throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
           }
-          case e: Throwable => {
+          case e: Exception => {
             logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
             throw new TokenVerificationException("Token verification failure of type " + e.getClass.getSimpleName, e)
           }

@@ -27,7 +27,6 @@ object CaseFileMerger extends LazyLogging {
           val myValue = arrayValue.get(itemIndex).asInstanceOf[ValueMap]
           handleRemoveChild(event.asInstanceOf[CaseFileItemChildRemoved], myValue)
         }
-        case _ => // Ignore other transitions for now
       }
     } else {
       event.getTransition match { // Matching on transition instead of event class, because classes only introduced in 1.1.9
@@ -43,7 +42,6 @@ object CaseFileMerger extends LazyLogging {
           }
           handleRemoveChild(event.asInstanceOf[CaseFileItemChildRemoved], myValue)
         }
-        case _ => // Ignore other transitions
       }
     }
   }

@@ -10,7 +10,7 @@ trait TenantTables extends QueryDBSchema {
   // Schema for the "tenant-owner" table:
   final class TenantOwnersTable(tag: Tag) extends CafienneTable[TenantOwnerRecord](tag, "tenant_owners") {
 
-    def * = (tenant, userId, enabled).<>(TenantOwnerRecord.tupled, TenantOwnerRecord.unapply)
+    def * = (tenant, userId, enabled) <> (TenantOwnerRecord.tupled, TenantOwnerRecord.unapply)
 
     def enabled = column[Boolean]("enabled", O.Default(true))
 
@@ -29,14 +29,14 @@ trait TenantTables extends QueryDBSchema {
     def enabled = column[Boolean]("enabled", O.Default(true))
 
     // Constraints
-    def pk = primaryKey("pk_tenant", name)
-    def * = (name, enabled).<>(TenantRecord.tupled, TenantRecord.unapply)
+    def pk = primaryKey("pk_tenant", (name))
+    def * = (name, enabled) <> (TenantRecord.tupled, TenantRecord.unapply)
   }
 
   class UserRoleTable(tag: Tag) extends CafienneTable[UserRoleRecord](tag, "user_role") {
     def pk = primaryKey("pk_userrole", (userId, tenant, role_name))
 
-    def * = (userId, tenant, role_name, name, email, isOwner, enabled).<>(UserRoleRecord.tupled, UserRoleRecord.unapply)
+    def * = (userId, tenant, role_name, name, email, isOwner, enabled) <> (UserRoleRecord.tupled, UserRoleRecord.unapply)
 
     def userId = userColumn[String]("user_id")
 

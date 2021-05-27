@@ -65,7 +65,7 @@ trait CaseTables extends QueryDBSchema {
     def indexCreatedBy = index(createdBy)
     def indexModifiedBy = index(modifiedBy)
 
-    def * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput).<>(CaseRecord.tupled, CaseRecord.unapply)
+    def * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput) <> (CaseRecord.tupled, CaseRecord.unapply)
   }
 
   final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTable[CaseDefinitionRecord](tag, "case_instance_definition") {
@@ -86,7 +86,7 @@ trait CaseTables extends QueryDBSchema {
 
     def modifiedBy = userColumn[String]("modified_by")
 
-    def * = ((caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy)).<>(CaseDefinitionRecord.tupled, CaseDefinitionRecord.unapply)
+    def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy) <> (CaseDefinitionRecord.tupled, CaseDefinitionRecord.unapply)
   }
 
   class PlanItemTable(tag: Tag) extends CafienneTable[PlanItemRecord](tag, "plan_item") {
@@ -133,7 +133,7 @@ trait CaseTables extends QueryDBSchema {
 
     def rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput).<>(PlanItemRecord.tupled, PlanItemRecord.unapply)
+    def * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemRecord.tupled, PlanItemRecord.unapply)
 
     def indexCaseInstanceId = index(caseInstanceId)
     def indexCreatedBy = index(createdBy)
@@ -184,7 +184,7 @@ trait CaseTables extends QueryDBSchema {
 
     def rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput).<>(PlanItemHistoryRecord.tupled, PlanItemHistoryRecord.unapply)
+    def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput) <> (PlanItemHistoryRecord.tupled, PlanItemHistoryRecord.unapply)
 
     def idx = index("idx_plan_item_history__plain_item_id", planItemId)
     def indexModifiedBy = index(modifiedBy)
@@ -198,7 +198,7 @@ trait CaseTables extends QueryDBSchema {
 
     def data = jsonColumn[String]("data")
 
-    def * = (caseInstanceId, tenant, data).<>(CaseFileRecord.tupled, CaseFileRecord.unapply)
+    def * = (caseInstanceId, tenant, data) <> (CaseFileRecord.tupled, CaseFileRecord.unapply)
 
     val indexCaseInstanceId = index(caseInstanceId)
   }
@@ -224,7 +224,7 @@ trait CaseTables extends QueryDBSchema {
 
     def path = column[String]("path")
 
-    def * = (caseInstanceId, tenant, name, value, active, path).<>(CaseBusinessIdentifierRecord.tupled, CaseBusinessIdentifierRecord.unapply)
+    def * = (caseInstanceId, tenant, name, value, active, path) <> (CaseBusinessIdentifierRecord.tupled, CaseBusinessIdentifierRecord.unapply)
 
     val caseInstanceTable = TableQuery[CaseInstanceTable]
 
@@ -246,7 +246,7 @@ trait CaseTables extends QueryDBSchema {
 
     def pk = primaryKey("pk_case_instance_role", (caseInstanceId, roleName))
 
-    def * = (caseInstanceId, tenant, roleName, assigned).<>(CaseRoleRecord.tupled, CaseRoleRecord.unapply)
+    def * = (caseInstanceId, tenant, roleName, assigned) <> (CaseRoleRecord.tupled, CaseRoleRecord.unapply)
 
     val indexCaseInstanceId = index(caseInstanceId)
   }
@@ -269,7 +269,7 @@ trait CaseTables extends QueryDBSchema {
 
     def pk = primaryKey("pk_case_instance_team_member", (caseInstanceId, caseRole, memberId, isTenantUser))
 
-    def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active).<>(CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
+    def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active) <> (CaseTeamMemberRecord.tupled, CaseTeamMemberRecord.unapply)
 
     val indexCaseInstanceId = index(caseInstanceId)
     def indexMemberId = index(generateIndexName(memberId), (memberId, isTenantUser))

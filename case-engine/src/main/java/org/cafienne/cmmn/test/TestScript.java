@@ -122,7 +122,7 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSeq(), "hard-coded-test-tenant", false, "", "", true);
+        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", false, "", "", true);
     }
 
     /**
@@ -152,7 +152,7 @@ public class TestScript {
      * @return
      */
     public static CaseTeamMember getOwner(TenantUser user) {
-        return CaseTeamMember.apply(new MemberKey(user.id(), "user"), user.roles(), true);
+        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(true), new scala.collection.immutable.Vector(0, 0, 0));
     }
 
     /**
@@ -161,7 +161,7 @@ public class TestScript {
      * @return
      */
     public static CaseTeamMember getMember(TenantUser user) {
-        return CaseTeamMember.apply(new MemberKey(user.id(), "user"), user.roles(), false);
+        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(false), new scala.collection.immutable.Vector(0, 0, 0));
     }
 
     /**
