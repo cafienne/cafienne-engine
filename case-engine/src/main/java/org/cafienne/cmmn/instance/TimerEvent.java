@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
+import org.cafienne.cmmn.akka.event.plan.eventlistener.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.TimerEventDefinition;
 import org.cafienne.timerservice.akka.command.CancelTimer;
@@ -54,23 +54,27 @@ public class TimerEvent extends PlanItem<TimerEventDefinition> {
 
     @Override
     protected void completeInstance() {
+        addEvent(new TimerCompleted(this));
     }
 
     @Override
     protected void suspendInstance() {
         // Suspending is done by simply removing the schedule. If we are resumed, we simply create a new schedule.
         removeSchedule();
+        addEvent(new TimerSuspended(this));
     }
 
     @Override
     protected void resumeInstance() {
         // Set a new schedule to make our plan item "Occur"
         setSchedule();
+        addEvent(new TimerResumed(this));
     }
 
     @Override
     protected void terminateInstance() {
         // Remove the schedule as it has become useless (if it still would go off, nothing would happen, since "Occur" has no transition once Terminated)
         removeSchedule();
+        addEvent(new TimerTerminated(this));
     }
 }

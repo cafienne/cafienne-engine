@@ -3,7 +3,6 @@ package org.cafienne.cmmn.akka.event.plan.eventlistener;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.cmmn.akka.event.CaseEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -14,32 +13,25 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class TimerSet extends CaseEvent {
+public class TimerSet extends TimerBaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(TimerSet.class);
 
     private final Instant targetMoment;
-    private final String timerId;
     private transient TimerEvent timerEvent;
 
     public TimerSet(TimerEvent timerEvent) {
-        super(timerEvent.getCaseInstance());
+        super(timerEvent);
         this.timerEvent = timerEvent;
-        this.timerId = timerEvent.getId();
         this.targetMoment = timerEvent.getDefinition().getMoment(timerEvent);
     }
 
     public TimerSet(ValueMap json) {
         super(json);
-        this.timerId = json.raw(Fields.timerId);
         this.targetMoment = Instant.parse(json.raw(Fields.targetMoment));
     }
 
     public Instant getTargetMoment() {
         return targetMoment;
-    }
-
-    public String getTimerId() {
-        return timerId;
     }
 
     @Override
@@ -56,13 +48,12 @@ public class TimerSet extends CaseEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
-        writeField(generator, Fields.timerId, timerId);
+        super.write(generator);
         writeField(generator, Fields.targetMoment, targetMoment);
     }
 
     @Override
     public String toString() {
-        return "Timer timerEvent "+getTimerId()+" has target moment " + targetMoment;
+        return "Timer "+getTimerId()+" is set to occur at " + targetMoment;
     }
 }
