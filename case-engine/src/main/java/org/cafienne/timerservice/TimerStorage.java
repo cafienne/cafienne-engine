@@ -16,6 +16,7 @@ import java.util.Map;
  * Object that can be saved as snapshot offer for the TimerService persistent actor
  */
 @Manifest
+@Deprecated
 public class TimerStorage implements ModelActorSnapshot {
     private Map<String, TimerJob> timers = new HashMap();
 
@@ -26,28 +27,12 @@ public class TimerStorage implements ModelActorSnapshot {
         json.withArray(Fields.timers).forEach(value -> addTimer(new TimerJob(value.asMap())));
     }
 
-    Collection<TimerJob> getTimers() {
+    public Collection<TimerJob> getTimers() {
         return new ArrayList<>(timers.values());
     }
 
-    private boolean changed = false;
-
-    boolean changed() {
-        return changed;
-    }
-
-    void addTimer(TimerJob job) {
+    private void addTimer(TimerJob job) {
         timers.put(job.timerId, job);
-        changed = true;
-    }
-
-    void removeTimer(String timerId) {
-        timers.remove(timerId);
-        changed = true;
-    }
-
-    void saved() {
-        changed = false;
     }
 
     @Override

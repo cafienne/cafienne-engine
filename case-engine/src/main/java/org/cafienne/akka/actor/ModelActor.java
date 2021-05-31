@@ -21,15 +21,13 @@ import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.*;
 import org.cafienne.akka.actor.health.HealthMonitor;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
-import org.cafienne.timerservice.akka.command.TimerServiceCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
@@ -415,16 +413,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param right
      */
     public void askProcess(ProcessCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
-    /**
-     * Similar to {@link #askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)}
-     * @param command
-     * @param left
-     * @param right
-     */
-    public void askTimerService(TimerServiceCommand command, CommandFailureListener left, CommandResponseListener... right) {
         askModel(command, left, right);
     }
 

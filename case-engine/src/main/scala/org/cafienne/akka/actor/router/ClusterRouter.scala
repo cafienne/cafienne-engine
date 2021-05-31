@@ -11,7 +11,6 @@ import org.cafienne.processtask.akka.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.tenant.TenantActor
 import org.cafienne.tenant.akka.command.TenantCommand
-import org.cafienne.timerservice.akka.command.TimerServiceCommand
 
 /**
   * Clustered representation, router as singleton actor
@@ -37,7 +36,6 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
       case _: CaseCommand => caseShardRouter
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
-      case _: TimerServiceCommand => caseSystem.timerService
       case _: PlatformCommand => caseSystem.platformService
     }
     shardRouter.forward(m)

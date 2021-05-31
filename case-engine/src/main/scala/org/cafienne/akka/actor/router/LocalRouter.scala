@@ -4,7 +4,6 @@ import akka.actor.{ActorRef, Props, Terminated}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.platform.akka.command.PlatformCommand
-import org.cafienne.timerservice.akka.command.TimerServiceCommand
 
 /**
   * In-memory router for akka messages sent in the CaseSystem.
@@ -21,7 +20,6 @@ class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     */
   override def forwardMessage(m: ModelCommand[_]): Unit = {
     val ref: ActorRef = m match {
-      case _: TimerServiceCommand => caseSystem.timerService
       case _: PlatformCommand => caseSystem.platformService
       case _ => actors.getOrElseUpdate(m.actorId, createActorRef(m))
     }
