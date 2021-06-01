@@ -1,7 +1,6 @@
 package org.cafienne.akka.actor.config
 
 import com.typesafe.config.{Config, ConfigObject}
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.util.{ChildConfigReader, ConfigReader}
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.akka.actor.serialization.json.ValueMap
@@ -41,7 +40,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   if (definition.isBlank) {
     fail(s"Definition cannot be empty in anonymous case definition on url '/request/case/$url' --> '$definition'")
   }
-  val tenant: String = readString("tenant", CaseSystem.config.platform.defaultTenant)
+  val tenant: String = readString("tenant", Cafienne.config.platform.defaultTenant)
   if (tenant.isBlank) {
     fail(s"Tenant is missing in anonymous case definition on url '/request/case/$url' --> '$definition'; also default tenant is empty")
   }
@@ -64,7 +63,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   }
 
   def createStartCaseCommand(newCaseId: String, inputParameters: ValueMap, debugMode: Boolean) = {
-    val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definition)
+    val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definition)
     val sc = new StartCase(tenant, anonymousTenantUser, newCaseId, definitionsDocument.getFirstCase, inputParameters, team, debugMode)
     sc
   }

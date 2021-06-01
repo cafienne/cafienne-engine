@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.repository.file;
 
-import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -19,7 +19,7 @@ import java.util.*;
 
 public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final static Logger logger = LoggerFactory.getLogger(FileBasedDefinitionProvider.class);
-    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache(CaseSystem.config().repository().cacheSize());
+    private final Map<String, FileBasedDefinition> cache = new SimpleLRUCache(Cafienne.config().repository().cacheSize());
     private String deployDirectory = null;
     private final String EXTENSION = ".xml";
 
@@ -116,7 +116,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      */
     public String getDeployDirectory() {
         if (deployDirectory == null) {
-            deployDirectory = CaseSystem.config().repository().location();
+            deployDirectory = Cafienne.config().repository().location();
             File file = new File(deployDirectory);
             if (!file.exists()) {
                 logger.warn("The deploy directory '" + file.getAbsolutePath() + "' does not exist (location configured is '" + deployDirectory + "'). The case engine will only read definitions from the class path until the deploy directory is created.");

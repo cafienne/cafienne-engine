@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.repository;
 
 import com.typesafe.config.Config;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StartCaseDefinitionProvider implements DefinitionProvider {
-    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache(CaseSystem.config().repository().cacheSize());
+    private final Map<String, DefinitionsDocument> cache = new SimpleLRUCache(Cafienne.config().repository().cacheSize());
     private final static String AUTHORIZED_TENANT_ROLES = "authorized-tenant-roles";
     private final List<String> authorizedTenantRoles;
 
@@ -32,7 +32,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     }
 
     private List<String> readTenantRoles() {
-        Config config = CaseSystem.config().repository().config();
+        Config config = Cafienne.config().repository().config();
         if (config.hasPath(AUTHORIZED_TENANT_ROLES)) {
             return config.getStringList(AUTHORIZED_TENANT_ROLES);
         } else {

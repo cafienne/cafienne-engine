@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.api.cases.route
 
-import java.util.UUID
 import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -16,8 +15,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import javax.ws.rs._
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.akka.command.team.CaseTeam
@@ -30,6 +28,9 @@ import org.cafienne.service.api
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCaseFormat
 import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
+
+import java.util.UUID
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -167,13 +168,13 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
           entity(as[StartCaseFormat]) { payload =>
             try {
               val tenant = platformUser.resolveTenant(payload.tenant)
-              val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, payload.definition)
+              val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, payload.definition)
               val caseDefinition = definitionsDocument.getFirstCase
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
-              val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
+              val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
               askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)

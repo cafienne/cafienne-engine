@@ -1,9 +1,9 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.command.response.ActorLastModified
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.service.api.projection.query.UserQueries
@@ -21,7 +21,7 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
-  private val cache = new SimpleLRUCache[String, PlatformUser](CaseSystem.config.api.security.identityCacheSize)
+  private val cache = new SimpleLRUCache[String, PlatformUser](Cafienne.config.api.security.identityCacheSize)
 
   def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
     tlm match {

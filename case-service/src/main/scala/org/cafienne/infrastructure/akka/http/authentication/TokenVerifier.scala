@@ -1,15 +1,15 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import java.text.ParseException
-
-import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.{BadJOSEException, BadJWEException, BadJWSException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.proc.{BadJOSEException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 
+import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenVerifier[T] {
@@ -91,7 +91,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
             }
             if (exceptionMessage.contains(invalidIssuerMsg)) {
               val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
-              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'. Issuers supported: " + CaseSystem.config.OIDC.issuer)
+              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'. Issuers supported: " + Cafienne.config.OIDC.issuer)
             }
             throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
           case e: BadJOSEException =>

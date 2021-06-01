@@ -7,9 +7,8 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
@@ -55,7 +54,7 @@ public class MailDefinition extends SubProcessDefinition {
     }
 
     public Properties getMailProperties() {
-        Properties properties = CaseSystem.config().engine().mailService().asProperties();
+        Properties properties = Cafienne.config().engine().mailService().asProperties();
         return properties;
     }
 

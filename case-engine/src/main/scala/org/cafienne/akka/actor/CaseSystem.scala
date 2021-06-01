@@ -7,16 +7,16 @@
  */
 package org.cafienne.akka.actor
 
-import java.time.Instant
 import akka.actor._
-import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.config.CafienneConfig
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
 import org.cafienne.timerservice.TimerService
+
+import java.time.Instant
 
 /**
   *
@@ -39,14 +39,6 @@ object CaseSystem extends LazyLogging {
   val devDebugLogger = EngineDeveloperConsole
 
   /**
-    * Configuration settings of this Cafienne Platform
-    */
-  val config = {
-    val fallback = ConfigFactory.defaultReference()
-    val config = ConfigFactory.load().withFallback(fallback)
-    new CafienneConfig(config)
-  }
-  /**
     * Returns the BuildInfo as a string (containing JSON)
     *
     * @return
@@ -64,7 +56,7 @@ object CaseSystem extends LazyLogging {
   def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
 
   def isPlatformOwner(userId: String): Boolean = {
-    config.platform.isPlatformOwner(userId)
+    Cafienne.config.platform.isPlatformOwner(userId)
   }
 
   /**

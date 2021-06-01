@@ -1,6 +1,6 @@
 package org.cafienne.akka.actor.config
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.config.util.ConfigReader
 
@@ -8,7 +8,10 @@ import org.cafienne.akka.actor.config.util.ConfigReader
   * Configuration settings of this Cafienne Case System Platform
   * @param systemConfig
   */
-class CafienneConfig(val systemConfig: Config) extends ConfigReader with LazyLogging {
+class CafienneConfig() extends ConfigReader with LazyLogging {
+  val fallback = ConfigFactory.defaultReference()
+  val systemConfig = ConfigFactory.load().withFallback(fallback)
+
   val path = "cafienne"
   override lazy val config = {
     if (systemConfig.hasPath(path)) {
@@ -78,3 +81,10 @@ class CafienneConfig(val systemConfig: Config) extends ConfigReader with LazyLog
   }
 }
 
+object Cafienne {
+
+  /**
+    * Configuration settings of this Cafienne Platform
+    */
+  lazy val config = new CafienneConfig
+}

@@ -1,6 +1,6 @@
 package org.cafienne.platform;
 
-import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ class JobScheduler {
         if (!awake) {
             awake = true;
             // Start 5 threads that nicely await work
-            int numWorkers = CaseSystem.config().engine().platformServiceConfig().workers();
+            int numWorkers = Cafienne.config().engine().platformServiceConfig().workers();
             while (numWorkers-- > 0) {
                 new JobRunner(service, this, numWorkers + 1).start(); // +1 because that is a little more clear when reading the log messages
             }

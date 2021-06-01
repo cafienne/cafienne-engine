@@ -13,6 +13,8 @@ import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.CommandFailureListener;
 import org.cafienne.akka.actor.command.response.CommandResponseListener;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.config.Cafienne;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
@@ -68,7 +70,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    private boolean debugMode = CaseSystem.config().actor().debugEnabled();
+    private boolean debugMode = Cafienne.config().actor().debugEnabled();
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.
@@ -255,7 +257,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     protected void enableSelfCleaner() {
         // Now set the new selfCleaner
-        long idlePeriod = CaseSystem.config().actor().idlePeriod();
+        long idlePeriod = Cafienne.config().actor().idlePeriod();
         FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
         selfCleaner = getScheduler().schedule(duration, () -> {
             getLogger().debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");

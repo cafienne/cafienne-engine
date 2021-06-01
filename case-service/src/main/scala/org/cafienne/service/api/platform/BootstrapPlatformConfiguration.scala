@@ -1,17 +1,17 @@
 package org.cafienne.service.api.platform
 
-import java.io.File
-
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.Main
 import org.cafienne.tenant.akka.command.TenantUserInformation
 import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
+import java.io.File
 import scala.collection.JavaConverters._
 
 /**
@@ -32,7 +32,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def findConfigFile(): Option[File] = {
     logger.warn("Checking presence of bootstrap configuration for the case system")
-    val bootstrapTenantConfFileName = CaseSystem.config.platform.bootstrapFile
+    val bootstrapTenantConfFileName = Cafienne.config.platform.bootstrapFile
     if (!bootstrapTenantConfFileName.isBlank) {
       val configFile = new File(bootstrapTenantConfFileName)
       if (! configFile.exists()) {
@@ -46,7 +46,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
       return Some(configFile)
     }
 
-    val defaultTenant = CaseSystem.config.platform.defaultTenant
+    val defaultTenant = Cafienne.config.platform.defaultTenant
     if (defaultTenant.isBlank) {
       logger.warn("Default tenant is empty and bootstrap-file is not filled. Skipping bootstrap attempts")
       return None
@@ -66,7 +66,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
    }
 
   private def parseConfigFile(configFile: File): CreateTenant = {
-    val defaultTenant = CaseSystem.config.platform.defaultTenant
+    val defaultTenant = Cafienne.config.platform.defaultTenant
     logger.info(s"Bootstrapping tenant '$defaultTenant' from file ${configFile.getAbsolutePath}")
 
     val tenantConfig: Config = ConfigFactory.parseFile(configFile)
@@ -95,7 +95,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("All bootstrap tenant owners must be defined as user. Following users not found: " + undefinedOwners)
       }
 
-      val aPlatformOwner = PlatformUser(CaseSystem.config.platform.platformOwners.get(0), Seq())
+      val aPlatformOwner = PlatformUser(Cafienne.config.platform.platformOwners.get(0), Seq())
 
       new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
 

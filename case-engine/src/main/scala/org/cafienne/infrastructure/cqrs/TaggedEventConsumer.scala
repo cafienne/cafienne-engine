@@ -5,6 +5,7 @@ import akka.stream.scaladsl.{RestartSource, Sink, Source}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.event.ModelEvent
 import org.cafienne.akka.actor.serialization.{DeserializationFailure, UnrecognizedManifest}
 
@@ -86,10 +87,10 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
 
   private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
     RestartSource.withBackoff(
-      minBackoff = CaseSystem.config.queryDB.restartSettings.minBackoff,
-      maxBackoff = CaseSystem.config.queryDB.restartSettings.maxBackoff,
-      randomFactor = CaseSystem.config.queryDB.restartSettings.randomFactor,
-      maxRestarts = CaseSystem.config.queryDB.restartSettings.maxRestarts
+      minBackoff = Cafienne.config.queryDB.restartSettings.minBackoff,
+      maxBackoff = Cafienne.config.queryDB.restartSettings.maxBackoff,
+      randomFactor = Cafienne.config.queryDB.restartSettings.randomFactor,
+      maxRestarts = Cafienne.config.queryDB.restartSettings.maxRestarts
     ) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.

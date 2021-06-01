@@ -1,8 +1,8 @@
 package org.cafienne.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.response.CommandFailure;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueList;
@@ -28,7 +28,7 @@ public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
     private final ValueList history;
 
     private static FiniteDuration getDuration() {
-        return Duration.create(CaseSystem.config().engine().platformServiceConfig().persistDelay(), TimeUnit.SECONDS);
+        return Duration.create(Cafienne.config().engine().platformServiceConfig().persistDelay(), TimeUnit.SECONDS);
     }
 
     PlatformStorage(PlatformService service) {
