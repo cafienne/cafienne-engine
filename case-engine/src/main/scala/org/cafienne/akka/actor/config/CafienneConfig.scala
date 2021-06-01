@@ -4,6 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CafienneVersion
 import org.cafienne.akka.actor.config.util.ConfigReader
+import org.cafienne.akka.actor.identity.TenantUser
 
 /**
   * Configuration settings of this Cafienne Case System Platform
@@ -95,4 +96,10 @@ object Cafienne {
     * @return
     */
   lazy val version = new CafienneVersion
+
+  def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
+
+  def isPlatformOwner(userId: String): Boolean = {
+    config.platform.isPlatformOwner(userId)
+  }
 }

@@ -1,10 +1,10 @@
 package org.cafienne.akka.actor.identity
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.AuthorizationException
-import org.cafienne.akka.actor.serialization.{CafienneSerializable, Fields}
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.serialization.json.{BooleanValue, Value, ValueMap}
+import org.cafienne.akka.actor.serialization.{CafienneSerializable, Fields}
 import org.cafienne.infrastructure.json.CafienneJson
 
 import scala.collection.mutable
@@ -63,7 +63,7 @@ object TenantUser {
   }
 
   final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {
-    if (!CaseSystem.isPlatformOwner(user.userId)) throw AuthorizationException("Only platform owners can execute this type of command")
+    if (!Cafienne.isPlatformOwner(user.userId)) throw AuthorizationException("Only platform owners can execute this type of command")
     TenantUser(user.userId, Seq(), tenantId, name = "")
   }
 

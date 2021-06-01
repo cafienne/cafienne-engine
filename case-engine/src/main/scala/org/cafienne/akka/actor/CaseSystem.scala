@@ -9,8 +9,6 @@ package org.cafienne.akka.actor
 
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
 import org.cafienne.timerservice.TimerService
@@ -36,12 +34,6 @@ object CaseSystem extends LazyLogging {
   var platformService: ActorRef = _
   var timerService: ActorRef = _
   var system: ActorSystem = null
-
-  def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
-
-  def isPlatformOwner(userId: String): Boolean = {
-    Cafienne.config.platform.isPlatformOwner(userId)
-  }
 
   /**
     * Start the Case System. This will spin up an akka system according to the specifications

@@ -7,12 +7,12 @@
  */
 package org.cafienne.platform.akka.command;
 
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.exception.CommandException;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.platform.PlatformService;
@@ -49,7 +49,7 @@ public abstract class PlatformCommand extends ModelCommand<PlatformService> impl
      * @throws InvalidCommandException If the command is invalid
      */
     public void validate(PlatformService platform) throws InvalidCommandException {
-        if (! CaseSystem.isPlatformOwner(getUser())) {
+        if (! Cafienne.isPlatformOwner(getUser())) {
             throw new AuthorizationException("Only platform owners can invoke platform commands");
         }
     }
