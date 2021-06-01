@@ -13,8 +13,6 @@ import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
 import org.cafienne.timerservice.TimerService
 
-import java.time.Instant
-
 /**
   *
   * A CaseSystem can be started either in Clustered mode, or as a Local system.
@@ -24,11 +22,6 @@ import java.time.Instant
   * a simple in-memory router.
   */
 object CaseSystem extends LazyLogging {
-
-  /**
-    * Global startup moment of the whole case system. Is used by LastModifiedRegistration in the case service
-    */
-  val startupMoment = Instant.now
 
   var messageRouterService: ActorRef = _
   var platformService: ActorRef = _
