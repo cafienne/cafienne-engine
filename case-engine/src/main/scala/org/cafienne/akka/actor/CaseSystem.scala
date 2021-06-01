@@ -34,11 +34,6 @@ object CaseSystem extends LazyLogging {
   val startupMoment = Instant.now
 
   /**
-    * Special logger for engine developers to print indented logging for SentryNetwork executions
-    */
-  val devDebugLogger = EngineDeveloperConsole
-
-  /**
     * Health monitor has latest status information on health of the Case System
     */
   val health = new HealthMonitor

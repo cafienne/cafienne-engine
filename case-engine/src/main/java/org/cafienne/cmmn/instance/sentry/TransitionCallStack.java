@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.EngineDeveloperConsole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,54 +44,54 @@ class TransitionCallStack {
             } else {
                 // Postpone the execution of the delayed behavior
                 currentFrame.children.add(0, this);
-                if (CaseSystem.devDebugLogger().enabled()) {
-                    CaseSystem.devDebugLogger().debugIndentedConsoleLogging(print("* postponing delayed behavior"));
-                    CaseSystem.devDebugLogger().indent(2);
+                if (EngineDeveloperConsole.enabled()) {
+                    EngineDeveloperConsole.debugIndentedConsoleLogging(print("* postponing delayed behavior"));
+                    EngineDeveloperConsole.indent(2);
                     currentFrame.children.forEach(frame -> {
-                        CaseSystem.devDebugLogger().debugIndentedConsoleLogging("- " + frame.event.getDescription());
+                        EngineDeveloperConsole.debugIndentedConsoleLogging("- " + frame.event.getDescription());
                     });
-                    CaseSystem.devDebugLogger().outdent(2);
+                    EngineDeveloperConsole.outdent(2);
                 }
             }
         }
 
         void invokeImmediateBehavior() {
-            CaseSystem.devDebugLogger().indent(2);
+            EngineDeveloperConsole.indent(2);
             Frame next = currentFrame;
             currentFrame = this;
-            if (CaseSystem.devDebugLogger().enabled()) {
-                CaseSystem.devDebugLogger().debugIndentedConsoleLogging("\n-------- " + this + print("Running immmediate behavior"));
+            if (EngineDeveloperConsole.enabled()) {
+                EngineDeveloperConsole.debugIndentedConsoleLogging("\n-------- " + this + print("Running immmediate behavior"));
             }
-            CaseSystem.devDebugLogger().indent(1);
+            EngineDeveloperConsole.indent(1);
             this.event.runImmediateBehavior();
-            CaseSystem.devDebugLogger().outdent(1);
-            if (CaseSystem.devDebugLogger().enabled()) {
-                CaseSystem.devDebugLogger().debugIndentedConsoleLogging("-------- " + this + print("Finished immmediate behavior") + "\n");
+            EngineDeveloperConsole.outdent(1);
+            if (EngineDeveloperConsole.enabled()) {
+                EngineDeveloperConsole.debugIndentedConsoleLogging("-------- " + this + print("Finished immmediate behavior") + "\n");
             }
-            CaseSystem.devDebugLogger().outdent(2);
+            EngineDeveloperConsole.outdent(2);
             currentFrame = next;
         }
 
         void invokeDelayedBehavior() {
             Frame next = currentFrame;
             currentFrame = this;
-            CaseSystem.devDebugLogger().indent(2);
-            if (CaseSystem.devDebugLogger().enabled()) {
-                CaseSystem.devDebugLogger().debugIndentedConsoleLogging("\n******** " + this + print("Running delayed behavior"));
+            EngineDeveloperConsole.indent(2);
+            if (EngineDeveloperConsole.enabled()) {
+                EngineDeveloperConsole.debugIndentedConsoleLogging("\n******** " + this + print("Running delayed behavior"));
             }
-            CaseSystem.devDebugLogger().indent(1);
+            EngineDeveloperConsole.indent(1);
             event.runDelayedBehavior();
             if (children.size() > 0) {
-                if (CaseSystem.devDebugLogger().enabled()) {
-                    CaseSystem.devDebugLogger().debugIndentedConsoleLogging(this + "Loading " + children.size() + " nested frames at level [" + (depth + 1) + "] as a consequence of " + event.getDescription());
+                if (EngineDeveloperConsole.enabled()) {
+                    EngineDeveloperConsole.debugIndentedConsoleLogging(this + "Loading " + children.size() + " nested frames at level [" + (depth + 1) + "] as a consequence of " + event.getDescription());
                 }
             }
             children.forEach(frame -> frame.invokeDelayedBehavior());
-            CaseSystem.devDebugLogger().outdent(1);
-            if (CaseSystem.devDebugLogger().enabled()) {
-                CaseSystem.devDebugLogger().debugIndentedConsoleLogging("******** " + this + print("Completed delayed behavior"));
+            EngineDeveloperConsole.outdent(1);
+            if (EngineDeveloperConsole.enabled()) {
+                EngineDeveloperConsole.debugIndentedConsoleLogging("******** " + this + print("Completed delayed behavior"));
             }
-            CaseSystem.devDebugLogger().outdent(2);
+            EngineDeveloperConsole.outdent(2);
             currentFrame = next;
         }
 

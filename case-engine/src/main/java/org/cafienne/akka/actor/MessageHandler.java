@@ -144,7 +144,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
             String logMessage = appender.debugInfo();
             if (! logMessage.isBlank()) { // Ignore blank messages
                 logger.debug(logMessage); // plain log4j
-                CaseSystem.devDebugLogger().debugIndentedConsoleLogging(logMessage); // special dev indentation in console
+                EngineDeveloperConsole.debugIndentedConsoleLogging(logMessage); // special dev indentation in console
                 getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
             }
         }
@@ -154,7 +154,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             Value json = appender.info();
             logger.debug(json.toString());
-            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(json);
+            EngineDeveloperConsole.debugIndentedConsoleLogging(json);
             getDebugEvent().addMessage(json);
         }
     }
@@ -163,7 +163,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             Throwable t = appender.exceptionInfo();
             logger.debug(t.getMessage(), t);
-            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(t);
+            EngineDeveloperConsole.debugIndentedConsoleLogging(t);
             getDebugEvent().addMessage(t);
         }
     }
@@ -175,7 +175,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * @return
      */
     private boolean logDebugMessages() {
-        return CaseSystem.devDebugLogger().enabled() || actor.debugMode() || logger.isDebugEnabled();
+        return EngineDeveloperConsole.enabled() || actor.debugMode() || logger.isDebugEnabled();
     }
 
     /**

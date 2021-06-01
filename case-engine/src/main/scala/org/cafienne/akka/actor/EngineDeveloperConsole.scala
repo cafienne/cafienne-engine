@@ -1,5 +1,8 @@
 package org.cafienne.akka.actor
 
+/**
+  * Special logger for engine developers to print indented logging for SentryNetwork executions
+  */
 object EngineDeveloperConsole {
   val enabled = false // Potentially make this a config setting, but better not. Note, if enabling probably switch off logback.xml logging
   private var currentIndent = 0
