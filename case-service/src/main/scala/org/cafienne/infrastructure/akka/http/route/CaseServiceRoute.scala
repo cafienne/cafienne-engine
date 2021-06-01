@@ -8,6 +8,7 @@ import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.ModelResponse
 import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
@@ -21,6 +22,7 @@ import scala.util.{Failure, Success}
   * Base class for Case Service APIs. All cors enabled
   */
 trait CaseServiceRoute extends LazyLogging {
+  implicit val caseSystem: CaseSystem
 
   import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 

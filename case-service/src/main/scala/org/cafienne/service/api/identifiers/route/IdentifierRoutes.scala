@@ -8,6 +8,7 @@
 package org.cafienne.service.api.identifiers.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.service.api.cases.CaseReader
@@ -17,9 +18,9 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/identifiers")
-class IdentifierRoutes(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider) extends QueryRoute {
+class IdentifierRoutes(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends QueryRoute {
   override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
   override val prefix = "identifiers"
 
-  addSubRoute(new IdentifiersRoute(identifierQueries)(userCache))
+  addSubRoute(new IdentifiersRoute(identifierQueries)(userCache, caseSystem))
 }

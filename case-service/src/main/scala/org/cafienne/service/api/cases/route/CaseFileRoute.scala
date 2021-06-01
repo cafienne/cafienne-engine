@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
+
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.Value
@@ -26,7 +28,7 @@ import org.cafienne.service.api.projection.query.CaseQueries
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
+class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
   override def routes = concat(getCaseFile, createCaseFileItem, replaceCaseFileItem, updateCaseFileItem, deleteCaseFileItem)
 

@@ -101,7 +101,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     private CafienneVersion engineVersion;
 
-    protected ModelActor(Class<C> commandClass, Class<E> eventClass) {
+    protected final CaseSystem caseSystem;
+
+    protected ModelActor(Class<C> commandClass, Class<E> eventClass, CaseSystem caseSystem) {
+        this.caseSystem = caseSystem;
         this.id = self().path().name();
         this.commandClass = commandClass;
         this.eventClass = eventClass;
@@ -433,7 +436,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         synchronized (responseListeners) {
             responseListeners.put(command.getMessageId(), new Responder(left, right));
         }
-        CaseSystem.router().tell(command, self());
+        caseSystem.router().tell(command, self());
     }
 
     /**

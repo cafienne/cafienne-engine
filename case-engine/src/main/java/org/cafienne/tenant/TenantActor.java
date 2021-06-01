@@ -1,5 +1,6 @@
 package org.cafienne.tenant;
 
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.identity.TenantUser;
@@ -27,8 +28,8 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     private Map<String, User> users = new HashMap();
     private boolean disabled = false; // TODO: we can add some behavior behind this...
 
-    public TenantActor() {
-        super(TenantCommand.class, TenantEvent.class);
+    public TenantActor(CaseSystem caseSystem) {
+        super(TenantCommand.class, TenantEvent.class, caseSystem);
     }
 
     @Override

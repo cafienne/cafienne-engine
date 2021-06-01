@@ -7,7 +7,9 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.akka.event.*;
@@ -24,6 +26,7 @@ import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
 import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.platform.akka.command.PlatformCommand;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,8 +83,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     private final Team caseTeam = new Team(this);
 
-    public Case() {
-        super(CaseCommand.class, CaseEvent.class);
+    public Case(CaseSystem caseSystem) {
+        super(CaseCommand.class, CaseEvent.class, caseSystem);
         this.createdOn = getTransactionTimestamp();
         this.sentryNetwork = new SentryNetwork(this);
 

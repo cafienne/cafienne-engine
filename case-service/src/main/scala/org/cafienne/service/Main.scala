@@ -53,12 +53,10 @@ object Main extends App {
   def caseSystemTimeout = Timeout(10 seconds) // This is the timeout that the routes use to interact with the case engine
 
   def startup(): Unit = {
-    // Start case system
-    CaseSystem.start()
-
     // Take some implicits from the case system
+    implicit val caseSystem = new CaseSystem
     implicit val timeout = httpRoutesTimeout
-    implicit val system = CaseSystem.system
+    implicit val system = caseSystem.system
     implicit val ec = system.dispatcher
 
     // Tell akka when we're going down.
@@ -68,7 +66,7 @@ object Main extends App {
     }
 
     // First, start platform bootstrap configuration
-    BootstrapPlatformConfiguration.run()
+    BootstrapPlatformConfiguration.run(caseSystem)
 
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl

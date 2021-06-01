@@ -8,21 +8,23 @@
 package org.cafienne.service.api.cases.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.cafienne.akka.actor.CaseSystem
+
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.CaseQueries
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
+class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
   override val prefix = "cases"
 
-  addSubRoute(new CaseRoute(caseQueries)(userCache))
-  addSubRoute(new CaseFileRoute(caseQueries)(userCache))
-  addSubRoute(new CaseTeamRoute(caseQueries)(userCache))
-  addSubRoute(new PlanItemRoute(caseQueries)(userCache))
-  addSubRoute(new DiscretionaryRoute(caseQueries)(userCache))
-  addSubRoute(new CaseDocumentationRoute(caseQueries)(userCache))
-  addSubRoute(new CaseHistoryRoute(caseQueries)(userCache))
-  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache))
+  addSubRoute(new CaseRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new CaseFileRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new CaseTeamRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new PlanItemRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new DiscretionaryRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new CaseDocumentationRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new CaseHistoryRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache, caseSystem))
 }

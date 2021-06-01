@@ -7,15 +7,17 @@
  */
 package org.cafienne.service.api.tenant.route
 
+import org.cafienne.akka.actor.CaseSystem
+
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
 
 @Path("/tenant")
-class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
   override val prefix: String = "tenant"
 
-  addSubRoute(new TenantOwnersRoute(userQueries)(userCache))
-  addSubRoute(new TenantUsersRoute(userQueries)(userCache))
-  addSubRoute(new DeprecatedTenantOwnersRoute(userQueries)(userCache))
+  addSubRoute(new TenantOwnersRoute(userQueries)(userCache, caseSystem))
+  addSubRoute(new TenantUsersRoute(userQueries)(userCache, caseSystem))
+  addSubRoute(new DeprecatedTenantOwnersRoute(userQueries)(userCache, caseSystem))
 }

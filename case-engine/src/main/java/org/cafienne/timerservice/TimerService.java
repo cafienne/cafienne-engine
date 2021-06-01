@@ -2,6 +2,7 @@ package org.cafienne.timerservice;
 
 import akka.persistence.SaveSnapshotFailure;
 import akka.persistence.SnapshotOffer;
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.event.ModelEvent;
@@ -31,9 +32,9 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
     private TimerStorage storage = new TimerStorage();
     private Map<String, ScheduledTimer> timers = new HashMap();
 
-    public TimerService() {
-        super(TimerServiceCommand.class, ModelEvent.class);
-        setEngineVersion(CaseSystem.version());
+    public TimerService(CaseSystem caseSystem) {
+        super(TimerServiceCommand.class, ModelEvent.class, caseSystem);
+        setEngineVersion(Cafienne.version());
         addPeriodicSnapshotSaver();
     }
 
@@ -145,7 +146,7 @@ public class TimerService extends ModelActor<TimerServiceCommand, ModelEvent> {
         Runnable saveJob = () -> {
             try {
                 while (true) {
-                    FiniteDuration duration = Duration.create(CaseSystem.config().engine().timerService().persistDelay(), TimeUnit.SECONDS);
+                    FiniteDuration duration = Duration.create(Cafienne.config().engine().timerService().persistDelay(), TimeUnit.SECONDS);
                     Thread.sleep(duration.toMillis());
                     saveTimerStorage("after period of " + duration);
 //                    if (logger.isDebugEnabled())

@@ -3,6 +3,7 @@ package org.cafienne.platform;
 import akka.persistence.SaveSnapshotFailure;
 import akka.persistence.SaveSnapshotSuccess;
 import akka.persistence.SnapshotOffer;
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.event.ModelEvent;
@@ -26,8 +27,8 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
     private final PlatformStorage storage = new PlatformStorage(this);
     private final JobScheduler jobScheduler = new JobScheduler(this, storage);
 
-    public PlatformService() {
-        super(PlatformCommand.class, ModelEvent.class);
+    public PlatformService(CaseSystem caseSystem) {
+        super(PlatformCommand.class, ModelEvent.class, caseSystem);
         setEngineVersion(Cafienne.version());
         setLastModified(Instant.now());
     }

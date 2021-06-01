@@ -5,6 +5,7 @@ import akka.event.Logging
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.ValueMarshallers
 import org.cafienne.service.api.projection.query.TenantQueriesImpl
@@ -16,6 +17,7 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
   val logger = Logging(system, getClass)
 
   implicit val userRegistration = new IdentityCache(new TenantQueriesImpl)
+  implicit val caseSystem: CaseSystem = new CaseSystem("RepositoryRouteTest")
 
   val repositoryRoute = new RepositoryRoute() {
   }

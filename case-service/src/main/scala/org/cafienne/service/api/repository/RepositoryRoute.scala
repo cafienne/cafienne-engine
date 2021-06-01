@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs._
 import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
@@ -31,7 +32,7 @@ import org.w3c.dom.Document
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
-class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
+class RepositoryRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute {
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
 

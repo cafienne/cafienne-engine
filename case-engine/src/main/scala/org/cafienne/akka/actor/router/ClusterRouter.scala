@@ -16,7 +16,7 @@ import org.cafienne.timerservice.akka.command.TimerServiceCommand
 /**
   * Clustered representation, router as singleton actor
   */
-class ClusterRouter extends CaseMessageRouter {
+class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
   logger.info("Starting case system in cluster mode")
 
   private lazy val caseShardRouter: ActorRef = ClusterSharding(context.system).shardRegion(caseShardTypeName)
@@ -37,8 +37,8 @@ class ClusterRouter extends CaseMessageRouter {
       case _: CaseCommand => caseShardRouter
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
-      case _: TimerServiceCommand => CaseSystem.timerService
-      case _: PlatformCommand => CaseSystem.platformService
+      case _: TimerServiceCommand => caseSystem.timerService
+      case _: PlatformCommand => caseSystem.platformService
     }
     shardRouter.forward(m)
   }
@@ -54,7 +54,7 @@ class ClusterRouter extends CaseMessageRouter {
     //  Perhaps with the new akka 2.6 this can be solved in a new way currently not known to us.
 
     def startShard(typeName: String, clazz: Class[_]) = {
-      ClusterSharding(context.system).start(typeName = typeName, entityProps = Props(clazz), settings = ClusterShardingSettings(context.system), extractEntityId = idExtractor, extractShardId = shardResolver)
+      ClusterSharding(context.system).start(typeName = typeName, entityProps = Props(clazz, caseSystem), settings = ClusterShardingSettings(context.system), extractEntityId = idExtractor, extractShardId = shardResolver)
     }
 
     // Start the shard system

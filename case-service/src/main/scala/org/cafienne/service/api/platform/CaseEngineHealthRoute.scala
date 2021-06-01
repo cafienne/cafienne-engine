@@ -12,6 +12,7 @@ import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
@@ -19,7 +20,7 @@ import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import javax.ws.rs._
 
 @Path("/")
-class CaseEngineHealthRoute() extends CaseServiceRoute {
+class CaseEngineHealthRoute(override implicit val caseSystem: CaseSystem) extends CaseServiceRoute {
 
 
   // For now, directly in the main, and not as child of PlatformRoutes;

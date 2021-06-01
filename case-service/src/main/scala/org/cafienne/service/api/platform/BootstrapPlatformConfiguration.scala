@@ -21,9 +21,10 @@ import scala.collection.JavaConverters._
   * name along with .json, .yaml or .yml
   */
 object BootstrapPlatformConfiguration extends LazyLogging {
-  def run(): Unit = {
+
+  def run(caseSystem: CaseSystem): Unit = {
     try {
-      findConfigFile.map{parseConfigFile}.map{sendCommand}
+      findConfigFile.map{parseConfigFile}.map{c => sendCommand(caseSystem, c)}
     } catch {
       case b: BootstrapFailure => throw b
       case t: Throwable => throw new BootstrapFailure("Unexpected error while reading bootstrap configuration", t)
@@ -120,12 +121,12 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     }
   }
 
-  private def sendCommand(bootstrapTenant: CreateTenant) = {
+  private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant) = {
     import akka.pattern.ask
     implicit val timeout = Main.caseSystemTimeout
     implicit val ec = scala.concurrent.ExecutionContext.global
 
-    CaseSystem.router.ask(bootstrapTenant).map(response =>
+    caseSystem.router.ask(bootstrapTenant).map(response =>
       response match {
         case e: CommandFailure => {
           if (e.exception().getMessage.toLowerCase().contains("already exists")) {

@@ -21,33 +21,24 @@ import org.cafienne.timerservice.TimerService
   * In the local scenario, the case system is run in-memory, and messages are forwarded by
   * a simple in-memory router.
   */
-object CaseSystem extends LazyLogging {
-
-  var messageRouterService: ActorRef = _
-  var platformService: ActorRef = _
-  var timerService: ActorRef = _
-  var system: ActorSystem = null
-
+class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging {
   /**
     * Start the Case System. This will spin up an akka system according to the specifications
     *
     * @return
     */
-  def start(name: String = "Cafienne-Case-System") = {
-    // Create an Akka system
-    system = ActorSystem(name)
+  val system: ActorSystem = ActorSystem(name) // Create an Akka system
 
-    val routerClazz = system.hasExtension(akka.cluster.Cluster) match {
-      case true => classOf[ClusterRouter]
-      case false => classOf[LocalRouter]
-    }
-
-    // Always immediately create a TimerService
-    platformService = system.actorOf(Props.create(classOf[PlatformService]), PlatformService.CAFIENNE_PLATFORM_SERVICE);
-    timerService = system.actorOf(Props.create(classOf[TimerService]), TimerService.CAFIENNE_TIMER_SERVICE);
-
-    messageRouterService = system.actorOf(Props.create(routerClazz))
+  private val routerClazz = system.hasExtension(akka.cluster.Cluster) match {
+    case true => classOf[ClusterRouter]
+    case false => classOf[LocalRouter]
   }
+
+  // Create singleton actors
+  val platformService: ActorRef = system.actorOf(Props.create(classOf[PlatformService], this), PlatformService.CAFIENNE_PLATFORM_SERVICE);
+  val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
+
+  val messageRouterService: ActorRef = system.actorOf(Props.create(routerClazz, this))
 
   /**
     * Retrieve a router for case messages. This will forward the messages to the correct case instance

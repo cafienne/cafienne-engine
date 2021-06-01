@@ -54,6 +54,7 @@ import java.util.*;
 public class TestScript {
     private final String testName;
     private final static Logger logger = LoggerFactory.getLogger(TestScript.class);
+    private final CaseSystem caseSystem;
 
     private boolean testCompleted;
 
@@ -172,7 +173,7 @@ public class TestScript {
      */
     public TestScript(String testName) {
         this.testName = testName;
-        CaseSystem.start("Case-Engine-Test-Script");
+        this.caseSystem = new CaseSystem("Case-Engine-Test-Script");
 
         // Start listening to the events coming out of the case persistence mechanism
         this.eventListener = new CaseEventListener(this);
@@ -401,7 +402,7 @@ public class TestScript {
     private void closeDown() {
         logger.debug("Closing down actor system");
         try {
-            Await.result(CaseSystem.system().terminate(), Duration.create(10, "seconds"));
+            Await.result(caseSystem.system().terminate(), Duration.create(10, "seconds"));
         } catch (Exception ex) {
             logger.error("ISSUE terminating the actor system " + ex.getMessage());
         }
@@ -448,5 +449,9 @@ public class TestScript {
             return;
         }
         continueTest();
+    }
+
+    public CaseSystem getCaseSystem() {
+        return caseSystem;
     }
 }

@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
+
 import javax.ws.rs._
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
@@ -23,7 +25,7 @@ import org.cafienne.tenant.akka.command._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
-class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
 
   override def routes =
     concat(getTenantOwners, upsertTenantUser, updateTenant, replaceTenantUser, replaceTenant, addTenantUserRoles, removeTenantUserRole, getDisabledUserAccounts)

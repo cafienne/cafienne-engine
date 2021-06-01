@@ -8,10 +8,11 @@
 package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.server.Directives._
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.CaseQueries
 
-class DeprecatedPlanItemHistoryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
+class DeprecatedPlanItemHistoryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
   override val addToSwaggerRoutes = false
   override def routes = concat(deprecatedPlanItemHistory)
 

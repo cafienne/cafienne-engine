@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
@@ -34,7 +35,7 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
+class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
   override def routes = concat(getCases, stats, getCase, getCaseDefinition, startCase, debugCase)
 
