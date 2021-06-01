@@ -18,6 +18,8 @@ trait TimerStore extends OffsetStorage with LazyLogging {
 
   override val storageName: String = "Timer Service Offset"
 
+  def importTimers(list: Seq[Timer]): Unit
+
   def getTimers(): Future[Seq[Timer]]
 
   def storeTimer(job: Timer, offset: Option[Offset]): Future[Done]

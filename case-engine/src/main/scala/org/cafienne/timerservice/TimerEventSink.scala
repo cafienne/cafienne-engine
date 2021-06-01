@@ -68,6 +68,13 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
     logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer ${job.timer.timerId} in case ${job.timer.caseInstanceId}"))
   }
 
+  def migrateTimers(timers: java.util.List[Timer]): Unit = {
+    import scala.jdk.CollectionConverters._
+    // Note: Migration MUST be done synchronously, otherwise the flow of starting and opening up to listen to the stream
+    //  may fail if timers are added async and already read when opening the stream.
+    storage.importTimers(timers.asScala)
+  }
+
   /**
     * This method must be implemented by the consumer to handle the tagged ModelEvent
     *

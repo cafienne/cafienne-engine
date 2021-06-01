@@ -79,7 +79,13 @@ public class TimerService extends ModelActor<ModelCommand, ModelEvent> {
         Object snapshot = offer.snapshot();
         if (snapshot instanceof TimerStorage) {
             Collection<TimerJob> existingTimers = ((TimerStorage) snapshot).getTimers();
-            logger.info("Bumped into a snapshot with " + existingTimers.size() + " timers; conversion is done implicitly in the new CafienneTimerService");
+            if (!existingTimers.isEmpty()) {
+                logger.info("Found an existing snapshot with " + existingTimers.size() + " timers; migrating them to the new storage");
+                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user)).collect(Collectors.toList());
+                timerstream.migrateTimers(legacy);
+                logger.info("Successfully migrated timers to the new storage; clearing snapshot");
+                saveSnapshot(new TimerStorage());
+            }
         }
     }
 }
