@@ -12,8 +12,8 @@ import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 
 import javax.ws.rs._
@@ -42,7 +42,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def status = get {
     pathPrefix("status") {
       pathEndOrSingleSlash {
-        if (CaseSystem.health.ok) {
+        if (HealthMonitor.ok) {
           complete(StatusCodes.OK)
         } else {
           complete(StatusCodes.ServiceUnavailable)
@@ -66,7 +66,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def health = get {
     pathPrefix("health") {
       pathEndOrSingleSlash {
-        completeJsonValue(CaseSystem.health.report)
+        completeJsonValue(HealthMonitor.report)
       }
     }
   }

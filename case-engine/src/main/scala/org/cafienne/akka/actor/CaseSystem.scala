@@ -10,7 +10,6 @@ package org.cafienne.akka.actor
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
@@ -33,10 +32,6 @@ object CaseSystem extends LazyLogging {
     */
   val startupMoment = Instant.now
 
-  /**
-    * Health monitor has latest status information on health of the Case System
-    */
-  val health = new HealthMonitor
   var messageRouterService: ActorRef = _
   var platformService: ActorRef = _
   var timerService: ActorRef = _

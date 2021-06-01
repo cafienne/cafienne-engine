@@ -7,7 +7,10 @@ import org.cafienne.akka.actor.serialization.json.ValueMap
 import scala.collection.mutable.Set
 import scala.collection.JavaConverters._
 
-class HealthMonitor() {
+/**
+  * Health monitor has latest status information on health of the Case System
+  */
+object HealthMonitor {
 
   // Make it an ordered set, so that the json structure is stable.
   private val measures: Set[HealthMeasurePoint] = new util.LinkedHashSet[HealthMeasurePoint]().asScala

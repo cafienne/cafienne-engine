@@ -4,9 +4,9 @@ import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.event.ModelEvent
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.serialization.{DeserializationFailure, UnrecognizedManifest}
 
 import scala.concurrent.Future
@@ -47,7 +47,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
       case Success(_) => //
       case Failure(ex) => {
         logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
-        CaseSystem.health.readJournal.hasFailed(ex)
+        HealthMonitor.readJournal.hasFailed(ex)
       }
     }
   }
@@ -55,7 +55,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   def runStream(): Future[Done] = {
     restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1) {
       element => {
-        CaseSystem.health.readJournal.isOK()
+        HealthMonitor.readJournal.isOK()
         handleSourceElement(element)
       }
     }.runWith(Sink.ignore)

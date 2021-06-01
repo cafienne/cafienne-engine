@@ -19,6 +19,7 @@ import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.*;
+import org.cafienne.akka.actor.health.HealthMonitor;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.akka.actor.event.DebugEvent;
@@ -512,7 +513,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         } else {
             T lastEvent = events.get(events.size() - 1);
             persistAll(events, e -> {
-                CaseSystem.health().writeJournal().isOK();
+                HealthMonitor.writeJournal().isOK();
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(this.getDescription() + " - persisted event [" + lastSequenceNr() +"] of type " + e.getClass().getName());
                 }
@@ -546,7 +547,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         //  Can also happen when a serialization of an event to JSON fails. In that case, recovery of the case seems not to work,
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
-        CaseSystem.health().writeJournal().hasFailed(cause);
+        HealthMonitor.writeJournal().hasFailed(cause);
         getLogger().error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
         if (currentMessageHandler instanceof CommandHandler) {
             ModelCommand command = ((CommandHandler) currentMessageHandler).getCommand();
