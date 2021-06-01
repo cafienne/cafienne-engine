@@ -2,6 +2,7 @@ package org.cafienne.akka.actor.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.CafienneVersion
 import org.cafienne.akka.actor.config.util.ConfigReader
 
 /**
@@ -87,4 +88,11 @@ object Cafienne {
     * Configuration settings of this Cafienne Platform
     */
   lazy val config = new CafienneConfig
+
+  /**
+    * Returns the BuildInfo as a string (containing JSON)
+    *
+    * @return
+    */
+  lazy val version = new CafienneVersion
 }

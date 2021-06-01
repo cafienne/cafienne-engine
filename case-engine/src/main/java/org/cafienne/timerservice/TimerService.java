@@ -2,8 +2,8 @@ package org.cafienne.timerservice;
 
 import akka.persistence.SaveSnapshotFailure;
 import akka.persistence.SnapshotOffer;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;

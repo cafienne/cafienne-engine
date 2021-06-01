@@ -39,12 +39,6 @@ object CaseSystem extends LazyLogging {
   val devDebugLogger = EngineDeveloperConsole
 
   /**
-    * Returns the BuildInfo as a string (containing JSON)
-    *
-    * @return
-    */
-  val version = new CafienneVersion
-  /**
     * Health monitor has latest status information on health of the Case System
     */
   val health = new HealthMonitor

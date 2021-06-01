@@ -7,16 +7,16 @@
  */
 package org.cafienne.service.api.platform
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 
-import scala.collection.immutable.Seq
+import javax.ws.rs._
 
 @Path("/")
 class CaseEngineHealthRoute() extends CaseServiceRoute {
@@ -85,7 +85,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   @Produces(Array("application/json"))
   def version = get {
     path("version") {
-      completeJsonValue(CaseSystem.version.json)
+      completeJsonValue(Cafienne.version.json)
     }
   }
 }

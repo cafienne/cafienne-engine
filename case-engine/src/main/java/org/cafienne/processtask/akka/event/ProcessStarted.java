@@ -2,7 +2,7 @@ package org.cafienne.processtask.akka.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.CafienneVersion;
-import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -30,7 +30,7 @@ public class ProcessStarted extends ProcessInstanceEvent {
         this.parentActorId = command.getParentActorId();
         this.rootActorId = command.getRootActorId();
         this.inputParameters = command.getInputParameters();
-        this.engineVersion = CaseSystem.version();
+        this.engineVersion = Cafienne.version();
     }
 
     public ProcessStarted(ValueMap json) {
