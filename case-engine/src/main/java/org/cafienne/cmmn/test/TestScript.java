@@ -138,7 +138,7 @@ public class TestScript {
         List<CaseTeamMember> members = new ArrayList();
         for (Object user : users) {
             if (user instanceof TenantUser) {
-                members.add(getMember((TenantUser)user));
+                members.add(getMember((TenantUser) user));
             } else if (user instanceof CaseTeamMember) {
                 members.add((CaseTeamMember) user);
             } else {
@@ -150,6 +150,7 @@ public class TestScript {
 
     /**
      * Create a case owner with roles, copies tenant roles, adds additional roles
+     *
      * @param user
      * @return
      */
@@ -159,6 +160,7 @@ public class TestScript {
 
     /**
      * Create a simple member with roles, copies tenant roles, adds additional roles
+     *
      * @param user
      * @return
      */
@@ -172,6 +174,7 @@ public class TestScript {
      * @param testName
      */
     public TestScript(String testName) {
+        logger.info("\n\n\t\t============ Creating new test '" + testName + "' ========================\n\n");
         this.testName = testName;
         this.caseSystem = new CaseSystem("Case-Engine-Test-Script");
 
@@ -214,6 +217,7 @@ public class TestScript {
     /**
      * Add a command that is expected to fail, and then invoke the validator with the failure to
      * do more assertions.
+     *
      * @param command
      * @param validator
      */
@@ -223,6 +227,7 @@ public class TestScript {
 
     /**
      * Check that command fails, without any further validations.
+     *
      * @param command
      */
     public void assertStepFails(CaseCommand command) {
@@ -231,6 +236,7 @@ public class TestScript {
 
     /**
      * Check that command fails, without any further validations.
+     *
      * @param command
      */
     public void insertStepFails(CaseCommand command, FailureValidator validator) {
@@ -240,6 +246,7 @@ public class TestScript {
     /**
      * Add a command, and use the validator to check the result.
      * Command is expected to succeed (should not return with CommandFailure)
+     *
      * @param command
      * @param validator
      */
@@ -249,6 +256,7 @@ public class TestScript {
 
     /**
      * Add a command that should return without failure.
+     *
      * @param command
      */
     public void addStep(CaseCommand command) {
@@ -321,9 +329,9 @@ public class TestScript {
         awaitCompletion(maximumDuration);
 
         if (testCompleted) {
-            logger.info("Completed test '" + testName + "'");
+            logger.info("\n\n\t\t============ Completed test '" + testName + "' ========================\n\n");
         } else {
-            logger.info("Could not complete test '" + testName + "'");
+            logger.info("\n\n\t\t============ Could not complete test '" + testName + "' ========================\n\n");
         }
     }
 
