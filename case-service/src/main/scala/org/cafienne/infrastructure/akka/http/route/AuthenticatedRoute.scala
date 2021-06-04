@@ -1,19 +1,19 @@
 package org.cafienne.infrastructure.akka.http.route
 
-import java.net.URL
-
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, extractUri, _}
 import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
 import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.{AuthorizationException, InvalidCommandException}
+import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
 import org.cafienne.service.api
 
+import java.net.URL
 import scala.concurrent.ExecutionContext
 
 
@@ -78,7 +78,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   // TODO: this is a temporary switch to enable IDE's debugger to show events
   @Deprecated // but no alternative yet...
   def optionalUser(subRoute: PlatformUser => Route): Route = {
-    if (CaseSystem.config.developerRouteOpen) {
+    if (Cafienne.config.developerRouteOpen) {
       subRoute(null)
     } else {
       validUser(subRoute)
@@ -104,15 +104,15 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   }
 
   def caseSystemMustBeHealthy = {
-    if (!CaseSystem.health.ok) {
+    if (!HealthMonitor.ok) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
     }
   }
 
   object OIDCAuthentication extends Directives with AuthenticationDirectives {
     override protected val userCache: IdentityProvider = uc
-    protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(CaseSystem.config.OIDC.keysUrl))
-    protected val issuer = CaseSystem.config.OIDC.issuer
+    protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(Cafienne.config.OIDC.keysUrl))
+    protected val issuer = Cafienne.config.OIDC.issuer
     override protected implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   }
 }

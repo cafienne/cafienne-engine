@@ -1,6 +1,7 @@
 package org.cafienne.akka.actor.serialization;
 
-import org.cafienne.cmmn.akka.command.*;
+import org.cafienne.cmmn.akka.command.StartCase;
+import org.cafienne.cmmn.akka.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
@@ -25,9 +26,6 @@ import org.cafienne.tenant.akka.command.platform.CreateTenant;
 import org.cafienne.tenant.akka.command.platform.DisableTenant;
 import org.cafienne.tenant.akka.command.platform.EnableTenant;
 import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
-import org.cafienne.timerservice.akka.command.CancelTimer;
-import org.cafienne.timerservice.akka.command.SetTimer;
-import org.cafienne.timerservice.akka.command.response.TimerServiceResponse;
 
 public class CommandSerializer extends CafienneSerializer {
     static void register() {
@@ -35,7 +33,6 @@ public class CommandSerializer extends CafienneSerializer {
         addProcessActorCommands();
         addTenantCommands();
         addPlatformCommands();
-        addTimerServiceCommands();
     }
 
     private static void addCaseCommands() {
@@ -108,11 +105,5 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(EnableTenant.class, EnableTenant::new);
         addManifestWrapper(UpdatePlatformInformation.class, UpdatePlatformInformation::new);
         addManifestWrapper(GetUpdateStatus.class, GetUpdateStatus::new);
-    }
-
-    private static void addTimerServiceCommands() {
-        addManifestWrapper(SetTimer.class, SetTimer::new);
-        addManifestWrapper(CancelTimer.class, CancelTimer::new);
-        addManifestWrapper(TimerServiceResponse.class, TimerServiceResponse::new);
     }
 }

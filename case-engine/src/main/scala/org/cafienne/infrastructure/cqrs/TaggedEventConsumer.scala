@@ -1,11 +1,12 @@
 package org.cafienne.infrastructure.cqrs
 
-import akka.{Done, NotUsed}
 import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
+import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.event.ModelEvent
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.serialization.{DeserializationFailure, UnrecognizedManifest}
 
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
       case Success(_) => //
       case Failure(ex) => {
         logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
-        CaseSystem.health.readJournal.hasFailed(ex)
+        HealthMonitor.readJournal.hasFailed(ex)
       }
     }
   }
@@ -54,7 +55,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   def runStream(): Future[Done] = {
     restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1) {
       element => {
-        CaseSystem.health.readJournal.isOK
+        HealthMonitor.readJournal.isOK()
         handleSourceElement(element)
       }
     }.runWith(Sink.ignore)
@@ -86,24 +87,19 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
 
   private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
     RestartSource.withBackoff(
-      minBackoff = CaseSystem.config.queryDB.restartSettings.minBackoff,
-      maxBackoff = CaseSystem.config.queryDB.restartSettings.maxBackoff,
-      randomFactor = CaseSystem.config.queryDB.restartSettings.randomFactor,
-      maxRestarts = CaseSystem.config.queryDB.restartSettings.maxRestarts
+      minBackoff = Cafienne.config.queryDB.restartSettings.minBackoff,
+      maxBackoff = Cafienne.config.queryDB.restartSettings.maxBackoff,
+      randomFactor = Cafienne.config.queryDB.restartSettings.randomFactor,
+      maxRestarts = Cafienne.config.queryDB.restartSettings.maxRestarts
     ) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
         //  consuming that were consumed already successfully before the source had to be restarted.
-        offsetStorage.getOffset.map {
-          case offset: Offset => {
+        offsetStorage.getOffset().map {
+          offset: Offset =>
             logger.debug("Starting from offset " + offset)
-            journal.eventsByTag(tag, offset)
-          }
-          case err: Throwable => {
-            logger.error("Received an error while asking for offset; start reading from offset 0; error was: ", err)
-            journal.eventsByTag(tag, Offset.noOffset)
-          }
+            journal().eventsByTag(tag, offset)
         }
       })
     }

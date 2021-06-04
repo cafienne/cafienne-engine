@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
+
 import javax.ws.rs._
 import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.identity.IdentityProvider
@@ -26,7 +28,7 @@ import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
-class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider) extends TenantRoute {
+class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
 
   override def routes = concat(getTenantUsers, getTenantUser)
 

@@ -9,9 +9,8 @@
 package org.cafienne.service.api.projection;
 
 import akka.dispatch.Futures;
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.command.response.ActorLastModified;
+import org.cafienne.akka.actor.event.TransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Promise;
@@ -27,9 +26,12 @@ import java.util.Map;
  */
 public class LastModifiedRegistration {
     private final static Logger logger = LoggerFactory.getLogger(LastModifiedRegistration.class);
+    /**
+     * Global startup moment of the whole JVM for last modified requests trying to be jumpy.
+     */
+    private final static Instant startupMoment = Instant.now();
     private final Map<String, Instant> lastModifiedRegistration = new HashMap();
     private final Map<String, List<Waiter>> waiters = new HashMap();
-    private final Instant startupMoment = CaseSystem.startupMoment();
     private final String name;
 
     public LastModifiedRegistration(String name) {

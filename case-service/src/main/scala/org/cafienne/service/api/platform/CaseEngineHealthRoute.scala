@@ -7,19 +7,20 @@
  */
 package org.cafienne.service.api.platform
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 
-import scala.collection.immutable.Seq
+import javax.ws.rs._
 
 @Path("/")
-class CaseEngineHealthRoute() extends CaseServiceRoute {
+class CaseEngineHealthRoute(override implicit val caseSystem: CaseSystem) extends CaseServiceRoute {
 
 
   // For now, directly in the main, and not as child of PlatformRoutes;
@@ -42,7 +43,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def status = get {
     pathPrefix("status") {
       pathEndOrSingleSlash {
-        if (CaseSystem.health.ok) {
+        if (HealthMonitor.ok) {
           complete(StatusCodes.OK)
         } else {
           complete(StatusCodes.ServiceUnavailable)
@@ -66,7 +67,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   def health = get {
     pathPrefix("health") {
       pathEndOrSingleSlash {
-        completeJsonValue(CaseSystem.health.report)
+        completeJsonValue(HealthMonitor.report)
       }
     }
   }
@@ -85,7 +86,7 @@ class CaseEngineHealthRoute() extends CaseServiceRoute {
   @Produces(Array("application/json"))
   def version = get {
     path("version") {
-      completeJsonValue(CaseSystem.version.json)
+      completeJsonValue(Cafienne.version.json)
     }
   }
 }

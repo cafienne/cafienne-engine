@@ -1,17 +1,17 @@
 package org.cafienne.service.api.platform
 
-import java.io.File
-
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.Main
 import org.cafienne.tenant.akka.command.TenantUserInformation
 import org.cafienne.tenant.akka.command.platform.CreateTenant
 import org.cafienne.tenant.akka.command.response.TenantResponse
 
+import java.io.File
 import scala.collection.JavaConverters._
 
 /**
@@ -21,9 +21,10 @@ import scala.collection.JavaConverters._
   * name along with .json, .yaml or .yml
   */
 object BootstrapPlatformConfiguration extends LazyLogging {
-  def run(): Unit = {
+
+  def run(caseSystem: CaseSystem): Unit = {
     try {
-      findConfigFile.map{parseConfigFile}.map{sendCommand}
+      findConfigFile.map{parseConfigFile}.map{c => sendCommand(caseSystem, c)}
     } catch {
       case b: BootstrapFailure => throw b
       case t: Throwable => throw new BootstrapFailure("Unexpected error while reading bootstrap configuration", t)
@@ -32,7 +33,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def findConfigFile(): Option[File] = {
     logger.warn("Checking presence of bootstrap configuration for the case system")
-    val bootstrapTenantConfFileName = CaseSystem.config.platform.bootstrapFile
+    val bootstrapTenantConfFileName = Cafienne.config.platform.bootstrapFile
     if (!bootstrapTenantConfFileName.isBlank) {
       val configFile = new File(bootstrapTenantConfFileName)
       if (! configFile.exists()) {
@@ -46,7 +47,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
       return Some(configFile)
     }
 
-    val defaultTenant = CaseSystem.config.platform.defaultTenant
+    val defaultTenant = Cafienne.config.platform.defaultTenant
     if (defaultTenant.isBlank) {
       logger.warn("Default tenant is empty and bootstrap-file is not filled. Skipping bootstrap attempts")
       return None
@@ -66,7 +67,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
    }
 
   private def parseConfigFile(configFile: File): CreateTenant = {
-    val defaultTenant = CaseSystem.config.platform.defaultTenant
+    val defaultTenant = Cafienne.config.platform.defaultTenant
     logger.info(s"Bootstrapping tenant '$defaultTenant' from file ${configFile.getAbsolutePath}")
 
     val tenantConfig: Config = ConfigFactory.parseFile(configFile)
@@ -95,7 +96,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("All bootstrap tenant owners must be defined as user. Following users not found: " + undefinedOwners)
       }
 
-      val aPlatformOwner = PlatformUser(CaseSystem.config.platform.platformOwners.get(0), Seq())
+      val aPlatformOwner = PlatformUser(Cafienne.config.platform.platformOwners.get(0), Seq())
 
       new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
 
@@ -120,12 +121,12 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     }
   }
 
-  private def sendCommand(bootstrapTenant: CreateTenant) = {
+  private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant) = {
     import akka.pattern.ask
     implicit val timeout = Main.caseSystemTimeout
     implicit val ec = scala.concurrent.ExecutionContext.global
 
-    CaseSystem.router.ask(bootstrapTenant).map(response =>
+    caseSystem.router.ask(bootstrapTenant).map(response =>
       response match {
         case e: CommandFailure => {
           if (e.exception().getMessage.toLowerCase().contains("already exists")) {

@@ -1,6 +1,6 @@
 package org.cafienne.service.db.querydb.schema
 
-import org.cafienne.infrastructure.jdbc.OffsetStoreTables
+import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.service.db.querydb.QueryDBSchema
 import slick.lifted.TableQuery
 import slick.migration.api.{SqlMigration, TableMigration}

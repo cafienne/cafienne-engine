@@ -1,15 +1,15 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import java.text.ParseException
-
-import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.{BadJOSEException, BadJWEException, BadJWSException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.proc.{BadJOSEException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
+import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.akka.actor.health.HealthMonitor
 
+import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TokenVerifier[T] {
@@ -59,7 +59,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
       claimsSet = Some(jwtProcessor.process(token, ctx))
       claimsSet.fold(throw new TokenVerificationException("Unable to create claimSet for " + token))(
         cS => {
-          CaseSystem.health.idp.isOK
+          HealthMonitor.idp.isOK
           ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
         }
       )
@@ -68,11 +68,11 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
         // TODO: this should return a HTTP code 503 Service Unavailable!
         logger.error("Failure in contacting IDP. Check IDP configuration settings of the case engine.", rp)
         val failure = new CannotReachIDPException("Cannot reach the IDP to validate credentials", rp)
-        CaseSystem.health.idp.hasFailed(failure)
+        HealthMonitor.idp.hasFailed(failure)
         throw  failure
       }
       case other: Throwable => {
-        CaseSystem.health.idp.isOK
+        HealthMonitor.idp.isOK
         other match {
           case nje: BadJWTException =>
             //        nje.printStackTrace()
@@ -91,7 +91,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
             }
             if (exceptionMessage.contains(invalidIssuerMsg)) {
               val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
-              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'. Issuers supported: " + CaseSystem.config.OIDC.issuer)
+              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'. Issuers supported: " + Cafienne.config.OIDC.issuer)
             }
             throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
           case e: BadJOSEException =>

@@ -1,8 +1,6 @@
 package org.cafienne.service.api.writer
 
-import java.time.Instant
-
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.serialization.Fields
 import org.cafienne.akka.actor.serialization.json.ValueMap
@@ -12,6 +10,8 @@ import org.cafienne.cmmn.akka.event.plan.{PlanItemCreated, PlanItemTransitioned}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 import org.cafienne.cmmn.instance.{State, Transition}
+
+import java.time.Instant
 
 /**
   * Intended to create events for projection testcases
@@ -25,7 +25,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     val json = new ValueMap(
       Fields.caseName, caseDefinition.getName
       ,Fields.definition, caseDefinition.toJSON
-      ,Fields.engineVersion, CaseSystem.version.json
+      ,Fields.engineVersion, Cafienne.version.json
       ,Fields.parentActorId, ""
       ,Fields.rootActorId, actorId
       ,Fields.createdOn, Instant.now

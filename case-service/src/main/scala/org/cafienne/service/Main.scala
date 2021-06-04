@@ -12,10 +12,11 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.util.Timeout
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.cmmn.akka.BuildInfo
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
-import org.cafienne.infrastructure.jdbc.JDBCBasedOffsetStorageProvider
+import org.cafienne.infrastructure.jdbc.cqrs.QueryDBOffsetStorageProvider
 import org.cafienne.service.api.SwaggerHttpServiceRoute
 import org.cafienne.service.api.anonymous.AnonymousRequestRoutes
 import org.cafienne.service.api.cases.route.CasesRoutes
@@ -52,12 +53,10 @@ object Main extends App {
   def caseSystemTimeout = Timeout(10 seconds) // This is the timeout that the routes use to interact with the case engine
 
   def startup(): Unit = {
-    // Start case system
-    CaseSystem.start()
-
     // Take some implicits from the case system
+    implicit val caseSystem = new CaseSystem
     implicit val timeout = httpRoutesTimeout
-    implicit val system = CaseSystem.system
+    implicit val system = caseSystem.system
     implicit val ec = system.dispatcher
 
     // Tell akka when we're going down.
@@ -67,14 +66,14 @@ object Main extends App {
     }
 
     // First, start platform bootstrap configuration
-    BootstrapPlatformConfiguration.run()
+    BootstrapPlatformConfiguration.run(caseSystem)
 
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl
     val identifierQueries = new IdentifierQueriesImpl
     val userQueries = new TenantQueriesImpl
     val updater = new SlickRecordsPersistence
-    val offsetStorage = new JDBCBasedOffsetStorageProvider
+    val offsetStorage = new QueryDBOffsetStorageProvider
 
     implicit val userCache = new IdentityCache(userQueries)
 
@@ -96,7 +95,7 @@ object Main extends App {
         new RepositoryRoute(),
         new DebugRoute()
       )
-      CaseSystem.config.api.anonymousConfig.enabled match {
+      Cafienne.config.api.anonymousConfig.enabled match {
         case true => fixedRoutes ++ Seq(new AnonymousRequestRoutes())
         case false => fixedRoutes
       }
@@ -112,8 +111,8 @@ object Main extends App {
       mainRoute
     }
 
-    val apiHost = CaseSystem.config.api.bindHost
-    val apiPort = CaseSystem.config.api.bindPort
+    val apiHost = Cafienne.config.api.bindHost
+    val apiPort = Cafienne.config.api.bindPort
     val httpServer = Http().newServerAt(apiHost, apiPort).bindFlow(apiRoutes)
     httpServer onComplete {
       case Success(answer) ⇒ {
@@ -130,7 +129,7 @@ object Main extends App {
   private def checkH2InDebugMode()(implicit system:ActorSystem): Unit = {
     import org.h2.tools.Server
 
-    if (CaseSystem.config.queryDB.debug) {
+    if (Cafienne.config.queryDB.debug) {
       val port = "8082"
       system.log.warning("Starting H2 Web Client on port " + port)
       Server.createWebServer("-web", "-webAllowOthers", "-webPort", port).start()

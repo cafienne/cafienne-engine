@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 
@@ -24,7 +25,7 @@ import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/debug")
-class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem) extends AuthenticatedRoute {
+class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute {
 
   val modelEventsReader = new ModelEventsReader()
 

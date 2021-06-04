@@ -8,12 +8,14 @@
 package org.cafienne.cmmn.akka.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.BootstrapCommand;
 import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.akka.actor.serialization.json.StringValue;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
@@ -22,8 +24,6 @@ import org.cafienne.cmmn.akka.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param caseTeamInput       The CaseTeam for the case
      */
     public StartCase(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeamInput) {
-        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeamInput, CaseSystem.config().actor().debugEnabled());
+        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeamInput, Cafienne.config().actor().debugEnabled());
     }
 
     /**

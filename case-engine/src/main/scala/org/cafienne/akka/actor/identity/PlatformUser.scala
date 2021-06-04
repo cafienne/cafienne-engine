@@ -1,7 +1,7 @@
 package org.cafienne.akka.actor.identity
 
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.serialization.Fields
 import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.infrastructure.json.CafienneJson
@@ -18,7 +18,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
     if (tenants.length == 1) {
       tenants.head
     } else {
-      val configuredDefaultTenant = CaseSystem.config.platform.defaultTenant
+      val configuredDefaultTenant = Cafienne.config.platform.defaultTenant
       if (configuredDefaultTenant.isEmpty) {
         throw new MissingTenantException("Tenant property must have a value, because ")
       }
@@ -55,7 +55,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
 
   final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw AuthorizationException("Tenant '" + tenant +"' does not exist, or user '"+userId+"' is not registered in it"))
 
-  final def isPlatformOwner: Boolean = CaseSystem.isPlatformOwner(userId)
+  final def isPlatformOwner: Boolean = Cafienne.isPlatformOwner(userId)
 
   final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse({
     val message = tenants.isEmpty match {

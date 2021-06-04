@@ -12,11 +12,11 @@ trait OffsetStorage extends LazyLogging {
   /**
     * Unique name of the storage.
     */
-  val name: String
+  val storageName: String
   /**
     * Gets the latest known offset from the storage
     *
     * @return
     */
-  def getOffset(): Future[Offset] = ???
+  def getOffset(): Future[Offset]
 }

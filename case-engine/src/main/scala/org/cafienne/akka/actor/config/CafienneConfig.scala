@@ -1,14 +1,19 @@
 package org.cafienne.akka.actor.config
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.akka.actor.CafienneVersion
 import org.cafienne.akka.actor.config.util.ConfigReader
+import org.cafienne.akka.actor.identity.TenantUser
 
 /**
   * Configuration settings of this Cafienne Case System Platform
   * @param systemConfig
   */
-class CafienneConfig(val systemConfig: Config) extends ConfigReader with LazyLogging {
+class CafienneConfig() extends ConfigReader with LazyLogging {
+  val fallback = ConfigFactory.defaultReference()
+  val systemConfig = ConfigFactory.load().withFallback(fallback)
+
   val path = "cafienne"
   override lazy val config = {
     if (systemConfig.hasPath(path)) {
@@ -78,3 +83,23 @@ class CafienneConfig(val systemConfig: Config) extends ConfigReader with LazyLog
   }
 }
 
+object Cafienne {
+
+  /**
+    * Configuration settings of this Cafienne Platform
+    */
+  lazy val config = new CafienneConfig
+
+  /**
+    * Returns the BuildInfo as a string (containing JSON)
+    *
+    * @return
+    */
+  lazy val version = new CafienneVersion
+
+  def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
+
+  def isPlatformOwner(userId: String): Boolean = {
+    config.platform.isPlatformOwner(userId)
+  }
+}

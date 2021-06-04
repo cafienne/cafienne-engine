@@ -16,9 +16,11 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import javax.ws.rs._
 import org.cafienne.akka.actor.CaseSystem
+
+import javax.ws.rs._
 import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
@@ -28,11 +30,9 @@ import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
 import org.w3c.dom.Document
 
-import scala.collection.immutable.Seq
-
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
-class RepositoryRoute()(override implicit val userCache: IdentityProvider) extends AuthenticatedRoute {
+class RepositoryRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute {
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
 
@@ -60,7 +60,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
       userWithTenant { (platformUser, tenant) => {
         try {
           logger.debug(s"Loading definitions '$modelName' from tenant '$tenant'")
-          val model = CaseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
+          val model = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
           complete(StatusCodes.OK, model.getDocument)
         }
         catch {
@@ -99,10 +99,10 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
         import scala.collection.JavaConverters._
 
         val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
-        for (file <- CaseSystem.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
+        for (file <- Cafienne.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
           var description = "Description"
           try {
-            val definitionsDocument = CaseSystem.config.repository.DefinitionProvider.read(platformUser, tenant, file)
+            val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, file)
             description = definitionsDocument.getFirstCase().documentation.text
           } catch {
             case i: InvalidDefinitionException => description = i.toString
@@ -177,7 +177,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider) exten
             tenantUser.isOwner match {
               case false => complete(StatusCodes.Unauthorized, "User '" + platformUser.userId + "' does not have the privileges to deploy a definition")
               case true => {
-                CaseSystem.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
+                Cafienne.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
                 complete(StatusCodes.NoContent)
               }
             }

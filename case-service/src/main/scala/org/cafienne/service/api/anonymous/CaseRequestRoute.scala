@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.akka.command.StartCase
 import org.cafienne.cmmn.akka.command.response.CaseStartedResponse
@@ -33,10 +34,10 @@ import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class CaseRequestRoute(implicit val userCache: IdentityProvider) extends AnonymousRoute {
+class CaseRequestRoute(implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AnonymousRoute {
 
   // Reading the definitions executes certain validations immediately
-  val configuredCaseDefinitions = CaseSystem.config.api.anonymousConfig.definitions
+  val configuredCaseDefinitions = Cafienne.config.api.anonymousConfig.definitions
 
   override def routes = {
     createCase
@@ -64,7 +65,7 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider) extends Anonymo
           configuredCaseDefinitions.get(caseType) match {
             case Some(definitionConfig) => {
               val newCaseId = payload.caseInstanceId.getOrElse(new Guid().toString)
-              val debugMode = payload.debug.getOrElse(CaseSystem.config.actor.debugEnabled)
+              val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
               val startCaseCommand = definitionConfig.createStartCaseCommand(newCaseId, payload.inputs, debugMode)
               createCaseWithValidTeam(definitionConfig.tenant, definitionConfig.team.members, startCaseCommand)
             }

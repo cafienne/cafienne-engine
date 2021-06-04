@@ -7,7 +7,7 @@ import org.cafienne.cmmn.akka.event.DebugDisabled;
 import org.cafienne.cmmn.akka.event.DebugEnabled;
 import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.cmmn.akka.event.file.*;
-import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerSet;
+import org.cafienne.cmmn.akka.event.plan.eventlistener.*;
 import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
@@ -66,6 +66,10 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
         addManifestWrapper(TaskOutputFilled.class, TaskOutputFilled::new);
         addManifestWrapper(TimerSet.class, TimerSet::new);
+        addManifestWrapper(TimerCompleted.class, TimerCompleted::new);
+        addManifestWrapper(TimerTerminated.class, TimerTerminated::new);
+        addManifestWrapper(TimerSuspended.class, TimerSuspended::new);
+        addManifestWrapper(TimerResumed.class, TimerResumed::new);
     }
 
     private static void registerCaseFileEvents() {

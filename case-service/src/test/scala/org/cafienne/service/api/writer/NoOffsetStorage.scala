@@ -11,7 +11,7 @@ import scala.concurrent.Future
 object NoOffsetStorage extends OffsetStorageProvider() {
   override def storage(storageName: String): OffsetStorage = {
     new OffsetStorage {
-      override val name: String = storageName
+      override val storageName: String = storageName
       override def getOffset(): Future[Offset] = Future.successful(Offset.noOffset)
     }
   }

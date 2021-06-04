@@ -13,20 +13,21 @@ import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.CommandFailureListener;
 import org.cafienne.akka.actor.command.response.CommandResponseListener;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.config.Cafienne;
+import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.*;
+import org.cafienne.akka.actor.health.HealthMonitor;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
 import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.processtask.akka.command.ProcessCommand;
-import org.cafienne.timerservice.akka.command.TimerServiceCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
@@ -68,7 +69,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
-    private boolean debugMode = CaseSystem.config().actor().debugEnabled();
+    private boolean debugMode = Cafienne.config().actor().debugEnabled();
 
     /**
      * Registration of listeners that are interacting with (other) models through this case.
@@ -98,7 +99,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     private CafienneVersion engineVersion;
 
-    protected ModelActor(Class<C> commandClass, Class<E> eventClass) {
+    protected final CaseSystem caseSystem;
+
+    protected ModelActor(Class<C> commandClass, Class<E> eventClass, CaseSystem caseSystem) {
+        this.caseSystem = caseSystem;
         this.id = self().path().name();
         this.commandClass = commandClass;
         this.eventClass = eventClass;
@@ -255,7 +259,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     protected void enableSelfCleaner() {
         // Now set the new selfCleaner
-        long idlePeriod = CaseSystem.config().actor().idlePeriod();
+        long idlePeriod = Cafienne.config().actor().idlePeriod();
         FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
         selfCleaner = getScheduler().schedule(duration, () -> {
             getLogger().debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
@@ -412,16 +416,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         askModel(command, left, right);
     }
 
-    /**
-     * Similar to {@link #askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)}
-     * @param command
-     * @param left
-     * @param right
-     */
-    public void askTimerService(TimerServiceCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
     public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
         if (recoveryRunning()) {
 //            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
@@ -430,7 +424,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         synchronized (responseListeners) {
             responseListeners.put(command.getMessageId(), new Responder(left, right));
         }
-        CaseSystem.router().tell(command, self());
+        caseSystem.router().tell(command, self());
     }
 
     /**
@@ -465,10 +459,10 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             return;
         }
 
-        if (getLogger().isDebugEnabled() || CaseSystem.devDebugLogger().enabled()) {
+        if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
             getLogger().debug(msg);
-            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(msg);
+            EngineDeveloperConsole.debugIndentedConsoleLogging(msg);
         }
         response.setLastModified(getLastModified());
         response.getRecipient().tell(response, self());
@@ -488,7 +482,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param <T>
      */
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
-        if (getLogger().isDebugEnabled() || CaseSystem.devDebugLogger().enabled()) {
+        if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
             StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
             events.forEach(e -> {
                 msg.append("\n\t");
@@ -501,7 +495,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
                 }
             });
             getLogger().debug(msg + "\n");
-            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(msg + "\n");
+            EngineDeveloperConsole.debugIndentedConsoleLogging(msg + "\n");
         }
         resetTransactionTimestamp();
         if (events.isEmpty()) {
@@ -510,7 +504,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         } else {
             T lastEvent = events.get(events.size() - 1);
             persistAll(events, e -> {
-                CaseSystem.health().writeJournal().isOK();
+                HealthMonitor.writeJournal().isOK();
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(this.getDescription() + " - persisted event [" + lastSequenceNr() +"] of type " + e.getClass().getName());
                 }
@@ -544,7 +538,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         //  Can also happen when a serialization of an event to JSON fails. In that case, recovery of the case seems not to work,
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
-        CaseSystem.health().writeJournal().hasFailed(cause);
+        HealthMonitor.writeJournal().hasFailed(cause);
         getLogger().error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
         if (currentMessageHandler instanceof CommandHandler) {
             ModelCommand command = ((CommandHandler) currentMessageHandler).getCommand();

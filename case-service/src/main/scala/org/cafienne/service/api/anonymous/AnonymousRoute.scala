@@ -30,14 +30,14 @@ import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class AnonymousRoute extends CaseServiceRoute {
+class AnonymousRoute(override implicit val caseSystem: CaseSystem) extends CaseServiceRoute {
 
   val defaultErrorMessage = "Your request bumped into an internal configuration issue and cannot be handled"
 
   def sendCommand[T](command: StartCase, expectedResponseClass: Class[T], expectedResponseHandler: T => Route): Route = {
     import akka.pattern.ask
     implicit val timeout = Main.caseSystemTimeout
-    onComplete(CaseSystem.router ? command) {
+    onComplete(caseSystem.router ? command) {
       case Success(value) =>
         value.getClass.isAssignableFrom(expectedResponseClass) match {
           case true => expectedResponseHandler(value.asInstanceOf[T])

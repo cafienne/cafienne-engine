@@ -1,6 +1,6 @@
 package org.cafienne.service.db.querydb
 
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
@@ -25,5 +25,5 @@ import slick.jdbc.JdbcProfile
   */
 
 trait QueryDBSchema extends CafienneJDBCConfig {
-  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", CaseSystem.config.queryDB.config)
+  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.queryDB.config)
 }

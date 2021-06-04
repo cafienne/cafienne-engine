@@ -4,13 +4,12 @@ import akka.actor.{ActorRef, Props, Terminated}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.platform.akka.command.PlatformCommand
-import org.cafienne.timerservice.akka.command.TimerServiceCommand
 
 /**
   * In-memory router for akka messages sent in the CaseSystem.
   * Facilitates actor management in a non-clustered actor system.
   */
-class LocalRouter extends CaseMessageRouter {
+class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
   logger.info("Starting case system in local mode")
 
   val actors = collection.mutable.Map[String, ActorRef]()
@@ -21,8 +20,7 @@ class LocalRouter extends CaseMessageRouter {
     */
   override def forwardMessage(m: ModelCommand[_]): Unit = {
     val ref: ActorRef = m match {
-      case _: TimerServiceCommand => CaseSystem.timerService
-      case _: PlatformCommand => CaseSystem.platformService
+      case _: PlatformCommand => caseSystem.platformService
       case _ => actors.getOrElseUpdate(m.actorId, createActorRef(m))
     }
     ref.forward(m)
@@ -48,7 +46,7 @@ class LocalRouter extends CaseMessageRouter {
     */
   private def createActorRef(m: ModelCommand[_]): ActorRef = {
     // Note: we create the ModelActor as a child to our context
-    val ref = context.actorOf(Props.create(m.actorClass), m.actorId)
+    val ref = context.actorOf(Props.create(m.actorClass, caseSystem), m.actorId)
     // Also start watching the lifecycle of the model actor
     context.watch(ref)
     ref

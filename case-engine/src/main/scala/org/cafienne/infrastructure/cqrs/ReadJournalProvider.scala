@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.scaladsl._
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.config.Cafienne
 
 /**
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)
@@ -26,7 +26,7 @@ trait ReadJournalProvider extends LazyLogging {
 
   private def findReadJournalSetting(): String = {
 
-    val explicitReadJournal = CaseSystem.config.readJournal
+    val explicitReadJournal = Cafienne.config.readJournal
     if (!explicitReadJournal.isEmpty) {
       return explicitReadJournal
     }

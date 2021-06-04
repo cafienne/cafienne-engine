@@ -40,9 +40,9 @@ public class CaseEventListener {
     CaseEventListener(TestScript testScript) {
         this.testScript = testScript;
         // Case message router is used to send messages into the case system
-        this.caseMessageRouter = CaseSystem.router();
+        this.caseMessageRouter = testScript.getCaseSystem().router();
 
-        final ActorSystem system = CaseSystem.system();
+        final ActorSystem system = testScript.getCaseSystem().system();
         // Now create the callback mechanism for the case system
         this.responseHandlingActor = system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
         // And create a connection with the Akka Event database to receive events from the case system

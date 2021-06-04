@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
@@ -24,7 +25,8 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/identifiers")
-class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider) extends QueryRoute {
+class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem
+) extends QueryRoute {
   override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
 
   override def routes = concat(getIdentifiers, getIdentifierNames)

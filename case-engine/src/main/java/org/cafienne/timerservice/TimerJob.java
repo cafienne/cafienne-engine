@@ -13,7 +13,6 @@ import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.timerservice.akka.command.SetTimer;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -32,18 +31,16 @@ public class TimerJob implements CafienneSerializable {
         return user;
     }
 
-    public TimerJob(SetTimer command) {
-        this.timerId = command.timerId;
-        this.caseInstanceId = command.caseInstanceId;
-        this.moment = command.moment;
-        this.user = command.getUser();
-    }
-
     public TimerJob(ValueMap json) {
         this.caseInstanceId = readField(json, Fields.caseInstanceId);
         this.moment = readInstant(json, Fields.moment);
         this.timerId = readField(json, Fields.timerId);
         this.user = TenantUser.from(json.with(Fields.user));
+    }
+
+    @Override
+    public String toString() {
+        return "Timer[" + timerId + "] in case ["+caseInstanceId+"] on behalf of user " + user.id();
     }
 
     @Override

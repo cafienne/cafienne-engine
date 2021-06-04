@@ -1,10 +1,10 @@
 package org.cafienne.infrastructure.cqrs
 
+import akka.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
+
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
-
-import akka.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
 
 /**
   * Simple and serializable wrapper to keep track of an Akka Persistence Offset by name.

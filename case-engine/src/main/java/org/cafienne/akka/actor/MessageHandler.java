@@ -2,6 +2,7 @@ package org.cafienne.akka.actor;
 
 import org.cafienne.akka.actor.command.ModelCommand;
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.event.DebugEvent;
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.ModelEvent;
@@ -66,7 +67,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
 
     protected void checkEngineVersion() {
         // First check whether the engine version has changed or not; this may lead to an EngineVersionChanged event
-        CafienneVersion currentEngineVersion = CaseSystem.version();
+        CafienneVersion currentEngineVersion = Cafienne.version();
         CafienneVersion actorVersion = actor.getEngineVersion();
         if (actorVersion != null && currentEngineVersion.differs(actor.getEngineVersion())) {
             logger.info(this + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
@@ -143,7 +144,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
             String logMessage = appender.debugInfo();
             if (! logMessage.isBlank()) { // Ignore blank messages
                 logger.debug(logMessage); // plain log4j
-                CaseSystem.devDebugLogger().debugIndentedConsoleLogging(logMessage); // special dev indentation in console
+                EngineDeveloperConsole.debugIndentedConsoleLogging(logMessage); // special dev indentation in console
                 getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
             }
         }
@@ -153,7 +154,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             Value json = appender.info();
             logger.debug(json.toString());
-            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(json);
+            EngineDeveloperConsole.debugIndentedConsoleLogging(json);
             getDebugEvent().addMessage(json);
         }
     }
@@ -162,7 +163,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         if (logDebugMessages()) {
             Throwable t = appender.exceptionInfo();
             logger.debug(t.getMessage(), t);
-            CaseSystem.devDebugLogger().debugIndentedConsoleLogging(t);
+            EngineDeveloperConsole.debugIndentedConsoleLogging(t);
             getDebugEvent().addMessage(t);
         }
     }
@@ -174,7 +175,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
      * @return
      */
     private boolean logDebugMessages() {
-        return CaseSystem.devDebugLogger().enabled() || actor.debugMode() || logger.isDebugEnabled();
+        return EngineDeveloperConsole.enabled() || actor.debugMode() || logger.isDebugEnabled();
     }
 
     /**

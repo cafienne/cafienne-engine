@@ -34,6 +34,8 @@ object Deps {
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka
   val akkaClusterSharding   = "com.typesafe.akka"       %% "akka-cluster-sharding"                % V.akka
   val cassandraPersistence	= "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.103"
+  val cassandraExtras =     "com.datastax.cassandra" % "cassandra-driver-extras" % "3.7.2"
+
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
   val akkaPersistenceJDBC   = "com.lightbend.akka"      %% "akka-persistence-jdbc"                % "4.0.0"
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka

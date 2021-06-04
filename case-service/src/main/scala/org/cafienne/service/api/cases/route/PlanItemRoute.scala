@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.akka.actor.CaseSystem
+
 import javax.ws.rs._
 import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
@@ -23,7 +25,7 @@ import org.cafienne.service.api.projection.query.CaseQueries
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider) extends CasesRoute {
+class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
   override def routes = concat(getPlanItems, getPlanItem, makePlanItemTransition)
 

@@ -10,6 +10,7 @@ package org.cafienne.cmmn.test;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.cmmn.akka.command.CaseCommand;
 import org.cafienne.cmmn.akka.command.team.CaseTeam;
@@ -53,6 +54,7 @@ import java.util.*;
 public class TestScript {
     private final String testName;
     private final static Logger logger = LoggerFactory.getLogger(TestScript.class);
+    private final CaseSystem caseSystem;
 
     private boolean testCompleted;
 
@@ -73,7 +75,7 @@ public class TestScript {
      */
     public static DefinitionsDocument getDefinitions(String fileName) {
         try {
-            return CaseSystem.config().repository().DefinitionProvider().read(null, null, fileName);
+            return Cafienne.config().repository().DefinitionProvider().read(null, null, fileName);
         } catch (MissingDefinitionException | InvalidDefinitionException e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +109,7 @@ public class TestScript {
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
         try {
-            CaseSystem.config().repository().DefinitionProvider().read(null, null, fileName);
+            Cafienne.config().repository().DefinitionProvider().read(null, null, fileName);
         } catch (MissingDefinitionException e) {
             throw new AssertionError(e);
         }
@@ -136,7 +138,7 @@ public class TestScript {
         List<CaseTeamMember> members = new ArrayList();
         for (Object user : users) {
             if (user instanceof TenantUser) {
-                members.add(getMember((TenantUser)user));
+                members.add(getMember((TenantUser) user));
             } else if (user instanceof CaseTeamMember) {
                 members.add((CaseTeamMember) user);
             } else {
@@ -148,6 +150,7 @@ public class TestScript {
 
     /**
      * Create a case owner with roles, copies tenant roles, adds additional roles
+     *
      * @param user
      * @return
      */
@@ -157,6 +160,7 @@ public class TestScript {
 
     /**
      * Create a simple member with roles, copies tenant roles, adds additional roles
+     *
      * @param user
      * @return
      */
@@ -170,8 +174,9 @@ public class TestScript {
      * @param testName
      */
     public TestScript(String testName) {
+        logger.info("\n\n\t\t============ Creating new test '" + testName + "' ========================\n\n");
         this.testName = testName;
-        CaseSystem.start("Case-Engine-Test-Script");
+        this.caseSystem = new CaseSystem("Case-Engine-Test-Script");
 
         // Start listening to the events coming out of the case persistence mechanism
         this.eventListener = new CaseEventListener(this);
@@ -212,6 +217,7 @@ public class TestScript {
     /**
      * Add a command that is expected to fail, and then invoke the validator with the failure to
      * do more assertions.
+     *
      * @param command
      * @param validator
      */
@@ -221,6 +227,7 @@ public class TestScript {
 
     /**
      * Check that command fails, without any further validations.
+     *
      * @param command
      */
     public void assertStepFails(CaseCommand command) {
@@ -229,6 +236,7 @@ public class TestScript {
 
     /**
      * Check that command fails, without any further validations.
+     *
      * @param command
      */
     public void insertStepFails(CaseCommand command, FailureValidator validator) {
@@ -238,6 +246,7 @@ public class TestScript {
     /**
      * Add a command, and use the validator to check the result.
      * Command is expected to succeed (should not return with CommandFailure)
+     *
      * @param command
      * @param validator
      */
@@ -247,6 +256,7 @@ public class TestScript {
 
     /**
      * Add a command that should return without failure.
+     *
      * @param command
      */
     public void addStep(CaseCommand command) {
@@ -319,9 +329,9 @@ public class TestScript {
         awaitCompletion(maximumDuration);
 
         if (testCompleted) {
-            logger.info("Completed test '" + testName + "'");
+            logger.info("\n\n\t\t============ Completed test '" + testName + "' ========================\n\n");
         } else {
-            logger.info("Could not complete test '" + testName + "'");
+            logger.info("\n\n\t\t============ Could not complete test '" + testName + "' ========================\n\n");
         }
     }
 
@@ -400,7 +410,7 @@ public class TestScript {
     private void closeDown() {
         logger.debug("Closing down actor system");
         try {
-            Await.result(CaseSystem.system().terminate(), Duration.create(10, "seconds"));
+            Await.result(caseSystem.system().terminate(), Duration.create(10, "seconds"));
         } catch (Exception ex) {
             logger.error("ISSUE terminating the actor system " + ex.getMessage());
         }
@@ -447,5 +457,9 @@ public class TestScript {
             return;
         }
         continueTest();
+    }
+
+    public CaseSystem getCaseSystem() {
+        return caseSystem;
     }
 }

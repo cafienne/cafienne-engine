@@ -5,16 +5,13 @@ import akka.persistence.SaveSnapshotSuccess;
 import akka.persistence.SnapshotOffer;
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
-import org.cafienne.akka.actor.handler.ResponseHandler;
-import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.platform.akka.command.GetUpdateStatus;
 import org.cafienne.platform.akka.command.PlatformCommand;
 import org.cafienne.platform.akka.command.UpdatePlatformInformation;
-import org.cafienne.platform.akka.response.PlatformResponse;
 import org.cafienne.platform.akka.response.PlatformUpdateStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +27,9 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
     private final PlatformStorage storage = new PlatformStorage(this);
     private final JobScheduler jobScheduler = new JobScheduler(this, storage);
 
-    public PlatformService() {
-        super(PlatformCommand.class, ModelEvent.class);
-        setEngineVersion(CaseSystem.version());
+    public PlatformService(CaseSystem caseSystem) {
+        super(PlatformCommand.class, ModelEvent.class, caseSystem);
+        setEngineVersion(Cafienne.version());
         setLastModified(Instant.now());
     }
 

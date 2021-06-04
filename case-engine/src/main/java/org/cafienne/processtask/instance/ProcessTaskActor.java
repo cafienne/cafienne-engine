@@ -1,5 +1,6 @@
 package org.cafienne.processtask.instance;
 
+import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
 import org.cafienne.cmmn.akka.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.akka.command.plan.task.FailTask;
@@ -22,8 +23,8 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     private SubProcess<?> taskImplementation;
     private ValueMap inputParameters;
 
-    public ProcessTaskActor() {
-        super(ProcessCommand.class, ProcessInstanceEvent.class);
+    public ProcessTaskActor(CaseSystem caseSystem) {
+        super(ProcessCommand.class, ProcessInstanceEvent.class, caseSystem);
     }
 
     @Override

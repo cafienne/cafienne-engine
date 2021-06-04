@@ -2,7 +2,7 @@ package org.cafienne.tenant.akka.event.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.CafienneVersion;
-import org.cafienne.akka.actor.CaseSystem;
+import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
@@ -16,7 +16,7 @@ public class TenantCreated extends PlatformEvent {
 
     public TenantCreated(TenantActor tenant) {
         super(tenant);
-        this.engineVersion = CaseSystem.version();
+        this.engineVersion = Cafienne.version();
     }
 
     public TenantCreated(ValueMap json) {
