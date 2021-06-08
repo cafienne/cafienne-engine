@@ -123,7 +123,9 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      *
      * @return
      */
-    public abstract String getParentActorId();
+    public String getParentActorId() {
+        return "";
+    }
 
     /**
      * Returns the id of the parent of this model, i.e., the one that created this model
@@ -131,7 +133,9 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      *
      * @return
      */
-    public abstract String getRootActorId();
+    public String getRootActorId() {
+        return getId();
+    }
 
     /**
      * Returns the Guid of the model instance

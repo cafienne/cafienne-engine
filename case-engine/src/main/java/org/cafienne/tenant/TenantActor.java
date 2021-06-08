@@ -33,16 +33,6 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     @Override
-    public String getParentActorId() {
-        return "";
-    }
-
-    @Override
-    public String getRootActorId() {
-        return getId();
-    }
-
-    @Override
     public String getDescription() {
         return "Tenant[" + getId() + "]";
     }

@@ -34,16 +34,6 @@ public class TimerService extends ModelActor<ModelCommand, ModelEvent> {
     }
 
     @Override
-    public String getParentActorId() {
-        return "";
-    }
-
-    @Override
-    public String getRootActorId() {
-        return getId();
-    }
-
-    @Override
     public TransactionEvent createTransactionEvent() {
         return null;
     }

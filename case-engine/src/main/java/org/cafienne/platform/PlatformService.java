@@ -53,16 +53,6 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
     }
 
     @Override
-    public String getParentActorId() {
-        return "";
-    }
-
-    @Override
-    public String getRootActorId() {
-        return getId();
-    }
-
-    @Override
     public TransactionEvent createTransactionEvent() {
         return null;
     }
