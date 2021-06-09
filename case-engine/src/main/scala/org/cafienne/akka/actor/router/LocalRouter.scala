@@ -26,6 +26,10 @@ class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     ref.forward(m)
   }
 
+  override def terminateActor(actorId: String): Unit = {
+    actors.get(actorId).foreach(actor => context.stop(actor))
+  }
+
   /**
     * Clean up the actor ref for the actor that has stopped
     * @param t

@@ -74,4 +74,8 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
       shard
     }
   }
+
+  override def terminateActor(actorId: String): Unit = {
+    System.err.println("\nTerminating actors is not implemented in clustered environments")
+  }
 }
