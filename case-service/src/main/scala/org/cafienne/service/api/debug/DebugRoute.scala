@@ -17,15 +17,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.akka.actor.command.TerminateModelActor
+import org.cafienne.akka.actor.command.response.{EngineChokedFailure, ModelResponse, SecurityFailure}
+import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
+import org.cafienne.infrastructure.akka.http.route.{AuthenticatedRoute, CommandRoute}
+import org.cafienne.service.Main
 
-import javax.ws.rs.{GET, Path, Produces}
+import javax.ws.rs.{GET, PATCH, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/debug")
-class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem, override implicit val caseSystem: CaseSystem) extends CommandRoute {
 
   val modelEventsReader = new ModelEventsReader()
 
@@ -33,7 +37,7 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
   //  Reason: avoid too easily using this route in development of applications, as that introduces a potential security issue.
   override def routes =
     pathPrefix("debug") {
-      getEvents
+      concat(getEvents, forceRecovery)
     }
 
   @Path("/{modelId}")
@@ -62,6 +66,35 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
             case Failure(err) => complete(StatusCodes.NotFound, err)
           }
         }
+        }
+      }
+    }
+  }
+
+  @Path("force-recovery/{tenant}/{modelId}")
+  @PATCH
+  @Operation(
+    summary = "Force recovery on a model actor",
+    description = "Returns the list of events in a case, tenant or process",
+    tags = Array("debug"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "Name of the tenant in which the actor lives", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+      new Parameter(name = "modelId", description = "Identifier of the actor (eg. case id or tenant name)", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Events in a json list", responseCode = "200"),
+      new ApiResponse(description = "Model actor not found", responseCode = "404")
+    )
+  )
+  @Produces(Array("application/json"))
+  def forceRecovery = patch {
+    path("force-recovery" / Segment) { modelId =>
+      validUser { _ =>
+        if (! Cafienne.config.developerRouteOpen) {
+          complete(StatusCodes.NotFound)
+        } else {
+          caseSystem.router ! new TerminateModelActor(modelId)
+          complete(StatusCodes.OK, s"Forced recovery of $modelId")
         }
       }
     }

@@ -22,7 +22,7 @@ public class InputParameterDefinition extends ParameterDefinition {
     public void validate(Value value) throws CaseFileError {
         CaseFileItemDefinition binding = getBinding();
         if (binding != null) {
-            binding.validate(value);
+            binding.validatePropertyTypes(value);
         }
     }
 }

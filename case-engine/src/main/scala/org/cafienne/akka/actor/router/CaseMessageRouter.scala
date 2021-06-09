@@ -9,7 +9,7 @@ package org.cafienne.akka.actor.router
 
 import akka.actor.{Actor, ActorPath, ActorRef, InvalidActorNameException, Props, Terminated}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.command.ModelCommand
+import org.cafienne.akka.actor.command.{TerminateModelActor, ModelCommand}
 import org.cafienne.akka.actor.command.response.CommandFailure
 import org.cafienne.timerservice.TimerService
 
@@ -18,6 +18,10 @@ import org.cafienne.timerservice.TimerService
   */
 abstract class CaseMessageRouter extends Actor with LazyLogging {
   def receive: Actor.Receive = {
+    case kill: TerminateModelActor => {
+      logger.info(s"Received termination request for actor ${kill.actorId}")
+      terminateActor(kill.actorId)
+    }
     case m: ModelCommand[_] => forwardMessage(m)
     case t: Terminated => removeActorRef(t)
     case other => handleUnknownMessage(other);
@@ -62,4 +66,6 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
   }
 
   def forwardMessage(m: ModelCommand[_])
+
+  def terminateActor(str: String)
 }

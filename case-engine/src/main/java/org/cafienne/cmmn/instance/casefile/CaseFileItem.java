@@ -539,7 +539,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         }
 
         // Validate type of new content
-        getDefinition().validate(content);
+        getDefinition().validatePropertyTypes(content);
     }
 
     protected boolean allowTransition(CaseFileItemTransition intendedTransition) {

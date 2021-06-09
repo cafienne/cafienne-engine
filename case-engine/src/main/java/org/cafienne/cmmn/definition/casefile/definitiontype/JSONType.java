@@ -12,37 +12,33 @@ import org.cafienne.akka.actor.serialization.json.Value;
 public class JSONType extends DefinitionType {
 
     @Override
-    public void validate(CaseFileItemDefinition itemDefinition, Value value, boolean onlyProperties) throws CaseFileError {
+    public void validate(CaseFileItemDefinition itemDefinition, Value value) throws CaseFileError {
         if (value.isMap()) {
-            Map<String, PropertyDefinition> properties = itemDefinition.getCaseFileItemDefinition().getProperties();
-            if (properties.isEmpty()) {
-                // Simply allow to dump the contents and don't do any further validation.
-                return;
-            }
-
-            // Now iterate the object fields and validate each item.
-            value.asMap().getValue().forEach((fieldName, fieldValue) -> {
-
-                // First check to see if it matches one of the properties,
-                // and if not, go check for a child item.
-                PropertyDefinition propertyDefinition = properties.get(fieldName);
-                if (propertyDefinition != null) {
-                    validateProperty(propertyDefinition, fieldValue); // Validation may throw TransitionDeniedException
-                } else {
-                    CaseFileItemDefinition childDefinition = itemDefinition.getChild(fieldName);
-                    if (onlyProperties) {
-                        if (childDefinition != null) {
-                            childDefinition.validatePropertyTypes(fieldValue);
-                        }
-                    } else {
-                        if (childDefinition == null) {
-                            throw new CaseFileError("Property '" + fieldName + "' is not found in the definition of "+itemDefinition.getName());
-                        }
-                        childDefinition.validate(fieldValue);
-                    }
-                }
+            validateItem(value.asMap(), itemDefinition);
+        } else if (value.isList() && itemDefinition.getMultiplicity().isIterable()) {
+            value.asList().getValue().forEach(element -> {
+                if (element.isMap()) validateItem(element.asMap(), itemDefinition);
             });
         }
+    }
+
+    private void validateItem(ValueMap value, CaseFileItemDefinition itemDefinition) {
+        Map<String, PropertyDefinition> properties = itemDefinition.getCaseFileItemDefinition().getProperties();
+        // Now iterate the object fields and validate each item.
+        value.asMap().getValue().forEach((fieldName, fieldValue) -> {
+            // First check to see if it matches one of the properties,
+            // and if not, go check for a child item.
+            // If also no child item found, then it is accepted as "blob" content
+            PropertyDefinition propertyDefinition = properties.get(fieldName);
+            if (propertyDefinition != null) {
+                validateProperty(propertyDefinition, fieldValue); // Validation may throw TransitionDeniedException
+            } else {
+                CaseFileItemDefinition childDefinition = itemDefinition.getChild(fieldName);
+                if (childDefinition != null) {
+                    childDefinition.validatePropertyTypes(fieldValue);
+                }
+            }
+        });
     }
 
     private void validateProperty(PropertyDefinition propertyDefinition, Value propertyValue) {
