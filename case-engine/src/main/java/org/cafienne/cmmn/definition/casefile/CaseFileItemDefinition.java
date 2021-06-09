@@ -107,14 +107,12 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
      * Recursively validates the potential value against this definition;
      * Checks whether the potential value matches the CaseFileItemDefinitionDefinition;
      * and, if there are children in the value, then also matches those children against our children.
+     * Only checks the CaseFileItemDefinition properties for their type; json properties that are not defined
+     * are accepted as "blob" content.
      * @param value
      */
-    public void validate(Value value) throws CaseFileError {
-        getCaseFileItemDefinition().getDefinitionType().validate(this, value, false);
-    }
-
     public void validatePropertyTypes(Value value) throws CaseFileError {
-        getCaseFileItemDefinition().getDefinitionType().validate(this, value, true);
+        getCaseFileItemDefinition().getDefinitionType().validate(this, value);
     }
 
     /**
