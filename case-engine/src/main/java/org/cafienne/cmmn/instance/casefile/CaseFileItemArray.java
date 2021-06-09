@@ -114,8 +114,22 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         return nextItem;
     }
 
+    @Override
+    public State getState() {
+        // CaseFileItemArray state is always depending on it's content
+        if (actualArrayItems.isEmpty()) {
+            return State.Null;
+        } else {
+            long available = actualArrayItems.stream().filter(item -> item.getState() == State.Available).count();
+            if (available > 0) {
+                return State.Available;
+            } else {
+                return State.Discarded;
+            }
+        }
+    }
+
     private void createNewItem(Value value) {
-        setState(State.Available);
         getNextItem().createContent(value);
     }
 
@@ -191,7 +205,6 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     @Override
     public void deleteContent() {
-        setState(State.Discarded);
         // Delete content in reverse order
         int numberToRemove = actualArrayItems.size();
         while (--numberToRemove >= 0) {
