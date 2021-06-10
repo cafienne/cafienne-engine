@@ -25,7 +25,7 @@ import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.api
+import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCaseFormat
 import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
@@ -112,7 +112,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
       new ApiResponse(description = "Case found and returned", responseCode = "200"),
@@ -136,7 +136,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
       new ApiResponse(description = "Case definition found and returned", responseCode = "200"),

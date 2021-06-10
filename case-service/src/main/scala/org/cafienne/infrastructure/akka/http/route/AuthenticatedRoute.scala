@@ -11,7 +11,7 @@ import org.cafienne.akka.actor.health.HealthMonitor
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
-import org.cafienne.service.api
+import org.cafienne.service.api.Headers
 
 import java.net.URL
 import scala.concurrent.ExecutionContext
@@ -86,7 +86,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   }
 
   def validUser(subRoute: PlatformUser => Route): Route = {
-    optionalHeaderValueByName(api.TENANT_LAST_MODIFIED) { tlm =>
+    optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { tlm =>
       OIDCAuthentication.user(tlm) { platformUser =>
         caseSystemMustBeHealthy
         subRoute(platformUser)

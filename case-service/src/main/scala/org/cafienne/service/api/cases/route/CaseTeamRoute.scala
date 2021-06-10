@@ -20,7 +20,7 @@ import javax.ws.rs._
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
-import org.cafienne.service.api
+import org.cafienne.service.api.Headers
 import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, Examples}
 import org.cafienne.service.api.projection.query.CaseQueries
 
@@ -38,7 +38,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     tags = Array("case team"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
       new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[Examples.CaseTeamResponseFormat])))),

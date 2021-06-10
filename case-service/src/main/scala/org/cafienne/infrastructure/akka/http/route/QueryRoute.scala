@@ -7,7 +7,7 @@ import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api
+import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases.CaseDefinitionDocument
 import org.cafienne.service.api.projection.{LastModifiedRegistration, SearchFailure}
 
@@ -19,7 +19,7 @@ trait QueryRoute extends AuthenticatedRoute {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   implicit val lastModifiedRegistration: LastModifiedRegistration
 
-  val lastModifiedHeaderName: String = api.CASE_LAST_MODIFIED
+  val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED
 
   def readLastModifiedHeader(): Directive1[Option[String]] = {
     optionalHeaderValueByName(lastModifiedHeaderName)

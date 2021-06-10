@@ -1,6 +1,7 @@
-package org.cafienne.service
+package org.cafienne.service.api
 
-package object api {
+object Headers {
+
 
   final val CASE_LAST_MODIFIED = "Case-Last-Modified"
 

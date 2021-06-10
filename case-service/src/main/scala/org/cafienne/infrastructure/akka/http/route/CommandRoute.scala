@@ -10,7 +10,8 @@ import org.cafienne.humantask.actorapi.response.{HumanTaskResponse, HumanTaskVal
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.platform.actorapi.response.{PlatformResponse, PlatformUpdateStatus}
-import org.cafienne.service.{Main, api}
+import org.cafienne.service.Main
+import org.cafienne.service.api.Headers
 import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
 import scala.util.{Failure, Success}
@@ -28,7 +29,7 @@ trait CommandRoute extends AuthenticatedRoute {
           case e: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case tenantOwners: TenantOwnersResponse => complete(StatusCodes.OK, tenantOwners)
-          case value: TenantResponse => writeLastModifiedHeader(value, api.TENANT_LAST_MODIFIED) {
+          case value: TenantResponse => writeLastModifiedHeader(value, Headers.TENANT_LAST_MODIFIED) {
             complete(StatusCodes.NoContent)
           }
           case value: HumanTaskValidationResponse =>
