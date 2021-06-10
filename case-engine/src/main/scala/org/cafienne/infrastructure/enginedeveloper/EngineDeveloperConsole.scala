@@ -1,4 +1,4 @@
-package org.cafienne.actormodel
+package org.cafienne.infrastructure.enginedeveloper
 
 /**
   * Special logger for engine developers to print indented logging for SentryNetwork executions

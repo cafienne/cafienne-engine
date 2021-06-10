@@ -1,10 +1,10 @@
-package org.cafienne.actormodel.config
+package org.cafienne.infrastructure.config
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.CafienneVersion
-import org.cafienne.actormodel.config.util.ConfigReader
+import org.cafienne.infrastructure.config.util.ConfigReader
 import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.infrastructure.CafienneVersion
 
 /**
   * Configuration settings of this Cafienne Case System Platform
@@ -83,23 +83,3 @@ class CafienneConfig() extends ConfigReader with LazyLogging {
   }
 }
 
-object Cafienne {
-
-  /**
-    * Configuration settings of this Cafienne Platform
-    */
-  lazy val config = new CafienneConfig
-
-  /**
-    * Returns the BuildInfo as a string (containing JSON)
-    *
-    * @return
-    */
-  lazy val version = new CafienneVersion
-
-  def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
-
-  def isPlatformOwner(userId: String): Boolean = {
-    config.platform.isPlatformOwner(userId)
-  }
-}

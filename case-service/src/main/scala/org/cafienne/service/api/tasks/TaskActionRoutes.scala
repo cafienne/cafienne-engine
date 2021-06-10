@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.CaseSystem
 import org.cafienne.json.ValueMap
 
 import javax.ws.rs._
@@ -26,6 +25,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api.model.Examples
 import org.cafienne.service.db.query.{TaskCount, TaskQueries}
+import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")

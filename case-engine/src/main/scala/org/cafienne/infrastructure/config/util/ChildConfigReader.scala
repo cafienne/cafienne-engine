@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.config.util
+package org.cafienne.infrastructure.config.util
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging

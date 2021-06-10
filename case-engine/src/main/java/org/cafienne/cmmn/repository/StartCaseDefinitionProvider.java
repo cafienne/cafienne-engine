@@ -2,7 +2,7 @@ package org.cafienne.cmmn.repository;
 
 import com.typesafe.config.Config;
 import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;

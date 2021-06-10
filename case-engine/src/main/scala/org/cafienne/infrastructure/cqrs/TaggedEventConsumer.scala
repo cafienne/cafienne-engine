@@ -4,9 +4,9 @@ import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.actormodel.health.HealthMonitor
+import org.cafienne.infrastructure.Cafienne
+import org.cafienne.system.health.HealthMonitor
 import org.cafienne.infrastructure.serialization.{DeserializationFailure, UnrecognizedManifest}
 
 import scala.concurrent.Future

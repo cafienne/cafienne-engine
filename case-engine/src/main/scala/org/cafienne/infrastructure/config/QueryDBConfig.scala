@@ -1,6 +1,6 @@
-package org.cafienne.actormodel.config
+package org.cafienne.infrastructure.config
 
-import org.cafienne.actormodel.config.util.{ChildConfigReader, MandatoryConfig}
+import org.cafienne.infrastructure.config.util.{ChildConfigReader, MandatoryConfig}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration

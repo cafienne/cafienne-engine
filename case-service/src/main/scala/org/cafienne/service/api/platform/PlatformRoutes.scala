@@ -8,11 +8,11 @@
 package org.cafienne.service.api.platform
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.actormodel.CaseSystem
 
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")

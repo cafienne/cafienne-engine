@@ -12,7 +12,7 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.command.exception.AuthorizationException;
 import org.cafienne.actormodel.command.exception.CommandException;
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.json.ValueMap;
 import org.cafienne.platform.PlatformService;

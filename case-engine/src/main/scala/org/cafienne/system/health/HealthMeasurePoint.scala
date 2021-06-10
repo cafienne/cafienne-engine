@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.health
+package org.cafienne.system.health
 
 import java.time.Instant
 import com.typesafe.scalalogging.LazyLogging

@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
@@ -21,6 +20,7 @@ import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.BusinessIdentifierFormat
 import org.cafienne.service.db.query.IdentifierQueries
 import org.cafienne.service.db.query.filter.IdentifierFilter
+import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 

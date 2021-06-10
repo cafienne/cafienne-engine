@@ -6,11 +6,11 @@ import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
 import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.actormodel.command.exception.{AuthorizationException, InvalidCommandException}
-import org.cafienne.actormodel.config.Cafienne
-import org.cafienne.actormodel.health.HealthMonitor
+import org.cafienne.system.health.HealthMonitor
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.actormodel.command.exception.InvalidCommandException
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, AuthenticationException, CannotReachIDPException}
 import org.cafienne.service.api.Headers
 

@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;

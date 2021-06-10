@@ -1,9 +1,9 @@
-package org.cafienne.actormodel.router
+package org.cafienne.system.router
 
 import akka.actor.{ActorRef, Props, Terminated}
-import org.cafienne.actormodel.CaseSystem
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.platform.actorapi.command.PlatformCommand
+import org.cafienne.system.CaseSystem
 
 /**
   * In-memory router for akka messages sent in the CaseSystem.

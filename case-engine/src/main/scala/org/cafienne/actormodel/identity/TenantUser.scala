@@ -2,7 +2,7 @@ package org.cafienne.actormodel.identity
 
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.command.exception.AuthorizationException
-import org.cafienne.actormodel.config.Cafienne
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.{CafienneSerializable, Fields}
 import org.cafienne.json.{BooleanValue, Value, ValueMap}
 import org.cafienne.json.CafienneJson

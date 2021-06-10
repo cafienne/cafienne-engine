@@ -14,11 +14,11 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.query.PlatformQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
+import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.platform.{DisableTenant, EnableTenant}
 
 import javax.ws.rs._

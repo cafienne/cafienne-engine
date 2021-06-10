@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.actormodel.EngineDeveloperConsole;
+import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 
 import java.util.ArrayList;
 import java.util.List;

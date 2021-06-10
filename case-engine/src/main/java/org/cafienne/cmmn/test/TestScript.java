@@ -7,10 +7,10 @@
  */
 package org.cafienne.cmmn.test;
 
-import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.system.CaseSystem;
 import org.cafienne.actormodel.command.response.CommandFailure;
 import org.cafienne.actormodel.command.response.ModelResponse;
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;

@@ -1,10 +1,10 @@
 package org.cafienne.timerservice;
 
 import akka.persistence.SnapshotOffer;
-import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.system.CaseSystem;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.event.TransactionEvent;
 import org.slf4j.Logger;

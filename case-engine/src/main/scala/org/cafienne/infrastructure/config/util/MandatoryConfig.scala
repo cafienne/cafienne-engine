@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.config.util
+package org.cafienne.infrastructure.config.util
 
 trait MandatoryConfig extends ChildConfigReader {
   val msg: String = s"Missing configuration property cafienne.$fullPath"

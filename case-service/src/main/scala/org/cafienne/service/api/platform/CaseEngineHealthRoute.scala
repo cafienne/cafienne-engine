@@ -12,10 +12,10 @@ import akka.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.cafienne.actormodel.CaseSystem
-import org.cafienne.actormodel.config.Cafienne
-import org.cafienne.actormodel.health.HealthMonitor
+import org.cafienne.infrastructure.Cafienne
+import org.cafienne.system.health.HealthMonitor
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
+import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 

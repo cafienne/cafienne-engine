@@ -1,6 +1,6 @@
 package org.cafienne.platform;
 
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

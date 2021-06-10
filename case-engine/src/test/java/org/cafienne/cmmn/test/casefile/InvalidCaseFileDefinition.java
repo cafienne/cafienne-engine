@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.MissingDefinitionException;

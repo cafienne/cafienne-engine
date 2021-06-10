@@ -1,6 +1,6 @@
 package org.cafienne.tenant;
 
-import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.system.CaseSystem;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.TenantUser;

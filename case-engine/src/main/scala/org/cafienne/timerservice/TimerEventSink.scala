@@ -3,11 +3,11 @@ package org.cafienne.timerservice
 import akka.Done
 import akka.actor.ActorSystem
 import akka.persistence.query.Offset
-import org.cafienne.actormodel.CaseSystem
 import org.cafienne.actormodel.command.response.{CommandFailure, ModelResponse}
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
 import org.cafienne.infrastructure.cqrs.{OffsetStorage, TaggedEventConsumer}
+import org.cafienne.system.CaseSystem
 import org.cafienne.timerservice.persistence.{TimerStore, TimerStoreProvider}
 
 import scala.collection.mutable

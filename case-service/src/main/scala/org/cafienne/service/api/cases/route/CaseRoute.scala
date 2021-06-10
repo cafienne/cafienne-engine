@@ -15,14 +15,13 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.CaseSystem
-import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.Headers
@@ -30,6 +29,7 @@ import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCaseFormat
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.service.db.query.filter.CaseFilter
+import org.cafienne.system.CaseSystem
 
 import java.util.UUID
 import javax.ws.rs._

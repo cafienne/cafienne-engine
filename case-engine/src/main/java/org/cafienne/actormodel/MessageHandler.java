@@ -4,13 +4,15 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.command.exception.AuthorizationException;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.json.Value;
-import org.cafienne.actormodel.config.Cafienne;
 import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

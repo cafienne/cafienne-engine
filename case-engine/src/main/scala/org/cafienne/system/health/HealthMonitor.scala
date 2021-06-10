@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.health
+package org.cafienne.system.health
 
 import org.cafienne.json.ValueMap
 

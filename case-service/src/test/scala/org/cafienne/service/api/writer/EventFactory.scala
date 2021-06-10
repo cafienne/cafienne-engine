@@ -1,6 +1,5 @@
 package org.cafienne.service.api.writer
 
-import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
@@ -10,6 +9,7 @@ import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitio
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 import org.cafienne.cmmn.instance.{State, Transition}
+import org.cafienne.infrastructure.Cafienne
 
 import java.time.Instant
 

@@ -1,6 +1,6 @@
-package org.cafienne.actormodel.config
+package org.cafienne.infrastructure.config
 
-import org.cafienne.actormodel.config.util.MandatoryConfig
+import org.cafienne.infrastructure.config.util.MandatoryConfig
 
 import java.util.Properties
 

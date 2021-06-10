@@ -1,4 +1,4 @@
-package org.cafienne.actormodel
+package org.cafienne.infrastructure
 
 import org.cafienne.BuildInfo
 import org.cafienne.json.{JSONReader, ValueMap}

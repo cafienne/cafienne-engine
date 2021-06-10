@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.actormodel
+package org.cafienne.system
 
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.router.{ClusterRouter, LocalRouter}
+import org.cafienne.system.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
 import org.cafienne.timerservice.TimerService
 

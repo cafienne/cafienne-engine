@@ -1,6 +1,6 @@
-package org.cafienne.actormodel.config
+package org.cafienne.infrastructure.config
 
-import org.cafienne.actormodel.config.util.ChildConfigReader
+import org.cafienne.infrastructure.config.util.ChildConfigReader
 
 class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
   val path = "engine"

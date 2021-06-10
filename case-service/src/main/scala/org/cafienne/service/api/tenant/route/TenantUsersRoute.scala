@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.CaseSystem
 import org.cafienne.actormodel.command.exception.AuthorizationException
 
 import javax.ws.rs._
@@ -22,6 +21,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model._
 import org.cafienne.service.db.query.exception.UserSearchFailure
+import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
