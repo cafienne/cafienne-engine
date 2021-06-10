@@ -1,6 +1,6 @@
 package org.cafienne.actormodel.serialization;
 
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 /**
  * A {@link Migrator} can migrate a json AST (see {@link ValueMap}) to one newer version.

@@ -9,7 +9,7 @@ import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.ValidationError;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;

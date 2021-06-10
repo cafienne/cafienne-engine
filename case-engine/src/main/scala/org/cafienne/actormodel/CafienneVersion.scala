@@ -1,7 +1,7 @@
 package org.cafienne.actormodel
 
 import org.cafienne.BuildInfo
-import org.cafienne.actormodel.serialization.json.{JSONReader, ValueMap}
+import org.cafienne.json.{JSONReader, ValueMap}
 
 class CafienneVersion(val json: ValueMap = JSONReader.parse(BuildInfo.toJson).asInstanceOf[ValueMap]) {
   val description: String = {

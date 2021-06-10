@@ -10,8 +10,8 @@ import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.CaseSystem
 import org.cafienne.actormodel.command.response.ModelResponse
-import org.cafienne.actormodel.serialization.json.Value
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.Value
+import org.cafienne.json.CafienneJson
 import org.cafienne.service.api.Headers
 
 import scala.collection.immutable.Seq

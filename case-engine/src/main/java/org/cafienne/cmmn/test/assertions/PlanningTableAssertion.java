@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
-import org.cafienne.actormodel.serialization.json.ValueList;
+import org.cafienne.json.ValueList;
 
 import java.util.ArrayList;
 import java.util.Collection;

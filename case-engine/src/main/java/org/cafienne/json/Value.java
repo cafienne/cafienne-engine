@@ -5,14 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.actormodel.serialization.json;
+package org.cafienne.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.infrastructure.json.CafienneJson;
+import org.cafienne.json.CafienneJson;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import scala.collection.Seq;

@@ -1,7 +1,7 @@
 package org.cafienne.service.api.cases
 
-import org.cafienne.actormodel.serialization.json.ValueMap
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.ValueMap
+import org.cafienne.json.CafienneJson
 
 final case class CaseList(caseName: String = "",
                           totalInstances: Long = 0,

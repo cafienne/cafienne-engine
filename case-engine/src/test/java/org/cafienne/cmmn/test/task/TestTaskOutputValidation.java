@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.json.*;
+import org.cafienne.json.*;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;

@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.task.process;
 
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.implementation.InlineSubProcess;
 
 class ProcessTaskInlineInformer extends ProcessInformer {

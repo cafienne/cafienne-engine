@@ -20,7 +20,7 @@ import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.handler.*;
 import org.cafienne.actormodel.health.HealthMonitor;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;

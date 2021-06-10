@@ -6,7 +6,7 @@ import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Member;
 

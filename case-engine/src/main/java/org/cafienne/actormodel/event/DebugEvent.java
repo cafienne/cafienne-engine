@@ -11,15 +11,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.StringValue;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.StringValue;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

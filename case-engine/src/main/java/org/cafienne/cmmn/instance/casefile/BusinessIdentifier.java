@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.event.file.BusinessIdentifierCleared;
 import org.cafienne.cmmn.actorapi.event.file.BusinessIdentifierEvent;
 import org.cafienne.cmmn.actorapi.event.file.BusinessIdentifierSet;

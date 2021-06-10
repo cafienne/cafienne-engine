@@ -5,7 +5,7 @@ import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.TimerEvent;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

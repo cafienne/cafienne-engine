@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.calculation.operation;
 
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.StepDefinition;

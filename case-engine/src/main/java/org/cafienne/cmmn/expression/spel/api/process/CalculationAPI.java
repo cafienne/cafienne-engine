@@ -1,7 +1,6 @@
 package org.cafienne.cmmn.expression.spel.api.process;
 
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;

@@ -5,7 +5,7 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.command.response.CommandFailure;
 import org.cafienne.actormodel.serialization.CafienneSerializable;
 import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 

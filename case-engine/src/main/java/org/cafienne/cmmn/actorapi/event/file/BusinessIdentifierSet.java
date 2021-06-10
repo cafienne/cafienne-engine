@@ -5,8 +5,8 @@ import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

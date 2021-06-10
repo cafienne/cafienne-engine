@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.command.exception.AuthorizationException
 import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.serialization.{CafienneSerializable, Fields}
-import org.cafienne.actormodel.serialization.json.{BooleanValue, Value, ValueMap}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.{BooleanValue, Value, ValueMap}
+import org.cafienne.json.CafienneJson
 
 import scala.collection.mutable
 

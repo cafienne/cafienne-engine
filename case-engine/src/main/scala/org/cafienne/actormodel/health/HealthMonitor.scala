@@ -1,6 +1,6 @@
 package org.cafienne.actormodel.health
 
-import org.cafienne.actormodel.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 
 import java.util
 import scala.collection.mutable.Set

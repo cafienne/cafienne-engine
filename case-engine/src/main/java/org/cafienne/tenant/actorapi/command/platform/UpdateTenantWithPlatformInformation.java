@@ -5,7 +5,7 @@ import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.command.platform.TenantUpdate;
 import org.cafienne.tenant.TenantActor;

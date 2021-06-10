@@ -7,8 +7,8 @@ import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.actormodel.serialization.json.LongValue;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.LongValue;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;

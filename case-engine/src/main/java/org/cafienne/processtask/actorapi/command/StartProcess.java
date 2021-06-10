@@ -5,7 +5,7 @@ import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;

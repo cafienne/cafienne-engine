@@ -12,11 +12,8 @@ import org.cafienne.actormodel.command.exception.SerializedException;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.exception.SerializedException;
-import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueList;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.infrastructure.json.CafienneJson;
+import org.cafienne.json.CafienneJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

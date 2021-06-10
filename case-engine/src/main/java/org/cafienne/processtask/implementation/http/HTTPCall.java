@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.http;
 
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;

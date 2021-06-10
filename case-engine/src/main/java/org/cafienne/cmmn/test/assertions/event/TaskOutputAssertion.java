@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions.event;
 
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 
 /**

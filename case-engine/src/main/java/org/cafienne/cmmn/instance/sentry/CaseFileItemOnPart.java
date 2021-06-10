@@ -8,10 +8,9 @@
 package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
-import org.cafienne.cmmn.instance.casefile.CaseFile;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.stream.Collectors;

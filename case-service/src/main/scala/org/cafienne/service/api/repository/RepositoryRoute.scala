@@ -20,7 +20,7 @@ import org.cafienne.actormodel.CaseSystem
 import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 
 import javax.ws.rs._
 import org.cafienne.actormodel.command.exception.MissingTenantException

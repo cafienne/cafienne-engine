@@ -10,7 +10,7 @@ package org.cafienne.humantask.actorapi.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;

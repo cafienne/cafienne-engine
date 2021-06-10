@@ -2,8 +2,8 @@ package org.cafienne.tenant.actorapi.command
 
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.serialization.{CafienneSerializable, Fields}
-import org.cafienne.actormodel.serialization.json.{BooleanValue, StringValue, ValueList, ValueMap}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.{BooleanValue, StringValue, ValueList, ValueMap}
+import org.cafienne.json.CafienneJson
 
 final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = None, name: Option[String] = None, email: Option[String] = None, owner: Option[Boolean] = None, enabled: Option[Boolean] = None) extends CafienneSerializable with CafienneJson {
 

@@ -7,22 +7,17 @@
  */
 package org.cafienne.cmmn.expression;
 
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
-import org.cafienne.cmmn.definition.TimerEventDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.TimerEvent;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
-
-import java.time.Duration;
-import java.time.format.DateTimeParseException;
 
 /**
  * Simplest implementation of the CMMNExpressionEvaluator. Intended to return default values

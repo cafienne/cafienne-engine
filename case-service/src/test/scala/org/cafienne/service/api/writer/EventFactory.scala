@@ -3,7 +3,7 @@ package org.cafienne.service.api.writer
 import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.actormodel.serialization.Fields
-import org.cafienne.actormodel.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 import org.cafienne.cmmn.actorapi.event._
 import org.cafienne.cmmn.actorapi.event.file.{CaseFileEvent, CaseFileItemCreated}
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}

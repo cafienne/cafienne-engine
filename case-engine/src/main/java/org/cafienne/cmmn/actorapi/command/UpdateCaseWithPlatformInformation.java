@@ -7,7 +7,7 @@ import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.platform.CaseUpdate;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;

@@ -10,7 +10,7 @@ package org.cafienne.humantask.actorapi.command;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
 

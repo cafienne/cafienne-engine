@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.calculation;
 
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;

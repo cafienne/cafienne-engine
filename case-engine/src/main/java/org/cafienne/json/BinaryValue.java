@@ -5,22 +5,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.actormodel.serialization.json;
+package org.cafienne.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 
 import java.io.IOException;
 
-public class BooleanValue extends PrimitiveValue<Boolean> {
-    public BooleanValue(Boolean value) {
-        super(value);
+public class BinaryValue extends PrimitiveValue<byte[]> {
+    BinaryValue(byte[] bytes) {
+        super(bytes);
     }
 
     @Override
     public boolean matches(PropertyDefinition.PropertyType propertyType) {
         switch (propertyType) {
-        case Boolean:
+        case Base64Binary:
         case String: // Hmmm, do we really match strings?
         case Unspecified:
             return true;
@@ -30,12 +30,12 @@ public class BooleanValue extends PrimitiveValue<Boolean> {
     }
 
     @Override
-    public BooleanValue cloneValueNode() {
-        return new BooleanValue(value);
+    public BinaryValue cloneValueNode() {
+        return new BinaryValue(value); // Or ... should we also copy/clone the bytearry?
     }
 
     @Override
     public void print(JsonGenerator generator) throws IOException {
-        generator.writeBoolean(value);
+        generator.writeBinary(value);
     }
 }

@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization.json;
+package org.cafienne.json;
 
 /**
  * Exception thrown when a JSON parsing ran into a failure.

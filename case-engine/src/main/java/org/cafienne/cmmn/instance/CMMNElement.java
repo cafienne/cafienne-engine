@@ -9,7 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 

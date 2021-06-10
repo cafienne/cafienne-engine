@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.platform
 
-import org.cafienne.actormodel.serialization.json.{Value, ValueList}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.{Value, ValueList}
+import org.cafienne.json.CafienneJson
 
 case class PlatformUpdate(info: Seq[NewUserInformation]) extends CafienneJson {
   override def toValue: Value[_] = {

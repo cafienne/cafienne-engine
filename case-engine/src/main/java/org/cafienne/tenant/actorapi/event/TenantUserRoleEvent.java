@@ -9,7 +9,7 @@ package org.cafienne.tenant.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;

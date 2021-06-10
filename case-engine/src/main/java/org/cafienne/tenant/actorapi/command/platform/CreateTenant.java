@@ -6,7 +6,7 @@ import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.command.TenantUserInformation;
 import org.cafienne.tenant.actorapi.exception.TenantException;

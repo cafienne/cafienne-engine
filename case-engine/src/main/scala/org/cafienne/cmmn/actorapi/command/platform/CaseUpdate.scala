@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.actorapi.command.platform
 
 import org.cafienne.actormodel.serialization.Fields
-import org.cafienne.actormodel.serialization.json.{Value, ValueMap}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.json.CafienneJson
 
 case class CaseUpdate(caseId: String, tenant: String, platformUpdate: PlatformUpdate) extends CafienneJson {
   override def toValue: Value[_] = new ValueMap(Fields.caseInstanceId, caseId, Fields.tenant, tenant, Fields.update, platformUpdate.toValue)

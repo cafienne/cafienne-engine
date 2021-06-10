@@ -9,7 +9,7 @@ package org.cafienne.actormodel.event;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.TenantUserMessage;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.actormodel.serialization.CafienneSerializable;
 
 public interface ModelEvent<M extends ModelActor> extends CafienneSerializable, TenantUserMessage<M> {

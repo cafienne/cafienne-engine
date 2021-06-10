@@ -11,7 +11,7 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.event.*;

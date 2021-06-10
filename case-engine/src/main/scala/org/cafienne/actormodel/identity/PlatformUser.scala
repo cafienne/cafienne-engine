@@ -3,8 +3,8 @@ package org.cafienne.actormodel.identity
 import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.serialization.Fields
-import org.cafienne.actormodel.serialization.json.ValueMap
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.ValueMap
+import org.cafienne.json.CafienneJson
 
 final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends CafienneJson {
   final def tenants: Seq[String] = users.map(u => u.tenant)

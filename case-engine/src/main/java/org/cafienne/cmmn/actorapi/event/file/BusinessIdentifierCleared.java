@@ -1,10 +1,10 @@
 package org.cafienne.cmmn.actorapi.event.file;
 
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 /**
  * Basic event allowing listeners that are interested only in case team member events to do initial filtering.

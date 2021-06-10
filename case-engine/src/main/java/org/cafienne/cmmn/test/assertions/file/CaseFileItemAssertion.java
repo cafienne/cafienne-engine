@@ -2,8 +2,8 @@ package org.cafienne.cmmn.test.assertions.file;
 
 import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueList;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueList;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;

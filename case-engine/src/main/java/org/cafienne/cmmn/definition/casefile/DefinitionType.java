@@ -5,7 +5,7 @@ import org.cafienne.cmmn.definition.casefile.definitiontype.UnspecifiedType;
 import org.cafienne.cmmn.definition.casefile.definitiontype.XMLComplexType;
 import org.cafienne.cmmn.definition.casefile.definitiontype.XMLElementType;
 import org.cafienne.cmmn.definition.casefile.definitiontype.XMLSimpleType;
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

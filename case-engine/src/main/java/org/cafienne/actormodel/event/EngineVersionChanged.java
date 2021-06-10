@@ -5,12 +5,7 @@ import org.cafienne.actormodel.CafienneVersion;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
-import org.cafienne.actormodel.CafienneVersion;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

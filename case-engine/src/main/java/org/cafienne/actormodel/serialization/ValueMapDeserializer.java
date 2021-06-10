@@ -1,6 +1,6 @@
 package org.cafienne.actormodel.serialization;
 
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 /**
  * Deserializes a {@link ValueMap} based json AST into an object

@@ -3,7 +3,7 @@ package org.cafienne.actormodel.config
 import com.typesafe.config.{Config, ConfigObject}
 import org.cafienne.actormodel.config.util.{ChildConfigReader, ConfigReader}
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.actormodel.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 

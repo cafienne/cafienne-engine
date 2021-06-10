@@ -3,7 +3,7 @@ package org.cafienne.cmmn.actorapi.event.team;
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 /**
  * Event caused when a role is removed from a case team member

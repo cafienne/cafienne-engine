@@ -3,7 +3,7 @@ package org.cafienne.cmmn.actorapi.command.team;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

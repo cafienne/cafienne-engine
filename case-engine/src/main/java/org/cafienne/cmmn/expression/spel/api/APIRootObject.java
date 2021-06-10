@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.expression.spel.api;
 
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.serialization.json.ValueList;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.Case;
 
 /**

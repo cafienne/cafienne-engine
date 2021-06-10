@@ -6,8 +6,8 @@ import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.serialization.json.{ValueList, ValueMap}
-import org.cafienne.actormodel.serialization.json.ValueList
+import org.cafienne.json.{ValueList, ValueMap}
+import org.cafienne.json.ValueList
 import org.cafienne.infrastructure.cqrs.{OffsetRecord, ReadJournalProvider}
 
 import scala.concurrent.Future

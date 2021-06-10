@@ -3,7 +3,7 @@ package org.cafienne.platform.actorapi.command;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.platform.PlatformService;
 import org.cafienne.platform.actorapi.response.PlatformUpdateStatus;
 

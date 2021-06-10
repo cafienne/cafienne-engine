@@ -4,7 +4,7 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 @Manifest
 public class FailTask extends CompleteTask {

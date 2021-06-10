@@ -1,10 +1,10 @@
 package org.cafienne.service.db.query
 
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.serialization.json.{StringValue, Value}
-import org.cafienne.actormodel.serialization.json.StringValue
+import org.cafienne.json.{StringValue, Value}
+import org.cafienne.json.StringValue
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.CafienneJson
 import org.cafienne.service.api.cases.CaseIdentifiers
 import org.cafienne.service.api.identifiers.route.IdentifierSet
 import org.cafienne.service.db.query.filter.IdentifierFilter

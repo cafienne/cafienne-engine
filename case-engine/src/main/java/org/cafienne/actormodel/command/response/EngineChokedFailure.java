@@ -9,9 +9,7 @@ package org.cafienne.actormodel.command.response;
 
 import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 /**
  * Can be used to return an exception to the sender of the command when the engine ran into some non-functional exception.

@@ -1,12 +1,12 @@
 package org.cafienne.service.db.query
 
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.serialization.json.{LongValue, Value, ValueMap}
+import org.cafienne.json.{LongValue, Value, ValueMap}
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
-import org.cafienne.actormodel.serialization.json.LongValue
+import org.cafienne.json.LongValue
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.CafienneJson
 import org.cafienne.service.db.record.TaskRecord
 import org.cafienne.service.db.query.exception.TaskSearchFailure
 import org.cafienne.service.db.query.exception.{CaseSearchFailure, TaskSearchFailure}

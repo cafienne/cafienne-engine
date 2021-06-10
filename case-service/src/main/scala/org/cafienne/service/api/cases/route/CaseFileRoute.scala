@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.CaseSystem
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.serialization.json.Value
+import org.cafienne.json.Value
 
 import javax.ws.rs._
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}

@@ -7,10 +7,10 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.actormodel.serialization.json.StringValue;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueList;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;

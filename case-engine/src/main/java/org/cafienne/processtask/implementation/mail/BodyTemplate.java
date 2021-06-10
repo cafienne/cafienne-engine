@@ -1,8 +1,8 @@
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.actormodel.serialization.json.StringValue;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.XMLElementDefinition;

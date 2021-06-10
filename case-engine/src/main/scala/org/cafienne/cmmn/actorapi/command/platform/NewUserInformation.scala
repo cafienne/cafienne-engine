@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.platform
 
-import org.cafienne.actormodel.serialization.json.{Value, ValueList, ValueMap}
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.{Value, ValueList, ValueMap}
+import org.cafienne.json.CafienneJson
 
 import java.util
 

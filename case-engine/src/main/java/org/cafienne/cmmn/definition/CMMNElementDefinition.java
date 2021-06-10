@@ -10,7 +10,7 @@ package org.cafienne.cmmn.definition;
 import org.cafienne.actormodel.serialization.CafienneSerializer;
 import org.cafienne.actormodel.serialization.DeserializationError;
 import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;

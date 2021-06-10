@@ -9,7 +9,7 @@ package org.cafienne.cmmn.actorapi.response;
 
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.actormodel.serialization.Manifest;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 
 /**
  * Response when a StartCase command is sent

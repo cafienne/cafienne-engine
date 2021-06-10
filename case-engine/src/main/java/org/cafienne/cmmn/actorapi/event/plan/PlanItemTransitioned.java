@@ -13,7 +13,7 @@ import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package org.cafienne.service.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.actormodel.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 
 import scala.annotation.meta.field
 

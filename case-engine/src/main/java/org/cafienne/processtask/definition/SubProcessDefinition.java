@@ -14,9 +14,8 @@ import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.implementation.SubProcess;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 

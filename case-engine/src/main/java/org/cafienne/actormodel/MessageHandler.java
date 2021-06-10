@@ -5,7 +5,7 @@ import org.cafienne.actormodel.command.exception.AuthorizationException;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.actormodel.config.Cafienne;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;

@@ -5,8 +5,8 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.actormodel.serialization.json.{JSONReader, ValueMap}
-import org.cafienne.actormodel.serialization.json.JSONReader
+import org.cafienne.json.{JSONReader, ValueMap}
+import org.cafienne.json.JSONReader
 import org.cafienne.cmmn.actorapi.event._
 import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
 import org.cafienne.cmmn.actorapi.event.plan._

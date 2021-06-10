@@ -4,7 +4,7 @@ import java.time.Instant
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
-import org.cafienne.actormodel.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory

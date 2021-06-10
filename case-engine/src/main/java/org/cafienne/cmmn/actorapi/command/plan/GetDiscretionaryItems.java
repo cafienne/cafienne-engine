@@ -15,9 +15,9 @@ import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
-import org.cafienne.actormodel.serialization.json.StringValue;
-import org.cafienne.actormodel.serialization.json.ValueList;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;

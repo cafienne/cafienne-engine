@@ -1,10 +1,10 @@
 package org.cafienne.cmmn.actorapi.command.team
 
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.actormodel.serialization.json.{BooleanValue, StringValue, Value, ValueMap}
+import org.cafienne.json.{BooleanValue, StringValue, Value, ValueMap}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
-import org.cafienne.infrastructure.json.CafienneJson
+import org.cafienne.json.CafienneJson
 
 case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwner: Option[Boolean] = None, removeRoles: Seq[String] = Seq()) extends CafienneJson {
   def validateRolesExist(caseDefinition: CaseDefinition): Unit = {

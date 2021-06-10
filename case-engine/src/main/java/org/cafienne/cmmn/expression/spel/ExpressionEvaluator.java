@@ -8,10 +8,9 @@
 package org.cafienne.cmmn.expression.spel;
 
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.serialization.json.LongValue;
-import org.cafienne.actormodel.serialization.json.StringValue;
-import org.cafienne.actormodel.serialization.json.Value;
-import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.json.LongValue;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
@@ -45,7 +44,6 @@ import org.springframework.expression.EvaluationException;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.SpelParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 

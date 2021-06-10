@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization.json;
+package org.cafienne.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
