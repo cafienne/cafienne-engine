@@ -19,7 +19,8 @@ import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.BusinessIdentifierFormat
-import org.cafienne.service.api.projection.query.{IdentifierFilter, IdentifierQueries}
+import org.cafienne.service.db.query.IdentifierQueries
+import org.cafienne.service.db.query.filter.IdentifierFilter
 
 import javax.ws.rs._
 

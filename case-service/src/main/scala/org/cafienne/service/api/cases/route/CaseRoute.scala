@@ -28,7 +28,8 @@ import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCaseFormat
-import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
+import org.cafienne.service.db.query.CaseQueries
+import org.cafienne.service.db.query.filter.CaseFilter
 
 import java.util.UUID
 import javax.ws.rs._

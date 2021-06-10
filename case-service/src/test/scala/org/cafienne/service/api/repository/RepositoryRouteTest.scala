@@ -8,7 +8,7 @@ import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.ValueMarshallers
-import org.cafienne.service.api.projection.query.TenantQueriesImpl
+import org.cafienne.service.db.query.TenantQueriesImpl
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 

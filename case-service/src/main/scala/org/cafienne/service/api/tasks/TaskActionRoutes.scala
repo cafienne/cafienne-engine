@@ -25,7 +25,7 @@ import org.cafienne.humantask.actorapi.command._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api.model.Examples
-import org.cafienne.service.api.projection.query.{TaskCount, TaskQueries}
+import org.cafienne.service.db.query.{TaskCount, TaskQueries}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")

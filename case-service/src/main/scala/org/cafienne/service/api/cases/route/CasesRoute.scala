@@ -16,8 +16,8 @@ import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, Member
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat}
-import org.cafienne.service.api.projection.CaseSearchFailure
-import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.service.db.query.CaseQueries
+import org.cafienne.service.db.query.exception.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 

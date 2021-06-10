@@ -9,7 +9,8 @@ import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases.CaseDefinitionDocument
-import org.cafienne.service.api.projection.{LastModifiedRegistration, SearchFailure}
+import org.cafienne.service.db.materializer.LastModifiedRegistration
+import org.cafienne.service.db.query.exception.SearchFailure
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

@@ -21,7 +21,7 @@ import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.Headers
-import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.service.db.query.CaseQueries
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")

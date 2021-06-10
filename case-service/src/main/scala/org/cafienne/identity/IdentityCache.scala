@@ -6,7 +6,7 @@ import org.cafienne.akka.actor.command.response.ActorLastModified
 import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
-import org.cafienne.service.api.projection.query.UserQueries
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.TenantReader
 
 import scala.concurrent.{ExecutionContext, Future}

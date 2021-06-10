@@ -19,9 +19,9 @@ import org.cafienne.akka.actor.CaseSystem
 import javax.ws.rs._
 import org.cafienne.akka.actor.command.exception.AuthorizationException
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.projection.UserSearchFailure
-import org.cafienne.service.api.projection.query.UserQueries
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model._
+import org.cafienne.service.db.query.exception.UserSearchFailure
 
 import scala.util.{Failure, Success}
 

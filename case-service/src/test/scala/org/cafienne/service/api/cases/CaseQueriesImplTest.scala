@@ -2,16 +2,16 @@ package org.cafienne.service.api.cases
 
 import java.time.Instant
 import java.util.UUID
-
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueriesImpl}
-import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
-import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
+import org.cafienne.service.db.query.CaseQueriesImpl
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
-import org.cafienne.service.db.querydb.{QueryDB, QueryDBSchema}
+import org.cafienne.service.db.query.filter.CaseFilter
+import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers

@@ -18,7 +18,7 @@ import org.cafienne.akka.actor.CaseSystem
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.Headers
-import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.service.db.query.CaseQueries
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")

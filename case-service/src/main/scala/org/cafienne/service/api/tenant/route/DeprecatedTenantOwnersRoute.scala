@@ -16,7 +16,7 @@ import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs.{Consumes, DELETE, PUT, Path}
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.projection.query.UserQueries
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.tenant.actorapi.command._
 

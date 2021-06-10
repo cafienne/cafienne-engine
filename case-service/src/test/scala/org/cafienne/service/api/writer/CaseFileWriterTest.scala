@@ -9,8 +9,8 @@ import org.cafienne.akka.actor.serialization.json.ValueMap
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.api.projection.cases.CaseProjectionsWriter
-import org.cafienne.service.api.projection.record.{CaseFileRecord, CaseRecord}
+import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
+import org.cafienne.service.db.record.{CaseFileRecord, CaseRecord}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers

@@ -12,7 +12,7 @@ import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs.Path
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.projection.query.TaskQueries
+import org.cafienne.service.db.query.TaskQueries
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
