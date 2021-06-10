@@ -19,7 +19,7 @@ import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.junit.Test;
 
 public class Planning {

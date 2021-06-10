@@ -2,10 +2,11 @@ package org.cafienne.service.api.platform
 
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.actormodel.CaseSystem
+import org.cafienne.actormodel.command.response.{CommandFailure, ModelResponse}
+import org.cafienne.actormodel.config.Cafienne
+import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.command.response.CommandFailure
 import org.cafienne.service.Main
 import org.cafienne.tenant.actorapi.command.TenantUserInformation
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant

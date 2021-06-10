@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.task.validation;
 
-import org.cafienne.akka.actor.serialization.json.*;
+import org.cafienne.actormodel.serialization.json.*;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.processtask.implementation.http.HTTPCallDefinition;

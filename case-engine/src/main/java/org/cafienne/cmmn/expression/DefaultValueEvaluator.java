@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.expression;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.Value;
 import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;

@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
+import org.cafienne.actormodel.serialization.json.{ValueList, ValueMap}
 import org.cafienne.cmmn.actorapi.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError

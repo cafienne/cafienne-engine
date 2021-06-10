@@ -1,9 +1,9 @@
 package org.cafienne.tenant;
 
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.event.TransactionEvent;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.tenant.actorapi.command.TenantCommand;
 import org.cafienne.tenant.actorapi.command.TenantUserInformation;

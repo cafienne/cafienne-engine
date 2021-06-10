@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.filter;
 
-import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.test.CaseEventListener;
 
 /**

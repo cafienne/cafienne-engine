@@ -3,8 +3,9 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
+import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
+import org.cafienne.actormodel.command.response.SecurityFailure
 import org.cafienne.cmmn.actorapi.response.CaseResponse
 import org.cafienne.humantask.actorapi.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._

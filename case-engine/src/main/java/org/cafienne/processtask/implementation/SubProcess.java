@@ -9,8 +9,8 @@ package org.cafienne.processtask.implementation;
 
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.definition.SubProcessMapping;
 import org.cafienne.processtask.instance.ProcessTaskActor;

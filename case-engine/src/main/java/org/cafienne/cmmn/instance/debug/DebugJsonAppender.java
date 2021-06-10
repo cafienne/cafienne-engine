@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.debug;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.Value;
 
 @FunctionalInterface
 public interface DebugJsonAppender {

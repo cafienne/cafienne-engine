@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance.task.process;
 
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ProcessTaskDefinition;
 import org.cafienne.cmmn.instance.Stage;

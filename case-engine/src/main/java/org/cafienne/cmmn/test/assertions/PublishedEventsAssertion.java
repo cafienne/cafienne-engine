@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.instance.casefile.Path;

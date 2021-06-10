@@ -1,6 +1,6 @@
 package org.cafienne.service.db.query
 
-import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.cmmn.definition.{CMMNElementDefinition, DefinitionsDocument}
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}

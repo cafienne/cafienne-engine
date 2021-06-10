@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.{Directive1, Directives}
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
-import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Configured
 

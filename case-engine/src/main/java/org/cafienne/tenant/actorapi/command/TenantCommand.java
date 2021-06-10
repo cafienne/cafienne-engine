@@ -7,13 +7,13 @@
  */
 package org.cafienne.tenant.actorapi.command;
 
-import org.cafienne.akka.actor.command.ModelCommand;
-import org.cafienne.akka.actor.command.exception.AuthorizationException;
-import org.cafienne.akka.actor.command.exception.CommandException;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.command.response.ModelResponse;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.exception.AuthorizationException;
+import org.cafienne.actormodel.command.exception.CommandException;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;

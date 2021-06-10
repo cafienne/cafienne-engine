@@ -2,8 +2,8 @@ package org.cafienne.cmmn.actorapi.response;
 
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 /**
  * Response to a {@link GetDiscretionaryItems} command

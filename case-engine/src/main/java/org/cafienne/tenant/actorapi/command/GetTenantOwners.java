@@ -1,9 +1,9 @@
 package org.cafienne.tenant.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.response.TenantOwnersResponse;
 import org.cafienne.tenant.actorapi.response.TenantResponse;

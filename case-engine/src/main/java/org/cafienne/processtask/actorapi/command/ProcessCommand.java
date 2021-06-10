@@ -1,9 +1,9 @@
 package org.cafienne.processtask.actorapi.command;
 
-import org.cafienne.akka.actor.command.ModelCommand;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 public abstract class ProcessCommand extends ModelCommand<ProcessTaskActor> {

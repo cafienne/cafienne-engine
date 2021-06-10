@@ -1,6 +1,7 @@
 package org.cafienne.service.api.identifiers.route
 
-import org.cafienne.akka.actor.serialization.json.{Value, ValueList, ValueMap}
+import org.cafienne.actormodel.serialization.json.{Value, ValueList, ValueMap}
+import org.cafienne.actormodel.serialization.json.ValueList
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
 import org.cafienne.infrastructure.json.CafienneJson

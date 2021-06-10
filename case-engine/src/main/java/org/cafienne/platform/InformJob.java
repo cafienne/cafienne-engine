@@ -1,11 +1,11 @@
 package org.cafienne.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.ModelCommand;
-import org.cafienne.akka.actor.command.response.CommandFailure;
-import org.cafienne.akka.actor.serialization.CafienneSerializable;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.serialization.CafienneSerializable;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 

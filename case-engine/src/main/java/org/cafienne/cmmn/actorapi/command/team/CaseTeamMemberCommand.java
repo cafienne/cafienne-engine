@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.actorapi.command.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 import java.io.IOException;
 

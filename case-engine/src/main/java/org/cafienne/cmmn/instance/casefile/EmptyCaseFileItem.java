@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,8 @@
 package org.cafienne.service.db.query
 
-import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.akka.actor.serialization.json.{StringValue, Value}
+import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.serialization.json.{StringValue, Value}
+import org.cafienne.actormodel.serialization.json.StringValue
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.cases.CaseIdentifiers

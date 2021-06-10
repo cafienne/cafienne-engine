@@ -7,7 +7,7 @@
  */
 package org.cafienne.tenant.actorapi.event.platform;
 
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.event.TenantEvent;
 

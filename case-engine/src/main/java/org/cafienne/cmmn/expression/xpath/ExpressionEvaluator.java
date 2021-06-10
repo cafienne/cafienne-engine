@@ -20,14 +20,14 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import org.cafienne.akka.actor.command.exception.CommandException;
+import org.cafienne.actormodel.command.exception.CommandException;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.akka.actor.serialization.json.BooleanValue;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.BooleanValue;
+import org.cafienne.actormodel.serialization.json.Value;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.util.XMLHelper;

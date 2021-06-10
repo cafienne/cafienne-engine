@@ -1,6 +1,6 @@
 package org.cafienne.timerservice
 
-import org.cafienne.akka.actor.identity.TenantUser
+import org.cafienne.actormodel.identity.TenantUser
 
 import java.time.Instant
 

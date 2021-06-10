@@ -1,6 +1,6 @@
 package org.cafienne.service.db.materializer.cases
 
-import org.cafienne.akka.actor.event.TransactionEvent
+import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.cmmn.actorapi.event._
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
 import org.cafienne.service.db.record.PlanItemHistoryRecord

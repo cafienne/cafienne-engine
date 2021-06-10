@@ -7,17 +7,17 @@
  */
 package org.cafienne.cmmn.actorapi.command.plan;
 
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.ValueList;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.StringValue;
+import org.cafienne.actormodel.serialization.json.ValueList;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;

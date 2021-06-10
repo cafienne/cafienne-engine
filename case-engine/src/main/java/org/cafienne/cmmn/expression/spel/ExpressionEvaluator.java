@@ -7,11 +7,11 @@
  */
 package org.cafienne.cmmn.expression.spel;
 
-import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.serialization.json.LongValue;
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.serialization.json.LongValue;
+import org.cafienne.actormodel.serialization.json.StringValue;
+import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;

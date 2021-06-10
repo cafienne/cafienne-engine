@@ -3,7 +3,7 @@ package org.cafienne.cmmn.test;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;

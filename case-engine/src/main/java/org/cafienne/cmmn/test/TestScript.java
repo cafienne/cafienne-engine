@@ -7,11 +7,11 @@
  */
 package org.cafienne.cmmn.test;
 
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.command.response.CommandFailure;
-import org.cafienne.akka.actor.command.response.ModelResponse;
-import org.cafienne.akka.actor.config.Cafienne;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;

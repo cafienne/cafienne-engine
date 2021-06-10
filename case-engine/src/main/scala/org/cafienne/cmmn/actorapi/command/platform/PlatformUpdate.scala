@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.actorapi.command.platform
 
-import org.cafienne.akka.actor.serialization.json.{Value, ValueList}
+import org.cafienne.actormodel.serialization.json.{Value, ValueList}
 import org.cafienne.infrastructure.json.CafienneJson
 
 case class PlatformUpdate(info: Seq[NewUserInformation]) extends CafienneJson {

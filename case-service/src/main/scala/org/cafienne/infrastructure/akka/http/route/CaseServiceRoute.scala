@@ -8,9 +8,9 @@ import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.response.ModelResponse
-import org.cafienne.akka.actor.serialization.json.Value
+import org.cafienne.actormodel.CaseSystem
+import org.cafienne.actormodel.command.response.ModelResponse
+import org.cafienne.actormodel.serialization.json.Value
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.api.Headers
 

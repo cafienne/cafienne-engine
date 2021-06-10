@@ -8,8 +8,8 @@
 package org.cafienne.tenant.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.event.BaseModelEvent;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.event.BaseModelEvent;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;

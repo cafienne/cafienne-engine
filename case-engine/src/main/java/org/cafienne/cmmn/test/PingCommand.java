@@ -8,16 +8,16 @@
 package org.cafienne.cmmn.test;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.BootstrapCommand;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.CafienneSerializable;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.serialization.CafienneSerializable;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.akka.actor.serialization.json.LongValue;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.LongValue;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

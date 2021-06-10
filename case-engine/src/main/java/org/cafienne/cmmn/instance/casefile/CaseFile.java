@@ -11,13 +11,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Document;

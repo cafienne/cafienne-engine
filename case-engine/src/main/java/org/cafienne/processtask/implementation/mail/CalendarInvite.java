@@ -9,9 +9,9 @@ import net.fortuna.ical4j.model.parameter.Role;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.StringValue;
+import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.util.Guid;
 
 import java.net.SocketException;

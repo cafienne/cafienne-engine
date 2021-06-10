@@ -8,7 +8,7 @@
 package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.server.Directives._
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.query.CaseQueries
 

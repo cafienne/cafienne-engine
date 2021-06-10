@@ -1,13 +1,13 @@
 package org.cafienne.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.response.CommandFailure;
-import org.cafienne.akka.actor.config.Cafienne;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueList;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.snapshot.RelaxedSnapshot;
+import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueList;
+import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.actormodel.snapshot.RelaxedSnapshot;
 import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;

@@ -1,12 +1,12 @@
 package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.command.BootstrapCommand;
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.identity.PlatformUser;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.identity.PlatformUser;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.command.TenantUserInformation;
 import org.cafienne.tenant.actorapi.exception.TenantException;

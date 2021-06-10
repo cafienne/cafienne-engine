@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.http;
 
-import org.cafienne.akka.actor.serialization.json.*;
+import org.cafienne.actormodel.serialization.json.*;
 
 import java.io.IOException;
 import java.net.URL;

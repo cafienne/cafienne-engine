@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.akka.actor.serialization.json.{BooleanValue, StringValue, Value, ValueMap}
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.actormodel.serialization.json.{BooleanValue, StringValue, Value, ValueMap}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
 import org.cafienne.infrastructure.json.CafienneJson

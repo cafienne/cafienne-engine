@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.expression.spel.api;
 
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 
 import java.util.HashSet;
 import java.util.Set;

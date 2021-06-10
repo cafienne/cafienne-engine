@@ -8,13 +8,13 @@
 package org.cafienne.cmmn.expression.json;
 
 import com.jayway.jsonpath.JsonPathException;
-import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.Value;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.sentry.Criterion;

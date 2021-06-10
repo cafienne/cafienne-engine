@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.actorapi.event.team;
 
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;
 
 /**

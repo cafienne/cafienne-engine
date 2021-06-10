@@ -1,6 +1,6 @@
 package org.cafienne.infrastructure.json
 
-import org.cafienne.akka.actor.serialization.json.Value
+import org.cafienne.actormodel.serialization.json.Value
 
 /**
   * Simple trait that case classes can implement if they can convert themselves into Value[_] objects.

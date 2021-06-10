@@ -8,11 +8,11 @@
 package org.cafienne.timerservice;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.CafienneSerializable;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.serialization.CafienneSerializable;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;

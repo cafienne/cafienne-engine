@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.CaseSystem
 
 import javax.ws.rs._
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition

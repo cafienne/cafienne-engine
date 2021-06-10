@@ -8,7 +8,7 @@
 
 package org.cafienne.cmmn.test.planning;
 
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
 import org.cafienne.cmmn.actorapi.command.StartCase;

@@ -2,7 +2,7 @@ package org.cafienne.service.db.materializer.slick
 
 import akka.Done
 import akka.persistence.query.Offset
-import org.cafienne.akka.actor.event.{ModelEvent, TransactionEvent}
+import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
 
 import scala.concurrent.Future
 

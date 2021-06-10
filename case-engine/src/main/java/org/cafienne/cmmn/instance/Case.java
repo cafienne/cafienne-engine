@@ -7,8 +7,8 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.*;
@@ -18,7 +18,7 @@ import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.CaseFile;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;

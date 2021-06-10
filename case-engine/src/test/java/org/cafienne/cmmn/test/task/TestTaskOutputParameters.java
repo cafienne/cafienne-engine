@@ -5,10 +5,10 @@ import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.junit.Test;
 

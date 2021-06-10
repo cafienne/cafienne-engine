@@ -15,11 +15,11 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.CaseSystem
+import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.serialization.json.Value
 
 import javax.ws.rs._
-import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.akka.actor.serialization.json.Value
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._

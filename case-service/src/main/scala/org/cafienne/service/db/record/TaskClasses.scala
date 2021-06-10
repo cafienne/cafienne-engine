@@ -1,8 +1,9 @@
 package org.cafienne.service.db.record
 
-import java.time.Instant
+import org.cafienne.actormodel.serialization.json.{JSONReader, Value, ValueMap}
 
-import org.cafienne.akka.actor.serialization.json.{JSONReader, Value, ValueMap}
+import java.time.Instant
+import org.cafienne.actormodel.serialization.json.JSONReader
 import org.cafienne.infrastructure.json.CafienneJson
 
 final case class TaskRecord(id: String,

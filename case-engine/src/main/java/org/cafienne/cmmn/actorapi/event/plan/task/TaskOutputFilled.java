@@ -8,11 +8,11 @@
 package org.cafienne.cmmn.actorapi.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 import java.io.IOException;
 

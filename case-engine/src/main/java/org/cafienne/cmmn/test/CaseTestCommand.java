@@ -7,15 +7,15 @@
  */
 package org.cafienne.cmmn.test;
 
-import org.cafienne.akka.actor.command.BootstrapCommand;
-import org.cafienne.akka.actor.command.response.CommandFailure;
-import org.cafienne.akka.actor.command.response.ModelResponse;
+import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.command.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package org.cafienne.service.db.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.identity.PlatformUser
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.service.db.record.CaseBusinessIdentifierRecord
 import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
 

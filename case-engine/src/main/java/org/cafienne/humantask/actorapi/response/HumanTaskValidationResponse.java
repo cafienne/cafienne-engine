@@ -1,9 +1,9 @@
 package org.cafienne.humantask.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.humantask.actorapi.command.WorkflowCommand;
 
 import java.io.IOException;

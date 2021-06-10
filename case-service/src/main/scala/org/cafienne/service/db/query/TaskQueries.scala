@@ -1,8 +1,10 @@
 package org.cafienne.service.db.query
 
+import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.serialization.json.{LongValue, Value, ValueMap}
+
 import java.time.{Instant, LocalDateTime, ZoneOffset}
-import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.akka.actor.serialization.json.{LongValue, Value, ValueMap}
+import org.cafienne.actormodel.serialization.json.LongValue
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.infrastructure.json.CafienneJson
 import org.cafienne.service.db.record.TaskRecord

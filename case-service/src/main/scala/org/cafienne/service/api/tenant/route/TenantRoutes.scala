@@ -7,7 +7,7 @@
  */
 package org.cafienne.service.api.tenant.route
 
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.CaseSystem
 
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider

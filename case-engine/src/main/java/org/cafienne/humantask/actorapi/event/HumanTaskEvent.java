@@ -8,9 +8,9 @@
 package org.cafienne.humantask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 
 import java.io.IOException;

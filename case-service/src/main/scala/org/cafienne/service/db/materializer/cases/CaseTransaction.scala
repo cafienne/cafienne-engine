@@ -3,9 +3,10 @@ package org.cafienne.service.db.materializer.cases
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.event.TransactionEvent
-import org.cafienne.akka.actor.identity.TenantUser
-import org.cafienne.akka.actor.serialization.json.{JSONReader, ValueMap}
+import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.actormodel.serialization.json.{JSONReader, ValueMap}
+import org.cafienne.actormodel.serialization.json.JSONReader
 import org.cafienne.cmmn.actorapi.event._
 import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
 import org.cafienne.cmmn.actorapi.event.plan._

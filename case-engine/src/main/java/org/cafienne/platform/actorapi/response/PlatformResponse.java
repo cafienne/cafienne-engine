@@ -7,9 +7,9 @@
  */
 package org.cafienne.platform.actorapi.response;
 
-import org.cafienne.akka.actor.command.response.ModelResponse;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.platform.actorapi.command.PlatformCommand;
 
 /**

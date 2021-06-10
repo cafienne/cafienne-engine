@@ -1,8 +1,9 @@
 package org.cafienne.service.db.record
 
-import java.time.Instant
+import org.cafienne.actormodel.serialization.json.{JSONReader, Value, ValueList, ValueMap}
 
-import org.cafienne.akka.actor.serialization.json.{JSONReader, Value, ValueList, ValueMap}
+import java.time.Instant
+import org.cafienne.actormodel.serialization.json.JSONReader
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
 import org.cafienne.infrastructure.json.CafienneJson
 

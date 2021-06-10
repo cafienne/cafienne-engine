@@ -1,11 +1,11 @@
 package org.cafienne.processtask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.CafienneVersion;
-import org.cafienne.akka.actor.config.Cafienne;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.CafienneVersion;
+import org.cafienne.actormodel.config.Cafienne;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.StartProcess;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;

@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.actorapi.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Fields;
+import org.cafienne.actormodel.serialization.Fields;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;
 
 import java.io.IOException;

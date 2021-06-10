@@ -1,6 +1,6 @@
 package org.cafienne.service.db.schema
 
-import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile

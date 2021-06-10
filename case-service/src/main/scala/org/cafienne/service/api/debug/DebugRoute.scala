@@ -16,10 +16,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.TerminateModelActor
-import org.cafienne.akka.actor.command.response.{EngineChokedFailure, ModelResponse, SecurityFailure}
-import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.actormodel.CaseSystem
+import org.cafienne.actormodel.command.TerminateModelActor
+import org.cafienne.actormodel.config.Cafienne
+import org.cafienne.actormodel.command.response.SecurityFailure
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.{AuthenticatedRoute, CommandRoute}
 import org.cafienne.service.Main

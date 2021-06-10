@@ -3,7 +3,7 @@ package org.cafienne.service.db.materializer.slick
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.event.{ModelEvent, TransactionEvent}
+import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
 import org.cafienne.infrastructure.cqrs.TaggedEventConsumer
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 

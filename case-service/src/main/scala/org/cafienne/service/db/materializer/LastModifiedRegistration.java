@@ -9,8 +9,8 @@
 package org.cafienne.service.db.materializer;
 
 import akka.dispatch.Futures;
-import org.cafienne.akka.actor.command.response.ActorLastModified;
-import org.cafienne.akka.actor.event.TransactionEvent;
+import org.cafienne.actormodel.command.response.ActorLastModified;
+import org.cafienne.actormodel.event.TransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Promise;

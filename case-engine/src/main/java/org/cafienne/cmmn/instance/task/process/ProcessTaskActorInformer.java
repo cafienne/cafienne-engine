@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.task.process;
 
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.processtask.actorapi.command.*;
 

@@ -16,7 +16,7 @@ import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.junit.Test;
 
 public class Simple {

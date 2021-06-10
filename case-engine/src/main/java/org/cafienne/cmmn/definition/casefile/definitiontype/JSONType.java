@@ -6,8 +6,8 @@ import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.DefinitionType;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.Value;
 
 public class JSONType extends DefinitionType {
 

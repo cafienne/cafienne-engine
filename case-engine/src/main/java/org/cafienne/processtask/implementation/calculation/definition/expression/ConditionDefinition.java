@@ -7,8 +7,8 @@
  */
 package org.cafienne.processtask.implementation.calculation.definition.expression;
 
-import org.cafienne.akka.actor.serialization.json.BooleanValue;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.BooleanValue;
+import org.cafienne.actormodel.serialization.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.implementation.calculation.Calculation;

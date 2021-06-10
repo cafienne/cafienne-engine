@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.akka.actor.event.ModelEvent;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.instance.Case;
 
 public interface StandardEvent<T extends Enum, C extends TransitionGenerator> extends ModelEvent<Case> {

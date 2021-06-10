@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.actorapi.event.team;
 
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 /**
  * Event caused when a team member is no longer owner

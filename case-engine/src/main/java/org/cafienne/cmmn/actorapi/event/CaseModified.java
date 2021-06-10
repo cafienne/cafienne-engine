@@ -1,14 +1,14 @@
 package org.cafienne.cmmn.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.actormodel.event.TransactionEvent;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.akka.actor.serialization.json.LongValue;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.LongValue;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;

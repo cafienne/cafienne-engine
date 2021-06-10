@@ -1,11 +1,11 @@
 package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.akka.actor.identity.PlatformUser;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.event.TransactionEvent;
+import org.cafienne.actormodel.identity.PlatformUser;
+import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.command.platform.TenantUpdate;
 import org.cafienne.tenant.TenantActor;

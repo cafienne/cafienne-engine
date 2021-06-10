@@ -1,7 +1,8 @@
 package org.cafienne.service.db.materializer.cases
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.serialization.json.{Value, ValueMap}
+import org.cafienne.actormodel.serialization.json.{Value, ValueMap}
+import org.cafienne.actormodel.serialization.json.ValueMap
 import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.instance.casefile.{CaseFileItemTransition, Path}
 

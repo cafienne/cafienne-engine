@@ -9,7 +9,8 @@ package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.complete
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.tenant.TenantReader

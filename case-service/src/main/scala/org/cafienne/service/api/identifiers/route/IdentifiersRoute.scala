@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}

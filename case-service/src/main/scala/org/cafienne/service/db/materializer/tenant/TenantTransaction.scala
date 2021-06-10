@@ -3,7 +3,7 @@ package org.cafienne.service.db.materializer.tenant
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.event.TransactionEvent
+import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.db.materializer.RecordsPersistence

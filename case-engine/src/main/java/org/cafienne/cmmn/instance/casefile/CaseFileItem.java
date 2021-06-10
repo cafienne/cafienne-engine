@@ -7,9 +7,9 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.actorapi.event.file.*;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;

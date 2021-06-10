@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.expression.spel.api;
 
-import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.cmmn.instance.Case;
 import org.slf4j.Logger;

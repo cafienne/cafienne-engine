@@ -1,10 +1,10 @@
 package org.cafienne.processtask.instance;
 
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.actormodel.CaseSystem;
+import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.actorapi.event.*;

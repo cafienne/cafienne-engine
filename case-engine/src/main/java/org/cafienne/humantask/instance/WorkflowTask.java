@@ -1,6 +1,6 @@
 package org.cafienne.humantask.instance;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
@@ -9,7 +9,7 @@ import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.actormodel.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.ValidationError;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;

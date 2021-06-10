@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.team;
 
-import org.cafienne.akka.actor.ModelActor;
+import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Team;

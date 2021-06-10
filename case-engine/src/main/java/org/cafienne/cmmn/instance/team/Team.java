@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.team;
 
-import org.cafienne.akka.actor.command.exception.AuthorizationException;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.command.exception.AuthorizationException;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;

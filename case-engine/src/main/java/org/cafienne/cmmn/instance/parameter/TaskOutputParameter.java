@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance.parameter;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.actormodel.serialization.json.Value;
 import org.cafienne.cmmn.definition.parameter.BindingOperation;
 import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;

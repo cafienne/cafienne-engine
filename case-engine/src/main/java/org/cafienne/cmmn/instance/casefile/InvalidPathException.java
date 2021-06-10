@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.cmmn.instance.casefile.Path;
 
 /**

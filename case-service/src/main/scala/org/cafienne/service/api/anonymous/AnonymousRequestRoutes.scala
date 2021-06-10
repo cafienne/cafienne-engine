@@ -8,7 +8,7 @@
 package org.cafienne.service.api.anonymous
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 
