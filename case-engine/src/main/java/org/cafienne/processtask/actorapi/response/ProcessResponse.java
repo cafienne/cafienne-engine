@@ -1,4 +1,4 @@
-package org.cafienne.processtask.actorapi.command.response;
+package org.cafienne.processtask.actorapi.response;
 
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.serialization.Manifest;

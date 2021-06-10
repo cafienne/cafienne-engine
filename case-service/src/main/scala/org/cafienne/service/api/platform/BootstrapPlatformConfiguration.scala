@@ -9,7 +9,7 @@ import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.Main
 import org.cafienne.tenant.actorapi.command.TenantUserInformation
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant
-import org.cafienne.tenant.actorapi.command.response.TenantResponse
+import org.cafienne.tenant.actorapi.response.TenantResponse
 
 import java.io.File
 import scala.collection.JavaConverters._

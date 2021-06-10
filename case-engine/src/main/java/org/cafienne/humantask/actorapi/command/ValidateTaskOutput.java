@@ -13,7 +13,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.humantask.actorapi.command.response.HumanTaskValidationResponse;
+import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
 
 /**

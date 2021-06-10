@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.actorapi.command.response;
+package org.cafienne.cmmn.actorapi.response;
 
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;

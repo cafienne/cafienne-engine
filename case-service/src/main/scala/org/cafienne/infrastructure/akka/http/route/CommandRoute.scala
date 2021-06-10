@@ -5,13 +5,13 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.akka.actor.command.ModelCommand
 import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
-import org.cafienne.cmmn.actorapi.command.response.CaseResponse
-import org.cafienne.humantask.actorapi.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
+import org.cafienne.cmmn.actorapi.response.CaseResponse
+import org.cafienne.humantask.actorapi.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.platform.actorapi.response.{PlatformResponse, PlatformUpdateStatus}
 import org.cafienne.service.{Main, api}
-import org.cafienne.tenant.actorapi.command.response.{TenantOwnersResponse, TenantResponse}
+import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
 import scala.util.{Failure, Success}
 

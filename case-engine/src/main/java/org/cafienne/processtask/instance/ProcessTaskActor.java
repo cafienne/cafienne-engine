@@ -6,7 +6,7 @@ import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
-import org.cafienne.processtask.actorapi.command.response.ProcessResponse;
+import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.actorapi.event.*;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;

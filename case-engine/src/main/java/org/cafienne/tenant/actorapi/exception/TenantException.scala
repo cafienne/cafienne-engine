@@ -1,4 +1,4 @@
-package org.cafienne.tenant.actorapi.command.exception
+package org.cafienne.tenant.actorapi.exception
 
 import org.cafienne.akka.actor.command.exception.InvalidCommandException
 

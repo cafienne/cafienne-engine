@@ -7,8 +7,8 @@ import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.exception.TenantException;
-import org.cafienne.tenant.actorapi.command.response.TenantResponse;
+import org.cafienne.tenant.actorapi.exception.TenantException;
+import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;

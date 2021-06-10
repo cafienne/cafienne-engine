@@ -1,4 +1,4 @@
-package org.cafienne.humantask.actorapi.command.response;
+package org.cafienne.humantask.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.akka.actor.serialization.Fields;

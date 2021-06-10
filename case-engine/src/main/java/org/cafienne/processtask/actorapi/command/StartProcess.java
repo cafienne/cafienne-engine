@@ -6,7 +6,7 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.processtask.actorapi.command.response.ProcessResponse;
+import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 

@@ -16,11 +16,11 @@ import org.cafienne.akka.actor.identity.TenantUser;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.response.CaseResponse;
+import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.exception.TenantException;
+import org.cafienne.tenant.actorapi.exception.TenantException;
 
 import java.util.List;
 

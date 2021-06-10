@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.plan.task;
 
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.cmmn.actorapi.command.response.CaseResponse;
+import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.akka.actor.serialization.json.ValueMap;

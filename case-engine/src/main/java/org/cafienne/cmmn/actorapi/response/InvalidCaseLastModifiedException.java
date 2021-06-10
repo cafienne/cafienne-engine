@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.actorapi.command.response;
+package org.cafienne.cmmn.actorapi.response;
 
 
 /**

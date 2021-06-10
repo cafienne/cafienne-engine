@@ -5,7 +5,7 @@ import org.cafienne.akka.actor.identity.PlatformUser;
 import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.response.TenantResponse;
+import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
 

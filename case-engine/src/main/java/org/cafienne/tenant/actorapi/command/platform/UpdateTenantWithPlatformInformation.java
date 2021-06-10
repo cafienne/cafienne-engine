@@ -9,7 +9,7 @@ import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.command.platform.TenantUpdate;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.response.TenantResponse;
+import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
 
