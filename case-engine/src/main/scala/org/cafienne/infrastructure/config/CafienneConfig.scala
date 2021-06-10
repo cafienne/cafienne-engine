@@ -1,18 +1,14 @@
 package org.cafienne.infrastructure.config
 
-import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.config.util.ConfigReader
-import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.infrastructure.CafienneVersion
+import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
 
 /**
   * Configuration settings of this Cafienne Case System Platform
   * @param systemConfig
   */
 class CafienneConfig() extends ConfigReader with LazyLogging {
-  val fallback = ConfigFactory.defaultReference()
-  val systemConfig = ConfigFactory.load().withFallback(fallback)
+  val systemConfig = SystemConfig.load()
 
   val path = "cafienne"
   override lazy val config = {
@@ -72,12 +68,11 @@ class CafienneConfig() extends ConfigReader with LazyLogging {
   /**
     * Returns true of the debug route is open (for developers using IDE to do debugging)
     */
-  val developerRouteOpen = {
+  val developerRouteOpen: Boolean = {
     val debugRouteOpenOption = "api.security.debug.events.open"
     val open = readBoolean(debugRouteOpenOption, false)
     if (open) {
-      val manyHashes = "\n\n############################################################################################################\n\n"
-      logger.warn(manyHashes+"\tWARNING - Case Service runs in developer mode (the debug route to get all events is open for anyone!)" + manyHashes)
+      SystemConfig.printWarning("Case Service runs in developer mode (the debug route to get all events is open for anyone!)")
     }
     open
   }

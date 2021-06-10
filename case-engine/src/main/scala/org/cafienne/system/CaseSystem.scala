@@ -9,6 +9,7 @@ package org.cafienne.system
 
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
 import org.cafienne.timerservice.TimerService
@@ -27,7 +28,7 @@ class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging 
     *
     * @return
     */
-  val system: ActorSystem = ActorSystem(name) // Create an Akka system
+  val system: ActorSystem = ActorSystem(name, Cafienne.config.systemConfig) // Create an Akka system
 
   private val routerClazz = system.hasExtension(akka.cluster.Cluster) match {
     case true => classOf[ClusterRouter]
