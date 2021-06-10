@@ -1,4 +1,4 @@
-package org.cafienne.service.api
+package org.cafienne.service.api.swagger
 
 import com.github.swagger.akka._
 import com.github.swagger.akka.model.Info
