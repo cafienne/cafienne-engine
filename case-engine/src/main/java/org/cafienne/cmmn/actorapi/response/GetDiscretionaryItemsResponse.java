@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.response;
 
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 /**

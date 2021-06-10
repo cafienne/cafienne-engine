@@ -9,8 +9,8 @@ package org.cafienne.actormodel.command.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.exception.SerializedException;
-import org.cafienne.actormodel.serialization.Fields;
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;

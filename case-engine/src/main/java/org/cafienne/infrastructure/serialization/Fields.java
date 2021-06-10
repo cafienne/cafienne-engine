@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 /**
  * Big long enum with all field names that are used in places with CafienneJson (ValueMap and so)

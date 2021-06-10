@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization
+package org.cafienne.infrastructure.serialization
 
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer

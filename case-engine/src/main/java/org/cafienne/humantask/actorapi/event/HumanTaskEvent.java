@@ -8,7 +8,7 @@
 package org.cafienne.humantask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;

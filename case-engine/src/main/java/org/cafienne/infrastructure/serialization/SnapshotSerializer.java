@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 import org.cafienne.platform.PlatformStorage;
 import org.cafienne.timerservice.TimerStorage;

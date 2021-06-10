@@ -1,6 +1,6 @@
 package org.cafienne.actormodel.event;
 
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest

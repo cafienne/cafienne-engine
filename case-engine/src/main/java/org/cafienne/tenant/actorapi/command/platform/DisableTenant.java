@@ -2,7 +2,7 @@ package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.PlatformUser;
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.response.TenantResponse;

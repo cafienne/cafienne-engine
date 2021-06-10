@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 /**
  * This exception is thrown when a CMMNElementDefinition cannot be deserialized from a JSON file.

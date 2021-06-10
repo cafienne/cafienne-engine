@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.json.ValueMap;
 

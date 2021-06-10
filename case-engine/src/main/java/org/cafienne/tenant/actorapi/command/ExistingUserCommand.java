@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.command.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.User;

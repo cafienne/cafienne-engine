@@ -9,7 +9,7 @@
 package org.cafienne.cmmn.actorapi.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;

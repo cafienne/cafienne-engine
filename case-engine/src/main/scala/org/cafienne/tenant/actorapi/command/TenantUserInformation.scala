@@ -1,7 +1,7 @@
 package org.cafienne.tenant.actorapi.command
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.actormodel.serialization.{CafienneSerializable, Fields}
+import org.cafienne.infrastructure.serialization.{CafienneSerializable, Fields}
 import org.cafienne.json.{BooleanValue, StringValue, ValueList, ValueMap}
 import org.cafienne.json.CafienneJson
 

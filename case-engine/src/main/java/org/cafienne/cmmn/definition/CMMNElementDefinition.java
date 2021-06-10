@@ -7,9 +7,9 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.actormodel.serialization.CafienneSerializer;
-import org.cafienne.actormodel.serialization.DeserializationError;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
+import org.cafienne.infrastructure.serialization.DeserializationError;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.util.XMLHelper;

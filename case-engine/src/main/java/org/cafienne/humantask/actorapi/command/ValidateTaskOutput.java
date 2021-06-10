@@ -10,7 +10,7 @@ package org.cafienne.humantask.actorapi.command;
 import org.cafienne.actormodel.command.response.CommandFailure;
 import org.cafienne.actormodel.command.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;

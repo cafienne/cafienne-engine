@@ -1,6 +1,6 @@
 package org.cafienne.processtask.actorapi.event;
 
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 

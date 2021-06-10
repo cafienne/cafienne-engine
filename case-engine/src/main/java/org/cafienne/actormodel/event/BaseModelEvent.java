@@ -3,7 +3,7 @@ package org.cafienne.actormodel.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;

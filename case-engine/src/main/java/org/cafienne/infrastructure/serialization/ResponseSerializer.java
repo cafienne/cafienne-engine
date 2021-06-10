@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 import org.cafienne.actormodel.command.response.CommandFailure;
 import org.cafienne.actormodel.command.response.EngineChokedFailure;

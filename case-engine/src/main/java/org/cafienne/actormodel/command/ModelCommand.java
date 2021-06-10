@@ -8,13 +8,13 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.command.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.actormodel.TenantUserMessage;
-import org.cafienne.actormodel.serialization.CafienneSerializable;
+import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.util.Guid;
 

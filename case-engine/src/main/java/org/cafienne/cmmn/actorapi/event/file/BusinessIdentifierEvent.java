@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.Value;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;

@@ -7,7 +7,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.config.Cafienne
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.actormodel.health.HealthMonitor
-import org.cafienne.actormodel.serialization.{DeserializationFailure, UnrecognizedManifest}
+import org.cafienne.infrastructure.serialization.{DeserializationFailure, UnrecognizedManifest}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

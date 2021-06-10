@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.actorapi.command.platform
 
-import org.cafienne.actormodel.serialization.Fields
+import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{Value, ValueMap}
 import org.cafienne.json.CafienneJson
 

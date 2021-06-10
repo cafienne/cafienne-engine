@@ -22,10 +22,10 @@ object TestConfig {
       |          serialize-messages = off
       |
       |          serializers {
-      |            cafienne_serializer = "org.cafienne.actormodel.serialization.CafienneSerializer"
+      |            cafienne_serializer = "org.cafienne.infrastructure.serialization.CafienneSerializer"
       |          }
       |          serialization-bindings {
-      |            "org.cafienne.actormodel.serialization.CafienneSerializable" = cafienne_serializer
+      |            "org.cafienne.infrastructure.serialization.CafienneSerializable" = cafienne_serializer
       |          }
       |        }
       |

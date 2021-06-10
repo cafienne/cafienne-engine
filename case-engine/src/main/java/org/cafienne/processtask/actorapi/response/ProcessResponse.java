@@ -1,7 +1,7 @@
 package org.cafienne.processtask.actorapi.response;
 
 import org.cafienne.actormodel.command.response.ModelResponse;
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.ProcessCommand;
 

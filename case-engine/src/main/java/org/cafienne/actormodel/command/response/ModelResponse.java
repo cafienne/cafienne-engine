@@ -9,11 +9,11 @@ package org.cafienne.actormodel.command.response;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.serialization.CafienneSerializable;
+import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;

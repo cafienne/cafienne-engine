@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 import akka.actor.ExtendedActorSystem;
 import akka.serialization.SerializerWithStringManifest;

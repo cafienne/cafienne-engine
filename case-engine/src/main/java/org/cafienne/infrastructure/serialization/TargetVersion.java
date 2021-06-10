@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

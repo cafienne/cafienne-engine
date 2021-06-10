@@ -2,7 +2,7 @@ package org.cafienne.actormodel.identity
 
 import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.actormodel.config.Cafienne
-import org.cafienne.actormodel.serialization.Fields
+import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 import org.cafienne.json.CafienneJson
 

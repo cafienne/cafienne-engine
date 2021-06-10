@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.actorapi.event.file;
 
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.State;

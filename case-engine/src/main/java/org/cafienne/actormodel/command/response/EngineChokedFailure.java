@@ -7,7 +7,7 @@
  */
 package org.cafienne.actormodel.command.response;
 
-import org.cafienne.actormodel.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.json.ValueMap;
 

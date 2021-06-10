@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.serialization;
+package org.cafienne.infrastructure.serialization;
 
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.SentryEvent;
