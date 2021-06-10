@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.test.casefile;
 
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
@@ -11,7 +11,7 @@ import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
-import org.cafienne.humantask.akka.command.CompleteHumanTask;
+import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 

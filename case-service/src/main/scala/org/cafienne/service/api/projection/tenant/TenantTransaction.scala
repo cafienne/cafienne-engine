@@ -10,8 +10,8 @@ import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.projection.record.{TenantRecord, UserRoleKey, UserRoleRecord}
 import org.cafienne.service.api.projection.slick.SlickTransaction
-import org.cafienne.tenant.akka.event._
-import org.cafienne.tenant.akka.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
+import org.cafienne.tenant.actorapi.event._
+import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}

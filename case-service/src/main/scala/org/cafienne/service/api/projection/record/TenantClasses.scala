@@ -1,6 +1,6 @@
 package org.cafienne.service.api.projection.record
 
-import org.cafienne.tenant.akka.event.{TenantUserEvent, TenantUserRoleEvent}
+import org.cafienne.tenant.actorapi.event.{TenantUserEvent, TenantUserRoleEvent}
 
 final case class UserRoleRecord(userId: String, tenant: String, role_name: String, name: String, email: String, isOwner: Boolean, enabled: Boolean) {
   val key = UserRoleKey(userId, tenant, role_name)

@@ -7,9 +7,9 @@ import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
 import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.identity.PlatformUser
 import org.cafienne.service.Main
-import org.cafienne.tenant.akka.command.TenantUserInformation
-import org.cafienne.tenant.akka.command.platform.CreateTenant
-import org.cafienne.tenant.akka.command.response.TenantResponse
+import org.cafienne.tenant.actorapi.command.TenantUserInformation
+import org.cafienne.tenant.actorapi.command.platform.CreateTenant
+import org.cafienne.tenant.actorapi.command.response.TenantResponse
 
 import java.io.File
 import scala.collection.JavaConverters._

@@ -1,7 +1,7 @@
 package org.cafienne.tenant;
 
-import org.cafienne.tenant.akka.command.TenantUserInformation;
-import org.cafienne.tenant.akka.event.*;
+import org.cafienne.tenant.actorapi.command.TenantUserInformation;
+import org.cafienne.tenant.actorapi.event.*;
 import scala.collection.Seq;
 import scala.collection.Traversable;
 

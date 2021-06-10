@@ -1,6 +1,6 @@
 package org.cafienne.service.api.projection.cases
 
-import org.cafienne.cmmn.akka.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
+import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
 import org.cafienne.service.api.projection.record.CaseBusinessIdentifierRecord
 
 object CaseIdentifierMerger {

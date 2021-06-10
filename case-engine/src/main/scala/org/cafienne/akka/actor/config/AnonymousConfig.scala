@@ -4,8 +4,8 @@ import com.typesafe.config.{Config, ConfigObject}
 import org.cafienne.akka.actor.config.util.{ChildConfigReader, ConfigReader}
 import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
 import org.cafienne.akka.actor.serialization.json.ValueMap
-import org.cafienne.cmmn.akka.command.StartCase
-import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
+import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 
 class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
   val path = "anonymous-access"

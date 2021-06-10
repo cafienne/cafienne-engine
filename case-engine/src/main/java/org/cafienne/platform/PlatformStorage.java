@@ -8,7 +8,7 @@ import org.cafienne.akka.actor.serialization.Manifest;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
 import org.cafienne.akka.actor.snapshot.RelaxedSnapshot;
-import org.cafienne.platform.akka.command.UpdatePlatformInformation;
+import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 

@@ -15,10 +15,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.exception.SerializedException
 import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
-import org.cafienne.cmmn.akka.command.StartCase
-import org.cafienne.cmmn.akka.command.response.CaseStartedResponse
-import org.cafienne.cmmn.akka.command.team.CaseTeamMember
-import org.cafienne.cmmn.akka.response.CaseResponseModels.StartCaseResponse
+import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.cmmn.actorapi.command.response.CaseStartedResponse
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember
+import org.cafienne.cmmn.actorapi.response.CaseResponseModels.StartCaseResponse
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.service.Main

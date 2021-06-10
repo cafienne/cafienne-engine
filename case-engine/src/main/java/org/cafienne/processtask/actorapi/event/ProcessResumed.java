@@ -1,0 +1,16 @@
+package org.cafienne.processtask.actorapi.event;
+
+import org.cafienne.akka.actor.serialization.Manifest;
+import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.processtask.instance.ProcessTaskActor;
+
+@Manifest
+public class ProcessResumed extends ProcessInstanceEvent {
+    public ProcessResumed(ProcessTaskActor actor) {
+        super(actor);
+    }
+
+    public ProcessResumed(ValueMap json) {
+        super(json);
+    }
+}

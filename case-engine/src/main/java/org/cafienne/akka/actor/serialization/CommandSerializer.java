@@ -1,31 +1,31 @@
 package org.cafienne.akka.actor.serialization;
 
-import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.command.UpdateCaseWithPlatformInformation;
-import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.DeleteCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.ReplaceCaseFileItem;
-import org.cafienne.cmmn.akka.command.casefile.UpdateCaseFileItem;
-import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode;
-import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
-import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
-import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.command.plan.eventlistener.RaiseEvent;
-import org.cafienne.cmmn.akka.command.plan.task.CompleteTask;
-import org.cafienne.cmmn.akka.command.plan.task.FailTask;
-import org.cafienne.cmmn.akka.command.team.PutTeamMember;
-import org.cafienne.cmmn.akka.command.team.RemoveTeamMember;
-import org.cafienne.cmmn.akka.command.team.SetCaseTeam;
-import org.cafienne.humantask.akka.command.*;
-import org.cafienne.platform.akka.command.GetUpdateStatus;
-import org.cafienne.platform.akka.command.UpdatePlatformInformation;
-import org.cafienne.processtask.akka.command.*;
-import org.cafienne.tenant.akka.command.*;
-import org.cafienne.tenant.akka.command.platform.CreateTenant;
-import org.cafienne.tenant.akka.command.platform.DisableTenant;
-import org.cafienne.tenant.akka.command.platform.EnableTenant;
-import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
+import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
+import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
+import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
+import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
+import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode;
+import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent;
+import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
+import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
+import org.cafienne.cmmn.actorapi.command.team.PutTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.RemoveTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.SetCaseTeam;
+import org.cafienne.humantask.actorapi.command.*;
+import org.cafienne.platform.actorapi.command.GetUpdateStatus;
+import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
+import org.cafienne.processtask.actorapi.command.*;
+import org.cafienne.tenant.actorapi.command.*;
+import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
+import org.cafienne.tenant.actorapi.command.platform.DisableTenant;
+import org.cafienne.tenant.actorapi.command.platform.EnableTenant;
+import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 
 public class CommandSerializer extends CafienneSerializer {
     static void register() {

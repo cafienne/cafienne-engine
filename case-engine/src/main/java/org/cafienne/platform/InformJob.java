@@ -6,8 +6,8 @@ import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.command.UpdateCaseWithPlatformInformation;
-import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
+import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
+import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 
 import java.io.IOException;
 

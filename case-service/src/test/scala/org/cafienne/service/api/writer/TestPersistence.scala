@@ -2,7 +2,7 @@ package org.cafienne.service.api.writer
 
 import akka.Done
 import akka.persistence.query.Offset
-import org.cafienne.cmmn.akka.command.platform.NewUserInformation
+import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.projection.record._
 

@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions.file;
 
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueList;

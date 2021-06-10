@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.akka.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;

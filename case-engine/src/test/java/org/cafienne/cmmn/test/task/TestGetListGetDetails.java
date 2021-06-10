@@ -8,11 +8,10 @@
 package org.cafienne.cmmn.test.task;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
@@ -21,8 +20,8 @@ import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.processtask.akka.event.ProcessCompleted;
-import org.cafienne.processtask.akka.event.ProcessFailed;
+import org.cafienne.processtask.actorapi.event.ProcessCompleted;
+import org.cafienne.processtask.actorapi.event.ProcessFailed;
 import org.junit.Rule;
 import org.junit.Test;
 

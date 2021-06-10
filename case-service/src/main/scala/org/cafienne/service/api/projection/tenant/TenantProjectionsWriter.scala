@@ -8,7 +8,7 @@ import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.projection.slick.SlickEventMaterializer
 import org.cafienne.service.api.projection.{LastModifiedRegistration, RecordsPersistence}
 import org.cafienne.service.api.tenant.TenantReader
-import org.cafienne.tenant.akka.event.TenantEvent
+import org.cafienne.tenant.actorapi.event.TenantEvent
 
 class TenantProjectionsWriter
   (userQueries: UserQueries, updater: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)

@@ -2,9 +2,9 @@ package org.cafienne.infrastructure.akka.http
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
-import org.cafienne.cmmn.akka.command.response.{CaseResponse, CaseResponseWithValueMap}
-import org.cafienne.humantask.akka.command.response.HumanTaskResponse
-import org.cafienne.tenant.akka.command.response.TenantOwnersResponse
+import org.cafienne.cmmn.actorapi.command.response.{CaseResponse, CaseResponseWithValueMap}
+import org.cafienne.humantask.actorapi.command.response.HumanTaskResponse
+import org.cafienne.tenant.actorapi.command.response.TenantOwnersResponse
 
 /**
   * This file contains some marshallers and unmarshallers for responses from ModelActors

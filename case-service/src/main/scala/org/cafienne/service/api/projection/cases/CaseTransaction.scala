@@ -6,11 +6,11 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.akka.actor.event.TransactionEvent
 import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.akka.actor.serialization.json.{JSONReader, ValueMap}
-import org.cafienne.cmmn.akka.event._
-import org.cafienne.cmmn.akka.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
-import org.cafienne.cmmn.akka.event.plan._
-import org.cafienne.cmmn.akka.event.team._
-import org.cafienne.humantask.akka.event._
+import org.cafienne.cmmn.actorapi.event._
+import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
+import org.cafienne.cmmn.actorapi.event.plan._
+import org.cafienne.cmmn.actorapi.event.team._
+import org.cafienne.humantask.actorapi.event._
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.api.projection.RecordsPersistence
 import org.cafienne.service.api.projection.record._

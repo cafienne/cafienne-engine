@@ -1,7 +1,7 @@
 package org.cafienne.service.api.projection.cases;
 
-import org.cafienne.cmmn.akka.event.file.CaseFileEvent;
-import org.cafienne.cmmn.akka.event.file.CaseFileItemChildRemoved;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
 import org.cafienne.cmmn.instance.casefile.Path;
 
 import java.util.ArrayList;

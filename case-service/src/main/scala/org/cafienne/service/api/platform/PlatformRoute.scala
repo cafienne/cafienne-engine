@@ -19,7 +19,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.PlatformQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
-import org.cafienne.tenant.akka.command.platform.{DisableTenant, EnableTenant}
+import org.cafienne.tenant.actorapi.command.platform.{DisableTenant, EnableTenant}
 
 import javax.ws.rs._
 

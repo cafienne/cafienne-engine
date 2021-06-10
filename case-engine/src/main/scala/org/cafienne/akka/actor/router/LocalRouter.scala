@@ -3,7 +3,7 @@ package org.cafienne.akka.actor.router
 import akka.actor.{ActorRef, Props, Terminated}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.platform.akka.command.PlatformCommand
+import org.cafienne.platform.actorapi.command.PlatformCommand
 
 /**
   * In-memory router for akka messages sent in the CaseSystem.

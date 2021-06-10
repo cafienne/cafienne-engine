@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs._
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api

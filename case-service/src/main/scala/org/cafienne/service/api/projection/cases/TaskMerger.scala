@@ -1,7 +1,7 @@
 package org.cafienne.service.api.projection.cases
 
 import org.cafienne.akka.actor.event.TransactionEvent
-import org.cafienne.humantask.akka.event._
+import org.cafienne.humantask.actorapi.event._
 import org.cafienne.service.api.projection.record.TaskRecord
 
 object TaskMerger {

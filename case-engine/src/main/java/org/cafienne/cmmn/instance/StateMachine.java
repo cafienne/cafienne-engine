@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cafienne.akka.actor.command.exception.CommandException;
-import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 
 /**
  * Simple state machine logic, with an indirection to figure out where we are and where we go

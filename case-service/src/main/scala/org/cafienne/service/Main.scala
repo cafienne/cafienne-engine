@@ -11,9 +11,9 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.util.Timeout
+import org.cafienne.BuildInfo
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.cmmn.akka.BuildInfo
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.cqrs.QueryDBOffsetStorageProvider

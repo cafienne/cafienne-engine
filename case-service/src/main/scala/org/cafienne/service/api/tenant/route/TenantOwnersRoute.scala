@@ -21,7 +21,7 @@ import org.cafienne.akka.actor.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.projection.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command._
+import org.cafienne.tenant.actorapi.command._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")

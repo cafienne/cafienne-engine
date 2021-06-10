@@ -18,9 +18,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.config.Cafienne
 import org.cafienne.akka.actor.serialization.json.ValueMap
-import org.cafienne.cmmn.akka.command.StartCase
-import org.cafienne.cmmn.akka.command.response.CaseStartedResponse
-import org.cafienne.cmmn.akka.command.team.CaseTeamMember
+import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.cmmn.actorapi.command.response.CaseStartedResponse
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider

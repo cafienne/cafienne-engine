@@ -2,16 +2,15 @@ package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.team.CaseTeam;
-import org.cafienne.cmmn.akka.command.team.CaseTeamMember;
-import org.cafienne.cmmn.akka.command.team.MemberKey;
-import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.akka.event.team.*;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.tenant.User;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

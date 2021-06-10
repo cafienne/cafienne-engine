@@ -4,13 +4,13 @@ import akka.actor.{ActorRef, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.cmmn.akka.command.CaseCommand
+import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
-import org.cafienne.platform.akka.command.PlatformCommand
-import org.cafienne.processtask.akka.command.ProcessCommand
+import org.cafienne.platform.actorapi.command.PlatformCommand
+import org.cafienne.processtask.actorapi.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.tenant.TenantActor
-import org.cafienne.tenant.akka.command.TenantCommand
+import org.cafienne.tenant.actorapi.command.TenantCommand
 
 /**
   * Clustered representation, router as singleton actor

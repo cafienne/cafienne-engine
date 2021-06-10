@@ -2,12 +2,12 @@ package org.cafienne.processtask.instance;
 
 import org.cafienne.akka.actor.CaseSystem;
 import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.cmmn.akka.command.plan.task.CompleteTask;
-import org.cafienne.cmmn.akka.command.plan.task.FailTask;
+import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
+import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.processtask.akka.command.*;
-import org.cafienne.processtask.akka.command.response.ProcessResponse;
-import org.cafienne.processtask.akka.event.*;
+import org.cafienne.processtask.actorapi.command.*;
+import org.cafienne.processtask.actorapi.command.response.ProcessResponse;
+import org.cafienne.processtask.actorapi.event.*;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.slf4j.Logger;

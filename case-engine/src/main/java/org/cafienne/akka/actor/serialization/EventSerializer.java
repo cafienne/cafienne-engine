@@ -2,25 +2,25 @@ package org.cafienne.akka.actor.serialization;
 
 import org.cafienne.akka.actor.event.EngineVersionChanged;
 import org.cafienne.akka.actor.event.SentryEvent;
-import org.cafienne.cmmn.akka.event.*;
-import org.cafienne.cmmn.akka.event.DebugDisabled;
-import org.cafienne.cmmn.akka.event.DebugEnabled;
+import org.cafienne.cmmn.actorapi.event.*;
+import org.cafienne.cmmn.actorapi.event.DebugDisabled;
+import org.cafienne.cmmn.actorapi.event.DebugEnabled;
 import org.cafienne.akka.actor.event.DebugEvent;
-import org.cafienne.cmmn.akka.event.file.*;
-import org.cafienne.cmmn.akka.event.plan.eventlistener.*;
-import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.akka.event.plan.RequiredRuleEvaluated;
-import org.cafienne.cmmn.akka.event.plan.task.TaskInputFilled;
-import org.cafienne.cmmn.akka.event.plan.task.TaskOutputFilled;
-import org.cafienne.cmmn.akka.event.team.*;
-import org.cafienne.humantask.akka.event.*;
-import org.cafienne.processtask.akka.event.*;
-import org.cafienne.tenant.akka.event.*;
-import org.cafienne.tenant.akka.event.platform.TenantCreated;
-import org.cafienne.tenant.akka.event.platform.TenantDisabled;
-import org.cafienne.tenant.akka.event.platform.TenantEnabled;
+import org.cafienne.cmmn.actorapi.event.file.*;
+import org.cafienne.cmmn.actorapi.event.plan.eventlistener.*;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
+import org.cafienne.cmmn.actorapi.event.team.*;
+import org.cafienne.humantask.actorapi.event.*;
+import org.cafienne.processtask.actorapi.event.*;
+import org.cafienne.tenant.actorapi.event.*;
+import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
+import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
+import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
 
 public class EventSerializer extends CafienneSerializer {
     static void register() {

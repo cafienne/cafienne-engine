@@ -15,7 +15,7 @@ import org.cafienne.akka.actor.serialization.json.JSONParseFailure;
 import org.cafienne.akka.actor.serialization.json.JSONReader;
 import org.cafienne.akka.actor.serialization.json.Value;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
+import org.cafienne.cmmn.actorapi.command.response.CaseResponse;
 import org.cafienne.util.Guid;
 
 import java.io.IOException;

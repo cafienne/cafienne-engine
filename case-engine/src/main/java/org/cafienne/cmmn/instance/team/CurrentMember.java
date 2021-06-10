@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.w3c.dom.Element;

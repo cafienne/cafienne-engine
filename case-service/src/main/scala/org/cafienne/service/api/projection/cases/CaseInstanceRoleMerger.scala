@@ -1,6 +1,6 @@
 package org.cafienne.service.api.projection.cases
 
-import org.cafienne.cmmn.akka.event.CaseDefinitionApplied
+import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied
 import org.cafienne.service.api.projection.record.CaseRoleRecord
 
 object CaseInstanceRoleMerger {

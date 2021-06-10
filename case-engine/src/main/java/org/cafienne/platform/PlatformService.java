@@ -9,10 +9,10 @@ import org.cafienne.akka.actor.config.Cafienne;
 import org.cafienne.akka.actor.event.ModelEvent;
 import org.cafienne.akka.actor.event.TransactionEvent;
 import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
-import org.cafienne.platform.akka.command.GetUpdateStatus;
-import org.cafienne.platform.akka.command.PlatformCommand;
-import org.cafienne.platform.akka.command.UpdatePlatformInformation;
-import org.cafienne.platform.akka.response.PlatformUpdateStatus;
+import org.cafienne.platform.actorapi.command.GetUpdateStatus;
+import org.cafienne.platform.actorapi.command.PlatformCommand;
+import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
+import org.cafienne.platform.actorapi.response.PlatformUpdateStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

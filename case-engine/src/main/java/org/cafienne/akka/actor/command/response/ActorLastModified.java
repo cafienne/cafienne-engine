@@ -7,7 +7,7 @@
  */
 package org.cafienne.akka.actor.command.response;
 
-import org.cafienne.cmmn.akka.command.response.InvalidCaseLastModifiedException;
+import org.cafienne.cmmn.actorapi.command.response.InvalidCaseLastModifiedException;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;

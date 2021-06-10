@@ -14,8 +14,8 @@ import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api
 import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenantFormat, UserFormat}
-import org.cafienne.tenant.akka.command.{TenantCommand, TenantUserInformation}
-import org.cafienne.tenant.akka.command.platform.{CreateTenant, PlatformTenantCommand}
+import org.cafienne.tenant.actorapi.command.{TenantCommand, TenantUserInformation}
+import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, PlatformTenantCommand}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
 

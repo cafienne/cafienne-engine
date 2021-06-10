@@ -2,7 +2,7 @@ package org.cafienne.service.api.projection.cases
 
 import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.akka.event.CaseEvent
+import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider}
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.projection.slick.SlickEventMaterializer

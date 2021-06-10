@@ -7,7 +7,6 @@ import org.cafienne.akka.actor.command.exception.AuthorizationException;
 import org.cafienne.akka.actor.command.response.CommandFailure;
 import org.cafienne.akka.actor.command.response.ModelResponse;
 import org.cafienne.akka.actor.event.ModelEvent;
-import org.cafienne.cmmn.akka.command.response.CaseResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

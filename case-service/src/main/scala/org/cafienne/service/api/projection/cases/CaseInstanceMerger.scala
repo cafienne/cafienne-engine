@@ -1,6 +1,6 @@
 package org.cafienne.service.api.projection.cases
 
-import org.cafienne.cmmn.akka.event.{CaseDefinitionApplied, CaseModified}
+import org.cafienne.cmmn.actorapi.event.{CaseDefinitionApplied, CaseModified}
 import org.cafienne.cmmn.instance.State
 import org.cafienne.service.api.projection.record.CaseRecord
 

@@ -9,12 +9,12 @@ package org.cafienne.akka.actor.tagging
 
 import akka.persistence.journal.{Tagged, WriteEventAdapter}
 import org.cafienne.akka.actor.event.ModelEvent
-import org.cafienne.cmmn.akka.event.plan.eventlistener.TimerBaseEvent
-import org.cafienne.cmmn.akka.event.team.CaseTeamEvent
-import org.cafienne.cmmn.akka.event.{CaseEvent, CaseModified}
-import org.cafienne.humantask.akka.event.HumanTaskEvent
-import org.cafienne.processtask.akka.event.ProcessInstanceEvent
-import org.cafienne.tenant.akka.event.TenantEvent
+import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerBaseEvent
+import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent
+import org.cafienne.cmmn.actorapi.event.{CaseEvent, CaseModified}
+import org.cafienne.humantask.actorapi.event.HumanTaskEvent
+import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
+import org.cafienne.tenant.actorapi.event.TenantEvent
 
 class CaseTaggingEventAdapter extends WriteEventAdapter {
   override def manifest(event: Any): String = ""

@@ -6,7 +6,7 @@ import akka.persistence.query.Offset
 import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.akka.actor.command.response.{CommandFailure, ModelResponse}
 import org.cafienne.akka.actor.event.ModelEvent
-import org.cafienne.cmmn.akka.event.plan.eventlistener._
+import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
 import org.cafienne.infrastructure.cqrs.{OffsetStorage, TaggedEventConsumer}
 import org.cafienne.timerservice.persistence.{TimerStore, TimerStoreProvider}
 

@@ -1,7 +1,7 @@
 package org.cafienne.akka.actor
 
 import org.cafienne.akka.actor.serialization.json.{JSONReader, ValueMap}
-import org.cafienne.cmmn.akka.BuildInfo
+import org.cafienne.BuildInfo
 
 class CafienneVersion(val json: ValueMap = JSONReader.parse(BuildInfo.toJson).asInstanceOf[ValueMap]) {
   val description: String = {

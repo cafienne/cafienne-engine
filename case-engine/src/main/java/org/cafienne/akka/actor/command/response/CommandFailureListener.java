@@ -1,6 +1,6 @@
 package org.cafienne.akka.actor.command.response;
 
-import org.cafienne.cmmn.akka.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 
 /**

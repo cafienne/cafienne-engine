@@ -7,9 +7,9 @@ import org.cafienne.akka.actor.serialization.CafienneSerializable;
 import org.cafienne.akka.actor.serialization.Fields;
 import org.cafienne.akka.actor.serialization.json.ValueList;
 import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.command.UpdateCaseWithPlatformInformation;
-import org.cafienne.platform.akka.command.UpdatePlatformInformation;
-import org.cafienne.tenant.akka.command.platform.UpdateTenantWithPlatformInformation;
+import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
+import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
+import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 
 import java.io.IOException;
 import java.time.Instant;
