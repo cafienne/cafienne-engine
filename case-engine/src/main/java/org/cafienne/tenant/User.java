@@ -115,12 +115,20 @@ public class User {
         }
     }
 
-    public TenantUserRoleRemoved removeRole(String role) {
-        return addEvent(new TenantUserRoleRemoved(tenant, userId, role));
+    public boolean removeRole(String role) {
+        if (roles.contains(role)) {
+            addEvent(new TenantUserRoleRemoved(tenant, userId, role));
+            return true;
+        }
+        return false;
     }
 
-    public TenantUserRoleAdded addRole(String role) {
-        return addEvent(new TenantUserRoleAdded(tenant, userId, role));
+    public boolean addRole(String role) {
+        if (! roles.contains(role)) {
+            addEvent(new TenantUserRoleAdded(tenant, userId, role));
+            return true;
+        }
+        return false;
     }
 
     public void disable() {
