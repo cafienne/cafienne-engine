@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.file;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.expression.spel.SpelPropertyValueProvider;
 import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;

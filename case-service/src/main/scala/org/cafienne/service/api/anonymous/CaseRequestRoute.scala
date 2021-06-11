@@ -15,17 +15,17 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.serialization.json.ValueMap
-import org.cafienne.cmmn.akka.command.StartCase
-import org.cafienne.cmmn.akka.command.response.CaseStartedResponse
-import org.cafienne.cmmn.akka.command.team.CaseTeamMember
+import org.cafienne.json.ValueMap
+import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.cmmn.actorapi.response.CaseStartedResponse
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.anonymous.CaseRequestRoute.AnonymousStartCaseFormat
+import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 
 import javax.ws.rs._

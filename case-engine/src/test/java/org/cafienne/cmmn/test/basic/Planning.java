@@ -7,11 +7,11 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.cmmn.akka.command.*;
-import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
-import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
-import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.actorapi.command.*;
+import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
@@ -19,7 +19,7 @@ import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.junit.Test;
 
 public class Planning {

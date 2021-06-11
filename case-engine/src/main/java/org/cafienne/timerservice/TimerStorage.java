@@ -1,10 +1,10 @@
 package org.cafienne.timerservice;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.Manifest;
-import org.cafienne.akka.actor.snapshot.ModelActorSnapshot;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.actormodel.snapshot.ModelActorSnapshot;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 import java.util.ArrayList;

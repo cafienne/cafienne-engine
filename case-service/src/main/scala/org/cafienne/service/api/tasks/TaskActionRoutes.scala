@@ -15,17 +15,17 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.json.ValueMap
 
 import javax.ws.rs._
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
-import org.cafienne.akka.actor.serialization.json.ValueMap
-import org.cafienne.cmmn.akka.command.CaseCommandModels
-import org.cafienne.humantask.akka.command._
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.cmmn.actorapi.command.CaseCommandModels
+import org.cafienne.humantask.actorapi.command._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.service.api.model.Examples
-import org.cafienne.service.api.projection.query.{TaskCount, TaskQueries}
+import org.cafienne.service.db.query.{TaskCount, TaskQueries}
+import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")

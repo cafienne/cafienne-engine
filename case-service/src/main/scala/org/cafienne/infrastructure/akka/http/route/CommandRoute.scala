@@ -3,15 +3,17 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.akka.actor.command.ModelCommand
-import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
-import org.cafienne.cmmn.akka.command.response.CaseResponse
-import org.cafienne.humantask.akka.command.response.{HumanTaskResponse, HumanTaskValidationResponse}
+import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
+import org.cafienne.actormodel.command.response.SecurityFailure
+import org.cafienne.cmmn.actorapi.response.CaseResponse
+import org.cafienne.humantask.actorapi.response.{HumanTaskResponse, HumanTaskValidationResponse}
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.platform.akka.response.{PlatformResponse, PlatformUpdateStatus}
-import org.cafienne.service.{Main, api}
-import org.cafienne.tenant.akka.command.response.{TenantOwnersResponse, TenantResponse}
+import org.cafienne.platform.actorapi.response.{PlatformResponse, PlatformUpdateStatus}
+import org.cafienne.service.Main
+import org.cafienne.service.api.Headers
+import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
 import scala.util.{Failure, Success}
 
@@ -28,7 +30,7 @@ trait CommandRoute extends AuthenticatedRoute {
           case e: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case tenantOwners: TenantOwnersResponse => complete(StatusCodes.OK, tenantOwners)
-          case value: TenantResponse => writeLastModifiedHeader(value, api.TENANT_LAST_MODIFIED) {
+          case value: TenantResponse => writeLastModifiedHeader(value, Headers.TENANT_LAST_MODIFIED) {
             complete(StatusCodes.NoContent)
           }
           case value: HumanTaskValidationResponse =>

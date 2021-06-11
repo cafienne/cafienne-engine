@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.test.assertions.event;
 
-import org.cafienne.cmmn.akka.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.CaseEvent;
 
 /**
  * Basic assertions around case instance events.

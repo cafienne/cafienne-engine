@@ -1,0 +1,54 @@
+package org.cafienne.tenant.actorapi.command;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
+import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.User;
+import org.cafienne.tenant.actorapi.exception.TenantException;
+import org.cafienne.tenant.actorapi.response.TenantResponse;
+
+import java.io.IOException;
+
+/**
+ * Helper class that validates the existence of specified user id in the tenant
+ */
+abstract class ExistingUserCommand extends TenantCommand {
+    public final String userId;
+
+    public ExistingUserCommand(TenantUser tenantOwner, String userId) {
+        super(tenantOwner);
+        this.userId = userId;
+    }
+
+    public ExistingUserCommand(ValueMap json) {
+        super(json);
+        this.userId = readField(json, Fields.userId);
+    }
+
+    @Override
+    public void validate(TenantActor tenant) throws InvalidCommandException {
+        super.validate(tenant);
+        if (tenant.getUser(userId) == null) {
+            throw new TenantException("User '" + userId + "' doesn't exist in tenant " + tenant.getId());
+        }
+    }
+
+    @Override
+    public ModelResponse process(TenantActor tenant) {
+        User user = tenant.getUser(userId);
+        updateUser(user);
+        return new TenantResponse(this);
+    }
+
+    protected abstract void updateUser(User user);
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        super.write(generator);
+        writeField(generator, Fields.userId, userId);
+    }
+}

@@ -4,9 +4,10 @@ import akka.actor.ActorSystem
 import akka.persistence.query.EventEnvelope
 import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.event.ModelEvent
-import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.akka.actor.serialization.json.{ValueList, ValueMap}
+import org.cafienne.actormodel.event.ModelEvent
+import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.json.{ValueList, ValueMap}
+import org.cafienne.json.ValueList
 import org.cafienne.infrastructure.cqrs.{OffsetRecord, ReadJournalProvider}
 
 import scala.concurrent.Future

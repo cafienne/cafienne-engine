@@ -7,13 +7,11 @@
  */
 package org.cafienne.cmmn.instance.task.process;
 
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ProcessTaskDefinition;
 import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.processtask.akka.command.*;
 
 public class ProcessTask extends Task<ProcessTaskDefinition> {
     private final ProcessInformer informer;

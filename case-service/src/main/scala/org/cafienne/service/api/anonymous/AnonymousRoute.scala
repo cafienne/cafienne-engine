@@ -8,22 +8,16 @@
 package org.cafienne.service.api.anonymous
 
 import _root_.akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.exception.SerializedException
-import org.cafienne.akka.actor.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
-import org.cafienne.cmmn.akka.command.StartCase
-import org.cafienne.cmmn.akka.command.response.CaseStartedResponse
-import org.cafienne.cmmn.akka.command.team.CaseTeamMember
-import org.cafienne.cmmn.akka.response.CaseResponseModels.StartCaseResponse
-import org.cafienne.identity.IdentityProvider
+import org.cafienne.actormodel.command.exception.SerializedException
+import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure}
+import org.cafienne.actormodel.command.response.CommandFailure
+import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.service.Main
-import org.cafienne.service.api.CASE_LAST_MODIFIED
-import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 import scala.util.{Failure, Success}

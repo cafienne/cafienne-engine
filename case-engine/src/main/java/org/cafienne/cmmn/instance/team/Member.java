@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.team;
 
-import org.cafienne.cmmn.akka.command.team.MemberKey;
-import org.cafienne.cmmn.akka.event.team.*;
+import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;

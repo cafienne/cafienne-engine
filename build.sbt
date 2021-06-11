@@ -138,7 +138,7 @@ lazy val engine = project("case-engine")
     sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.BuildTime,
     sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.ToMap,
     sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.ToJson,
-    sbtbuildinfo.BuildInfoKeys.buildInfoPackage := "org.cafienne.cmmn.akka",
+    sbtbuildinfo.BuildInfoKeys.buildInfoPackage := "org.cafienne",
     sbtbuildinfo.BuildInfoKeys.buildInfoObject := "BuildInfo"
   )
   .enablePlugins(BuildInfoPlugin)

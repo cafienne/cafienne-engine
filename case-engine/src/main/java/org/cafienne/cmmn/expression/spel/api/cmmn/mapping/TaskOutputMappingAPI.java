@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.mapping;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.instance.Task;
 

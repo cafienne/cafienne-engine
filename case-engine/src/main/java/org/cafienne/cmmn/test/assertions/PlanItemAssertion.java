@@ -7,11 +7,11 @@
  */
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.akka.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.akka.event.plan.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.akka.event.plan.RequiredRuleEvaluated;
-import org.cafienne.cmmn.akka.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;

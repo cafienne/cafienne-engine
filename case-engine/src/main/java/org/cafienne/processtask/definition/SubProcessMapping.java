@@ -7,8 +7,8 @@
  */
 package org.cafienne.processtask.definition;
 
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ExpressionDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;

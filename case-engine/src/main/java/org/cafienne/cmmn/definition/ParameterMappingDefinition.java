@@ -12,7 +12,7 @@ import java.util.Map;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.task.TaskImplementationContract;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.w3c.dom.Element;
 

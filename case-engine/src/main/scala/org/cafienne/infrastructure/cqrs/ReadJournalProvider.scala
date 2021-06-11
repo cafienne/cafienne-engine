@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.scaladsl._
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.config.Cafienne
+import org.cafienne.infrastructure.Cafienne
 
 /**
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)

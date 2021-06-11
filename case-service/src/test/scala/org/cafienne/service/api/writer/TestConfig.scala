@@ -22,10 +22,10 @@ object TestConfig {
       |          serialize-messages = off
       |
       |          serializers {
-      |            cafienne_serializer = "org.cafienne.akka.actor.serialization.CafienneSerializer"
+      |            cafienne_serializer = "org.cafienne.infrastructure.serialization.CafienneSerializer"
       |          }
       |          serialization-bindings {
-      |            "org.cafienne.akka.actor.serialization.CafienneSerializable" = cafienne_serializer
+      |            "org.cafienne.infrastructure.serialization.CafienneSerializable" = cafienne_serializer
       |          }
       |        }
       |
@@ -44,11 +44,10 @@ object TestConfig {
       |
       |    inmemory-journal {
       |      event-adapters {
-      |         tagging = "org.cafienne.akka.actor.tagging.CaseTaggingEventAdapter"
-      |
+      |         tagging = "org.cafienne.actormodel.tagging.CaseTaggingEventAdapter"
       |      }
       |      event-adapter-bindings {
-      |        "org.cafienne.akka.actor.event.ModelEvent" = tagging
+      |        "org.cafienne.actormodel.event.ModelEvent" = tagging
       |      }
       |    }
     """.stripMargin

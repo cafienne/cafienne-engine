@@ -2,8 +2,8 @@ package org.cafienne.timerservice
 
 import akka.actor.Cancellable
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.cmmn.akka.command.plan.eventlistener.RaiseEvent
+import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
+import org.cafienne.system.CaseSystem
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global

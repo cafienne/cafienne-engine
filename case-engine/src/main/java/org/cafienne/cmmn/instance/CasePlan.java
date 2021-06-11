@@ -7,12 +7,12 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.akka.actor.identity.TenantUser;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
-import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.command.plan.task.CompleteTask;
-import org.cafienne.cmmn.akka.command.plan.task.FailTask;
+import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
+import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

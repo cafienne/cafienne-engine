@@ -1,6 +1,6 @@
 package org.cafienne.service.api.model
 
-import org.cafienne.akka.actor.serialization.json.ValueMap
+import org.cafienne.json.ValueMap
 import org.cafienne.infrastructure.akka.http.JsonUtil
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers

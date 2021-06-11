@@ -10,12 +10,13 @@ package org.cafienne.service.api.tasks
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
-import org.cafienne.humantask.akka.command.WorkflowCommand
+import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.humantask.actorapi.command.WorkflowCommand
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
-import org.cafienne.service.api.projection.TaskSearchFailure
-import org.cafienne.service.api.projection.query.TaskQueries
+import org.cafienne.service.db.query.TaskQueries
+import org.cafienne.service.db.query.exception.TaskSearchFailure
 
 import scala.util.{Failure, Success}
 

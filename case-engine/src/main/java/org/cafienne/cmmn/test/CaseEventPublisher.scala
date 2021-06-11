@@ -4,8 +4,7 @@ import akka.actor.ActorSystem
 import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.{Done, NotUsed}
-import org.cafienne.akka.actor.event.ModelEvent
-import org.cafienne.akka.actor.serialization.{DeserializationFailure, UnrecognizedManifest}
+import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 
 import scala.concurrent.Future

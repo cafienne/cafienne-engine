@@ -7,10 +7,9 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.event.file.CaseFileItemChildRemoved;
-import org.cafienne.cmmn.definition.Multiplicity;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;

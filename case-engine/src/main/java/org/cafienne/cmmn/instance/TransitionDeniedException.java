@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.akka.actor.command.exception.CommandException;
+import org.cafienne.actormodel.command.exception.CommandException;
 
 public class TransitionDeniedException extends CommandException {
     public TransitionDeniedException(String msg) {

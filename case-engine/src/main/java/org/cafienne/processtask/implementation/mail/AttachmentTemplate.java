@@ -1,7 +1,7 @@
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.XMLElementDefinition;

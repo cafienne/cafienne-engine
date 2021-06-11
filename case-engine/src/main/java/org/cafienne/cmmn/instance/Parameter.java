@@ -7,11 +7,9 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 
 import java.io.Serializable;
 

@@ -1,7 +1,8 @@
 package org.cafienne.identity
 
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
-import org.cafienne.service.api.projection.record.UserRoleRecord
+import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.service.db.record.UserRoleRecord
 
 object TestIdentityFactory {
 

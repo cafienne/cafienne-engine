@@ -1,6 +1,6 @@
 package org.cafienne.processtask.implementation.report;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
 
 public class MissingParameterException extends InvalidCommandException {
     public MissingParameterException(String msg) {

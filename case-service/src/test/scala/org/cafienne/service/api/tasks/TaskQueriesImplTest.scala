@@ -1,15 +1,14 @@
 package org.cafienne.service.api.tasks
 
 import java.time.Instant
-
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.api.projection.TaskSearchFailure
-import org.cafienne.service.api.projection.query.TaskQueriesImpl
-import org.cafienne.service.api.projection.record.{CaseRecord, CaseTeamMemberRecord, TaskRecord}
-import org.cafienne.service.api.projection.slick.SlickRecordsPersistence
-import org.cafienne.service.db.querydb.{QueryDB, QueryDBSchema}
+import org.cafienne.service.db.query.TaskQueriesImpl
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord, TaskRecord}
+import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
+import org.cafienne.service.db.query.exception.TaskSearchFailure
+import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers

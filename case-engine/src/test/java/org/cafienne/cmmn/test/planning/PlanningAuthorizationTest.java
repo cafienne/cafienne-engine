@@ -8,12 +8,12 @@
 
 package org.cafienne.cmmn.test.planning;
 
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.plan.AddDiscretionaryItem;
-import org.cafienne.cmmn.akka.command.plan.GetDiscretionaryItems;
-import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.command.response.GetDiscretionaryItemsResponse;
-import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
+import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;

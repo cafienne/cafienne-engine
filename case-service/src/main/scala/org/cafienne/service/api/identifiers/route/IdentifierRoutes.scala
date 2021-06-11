@@ -8,11 +8,11 @@
 package org.cafienne.service.api.identifiers.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.akka.actor.CaseSystem
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.service.api.cases.CaseReader
-import org.cafienne.service.api.projection.query.IdentifierQueries
+import org.cafienne.service.db.query.IdentifierQueries
+import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 

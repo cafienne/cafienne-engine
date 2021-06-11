@@ -1,17 +1,16 @@
 package org.cafienne.tenant;
 
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.platform.PlatformUpdate;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.tenant.akka.command.TenantCommand;
-import org.cafienne.tenant.akka.command.TenantUserInformation;
-import org.cafienne.tenant.akka.event.*;
-import org.cafienne.tenant.akka.event.platform.TenantCreated;
-import org.cafienne.tenant.akka.event.platform.TenantDisabled;
-import org.cafienne.tenant.akka.event.platform.TenantEnabled;
+import org.cafienne.system.CaseSystem;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.event.TransactionEvent;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
+import org.cafienne.tenant.actorapi.command.TenantCommand;
+import org.cafienne.tenant.actorapi.command.TenantUserInformation;
+import org.cafienne.tenant.actorapi.event.*;
+import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
+import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
+import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +29,6 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
 
     public TenantActor(CaseSystem caseSystem) {
         super(TenantCommand.class, TenantEvent.class, caseSystem);
-    }
-
-    @Override
-    public String getParentActorId() {
-        return "";
-    }
-
-    @Override
-    public String getRootActorId() {
-        return getId();
     }
 
     @Override

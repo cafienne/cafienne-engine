@@ -1,10 +1,10 @@
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.akka.actor.serialization.json.Value;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierCleared;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierEvent;
-import org.cafienne.cmmn.akka.event.file.BusinessIdentifierSet;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
+import org.cafienne.cmmn.actorapi.event.file.BusinessIdentifierCleared;
+import org.cafienne.cmmn.actorapi.event.file.BusinessIdentifierEvent;
+import org.cafienne.cmmn.actorapi.event.file.BusinessIdentifierSet;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 
 class BusinessIdentifier {

@@ -8,11 +8,11 @@
 package org.cafienne.service.api.cases.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.service.db.query.CaseQueries
+import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")

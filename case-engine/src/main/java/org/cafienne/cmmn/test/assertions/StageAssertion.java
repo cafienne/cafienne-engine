@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.akka.event.plan.PlanItemCreated;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.instance.CasePlan;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.State;

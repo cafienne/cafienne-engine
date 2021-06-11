@@ -3,16 +3,16 @@ package org.cafienne.platform;
 import akka.persistence.SaveSnapshotFailure;
 import akka.persistence.SaveSnapshotSuccess;
 import akka.persistence.SnapshotOffer;
-import org.cafienne.akka.actor.CaseSystem;
-import org.cafienne.akka.actor.ModelActor;
-import org.cafienne.akka.actor.config.Cafienne;
-import org.cafienne.akka.actor.event.ModelEvent;
-import org.cafienne.akka.actor.event.TransactionEvent;
-import org.cafienne.akka.actor.handler.AkkaSystemMessageHandler;
-import org.cafienne.platform.akka.command.GetUpdateStatus;
-import org.cafienne.platform.akka.command.PlatformCommand;
-import org.cafienne.platform.akka.command.UpdatePlatformInformation;
-import org.cafienne.platform.akka.response.PlatformUpdateStatus;
+import org.cafienne.system.CaseSystem;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.event.TransactionEvent;
+import org.cafienne.actormodel.handler.AkkaSystemMessageHandler;
+import org.cafienne.platform.actorapi.command.GetUpdateStatus;
+import org.cafienne.platform.actorapi.command.PlatformCommand;
+import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
+import org.cafienne.platform.actorapi.response.PlatformUpdateStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,16 +50,6 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
             jobScheduler.wakeUp();
         }
         return super.createAkkaSystemMessageHandler(message);
-    }
-
-    @Override
-    public String getParentActorId() {
-        return "";
-    }
-
-    @Override
-    public String getRootActorId() {
-        return getId();
     }
 
     @Override

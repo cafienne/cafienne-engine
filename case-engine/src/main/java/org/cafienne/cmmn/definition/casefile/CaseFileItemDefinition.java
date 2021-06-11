@@ -17,7 +17,7 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemArray;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.w3c.dom.Element;
 
 public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {

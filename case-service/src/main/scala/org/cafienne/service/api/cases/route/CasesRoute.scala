@@ -10,14 +10,15 @@ package org.cafienne.service.api.cases.route
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
-import org.cafienne.cmmn.akka.command._
-import org.cafienne.cmmn.akka.command.team.{CaseTeam, CaseTeamMember, MemberKey}
+import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.cmmn.actorapi.command._
+import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat}
-import org.cafienne.service.api.projection.CaseSearchFailure
-import org.cafienne.service.api.projection.query.CaseQueries
+import org.cafienne.service.db.query.CaseQueries
+import org.cafienne.service.db.query.exception.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 

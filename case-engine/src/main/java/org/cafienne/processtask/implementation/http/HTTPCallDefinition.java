@@ -9,7 +9,7 @@ package org.cafienne.processtask.implementation.http;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
 import org.cafienne.processtask.definition.SubProcessDefinition;

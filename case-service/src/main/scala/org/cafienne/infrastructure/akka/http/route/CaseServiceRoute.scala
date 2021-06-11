@@ -8,15 +8,13 @@ import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.command.response.ModelResponse
-import org.cafienne.akka.actor.serialization.json.Value
-import org.cafienne.infrastructure.json.CafienneJson
-import org.cafienne.service.api
+import org.cafienne.actormodel.command.response.ModelResponse
+import org.cafienne.json.Value
+import org.cafienne.json.CafienneJson
+import org.cafienne.service.api.Headers
+import org.cafienne.system.CaseSystem
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 /**
   * Base class for Case Service APIs. All cors enabled
@@ -27,9 +25,9 @@ trait CaseServiceRoute extends LazyLogging {
   import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
   val corsSettings = CorsSettings.defaultSettings
-    .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", api.CASE_LAST_MODIFIED, api.TENANT_LAST_MODIFIED, "accept", "origin"))
+    .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", Headers.CASE_LAST_MODIFIED, Headers.TENANT_LAST_MODIFIED, "accept", "origin"))
     .withAllowedMethods(Seq(GET, POST, HEAD, OPTIONS, PUT, DELETE))
-    .withExposedHeaders(Seq(api.CASE_LAST_MODIFIED, api.TENANT_LAST_MODIFIED))
+    .withExposedHeaders(Seq(Headers.CASE_LAST_MODIFIED, Headers.TENANT_LAST_MODIFIED))
     .withMaxAge(Some(200L)
     )
 
@@ -90,7 +88,7 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
 
-  def writeLastModifiedHeader(response: ModelResponse, headerName: String = api.CASE_LAST_MODIFIED): Directive0 = {
+  def writeLastModifiedHeader(response: ModelResponse, headerName: String = Headers.CASE_LAST_MODIFIED): Directive0 = {
     respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
   }
 

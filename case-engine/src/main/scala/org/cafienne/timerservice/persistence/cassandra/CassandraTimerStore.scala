@@ -7,7 +7,7 @@ import akka.util.Timeout
 import com.datastax.driver.core.querybuilder.{Insert, QueryBuilder}
 import com.datastax.driver.core.schemabuilder.SchemaBuilder
 import com.datastax.driver.core.{BatchStatement, DataType}
-import org.cafienne.akka.actor.identity.TenantUser
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore

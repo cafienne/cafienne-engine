@@ -4,10 +4,10 @@ import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{RestartSource, Sink, Source}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.event.ModelEvent
-import org.cafienne.akka.actor.health.HealthMonitor
-import org.cafienne.akka.actor.serialization.{DeserializationFailure, UnrecognizedManifest}
+import org.cafienne.actormodel.event.ModelEvent
+import org.cafienne.infrastructure.Cafienne
+import org.cafienne.system.health.HealthMonitor
+import org.cafienne.infrastructure.serialization.{DeserializationFailure, UnrecognizedManifest}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

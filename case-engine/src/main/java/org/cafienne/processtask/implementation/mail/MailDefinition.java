@@ -7,10 +7,10 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.akka.actor.config.Cafienne;
-import org.cafienne.akka.actor.serialization.json.StringValue;
-import org.cafienne.akka.actor.serialization.json.ValueList;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;

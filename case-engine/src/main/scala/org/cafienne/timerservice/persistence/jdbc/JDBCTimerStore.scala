@@ -2,8 +2,8 @@ package org.cafienne.timerservice.persistence.jdbc
 
 import akka.Done
 import akka.persistence.query.Offset
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.identity.TenantUser
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
 import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage

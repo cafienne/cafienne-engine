@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.repository;
 
-import org.cafienne.akka.actor.identity.PlatformUser;
+import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 

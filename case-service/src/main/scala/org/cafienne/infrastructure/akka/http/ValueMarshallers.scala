@@ -3,7 +3,8 @@ package org.cafienne.infrastructure.akka.http
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshaller
-import org.cafienne.akka.actor.serialization.json.{JSONReader, Value, ValueList, ValueMap}
+import org.cafienne.json.{JSONReader, Value, ValueList, ValueMap}
+import org.cafienne.json.JSONReader
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Document
 

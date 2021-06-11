@@ -7,7 +7,7 @@
  */
 package org.cafienne.processtask.implementation.calculation.definition.expression;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.expression.spel.ExpressionEvaluator;

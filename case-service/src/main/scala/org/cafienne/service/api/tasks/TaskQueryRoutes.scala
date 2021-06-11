@@ -13,13 +13,14 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.api
-import org.cafienne.service.api.projection.query.{TaskCount, TaskFilter, TaskQueries}
+import org.cafienne.service.api.Headers
+import org.cafienne.service.db.query.filter.TaskFilter
+import org.cafienne.service.db.query.{TaskCount, TaskQueries}
+import org.cafienne.system.CaseSystem
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
@@ -47,7 +48,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
       new Parameter(name = "sortBy", description = "Field to sort on", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String], allowableValues = Array("taskstate", "assignee", "owner", "duedate", "createdby", "modifiedby", "lastmodified"))),
       new Parameter(name = "sortOrder", description = "Sort direction", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String])),
       new Parameter(name = "timeZone", description = "Time zone offset.Provide the time zone offset in the format '+01:00' ", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Tasks found", responseCode = "200"),
@@ -79,7 +80,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "The id of the case to get the tasks from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Tasks found and returned", responseCode = "200"),
@@ -104,7 +105,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     tags = Array("tasks"),
     parameters = Array(
       new Parameter(name = "taskId", description = "Id of the task to retrieve", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String], example = "timestamp;caseInstanceId"), required = false),
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String], example = "timestamp;caseInstanceId"), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Task found and returned", responseCode = "200"),
@@ -155,7 +156,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     parameters = Array(
       new Parameter(name = "tenant", description = "Optional tenant to get tasks from", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
       new Parameter(name = "caseName", description = "The name of cases to get the tasks for", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
       new ApiResponse(description = "Tasks found and returned", responseCode = "200"),

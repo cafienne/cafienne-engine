@@ -6,8 +6,8 @@ import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.health.HealthMonitor
+import org.cafienne.infrastructure.Cafienne
+import org.cafienne.system.health.HealthMonitor
 
 import java.text.ParseException
 import scala.concurrent.{ExecutionContext, Future}

@@ -12,13 +12,13 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.cafienne.akka.actor.CaseSystem
 
 import javax.ws.rs.{Consumes, DELETE, PUT, Path}
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.projection.query.UserQueries
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
-import org.cafienne.tenant.akka.command._
+import org.cafienne.system.CaseSystem
+import org.cafienne.tenant.actorapi.command._
 
 class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
   override val addToSwaggerRoutes = false

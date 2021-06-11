@@ -16,18 +16,19 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
+import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
+import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.json.ValueMap
 
 import javax.ws.rs._
-import org.cafienne.akka.actor.command.exception.{AuthorizationException, MissingTenantException}
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.akka.actor.identity.PlatformUser
-import org.cafienne.akka.actor.serialization.json.ValueMap
+import org.cafienne.actormodel.command.exception.MissingTenantException
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
+import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))

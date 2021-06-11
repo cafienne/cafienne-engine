@@ -7,13 +7,13 @@
  */
 package org.cafienne.cmmn.test.team;
 
-import org.cafienne.akka.actor.command.exception.InvalidCommandException;
-import org.cafienne.akka.actor.identity.TenantUser;
-import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.akka.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.command.team.*;
-import org.cafienne.cmmn.akka.event.team.TeamRoleCleared;
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.team.*;
+import org.cafienne.cmmn.actorapi.event.team.TeamRoleCleared;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.instance.team.CaseTeamError;

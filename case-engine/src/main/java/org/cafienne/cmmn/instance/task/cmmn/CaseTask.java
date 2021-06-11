@@ -7,10 +7,10 @@
  */
 package org.cafienne.cmmn.instance.task.cmmn;
 
-import org.cafienne.cmmn.akka.command.CaseCommand;
-import org.cafienne.cmmn.akka.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.akka.command.StartCase;
-import org.cafienne.cmmn.akka.command.team.CaseTeam;
+import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
@@ -18,7 +18,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

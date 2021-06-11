@@ -7,10 +7,10 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.akka.actor.serialization.CafienneSerializer;
-import org.cafienne.akka.actor.serialization.DeserializationError;
-import org.cafienne.akka.actor.serialization.Fields;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
+import org.cafienne.infrastructure.serialization.DeserializationError;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;

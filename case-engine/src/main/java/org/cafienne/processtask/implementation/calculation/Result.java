@@ -1,6 +1,6 @@
 package org.cafienne.processtask.implementation.calculation;
 
-import org.cafienne.akka.actor.serialization.json.Value;
+import org.cafienne.json.Value;
 import org.cafienne.processtask.implementation.calculation.operation.Source;
 
 public class Result {

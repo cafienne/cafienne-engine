@@ -15,20 +15,21 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.akka.actor.CaseSystem
-import org.cafienne.akka.actor.config.Cafienne
-import org.cafienne.cmmn.akka.command.StartCase
-import org.cafienne.cmmn.akka.command.debug.SwitchDebugMode
-import org.cafienne.cmmn.akka.command.team.CaseTeam
+import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.api
+import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases._
 import org.cafienne.service.api.model.StartCaseFormat
-import org.cafienne.service.api.projection.query.{CaseFilter, CaseQueries}
+import org.cafienne.service.db.query.CaseQueries
+import org.cafienne.service.db.query.filter.CaseFilter
+import org.cafienne.system.CaseSystem
 
 import java.util.UUID
 import javax.ws.rs._
@@ -112,7 +113,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
       new ApiResponse(description = "Case found and returned", responseCode = "200"),
@@ -136,7 +137,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     tags = Array("case"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
-      new Parameter(name = api.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
+      new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
       new ApiResponse(description = "Case definition found and returned", responseCode = "200"),

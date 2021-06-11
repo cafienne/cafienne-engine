@@ -3,7 +3,6 @@ package org.cafienne.infrastructure.akka.http.authentication
 import java.security.KeyPairGenerator
 import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 import java.util.Date
-
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.OAuth2BearerToken
@@ -16,8 +15,9 @@ import com.nimbusds.jose.jwk.{JWKSet, RSAKey}
 import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
-import org.cafienne.akka.actor.command.exception.AuthorizationException
-import org.cafienne.akka.actor.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.command.exception.AuthorizationException
+import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers

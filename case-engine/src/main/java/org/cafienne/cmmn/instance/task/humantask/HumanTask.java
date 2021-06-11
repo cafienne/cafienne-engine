@@ -7,15 +7,14 @@
  */
 package org.cafienne.cmmn.instance.task.humantask;
 
-import org.cafienne.akka.actor.serialization.json.ValueList;
-import org.cafienne.cmmn.akka.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.akka.actor.serialization.json.ValueMap;
+import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
-import org.cafienne.humantask.akka.event.*;
+import org.cafienne.humantask.actorapi.event.*;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.w3c.dom.Element;
 
