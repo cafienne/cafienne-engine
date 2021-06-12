@@ -80,7 +80,7 @@ object SystemConfig extends LazyLogging {
       if (value != newValue) {
         if (value == oldValue) {
           printWarning(s"""$location\n\tPlease change deprecated configuration property '$keyPath' to\n\n\t\t$key = "$newValue" """)
-          return config.withValue(path, ConfigValueFactory.fromAnyRef(newValue))
+          return config.withValue(keyPath, ConfigValueFactory.fromAnyRef(newValue))
         } else {
           printWarning(s"""$location\n\tConfiguration property '$keyPath' may have the wrong value; consider changing it to \n\n\t\t$key = "$newValue" """)
         }
