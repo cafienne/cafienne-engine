@@ -13,22 +13,30 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 
 public class ActorLastModified {
+    private final static String SEPARATOR = ";";
 
     //Variable to store the command completed moment
     private final Instant lastModified;
     //Variable to store the case instance identifier
     private final String actorId;
+    private final String string;
 
     public ActorLastModified(String actorId, Instant lastModified) {
         this.lastModified = lastModified;
         this.actorId = actorId;
+        this.string = asString();
+    }
+
+    private String asString() {
+        return lastModified == null ? null : lastModified + SEPARATOR + actorId;
     }
 
     public ActorLastModified(String lastModifiedContent) throws InvalidCaseLastModifiedException {
         try {
-            String[] lastModifiedHeaderParts = lastModifiedContent.split(";");
+            String[] lastModifiedHeaderParts = lastModifiedContent.split(SEPARATOR);
             this.lastModified = java.time.Instant.parse(lastModifiedHeaderParts[0]);
             this.actorId = lastModifiedHeaderParts[1];
+            this.string = asString();
         } catch (ArrayIndexOutOfBoundsException | DateTimeParseException | NullPointerException ex) {
             if (ex instanceof DateTimeParseException) {
                 throw new InvalidCaseLastModifiedException("Invalid time stamp '" + ((DateTimeParseException) ex).getParsedString() + "' received in CaseLastModified header");
@@ -40,7 +48,7 @@ public class ActorLastModified {
 
     @Override
     public String toString() {
-        return lastModified.toString() + ";" + actorId;
+        return string;
     }
 
     /**

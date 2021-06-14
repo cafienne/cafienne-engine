@@ -94,7 +94,12 @@ trait CaseServiceRoute extends LazyLogging {
   }
 
   def writeLastModifiedHeader(response: ModelResponse, headerName: String = Headers.CASE_LAST_MODIFIED): Directive0 = {
-    respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
+    val lm = response.lastModifiedContent().toString
+    if (lm != null) {
+      respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
+    } else {
+      respondWithHeaders(Seq())
+    }
   }
 
   def completeCafienneJSONSeq(seq: Seq[CafienneJson]) = {
