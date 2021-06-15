@@ -16,12 +16,4 @@ public class GetDiscretionaryItemsResponse extends CaseResponseWithValueMap {
     public GetDiscretionaryItemsResponse(ValueMap json) {
         super(json);
     }
-
-    /**
-     * Returns a JSON representation of the discretionary items that are currently applicable in the case
-     * @return
-     */
-    public ValueMap getItems() {
-        return getResponse();
-    }
 }

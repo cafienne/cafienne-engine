@@ -89,7 +89,7 @@ public class PlanningAuthorizationTest {
         testCase.addStep(new GetDiscretionaryItems(anonymous, caseInstanceId), response -> {
             new PlanningTableAssertion(response).assertNoItems();
             GetDiscretionaryItemsResponse items = response.getTestCommand().getActualResponse();
-            TestScript.debugMessage(items.getItems());
+            TestScript.debugMessage(items.toJson());
         });
 
         testCase.runTest();

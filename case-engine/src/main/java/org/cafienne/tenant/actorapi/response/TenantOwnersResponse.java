@@ -3,6 +3,7 @@ package org.cafienne.tenant.actorapi.response;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.actorapi.command.GetTenantOwners;
 
@@ -24,6 +25,11 @@ public class TenantOwnersResponse extends TenantResponse {
         super(json);
         this.name = readField(json, Fields.name);
         this.owners = json.withArray(Fields.owners).rawList();
+    }
+
+    @Override
+    public Value<?> toJson() {
+        return Value.convert(owners);
     }
 
     @Override

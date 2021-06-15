@@ -14,6 +14,7 @@ import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class ModelResponse implements CafienneSerializable, TenantUserMessage {
         this.commandType = command.getClass().getName();
     }
 
-    public ModelResponse(ValueMap json) {
+    protected ModelResponse(ValueMap json) {
         this.recipient = null;
         this.messageId = readField(json, Fields.messageId);
         this.actorId = readField(json, Fields.actorId);
@@ -108,6 +109,10 @@ public class ModelResponse implements CafienneSerializable, TenantUserMessage {
 
     public TenantUser getUser() {
         return user;
+    }
+
+    public Value<?> toJson() {
+        return new ValueMap();
     }
 
     @Override

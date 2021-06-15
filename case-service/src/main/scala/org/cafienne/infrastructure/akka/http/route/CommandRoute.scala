@@ -5,11 +5,10 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.actormodel.command.ModelCommand
-import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure, SecurityFailure}
+import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
 import org.cafienne.cmmn.actorapi.response.CaseResponse
-import org.cafienne.humantask.actorapi.response.{HumanTaskResponse, HumanTaskValidationResponse}
+import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
-import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.platform.actorapi.response.{PlatformResponse, PlatformUpdateStatus}
 import org.cafienne.service.Main
 import org.cafienne.service.api.Headers
@@ -28,38 +27,37 @@ trait CommandRoute extends AuthenticatedRoute {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
-          case e: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
+          case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
-          case tenantOwners: TenantOwnersResponse => complete(StatusCodes.OK, tenantOwners)
-          case value: TenantResponse => writeLastModifiedHeader(value, Headers.TENANT_LAST_MODIFIED) {
-            complete(StatusCodes.NoContent)
-          }
-          case value: HumanTaskValidationResponse =>
-            writeLastModifiedHeader(value) {
-              complete(StatusCodes.Accepted, value.value())
-            }
-          case value: HumanTaskResponse =>
-            writeLastModifiedHeader(value) {
-              complete(StatusCodes.Accepted, value)
-            }
-          case value: CaseResponse =>
-            writeLastModifiedHeader(value) {
-              complete(StatusCodes.OK, value)
-            }
-          case value: PlatformUpdateStatus => {
-            // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
-            complete(StatusCodes.OK, value.getValue)
-          }
-          case _: PlatformResponse => {
-            // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
-            complete(StatusCodes.Accepted, "Handling is in progress")
-          }
-          case other => { // Unknown new type of response that is not handled
+          case value: HumanTaskResponse => completeWithLMH(StatusCodes.Accepted, value)
+          case value: CaseResponse => completeWithLMH(StatusCodes.OK, value)
+          case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
+          case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
+          case value: PlatformUpdateStatus => complete(StatusCodes.OK, value) // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
+          case _: PlatformResponse =>complete(StatusCodes.Accepted, "Handling is in progress") // We should avoid returning a last modified header, as there is a fully asynchronous operation as of now.
+          case other => // Unknown new type of response that is not handled
             logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.OK)
-          }
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
+    }
+  }
+
+  /**
+    * Complete by marshalling the response as JSON and with writing last modified header
+    */
+  private def completeWithLMH[R <: ModelResponse](statusCode: StatusCodes.Success, response: R, header: String = Headers.CASE_LAST_MODIFIED) = {
+    writeLastModifiedHeader(response, header) {
+      complete(statusCode, response)
+    }
+  }
+
+  /**
+    * Complete without a response but still with writing last modified header
+    */
+  private def completeOnlyLMH[R <: ModelResponse](statusCode: StatusCodes.Success, response: R, header: String) = {
+    writeLastModifiedHeader(response, header) {
+      complete(statusCode)
     }
   }
 }

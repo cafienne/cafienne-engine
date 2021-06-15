@@ -60,6 +60,7 @@ public class CommandFailure extends ModelResponse {
         return exception;
     }
 
+    @Override
     public ValueMap toJson() {
         return exceptionAsJSON;
     }
