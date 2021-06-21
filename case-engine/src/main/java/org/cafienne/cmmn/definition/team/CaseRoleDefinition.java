@@ -5,11 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.definition;
+package org.cafienne.cmmn.definition.team;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
@@ -26,9 +29,11 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
     private Collection<CaseRoleDefinition> mutexRoles = new ArrayList();
     private Collection<String> mutexRoleReferences = new ArrayList();
     private final boolean isSingleton;
+    private final CaseTeamDefinition teamDefinition;
 
     public CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
+        this.teamDefinition = getParentElement();
         if (getName() == null) {
             modelDefinition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
         }
@@ -46,7 +51,7 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
 
         for (String string : mutexRoleReferences) {
             String errorMessage = "Case role " + this.getName();
-            CaseRoleDefinition mutexRole = getCaseDefinition().resolveRoleReference(string, errorMessage);
+            CaseRoleDefinition mutexRole = teamDefinition.resolveRoleReference(string, errorMessage);
             mutexRoles.add(mutexRole);
             mutexRole.mutexRoles.add(this);
         }
@@ -69,11 +74,11 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
         return isSingleton;
     }
 
-    static CaseRoleDefinition createEmptyDefinition(CaseDefinition caseDefinition) {
-        Element emptyXMLRole = caseDefinition.getElement().getOwnerDocument().createElement("caseRole");
+    static CaseRoleDefinition createEmptyDefinition(CMMNElementDefinition definitionElement) {
+        Element emptyXMLRole = definitionElement.getElement().getOwnerDocument().createElement("caseRole");
         emptyXMLRole.setAttribute("id", "all_across_empty_role");
         emptyXMLRole.setAttribute("name", "");
         emptyXMLRole.setAttribute("description", "");
-        return new CaseRoleDefinition(emptyXMLRole, caseDefinition, caseDefinition);
+        return new CaseRoleDefinition(emptyXMLRole, definitionElement.getModelDefinition(), definitionElement);
     }
 }

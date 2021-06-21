@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.instance.task.humantask;
 
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;

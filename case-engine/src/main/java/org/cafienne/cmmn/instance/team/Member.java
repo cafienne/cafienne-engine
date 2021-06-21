@@ -2,8 +2,8 @@ package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.actorapi.event.team.*;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.w3c.dom.Element;
 
@@ -11,11 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A member in the case team. Consists of a user id and associated roles (that have been defined in the {@link CaseDefinition#getCaseRoles()})
+ * A member in the case team. Consists of a user id and associated roles (that have been defined in the {@link CaseTeamDefinition#getCaseRoles()})
  */
-public class Member extends CMMNElement<CaseDefinition> {
+public class Member extends CMMNElement<CaseTeamDefinition> {
     private final Team team;
-    private final Set<CaseRoleDefinition> roles = new HashSet();
+    private final Set<CaseRoleDefinition> roles = new HashSet<>();
     private boolean isOwner = false;
     public final MemberKey key;
 
@@ -33,18 +33,22 @@ public class Member extends CMMNElement<CaseDefinition> {
 
     Member(Team team, TeamMemberAdded event) throws CaseTeamError {
         this(team, event.key);
-        event.getRoles().forEach(roleName -> addRole(roleName));
+        event.getRoles().forEach(this::addRole);
     }
 
     protected Member(Team team, MemberKey key) {
-        super(team, team.getDefinition());
+        super(team.getCaseInstance(), team.getDefinition());
         this.team = team;
         this.key = key;
     }
 
+    /**
+     * Clone construct;
+     * @param key
+     * @param source
+     */
     private Member(MemberKey key, Member source) {
-        this.key = key;
-        this.team = source.team;
+        this(source.team, key);
         this.roles.addAll(source.roles);
         this.isOwner = source.isOwner;
     }
@@ -58,7 +62,7 @@ public class Member extends CMMNElement<CaseDefinition> {
     }
 
     private void addRole(String roleName) {
-        CaseRoleDefinition role = getCaseInstance().getDefinition().getCaseRole(roleName);
+        CaseRoleDefinition role = getCaseInstance().getDefinition().getCaseTeamModel().getCaseRole(roleName);
         roles.add(role);
     }
 
@@ -91,35 +95,6 @@ public class Member extends CMMNElement<CaseDefinition> {
 
     private CaseRoleDefinition findRole(String roleName) {
         return roles.stream().filter(role -> role.getName().equals(roleName)).findFirst().orElse(null);
-    }
-
-    /**
-     * Get the role after validating against case definition
-     * @param caseDefinition
-     * @param roleName
-     * @return
-     * @throws CaseTeamError
-     */
-    private CaseRoleDefinition getCaseRole(CaseDefinition caseDefinition, String roleName) throws CaseTeamError {
-        CaseRoleDefinition role = caseDefinition.getCaseRole(roleName);
-        if (role == null) {
-            throw new CaseTeamError("A role with name " + roleName + " is not defined within the case");
-            // Alternatively we could just ignore the role?
-        }
-        return role;
-    }
-
-    /**
-     * Parse and validate the user name
-     *
-     * @param nameValue
-     * @return
-     */
-    private String parseName(String nameValue) throws CaseTeamError {
-        if (nameValue == null) {
-            throw new CaseTeamError("The user is not supplied");
-        }
-        return nameValue;
     }
 
     /**
@@ -189,10 +164,5 @@ public class Member extends CMMNElement<CaseDefinition> {
         // memberXML.appendChild(roleXML);
         // roleXML.appendChild(parentElement.getOwnerDocument().createTextNode(role.getName()));
         // });
-    }
-
-    @Override
-    public CaseDefinition getDefinition() {
-        return getCaseInstance().getDefinition();
     }
 }

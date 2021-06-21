@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
@@ -25,7 +26,7 @@ public class UserEventDefinition extends PlanItemDefinitionDefinition {
     @Override
     protected void resolveReferences() {
         super.resolveReferences();
-        getCaseDefinition().resolveRoleReferences(authorizedRoleRefs, authorizedRoles, "User Event " + this);
+        getCaseDefinition().getCaseTeamModel().resolveRoleReferences(authorizedRoleRefs, authorizedRoles, "User Event " + this);
     }
 
     /**

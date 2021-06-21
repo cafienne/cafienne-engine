@@ -8,7 +8,8 @@ import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.team.*;
 import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
 import org.w3c.dom.Element;
@@ -23,16 +24,16 @@ import java.util.stream.Collectors;
  * The team of users with their roles that can work on a Case instance.
  * This is an engine extension to CMMN.
  */
-public class Team extends CMMNElement<CaseDefinition> {
+public class Team extends CMMNElement<CaseTeamDefinition> {
 
-    private final Collection<Member> members = new ArrayList();
+    private final Collection<Member> members = new ArrayList<>();
 
     /**
      * Create a new, empty case team.
      * @param caseInstance
      */
     public Team(Case caseInstance) {
-        super(caseInstance, caseInstance.getDefinition());
+        super(caseInstance, caseInstance.getDefinition().getCaseTeamModel());
     }
 
     public void clear() {
@@ -151,7 +152,7 @@ public class Team extends CMMNElement<CaseDefinition> {
      * @return
      */
     public Collection<Member> getOwners() {
-        return members.stream().filter(member -> member.isOwner()).collect(Collectors.toList());
+        return members.stream().filter(Member::isOwner).collect(Collectors.toList());
     }
 
     /**
@@ -232,9 +233,9 @@ public class Team extends CMMNElement<CaseDefinition> {
     }
 
     public CaseTeam createSubCaseTeam(CaseDefinition subCaseDefinition) {
-        List<CaseTeamMember> members = new ArrayList();
+        List<CaseTeamMember> members = new ArrayList<>();
         this.getMembers().forEach(teamMember -> {
-            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).filter(name -> subCaseDefinition.getCaseRole(name)!=null).collect(Collectors.toList()).toArray(new String[]{});
+            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).filter(name -> subCaseDefinition.getCaseTeamModel().getCaseRole(name)!=null).collect(Collectors.toList()).toArray(new String[]{});
             CaseTeamMember member = CaseTeamMember.apply(teamMember.key, roleNames, teamMember.isOwner());
             members.add(member);
         });
@@ -267,11 +268,6 @@ public class Team extends CMMNElement<CaseDefinition> {
 
     public CurrentMember getTeamMember(TenantUser currentTenantUser) {
         return new CurrentMember(this, currentTenantUser);
-    }
-
-    @Override
-    public CaseDefinition getDefinition() {
-        return getCaseInstance().getDefinition();
     }
 
     /**

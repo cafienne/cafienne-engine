@@ -3,7 +3,7 @@ package org.cafienne.cmmn.actorapi.event.team;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;

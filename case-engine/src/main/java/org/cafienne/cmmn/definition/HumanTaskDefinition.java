@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -66,7 +67,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     protected void resolveReferences() {
         super.resolveReferences();
         if (!performerRef.isEmpty()) {
-            performer = getCaseDefinition().resolveRoleReference(performerRef, "Human Task " + this);
+            performer = getCaseDefinition().getCaseTeamModel().resolveRoleReference(performerRef, "Human Task " + this);
         }
         if (!taskOutputValidatorRef.isEmpty()) {
             ProcessDefinition pd = getCaseDefinition().getDefinitionsDocument().getProcessDefinition(this.taskOutputValidatorRef);

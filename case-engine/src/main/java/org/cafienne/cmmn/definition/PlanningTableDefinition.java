@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
@@ -126,7 +127,7 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
             }
         }
 
-        getCaseDefinition().resolveRoleReferences(authorizedRoleRefs, authorizedRoles, "Table item " + this);
+        getCaseDefinition().getCaseTeamModel().resolveRoleReferences(authorizedRoleRefs, authorizedRoles, "Table item " + this);
     }
 
     /**
