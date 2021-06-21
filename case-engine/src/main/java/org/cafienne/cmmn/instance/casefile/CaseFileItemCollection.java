@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,27 +7,47 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDefinition> extends CMMNElement<T> {
-    private final Map<CaseFileItemDefinition, CaseFileItem> items = new LinkedHashMap();
-    private final String name;
+    /**
+     * Child items of this collection.
+     */
+    private final List<CaseFileItem> items = new ArrayList<>();
 
-    protected CaseFileItemCollection(Case caseInstance, T definition, String name) {
+    protected CaseFileItemCollection(Case caseInstance, T definition) {
         super(caseInstance, definition);
-        this.name = name;
+    }
+
+    private CaseFileItem constructItem(CaseFileItemDefinition childDefinition) {
+        CaseFileItem item = childDefinition.createInstance(getCaseInstance(), this);
+        items.add(item);
+        return item;
+    }
+
+    private void removeItem(CaseFileItem item) {
+        items.remove(item);
+    }
+
+    /**
+     * Returns a copy of the current items within this container.
+     *
+     * @return
+     */
+    protected List<CaseFileItem> getItems() {
+        return new ArrayList<>(items);
     }
 
     /**
@@ -36,15 +56,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      * @return
      */
     public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the items within this container.
-     * @return
-     */
-    protected Map<CaseFileItemDefinition, CaseFileItem> getItems() {
-        return items;
+        return getDefinition().getName();
     }
 
     /**
@@ -54,12 +66,13 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      * unless and until this call is done.
      */
     public void releaseBootstrapEvents() {
-        new LinkedHashMap<>(getItems()).values().forEach(item -> item.releaseBootstrapEvents());
+        getItems().forEach(CaseFileItem::releaseBootstrapEvents);
     }
 
     /**
      * Returns the case file item with the specified index. Default implementation throws an exception, i.e., invoking this method
      * on a plain case file item will result in an {@link InvalidPathException}. It can only be invoked properly on a CaseFileItemArray.
+     *
      * @param index
      * @return
      */
@@ -68,20 +81,27 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     }
 
     /**
-    * Returns the case file item with the specified name, or null if it does not exist
-    * @param childName
-    * @return
-    */
+     * Returns the case file item with the specified name, or null if it does not exist
+     *
+     * @param childName
+     * @return
+     */
     public CaseFileItem getItem(String childName) {
-        CaseFileItemDefinition childDefinition = getChildDefinition(childName);
+        CaseFileItemDefinition childDefinition = getDefinition().getChild(childName);
         if (childDefinition == null) {
             return null;
         }
-        return getItem(childDefinition);
+        for (CaseFileItem item : getItems()) {
+            if (item.getDefinition().equals(childDefinition)) return item;
+        }
+        // If we reach this point, the item does not yet exist, so create it.
+        // Note: without setting a value or transitioning it into the Available state!
+        return constructItem(childDefinition);
     }
 
     /**
      * Returns true if the an item (or property) is undefined.
+     *
      * @param identifier
      * @return
      */
@@ -89,36 +109,20 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
         return getDefinition().isUndefined(identifier);
     }
 
-    protected CaseFileItem getItem(CaseFileItemDefinition childDefinition) {
-        CaseFileItem item = getItems().get(childDefinition);
-        if (item == null) {
-            // Does not yet exist, so create it. Without setting a value or transitioning it into the Available state!
-            item = childDefinition.createInstance(getCaseInstance(), this);
-            getItems().put(childDefinition, item);
-        }
-        return item;
-    }
-
-    /**
-     * Returns a child definition that has the specified name or identifier if it exists for this case file item.
-     * @param childName
-     * @return
-     */
-    public CaseFileItemDefinition getChildDefinition(String childName) {
-        return getDefinition().getChildren().stream().filter(d -> d.getName().equals(childName)).findFirst().orElse(null);
-    }
-
     public abstract void createContent(Value<?> newContent);
+
     public abstract void deleteContent();
+
     public abstract void replaceContent(Value<?> newContent);
 
     /**
      * When replacing existing content with the map, it should generate removeChild events for existing children not in map.
+     *
      * @param map
      */
     protected void removeReplacedItems(ValueMap map) {
         Set<String> newKeys = map.getValue().keySet();
-        Set<CaseFileItem> unfoundItems = getItems().values().stream().filter(item -> !newKeys.contains(item.getName())).collect(Collectors.toSet());
+        List<CaseFileItem> unfoundItems = getItems().stream().filter(item -> !newKeys.contains(item.getName())).collect(Collectors.toList());
         unfoundItems.forEach(this::removeChildItem);
     }
 
@@ -132,7 +136,7 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
         if (childPath.isArrayElement()) {
             child.getContainer().itemRemoved(childPath.index);
         } else {
-            getItems().remove(child.getDefinition());
+            removeItem(child);
         }
     }
 

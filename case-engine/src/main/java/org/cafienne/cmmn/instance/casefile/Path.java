@@ -184,11 +184,11 @@ public class Path implements Serializable {
         if (isEmpty()) {
             return (C) parentItem;
         }
-        CaseFileItemDefinition itemDefinition = parentItem.getDefinition().getChild(name);
-        if (itemDefinition == null) {
+        CaseFileItem childContainer = parentItem.getItem(name);
+        if (childContainer == null) {
             throw new InvalidPathException("The path '" + originalPath + "' is invalid, since the part '" + name + "' is not defined in the case file");
         }
-        CaseFileItem item = this.resolveOptionalArrayItem(parentItem.getItem(itemDefinition));
+        CaseFileItem item = this.resolveOptionalArrayItem(childContainer);
         if (child != null) {
             return child.resolve(item);
         } else {
