@@ -2,6 +2,8 @@ package org.cafienne.service.db.materializer.cases
 
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent
+import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated
 import org.cafienne.cmmn.actorapi.event.{CaseDefinitionApplied, CaseEvent, CaseModified}
 import org.cafienne.cmmn.instance.State
 import org.cafienne.service.db.materializer.RecordsPersistence
@@ -17,6 +19,7 @@ class CaseProjection(persistence: RecordsPersistence, caseFileProjection: CaseFi
   def handleCaseEvent(event: CaseEvent): Future[Done] = {
     event match {
       case event: CaseDefinitionApplied => createCaseInstance(event)
+      case event: CaseDefinitionMigrated => migrateCaseDefinition(event)
       case event: CaseModified => updateCaseModified(event)
       case _ => Future.successful(Done) // Ignore other events
     }
@@ -41,13 +44,18 @@ class CaseProjection(persistence: RecordsPersistence, caseFileProjection: CaseFi
     Future.successful(Done)
   }
 
-  private def upsertCaseDefinitionRecords(event: CaseDefinitionApplied): Unit = {
+  private def upsertCaseDefinitionRecords(event: CaseDefinitionEvent): Unit = {
     import scala.jdk.CollectionConverters._
 
     // First upsert the CaseDefinition, then all roles
     caseDefinition = Some(CaseDefinitionRecord(event.getActorId, event.getCaseName, event.getDefinition.documentation.text, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.getTimestamp, event.getUser.id))
     val roles = event.getDefinition.getCaseTeamModel.getCaseRoles.asScala.toSeq
     roles.foreach(role => persistence.upsert(CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false)))
+  }
+
+  private def migrateCaseDefinition(event: CaseDefinitionMigrated): Future[Done] = {
+    upsertCaseDefinitionRecords(event)
+    changeCaseRecord(event, instance => instance.copy(caseName = event.getDefinition.getName))
   }
 
   private def updateCaseModified(evt: CaseModified): Future[Done] = {

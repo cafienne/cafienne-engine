@@ -5,6 +5,7 @@ import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.SentryEvent;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.file.*;
+import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
@@ -42,6 +43,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseModified.class, CaseModified::new);
         addManifestWrapper(CaseAppliedPlatformUpdate.class, CaseAppliedPlatformUpdate::new);
         addManifestWrapper(EngineVersionChanged.class, EngineVersionChanged::new);
+        addManifestWrapper(CaseDefinitionMigrated.class, CaseDefinitionMigrated::new);
         registerCaseTeamEvents();
         registerCasePlanEvents();
         registerCaseFileEvents();
