@@ -1,20 +1,26 @@
 package org.cafienne.tenant;
 
-import org.cafienne.system.CaseSystem;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
+import org.cafienne.system.CaseSystem;
 import org.cafienne.tenant.actorapi.command.TenantCommand;
 import org.cafienne.tenant.actorapi.command.TenantUserInformation;
-import org.cafienne.tenant.actorapi.event.*;
+import org.cafienne.tenant.actorapi.event.TenantAppliedPlatformUpdate;
+import org.cafienne.tenant.actorapi.event.TenantEvent;
+import org.cafienne.tenant.actorapi.event.TenantModified;
+import org.cafienne.tenant.actorapi.event.TenantUserCreated;
 import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
 import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
 import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -24,7 +30,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     private final static Logger logger = LoggerFactory.getLogger(TenantActor.class);
 
     private TenantCreated creationEvent;
-    private Map<String, User> users = new HashMap();
+    private final Map<String, User> users = new HashMap<>();
     private boolean disabled = false; // TODO: we can add some behavior behind this...
 
     public TenantActor(CaseSystem caseSystem) {
@@ -56,8 +62,8 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void replaceInstance(List<TenantUserInformation> newUsers) {
-        new HashMap(users).keySet().forEach(userId -> {
-            if (newUsers.stream().filter(user -> user.id().equals(userId)).count() == 0) {
+        new HashMap<>(users).keySet().forEach(userId -> {
+            if (newUsers.stream().noneMatch(user -> user.id().equals(userId))) {
                 users.get(userId).disable();
             }
         });
@@ -69,9 +75,22 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void updateState(TenantAppliedPlatformUpdate event) {
+        Map<String, NewUserInformation> updatedUsers = new HashMap<>();
         event.newUserInformation.info().foreach(userInfo -> {
             User user = users.remove(userInfo.existingUserId());
-            users.put(userInfo.newUserId(), user.copy(userInfo.newUserId()));
+            if (user != null) {
+                users.put(userInfo.newUserId(), user.copy(userInfo.newUserId()));
+                updatedUsers.put(userInfo.existingUserId(), userInfo);
+            } else {
+                // Ouch. How can that be? Well ... if same user id is updated multiple times within this event.
+                // We'll ignore those updates for now.
+                NewUserInformation previouslyUpdated = updatedUsers.get(userInfo.existingUserId());
+                if (previouslyUpdated != null) {
+                    logger.warn("Not updating user id " + userInfo.existingUserId() + " to " + userInfo.newUserId() + ", because a user with this id has just now been updated to " + previouslyUpdated.newUserId());
+                } else {
+                    logger.warn("Not updating user id " + userInfo.existingUserId() + " to " + userInfo.newUserId() + ", because a user with this id is not found in the tenant.");
+                }
+            }
             return userInfo;
         });
     }
@@ -96,7 +115,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public void disable() {
-        if (! disabled) {
+        if (!disabled) {
             addEvent(new TenantDisabled(this));
         }
     }
