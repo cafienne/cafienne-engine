@@ -2,8 +2,7 @@ package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.w3c.dom.Element;
 
 import java.util.HashSet;
@@ -59,10 +58,5 @@ public class CurrentMember extends Member {
         // memberXML.appendChild(roleXML);
         // roleXML.appendChild(parentElement.getOwnerDocument().createTextNode(role.getName()));
         // });
-    }
-
-    @Override
-    public CaseDefinition getDefinition() {
-        return getCaseInstance().getDefinition();
     }
 }

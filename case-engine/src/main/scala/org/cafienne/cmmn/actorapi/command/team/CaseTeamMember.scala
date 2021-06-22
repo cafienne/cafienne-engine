@@ -9,7 +9,7 @@ import org.cafienne.json.CafienneJson
 case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwner: Option[Boolean] = None, removeRoles: Seq[String] = Seq()) extends CafienneJson {
   def validateRolesExist(caseDefinition: CaseDefinition): Unit = {
     val blankRoles = (caseRoles ++ removeRoles).filter(roleName => roleName.isBlank)
-    val undefinedRoles = (caseRoles ++ removeRoles).filter(roleName => caseDefinition.getCaseRole(roleName) == null)
+    val undefinedRoles = (caseRoles ++ removeRoles).filter(roleName => caseDefinition.getCaseTeamModel().getCaseRole(roleName) == null)
 
     if (blankRoles.nonEmpty || undefinedRoles.nonEmpty) {
       if (undefinedRoles.isEmpty) {

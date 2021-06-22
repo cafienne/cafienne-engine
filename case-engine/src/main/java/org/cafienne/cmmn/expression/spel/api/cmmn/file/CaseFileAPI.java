@@ -18,12 +18,12 @@ public class CaseFileAPI extends APIObject<Case> {
     public CaseFileAPI(CaseFile file) {
         super(file.getCaseInstance());
         this.file = file;
-        this.file.getCaseFileItems().forEach((definition, item) -> {
+        this.file.getCaseFileItems().forEach(item -> {
             // Enable directly accessing the JSON structure of the CaseFileItem by name
-            addPropertyReader(definition.getName(), () -> new ValueAPI(item));
+            addPropertyReader(item.getName(), () -> new ValueAPI(item));
             // And enable CaseFileItem wrapper to be accessed by getItem() method
             CaseFileItemAPI itemAPI = new CaseFileItemAPI(item);
-            items.put(definition.getName(), itemAPI);
+            items.put(item.getName(), itemAPI);
         });
     }
 

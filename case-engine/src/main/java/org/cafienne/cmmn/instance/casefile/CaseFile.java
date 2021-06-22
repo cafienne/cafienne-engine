@@ -7,24 +7,21 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.List;
+
 public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
     public CaseFile(Case caseInstance, CaseFileDefinition definition) {
-        super(caseInstance, definition, "CASEFILE " + definition.getName());
+        super(caseInstance, definition);
     }
 
     /**
@@ -32,7 +29,7 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
      *
      * @return
      */
-    public Map<CaseFileItemDefinition, CaseFileItem> getCaseFileItems() {
+    public List<CaseFileItem> getCaseFileItems() {
         return getItems();
     }
 
@@ -55,7 +52,7 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
 
     @Override
     public void deleteContent() {
-        getItems().values().forEach(CaseFileItem::deleteContent);
+        getItems().forEach(CaseFileItem::deleteContent);
     }
 
     @Override
@@ -91,17 +88,14 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
 
     public ValueMap toJson() {
         ValueMap caseFileJson = new ValueMap();
-        getItems().values().forEach(item -> caseFileJson.put(item.getName(), item.getValue()));
+        getItems().forEach(item -> caseFileJson.put(item.getName(), item.getValue()));
         return caseFileJson;
     }
 
     public void dumpMemoryStateToXML(Element parentElement) {
         Element caseFileXML = parentElement.getOwnerDocument().createElement("CaseFile");
         parentElement.appendChild(caseFileXML);
-        Iterator<Entry<CaseFileItemDefinition, CaseFileItem>> c = getCaseFileItems().entrySet().iterator();
-        while (c.hasNext()) {
-            c.next().getValue().dumpMemoryStateToXML(caseFileXML);
-        }
+        getCaseFileItems().forEach(item -> item.dumpMemoryStateToXML(caseFileXML));
     }
 
     @Override

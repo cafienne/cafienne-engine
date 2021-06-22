@@ -56,7 +56,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     private final boolean isArray;
 
     private CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent, CaseFileItemArray array, int indexInArray, boolean isArray) {
-        super(caseInstance, definition, definition.getName());
+        super(caseInstance, definition);
         this.parent = parent instanceof CaseFileItem ? (CaseFileItem) parent : null;
         this.container = array == null ? this : array;
         this.indexInArray = indexInArray;
@@ -360,7 +360,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // EVENT ORDER for Delete Content: first delete children, then ourselves (optionally)
 
         // First recursively delete all of our 'Available' children...
-        getItems().values().stream().filter(item -> item.getState() == State.Available).forEach(child -> child.deleteContent());
+        getItems().stream().filter(item -> item.getState() == State.Available).forEach(CaseFileItem::deleteContent);
         // Only generate the event if we're not yet in discarded state.
         if (getState() != State.Discarded) addDeletedEvent(new CaseFileItemDeleted(this));
     }
@@ -504,12 +504,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         caseFileItemXML.appendChild(contentElement);
         value.dumpMemoryStateToXML(contentElement);
 
-        // Next, print our children.
-        Iterator<Entry<CaseFileItemDefinition, CaseFileItem>> c = getItems().entrySet().iterator();
-        while (c.hasNext()) {
-            c.next().getValue().dumpMemoryStateToXML(caseFileItemXML);
-        }
-        // XMLHelper.printXMLNode(parentElement)
+        // Finally, print our children.
+        getItems().forEach(item -> item.dumpMemoryStateToXML(caseFileItemXML));
     }
 
     /**

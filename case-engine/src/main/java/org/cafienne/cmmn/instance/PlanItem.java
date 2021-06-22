@@ -27,14 +27,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     private final int index;
     /**
-     * Name of the plan item, taken from the ItemDefinition
-     */
-    private final String name;
-    /**
-     * Type of plan item, taken from the PlanItemDefinitionDefinition (HumanTask, Stage, CaseTask, Milestone, etc)
-     */
-    private final String type;
-    /**
      * Stage to which this plan item belongs (null for CasePlan)
      */
     private final Stage stage;
@@ -92,8 +84,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.id = id;
         this.itemDefinition = itemDefinition;
         this.stage = parent;
-        this.name = itemDefinition.getName();
-        this.type = definition.getType();
         this.index = index;
         this.stateMachine = stateMachine;
 
@@ -386,7 +376,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public String getName() {
-        return name;
+        return itemDefinition.getName();
     }
 
     /**
@@ -395,7 +385,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public String getPath() {
-        return "'" + this.name + "." + this.index + "'";
+        return "'" + this.getName() + "." + this.index + "'";
     }
 
     /**
@@ -437,7 +427,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public String getType() {
-        return type;
+        return getDefinition().getType();
     }
 
     /**
@@ -459,7 +449,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public String toString() {
-        return type + "[" + getName() + "." + index + "]";
+        return getType() + "[" + getName() + "." + index + "]";
     }
 
     protected void dumpImplementationToXML(Element planItemXML) {
@@ -475,7 +465,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         }
 
         // Print the repeat attribute if there is a repetition rule defined for this plan item.
-        if (!(this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+        if (! (this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
             planItemXML.setAttribute("repeat", "" + repeats());
         }
 

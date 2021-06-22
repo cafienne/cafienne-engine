@@ -9,7 +9,7 @@ object CaseInstanceRoleMerger {
 
   def merge(event: CaseDefinitionApplied): Seq[CaseRoleRecord] = {
     val caseDefinition = event.getDefinition()
-    caseDefinition.getCaseRoles().asScala.map(role => CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false)).toSeq
+    caseDefinition.getCaseTeamModel().getCaseRoles().asScala.map(role => CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false)).toSeq
   }
 
 }

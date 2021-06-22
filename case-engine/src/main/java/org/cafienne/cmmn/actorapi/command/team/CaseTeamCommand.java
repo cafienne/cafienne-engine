@@ -4,7 +4,7 @@ import org.cafienne.actormodel.command.exception.AuthorizationException;
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
@@ -34,7 +34,7 @@ abstract class CaseTeamCommand extends CaseCommand {
     }
 
     protected void validateCaseTeamRole(Case caseInstance, MemberKey memberId, String roleName) {
-        CaseRoleDefinition role = caseInstance.getDefinition().getCaseRole(roleName);
+        CaseRoleDefinition role = caseInstance.getDefinition().getCaseTeamModel().getCaseRole(roleName);
         if (role == null) {
             throw new CaseTeamError("A role with name " + roleName + " is not defined within the case");
         }
@@ -65,7 +65,7 @@ abstract class CaseTeamCommand extends CaseCommand {
         newMember.validateRolesExist(caseInstance.getDefinition());
 
         // Now also validate that the new roles do not mutex each other
-        List<CaseRoleDefinition> newRoles = newMember.getCaseRoles().stream().map(caseInstance.getDefinition()::getCaseRole).collect(Collectors.toList());
+        List<CaseRoleDefinition> newRoles = newMember.getCaseRoles().stream().map(caseInstance.getDefinition().getCaseTeamModel()::getCaseRole).collect(Collectors.toList());
         newRoles.forEach(role -> {
             newRoles.stream().filter(otherRole -> otherRole != role).forEach(otherRole -> {
                 if (otherRole.getMutexRoles().contains(role)) {

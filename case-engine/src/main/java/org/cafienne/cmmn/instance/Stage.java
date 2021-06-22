@@ -24,7 +24,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     private final Collection<PlanItem> planItems = new ArrayList();
 
     // Below are two flags that are required for the checking of stage completion
-    private final boolean autoCompletes; // This is the flag set in the definition.
     private boolean isManualCompletion = true; // This is a status keeping track of the cause of the attempt to complete (this info cannot be passed through the statemachine)
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance) {
@@ -33,7 +32,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
     protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance, StateMachine stateMachine) {
         super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
-        this.autoCompletes = definition.autoCompletes();
     }
 
     void register(PlanItem child) {
@@ -97,7 +95,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
                 return false;
             }
             if (!childItem.getState().isSemiTerminal()) {
-                if (autoCompletes || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
+                if (getDefinition().autoCompletes() || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
                     if (childItem.isRequired()) { // Stage cannot complete if required items are not in semi-terminal state
                         addDebugInfo(() -> "*** " + this + " cannot auto complete, because " + childItem.toDescription() + " is required and has state " + childItem.getState());
                         return false;
@@ -111,7 +109,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         }
 
         // And, finally, check if there are no discretionary items, but only if we're not completing manually and autoCompletion is false
-        if (!autoCompletes && !isManualCompletion) {
+        if (!getDefinition().autoCompletes() && !isManualCompletion) {
             if (hasDiscretionaryItems()) {
                 addDebugInfo(() -> "*** " + this + " cannot auto complete, because there are still discretionary items");
                 return false;

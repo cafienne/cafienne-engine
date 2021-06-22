@@ -1,14 +1,11 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.team;
 
-import org.cafienne.cmmn.definition.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.cmmn.instance.team.Team;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**

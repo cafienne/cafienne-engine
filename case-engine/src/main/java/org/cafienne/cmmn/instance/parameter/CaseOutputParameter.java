@@ -21,8 +21,8 @@ public class CaseOutputParameter extends Parameter<OutputParameterDefinition> {
 
         // If we have a binding defined, link this parameter to the case file via that binding
         // perhaps generate a debug statement if a case output parameter does not bind to case file?
-        if (binding != null) {
-            CaseFileItem item = binding.getPath().resolve(getCaseInstance());
+        if (hasBinding()) {
+            CaseFileItem item = getBinding().getPath().resolve(getCaseInstance());
             this.value = item.getValue();
         }
     }

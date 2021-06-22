@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.system.CaseSystem;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
@@ -18,13 +17,14 @@ import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.CaseFile;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
 import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.json.ValueMap;
+import org.cafienne.system.CaseSystem;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * Workers in the case team
      */
-    private final Team caseTeam = new Team(this);
+    private Team caseTeam;
 
     public Case(CaseSystem caseSystem) {
         super(CaseCommand.class, CaseEvent.class, caseSystem);
@@ -232,10 +232,6 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         return sentryNetwork;
     }
 
-    void setCasePlan(CasePlan casePlan) {
-        this.casePlan = casePlan;
-    }
-
     /**
      * Returns the root plan item
      *
@@ -247,6 +243,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
 
     /**
      * Creates a PlanItem within the Case based on the information in the event.
+     *
      * @param event
      * @return
      */
@@ -254,7 +251,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         String stageId = event.getStageId();
         if (stageId.isEmpty()) {
             CasePlanDefinition definition = this.getDefinition().getCasePlanModel();
-            return definition.createInstance(event.planItemId, 0, definition, null, this);
+            this.casePlan = definition.createInstance(event.planItemId, 0, definition, null, this);
+            return this.casePlan;
         } else {
             // Lookup the stage to which the plan item belongs,
             // then lookup the definition for the plan item
@@ -387,12 +385,15 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      * @return
      */
     public Team getCaseTeam() {
+        if (caseTeam == null) {
+            caseTeam = new Team(this);
+        }
         return caseTeam;
     }
 
     public void upsertDebugMode(boolean newDebugMode) {
         // TODO: this belongs in ModelActor, but then the debugenabled/disabled events need to take ModelActor and should no longer extend CaseEvent
-        if (newDebugMode!=this.debugMode()) {
+        if (newDebugMode != this.debugMode()) {
             if (newDebugMode) addEvent(new DebugEnabled(this));
             else addEvent(new DebugDisabled(this));
         }

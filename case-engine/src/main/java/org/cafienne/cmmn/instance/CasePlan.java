@@ -21,7 +21,6 @@ public class CasePlan extends Stage<CasePlanDefinition> {
 
     public CasePlan(String id, CasePlanDefinition definition, Case caseInstance) {
         super(id, 0, definition, definition, null, caseInstance, StateMachine.CasePlan);
-        caseInstance.setCasePlan(this);
     }
 
     @Override
