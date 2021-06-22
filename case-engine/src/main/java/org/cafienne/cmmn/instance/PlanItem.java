@@ -35,7 +35,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * The actual plan item definition (or discretionary item definition, or caseplan definition).
      */
-    private final ItemDefinition itemDefinition;
+    private ItemDefinition itemDefinition;
+    /**
+     * Previous item definition for reference and comparison if the itemDefinition is migrated
+     */
+    private ItemDefinition previousItemDefinition;
     /**
      * State machine that executes behavior
      */
@@ -137,7 +141,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         addDebugInfo(() -> this + ": evaluating RepetitionRule from within repeat()");
         evaluateRepetitionRule(false);
         if (repeats()) {
-            if (itemDefinition.isDiscretionary()) {
+            if (getItemDefinition().isDiscretionary()) {
                 // Means we are discretionary, and adding to the plan must be done manually
                 return;
             }
@@ -212,6 +216,15 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         }
     }
 
+    private void setItemDefinition(ItemDefinition newItemDefinition) {
+        this.previousItemDefinition = this.itemDefinition;
+        this.itemDefinition = newItemDefinition;
+    }
+
+    public ItemDefinition getPreviousItemDefinition() {
+        return previousItemDefinition;
+    }
+
     public ItemDefinition getItemDefinition() {
         return itemDefinition;
     }
@@ -278,7 +291,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Evaluates the repetition rule on the plan item. Typically done when the plan item goes into Active state
      */
     void evaluateRepetitionRule(boolean firstEvaluation) {
-        boolean newRuleOutcome = itemDefinition.getPlanItemControl().getRepetitionRule().evaluate(this);
+        boolean newRuleOutcome = getItemDefinition().getPlanItemControl().getRepetitionRule().evaluate(this);
         if (firstEvaluation || newRuleOutcome != this.repetitionRuleOutcome) {
             addEvent(new RepetitionRuleEvaluated(this, newRuleOutcome));
         }
@@ -288,7 +301,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Evaluates the required rule on the plan item. Typically done when the plan item goes into Active state
      */
     void evaluateRequiredRule() {
-        boolean required = itemDefinition.getPlanItemControl().getRequiredRule().evaluate(this);
+        boolean required = getItemDefinition().getPlanItemControl().getRequiredRule().evaluate(this);
         addEvent(new RequiredRuleEvaluated(this, required));
     }
 
@@ -297,7 +310,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * resulted in true, Start when it resulted in false.
      */
     Transition evaluateManualActivationRule() {
-        boolean manualActivation = itemDefinition.getPlanItemControl().getManualActivationRule().evaluate(this);
+        boolean manualActivation = getItemDefinition().getPlanItemControl().getManualActivationRule().evaluate(this);
         return manualActivation ? Transition.Enable : Transition.Start;
     }
 
@@ -387,7 +400,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public String getName() {
-        return itemDefinition.getName();
+        return getItemDefinition().getName();
     }
 
     /**
@@ -476,7 +489,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         }
 
         // Print the repeat attribute if there is a repetition rule defined for this plan item.
-        if (! (this instanceof CasePlan) && !itemDefinition.getPlanItemControl().getRepetitionRule().isDefault()) {
+        if (!(this instanceof CasePlan) && !getItemDefinition().getPlanItemControl().getRepetitionRule().isDefault()) {
             planItemXML.setAttribute("repeat", "" + repeats());
         }
 
@@ -579,5 +592,24 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void updateState(CaseAppliedPlatformUpdate event) {
+    }
+
+    protected void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition) {
+        MigDevConsole("\n==================== Giving " + this.getClass().getSimpleName() + " " + getName() + " a new item definition:\n");
+        super.migrateDefinition(newDefinition);
+        setItemDefinition(newItemDefinition);
+    }
+
+    @Override
+    protected boolean hasNewDefinition() {
+        // Note: We're overriding hasNewDefinition, since itemDefinition determines everything of a plan item
+        //  This includes the reference to the actual definition like TaskDefinition or StageDefinition
+        //  because these are referenced from the itemDefinition and included in the comparison
+        return previousItemDefinition != null && itemDefinition.differs(previousItemDefinition);
+    }
+
+    protected void lostDefinition() {
+        // Scenario not yet supported... What to do with existing items that cannot be found in the new stage definition?
+        addDebugInfo(() -> "Not possible to migrate plan item " + getPath() + ", as a new definition is not found for it.");
     }
 }

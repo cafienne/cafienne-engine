@@ -69,6 +69,11 @@ public class CasePlan extends Stage<CasePlanDefinition> {
             logger.error("Parent case " + parentCaseId + " did not accept our request " + command + " and responded with a failure\n" + failure));
     }
 
+    @Override
+    public void migrateDefinition(CasePlanDefinition newDefinition) {
+        migrateItemDefinition(newDefinition, newDefinition);
+    }
+
     @FunctionalInterface
     interface CommandCreator {
         CaseCommand createCommand();
