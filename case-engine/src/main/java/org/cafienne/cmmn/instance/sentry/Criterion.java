@@ -3,10 +3,13 @@ package org.cafienne.cmmn.instance.sentry;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
-import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.CMMNElement;
+import org.cafienne.cmmn.instance.CasePlan;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.w3c.dom.Element;
 
 import java.util.HashSet;
@@ -42,7 +45,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         // Add ourselves to the sentry network
         getCaseInstance().getSentryNetwork().add(this);
         // Tell our onparts to connect to the case network
-        onParts.values().forEach(onPart -> onPart.connectToCase());
+        onParts.values().forEach(OnPart::connectToCase);
     }
 
     public PlanItem getTarget() {

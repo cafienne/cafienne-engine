@@ -17,16 +17,20 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
-    private final Transition standardEvent;
-    private final String sourceName;
     private boolean isActive;
     private Criterion relatedExitCriterion;
     private StandardEvent lastEvent;
 
     public PlanItemOnPart(Criterion criterion, PlanItemOnPartDefinition definition) {
         super(criterion, definition);
-        this.standardEvent = definition.getStandardEvent();
-        this.sourceName = definition.getSourceDefinition().getName();
+    }
+
+    private Transition getStandardEvent() {
+        return getDefinition().getStandardEvent();
+    }
+
+    private String getSourceName() {
+        return getDefinition().getSourceDefinition().getName();
     }
 
     /**
@@ -88,13 +92,13 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     public void inform(PlanItem item, StandardEvent event) {
         addDebugInfo(() -> item + " informs " + criterion + " about transition " + event.getTransition());
         lastEvent = event;
-        isActive = standardEvent.equals(event.getTransition());
+        isActive = getStandardEvent().equals(event.getTransition());
         if (isActive) {
             if (relatedExitCriterion != null) { // The exitCriterion must also be active
                 if (relatedExitCriterion.isActive()) {
                     criterion.activate(this);
                 } else {
-                    addDebugInfo(() -> criterion + ": onPart '" + sourceName + "=>" + event.getTransition() + "' is not activated, because related exit criterion is not active", this.criterion);
+                    addDebugInfo(() -> criterion + ": onPart '" + getSourceName() + "=>" + event.getTransition() + "' is not activated, because related exit criterion is not active", this.criterion);
                 }
             } else {
                 // Bingo, we have a hit
@@ -107,15 +111,15 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
 
     @Override
     public String toString() {
-        String printedItems = connectedItems.isEmpty() ? "'" + sourceName+"'" : connectedItems.stream().map(item -> item.getPath()).collect(Collectors.joining(","));
-        return standardEvent +" of " + printedItems;
+        String printedItems = connectedItems.isEmpty() ? "'" + getSourceName()+"'" : connectedItems.stream().map(item -> item.getPath()).collect(Collectors.joining(","));
+        return getStandardEvent() +" of " + printedItems;
     }
 
     @Override
     ValueMap toJson() {
-        return new ValueMap("planitem", sourceName,
+        return new ValueMap("planitem", getSourceName(),
             "active", isActive,
-            "awaiting-transition", standardEvent,
+            "awaiting-transition", getStandardEvent(),
             "last-found-transition", "" + lastEvent
         );
     }
@@ -125,7 +129,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         Element onPartXML = parentElement.getOwnerDocument().createElement("onPart");
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
-        onPartXML.setAttribute("source", sourceName + "." + standardEvent);
+        onPartXML.setAttribute("source", getSourceName() + "." + getStandardEvent());
         onPartXML.setAttribute("last", "" + lastEvent);
 
         if (showConnectedPlanItems) {

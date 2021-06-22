@@ -23,7 +23,7 @@ public class TaskInputParameter extends TaskParameter<InputParameterDefinition> 
         // TaskInputParameters get a value when the task is activated, not when the task is instantiated
         super(definition, task, null);
         // If we have a binding defined, link this parameter to the case file via that binding
-        if (binding != null) {
+        if (hasBinding()) {
             bindCaseFileToTaskInputParameter();
         }
     }
@@ -33,10 +33,7 @@ public class TaskInputParameter extends TaskParameter<InputParameterDefinition> 
      */
     private void bindCaseFileToTaskInputParameter() {
         // If we have a binding defined, link this parameter to the case file via that binding, otherwise just return
-        if (binding == null) {
-            return;
-        }
-        CaseFileItem item = binding.getPath().resolve(getCaseInstance());
+        CaseFileItem item = getBinding().getPath().resolve(getCaseInstance());
 
         // Old default behavior: we're navigating to the 'CURRENT' case file item. That is, for array type of case file item,
         //  this will lead to the item that is most recently modified.

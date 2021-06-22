@@ -16,15 +16,19 @@ import org.w3c.dom.Element;
 import java.util.stream.Collectors;
 
 public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItem> {
-    private final CaseFileItemTransition standardEvent;
-    private final String sourceName;
     private boolean isActive;
     private StandardEvent lastEvent;
 
     public CaseFileItemOnPart(Criterion criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(criterion, caseFileItemOnPartDefinition);
-        this.standardEvent = caseFileItemOnPartDefinition.getStandardEvent();
-        this.sourceName = caseFileItemOnPartDefinition.getSourceDefinition().getName();
+    }
+
+    private String getSourceName() {
+        return getDefinition().getSourceDefinition().getName();
+    }
+
+    private CaseFileItemTransition getStandardEvent() {
+        return getDefinition().getStandardEvent();
     }
 
     @Override
@@ -52,7 +56,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     public void inform(CaseFileItem item, StandardEvent event) {
         addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
         lastEvent = event;
-        isActive = standardEvent.equals(event.getTransition());
+        isActive = getStandardEvent().equals(event.getTransition());
         // Change in state...
         if (isActive) {
             criterion.activate(this);
@@ -63,15 +67,15 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
 
     @Override
     public String toString() {
-        String printedItems = connectedItems.isEmpty() ? "No items '" + sourceName + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
-        return standardEvent + " of " + printedItems;
+        String printedItems = connectedItems.isEmpty() ? "No items '" + getSourceName() + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
+        return getStandardEvent() + " of " + printedItems;
     }
 
     @Override
     ValueMap toJson() {
-        return new ValueMap("casefile-item", sourceName,
+        return new ValueMap("casefile-item", getSourceName(),
             "active", isActive,
-            "awaiting-transition", standardEvent,
+            "awaiting-transition", getStandardEvent(),
             "last-found-transition", "" + lastEvent
         );
     }
@@ -81,7 +85,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         Element onPartXML = parentElement.getOwnerDocument().createElement("onPart");
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
-        onPartXML.setAttribute("source", sourceName + "." + standardEvent);
+        onPartXML.setAttribute("source", getSourceName() + "." + getStandardEvent());
         onPartXML.setAttribute("last", "" + lastEvent);
 
         if (showConnectedPlanItems) {

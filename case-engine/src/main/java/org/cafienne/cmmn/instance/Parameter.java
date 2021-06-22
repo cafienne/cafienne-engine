@@ -16,19 +16,27 @@ import java.io.Serializable;
 
 public class Parameter<T extends ParameterDefinition> extends CMMNElement<T> implements Serializable {
     protected Value<?> value; // Default value is Null.
-    private final String name;
-    protected final CaseFileItemDefinition binding;
 
     protected Parameter(T definition, Case caseInstance, Value value) {
         super(caseInstance, definition);
-        this.name = definition.getName();
         this.value = value == null ? Value.NULL : value;
-        this.binding = definition.getBinding();
+    }
+
+    protected boolean hasBinding() {
+        return getDefinition().getBinding() != null;
+    }
+
+    protected CaseFileItemDefinition getBinding() {
+        return getDefinition().getBinding();
+    }
+
+    public String getName() {
+        return getDefinition().getName();
     }
 
     @Override
     public String toString() {
-        return name + " : " + value;
+        return getName() + " : " + value;
     }
 
     /**

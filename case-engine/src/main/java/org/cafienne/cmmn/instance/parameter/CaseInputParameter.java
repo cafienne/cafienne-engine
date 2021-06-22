@@ -20,8 +20,8 @@ public class CaseInputParameter extends Parameter<InputParameterDefinition> {
     public CaseInputParameter(InputParameterDefinition definition, Case caseInstance, Value value) {
         super(definition, caseInstance, value);
         // Now do the binding to the case file, if it is defined
-        if (binding != null) {
-            CaseFileItem item = binding.getPath().resolve(getCaseInstance());
+        if (hasBinding()) {
+            CaseFileItem item = getBinding().getPath().resolve(getCaseInstance());
             // Validate proper types
             item.getDefinition().validatePropertyTypes(value);
 

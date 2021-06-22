@@ -232,10 +232,6 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         return sentryNetwork;
     }
 
-    void setCasePlan(CasePlan casePlan) {
-        this.casePlan = casePlan;
-    }
-
     /**
      * Returns the root plan item
      *
@@ -254,7 +250,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         String stageId = event.getStageId();
         if (stageId.isEmpty()) {
             CasePlanDefinition definition = this.getDefinition().getCasePlanModel();
-            return definition.createInstance(event.planItemId, 0, definition, null, this);
+            this.casePlan = definition.createInstance(event.planItemId, 0, definition, null, this);
+            return this.casePlan;
         } else {
             // Lookup the stage to which the plan item belongs,
             // then lookup the definition for the plan item
