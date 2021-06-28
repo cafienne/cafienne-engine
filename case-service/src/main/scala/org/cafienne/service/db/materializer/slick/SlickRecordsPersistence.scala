@@ -67,20 +67,136 @@ class SlickRecordsPersistence
   }
 
   override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = {
-    val updateQueries = info.filter(u => u.newUserId != u.existingUserId).map(user => {
+    // Update logic has some complexity when the multiple old user id's are mapped to the same new user id
+    //  In that case, duplicate key insertion may occur with the earlier approach that is done through 'simpleUpdate' below.
+    val simpleUpdate = info.filter(u => u.newUserId != u.existingUserId).map(user => {
       (for {c <- TableQuery[UserRoleTable].filter(r => r.userId === user.existingUserId && r.tenant === tenant)} yield c.userId).update(user.newUserId)
-    }) ++ getOffsetRecord(offsetName, offset)
-    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
+    })
+
+    val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
+    val hasNoDuplicates = infoPerNewUserId.exists(update => update._2.size <= 1)
+
+    // If there are no updates on different user id's to one new user id, then the update is simple
+
+    val statements = if (hasNoDuplicates) {
+      Future.successful(simpleUpdate)
+    } else {
+      val oldUserIds = info.map(_.existingUserId).toSet
+      val allOldUsers = TableQuery[UserRoleTable].filter(r => r.tenant === tenant && r.userId.inSet(oldUserIds))
+      val sql = db.run(allOldUsers.result).flatMap(records => {
+        if (records.nonEmpty) {
+          val deleteOldUsers = allOldUsers.delete
+          val insertNewUsers = {
+            infoPerNewUserId.flatMap(member => {
+              val newMemberId = member._1
+
+              val updatableRecords = records.filter(record => member._2.contains(record.userId))
+              val userRecords = updatableRecords.filter(_.role_name.isBlank)
+              val roleRecords = updatableRecords.filterNot(_.role_name.isBlank)
+
+              // First user's name and email are taken as the "truth"; note: if there is no user record, a blank name and email are given
+              val name = userRecords.headOption.fold("")(_.name)
+              val email = userRecords.headOption.fold("")(_.email)
+              val isOwner = userRecords.filter(_.enabled).filter(_.isOwner).toSet.nonEmpty
+              val accountIsEnabled = userRecords.filter(_.enabled).toSet.nonEmpty
+
+              val distinctActiveRoles = roleRecords.filter(_.enabled).map(_.role_name).toSet
+              val distinctInactiveRoles = roleRecords.filterNot(_.enabled).filterNot(m => distinctActiveRoles.contains(m.role_name)).map(_.role_name).toSet
+
+              val newUsersAndRoles: Seq[UserRoleRecord] = {
+                // New user record
+                Seq(UserRoleRecord(newMemberId, tenant, role_name = "", name = name, email = email, isOwner = isOwner, enabled = accountIsEnabled)) ++
+                // Active roles of the user
+                distinctActiveRoles.map(roleName => UserRoleRecord(newMemberId, tenant, role_name = roleName, name = "", email = "", isOwner = false, enabled = true)) ++
+                // Inactive roles of the user
+                distinctInactiveRoles.map(roleName => UserRoleRecord(newMemberId, tenant, role_name = roleName, name = "", email = "", isOwner = false, enabled = false))
+              }
+              newUsersAndRoles.map(record => TableQuery[UserRoleTable].insertOrUpdate(record))
+            })
+          }
+          Future.successful(Seq(deleteOldUsers) ++ insertNewUsers)
+        } else {
+          // If there are no records, then we can simply use the old statement. Actually - do we even need to do anything?
+          Future.successful(simpleUpdate)
+        }
+      })
+      sql
+    }
+
+    statements.flatMap(sql => db.run(DBIO.sequence(sql ++ getOffsetRecord(offsetName, offset)).transactionally).map(_ => Done))
   }
 
-//  var nr = 0L
-  def getOffsetRecord(offsetName: String, offset: Offset) = {
-//    println(s"$nr: Updating $offsetName to $offset")
-//    nr += 1
-    Seq(offsetQuery.insertOrUpdate(OffsetRecord(offsetName, offset)))
+  private def convertUserUpdate(info: Seq[NewUserInformation]): Set[(String, Set[String])] = {
+    val newUserIds: Set[String] = info.map(_.newUserId).toSet
+    newUserIds.map(newUserId => (newUserId, info.filter(_.newUserId == newUserId).map(_.existingUserId).toSet))
+  }
+
+  private def constructCaseTeamUserIdUpdates(caseId: String, info: Seq[NewUserInformation]) = {
+    val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
+    val hasNoDuplicates = infoPerNewUserId.exists(update => update._2.size <= 1)
+
+    // If there are no duplicates (i.e., no situations where multiple old user id's map to the same new id)
+    //  then the update is simple.
+    // Otherwise we need to analyze the current database information (see below)
+    val simpleCaseTeamUpdate = info.map(user => {
+      // Update 'memberId' field in team table
+      val member = for {
+        member <- TableQuery[CaseInstanceTeamMemberTable].filter(r => r.caseInstanceId === caseId && r.isTenantUser && r.memberId === user.existingUserId)
+      } yield member.memberId
+      member.update(user.newUserId)
+    })
+
+    if (hasNoDuplicates) {
+      Future.successful(simpleCaseTeamUpdate)
+    } else {
+      // Run a query on the old user id's, in order to find out what their role in the case team is
+      //  - Subsequently delete all those old records, and replace them with a new set
+      val oldUserIds = info.map(_.existingUserId).toSet
+      val allOldMembers = TableQuery[CaseInstanceTeamMemberTable].filter(r => r.caseInstanceId === caseId && r.isTenantUser && r.memberId.inSet(oldUserIds))
+      val sql = db.run(allOldMembers.result).flatMap(records => {
+        if (records.nonEmpty) {
+          val tenant = records.head.tenant
+          val deleteOldMembers = allOldMembers.delete
+          val insertNewMembers = {
+            infoPerNewUserId.flatMap(member => {
+              val newMemberId = member._1
+              val updatableRecords = records.filter(record => member._2.contains(record.memberId))
+              val userRecords = updatableRecords.filter(_.caseRole.isBlank)
+              val roleRecords = updatableRecords.filterNot(_.caseRole.isBlank)
+
+              val distinctActiveRoles = roleRecords.filter(_.active).map(_.caseRole).toSet
+              val distinctInactiveRoles = roleRecords.filterNot(_.active).filterNot(m => distinctActiveRoles.contains(m.caseRole)).map(_.caseRole).toSet
+
+              // The new member becomes case owner if one or more of the old members is also case owner
+              val isCaseOwner = userRecords.filter(_.active).filter(_.isOwner).toSet.nonEmpty
+              val isActive = userRecords.filter(_.active).toSet.nonEmpty
+
+              val newMembers: Seq[CaseTeamMemberRecord] = {
+                Seq(CaseTeamMemberRecord(caseId, tenant, newMemberId, "", isTenantUser = true, isOwner = isCaseOwner, active = isActive)) ++
+                  distinctActiveRoles.map(roleName => CaseTeamMemberRecord(caseId, tenant, newMemberId, roleName, isTenantUser = true, isOwner = false, active = true)) ++
+                  distinctInactiveRoles.map(roleName => CaseTeamMemberRecord(caseId, tenant, newMemberId, roleName, isTenantUser = true, isOwner = false, active = false))
+              }
+              newMembers.map(newMember => TableQuery[CaseInstanceTeamMemberTable].insertOrUpdate(newMember))
+            })
+          }
+          Future.successful(Seq(deleteOldMembers) ++ insertNewMembers)
+        } else {
+          Future.successful(simpleCaseTeamUpdate)
+        }
+      })
+      sql
+    }
   }
 
   def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = {
+    // When the user id is updated, then all records relating to the case instance need to be updated
+    //  - Case itself on [createdBy, modifiedBy]
+    //  - CaseDefinition on [modifiedBy]
+    //  - PlanItem on [createdBy, modifiedBy]
+    //  - PlanItemHistory on [modifiedBy]
+    //  - Tasks on [createdBy, modifiedBy, assignee, owner]
+    //  - CaseTeam members --> this has special logic, as multiple old id's may map to one new id.
+    //    Updating this requires a database query, therefore this is isolated in a separate method returning a Future
     val updateQueries = info.map(user => {
       // Update 'createdBy' field in case instance table
       (for {cases <- TableQuery[CaseInstanceTable].filter(r => r.id === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
@@ -111,11 +227,23 @@ class SlickRecordsPersistence
     }) ++ info.map(user => {
       // Update 'owner' field in task table
       (for {cases <- TableQuery[TaskTable].filter(r => r.caseInstanceId === caseId && r.owner === user.existingUserId)} yield cases.owner).update(user.newUserId)
-    }) ++ info.map(user => {
-      // Update 'memberId' field in team table
-      (for {cases <- TableQuery[CaseInstanceTeamMemberTable].filter(r => r.isTenantUser && r.memberId === user.existingUserId)} yield cases.memberId).update(user.newUserId)
     }) ++ getOffsetRecord(offsetName, offset)
-    db.run(DBIO.sequence(updateQueries).transactionally).map { _ => Done }
+
+    // Now retrieve the future with the case team updates, and combine it with the above statements and run it
+    val caseteamUpdates = constructCaseTeamUserIdUpdates(caseId, info)
+    caseteamUpdates.flatMap(sql => {
+      db.run(DBIO.sequence(updateQueries ++ sql).transactionally).map(_ => {
+//        println(s"---- updated case $caseId")
+        Done
+      })
+    })
+  }
+
+  //  var nr = 0L
+  def getOffsetRecord(offsetName: String, offset: Offset) = {
+    //    println(s"$nr: Updating $offsetName to $offset")
+    //    nr += 1
+    Seq(offsetQuery.insertOrUpdate(OffsetRecord(offsetName, offset)))
   }
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {
