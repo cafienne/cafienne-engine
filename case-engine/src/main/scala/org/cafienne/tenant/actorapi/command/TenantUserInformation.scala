@@ -1,9 +1,9 @@
 package org.cafienne.tenant.actorapi.command
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.{CafienneSerializable, Fields}
-import org.cafienne.json.{BooleanValue, StringValue, ValueList, ValueMap}
-import org.cafienne.json.CafienneJson
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.json._
+import scala.jdk.CollectionConverters._
 
 final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = None, name: Option[String] = None, email: Option[String] = None, owner: Option[Boolean] = None, enabled: Option[Boolean] = None) extends CafienneJson {
 
@@ -19,20 +19,16 @@ final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = 
     * @param generator
     */
   override def write(generator: JsonGenerator): Unit = {
-    generator.writeStartObject()
     writeField(generator, Fields.userId, id)
-    name.map(name => writeField(generator, Fields.name, name))
-    email.map(email => writeField(generator, Fields.email, email))
-    roles.map(roles => {
-      import scala.jdk.CollectionConverters._
-      writeField(generator, Fields.roles, roles.asJava)
-    })
-    owner.map(value => writeField(generator, Fields.isOwner, value))
-    enabled.map(value => writeField(generator, Fields.enabled, value))
-    generator.writeEndObject()
+    // Write optional fields through foreach pattern
+    name.foreach(name => writeField(generator, Fields.name, name))
+    email.foreach(email => writeField(generator, Fields.email, email))
+    roles.foreach(roles => writeField(generator, Fields.roles, roles.asJava))
+    owner.foreach(value => writeField(generator, Fields.isOwner, value))
+    enabled.foreach(value => writeField(generator, Fields.enabled, value))
   }
 
-  override def toValue = {
+  override def toValue: Value[_] = {
     val json: ValueMap = new ValueMap(Fields.userId, id)
     name.map(name => json.put(Fields.name, new StringValue(name)))
     email.map(email => json.put(Fields.email, new StringValue(email)))
@@ -51,7 +47,6 @@ final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = 
 object TenantUserInformation {
   def from(json: ValueMap) : TenantUserInformation = {
     def readOptionalStringList(field:Fields): Option[Seq[String]] = {
-      import scala.jdk.CollectionConverters._
       json.get(field) match {
         case list: ValueList => Some(list.getValue.asScala.map(v => v.getValue.asInstanceOf[String]))
         case _ => None

@@ -72,11 +72,9 @@ public class SerializedException implements CafienneSerializable {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        generator.writeStartObject();
         writeField(generator, Fields.className, className);
         writeField(generator, Fields.message, message);
         writeField(generator, Fields.cause, cause);
-        generator.writeEndObject();
     }
 
     @Override

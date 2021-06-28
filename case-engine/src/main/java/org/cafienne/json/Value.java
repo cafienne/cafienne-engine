@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.cafienne.json.CafienneJson;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -246,6 +247,8 @@ public abstract class Value<T> implements Serializable {
             return valueList;
         } else if (object instanceof Throwable) {
             return convertThrowable((Throwable) object);
+        } else if (object instanceof CafienneSerializable) {
+            return new CafienneSerializableValue((CafienneSerializable) object);
         } else if (object instanceof Serializable) {
             return new SerializableValue(object);
         } else {

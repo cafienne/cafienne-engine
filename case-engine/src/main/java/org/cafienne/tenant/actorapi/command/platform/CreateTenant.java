@@ -63,7 +63,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         writeField(generator, Fields.name, name);
         generator.writeArrayFieldStart(Fields.users.toString());
         for (TenantUserInformation user : users) {
-            user.write(generator);
+            user.writeThisObject(generator);
         }
         generator.writeEndArray();
     }
