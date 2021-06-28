@@ -22,7 +22,7 @@ import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.identifiers.route.IdentifierRoutes
 import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
-import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
+import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, PlatformQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
 import org.cafienne.service.db.materializer.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.repository.RepositoryRoute
@@ -73,6 +73,7 @@ object Main extends App {
     val userQueries = new TenantQueriesImpl
     val updater = new SlickRecordsPersistence
     val offsetStorage = new QueryDBOffsetStorageProvider
+    val platformQueries = new PlatformQueriesImpl
 
     implicit val userCache = new IdentityCache(userQueries)
 
@@ -90,7 +91,7 @@ object Main extends App {
         new IdentifierRoutes(identifierQueries),
         new TaskRoutes(taskQueries),
         new TenantRoutes(userQueries),
-        new PlatformRoutes(),
+        new PlatformRoutes(platformQueries),
         new RepositoryRoute(),
         new DebugRoute()
       )
