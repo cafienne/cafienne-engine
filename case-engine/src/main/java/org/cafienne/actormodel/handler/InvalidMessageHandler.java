@@ -25,12 +25,12 @@ public class InvalidMessageHandler<C extends ModelCommand, E extends ModelEvent,
             ModelCommand invalidCommand = (ModelCommand) msg;
             // Still set the actor, so that it can create a proper failure response.
             invalidCommand.setActor(this.actor);
-            Exception wrongCommandType = new Exception("ModelActor of type '" + this.actor.getClass().getSimpleName() + "' does not support commands of type " + invalidCommand.getClass().getName());
+            Exception wrongCommandType = new Exception(this.actor + " does not support commands of type " + invalidCommand.getClass().getName());
             addDebugInfo(() -> wrongCommandType.getMessage(), logger);
             CommandFailure response = new CommandFailure((ModelCommand) msg, wrongCommandType);
             actor.reply(response);
         } else {
-            logger.warn(actor.getClass().getSimpleName() + " " + actor.getId() + " received a message it cannot handle, of type " + msg.getClass().getName());
+            logger.warn(actor + " received a message it cannot handle, of type " + msg.getClass().getName());
         }
 
         actor.persistEvents(events);

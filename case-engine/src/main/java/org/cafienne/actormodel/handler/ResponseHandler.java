@@ -38,7 +38,7 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
             // So if we still do not find a listener, it means that we received a response to a command that we never submitted,
             // and we log a warning for that. It basically means someone else has submitted the command and told the other case to respond to us -
             // which is strange.
-            logger.warn(actor.getClass().getSimpleName() + " " + actor.getId() + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
+            logger.warn(actor + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
         } else {
             if (msg instanceof CommandFailure) {
                 handler.left.handleFailure((CommandFailure) msg);
