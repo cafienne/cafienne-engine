@@ -29,7 +29,9 @@ object TenantAPI {
 
   case class PlatformUserUpdateFormat(existingUserId: String, newUserId: String)
 
-  case class PlatformUsersUpdateFormat(users: Seq[PlatformUserUpdateFormat])
+  case class PlatformUsersUpdateFormat(
+    @(Schema @field)(implementation = classOf[String], example = "Users for which to update the id") users: Seq[PlatformUserUpdateFormat],
+    @(Schema @field)(implementation = classOf[String], example = "Optional list of tenants in which to update the users. If empty it selects all tenants") tenants: Option[Seq[String]] = None)
 
   case class BackwardsCompatibleTenantFormat(name: String, owners: Option[Seq[UserFormat]] = None, users: Option[Seq[UserFormat]] = None)
 }

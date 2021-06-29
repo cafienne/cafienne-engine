@@ -25,6 +25,7 @@ public class UpdatePlatformInformation extends PlatformCommand {
     public UpdatePlatformInformation(PlatformUser user, PlatformUpdate platformUpdate, List<TenantUpdate> tenants, List<CaseUpdate> cases) {
         super(TenantUser.fromPlatformOwner(user, "PLATFORM"));
         this.platformUpdate = platformUpdate;
+        this.platformUpdate.validate(); // Let's do an early check on proper input information
         this.tenants = tenants;
         this.cases = cases;
     }

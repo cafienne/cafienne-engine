@@ -139,7 +139,7 @@ public interface CafienneSerializable {
             generator.writeNullField(fieldName.toString());
         } else {
             generator.writeFieldName(fieldName.toString());
-            value.write(generator);
+            value.writeThisObject(generator);
         }
     }
 

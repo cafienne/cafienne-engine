@@ -11,7 +11,7 @@ trait TaskTables extends QueryDBSchema {
   import dbConfig.profile.api._
 
   // Schema for the "task" table:
-  final class TaskTable(tag: Tag) extends CafienneTable[TaskRecord](tag, "task") {
+  final class TaskTable(tag: Tag) extends CafienneTenantTable[TaskRecord](tag, "task") {
 
     override def getSortColumn(field: String): ColumnOrdered[_] = field match {
       case "taskstate" => taskState
@@ -28,8 +28,6 @@ trait TaskTables extends QueryDBSchema {
     def id = idColumn[String]("id", O.PrimaryKey)
 
     def caseInstanceId = idColumn[String]("case_instance_id")
-
-    def tenant = idColumn[String]("tenant")
 
     def role = column[String]("role", O.Default(""))
 

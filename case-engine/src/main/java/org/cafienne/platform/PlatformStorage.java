@@ -49,8 +49,15 @@ public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
      * @param snapshot
      */
     void merge(PlatformStorage snapshot) {
-        snapshot.batches.forEach(batch -> registerBatch(batch));
         this.history.merge(snapshot.history);
+        snapshot.batches.forEach(batch -> {
+            if (batch.getJobs().isEmpty()) {
+                // For some reason the completion of the batch was not properly added to history; doing it here.
+                history.add(batch.getHistory());
+            } else {
+                registerBatch(batch);
+            }
+        });
     }
 
     private void registerBatch(BatchJob batch) {

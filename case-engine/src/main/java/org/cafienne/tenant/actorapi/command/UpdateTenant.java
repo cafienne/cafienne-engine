@@ -54,7 +54,7 @@ public class UpdateTenant extends TenantCommand {
         super.write(generator);
         generator.writeArrayFieldStart(Fields.users.toString());
         for (TenantUserInformation user : users) {
-            user.write(generator);
+            user.writeThisObject(generator);
         }
         generator.writeEndArray();
     }

@@ -49,6 +49,6 @@ public class TimerJob implements CafienneSerializable {
         writeField(generator, Fields.caseInstanceId, caseInstanceId);
         writeField(generator, Fields.moment, moment);
         generator.writeFieldName(Fields.user.toString());
-        user.write(generator);
+        user.writeThisObject(generator);
     }
 }

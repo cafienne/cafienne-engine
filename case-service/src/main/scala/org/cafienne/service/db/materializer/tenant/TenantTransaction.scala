@@ -25,6 +25,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
 //    println("Modified: "+rolesByUserAndRoleName.keySet)
     users.keySet.map(key => key.userId).toSet
   }
+
   
   def handleEvent(evt: TenantEvent, offsetName: String, offset: Offset): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " on tenant " + tenant)
@@ -88,10 +89,10 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
         Future.successful(value)
       case None =>
         logger.debug(s"Retrieving user_role[$key] from database")
-        persistence.getUserRole(key).map(result => result match {
+        persistence.getUserRole(key).map {
           case Some(value) => value
-          case None => UserRoleRecord(key.userId, key.tenant, key.role_name, "", "", false, true)
-        })
+          case None => UserRoleRecord(key.userId, key.tenant, key.role_name, "", "", isOwner = false, enabled = true)
+        }
     }
   }
 

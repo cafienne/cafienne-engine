@@ -156,6 +156,16 @@ trait CafienneJDBCConfig {
     }
   }
 
+  /**
+    * Base class for tables that have a 'tenant' column
+    * @param tag
+    * @param tableName
+    * @tparam T
+    */
+  abstract class CafienneTenantTable[T](tag: Tag, tableName: String) extends CafienneTable[T](tag, tableName) {
+    def tenant = idColumn[String]("tenant")
+  }
+
   implicit class QueryHelper[T <: CafienneTable[_], E](query: Query[T, E, Seq]) {
     /**
       * Orders the results as given in the Sort object.
@@ -178,6 +188,23 @@ trait CafienneJDBCConfig {
       */
     def only(area: Area) = {
       query.drop(area.offset).take(area.numOfResults)
+    }
+  }
+
+  implicit class TenantQueryHelper[T <: CafienneTenantTable[_], E](query: Query[T, E, Seq]) {
+    /**
+      * Add tenant selector to the query. If no tenants specified, it will not add a filter on tenant
+      * and search across tenants
+      *
+      * @param tenants
+      * @return
+      */
+    def inTenants(tenants: Option[Seq[String]]): Query[T, E, Seq] = {
+      val set = tenants.getOrElse(Seq())
+      set.isEmpty match {
+        case true => query
+        case false => query.filter(_.tenant.inSet(set))
+      }
     }
   }
 

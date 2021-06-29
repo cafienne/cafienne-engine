@@ -65,7 +65,7 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
         } catch (Throwable e) {
             addDebugInfo(() -> e, logger);
             setNextResponse(new EngineChokedFailure(getCommand(), e));
-            addDebugInfo(() -> "---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in actor " + this.actor.getId() + "\nwith exception", logger);
+            addDebugInfo(() -> "---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception", logger);
             return;
         }
 
@@ -79,11 +79,11 @@ public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A exte
             logger.debug("===== Command was not authorized ======");
         } catch (CommandException e) {
             setNextResponse(new CommandFailure(getCommand(), e));
-            addDebugInfo(() -> "---------- User " + command.getUser().id() + " in actor " + this.actor.getId() + " failed to complete command " + command + "\nwith exception", logger);
+            addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception", logger);
             addDebugInfo(() -> e, logger);
         } catch (Throwable e) {
             setNextResponse(new EngineChokedFailure(getCommand(), e));
-            addDebugInfo(() -> "---------- Engine choked during processing of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in actor " + this.actor.getId() + "\nwith exception", logger);
+            addDebugInfo(() -> "---------- Engine choked during processing of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception", logger);
             addDebugInfo(() -> e, logger);
         }
     }
