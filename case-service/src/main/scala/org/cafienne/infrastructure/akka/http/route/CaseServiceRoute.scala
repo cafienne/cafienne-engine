@@ -122,7 +122,7 @@ trait CaseServiceRoute extends LazyLogging {
   }
 
   def apiClasses(): Seq[Class[_]] = {
-    swaggerClasses.to[Seq]
+    swaggerClasses.toSeq
   }
 
   /**

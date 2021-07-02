@@ -1,10 +1,10 @@
 package org.cafienne.service.api.platform
 
+import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.response.{CommandFailure, ModelResponse}
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.command.response.CommandFailure
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.Main
 import org.cafienne.system.CaseSystem
@@ -13,7 +13,8 @@ import org.cafienne.tenant.actorapi.command.platform.CreateTenant
 import org.cafienne.tenant.actorapi.response.TenantResponse
 
 import java.io.File
-import scala.collection.JavaConverters._
+import scala.concurrent._
+import scala.jdk.CollectionConverters._
 
 /**
   * The platform can be configured with a default tenant setup.
@@ -83,7 +84,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure("Bootstrap file should contain a list of owners, with at least one owner for the tenant")
       }
 
-      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.map(user => {
+      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.toSeq.map(user => {
         val userId = user.getString("id")
         val roles = readStringList(user, "roles")
         val name = readStringOr(user, "name", "")
@@ -116,7 +117,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def readStringList(config: Config, path: String, defaultValue: Seq[String] = Seq()): Seq[String] = {
     if (config.hasPath(path)) {
-      config.getStringList(path).asScala
+      config.getStringList(path).asScala.toSeq
     } else {
       defaultValue
     }
@@ -124,24 +125,22 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant) = {
     import akka.pattern.ask
-    implicit val timeout = Main.caseSystemTimeout
-    implicit val ec = scala.concurrent.ExecutionContext.global
+    implicit val timeout: Timeout = Main.caseSystemTimeout
+    implicit val ec: ExecutionContextExecutor = ExecutionContext.global
 
-    caseSystem.router.ask(bootstrapTenant).map(response =>
-      response match {
-        case e: CommandFailure => {
-          if (e.exception().getMessage.toLowerCase().contains("already exists")) {
-            logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
-          } else {
-            logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
-          }
+    caseSystem.router().ask(bootstrapTenant).map {
+      case e: CommandFailure => {
+        if (e.exception().getMessage.toLowerCase().contains("already exists")) {
+          logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
+        } else {
+          logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
         }
-        case t: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
-        case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
-        case t: Throwable => throw t
-        case other => logger.error("Unexpected response during creation of bootstrap tenant, of type " + other.getClass.getName)
       }
-    )
+      case t: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
+      case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
+      case t: Throwable => throw t
+      case other => logger.error("Unexpected response during creation of bootstrap tenant, of type " + other.getClass.getName)
+    }
   }
 }
 

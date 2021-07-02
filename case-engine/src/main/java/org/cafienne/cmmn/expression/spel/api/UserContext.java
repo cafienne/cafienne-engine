@@ -17,7 +17,7 @@ public class UserContext {
     public UserContext(TenantUser user) {
         this.id = user.id();
         this.name = user.name();
-        this.roles = new HashSet(scala.collection.JavaConverters.seqAsJavaList(user.roles()));
+        this.roles = new HashSet(scala.jdk.CollectionConverters.SeqHasAsJava(user.roles()).asJava());
         this.email = user.email();
     }
 }

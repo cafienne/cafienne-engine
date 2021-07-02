@@ -20,7 +20,7 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
   val keyspace: String = "akka" // For now store timers inside the akka keyspace, not too sure if that is handy
   val timerTable = "cafienne_timer"
   val offsetTable = "cafienne_timer_offset"
-  val cassandraTimeout = Timeout(15 seconds)
+  val cassandraTimeout = Timeout(15.seconds)
   override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
   Await.result({

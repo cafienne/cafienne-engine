@@ -16,7 +16,7 @@ final case class CaseDefinitionDocument(record: CaseDefinitionRecord) {
 }
 
 final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {
-  override def toValue: Value[_] = {
+  override def toValue = {
     val list = new ValueList
     items.foreach(item => list.add(item.toValueMap))
     list

@@ -79,7 +79,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     // Even if there are no new records, we will still update the offset store
     records += OffsetRecord(offsetName, offset)
 
-    persistence.bulkUpdate(records.filter(r => r != null))
+    persistence.bulkUpdate(records.filter(r => r != null).toSeq)
   }
 
   private def getUserRoleRecord(key: UserRoleKey): Future[UserRoleRecord] = {

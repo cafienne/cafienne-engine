@@ -53,7 +53,7 @@ class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implic
   def getIdentifiers = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
-        parameters('tenant ?, 'name ?, 'offset ? 0, 'numberOfResults ? 100, 'sortBy ?, 'sortOrder ?) {
+        parameters("tenant".?, "name".?, "offset".?(0), "numberOfResults".?(100), "sortBy".?, "sortOrder".?) {
           (tenant, name, offset, numResults, sortBy, sortOrder) =>
             val filter = IdentifierFilter(tenant, name)
             runQuery(identifierQueries.getIdentifiers(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "name")))
@@ -80,7 +80,7 @@ class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implic
     path("names") {
       pathEndOrSingleSlash {
         validUser { platformUser =>
-          parameters('tenant ?) { tenant =>
+          parameters("tenant".?) { tenant =>
             runListQuery(identifierQueries.getIdentifierNames(platformUser, tenant))
           }
         }

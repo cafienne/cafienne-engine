@@ -59,7 +59,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
   def getAllTasks = get {
     validUser { platformUser =>
       pathEndOrSingleSlash {
-        parameters('tenant ?, 'identifiers ?, 'caseName ?, 'taskName ?, 'taskState ?, 'assignee ?, 'owner ?, 'dueOn ?, 'dueBefore ?, 'dueAfter ?, 'sortBy ?, 'sortOrder ?, 'offset ? 0, 'numberOfResults ? 100) {
+        parameters("tenant".?, "identifiers".?, "caseName".?, "taskName".?, "taskState".?, "assignee".?, "owner".?, "dueOn".?, "dueBefore".?, "dueAfter".?, "sortBy".?, "sortOrder".?, "offset".?(0), "numberOfResults".?(100)) {
           (tenant, identifiers, caseName, taskName, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
             optionalHeaderValueByName("timeZone") { timeZone =>
               val area = Area(offset, numberOfResults)
@@ -139,7 +139,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
   @Produces(Array("application/json"))
   def getTaskCount = get {
     validUser { platformUser =>
-      parameters('tenant ?) { tenant =>
+      parameters("tenant".?) { tenant =>
         path("user" / "count") {
           runQuery(taskQueries.getCountForUser(platformUser, tenant))
         }
@@ -168,7 +168,7 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
   def getCaseDefinitionTasks = get {
     validUser { platformUser =>
       path("case-name" / Segment) { caseName =>
-        parameters('tenant ?) {
+        parameters("tenant".?) {
           optionalTenant => runListQuery(taskQueries.getTasksWithCaseName(caseName, optionalTenant, platformUser))
         }
       }

@@ -48,7 +48,7 @@ object TenantUserInformation {
   def from(json: ValueMap) : TenantUserInformation = {
     def readOptionalStringList(field:Fields): Option[Seq[String]] = {
       json.get(field) match {
-        case list: ValueList => Some(list.getValue.asScala.map(v => v.getValue.asInstanceOf[String]))
+        case list: ValueList => Some(list.getValue.asScala.toSeq.map(v => v.getValue.asInstanceOf[String]))
         case _ => None
       }
     }

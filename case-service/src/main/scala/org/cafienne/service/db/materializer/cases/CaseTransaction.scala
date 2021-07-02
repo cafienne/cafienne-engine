@@ -305,6 +305,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
     //    println("Committing "+records.size+" records into the database for "+offset)
 
-    persistence.bulkUpdate(records.filter(r => r != null))
+    persistence.bulkUpdate(records.toSeq.filter(r => r != null))
   }
 }

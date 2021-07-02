@@ -146,7 +146,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   def deleteCaseTeamMember = delete {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("caseteam" / Segment) { memberId =>
-        parameters('type ?) { memberType =>
+        parameters("type".?) { memberType =>
           askCase(platformUser, caseInstanceId, tenantUser => new RemoveTeamMember(tenantUser, caseInstanceId, MemberKey(memberId, memberType.getOrElse("user"))))
         }
       }

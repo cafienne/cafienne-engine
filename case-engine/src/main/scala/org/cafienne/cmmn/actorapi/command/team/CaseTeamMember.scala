@@ -6,6 +6,8 @@ import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
 import org.cafienne.json.CafienneJson
 
+import scala.jdk.CollectionConverters._
+
 case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwner: Option[Boolean] = None, removeRoles: Seq[String] = Seq()) extends CafienneJson {
   def validateRolesExist(caseDefinition: CaseDefinition): Unit = {
     val blankRoles = (caseRoles ++ removeRoles).filter(roleName => roleName.isBlank)
@@ -25,16 +27,14 @@ case class CaseTeamMember(key: MemberKey, caseRoles: Seq[String] = Seq(), isOwne
   }
 
   def getCaseRoles = {
-    import scala.collection.JavaConverters._
     caseRoles.asJava
   }
 
   def rolesToRemove = {
-    import scala.collection.JavaConverters._
     removeRoles.asJava
   }
 
-  override def toValue(): ValueMap = {
+  override def toValue = {
     val json = new ValueMap("memberId", key.id,
       "memberType", key.`type`,
       "isOwner", isOwner.fold(Value.NULL.asInstanceOf[Value[Any]])(b => new BooleanValue(b).asInstanceOf[Value[Any]]),
@@ -50,6 +50,8 @@ object CaseTeamMember {
 
   def apply(key: MemberKey, caseRoles: Array[String], isOwner: Boolean) = new CaseTeamMember(key, caseRoles = caseRoles.toSeq, isOwner = Some(isOwner))
 
+  def apply(key: MemberKey, caseRoles: Seq[String], isOwner: Boolean) = new CaseTeamMember(key, caseRoles = caseRoles.toSeq, isOwner = Some(isOwner))
+
   def createBootstrapMember(user: TenantUser) = new CaseTeamMember(MemberKey(user.id, "user"), isOwner = Some(true))
 
   def deserialize(json: ValueMap) = {
@@ -64,9 +66,8 @@ object CaseTeamMember {
       }
     }
 
-    import scala.collection.JavaConverters._
-    val caseRoles = json.withArray("caseRoles").getValue.asScala.asInstanceOf[Seq[StringValue]].map(sv => sv.getValue)
-    val removeRoles = json.withArray("removeRoles").getValue.asScala.asInstanceOf[Seq[StringValue]].map(sv => sv.getValue)
+    val caseRoles = json.withArray("caseRoles").getValue.asScala.toSeq.asInstanceOf[Seq[StringValue]].map(sv => sv.getValue)
+    val removeRoles = json.withArray("removeRoles").getValue.asScala.toSeq.asInstanceOf[Seq[StringValue]].map(sv => sv.getValue)
     new CaseTeamMember(MemberKey(memberId, memberType), caseRoles = caseRoles, isOwner = isOwner, removeRoles = removeRoles)
   }
 }

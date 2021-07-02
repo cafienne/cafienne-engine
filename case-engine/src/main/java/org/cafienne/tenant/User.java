@@ -3,7 +3,6 @@ package org.cafienne.tenant;
 import org.cafienne.tenant.actorapi.command.TenantUserInformation;
 import org.cafienne.tenant.actorapi.event.*;
 import scala.collection.Seq;
-import scala.collection.Traversable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -55,7 +54,7 @@ public class User {
     }
 
     private void updateRoles(Seq<String> newRolesInfo) {
-        Traversable<String> newRolesToAdd = newRolesInfo.filter(roleToAdd -> !this.roles.contains(roleToAdd));
+        scala.collection.Iterable<String> newRolesToAdd = newRolesInfo.filter(roleToAdd -> !this.roles.contains(roleToAdd));
         List<String> oldRolesToRemove = this.roles.stream().filter(roleToRemove -> !newRolesInfo.contains(roleToRemove)).collect(Collectors.toList());
 
         newRolesToAdd.foreach(role -> addRole(role));
