@@ -18,9 +18,9 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.platform.{CaseUpdate, NewUserInformation, PlatformUpdate, TenantUpdate}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.platform.actorapi.command.{GetUpdateStatus, UpdatePlatformInformation}
-import org.cafienne.service.db.query.PlatformQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.service.api.tenant.route.TenantRoute
+import org.cafienne.service.db.query.PlatformQueries
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.platform.{DisableTenant, EnableTenant}
 
@@ -149,65 +149,49 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     validOwner { platformOwner =>
       pathPrefix("user") {
         pathEndOrSingleSlash {
-          import spray.json.DefaultJsonProtocol._
           import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+          import spray.json.DefaultJsonProtocol._
 
           implicit val userFormat = jsonFormat2(TenantAPI.PlatformUserUpdateFormat)
           implicit val listFormat = jsonFormat2(TenantAPI.PlatformUsersUpdateFormat)
           entity(as[TenantAPI.PlatformUsersUpdateFormat]) { request =>
-            readLastModifiedHeader() { lastModified =>
-              val newUserIds = request.users.map(u => u.newUserId)
-              val existingUserIds = request.users.map(u => u.existingUserId)
-              logger.warn("Received request to update platform users " + request)
-              onComplete(handleSyncedQuery(() => platformQueries.hasExistingUserIds(newUserIds, request.tenants), lastModified)) {
-                case Success(value) => value.size match {
-                  case 0 => {
-                    logger.warn("New user ids are not in use; retrieving where used information across the system for the existing users ids")
-                    val startWhereUsedQueries = System.currentTimeMillis()
-                    val queries = for {
-                      tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds, request.tenants)
-                      casesByUser <- platformQueries.whereUsedInCases(existingUserIds, request.tenants)
-                    } yield (tenantsByUser, casesByUser)
-                    onComplete(queries) {
-                      case Success(value) => {
-                        val finishedWhereUsedQueries = System.currentTimeMillis()
-                        logger.warn(s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases; query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis")
+            val existingUserIds = request.users.map(u => u.existingUserId)
+            logger.warn("Received request to update platform users " + request)
+            val startWhereUsedQueries = System.currentTimeMillis()
+            val queries = for {
+              tenantsByUser <- platformQueries.whereUsedInTenants(existingUserIds, request.tenants)
+              casesByUser <- platformQueries.whereUsedInCases(existingUserIds, request.tenants)
+            } yield (tenantsByUser, casesByUser)
+            onComplete(queries) {
+              case Success(value) => {
+                val finishedWhereUsedQueries = System.currentTimeMillis()
+                logger.warn(s"Existing user ids are found in ${value._1.size} tenants and ${value._2.size} cases; query took ${finishedWhereUsedQueries - startWhereUsedQueries} millis")
 
-                        // Create a base list of NewUserInformation from which a selection will be added to each TenantUpdate and CaseUpdate
-                        val newUserInfo = request.users.map(user => NewUserInformation(user.existingUserId, user.newUserId))
+                // Create a base list of NewUserInformation from which a selection will be added to each TenantUpdate and CaseUpdate
+                val newUserInfo = request.users.map(user => NewUserInformation(user.existingUserId, user.newUserId))
 
-                        // Convert query results to command objects for inside the engine
-                        val tenantsToUpdate = value._1.map(tenantUserInfo => {
-                          val tenant = tenantUserInfo._1
-                          val tenantUsers = newUserInfo.filter(info => tenantUserInfo._2.contains(info.existingUserId))
-                          TenantUpdate(tenant, PlatformUpdate(tenantUsers))
-                        })
+                // Convert query results to command objects for inside the engine
+                val tenantsToUpdate = value._1.map(tenantUserInfo => {
+                  val tenant = tenantUserInfo._1
+                  val tenantUsers = newUserInfo.filter(info => tenantUserInfo._2.contains(info.existingUserId))
+                  TenantUpdate(tenant, PlatformUpdate(tenantUsers))
+                })
 
-                        val casesToUpdate = value._2.map(caseUserInfo => {
-                          val caseId = caseUserInfo._1._1
-                          val tenant = caseUserInfo._1._2
-                          val users = caseUserInfo._2
-                          val caseUsers = newUserInfo.filter(info => users.contains(info.existingUserId))
-                          CaseUpdate(caseId, tenant, PlatformUpdate(caseUsers))
-                        })
+                val casesToUpdate = value._2.map(caseUserInfo => {
+                  val caseId = caseUserInfo._1._1
+                  val tenant = caseUserInfo._1._2
+                  val users = caseUserInfo._2
+                  val caseUsers = newUserInfo.filter(info => users.contains(info.existingUserId))
+                  CaseUpdate(caseId, tenant, PlatformUpdate(caseUsers))
+                })
 
-                        // Make it Java-ish and inform the platform
-                        import scala.collection.JavaConverters._
-                        val tenants = seqAsJavaList(tenantsToUpdate.toSeq)
-                        val cases = seqAsJavaList(casesToUpdate.toSeq)
-                        askModelActor(new UpdatePlatformInformation(platformOwner, PlatformUpdate(newUserInfo), tenants, cases))
-                      }
-                      case Failure(t) => handleFailure(t)
-                    }
-                  }
-                  case _ => {
-                    val error = "Cannot apply new user ids; found existing ids: " + value.mkString(", ")
-                    logger.warn(error)
-                    complete(StatusCodes.BadRequest, error)
-                  }
-                }
-                case Failure(t) => handleFailure(t)
+                // Make it Java-ish and inform the platform
+                import scala.collection.JavaConverters._
+                val tenants = seqAsJavaList(tenantsToUpdate.toSeq)
+                val cases = seqAsJavaList(casesToUpdate.toSeq)
+                askModelActor(new UpdatePlatformInformation(platformOwner, PlatformUpdate(newUserInfo), tenants, cases))
               }
+              case Failure(t) => handleFailure(t)
             }
           }
         }
@@ -232,8 +216,8 @@ class PlatformRoute(platformQueries: PlatformQueries)(override implicit val user
     validOwner { _ =>
       pathPrefix("where-used-info") {
         pathEndOrSingleSlash {
-          import spray.json.DefaultJsonProtocol._
           import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+          import spray.json.DefaultJsonProtocol._
 
           implicit val userFormat = jsonFormat2(TenantAPI.PlatformUserUpdateFormat)
           implicit val listFormat = jsonFormat2(TenantAPI.PlatformUsersUpdateFormat)
