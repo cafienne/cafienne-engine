@@ -68,14 +68,13 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
 
     @Override
     public void print(JsonGenerator generator) throws IOException {
-        generator.writeStartArray(value.size());
+        generator.writeStartArray(value, value.size());
 
-        int num = value.size();
-        for (int i = 0; i < num; i++) {
-            Object obj = value.get(i);
-            if (obj instanceof Value<?>) {
-                Value<?> cfi = (Value<?>) obj;
-                cfi.print(generator);
+        for (Value<?> item : value) {
+            if (item != null) {
+                item.print(generator);
+            } else {
+                generator.writeNull();
             }
         }
 

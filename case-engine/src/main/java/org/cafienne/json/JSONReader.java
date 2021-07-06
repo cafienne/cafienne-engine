@@ -61,7 +61,7 @@ public class JSONReader {
 
         // Iterate over object fields:
         // JsonToken token = jp.getCurrentToken();
-        int tokenId = jp.getCurrentTokenId();
+        int tokenId = jp.currentTokenId();
 
         Value<?> value = null;
 
