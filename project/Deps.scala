@@ -93,7 +93,7 @@ object Deps {
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
   val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.6.0"
   val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "9.2.1.jre11"
-  val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.11.0"
+  val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.2.1"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
 
