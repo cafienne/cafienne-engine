@@ -10,6 +10,7 @@ package org.cafienne.humantask.actorapi.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
@@ -26,9 +27,9 @@ public class HumanTaskActivated extends HumanTaskTransitioned {
     private final Instant createdOn;
     private final String createdBy;
     private final String performer;
-    private final ValueMap taskModel;
+    private final Value<?> taskModel;
 
-    public HumanTaskActivated(HumanTask task, String performer, ValueMap taskModel) {
+    public HumanTaskActivated(HumanTask task, String performer, Value<?> taskModel) {
         super(task, TaskState.Unassigned, TaskState.Null, TaskAction.Create);
         this.createdOn = task.getCaseInstance().getTransactionTimestamp();
         this.createdBy = task.getCaseInstance().getCurrentUser().id();
@@ -41,7 +42,7 @@ public class HumanTaskActivated extends HumanTaskTransitioned {
         this.createdOn = readInstant(json, Fields.createdOn);
         this.createdBy = readField(json, Fields.createdBy);
         this.performer = json.raw(Fields.performer);
-        this.taskModel = readMap(json, Fields.taskModel);
+        this.taskModel = json.get(Fields.taskModel);
     }
 
     @Override
@@ -73,8 +74,8 @@ public class HumanTaskActivated extends HumanTaskTransitioned {
      * Get the task-model / json schema for task
      * @return task-model / json schema for task
      */
-    public ValueMap getTaskModel() {
-        return taskModel;
+    public String getTaskModel() {
+        return taskModel.toString();
     }
 
     @Override

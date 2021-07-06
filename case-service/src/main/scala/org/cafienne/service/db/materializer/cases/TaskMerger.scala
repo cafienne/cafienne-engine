@@ -16,10 +16,4 @@ object TaskMerger {
   def apply(evt: HumanTaskOutputSaved, current: TaskRecord): TaskRecord = current.copy(output = evt.getTaskOutput.toString)
   def apply(evt: HumanTaskInputSaved, current: TaskRecord): TaskRecord = current.copy(input = evt.getInput.toString)
   def apply(evt: TransactionEvent[_], current: TaskRecord): TaskRecord = current.copy(modifiedBy = evt.getUser.id, lastModified = evt.lastModified)
-
-  def apply(evt: HumanTaskActivated, current: TaskRecord): TaskRecord = {
-    // We should never reach this point
-    System.err.println("Touching deprecated code. Should not be reachable at all ...")
-    current.copy(role = evt.getPerformer, taskModel = evt.getTaskModel.toString)
-  }
 }

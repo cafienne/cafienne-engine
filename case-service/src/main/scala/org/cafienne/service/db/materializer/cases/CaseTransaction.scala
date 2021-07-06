@@ -209,11 +209,11 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
           modifiedBy = evt.getCreatedBy,
           role = evt.getPerformer,
           taskState = evt.getCurrentState.name,
-          taskModel = evt.getTaskModel.toString)
+          taskModel = evt.getTaskModel)
       }
       case Some(task) => {
         // Old format, must have been created in same transaction through HumanTaskCreated, fine too
-        task.copy(role = evt.getPerformer, taskModel = evt.getTaskModel.toString, taskState = evt.getCurrentState.name)
+        task.copy(role = evt.getPerformer, taskModel = evt.getTaskModel, taskState = evt.getCurrentState.name)
       }
     }
     this.tasks.put(evt.taskId, updatedTask)
