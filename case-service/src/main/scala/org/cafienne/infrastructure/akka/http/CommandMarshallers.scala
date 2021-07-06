@@ -5,8 +5,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.unmarshalling.Unmarshaller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.{DefaultScalaModule, ScalaObjectMapper}
 import org.cafienne.cmmn.actorapi.command.CaseCommandModels
 import org.cafienne.infrastructure.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
 import org.cafienne.json.ValueMap

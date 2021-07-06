@@ -16,11 +16,11 @@ import java.util.Map;
  * Object that can be saved as snapshot offer for the TimerService persistent actor
  */
 @Manifest
-@Deprecated
 public class TimerStorage implements ModelActorSnapshot {
-    private Map<String, TimerJob> timers = new HashMap();
+    private final Map<String, TimerJob> timers = new HashMap<>();
 
     public TimerStorage() {
+        throw new RuntimeException("This structure is no longer supported");
     }
 
     public TimerStorage(ValueMap json) {
