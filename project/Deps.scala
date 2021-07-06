@@ -91,7 +91,7 @@ object Deps {
   val hikariCP              = "com.typesafe.slick"      %% "slick-hikaricp"                       % V.slick
   val postgres              = "org.postgresql"          % "postgresql"                            % "42.2.22"
   val h2                    = "com.h2database"          % "h2"                                    % "1.4.200"
-  val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.6.0"
+  val hsqldb                = "org.hsqldb"              % "hsqldb"                                % "2.5.1"
   val sqlserver             = "com.microsoft.sqlserver" % "mssql-jdbc"                            % "9.2.1.jre11"
   val flyway                = "org.flywaydb"            % "flyway-core"                           % "7.2.1"
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
