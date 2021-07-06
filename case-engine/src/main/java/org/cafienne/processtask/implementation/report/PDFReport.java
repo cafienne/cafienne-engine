@@ -54,7 +54,7 @@ public class PDFReport extends SubProcess<PDFReportDefinition> {
         try {
             long start = System.currentTimeMillis();
 
-            Map<String, Object> jasperParameters = new HashMap();
+            Map<String, Object> jasperParameters = new HashMap<>();
             jasperParameters.put(JsonQueryExecuterFactory.JSON_INPUT_STREAM, definition.createDataStream(this));
             jasperParameters.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, "yyyy-MM-dd");
             jasperParameters.put(JsonQueryExecuterFactory.JSON_NUMBER_PATTERN, "#,##0.##");

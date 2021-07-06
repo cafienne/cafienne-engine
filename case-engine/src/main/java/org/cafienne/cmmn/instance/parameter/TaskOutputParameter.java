@@ -21,7 +21,7 @@ import org.cafienne.json.Value;
  * If its value is set (after it is mapped from the raw output of the task), it is bound to the case file.
  */
 public class TaskOutputParameter extends TaskParameter<ParameterDefinition> {
-    public TaskOutputParameter(ParameterDefinition definition, Task task, Value value) {
+    public TaskOutputParameter(ParameterDefinition definition, Task<?> task, Value<?> value) {
         super(definition, task, value);
     }
 

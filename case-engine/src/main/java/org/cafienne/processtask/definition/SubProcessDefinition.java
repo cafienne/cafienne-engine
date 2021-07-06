@@ -59,9 +59,9 @@ import org.w3c.dom.Element;
  */
 public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
-    private final Collection<SubProcessMapping> mappings = new ArrayList();
-    private final Collection<SubProcessMapping> successMappings = new ArrayList();
-    private final Collection<SubProcessMapping> failureMappings = new ArrayList();
+    private final Collection<SubProcessMapping> mappings = new ArrayList<>();
+    private final Collection<SubProcessMapping> successMappings = new ArrayList<>();
+    private final Collection<SubProcessMapping> failureMappings = new ArrayList<>();
     private final boolean isAsync;
     /**
      * Default exception parameter, can be used to store Throwables.
@@ -136,14 +136,14 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      * @return
      */
     protected Set<String> getExceptionParameterNames() {
-        Set<String> names = new HashSet();
+        Set<String> names = new HashSet<>();
         names.add(EXCEPTION_PARAMETER);
         return names;
     }
 
     public Map<String, OutputParameterDefinition> getRawOutputParameters() {
         Set<String> names = getRawOutputParameterNames();
-        Map<String, OutputParameterDefinition> rawOutputParameters = new HashMap();
+        Map<String, OutputParameterDefinition> rawOutputParameters = new HashMap<>();
         for (String name : names) {
             Element xmlElement = getElement().getOwnerDocument().createElement("parameter");
             xmlElement.setAttribute("name", name);

@@ -7,7 +7,7 @@ import org.cafienne.cmmn.instance.sentry.Criterion;
  * Context for evaluation of an if part in a criterion.
  */
 public class IfPartAPI extends PlanItemRootAPI<IfPartDefinition> {
-    public IfPartAPI(IfPartDefinition ifPartDefinition, Criterion criterion) {
+    public IfPartAPI(IfPartDefinition ifPartDefinition, Criterion<?> criterion) {
         super(ifPartDefinition, criterion.getTarget());
     }
 

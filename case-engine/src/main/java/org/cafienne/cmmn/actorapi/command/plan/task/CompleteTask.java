@@ -43,7 +43,7 @@ public class CompleteTask extends CaseCommand {
      * @param taskOutput       An optional map with named output parameters for the task. These will be set on the task before the task is reported as complete. This
      *                         means that the parameters will also be bound to the case file, which may cause sentries to activate before the task completes.
      */
-    public CompleteTask(ModelActor child, ValueMap taskOutput) {
+    public CompleteTask(ModelActor<?,?> child, ValueMap taskOutput) {
         super(child.getCurrentUser(), child.getParentActorId());
         this.taskId = child.getId();
         this.taskOutput = taskOutput;
@@ -69,7 +69,7 @@ public class CompleteTask extends CaseCommand {
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new InvalidCommandException("Invalid or missing task id");
         }
-        PlanItem planItem = getPlanItem(caseInstance);
+        PlanItem<?> planItem = getPlanItem(caseInstance);
         if (planItem == null) {
             throw new InvalidCommandException("Invalid or missing task id");
         }
@@ -88,7 +88,7 @@ public class CompleteTask extends CaseCommand {
         return new CaseResponse(this);
     }
 
-    private PlanItem getPlanItem(Case caseInstance) {
+    private PlanItem<?> getPlanItem(Case caseInstance) {
         return caseInstance.getPlanItemById(taskId);
     }
 

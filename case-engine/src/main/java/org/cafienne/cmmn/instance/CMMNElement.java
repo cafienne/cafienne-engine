@@ -33,7 +33,7 @@ public class CMMNElement<T extends CMMNElementDefinition> {
         this.definition = definition;
     }
 
-    protected void addDebugInfo(DebugStringAppender appender, Criterion criterion) {
+    protected void addDebugInfo(DebugStringAppender appender, Criterion<?> criterion) {
         addDebugInfo(appender, criterion.toJson());
     }
 
@@ -41,7 +41,7 @@ public class CMMNElement<T extends CMMNElementDefinition> {
         getCaseInstance().addDebugInfo(appender, e);
     }
 
-    protected void addDebugInfo(DebugStringAppender appender, Value v) {
+    protected void addDebugInfo(DebugStringAppender appender, Value<?> v) {
         getCaseInstance().addDebugInfo(appender, v);
     }
 

@@ -15,7 +15,7 @@ public class ApplicabilityRuleDefinition extends ConstraintDefinition {
         super(element, modelDefinition, parentElement);
     }
 
-    public boolean evaluate(PlanItem planItem, ApplicabilityRuleDefinition rule, DiscretionaryItemDefinition discretionaryItemDefinition) {
+    public boolean evaluate(PlanItem<?> planItem, ApplicabilityRuleDefinition rule, DiscretionaryItemDefinition discretionaryItemDefinition) {
         return getExpressionDefinition().getEvaluator().evaluateApplicabilityRule(planItem, discretionaryItemDefinition, rule);
     }
 

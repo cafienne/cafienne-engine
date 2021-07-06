@@ -19,7 +19,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     private boolean isActive;
     private StandardEvent lastEvent;
 
-    public CaseFileItemOnPart(Criterion criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
+    public CaseFileItemOnPart(Criterion<?> criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(criterion, caseFileItemOnPartDefinition);
     }
 

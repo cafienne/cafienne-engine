@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public abstract class DeprecatedCaseTeamEvent extends CaseTeamEvent {
     protected final String userId;
-    protected final Set<String> roles = new HashSet();
+    protected final Set<String> roles = new HashSet<>();
     public final transient MemberKey key;
 
     protected DeprecatedCaseTeamEvent(Case caseInstance, Member member) {

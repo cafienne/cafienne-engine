@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class PlanningTableDefinition extends TableItemDefinition {
-    private final Collection<TableItemDefinition> tableItems = new ArrayList();
-    private final Collection<ApplicabilityRuleDefinition> ruleDefinitions = new ArrayList();
+    private final Collection<TableItemDefinition> tableItems = new ArrayList<>();
+    private final Collection<ApplicabilityRuleDefinition> ruleDefinitions = new ArrayList<>();
 
     public PlanningTableDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -40,7 +40,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
     }
 
     @Override
-    public Element dumpMemoryStateToXML(Element parentElement, Stage stage) {
+    public Element dumpMemoryStateToXML(Element parentElement, Stage<?> stage) {
         Element planningTableXML = parentElement.getOwnerDocument().createElement("PlanningTable");
         parentElement.appendChild(planningTableXML);
 
@@ -58,7 +58,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
      * Indicates whether or not there are instances of DiscretionaryItem available within this table;
      * @return
      */
-    public boolean hasItems(PlanItem containingPlanItem) {
+    public boolean hasItems(PlanItem<?> containingPlanItem) {
         // We cannot have discretionary items if our containing plan item is not in a state that allows planning; e.g., Completed human tasks or stages do NOT have discretionary items
         if (!isPlanningAllowed(containingPlanItem)) {
             return false;
@@ -76,7 +76,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
     }
 
     @Override
-    public void evaluate(PlanItem containingPlanItem, Collection<DiscretionaryItem> items) {
+    public void evaluate(PlanItem<?> containingPlanItem, Collection<DiscretionaryItem> items) {
         if (isPlanningAllowed(containingPlanItem)) {
             tableItems.forEach(t -> t.evaluate(containingPlanItem, items));
         }
@@ -97,8 +97,8 @@ public class PlanningTableDefinition extends TableItemDefinition {
 abstract class TableItemDefinition extends CMMNElementDefinition {
     private final String applicabilityRuleRefs;
     private final String authorizedRoleRefs;
-    private final List<ApplicabilityRuleDefinition> applicabilityRules = new ArrayList();
-    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList();
+    private final List<ApplicabilityRuleDefinition> applicabilityRules = new ArrayList<>();
+    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList<>();
 
     protected TableItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -170,7 +170,7 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
      * @param planItem
      * @return
      */
-    public boolean isPlanningAllowed(PlanItem planItem) {
+    public boolean isPlanningAllowed(PlanItem<?> planItem) {
         // Refactoring thought: this code could also be placed in PlanItemDefinitionInstance, with specific overriding in CasePlan, Stage and HumanTask;
         // however, the algorithm is described in a single place in the specification, section 7.7 on page 80.
         State planItemState = planItem.getState();
@@ -189,9 +189,9 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
      * @param containingPlanItem
      * @param items
      */
-    public abstract void evaluate(PlanItem containingPlanItem, Collection<DiscretionaryItem> items);
+    public abstract void evaluate(PlanItem<?> containingPlanItem, Collection<DiscretionaryItem> items);
 
-    public Element dumpMemoryStateToXML(Element tableItemXML, Stage stage) {
+    public Element dumpMemoryStateToXML(Element tableItemXML, Stage<?> stage) {
         Collection<CaseRoleDefinition> roles = getAuthorizedRoles();
         for (CaseRoleDefinition role : roles) {
             String roleName = role.getName();

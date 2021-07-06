@@ -37,7 +37,7 @@ public class DefinitionsDocument implements Serializable {
     /**
      * All definition objects, e.g. Case, Process, CaseFileItemDefinition, etc.
      */
-    private transient Collection<ModelDefinition> definitions = new ArrayList();
+    private transient Collection<ModelDefinition> definitions = new ArrayList<>();
     /**
      * All elements is a collection of all the elements across all Definition documents
      */
@@ -47,8 +47,8 @@ public class DefinitionsDocument implements Serializable {
      * During parsing of the case, multiple errors may be encountered. We try to parse the case as long as possible, and give as much feedback to the case developer as we can, so that he can see all
      * errors at once, instead of needing to fix error for error and in between having to parse each time.
      */
-    private transient Collection<String> definitionErrors = new ArrayList();
-    private transient Collection<InvalidDefinitionException> fatals = new ArrayList();
+    private transient Collection<String> definitionErrors = new ArrayList<>();
+    private transient Collection<InvalidDefinitionException> fatals = new ArrayList<>();
 
     /**
      * Creates a new DefinitionsDocument based on the given XML Document.
@@ -103,7 +103,7 @@ public class DefinitionsDocument implements Serializable {
         // Parse the default expression language. If the attribute is not defined, then it will set an empty string
         this.defaultExpressionLanguage = document.getDocumentElement().getAttribute("expressionLanguage");
 
-        allElements = new ArrayList();
+        allElements = new ArrayList<>();
 
         parseImports();
         parseCaseFileItemDefinitions();
@@ -219,7 +219,7 @@ public class DefinitionsDocument implements Serializable {
 
     private Collection<ModelDefinition> getDefinitions() {
         if (null == definitions) {
-            definitions = new ArrayList();
+            definitions = new ArrayList<>();
             initAfterDeserialization();
         }
 
@@ -257,7 +257,7 @@ public class DefinitionsDocument implements Serializable {
 
     private Collection<String> getDefinitionErrors() {
         if (null == definitionErrors) {
-            definitionErrors = new ArrayList();
+            definitionErrors = new ArrayList<>();
             initAfterDeserialization();
         }
         return definitionErrors;
@@ -265,7 +265,7 @@ public class DefinitionsDocument implements Serializable {
 
     private Collection<InvalidDefinitionException> getFatals() {
         if (null == fatals) {
-            fatals = new ArrayList();
+            fatals = new ArrayList<>();
             initAfterDeserialization();
         }
         return fatals;

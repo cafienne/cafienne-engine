@@ -9,7 +9,7 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 /**
  */
 public class ValueAPI extends APIObject<Case> implements SpelPropertyValueProvider {
-    private final Value value;
+    private final Value<?> value;
 
     public ValueAPI(CaseFileItem item) {
         super(item.getCaseInstance());
@@ -19,8 +19,7 @@ public class ValueAPI extends APIObject<Case> implements SpelPropertyValueProvid
     @Override
     public Object getValue() {
         if (value.isPrimitive()) {
-            Object primitiveValue = value.getValue();
-            return primitiveValue;
+            return value.getValue();
         } else {
             return value;
         }

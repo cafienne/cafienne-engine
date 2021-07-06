@@ -25,7 +25,7 @@ public class PDFReportDefinition extends SubProcessDefinition {
 
 
     private final JasperDefinition mainReportDefinition;
-    private final Collection<JasperSubReportDefinition> subReportDefinitions = new ArrayList();
+    private final Collection<JasperSubReportDefinition> subReportDefinitions = new ArrayList<>();
     private final ReportDataDefinition reportDataDefinition;
 
     public PDFReportDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {

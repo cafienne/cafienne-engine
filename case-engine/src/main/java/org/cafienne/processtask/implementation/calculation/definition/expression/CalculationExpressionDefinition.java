@@ -29,12 +29,12 @@ public class CalculationExpressionDefinition extends CMMNElementDefinition {
         this.evaluator = new ExpressionEvaluator(this);
     }
 
-    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> sourceMap) {
         // If there is an expression, execute it on the incoming values, otherwise just return the incoming values
         return new Result(calculation, step, evaluateExpression(calculation, step, sourceMap));
     }
 
-    protected Value evaluateExpression(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
+    protected Value<?> evaluateExpression(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> sourceMap) {
         return evaluator.runCalculationStep(calculation, step, sourceMap);
     }
 

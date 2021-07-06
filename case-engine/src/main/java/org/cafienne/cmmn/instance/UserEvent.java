@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public class UserEvent extends PlanItem<UserEventDefinition> {
-    public UserEvent(String id, int index, ItemDefinition itemDefinition, UserEventDefinition definition, Stage stage) {
+    public UserEvent(String id, int index, ItemDefinition itemDefinition, UserEventDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
 

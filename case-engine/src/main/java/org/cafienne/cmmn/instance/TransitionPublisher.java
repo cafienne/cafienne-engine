@@ -10,9 +10,9 @@ import java.util.List;
 
 public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart<?,I>> {
     protected final I item;
-    private final List<StandardEvent> transitions = new ArrayList();
-    private final List<P> connectedEntryCriteria = new ArrayList();
-    private final List<P> connectedExitCriteria = new ArrayList();
+    private final List<StandardEvent> transitions = new ArrayList<>();
+    private final List<P> connectedEntryCriteria = new ArrayList<>();
+    private final List<P> connectedExitCriteria = new ArrayList<>();
 
     public TransitionPublisher(I item) {
         this.item = item;
@@ -77,7 +77,7 @@ public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart
         if (list.contains(onPart)) {
             return; // do not connect more than once
         }
-        Stage onPartStage = onPart.getCriterion().getStage();
+        Stage<?> onPartStage = onPart.getCriterion().getStage();
         int i = 0;
         // Iterate the list until we encounter an onPart that does not contain the new criterion.
         while (i < list.size() && list.get(i).getCriterion().getStage().contains(onPartStage)) {

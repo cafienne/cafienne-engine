@@ -61,7 +61,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         return evaluateJSON(processTaskActor, value);
     }
 
-    private Value<?> evaluateJSON(ModelActor caseInstance, Value<?> value) {
+    private Value<?> evaluateJSON(ModelActor<?,?> caseInstance, Value<?> value) {
         // First check if there is something at all to evaluate on. If not, return immediately.
         if (value == null || value.equals(Value.NULL)) {
             // Just can't read from null
@@ -111,19 +111,19 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
+    public boolean evaluateItemControl(PlanItem<?> planItem, ConstraintDefinition ruleDefinition) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion<?> criterion, IfPartDefinition ifPartDefinition) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
+    public boolean evaluateApplicabilityRule(PlanItem<?> containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
         // TODO Auto-generated method stub
         return false;
     }

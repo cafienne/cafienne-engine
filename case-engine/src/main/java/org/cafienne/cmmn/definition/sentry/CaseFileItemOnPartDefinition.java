@@ -55,7 +55,7 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
     }
 
     @Override
-    public CaseFileItemOnPart createInstance(Criterion criterion) {
+    public CaseFileItemOnPart createInstance(Criterion<?> criterion) {
         return new CaseFileItemOnPart(criterion, this);
     }
 }

@@ -21,7 +21,7 @@ import org.cafienne.util.Guid;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public abstract class ModelCommand<T extends ModelActor> implements CafienneSerializable, TenantUserMessage<T> {
+public abstract class ModelCommand<T extends ModelActor<?,?>> implements CafienneSerializable, TenantUserMessage<T> {
     protected final String msgId;
     public final String actorId;
     protected transient T actor;

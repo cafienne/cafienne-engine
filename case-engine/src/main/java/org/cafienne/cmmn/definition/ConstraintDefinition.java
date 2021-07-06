@@ -81,7 +81,7 @@ public class ConstraintDefinition extends CMMNElementDefinition {
         return expression;
     }
 
-    public boolean evaluate(PlanItem planItem) {
+    public boolean evaluate(PlanItem<?> planItem) {
         return expression.getEvaluator().evaluateItemControl(planItem, this);
     }
 

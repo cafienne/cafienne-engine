@@ -26,8 +26,8 @@ import org.w3c.dom.Element;
  *
  */
 public class CaseRoleDefinition extends CMMNElementDefinition {
-    private Collection<CaseRoleDefinition> mutexRoles = new ArrayList();
-    private Collection<String> mutexRoleReferences = new ArrayList();
+    private Collection<CaseRoleDefinition> mutexRoles = new ArrayList<>();
+    private Collection<String> mutexRoleReferences = new ArrayList<>();
     private final boolean isSingleton;
     private final CaseTeamDefinition teamDefinition;
 

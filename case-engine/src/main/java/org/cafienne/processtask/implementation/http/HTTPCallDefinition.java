@@ -27,7 +27,7 @@ public class HTTPCallDefinition extends SubProcessDefinition {
     private final String contentTemplate;
     private final String httpMethod;
     private final String sourceURL;
-    private final List<Header> httpHeaders = new ArrayList();
+    private final List<Header> httpHeaders = new ArrayList<>();
 
     // Raw, hard coded output parameter names
     public static final String RESPONSE_PAYLOAD_PARAMETER = "responsePayload";

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class User {
     final String userId;
-    private final Set<String> roles = new HashSet();
+    private final Set<String> roles = new HashSet<>();
     private boolean isOwner = false;
     private boolean enabled = true;
     private String name;

@@ -44,7 +44,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     private final String xpathExpression;
     private final ExpressionDefinition definition;
-    private final Map<String, String> prefixes = new HashMap();
+    private final Map<String, String> prefixes = new HashMap<>();
 
     public ExpressionEvaluator(ExpressionDefinition expressionDefinition) {
         xpathExpression = expressionDefinition.getBody();
@@ -142,19 +142,19 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
+    public boolean evaluateItemControl(PlanItem<?> planItem, ConstraintDefinition ruleDefinition) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion<?> criterion, IfPartDefinition ifPartDefinition) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
+    public boolean evaluateApplicabilityRule(PlanItem<?> containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
         // TODO Auto-generated method stub
         return false;
     }

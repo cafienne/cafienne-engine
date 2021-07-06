@@ -20,7 +20,7 @@ public class BusinessIdentifierCleared extends BusinessIdentifierEvent {
     }
 
     @Override
-    public Value getValue() {
+    public Value<?> getValue() {
         return null;
     }
 }

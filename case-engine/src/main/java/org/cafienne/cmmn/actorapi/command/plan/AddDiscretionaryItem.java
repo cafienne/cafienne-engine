@@ -34,7 +34,7 @@ public class AddDiscretionaryItem extends CaseCommand {
     private final String parentId;
     private final String definitionId;
     private transient DiscretionaryItem discretionaryItem;
-    private transient PlanItem parentItem;
+    private transient PlanItem<?> parentItem;
 
     /**
      * Create a command to add a new plan item to the case, based on a discretionary item definition with the specified name.
@@ -64,7 +64,7 @@ public class AddDiscretionaryItem extends CaseCommand {
     @Override
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
-        PlanItem alreadyExisting = caseInstance.getPlanItemById(planItemId);
+        PlanItem<?> alreadyExisting = caseInstance.getPlanItemById(planItemId);
         if (alreadyExisting != null) {
             throw new InvalidCommandException("Cannot plan a discretionary item named '" + name + "' with the specified id " + planItemId + ", because the case already has a plan item with that id");
         }

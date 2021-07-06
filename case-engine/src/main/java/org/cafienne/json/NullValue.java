@@ -41,7 +41,7 @@ class NullValue extends PrimitiveValue<Object> implements SpelReadable, List<Obj
     }
 
     @Override
-    public boolean isSupersetOf(Value otherValue) {
+    public boolean isSupersetOf(Value<?> otherValue) {
         return otherValue == null || otherValue.value == null;
     }
 

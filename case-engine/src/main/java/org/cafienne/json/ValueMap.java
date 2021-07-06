@@ -37,7 +37,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * Construct a new, empty value map
      */
     public ValueMap() {
-        super(new LinkedHashMap());
+        super(new LinkedHashMap<>());
     }
 
     /**
@@ -109,7 +109,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     @Override
-    public boolean isSupersetOf(Value other) {
+    public boolean isSupersetOf(Value<?> other) {
         if (other == null || !other.isMap()) {
             return false;
         }
@@ -121,8 +121,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
         // OtherMap has equal or less keys. Let's compare values for each key in the other map.
         for (String key : otherMap.keySet()) {
-            Value thisValue = thisMap.get(key);
-            Value otherValue = otherMap.get(key);
+            Value<?> thisValue = thisMap.get(key);
+            Value<?> otherValue = otherMap.get(key);
             if (thisValue == null || !thisValue.isSupersetOf(otherValue)) {
                 return false;
             }
@@ -340,7 +340,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     @Override
-    public <T extends Value> T merge(T withValue) {
+    public <V extends Value<?>> V merge(V withValue) {
         if (!(withValue.isMap())) {
             return withValue;
         }
@@ -353,6 +353,6 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
             // And now overwrite our value
             this.value.put(fieldName, fromFieldValue);
         });
-        return (T) this;
+        return (V) this;
     }
 }

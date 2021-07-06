@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class CaseFileItemCollectionDefinition extends CMMNElementDefinition {
-    private final Collection<CaseFileItemDefinition> items = new ArrayList();
+    private final Collection<CaseFileItemDefinition> items = new ArrayList<>();
 
     public CaseFileItemCollectionDefinition(Element element, ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);

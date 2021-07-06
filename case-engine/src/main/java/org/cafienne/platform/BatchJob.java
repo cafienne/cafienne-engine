@@ -21,7 +21,7 @@ public class BatchJob implements CafienneSerializable {
     private PlatformStorage storage;
     final String batchIdentifier;
     private final ValueList failures;
-    private final List<InformJob> jobs = new ArrayList();
+    private final List<InformJob> jobs = new ArrayList<>();
     private final Instant createdOn;
     private Instant completedOn;
     private final ValueMap jobCount;

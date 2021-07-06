@@ -36,7 +36,7 @@ public class TaskOutputAssertion extends CaseInstanceEventAssertion<TaskOutputFi
      * @param <T>
      * @return
      */
-    public <T extends Value> T getValue(String outputParameterName) {
+    public <T extends Value<?>> T getValue(String outputParameterName) {
         return (T) event.getTaskOutputParameters().get(outputParameterName);
     }
 }

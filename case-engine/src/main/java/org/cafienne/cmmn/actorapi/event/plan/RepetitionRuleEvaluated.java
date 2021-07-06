@@ -19,7 +19,7 @@ import java.io.IOException;
 public class RepetitionRuleEvaluated extends PlanItemEvent {
     private final boolean isRepeating;
 
-    public RepetitionRuleEvaluated(PlanItem planItem, boolean repeats) {
+    public RepetitionRuleEvaluated(PlanItem<?> planItem, boolean repeats) {
         super(planItem);
         this.isRepeating = repeats;
     }
@@ -39,7 +39,7 @@ public class RepetitionRuleEvaluated extends PlanItemEvent {
     }
 
     @Override
-    protected void updatePlanItemState(PlanItem planItem) {
+    protected void updatePlanItemState(PlanItem<?> planItem) {
         planItem.updateState(this);
     }
 

@@ -105,7 +105,7 @@ public abstract class Value<T> implements Serializable {
      * @param otherValue Value that should be contained within this value
      * @return
      */
-    public boolean isSupersetOf(Value otherValue) {
+    public boolean isSupersetOf(Value<?> otherValue) {
         return false;
     }
 
@@ -173,7 +173,7 @@ public abstract class Value<T> implements Serializable {
      *
      * @param withValue - Value to be merged into this
      */
-    public abstract <T extends Value> T merge(T withValue);
+    public abstract <V extends Value<?>> V merge(V withValue);
 
     /**
      * Converts a (possibly not-Serializable) value to something that can be serialized.

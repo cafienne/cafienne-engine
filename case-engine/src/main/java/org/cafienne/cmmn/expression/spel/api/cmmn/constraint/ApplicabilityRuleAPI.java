@@ -12,7 +12,7 @@ public class ApplicabilityRuleAPI extends PlanItemRootAPI<ApplicabilityRuleDefin
     private final ApplicabilityRuleDefinition ruleDefinition;
     private final DiscretionaryItemDefinition itemDefinition;
 
-    public ApplicabilityRuleAPI(PlanItem planItem, DiscretionaryItemDefinition itemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
+    public ApplicabilityRuleAPI(PlanItem<?> planItem, DiscretionaryItemDefinition itemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
         super(ruleDefinition, planItem);
         this.ruleDefinition = ruleDefinition;
         this.itemDefinition = itemDefinition;

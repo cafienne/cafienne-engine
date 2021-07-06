@@ -21,9 +21,9 @@ import org.springframework.expression.TypedValue;
 public class SpelReadableRecognizer implements PropertyAccessor {
     private final static Logger logger = LoggerFactory.getLogger(SpelReadableRecognizer.class);
 
-    public final ModelActor model;
+    public final ModelActor<?,?> model;
 
-    SpelReadableRecognizer(ModelActor model) {
+    SpelReadableRecognizer(ModelActor<?,?> model) {
         this.model = model;
     }
 

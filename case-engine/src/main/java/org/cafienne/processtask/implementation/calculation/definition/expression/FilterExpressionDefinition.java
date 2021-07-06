@@ -24,7 +24,7 @@ public class FilterExpressionDefinition extends ConditionDefinition {
     }
 
     @Override
-    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> inputs) {
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> inputs) {
         return new ResultCreator(calculation, step, inputs.get(inputReference)).result;
     }
 
@@ -36,17 +36,17 @@ public class FilterExpressionDefinition extends ConditionDefinition {
     class ResultCreator {
         private final Calculation calculation;
         private final CalculationStep step;
-        private final Value input;
+        private final Value<?> input;
         private final Result result;
 
-        ResultCreator(Calculation calculation, CalculationStep step, Value input) {
+        ResultCreator(Calculation calculation, CalculationStep step, Value<?> input) {
             this.calculation = calculation;
             this.step = step;
             this.input = input;
             this.result = new Result(calculation, step, getFilteredValue());
         }
 
-        private Value getFilteredValue() {
+        private Value<?> getFilteredValue() {
             if (input.isList()) {
                 // Filter the list and return a list with the filtered items only.
                 Object[] items = input.asList().stream().filter(this::isFilteredItem).toArray();
@@ -63,9 +63,9 @@ public class FilterExpressionDefinition extends ConditionDefinition {
             }
         }
 
-        private boolean isFilteredItem(Value item) {
+        private boolean isFilteredItem(Value<?> item) {
             // In the expression, the input element can only be accessed through the element name
-            Map<InputReference, Value> filteredInputs = new HashMap();
+            Map<InputReference, Value<?>> filteredInputs = new HashMap<>();
             filteredInputs.put(inputReference, item);
             return getBooleanResult(calculation, step, filteredInputs);
         }

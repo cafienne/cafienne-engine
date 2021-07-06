@@ -17,7 +17,7 @@ public class PlanItemRootAPI<T extends ConstraintDefinition> extends CaseRootObj
 
     private final T constraintDefinition;
 
-    public PlanItemRootAPI(T constraintDefinition, PlanItem planItem) {
+    public PlanItemRootAPI(T constraintDefinition, PlanItem<?> planItem) {
         super(planItem.getCaseInstance());
         this.constraintDefinition = constraintDefinition;
 

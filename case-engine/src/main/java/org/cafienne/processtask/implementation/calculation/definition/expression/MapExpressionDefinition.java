@@ -24,7 +24,7 @@ public class MapExpressionDefinition extends CalculationExpressionDefinition {
     }
 
     @Override
-    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> sourceMap) {
         return new ResultCreator(calculation, step, sourceMap.get(inputReference)).result;
     }
 
@@ -36,17 +36,17 @@ public class MapExpressionDefinition extends CalculationExpressionDefinition {
     class ResultCreator {
         private final Calculation calculation;
         private final CalculationStep step;
-        private final Value input;
+        private final Value<?> input;
         private final Result result;
 
-        ResultCreator(Calculation calculation, CalculationStep step, Value input) {
+        ResultCreator(Calculation calculation, CalculationStep step, Value<?> input) {
             this.calculation = calculation;
             this.step = step;
             this.input = input;
             this.result = new Result(calculation, step, getMappedValue());
         }
 
-        private Value getMappedValue() {
+        private Value<?> getMappedValue() {
             if (input.isList()) {
                 // Map the list and return a list with the mapped items.
                 Object[] items = input.asList().stream().map(this::mapItem).toArray();
@@ -58,9 +58,9 @@ public class MapExpressionDefinition extends CalculationExpressionDefinition {
             }
         }
 
-        private Value mapItem(Value item) {
+        private Value<?> mapItem(Value<?> item) {
             // In the expression, the input element can only be accessed through the element name
-            Map<InputReference, Value> mappableInput = new HashMap();
+            Map<InputReference, Value<?>> mappableInput = new HashMap<>();
             mappableInput.put(inputReference, item);
             return evaluateExpression(calculation, step, mappableInput);
         }

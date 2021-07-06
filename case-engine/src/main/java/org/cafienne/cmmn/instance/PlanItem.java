@@ -29,7 +29,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Stage to which this plan item belongs (null for CasePlan)
      */
-    private final Stage stage;
+    private final Stage<?> stage;
     /**
      * The actual plan item definition (or discretionary item definition, or caseplan definition).
      */
@@ -64,7 +64,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     private int planItemEventCounter = 0; // Akka event sequence number
 
-    protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, StateMachine stateMachine) {
+    protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, StateMachine stateMachine) {
         this(id, index, itemDefinition, definition, parent.getCaseInstance(), parent, stateMachine);
     }
 
@@ -79,7 +79,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @param parent
      * @param stateMachine
      */
-    protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage parent, StateMachine stateMachine) {
+    protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage<?> parent, StateMachine stateMachine) {
         super(caseInstance, definition);
         this.id = id;
         this.itemDefinition = itemDefinition;
@@ -435,7 +435,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public Stage getStage() {
+    public Stage<?> getStage() {
         return stage;
     }
 

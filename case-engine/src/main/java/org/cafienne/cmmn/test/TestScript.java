@@ -135,7 +135,7 @@ public class TestScript {
      * @return
      */
     public static CaseTeam getCaseTeam(Object... users) {
-        List<CaseTeamMember> members = new ArrayList();
+        List<CaseTeamMember> members = new ArrayList<>();
         for (Object user : users) {
             if (user instanceof TenantUser) {
                 members.add(getMember((TenantUser) user));

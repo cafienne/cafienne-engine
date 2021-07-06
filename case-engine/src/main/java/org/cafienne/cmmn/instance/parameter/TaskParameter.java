@@ -16,9 +16,9 @@ import org.cafienne.cmmn.instance.Task;
  * TaskParameter is specific to {@link Task} input and output
  */
 public class TaskParameter<P extends ParameterDefinition> extends Parameter<P> {
-    protected final Task task;
+    protected final Task<?> task;
 
-    protected TaskParameter(P definition, Task task, Value value) {
+    protected TaskParameter(P definition, Task<?> task, Value<?> value) {
         super(definition, task.getCaseInstance(), value);
         this.task = task;
     }

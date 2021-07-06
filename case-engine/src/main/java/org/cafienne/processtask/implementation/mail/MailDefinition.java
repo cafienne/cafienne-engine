@@ -28,12 +28,12 @@ import java.util.Set;
 public class MailDefinition extends SubProcessDefinition {
     private final StringTemplate subject;
     private final BodyTemplate body;
-    private final List<AddressTemplate> toList = new ArrayList();
-    private final List<AddressTemplate> ccList = new ArrayList();
-    private final List<AddressTemplate> bccList = new ArrayList();
+    private final List<AddressTemplate> toList = new ArrayList<>();
+    private final List<AddressTemplate> ccList = new ArrayList<>();
+    private final List<AddressTemplate> bccList = new ArrayList<>();
     private final AddressTemplate from;
     private final AddressTemplate replyTo;
-    private final List<AttachmentTemplate> attachmentList = new ArrayList();
+    private final List<AttachmentTemplate> attachmentList = new ArrayList<>();
 
     public MailDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);

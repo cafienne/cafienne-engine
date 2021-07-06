@@ -16,7 +16,7 @@ public class MilestoneDefinition extends PlanItemDefinitionDefinition {
     }
 
     @Override
-    public Milestone createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public Milestone createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new Milestone(id, index, itemDefinition, this, stage);
     }
 

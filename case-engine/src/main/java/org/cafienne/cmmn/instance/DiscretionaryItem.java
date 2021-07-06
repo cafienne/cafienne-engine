@@ -14,18 +14,18 @@ import java.util.Collection;
 import java.util.Set;
 
 public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> {
-    private final PlanItem containingPlanItem;
-    private final Stage containingStage;
+    private final PlanItem<?> containingPlanItem;
+    private final Stage<?> containingStage;
     
     /**
      * Creates a new discretionary item for the specified definition inside the parent (i.e., Task or Stage)
      * @param parentPlanItem
      * @param definition
      */
-    public DiscretionaryItem(PlanItem parentPlanItem, DiscretionaryItemDefinition definition) {
+    public DiscretionaryItem(PlanItem<?> parentPlanItem, DiscretionaryItemDefinition definition) {
         super(parentPlanItem, definition);
         this.containingPlanItem = parentPlanItem;
-        this.containingStage = containingPlanItem instanceof Stage ? (Stage) containingPlanItem : containingPlanItem.getStage();
+        this.containingStage = containingPlanItem instanceof Stage<?> ? (Stage<?>) containingPlanItem : containingPlanItem.getStage();
     }
     
     /**

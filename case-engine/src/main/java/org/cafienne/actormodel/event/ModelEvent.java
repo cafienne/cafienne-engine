@@ -12,7 +12,7 @@ import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.json.ValueMap;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
 
-public interface ModelEvent<M extends ModelActor> extends CafienneSerializable, TenantUserMessage<M> {
+public interface ModelEvent<M extends ModelActor<?,?>> extends CafienneSerializable, TenantUserMessage<M> {
     String TAG = "cafienne";
 
     void updateState(M actor);

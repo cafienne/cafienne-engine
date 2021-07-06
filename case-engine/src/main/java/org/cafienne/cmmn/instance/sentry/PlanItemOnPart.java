@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
     private boolean isActive;
-    private Criterion relatedExitCriterion;
+    private Criterion<?> relatedExitCriterion;
     private StandardEvent lastEvent;
 
-    public PlanItemOnPart(Criterion criterion, PlanItemOnPartDefinition definition) {
+    public PlanItemOnPart(Criterion<?> criterion, PlanItemOnPartDefinition definition) {
         super(criterion, definition);
     }
 
@@ -41,12 +41,12 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
      * @param right
      * @return
      */
-    private boolean isNotSomewhereSibling(PlanItem left, PlanItem right) {
+    private boolean isNotSomewhereSibling(PlanItem<?> left, PlanItem<?> right) {
         if (right == null) {
             return true;
         }
 
-        PlanItem leftOrAnAncestorOfLeft = left;
+        PlanItem<?> leftOrAnAncestorOfLeft = left;
         while (leftOrAnAncestorOfLeft != null) {
             if (leftOrAnAncestorOfLeft.getItemDefinition().equals(right.getItemDefinition()) && leftOrAnAncestorOfLeft != right) {
                 // If the definitions match and the instances mis-match, then we found somewhere a sibling
@@ -60,12 +60,12 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     @Override
     void connectToCase() {
         // Try to connect with all plan items in the case
-        for (PlanItem item : new ArrayList<>(getCaseInstance().getPlanItems())) {
+        for (PlanItem<?> item : new ArrayList<>(getCaseInstance().getPlanItems())) {
             criterion.establishPotentialConnection(item);
         }
     }
 
-    void connect(PlanItem potentialNewSource) {
+    void connect(PlanItem<?> potentialNewSource) {
         if (connectedItems.contains(potentialNewSource)) {
             // Avoid repeated additions
             return;
@@ -89,7 +89,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         connectedItems.forEach(planItem -> planItem.releaseOnPart(this));
     }
 
-    public void inform(PlanItem item, StandardEvent event) {
+    public void inform(PlanItem<?> item, StandardEvent event) {
         addDebugInfo(() -> item + " informs " + criterion + " about transition " + event.getTransition());
         lastEvent = event;
         isActive = getStandardEvent().equals(event.getTransition());
@@ -133,7 +133,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         onPartXML.setAttribute("last", "" + lastEvent);
 
         if (showConnectedPlanItems) {
-            for (PlanItem planItem : connectedItems) {
+            for (PlanItem<?> planItem : connectedItems) {
                 String lastTransition = planItem.getName() + "." + planItem.getLastTransition();
                 Element planItemXML = parentElement.getOwnerDocument().createElement("planitem");
                 planItemXML.setAttribute("last", lastTransition);

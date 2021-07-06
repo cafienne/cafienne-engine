@@ -33,7 +33,7 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
     }
 
     @Override
-    public CaseTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public CaseTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new CaseTask(id, index, itemDefinition, this, stage);
     }
 

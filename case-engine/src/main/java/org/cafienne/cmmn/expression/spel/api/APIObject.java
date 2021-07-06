@@ -24,14 +24,14 @@ import java.util.Set;
  * <p>
  * See {@link Case} itself for it's members.
  */
-public abstract class APIObject<T extends ModelActor> implements SpelReadable {
+public abstract class APIObject<T extends ModelActor<?,?>> implements SpelReadable {
     private final static Logger logger = LoggerFactory.getLogger(APIObject.class);
 
     /**
      * Set of accessible property names. Case sensitive, and does not contain deprecated properties
      */
-    private final Set<String> propertyNames = new HashSet();
-    private final Map<String, ExpressionObjectPropertyReader> readers = new HashMap();
+    private final Set<String> propertyNames = new HashSet<>();
+    private final Map<String, ExpressionObjectPropertyReader> readers = new HashMap<>();
     protected final T actor;
 
     protected APIObject(T actor) {
@@ -53,7 +53,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
         addPropertyReader(propertyName, () -> property);
     }
 
-    protected void addContextProperty(APIObject context, String propertyName, String deprecatedName) {
+    protected void addContextProperty(APIObject<T> context, String propertyName, String deprecatedName) {
         addPropertyReader(propertyName, () -> context);
         addDeprecatedReader(deprecatedName, propertyName, () -> context);
     }
@@ -79,7 +79,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
 
     @Override
     public boolean canRead(String propertyName) {
-        boolean found = readers.keySet().contains(propertyName.toLowerCase());
+        boolean found = readers.containsKey(propertyName.toLowerCase());
         if (!found) {
             getActor().addDebugInfo(() -> "Property " + propertyName + " is not available on the " + getClass().getSimpleName() + "; available properties: " + propertyNames);
         }

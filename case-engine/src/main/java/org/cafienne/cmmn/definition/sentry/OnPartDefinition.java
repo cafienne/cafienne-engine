@@ -20,5 +20,5 @@ public abstract class OnPartDefinition extends CMMNElementDefinition {
 
     public abstract CMMNElementDefinition getSourceDefinition();
 
-    public abstract OnPart<?, ?> createInstance(Criterion criterion);
+    public abstract OnPart<?, ?> createInstance(Criterion<?> criterion);
 }

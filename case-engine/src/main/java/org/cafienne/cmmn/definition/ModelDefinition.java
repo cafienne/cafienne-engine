@@ -27,14 +27,14 @@ public class ModelDefinition extends CMMNElementDefinition {
     /**
      * Collection with all elements belonging to the case definition.
      */
-    private final Collection<CMMNElementDefinition> elements = new ArrayList();
+    private final Collection<CMMNElementDefinition> elements = new ArrayList<>();
     /**
      * Document to which this definition belongs.
      */
     private final DefinitionsDocument document;
 
-    private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap();
-    private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap();
+    private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap<>();
+    private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap<>();
 
     protected ModelDefinition(Element element, DefinitionsDocument document) {
         super(element, null, null, true); // All definitions must have an identifier

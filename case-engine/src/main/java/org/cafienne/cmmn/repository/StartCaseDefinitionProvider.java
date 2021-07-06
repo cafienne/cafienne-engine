@@ -24,7 +24,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
 
     @Override
     public List<String> list(PlatformUser user, String tenant) {
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     public StartCaseDefinitionProvider() {
@@ -36,7 +36,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
         if (config.hasPath(AUTHORIZED_TENANT_ROLES)) {
             return config.getStringList(AUTHORIZED_TENANT_ROLES);
         } else {
-            return new ArrayList();
+            return new ArrayList<>();
         }
     }
 

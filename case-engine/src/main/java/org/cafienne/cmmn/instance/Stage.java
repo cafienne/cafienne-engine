@@ -21,20 +21,20 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends PlanFragment<T> {
-    private final Collection<PlanItem> planItems = new ArrayList();
+    private final Collection<PlanItem<?>> planItems = new ArrayList<>();
 
     // Below are two flags that are required for the checking of stage completion
     private boolean isManualCompletion = true; // This is a status keeping track of the cause of the attempt to complete (this info cannot be passed through the statemachine)
 
-    public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance) {
+    public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
         this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);
     }
 
-    protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage parent, Case caseInstance, StateMachine stateMachine) {
+    protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance, StateMachine stateMachine) {
         super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
     }
 
-    void register(PlanItem child) {
+    void register(PlanItem<?> child) {
         if (getCaseInstance().recoveryRunning() && child.getIndex() > 0) {
             planItems.stream().filter(p -> p.getDefinition().equals(child.getDefinition()) && p.getIndex() + 1 == child.getIndex()).forEach(leftSibling -> {
 //                System.out.println("!!!Releasing already repeated plan item " + leftSibling);
@@ -45,7 +45,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         planItems.add(child);
     }
 
-    public Collection<PlanItem> getPlanItems() {
+    public Collection<PlanItem<?>> getPlanItems() {
         return planItems;
     }
 
@@ -88,7 +88,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
             String msg = getPlanItems().stream().map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
             return "*   checking " + planItems.size() +" plan items for completion:" + msg;
         });
-        for (PlanItem childItem : planItems) {
+        for (PlanItem<?> childItem : planItems) {
             // There shouldn't be any active item.
             if (childItem.getState() == State.Active) {
                 addDebugInfo(() -> "*** " + this + " cannot auto complete, because '" + childItem.toDescription() + "' is still Active");
@@ -154,7 +154,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         if (table != null && table.hasItems(this)) {
             return true;
         }
-        for (PlanItem child : getPlanItems()) {
+        for (PlanItem<?> child : getPlanItems()) {
             if (child.hasDiscretionaryItems()) {
                 return true;
             }
@@ -194,7 +194,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     private void disconnectChildren(boolean makeTerminationTransition) {
-        for (PlanItem child : planItems) {
+        for (PlanItem<?> child : planItems) {
             if (makeTerminationTransition ) {
                 child.makeTransition(child.getTerminationTransition());
             }
@@ -209,7 +209,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
      * @param transition
      */
     private void propagateTransition(Transition transition) {
-        for (PlanItem child : planItems) {
+        for (PlanItem<?> child : planItems) {
             child.makeTransition(transition);
         }
     }
@@ -217,7 +217,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     @Override
     protected void dumpImplementationToXML(Element stageXML) {
         super.dumpImplementationToXML(stageXML);
-        for (PlanItem child : planItems) {
+        for (PlanItem<?> child : planItems) {
             child.dumpMemoryStateToXML(stageXML);
         }
 
@@ -233,11 +233,11 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
      * @param planItem
      * @return
      */
-    public boolean contains(PlanItem planItem) {
+    public boolean contains(PlanItem<?> planItem) {
         if (planItem == null) {
             return false;
         }
-        Stage planItemsParent = planItem.getStage();
+        Stage<?> planItemsParent = planItem.getStage();
         if (planItemsParent == null) {
             return false;
         }

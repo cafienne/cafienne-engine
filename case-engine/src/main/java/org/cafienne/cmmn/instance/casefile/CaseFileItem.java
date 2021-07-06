@@ -37,7 +37,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     private CaseFileItemTransition lastTransition; // Last transition
 
     private Value<?> value = Value.NULL;
-    private Map<String, BusinessIdentifier> businessIdentifiers = new HashMap();
+    private Map<String, BusinessIdentifier> businessIdentifiers = new HashMap<>();
     /**
      * The parent case file item that we are contained in, or null if we are contained in the top level case file.
      */
@@ -237,7 +237,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             getDefinition().getChildren().forEach(childDefinition -> {
                 String childName = childDefinition.getName();
                 if (map.has(childName)) {
-                    Value newChildValue = map.get(childName);
+                    Value<?> newChildValue = map.get(childName);
                     CaseFileItem item = getItem(childName);
                     if (item.getState() == State.Available) {
                         item.replaceContent(newChildValue);
@@ -306,7 +306,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                     }
                 }
             });
-            Value newValue = value.cloneValueNode().merge(newContent);
+            Value<?> newValue = value.cloneValueNode().merge(newContent);
             addCaseFileEvent(new CaseFileItemUpdated(this, newValue));
             return;
         }
@@ -318,9 +318,9 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         //  they are changed, then we will first update those children.
         getDefinition().getChildren().stream().map(CMMNElementDefinition::getName).forEach(childName -> {
             if (newMap.has(childName)) {
-                Value newChildValue = newMap.get(childName);
+                Value<?> newChildValue = newMap.get(childName);
                 CaseFileItem childItem = getItem(childName);
-                Value existingChildValue = childItem.getValue();
+                Value<?> existingChildValue = childItem.getValue();
                 if (!existingChildValue.isSupersetOf(newChildValue)) {
                     childItem.updateContent(newChildValue);
                 }
@@ -336,7 +336,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 // This is actually a child. Let's skip it, because it is handled above.
                 return;
             }
-            Value currentPropertyValue = ourMap.get(propertyName);
+            Value<?> currentPropertyValue = ourMap.get(propertyName);
             if (!currentPropertyValue.isSupersetOf(newPropertyValue)) {
                 if (getDefinition().getCaseFileItemDefinition().getProperties().get(propertyName) == null) {
                     addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] contains property '" + propertyName + "'. This property is NOT DEFINED in the CaseDefinition");
@@ -348,7 +348,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // Only make a transition if there are changed properties.
         if (!updatedProperties.getValue().isEmpty()) {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] contains changes in properties " + updatedProperties.getValue().keySet().stream().map(p -> "'" + p + "'").collect(Collectors.joining(", ")));
-            Value newValue = value.cloneValueNode().merge(updatedProperties);
+            Value<?> newValue = value.cloneValueNode().merge(updatedProperties);
             addCaseFileEvent(new CaseFileItemUpdated(this, newValue));
         } else {
             addDebugInfo(() -> "Update on CaseFileItem[" + getPath() + "] has no property changes");

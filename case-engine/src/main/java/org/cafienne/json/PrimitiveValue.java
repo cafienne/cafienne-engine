@@ -38,12 +38,12 @@ public abstract class PrimitiveValue<T> extends Value<T> implements SpelProperty
     public abstract void print(JsonGenerator generator) throws IOException;
 
     @Override
-    public boolean isSupersetOf(Value otherValue) {
+    public boolean isSupersetOf(Value<?> otherValue) {
         return otherValue != null && this.value.equals(otherValue.value);
     }
 
     @Override
-    public <T extends Value> T merge(T withValue) {
+    public <V extends Value<?>> V merge(V withValue) {
         // Primitives cannot merge, so we always return the other value; it simply overwrites our value.
         return withValue;
     }

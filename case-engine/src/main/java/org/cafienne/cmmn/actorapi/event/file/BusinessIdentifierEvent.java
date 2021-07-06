@@ -47,7 +47,7 @@ public abstract class BusinessIdentifierEvent extends CaseEvent {
         }
     }
 
-    public abstract Value getValue();
+    public abstract Value<?> getValue();
 
     @Override
     public String getDescription() {

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CalculationStep extends Source<StepDefinition> {
-    private Map<InputReference, Value> inputs = null;
+    private Map<InputReference, Value<?>> inputs = null;
     private final ConditionDefinition condition;
 
     public CalculationStep(Calculation calculation, StepDefinition definition) {
@@ -26,11 +26,11 @@ public class CalculationStep extends Source<StepDefinition> {
         this.condition = definition.getCondition();
     }
 
-    protected Map<InputReference, Value> getInputs() {
+    protected Map<InputReference, Value<?>> getInputs() {
         if (inputs == null) {
-            inputs = new HashMap();
+            inputs = new HashMap<>();
             for (InputReference input : definition.getInputs()) {
-                Source source = calculation.getSource(input.getSource());
+                Source<?> source = calculation.getSource(input.getSource());
                 inputs.put(input, source.getResult().getValue());
             }
         }

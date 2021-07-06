@@ -261,7 +261,7 @@ public class Path implements Serializable {
         if (this.isArrayElement()) {
             ValueList list = parent.withArray(this.name);
             if (list.size() > this.index) {
-                Value value = list.get(this.index);
+                Value<?> value = list.get(this.index);
                 if (value.isMap()) {
                     return value.asMap();
                 } else {

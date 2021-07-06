@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class TestSerializer extends JSerializer {
 
-    private Map<String, Object> cache = new LinkedHashMap();
+    private Map<String, Object> cache = new LinkedHashMap<>();
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {

@@ -87,7 +87,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
     }
 
     @Override
-    public PlanItemOnPart createInstance(Criterion criterion) {
+    public PlanItemOnPart createInstance(Criterion<?> criterion) {
         return new PlanItemOnPart(criterion, this);
     }
 }

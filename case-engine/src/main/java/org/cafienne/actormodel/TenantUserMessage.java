@@ -2,13 +2,11 @@ package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.event.TransactionEvent;
-import org.cafienne.actormodel.identity.TenantUser;
 
 /**
  * A TenantUserMessage carries a TenantUser
  */
-public interface TenantUserMessage<T extends ModelActor> {
+public interface TenantUserMessage<T extends ModelActor<?,?>> {
     TenantUser getUser();
 
     /**
@@ -19,7 +17,7 @@ public interface TenantUserMessage<T extends ModelActor> {
      * @param actor
      * @return
      */
-    default TransactionEvent createTransactionEvent(T actor) {
+    default TransactionEvent<T> createTransactionEvent(T actor) {
         return actor.createTransactionEvent();
     }
 }

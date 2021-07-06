@@ -13,7 +13,7 @@ import java.util.*;
 
 public class CaseFileAssertion extends ModelTestCommandAssertion {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileAssertion.class);
-    private final Map<Path, CaseFileItemAssertion> assertions = new HashMap();
+    private final Map<Path, CaseFileItemAssertion> assertions = new HashMap<>();
 
     public CaseFileAssertion(ModelTestCommand command) {
         super(command);
@@ -55,7 +55,7 @@ public class CaseFileAssertion extends ModelTestCommandAssertion {
     }
 
     List<CaseFileItemAssertion> getArrayElements(Path path) {
-        List<CaseFileItemAssertion> children = new ArrayList();
+        List<CaseFileItemAssertion> children = new ArrayList<>();
         assertions.entrySet().stream().filter(entry -> entry.getKey().isArrayElementOf(path)).forEach(entry -> children.add(entry.getValue()));
 //        System.out.println("Sorting "+children.size());
         children.sort(Comparator.comparing(CaseFileItemAssertion::getIndexInArray));

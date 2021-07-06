@@ -32,11 +32,11 @@ public class PlanItemCreated extends PlanItemEvent {
         this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);
     }
 
-    public PlanItemCreated(Stage stage, ItemDefinition definition, String planItemId, int index) {
+    public PlanItemCreated(Stage<?> stage, ItemDefinition definition, String planItemId, int index) {
         this(stage.getCaseInstance(), planItemId, definition.getName(), stage, definition, index);
     }
 
-    private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage stage, ItemDefinition definition, int index) {
+    private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage<?> stage, ItemDefinition definition, int index) {
         super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0);
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
@@ -67,9 +67,9 @@ public class PlanItemCreated extends PlanItemEvent {
         return stageId;
     }
 
-    private transient PlanItem planItem;
+    private transient PlanItem<?> planItem;
 
-    public PlanItem getCreatedPlanItem() {
+    public PlanItem<?> getCreatedPlanItem() {
         return planItem;
     }
 
@@ -89,7 +89,7 @@ public class PlanItemCreated extends PlanItemEvent {
     }
 
     @Override
-    protected void updatePlanItemState(PlanItem planItem) {
+    protected void updatePlanItemState(PlanItem<?> planItem) {
         // Nothing to do here, since we overwrite updateState(Case actor).
     }
 }

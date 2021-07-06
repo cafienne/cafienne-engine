@@ -122,9 +122,9 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
         return debugEvent;
     }
 
-    protected void addDebugInfo(DebugStringAppender appender, Value json, Logger logger) {
+    protected void addDebugInfo(DebugStringAppender appender, Value<?> json, Logger logger) {
         addDebugInfo(appender, logger);
-        addDebugInfo(() -> json.cloneValueNode(), logger);
+        addDebugInfo(json::cloneValueNode, logger);
     }
 
     protected void addDebugInfo(DebugStringAppender appender, Exception exception, Logger logger) {
@@ -154,7 +154,7 @@ public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelE
 
     public void addDebugInfo(DebugJsonAppender appender, Logger logger) {
         if (logDebugMessages()) {
-            Value json = appender.info();
+            Value<?> json = appender.info();
             logger.debug(json.toString());
             EngineDeveloperConsole.debugIndentedConsoleLogging(json);
             getDebugEvent().addMessage(json);

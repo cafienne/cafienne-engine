@@ -25,7 +25,7 @@ public class CaseFileItemDefinitionDefinition extends ModelDefinition {
     private final String structureRef;
     private final String importRef;
     private ImportDefinition importDefinition;
-    private final Map<String, PropertyDefinition> properties = new LinkedHashMap();
+    private final Map<String, PropertyDefinition> properties = new LinkedHashMap<>();
 
     public CaseFileItemDefinitionDefinition(Element definitionElement, DefinitionsDocument document) {
         super(definitionElement, document);

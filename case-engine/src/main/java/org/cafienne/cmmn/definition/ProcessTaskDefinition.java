@@ -33,7 +33,7 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
     }
 
     @Override
-    public ProcessTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public ProcessTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new ProcessTask(id, index, itemDefinition, this, stage);
     }
 

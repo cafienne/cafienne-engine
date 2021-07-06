@@ -22,8 +22,8 @@ import org.w3c.dom.Element;
 public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     private final static Logger logger = LoggerFactory.getLogger(PlanFragmentDefinition.class);
 
-    private final Collection<PlanItemDefinition> planItems = new ArrayList();
-    private final Collection<SentryDefinition> sentries = new ArrayList();
+    private final Collection<PlanItemDefinition> planItems = new ArrayList<>();
+    private final Collection<SentryDefinition> sentries = new ArrayList<>();
 
     public PlanFragmentDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -85,7 +85,7 @@ public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     }
 
     @Override
-    public PlanItem createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public PlanItem<?> createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         throw new RuntimeException("Not yet implemented");
     }
 

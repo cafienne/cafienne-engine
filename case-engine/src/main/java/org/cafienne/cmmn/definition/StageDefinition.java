@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class StageDefinition extends PlanFragmentDefinition {
-    private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList(); // Only in the root stage
+    private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList<>(); // Only in the root stage
 
     private boolean autoComplete;
     private PlanningTableDefinition planningTable;
@@ -77,7 +77,7 @@ public class StageDefinition extends PlanFragmentDefinition {
     }
 
     @Override
-    public Stage createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public Stage<?> createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new Stage(id, index, itemDefinition, this, stage, caseInstance);
     }
 }

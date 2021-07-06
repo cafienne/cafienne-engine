@@ -9,12 +9,10 @@ import java.util.HashMap;
 /**
  *
  */
-public class PlanItemAPI<P extends PlanItem> extends APIObject<Case> {
+public class PlanItemAPI<P extends PlanItem<?>> extends APIObject<Case> {
     protected final P item;
     protected final StageAPI parent;
     protected final CaseAPI caseAPI;
-
-    private static HashMap<PlanItem, Integer> map = new HashMap();
 
     public String getName() {
         return item.getType().toLowerCase();
@@ -25,10 +23,10 @@ public class PlanItemAPI<P extends PlanItem> extends APIObject<Case> {
         this.item = item;
         this.caseAPI = caseAPI;
         this.parent = parent;
-        addPropertyReader("id", () -> item.getId());
-        addPropertyReader("name", () -> item.getName());
-        addPropertyReader("index", () -> item.getIndex());
-        addPropertyReader("state", () -> item.getState());
+        addPropertyReader("id", item::getId);
+        addPropertyReader("name", item::getName);
+        addPropertyReader("index", item::getIndex);
+        addPropertyReader("state", item::getState);
         addPropertyReader("stage", () -> parent);
         this.caseAPI.register(this);
     }
