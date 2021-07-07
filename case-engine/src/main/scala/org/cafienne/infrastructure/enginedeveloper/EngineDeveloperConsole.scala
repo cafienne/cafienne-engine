@@ -8,14 +8,13 @@ object EngineDeveloperConsole {
   private var currentIndent = 0
 
   def debugIndentedConsoleLogging(any: Any): Unit = {
-    enabled match {
-      case false => // Nothing to to log
-      case true => {
-        if (any.isInstanceOf[Throwable]) { // Print exception with newline before and after it. Will not be indented
+    if (enabled) {
+      any match {
+        case throwable: Throwable => // Print exception with newline before and after it. Will not be indented
           println("\n")
-          any.asInstanceOf[Throwable].printStackTrace(System.out)
+          throwable.printStackTrace(System.out)
           println("\n")
-        } else {
+        case _ =>
           var logMessage = String.valueOf(any) // String.valueOf converts JSON Value if required
           // Now get current level of indent from current behavior (recursive method)
           val indent = getIndent
@@ -23,7 +22,6 @@ object EngineDeveloperConsole {
           logMessage = logMessage.replaceAll("\n", "\n" + indent)
           // Print to console.
           println(indent + logMessage)
-        }
       }
     }
   }
