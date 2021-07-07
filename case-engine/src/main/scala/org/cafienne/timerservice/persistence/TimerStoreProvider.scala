@@ -15,7 +15,7 @@ import org.cafienne.timerservice.persistence.jdbc.JDBCTimerStore
 class TimerStoreProvider(implicit override val system: ActorSystem) extends ReadJournalProvider {
 
   val store: TimerStore = {
-    journal match {
+    journal() match {
       case c: CassandraReadJournal => new CassandraTimerStore(c)
       case _: JdbcReadJournal => new JDBCTimerStore()
       case _ => new InMemoryStore() // By default return in memory map

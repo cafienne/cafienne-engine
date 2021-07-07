@@ -19,7 +19,7 @@ import java.io.IOException;
 public class RequiredRuleEvaluated extends PlanItemEvent {
     private final boolean isRequired;
 
-    public RequiredRuleEvaluated(PlanItem planItem, boolean isRequired) {
+    public RequiredRuleEvaluated(PlanItem<?> planItem, boolean isRequired) {
         super(planItem);
         this.isRequired = isRequired;
     }
@@ -39,7 +39,7 @@ public class RequiredRuleEvaluated extends PlanItemEvent {
     }
 
     @Override
-    protected void updatePlanItemState(PlanItem planItem) {
+    protected void updatePlanItemState(PlanItem<?> planItem) {
         planItem.updateState(this);
     }
 

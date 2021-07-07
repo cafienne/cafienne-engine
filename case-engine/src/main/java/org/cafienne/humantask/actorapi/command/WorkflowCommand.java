@@ -47,7 +47,7 @@ public abstract class WorkflowCommand extends CaseCommand {
     public void validate(Case caseInstance) throws InvalidCommandException {
         super.validate(caseInstance);
         // Now get the plan item ...
-        PlanItem planItem = caseInstance.getPlanItemById(taskId);
+        PlanItem<?> planItem = caseInstance.getPlanItemById(taskId);
         if (planItem == null) {
             throw new InvalidCommandException(this.getClass().getSimpleName() + ": The task with id " + taskId + " could not be found in case " + caseInstance.getId());
         }

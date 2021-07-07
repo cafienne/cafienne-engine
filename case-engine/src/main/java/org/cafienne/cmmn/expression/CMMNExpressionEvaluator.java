@@ -46,7 +46,7 @@ public interface CMMNExpressionEvaluator {
      * @return
      * @throws InvalidExpressionException
      */
-    boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) throws InvalidExpressionException;
+    boolean evaluateItemControl(PlanItem<?> planItem, ConstraintDefinition ruleDefinition) throws InvalidExpressionException;
 
     /**
      * Evaluate an if part expression
@@ -55,7 +55,7 @@ public interface CMMNExpressionEvaluator {
      * @return
      * @throws InvalidExpressionException
      */
-    boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) throws InvalidExpressionException;
+    boolean evaluateIfPart(Criterion<?> criterion, IfPartDefinition ifPartDefinition) throws InvalidExpressionException;
 
     /**
      * Evaluate an applicability rule expression - whether or not the discretionary item can be planned inside the containing plan item.
@@ -65,7 +65,7 @@ public interface CMMNExpressionEvaluator {
      * @return
      * @throws InvalidExpressionException
      */
-    boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) throws InvalidExpressionException;
+    boolean evaluateApplicabilityRule(PlanItem<?> containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) throws InvalidExpressionException;
 
     /**
      * Evaluation of the expression in the context of the plan item should result in a Duration that can be used in a @{@link TimerEvent} listener.

@@ -3,8 +3,7 @@ package org.cafienne.actormodel.identity
 import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.ValueMap
-import org.cafienne.json.CafienneJson
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends CafienneJson {
   final def tenants: Seq[String] = users.map(u => u.tenant)
@@ -44,7 +43,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
     }
   }
 
-  override def toValue  = {
+  override def toValue: Value[_] = {
     val map = new ValueMap(Fields.userId, userId)
     val userList = map.withArray("tenants")
     users.foreach(user => {

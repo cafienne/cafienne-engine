@@ -1,12 +1,11 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.json.{ValueList, ValueMap}
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.cmmn.actorapi.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
-import org.cafienne.json.CafienneJson
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class CaseTeam(members: Seq[CaseTeamMember] = Seq(), caseRoles: Seq[String] = Seq(), unassignedRoles: Seq[String] = Seq()) extends CafienneJson {
 
@@ -45,14 +44,12 @@ case class CaseTeam(members: Seq[CaseTeamMember] = Seq(), caseRoles: Seq[String]
 
   def getMembers() = members.asJava
 
-  override def toValue(): ValueMap = {
+  override def toValue: Value[_] = {
     new ValueMap("caseRoles", caseRoles, "members", members, "unassignedRoles", unassignedRoles)
   }
 }
 
 object CaseTeam {
-
-  import scala.collection.JavaConverters._
 
   def apply() = new CaseTeam(Seq())
 
@@ -61,7 +58,7 @@ object CaseTeam {
   def apply(member: CaseTeamMember) = new CaseTeam(Seq(member))
 
   def deserialize(memberList: ValueList) = {
-    val teamMembers = memberList.getValue.asScala.asInstanceOf[Seq[ValueMap]].map(json => CaseTeamMember.deserialize(json))
+    val teamMembers = memberList.getValue.asScala.toSeq.asInstanceOf[Seq[ValueMap]].map(json => CaseTeamMember.deserialize(json))
     team.CaseTeam(teamMembers)
   }
 }

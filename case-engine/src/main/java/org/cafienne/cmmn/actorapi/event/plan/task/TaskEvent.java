@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public abstract class TaskEvent<T extends Task> extends CaseEvent {
+public abstract class TaskEvent<T extends Task<?>> extends CaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(TaskEvent.class);
 
     private final String taskId;

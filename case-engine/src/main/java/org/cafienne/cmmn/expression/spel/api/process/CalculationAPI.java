@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class CalculationAPI extends CaseRootObject {
     private final CalculationStep step;
 
-    public CalculationAPI(Calculation calculation, CalculationStep step, Map<InputReference, Value> sources) {
+    public CalculationAPI(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> sources) {
         super(calculation.getTask().getCaseInstance());
         this.step = step;
 

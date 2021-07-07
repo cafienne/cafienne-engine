@@ -37,6 +37,7 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
       case _: PlatformCommand => caseSystem.platformService
+      case other => throw new Error(s"Cannot forward ModelCommands of type ${other.getClass.getName}")
     }
     shardRouter.forward(m)
   }
@@ -65,12 +66,19 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     case pl: CaseCommand => (pl.actorId, pl)
     case pl: ProcessCommand => (pl.actorId, pl)
     case pl: TenantCommand => (pl.actorId, pl)
+    case other => throw new Error(s"Cannot extract actor id for messages of type ${other.getClass.getName}")
   }
 
-  private val shardResolver: ShardRegion.ExtractShardId = msg ⇒ msg match {
+  private val shardResolver: ShardRegion.ExtractShardId = {
     case m: ModelCommand[_] => {
       val pidHashKey: Long = m.actorId.hashCode()
       val shard = ((localSystemKey + pidHashKey) % numberOfPartitions).toString
+      shard
+    }
+    case other => {
+      System.err.println(s"\nShard resolver for messages of type ${other.getClass.getName} is not supported")
+      // Unsupported command type
+      val shard = ((localSystemKey + other.hashCode()) % numberOfPartitions).toString
       shard
     }
   }

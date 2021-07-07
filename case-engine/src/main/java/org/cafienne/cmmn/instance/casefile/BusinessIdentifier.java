@@ -10,7 +10,7 @@ import org.cafienne.json.ValueMap;
 
 class BusinessIdentifier extends CMMNElement<PropertyDefinition> {
     private final CaseFileItem item;
-    private Value currentValue = null;
+    private Value<?> currentValue = null;
 
     BusinessIdentifier(CaseFileItem item, PropertyDefinition property) {
         super(item, property);
@@ -23,7 +23,7 @@ class BusinessIdentifier extends CMMNElement<PropertyDefinition> {
 
     void update(ValueMap map) {
         if (map.has(getDefinition().getName())) {
-            Value potentialNewValue = map.get(getDefinition().getName());
+            Value<?> potentialNewValue = map.get(getDefinition().getName());
             if (! potentialNewValue.equals(currentValue)) {
                 item.getCaseInstance().addEvent(new BusinessIdentifierSet(item, getDefinition(), potentialNewValue));
             }

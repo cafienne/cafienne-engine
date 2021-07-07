@@ -32,7 +32,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     private ValueMap givenOutput = new ValueMap();
     private ValueMap taskOutput = new ValueMap();
 
-    protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage stage) {
+    protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage, StateMachine.TaskStage);
     }
 
@@ -79,7 +79,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
         ValueMap inputParametersValues = new ValueMap();
 
         // First, create and set the parameter value based on the case file bindings
-        Map<String, TaskInputParameter> inputParameters = new LinkedHashMap();
+        Map<String, TaskInputParameter> inputParameters = new LinkedHashMap<>();
         getDefinition().getInputParameters().forEach((name, inputParameterDefinition) -> {
             TaskInputParameter inputParameter = new TaskInputParameter(inputParameterDefinition, this);
             inputParameters.put(name, inputParameter);

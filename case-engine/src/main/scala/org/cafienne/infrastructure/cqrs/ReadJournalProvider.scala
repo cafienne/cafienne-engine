@@ -27,7 +27,7 @@ trait ReadJournalProvider extends LazyLogging {
   private def findReadJournalSetting(): String = {
 
     val explicitReadJournal = Cafienne.config.readJournal
-    if (!explicitReadJournal.isEmpty) {
+    if (explicitReadJournal.nonEmpty) {
       return explicitReadJournal
     }
 

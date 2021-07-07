@@ -19,7 +19,7 @@ public class InputParameterSourceDefinition implements SourceDefinition {
     }
 
     @Override
-    public Source createInstance(Calculation calculation) {
+    public Source<?> createInstance(Calculation calculation) {
         return new InputSource(this, calculation, parameter);
     }
 

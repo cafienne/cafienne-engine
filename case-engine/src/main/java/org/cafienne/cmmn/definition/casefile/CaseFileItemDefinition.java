@@ -111,7 +111,7 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
      * are accepted as "blob" content.
      * @param value
      */
-    public void validatePropertyTypes(Value value) throws CaseFileError {
+    public void validatePropertyTypes(Value<?> value) throws CaseFileError {
         getCaseFileItemDefinition().getDefinitionType().validate(this, value);
     }
 

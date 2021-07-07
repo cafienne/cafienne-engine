@@ -51,7 +51,7 @@ public class VariousSpelExpressions {
                     toa.assertValue("CaseID", caseInstanceId);
                     toa.assertValue("TaskName", taskName);
                     toa.assertValue("TaskOutput", defaultOutput);
-                    Value v = toa.getValue("MultiOutput");
+//                    Value<?> v = toa.getValue("MultiOutput");
 //                    System.out.println("Value of special output: " + v);
                     return true;
                 });

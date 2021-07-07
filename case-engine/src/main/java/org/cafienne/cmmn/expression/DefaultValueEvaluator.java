@@ -42,17 +42,17 @@ public class DefaultValueEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
+    public boolean evaluateItemControl(PlanItem<?> planItem, ConstraintDefinition ruleDefinition) {
         return defaultValue;
     }
 
     @Override
-    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion<?> criterion, IfPartDefinition ifPartDefinition) {
         return defaultValue;
     }
 
     @Override
-    public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
+    public boolean evaluateApplicabilityRule(PlanItem<?> containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
         return defaultValue;
     }
 

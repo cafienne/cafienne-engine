@@ -80,7 +80,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     }
 
     @Override
-    public HumanTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public HumanTask createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new HumanTask(id, index, itemDefinition, this, stage);
     }
 

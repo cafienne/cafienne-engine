@@ -2,14 +2,12 @@ package org.cafienne.service.db.query
 
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
-import org.cafienne.cmmn.definition.{CMMNElementDefinition, DefinitionsDocument}
+import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
-import org.cafienne.service.db.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord, CaseTeamMemberRecord}
-import org.cafienne.service.db.query.exception.PlanItemSearchFailure
 import org.cafienne.service.db.query.exception.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.db.query.filter.CaseFilter
-import org.cafienne.util.XMLHelper
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord}
 
 import scala.concurrent.Future
 
@@ -147,20 +145,26 @@ class CaseQueriesImpl
       baseQuery <- caseInstanceTeamMemberQuery
         .filter(_.caseInstanceId === caseInstanceId)
         .filter(_.active === true)
-        .joinRight(TableQuery[CaseInstanceRoleTable]) // Select all defined case roles; joining right will also return unfilled case roles
-        .on((m, r) => m.caseInstanceId === r.caseInstanceId && m.caseRole === r.roleName)
-        .filter(_._2.caseInstanceId === caseInstanceId) // but only for this case obviously
       // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery._2.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
     } yield baseQuery
 
-    db.run(query.distinct.result).map(records => {
-      if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
-      val team = fillCaseTeam(records.map(r => r._1).filter(m => m.nonEmpty).map(m => m.get))
-      val unassignedRoles = records.filter(r => r._1.isEmpty).map(r => r._2.roleName)
-      val caseRoles = records.map(r => r._2.roleName).filterNot(_.isBlank).toSet.toSeq
-      team.copy(caseRoles = caseRoles, unassignedRoles = unassignedRoles)
-    })
+    (for {
+      teamRecords <- db.run(query.distinct.result)
+      roleRecords <- db.run(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).distinct.result)
+    } yield (teamRecords, roleRecords))
+      .map(records => {
+        val members = records._1
+        val roles = records._2.map(_.roleName)
+        if (members.isEmpty) {
+          throw CaseSearchFailure(caseInstanceId)
+        }
+
+        val team = fillCaseTeam(members)
+        val caseRoles = roles.filterNot(_.isBlank).distinct
+        val unassignedRoles = caseRoles.filter(caseRole => !members.exists(_.caseRole == caseRole))
+        team.copy(caseRoles = caseRoles, unassignedRoles = unassignedRoles)
+      })
   }
 
   private def fillCaseTeam(records: Seq[CaseTeamMemberRecord]): CaseTeam = {

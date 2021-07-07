@@ -18,18 +18,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.json.ValueMap
-
-import javax.ws.rs._
-import org.cafienne.actormodel.command.exception.MissingTenantException
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
+import org.cafienne.json.ValueMap
 import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
+
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
@@ -97,7 +96,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
   def listModels = get {
     path("list") {
       userWithTenant { (platformUser, tenant) => {
-        import scala.collection.JavaConverters._
+        import scala.jdk.CollectionConverters._
 
         val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
         for (file <- Cafienne.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
@@ -215,7 +214,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
     */
   private def userWithTenant(subRoute: (PlatformUser, String) => Route): Route = {
     validUser { platformUser =>
-      parameters('tenant ?) { optionalTenant =>
+      parameters("tenant".?) { optionalTenant =>
         val tenant = platformUser.resolveTenant(optionalTenant)
         subRoute(platformUser, tenant)
       }

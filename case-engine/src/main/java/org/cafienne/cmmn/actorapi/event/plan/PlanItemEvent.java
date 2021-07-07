@@ -22,14 +22,14 @@ import java.io.IOException;
 public abstract class PlanItemEvent extends CaseEvent {
     private final static Logger logger = LoggerFactory.getLogger(PlanItemEvent.class);
 
-    protected final transient PlanItem planItem;
+    protected final transient PlanItem<?> planItem;
 
     public final String planItemId;
     public final String type;
     public final int seqNo;
     public final int index;
 
-    protected PlanItemEvent(PlanItem planItem) {
+    protected PlanItemEvent(PlanItem<?> planItem) {
         this(planItem.getCaseInstance(), planItem.getId(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
     }
 
@@ -37,7 +37,7 @@ public abstract class PlanItemEvent extends CaseEvent {
         this(actor, planItemId, type, index, seqNo, null);
     }
 
-    protected PlanItemEvent(Case actor, String planItemId, String type, int index, int seqNo, PlanItem planItem) {
+    protected PlanItemEvent(Case actor, String planItemId, String type, int index, int seqNo, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
         this.seqNo = seqNo;
@@ -71,7 +71,7 @@ public abstract class PlanItemEvent extends CaseEvent {
 
     @Override
     public void updateState(Case actor) {
-        PlanItem planItem = actor.getPlanItemById(planItemId);
+        PlanItem<?> planItem = actor.getPlanItemById(planItemId);
         if (planItem == null) {
             // Ouch!
             logger.error("Error while updating state from event " + getClass().getSimpleName()+": cannot find plan item with id " + getPlanItemId() + " in case " + actor);
@@ -81,7 +81,7 @@ public abstract class PlanItemEvent extends CaseEvent {
         updatePlanItemState(planItem);
     }
 
-    abstract protected void updatePlanItemState(PlanItem planItem);
+    abstract protected void updatePlanItemState(PlanItem<?> planItem);
 
     protected String getName() {
         return planItem != null ? planItem.getName() + "." + getIndex() : "PlanItem";

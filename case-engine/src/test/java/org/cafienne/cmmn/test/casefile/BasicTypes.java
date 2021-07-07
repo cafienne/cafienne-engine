@@ -185,7 +185,7 @@ public class BasicTypes {
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
-        final ValueMap expectedChildContent = childItemClone.merge(updatedContent).asMap();
+        final ValueMap expectedChildContent = childItemClone.merge(updatedContent);
 
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
         testCase.addStep(updateChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(expectedChildContent));

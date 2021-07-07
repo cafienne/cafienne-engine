@@ -19,12 +19,12 @@ import org.cafienne.cmmn.instance.sentry.StandardEvent;
 import java.io.IOException;
 
 @Manifest
-public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent<Transition, PlanItem> {
+public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent<Transition, PlanItem<?>> {
     private final State currentState;
     private final State historyState;
     private final Transition transition;
 
-    public PlanItemTransitioned(PlanItem planItem, State newState, State historyState, Transition transition) {
+    public PlanItemTransitioned(PlanItem<?> planItem, State newState, State historyState, Transition transition) {
         super(planItem);
         this.currentState = newState;
         this.historyState = historyState;
@@ -39,7 +39,7 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
     }
 
     @Override
-    public PlanItem getSource() {
+    public PlanItem<?> getSource() {
         return planItem;
     }
 
@@ -94,7 +94,7 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
     }
 
     @Override
-    protected void updatePlanItemState(PlanItem planItem) {
+    protected void updatePlanItemState(PlanItem<?> planItem) {
         planItem.updateState(this);
     }
 }

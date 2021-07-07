@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 
 public class PlanItemExit extends CriteriaListener<ExitCriterion> {
 
-    PlanItemExit(PlanItem target) {
+    PlanItemExit(PlanItem<?> target) {
         super(target);
     }
 
@@ -31,7 +31,7 @@ public class PlanItemExit extends CriteriaListener<ExitCriterion> {
             return;
         }
         planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Exit criteria "));
-        for (Criterion criterion : criteria) {
+        for (Criterion<?> criterion : criteria) {
             criterion.dumpMemoryStateToXML(planItemXML, true);
         }
     }

@@ -10,13 +10,12 @@ package org.cafienne.service.api.tenant.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.complete
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenantFormat, UserFormat}
-import org.cafienne.tenant.actorapi.command.{TenantCommand, TenantUserInformation}
 import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, PlatformTenantCommand}
+import org.cafienne.tenant.actorapi.command.{TenantCommand, TenantUserInformation}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
 
@@ -37,7 +36,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
   }
 
   def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenantFormat) = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     val users = convertToTenant(newTenant).asJava
     if (users.isEmpty) {

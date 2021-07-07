@@ -232,7 +232,7 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
         } else {
             // Wrong type of input; ignore it.
         }
-        processTaskActor.addDebugInfo(() -> "Field " + fieldType + ": '" + list.stream().map(a -> a.toString()).collect(Collectors.joining("; ")) + "'");
+        processTaskActor.addDebugInfo(() -> "Field " + fieldType + ": '" + list.stream().map(InternetAddress::toString).collect(Collectors.joining("; ")) + "'");
         return list.toArray(new InternetAddress[list.size()]);
     }
 
@@ -242,7 +242,7 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
      * @param value
      * @return
      */
-    private InternetAddress getAddress(Value value) throws InvalidMailException {
+    private InternetAddress getAddress(Value<?> value) throws InvalidMailException {
         String email = "";
         String name = "";
 

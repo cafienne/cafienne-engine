@@ -67,7 +67,7 @@ public class RaiseEvent extends CaseCommand {
     @Override
     public CaseResponse process(Case caseInstance) {
         if (identifier != null && !identifier.trim().isEmpty()) {
-            PlanItem planItem = caseInstance.getPlanItemById(identifier);
+            PlanItem<?> planItem = caseInstance.getPlanItemById(identifier);
             if (planItem != null) {
                 // When Plan item exists by id
                 caseInstance.makePlanItemTransition(planItem, Transition.Occur);
@@ -76,7 +76,7 @@ public class RaiseEvent extends CaseCommand {
         }
         //when the Plan Item is not found by id, check if it is found by name.
         //if the name was not set, it will use the planItemId as name.
-        List<PlanItem> planItemsByName = new ArrayList<PlanItem>();
+        List<PlanItem<?>> planItemsByName = new ArrayList<PlanItem<?>>();
         caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(identifier)).forEach(p -> planItemsByName.add(p));
         if (planItemsByName.isEmpty()) {
             throw new CommandException("There is no plan item with identifier " + identifier + " in case " + caseInstance.getId());

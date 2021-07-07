@@ -89,7 +89,7 @@ class Result {
         return errorDescription;
     }
 
-    Value getException() {
+    Value<?> getException() {
         if (cause != null) {
             return Value.convert(cause);
         } else {
@@ -107,7 +107,7 @@ class Result {
         return responseJson;
     }
 
-    Value getDebugInfo() {
+    Value<?> getDebugInfo() {
         return new ValueMap("Request", getRequestDebugInfo(), "Response", getResponseDebugInfo());
     }
 
@@ -133,7 +133,7 @@ class Result {
         return responseDebugInfo;
     }
 
-    private Value convertPayloadToJSON(String payload) {
+    private Value<?> convertPayloadToJSON(String payload) {
         try {
             // Try to parse the response into a JSON structure if possible.
             //  Otherwise just put the raw string

@@ -16,7 +16,7 @@ public class CaseAPI extends APIObject<Case> {
     private final CaseTeamAPI caseTeam;
     private final CaseFileAPI caseFile;
 
-    private final Map<String, PlanItemAPI> planItems = new HashMap();
+    private final Map<String, PlanItemAPI> planItems = new HashMap<>();
 
     public CaseAPI(Case actor) {
         super(actor);
@@ -36,7 +36,7 @@ public class CaseAPI extends APIObject<Case> {
         addDeprecatedReader("caseFile", "file", () -> caseFile);
     }
 
-    protected void register(PlanItemAPI item) {
+    protected void register(PlanItemAPI<?> item) {
         planItems.put(item.item.getId(), item);
     }
 
@@ -45,12 +45,12 @@ public class CaseAPI extends APIObject<Case> {
         return actor.getId();
     }
 
-    public Collection<PlanItem> getPlanItems(String identifier) {
+    public Collection<PlanItem<?>> getPlanItems(String identifier) {
         warnDeprecation("getPlanItemByName(\"" + identifier + "\")", "plan");
         return actor.getPlanItems(identifier);
     }
 
-    public PlanItemAPI getPlanItemByName(String identifier) {
+    public PlanItemAPI<?> getPlanItemByName(String identifier) {
         warnDeprecation("getPlanItemByName(\"" + identifier + "\")", "plan");
         return find(actor.getPlanItemByName(identifier));
     }
@@ -65,8 +65,8 @@ public class CaseAPI extends APIObject<Case> {
         return caseFile;
     }
 
-    public PlanItemAPI find(PlanItem item) {
-        PlanItemAPI api = planItems.get(item.getId());
+    public PlanItemAPI<?> find(PlanItem<?> item) {
+        PlanItemAPI<?> api = planItems.get(item.getId());
         if (api == null) {
             getActor().addDebugInfo(() -> "ERROR: Unexpectedly cannot find a PlanItemAPI object for " + item);
         }

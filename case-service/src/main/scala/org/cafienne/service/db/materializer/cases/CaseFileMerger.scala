@@ -1,10 +1,9 @@
 package org.cafienne.service.db.materializer.cases
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.json.{Value, ValueMap}
-import org.cafienne.json.ValueMap
 import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.instance.casefile.{CaseFileItemTransition, Path}
+import org.cafienne.json.{Value, ValueMap}
 
 object CaseFileMerger extends LazyLogging {
 
@@ -28,6 +27,7 @@ object CaseFileMerger extends LazyLogging {
           val myValue = arrayValue.get(itemIndex).asInstanceOf[ValueMap]
           handleRemoveChild(event.asInstanceOf[CaseFileItemChildRemoved], myValue)
         }
+        case _ => // Ignore other transitions for now
       }
     } else {
       event.getTransition match { // Matching on transition instead of event class, because classes only introduced in 1.1.9
@@ -43,6 +43,7 @@ object CaseFileMerger extends LazyLogging {
           }
           handleRemoveChild(event.asInstanceOf[CaseFileItemChildRemoved], myValue)
         }
+        case _ => // Ignore other transitions
       }
     }
   }

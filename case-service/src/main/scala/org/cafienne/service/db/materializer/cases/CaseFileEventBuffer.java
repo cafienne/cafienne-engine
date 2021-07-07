@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class CaseFileEventBuffer {
-    private List<CaseFileEvent> events = new ArrayList();
-    private List<CaseFileEvent> removedChildren = new ArrayList();
+    private List<CaseFileEvent> events = new ArrayList<>();
+    private List<CaseFileEvent> removedChildren = new ArrayList<>();
 
     /**
      * Return the list of events to be handled in the current transaction

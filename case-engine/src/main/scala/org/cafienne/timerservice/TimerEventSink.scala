@@ -21,7 +21,7 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
   override val tag: String = TimerBaseEvent.TAG
   private val schedule: mutable.Map[String, Scheduled] = mutable.Map()
 
-  def open() = {
+  def open(): Future[Unit] = {
     storage.getTimers().map(timers => {
       logger.info(s"Scheduling batch with ${timers.length} timers upon startup.")
       loadTimerBatch(timers)
@@ -29,11 +29,11 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
     })
   }
 
-  private def loadTimerBatch(timers: Seq[Timer]) = {
+  private def loadTimerBatch(timers: Seq[Timer]): Unit = {
     timers.foreach(scheduleTimer)
   }
 
-  private def scheduleTimer(job: Timer) = {
+  private def scheduleTimer(job: Timer): Unit = {
     schedule.put(job.timerId, new Scheduled(timerService, job, this))
   }
 
@@ -54,16 +54,16 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
   }
 
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done] = {
-    schedule.remove(timerId).map(schedule => schedule.cancel)
+    schedule.remove(timerId).map(schedule => schedule.cancel())
     storage.removeTimer(timerId, offset)
   }
 
-  def handleFailingCaseInvocation(job: Scheduled, failure: CommandFailure) = {
+  def handleFailingCaseInvocation(job: Scheduled, failure: CommandFailure): Unit = {
     // TODO: we can also update the timer state in the storage???
     logger.warn(s"Could not trigger timer ${job.timer.timerId} in case ${job.timer.caseInstanceId}:" + failure.toJson)
   }
 
-  def handleCaseInvocation(job: Scheduled, response: ModelResponse) = {
+  def handleCaseInvocation(job: Scheduled, response: ModelResponse): Unit = {
     // TODO: we can also delete the timer here, or update a state for that timer in the store
     logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer ${job.timer.timerId} in case ${job.timer.caseInstanceId}"))
   }
@@ -72,7 +72,7 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
     import scala.jdk.CollectionConverters._
     // Note: Migration MUST be done synchronously, otherwise the flow of starting and opening up to listen to the stream
     //  may fail if timers are added async and already read when opening the stream.
-    storage.importTimers(timers.asScala)
+    storage.importTimers(timers.asScala.toSeq)
   }
 
   /**
@@ -88,10 +88,9 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
     modelEvent match {
       case event: TimerSet => setTimer(event, offset)
       case event: TimerCleared => removeTimer(event, offset)
-      case other => {
+      case other =>
         logger.warn(s"Timer Service received an unexpected event of type ${other.getClass.getName}")
         Future.successful(Done)
-      }
     }
   }
 }

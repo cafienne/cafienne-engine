@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class CaseFileAPI extends APIObject<Case> {
     private final CaseFile file;
-    private final Map<String, CaseFileItemAPI> items = new HashMap();
+    private final Map<String, CaseFileItemAPI> items = new HashMap<>();
 
     public CaseFileAPI(CaseFile file) {
         super(file.getCaseInstance());

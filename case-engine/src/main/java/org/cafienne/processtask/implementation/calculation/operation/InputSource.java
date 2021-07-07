@@ -5,7 +5,7 @@ import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.source.InputParameterSourceDefinition;
 
-public class InputSource extends Source {
+public class InputSource extends Source<InputParameterSourceDefinition> {
     private final InputParameterDefinition parameter;
 
     public InputSource(InputParameterSourceDefinition inputParameterSourceDefinition, Calculation calculation, InputParameterDefinition parameter) {

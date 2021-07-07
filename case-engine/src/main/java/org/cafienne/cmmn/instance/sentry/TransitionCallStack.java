@@ -24,7 +24,7 @@ class TransitionCallStack {
     private class Frame {
         private final StandardEvent event;
         private final Frame parent;
-        private final List<Frame> children = new ArrayList();
+        private final List<Frame> children = new ArrayList<>();
         private final int depth;
 
         Frame(StandardEvent event, Frame parent) {

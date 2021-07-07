@@ -29,7 +29,7 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
         return defaultControl;
     }
 
-    public abstract PlanItem createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance);
+    public abstract PlanItem<?> createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance);
 
     /**
      * Returns the transition that is to be invoked on the plan item when one of the entry criteria sentries is satisfied

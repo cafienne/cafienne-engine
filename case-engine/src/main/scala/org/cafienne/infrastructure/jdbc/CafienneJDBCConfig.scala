@@ -43,7 +43,7 @@ trait CafienneJDBCConfig {
       * @tparam T
       * @return
       */
-    def idColumn[T](columnName: String, options: ColumnOption[String]*) = {
+    def idColumn[C](columnName: String, options: ColumnOption[String]*) = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -82,7 +82,7 @@ trait CafienneJDBCConfig {
       * @tparam T
       * @return
       */
-    def userColumn[T](columnName: String, options: ColumnOption[String]*) = {
+    def userColumn[C](columnName: String, options: ColumnOption[String]*) = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -109,7 +109,7 @@ trait CafienneJDBCConfig {
       * @tparam T
       * @return
       */
-    def stateColumn[T](columnName: String, options: ColumnOption[String]*) = {
+    def stateColumn[C](columnName: String, options: ColumnOption[String]*) = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -136,7 +136,7 @@ trait CafienneJDBCConfig {
       * @tparam T
       * @return
       */
-    def jsonColumn[T](columnName: String, options: ColumnOption[String]*) = {
+    def jsonColumn[C](columnName: String, options: ColumnOption[String]*) = {
       // NOTE: This code is invoked many times, also continuously during runtime
 
       val newOptions = {
@@ -166,7 +166,7 @@ trait CafienneJDBCConfig {
     def tenant = idColumn[String]("tenant")
   }
 
-  implicit class QueryHelper[T <: CafienneTable[_], E](query: Query[T, E, Seq]) {
+  implicit class QueryHelper[CT <: CafienneTable[_], E](query: Query[CT, E, Seq]) {
     /**
       * Orders the results as given in the Sort object.
       * Note that if the Sort.on field is empty (None), the query will not be affected.
@@ -174,7 +174,7 @@ trait CafienneJDBCConfig {
       * @param sort
       * @return
       */
-    def order(sort: Sort): Query[T, E, Seq] = {
+    def order(sort: Sort): Query[CT, E, Seq] = {
       sort.on.fold(query)(fieldName => sort.ascending match {
         case true => query.sortBy(_.getSortColumn(fieldName.toLowerCase).asc)
         case _ => query.sortBy(_.getSortColumn(fieldName.toLowerCase).desc)
@@ -186,12 +186,12 @@ trait CafienneJDBCConfig {
       * @param area
       * @return
       */
-    def only(area: Area) = {
+    def only(area: Area): Query[CT, E, Seq] = {
       query.drop(area.offset).take(area.numOfResults)
     }
   }
 
-  implicit class TenantQueryHelper[T <: CafienneTenantTable[_], E](query: Query[T, E, Seq]) {
+  implicit class TenantQueryHelper[CTT <: CafienneTenantTable[_], E](query: Query[CTT, E, Seq]) {
     /**
       * Add tenant selector to the query. If no tenants specified, it will not add a filter on tenant
       * and search across tenants
@@ -199,7 +199,7 @@ trait CafienneJDBCConfig {
       * @param tenants
       * @return
       */
-    def inTenants(tenants: Option[Seq[String]]): Query[T, E, Seq] = {
+    def inTenants(tenants: Option[Seq[String]]): Query[CTT, E, Seq] = {
       val set = tenants.getOrElse(Seq())
       set.isEmpty match {
         case true => query

@@ -30,7 +30,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     private final WorkflowTask workflow;
     private final TaskOutputValidator validator;
 
-    public HumanTask(String id, int index, ItemDefinition itemDefinition, HumanTaskDefinition definition, Stage stage) {
+    public HumanTask(String id, int index, ItemDefinition itemDefinition, HumanTaskDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage);
 
         // Create an instance of the output validator if we have one

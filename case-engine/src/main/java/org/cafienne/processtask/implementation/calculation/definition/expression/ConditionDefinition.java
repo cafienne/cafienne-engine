@@ -23,8 +23,8 @@ public class ConditionDefinition extends CalculationExpressionDefinition {
         super(element, processDefinition, parentElement);
     }
 
-    public boolean getBooleanResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> sourceMap) {
-        Value validity = super.evaluateExpression(calculation, step, sourceMap);
+    public boolean getBooleanResult(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> sourceMap) {
+        Value<?> validity = super.evaluateExpression(calculation, step, sourceMap);
         if (validity instanceof BooleanValue) {
             return ((BooleanValue) validity).getValue();
         } else {

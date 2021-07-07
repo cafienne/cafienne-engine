@@ -29,7 +29,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
      * of a CaseFileItem. However, for a CaseFileItemArray, these items may not be accessed, 
      * since the array consists itself of CaseFileItems each having their own children.
      */
-    private final List<CaseFileItem> actualArrayItems = new ArrayList();
+    private final List<CaseFileItem> actualArrayItems = new ArrayList<>();
     /**
      * "Override" member of the private {@link CaseFileItem} value field. Is returned in the override
      * of {@link CaseFileItemArray#getValue()} method
@@ -129,7 +129,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         }
     }
 
-    private void createNewItem(Value value) {
+    private void createNewItem(Value<?> value) {
         getNextItem().createContent(value);
     }
 

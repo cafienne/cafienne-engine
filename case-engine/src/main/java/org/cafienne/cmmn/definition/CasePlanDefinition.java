@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class CasePlanDefinition extends StageDefinition implements ItemDefinition {
-    private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList(); // Only in the root stage
+    private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>(); // Only in the root stage
 
     public CasePlanDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -25,7 +25,7 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
     }
 
     @Override
-    public CasePlan createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public CasePlan createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new CasePlan(id, this, caseInstance);
     }
 

@@ -21,10 +21,10 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugEvent extends BaseModelEvent {
+public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
     private final ValueMap messages;
 
-    public DebugEvent(ModelActor modelActor) {
+    public DebugEvent(ModelActor<?,?> modelActor) {
         super(modelActor);
         this.messages = new ValueMap();
     }
@@ -38,7 +38,7 @@ public class DebugEvent extends BaseModelEvent {
         add(new StringValue(msg));
     }
 
-    public void addMessage(Value json) {
+    public void addMessage(Value<?> json) {
         add(json);
     }
 
@@ -56,7 +56,7 @@ public class DebugEvent extends BaseModelEvent {
     }
 
     @Override
-    public void updateState(ModelActor actor) {
+    public void updateState(ModelActor<?,?> actor) {
         // nothing to update
     }
 

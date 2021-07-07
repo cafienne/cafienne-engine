@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Schema}
 
 import scala.annotation.meta.field
 
-final object Examples {
+object Examples {
   @Schema(description = "Input parameters example json")
   case class InputParametersFormat(input1: String, input2: Object)
 

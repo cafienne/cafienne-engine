@@ -15,13 +15,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.TenantUser
-
-import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command._
+
+import javax.ws.rs._
+import scala.jdk.CollectionConverters._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
@@ -80,8 +81,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         implicit val tenantFormat = jsonFormat1(TenantAPI.UpdateTenantFormat)
         entity(as[TenantAPI.UpdateTenantFormat]) { newTenantInformation =>
           // Map users from external format to TenantUser case class and convert to java List
-          import scala.jdk.CollectionConverters._
-          val users = seqAsJavaList(newTenantInformation.users.map(user => asTenantUser(user, tenant)))
+          val users = newTenantInformation.users.map(user => asTenantUser(user, tenant)).asJava
           askTenant(platformUser, tenant, tenantOwner => new ReplaceTenant(tenantOwner, users))
         }
       }
@@ -114,8 +114,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         implicit val tenantFormat = jsonFormat1(TenantAPI.UpdateTenantFormat)
         entity(as[TenantAPI.UpdateTenantFormat]) { newTenantInformation =>
           // Map users from external format to TenantUser case class and convert to java List
-          import scala.jdk.CollectionConverters._
-          val users = seqAsJavaList(newTenantInformation.users.map(user => asTenantUser(user, tenant)))
+          val users = newTenantInformation.users.map(user => asTenantUser(user, tenant)).asJava
           askTenant(platformUser, tenant, tenantOwner => new UpdateTenant(tenantOwner, users))
         }
       }

@@ -64,7 +64,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def getCases = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
-        parameters('tenant ?, 'identifiers ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?, 'sortBy ?, 'sortOrder ?) {
+        parameters("tenant".?,"identifiers".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?, "sortBy".?, "sortOrder".?) {
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
@@ -96,7 +96,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   def stats = get {
     path("stats") {
       validUser { platformUser =>
-        parameters('tenant ?, 'offset ? 0, 'numberOfResults ? 100, 'caseName ?, 'definition ?, 'state ?
+        parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
         ) { (tenant, offset, numOfResults, caseName, definition, status) =>
           val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
           runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))

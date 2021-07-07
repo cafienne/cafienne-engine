@@ -1,8 +1,8 @@
 package org.cafienne.service.db.schema.versions
 
 import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
-import org.cafienne.service.db.schema.table.{CaseTables, TaskTables}
 import org.cafienne.service.db.schema.QueryDBSchema
+import org.cafienne.service.db.schema.table.{CaseTables, TaskTables}
 import org.cafienne.service.db.schema.versions.util.Projections
 import slick.migration.api.TableMigration
 

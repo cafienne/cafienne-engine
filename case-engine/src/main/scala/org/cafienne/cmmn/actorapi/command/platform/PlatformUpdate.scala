@@ -28,6 +28,6 @@ object PlatformUpdate {
   def deserialize(list: ValueList): PlatformUpdate = {
     val users = scala.collection.mutable.Buffer[NewUserInformation]()
     list.forEach(map => users += NewUserInformation(map.asMap().raw("existingUserId"), map.asMap().raw("newUserId")))
-    PlatformUpdate(users)
+    PlatformUpdate(users.toSeq)
   }
 }

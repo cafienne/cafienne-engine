@@ -43,7 +43,7 @@ public class GetDiscretionaryItems extends CaseCommand {
     @Override
     public CaseResponse process(Case caseInstance) {
         // Get the list of valid items
-        List<DiscretionaryItem> discretionaryItems = new ArrayList();
+        List<DiscretionaryItem> discretionaryItems = new ArrayList<>();
         caseInstance.getDiscretionaryItems().stream().distinct().forEach(d -> discretionaryItems.add(d));
 
         // Convert the response to JSON

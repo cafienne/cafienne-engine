@@ -17,8 +17,8 @@ import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
  * Simple state machine logic, with an indirection to figure out where we are and where we go
  */
 class StateMachine {
-    private final Map<State, Map<Transition, Target>> transitions = new HashMap();
-    private final Map<State, Target> states = new HashMap();
+    private final Map<State, Map<Transition, Target>> transitions = new HashMap<>();
+    private final Map<State, Target> states = new HashMap<>();
     final Transition entryTransition;
     final Transition exitTransition;
     final Transition terminationTransition;
@@ -75,7 +75,7 @@ class StateMachine {
     private Map<Transition, Target> getTransitions(State state) {
         Map<Transition, Target> stateTransitions = transitions.get(state);
         if (stateTransitions == null) {
-            stateTransitions = new HashMap();
+            stateTransitions = new HashMap<>();
             transitions.put(state, stateTransitions);
         }
         return stateTransitions;
@@ -89,7 +89,7 @@ class StateMachine {
      * @param transition
      * @return
      */
-    PlanItemTransitioned transition(PlanItem planItem, Transition transition) {
+    PlanItemTransitioned transition(PlanItem<?> planItem, Transition transition) {
         State currentState = planItem.getState();
 
         Map<Transition, Target> stateTransitions = transitions.get(currentState);
@@ -120,7 +120,7 @@ class StateMachine {
 
         private Target(State targetState) {
             this.state = targetState;
-            this.action = (PlanItem p, Transition t) -> {
+            this.action = (PlanItem<?> p, Transition t) -> {
             }; // By default an empty action.
         }
     }
@@ -135,7 +135,7 @@ class StateMachine {
          * @param planItem The plan item that has made the state change
          * @param transition The transition that caused the state change
          */
-        void execute(PlanItem planItem, Transition transition);
+        void execute(PlanItem<?> planItem, Transition transition);
     }
 
     // State machine configuration for events and milestones
@@ -151,10 +151,10 @@ class StateMachine {
         EventMilestone.addTransition(Transition.ParentResume, State.Available, State.Suspended);
         EventMilestone.addTransition(Transition.ParentTerminate, State.Terminated, new State[] { State.Available, State.Suspended });
 
-        EventMilestone.setAction(State.Completed, (PlanItem p, Transition t) -> p.completeInstance());
-        EventMilestone.setAction(State.Terminated, (PlanItem p, Transition t) -> p.terminateInstance());
-        EventMilestone.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
-        EventMilestone.setAction(State.Available, (PlanItem p, Transition t) -> {
+        EventMilestone.setAction(State.Completed, (PlanItem<?> p, Transition t) -> p.completeInstance());
+        EventMilestone.setAction(State.Terminated, (PlanItem<?> p, Transition t) -> p.terminateInstance());
+        EventMilestone.setAction(State.Suspended, (PlanItem<?> p, Transition t) -> p.suspendInstance());
+        EventMilestone.setAction(State.Available, (PlanItem<?> p, Transition t) -> {
             if (t == Transition.Create) {
                 p.createInstance();
                 if (p instanceof Milestone) {
@@ -188,7 +188,7 @@ class StateMachine {
         TaskStage.addTransition(Transition.ParentSuspend, State.Suspended, new State[] { State.Available, State.Active, State.Enabled, State.Disabled });
         TaskStage.addTransition(Transition.ParentResume, null, State.Suspended);
 
-        TaskStage.setAction(State.Available, (PlanItem p, Transition t) -> {
+        TaskStage.setAction(State.Available, (PlanItem<?> p, Transition t) -> {
             p.createInstance();
             p.evaluateRepetitionRule(true);
             p.evaluateRequiredRule();
@@ -197,7 +197,7 @@ class StateMachine {
             Transition transition = p.evaluateManualActivationRule();
             p.getEntryCriteria().beginLifeCycle(transition);
         });
-        TaskStage.setAction(State.Active, (PlanItem p, Transition t) -> {
+        TaskStage.setAction(State.Active, (PlanItem<?> p, Transition t) -> {
             if (t == Transition.Start || t == Transition.ManualStart) {
                 p.startInstance();
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
@@ -209,21 +209,21 @@ class StateMachine {
                 throw new CommandException("FIRST TIME EXCEPTION: I am an unexpected transition on this stage/task");
             }
         });
-        TaskStage.setAction(State.Enabled, (PlanItem p, Transition t) -> p.makeTransition(Transition.Start));
-        TaskStage.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
-        TaskStage.setAction(State.Completed, (PlanItem p, Transition t) -> {
+        TaskStage.setAction(State.Enabled, (PlanItem<?> p, Transition t) -> p.makeTransition(Transition.Start));
+        TaskStage.setAction(State.Suspended, (PlanItem<?> p, Transition t) -> p.suspendInstance());
+        TaskStage.setAction(State.Completed, (PlanItem<?> p, Transition t) -> {
             p.completeInstance();
             if (p.getEntryCriteria().isEmpty()) {
                 p.repeat();
             }
         });
-        TaskStage.setAction(State.Terminated, (PlanItem p, Transition t) -> {
+        TaskStage.setAction(State.Terminated, (PlanItem<?> p, Transition t) -> {
             p.terminateInstance();
             if (p.getEntryCriteria().isEmpty()) {
                 p.repeat();
             }
         });
-        TaskStage.setAction(State.Failed, (PlanItem p, Transition t) -> p.failInstance());
+        TaskStage.setAction(State.Failed, (PlanItem<?> p, Transition t) -> p.failInstance());
     }
 
     // State machine configuration for the case plan
@@ -238,11 +238,11 @@ class StateMachine {
         CasePlan.addTransition(Transition.Reactivate, State.Active, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended });
         CasePlan.addTransition(Transition.Close, State.Closed, new State[] { State.Completed, State.Terminated, State.Failed, State.Suspended });
 
-        CasePlan.setAction(State.Suspended, (PlanItem p, Transition t) -> p.suspendInstance());
-        CasePlan.setAction(State.Completed, (PlanItem p, Transition t) -> p.completeInstance());
-        CasePlan.setAction(State.Terminated, (PlanItem p, Transition t) -> p.terminateInstance());
-        CasePlan.setAction(State.Failed, (PlanItem p, Transition t) -> p.failInstance());
-        CasePlan.setAction(State.Active, (PlanItem p, Transition t) -> {
+        CasePlan.setAction(State.Suspended, (PlanItem<?> p, Transition t) -> p.suspendInstance());
+        CasePlan.setAction(State.Completed, (PlanItem<?> p, Transition t) -> p.completeInstance());
+        CasePlan.setAction(State.Terminated, (PlanItem<?> p, Transition t) -> p.terminateInstance());
+        CasePlan.setAction(State.Failed, (PlanItem<?> p, Transition t) -> p.failInstance());
+        CasePlan.setAction(State.Active, (PlanItem<?> p, Transition t) -> {
             if (t == Transition.Create) {
                 // Create plan items
                 p.startInstance();

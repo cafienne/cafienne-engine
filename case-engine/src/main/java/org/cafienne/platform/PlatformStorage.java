@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
  */
 @Manifest
 public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
-    private final List<BatchJob> batches = new ArrayList();
-    private final List<String> pendingBatches = new ArrayList();
+    private final List<BatchJob> batches = new ArrayList<>();
+    private final List<String> pendingBatches = new ArrayList<>();
     private final ValueList history;
 
     private static FiniteDuration getDuration() {

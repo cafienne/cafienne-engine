@@ -48,6 +48,6 @@ public class DefinitionType {
      * @param item
      * @param value
      */
-    public void validate(CaseFileItemDefinition item, Value value) throws CaseFileError {
+    public void validate(CaseFileItemDefinition item, Value<?> value) throws CaseFileError {
     }
 }

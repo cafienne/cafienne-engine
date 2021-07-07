@@ -30,8 +30,8 @@ public class LastModifiedRegistration {
      * Global startup moment of the whole JVM for last modified requests trying to be jumpy.
      */
     private final static Instant startupMoment = Instant.now();
-    private final Map<String, Instant> lastModifiedRegistration = new HashMap();
-    private final Map<String, List<Waiter>> waiters = new HashMap();
+    private final Map<String, Instant> lastModifiedRegistration = new HashMap<>();
+    private final Map<String, List<Waiter>> waiters = new HashMap<>();
     private final String name;
 
     public LastModifiedRegistration(String name) {
@@ -67,23 +67,23 @@ public class LastModifiedRegistration {
     }
 
     public void handle(TransactionEvent<?> event) {
-        handle("case", event.getActorId(), event.lastModified());
+        handle(event.getActorId(), event.lastModified());
     }
 
-    private void handle(String actorType, String actorId, Instant newTimestamp) {
+    private void handle(String actorId, Instant newTimestamp) {
         Instant lastKnownTimestamp = lastModifiedRegistration.get(actorId);
         // Now check whether the new timestamp is indeed newer, and if so, update the registration
         if (lastKnownTimestamp == null || lastKnownTimestamp.isBefore(newTimestamp)) {
             lastModifiedRegistration.put(actorId, newTimestamp);
-            informWaiters(actorType, actorId, newTimestamp);
+            informWaiters(actorId, newTimestamp);
         }
     }
 
-    private void informWaiters(String actorType, String id, Instant newTimestamp) {
+    private void informWaiters(String id, Instant newTimestamp) {
         // TODO: should this be synchronized code?? I think so... Or can we better use scala immutable maps?
         synchronized (waiters) {
             List<Waiter> waiterList = waiters.remove(id);
-            List<Waiter> newWaiters = new ArrayList();
+            List<Waiter> newWaiters = new ArrayList<>();
             if (waiterList == null) {
                 return;
             }
@@ -106,11 +106,7 @@ public class LastModifiedRegistration {
 
     private void addWaiter(Waiter waiter) {
         synchronized (waiters) {
-            List<Waiter> waiterList = waiters.get(waiter.id());
-            if (waiterList == null) {
-                waiterList = new ArrayList();
-                waiters.put(waiter.id(), waiterList);
-            }
+            List<Waiter> waiterList = waiters.computeIfAbsent(waiter.id(), k -> new ArrayList<>());
             waiterList.add(waiter);
         }
     }

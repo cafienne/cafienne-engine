@@ -19,7 +19,7 @@ public class InputParameterDefinition extends ParameterDefinition {
         super(element, modelDefinition, parentElement);
     }
 
-    public void validate(Value value) throws CaseFileError {
+    public void validate(Value<?> value) throws CaseFileError {
         CaseFileItemDefinition binding = getBinding();
         if (binding != null) {
             binding.validatePropertyTypes(value);

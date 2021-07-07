@@ -1,7 +1,6 @@
 package org.cafienne.service.api.cases
 
-import org.cafienne.json.ValueMap
-import org.cafienne.json.CafienneJson
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 final case class CaseList(caseName: String = "",
                           totalInstances: Long = 0,
@@ -13,7 +12,7 @@ final case class CaseList(caseName: String = "",
                           numClosed:Long = 0,
                           numWithFailures: Long = 0) extends CafienneJson {
 
-  override def toValue = {
+  override def toValue: Value[_] = {
     val v = new ValueMap
     v.putRaw("caseName", caseName)
     v.putRaw("totalInstances", totalInstances)

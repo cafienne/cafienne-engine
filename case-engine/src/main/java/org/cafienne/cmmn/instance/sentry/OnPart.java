@@ -16,15 +16,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class OnPart<T extends OnPartDefinition, I extends TransitionGenerator> extends CMMNElement<T> {
-    protected final Criterion criterion;
-    protected Collection<I> connectedItems = new ArrayList();
+    protected final Criterion<?> criterion;
+    protected Collection<I> connectedItems = new ArrayList<>();
 
-    protected OnPart(Criterion criterion, T definition) {
+    protected OnPart(Criterion<?> criterion, T definition) {
         super(criterion, definition);
         this.criterion = criterion;
     }
 
-    public Criterion getCriterion() {
+    public Criterion<?> getCriterion() {
         return criterion;
     }
 

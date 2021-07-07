@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BootstrapCaseFileTransitionPublisher extends TransitionPublisher<CaseFileItem, CaseFileItemOnPart> {
-    private final List<StandardEvent> bootstrapEvents = new ArrayList();
+    private final List<StandardEvent> bootstrapEvents = new ArrayList<>();
 
     BootstrapCaseFileTransitionPublisher(CaseFileItem item) {
         super(item);

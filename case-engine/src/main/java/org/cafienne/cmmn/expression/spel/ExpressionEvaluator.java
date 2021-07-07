@@ -93,8 +93,8 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
      * @param rootObject
      * @return
      */
-    private <T> T evaluateExpression(APIRootObject rootObject) {
-        ModelActor actor = rootObject.getActor();
+    private <T> T evaluateExpression(APIRootObject<?> rootObject) {
+        ModelActor<?,?> actor = rootObject.getActor();
         // System.out.println("Now evaluating the expression " + definition.getBody());
         StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
         // The case file accessor can be used to dynamically resolve properties that belong to the case file
@@ -168,17 +168,17 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     }
 
     @Override
-    public boolean evaluateItemControl(PlanItem planItem, ConstraintDefinition ruleDefinition) {
+    public boolean evaluateItemControl(PlanItem<?> planItem, ConstraintDefinition ruleDefinition) {
         return evaluateConstraint(new PlanItemRootAPI(ruleDefinition, planItem));
     }
 
     @Override
-    public boolean evaluateIfPart(Criterion criterion, IfPartDefinition ifPartDefinition) {
+    public boolean evaluateIfPart(Criterion<?> criterion, IfPartDefinition ifPartDefinition) {
         return evaluateConstraint(new IfPartAPI(ifPartDefinition, criterion));
     }
 
     @Override
-    public boolean evaluateApplicabilityRule(PlanItem containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
+    public boolean evaluateApplicabilityRule(PlanItem<?> containingPlanItem, DiscretionaryItemDefinition discretionaryItemDefinition, ApplicabilityRuleDefinition ruleDefinition) {
         return evaluateConstraint(new ApplicabilityRuleAPI(containingPlanItem, discretionaryItemDefinition, ruleDefinition));
     }
 
@@ -237,7 +237,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
      * @return
      * @throws InvalidExpressionException
      */
-    public Value runCalculationStep(Calculation calculation, CalculationStep step, Map<InputReference, Value> sources) throws InvalidExpressionException {
+    public Value<?> runCalculationStep(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> sources) throws InvalidExpressionException {
         CalculationAPI context = new CalculationAPI(calculation, step, sources);
         Object result = evaluateExpression(context);
         return Value.convert(result);

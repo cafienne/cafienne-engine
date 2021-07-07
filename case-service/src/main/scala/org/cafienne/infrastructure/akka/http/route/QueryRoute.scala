@@ -60,7 +60,7 @@ trait QueryRoute extends AuthenticatedRoute {
 
   def handleQueryResultList(future: => Future[Seq[CafienneJson]]): Route = {
     onComplete(future) {
-      case Success(value) => completeJsonValue(Value.convert(value.seq.map(v => v.toValue)))
+      case Success(value) => completeJsonValue(Value.convert(value.map(v => v.toValue)))
       case Failure(t) => handleFailure(t)
     }
   }
@@ -70,11 +70,10 @@ trait QueryRoute extends AuthenticatedRoute {
       case notFound: SearchFailure => complete(StatusCodes.NotFound, notFound.getLocalizedMessage)
       case notAllowed: AuthorizationException => complete(StatusCodes.Unauthorized, notAllowed.getMessage)
       case notAllowed: SecurityException => complete(StatusCodes.Unauthorized, notAllowed.getMessage)
-      case error => {
+      case error =>
         logger.warn("Bumped into an exception " + t.getMessage)
-        logger.whenDebugEnabled(() => logger.debug("Failure while handling query", error))
+        logger.whenDebugEnabled(logger.debug("Failure while handling query", error))
         complete(StatusCodes.InternalServerError)
-      }
     }
   }
 

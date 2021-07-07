@@ -25,12 +25,12 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     // The source can only be a PlanItemDefinition or a CaseFileItemDefinition. We have taken the first
     // level parent class (CMMNElementDefinition) for this. So, technically we might also store on parts
     // with a different type of key ... but the logic prevents this from happening.
-    private final Map<CMMNElementDefinition, OnPart> onParts = new LinkedHashMap();
+    private final Map<CMMNElementDefinition, OnPart> onParts = new LinkedHashMap<>();
 
     /**
      * Simple set to be able to quickly check whether the criterion may become active
      */
-    private final Set<OnPart> inactiveOnParts = new HashSet();
+    private final Set<OnPart> inactiveOnParts = new HashSet<>();
 
     boolean isActive;
 
@@ -48,11 +48,11 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         onParts.values().forEach(OnPart::connectToCase);
     }
 
-    public PlanItem getTarget() {
+    public PlanItem<?> getTarget() {
         return target.item;
     }
 
-    public Stage getStage() {
+    public Stage<?> getStage() {
         return getTarget() instanceof CasePlan ? (CasePlan) getTarget() : getTarget().getStage();
     }
 
@@ -136,7 +136,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
      *
      * @param planItem
      */
-    void establishPotentialConnection(PlanItem planItem) {
+    void establishPotentialConnection(PlanItem<?> planItem) {
         PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getItemDefinition());
         if (onPart != null) {
             onPart.connect(planItem);

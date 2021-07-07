@@ -48,7 +48,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * List of plan items in the case.
      */
-    private Collection<PlanItem> planItems = new ArrayList();
+    private Collection<PlanItem<?>> planItems = new ArrayList<>();
     /**
      * Pointer to the case file instance of the case.
      */
@@ -124,7 +124,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @param planItem
      */
-    void registerPlanItem(PlanItem planItem) {
+    void registerPlanItem(PlanItem<?> planItem) {
         planItems.add(planItem);
     }
 
@@ -174,7 +174,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      * @param id
      * @return
      */
-    public <T extends PlanItem> T getPlanItemById(String id) {
+    public <T extends PlanItem<?>> T getPlanItemById(String id) {
         return (T) planItems.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
     }
 
@@ -185,9 +185,9 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      * @param name
      * @return
      */
-    public PlanItem getPlanItemByName(String name) {
-        PlanItem lastWithThisName = null;
-        for (PlanItem planItem : planItems) {
+    public PlanItem<?> getPlanItemByName(String name) {
+        PlanItem<?> lastWithThisName = null;
+        for (PlanItem<?> planItem : planItems) {
             if (planItem.getName().equals(name)) {
                 lastWithThisName = planItem;
             }
@@ -200,7 +200,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      *
      * @return
      */
-    public Collection<PlanItem> getPlanItems() {
+    public Collection<PlanItem<?>> getPlanItems() {
         return planItems;
     }
 
@@ -213,9 +213,9 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      * @param identifier
      * @return
      */
-    public Collection<PlanItem> getPlanItems(String identifier) {
-        ArrayList<PlanItem> list = new ArrayList();
-        for (PlanItem planItem : getPlanItems()) {
+    public Collection<PlanItem<?>> getPlanItems(String identifier) {
+        ArrayList<PlanItem<?>> list = new ArrayList<>();
+        for (PlanItem<?> planItem : getPlanItems()) {
             if (planItem.getName().equals(identifier) || planItem.getId().equals(identifier)) {
                 list.add(0, planItem);
             }
@@ -247,7 +247,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      * @param event
      * @return
      */
-    public PlanItem add(PlanItemCreated event) {
+    public PlanItem<?> add(PlanItemCreated event) {
         String stageId = event.getStageId();
         if (stageId.isEmpty()) {
             CasePlanDefinition definition = this.getDefinition().getCasePlanModel();
@@ -297,7 +297,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public Collection<DiscretionaryItem> getDiscretionaryItems() {
         addDebugInfo(() -> "Retrieving discretionary items of " + this);
-        Collection<DiscretionaryItem> items = new ArrayList();
+        Collection<DiscretionaryItem> items = new ArrayList<>();
         getCasePlan().retrieveDiscretionaryItems(items);
         addDebugInfo(() -> {
             StringBuilder itemsString = new StringBuilder();
@@ -357,7 +357,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * Internal framework method to support Akka command handling and recovery
      */
-    public void makePlanItemTransition(PlanItem planItem, Transition transition) {
+    public void makePlanItemTransition(PlanItem<?> planItem, Transition transition) {
         planItem.makeTransition(transition);
     }
 

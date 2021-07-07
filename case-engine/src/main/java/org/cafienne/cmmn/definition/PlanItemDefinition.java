@@ -17,8 +17,8 @@ import java.util.Collection;
 public class PlanItemDefinition extends CMMNElementDefinition implements ItemDefinition {
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
-    private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList();
-    private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList();
+    private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
+    private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>();
     private final String planItemDefinitionRefValue;
 
     public PlanItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {

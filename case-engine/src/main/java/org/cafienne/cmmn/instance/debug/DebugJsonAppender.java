@@ -4,5 +4,5 @@ import org.cafienne.json.Value;
 
 @FunctionalInterface
 public interface DebugJsonAppender {
-    Value info();
+    Value<?> info();
 }

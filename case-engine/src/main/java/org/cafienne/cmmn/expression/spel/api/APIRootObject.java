@@ -18,7 +18,7 @@ import org.cafienne.cmmn.instance.Case;
  * <p>
  * See {@link Case} itself for it's members.
  */
-public abstract class APIRootObject<T extends ModelActor> extends APIObject<T> {
+public abstract class APIRootObject<T extends ModelActor<?,?>> extends APIObject<T> {
     protected APIRootObject(T model) {
         super(model);
     }

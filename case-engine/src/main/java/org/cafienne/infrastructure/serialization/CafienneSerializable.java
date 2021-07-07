@@ -172,7 +172,7 @@ public interface CafienneSerializable {
     }
 
     default <T> Set<T> readSet(ValueMap json, Fields fieldName) {
-        return new HashSet(readArray(json, fieldName).rawList());
+        return new HashSet<>(readArray(json, fieldName).rawList());
     }
 
     default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Fields fieldName, Class<T> tClass) {

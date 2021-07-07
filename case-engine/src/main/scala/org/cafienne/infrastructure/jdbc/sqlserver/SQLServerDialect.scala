@@ -43,7 +43,7 @@ class SQLServerDialect extends Dialect[SQLServerProfile] with LazyLogging {
   }
 
   override def alterColumnDefault(table: TableInfo, column: ColumnInfo): String = {
-    val statement = super.alterColumnDefault(table, column)
+//    val statement = super.alterColumnDefault(table, column)
     log(s"alterColumnDefault [${table.tableName}.${column.name}]: returning empty string")
     ""
   }

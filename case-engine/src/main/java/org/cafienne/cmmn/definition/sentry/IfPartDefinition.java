@@ -22,7 +22,7 @@ public class IfPartDefinition extends ConstraintDefinition {
         super(modelDefinition, parentElement, true); // Default ifPart: evaluates always to true
     }
 
-    public boolean evaluate(Criterion criterion) {
+    public boolean evaluate(Criterion<?> criterion) {
         return getExpressionDefinition().getEvaluator().evaluateIfPart(criterion, this);
     }
 }

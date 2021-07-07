@@ -15,7 +15,7 @@ import org.cafienne.cmmn.instance.Task;
 
 public class ProcessTask extends Task<ProcessTaskDefinition> {
     private final ProcessInformer informer;
-    public ProcessTask(String id, int index, ItemDefinition itemDefinition, ProcessTaskDefinition definition, Stage stage) {
+    public ProcessTask(String id, int index, ItemDefinition itemDefinition, ProcessTaskDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage);
         informer = ProcessInformer.getInstance(this, definition);
     }

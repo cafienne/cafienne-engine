@@ -10,7 +10,7 @@ import scala.concurrent.duration.FiniteDuration;
  * no on immediate changes, but after a certain period of time.
  * This can be used if the snapshot may have to be updated in a high frequency
  */
-public abstract class RelaxedSnapshot<M extends ModelActor> implements ModelActorSnapshot {
+public abstract class RelaxedSnapshot<M extends ModelActor<?,?>> implements ModelActorSnapshot {
     private final static Logger logger = LoggerFactory.getLogger(RelaxedSnapshot.class);
     private final M actor;
     private final FiniteDuration delay;

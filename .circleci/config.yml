@@ -8,6 +8,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Clone CMMN-test framework
+          command: |
+            cd ..
+            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+      - run:
           name: Updating Java and sbt versions
           command: |
             echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
@@ -33,11 +38,6 @@ jobs:
       - run:
           name: Unit tests
           command: sbt test
-      - run:
-          name: Clone CMMN-test framework
-          command: |
-            cd ..
-            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
       - run:
           name: Install dependencies
           command: |
@@ -237,6 +237,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Clone CMMN-test framework
+          command: |
+            cd ..
+            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+      - run:
           name: Updating Java and sbt versions
           command: |
             echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
@@ -262,11 +267,6 @@ jobs:
       - run:
           name: Unit tests
           command: sbt test
-      - run:
-          name: Clone CMMN-test framework
-          command: |
-            cd ..
-            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
       - run:
           name: Install dependencies
           command: |
@@ -344,6 +344,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Clone CMMN-test framework
+          command: |
+            cd ..
+            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+      - run:
           name: Updating Java and sbt versions
           command: |
             echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
@@ -375,11 +380,6 @@ jobs:
       - run:
           name: Unit tests
           command: sbt test
-      - run:
-          name: Clone CMMN-test framework
-          command: |
-            cd ..
-            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
       - run:
           name: Install dependencies
           command: |

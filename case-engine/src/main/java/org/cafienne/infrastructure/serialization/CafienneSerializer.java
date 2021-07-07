@@ -21,8 +21,8 @@ public class CafienneSerializer extends SerializerWithStringManifest {
      */
     public static final int IDENTIFIER = 52943;
 
-    private final static Map<String, ManifestWrapper> manifests = new HashMap();
-    private final static Map<Class<?>, ManifestWrapper> manifestsByClass = new HashMap();
+    private final static Map<String, ManifestWrapper> manifests = new HashMap<>();
+    private final static Map<Class<?>, ManifestWrapper> manifestsByClass = new HashMap<>();
 
     static {
         EventSerializer.register();

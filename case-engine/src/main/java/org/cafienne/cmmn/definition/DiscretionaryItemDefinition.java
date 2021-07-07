@@ -20,8 +20,8 @@ import java.util.Collection;
 public class DiscretionaryItemDefinition extends TableItemDefinition implements ItemDefinition {
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
-    private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList();
-    private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList();
+    private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
+    private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>();
     private final String planItemDefinitionRefValue;
 
     public DiscretionaryItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
@@ -91,7 +91,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
      * @param containingPlanItem
      * @return
      */
-    public boolean isApplicable(PlanItem containingPlanItem) {
+    public boolean isApplicable(PlanItem<?> containingPlanItem) {
         if (isAlreadyPlanned(containingPlanItem)) {
             return false;
         }
@@ -115,12 +115,12 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
      * @param containingPlanItem
      * @return
      */
-    private boolean isAlreadyPlanned(PlanItem containingPlanItem) {
+    private boolean isAlreadyPlanned(PlanItem<?> containingPlanItem) {
         // Go through all plan items in the containing stage, check if there is one with our name
         // and then check if it is not repeating. If not, then there is one, and we cannot add more, so then we are "already planned".
-        Stage containingStage = containingPlanItem instanceof Stage ? (Stage) containingPlanItem : containingPlanItem.getStage();
-        Collection<PlanItem> currentPlanItemsInStage = containingStage.getPlanItems();
-        for (PlanItem planItem : currentPlanItemsInStage) {
+        Stage<?> containingStage = containingPlanItem instanceof Stage<?> ? (Stage<?>) containingPlanItem : containingPlanItem.getStage();
+        Collection<PlanItem<?>> currentPlanItemsInStage = containingStage.getPlanItems();
+        for (PlanItem<?> planItem : currentPlanItemsInStage) {
             if (planItem.getName().equals(this.getName())) {
                 if (!planItem.repeats()) {
                     return true;
@@ -132,7 +132,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     }
 
     @Override
-    public Element dumpMemoryStateToXML(Element parentElement, Stage stage) {
+    public Element dumpMemoryStateToXML(Element parentElement, Stage<?> stage) {
         Element discretionaryXML = parentElement.getOwnerDocument().createElement("discretionaryItem");
 
         discretionaryXML.setAttribute("name", getName());
@@ -147,7 +147,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     }
 
     @Override
-    public void evaluate(PlanItem containingPlanItem, Collection<DiscretionaryItem> items) {
+    public void evaluate(PlanItem<?> containingPlanItem, Collection<DiscretionaryItem> items) {
         if (isApplicable(containingPlanItem)) {
             items.add(createInstance(containingPlanItem));
         }
@@ -158,7 +158,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
      * @param parent The stage or task in which the discretionary item can be planned
      * @return
      */
-    public DiscretionaryItem createInstance(PlanItem parent) {
+    public DiscretionaryItem createInstance(PlanItem<?> parent) {
         return new DiscretionaryItem(parent, this);
     }
 

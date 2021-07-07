@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.MilestoneDefinition;
 
 public class Milestone extends PlanItem<MilestoneDefinition> {
-    public Milestone(String id, int index, ItemDefinition itemDefinition, MilestoneDefinition definition, Stage stage) {
+    public Milestone(String id, int index, ItemDefinition itemDefinition, MilestoneDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
 }

@@ -9,7 +9,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 import java.time.Instant;
 
-public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent<M> {
+public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements ModelEvent<M> {
     private final ValueMap json;
 
     // Serializable fields

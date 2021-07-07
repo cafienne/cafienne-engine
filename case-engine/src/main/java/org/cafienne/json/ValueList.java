@@ -23,7 +23,7 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
      * @param rawItems
      */
     public ValueList(Object... rawItems) {
-        super(new ArrayList());
+        super(new ArrayList<>());
         for (Object listItem : rawItems) {
             add(convert(listItem));
         }
@@ -42,11 +42,11 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
     @Override
     public void clearOwner() {
         super.clearOwner();
-        getValue().forEach(v -> v.clearOwner());
+        getValue().forEach(Value::clearOwner);
     }
 
     @Override
-    public boolean isSupersetOf(Value otherValue) {
+    public boolean isSupersetOf(Value<?> otherValue) {
         if (otherValue == null || !otherValue.isList()) {
             return false;
         }
@@ -57,8 +57,8 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
         }
         // Compare contents
         for (int i = 0; i < otherList.size(); i++) {
-            Value thisListItem = this.get(i);
-            Value otherListItem = otherList.get(i);
+            Value<?> thisListItem = this.get(i);
+            Value<?> otherListItem = otherList.get(i);
             if (!thisListItem.isSupersetOf(otherListItem)) {
                 return false;
             }
@@ -68,14 +68,13 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
 
     @Override
     public void print(JsonGenerator generator) throws IOException {
-        generator.writeStartArray(value.size());
+        generator.writeStartArray(value, value.size());
 
-        int num = value.size();
-        for (int i = 0; i < num; i++) {
-            Object obj = value.get(i);
-            if (obj instanceof Value<?>) {
-                Value<?> cfi = (Value<?>) obj;
-                cfi.print(generator);
+        for (Value<?> item : value) {
+            if (item != null) {
+                item.print(generator);
+            } else {
+                generator.writeNull();
             }
         }
 
@@ -209,7 +208,7 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
      */
     public <T> List<T> rawList() {
         List<Value<?>> values = getValue();
-        List<T> list = new ArrayList();
+        List<T> list = new ArrayList<>();
         values.forEach(value -> list.add((T) value.getValue()));
         return list;
     }
@@ -227,13 +226,13 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
     }
 
     @Override
-    public <T extends Value> T merge(T withValue) {
+    public <V extends Value<?>> V merge(V withValue) {
         if (! (withValue.isList())) {
             return withValue;
         }
         ValueList fromList = withValue.asList();
         for (int i = 0; i < fromList.size(); i++) {
-            Value fromValue = fromList.get(i);
+            Value<?> fromValue = fromList.get(i);
             if (i < this.size()) {
                 // Merge into existing value (and replace, since merge may or may not return a new object reference)
                 this.set(i, this.get(i).merge(fromValue));
@@ -242,6 +241,6 @@ public class ValueList extends Value<List<Value<?>>> implements List<Value<?>> {
                 this.add(fromValue);
             }
         }
-        return (T) this;
+        return (V) this;
     }
 }

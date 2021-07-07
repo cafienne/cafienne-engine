@@ -48,7 +48,7 @@ public class ValueTests {
         ValueMap arrayConversionOfString = new ValueMap("SpecialOutput", new ValueMap("Multi", new String[]{"1", "2", "3", "4"}));
 
         // Test list conversion
-        List<String> stringList = new ArrayList();
+        List<String> stringList = new ArrayList<>();
         stringList.add("1");
         stringList.add("2");
         stringList.add("3");
@@ -63,7 +63,7 @@ public class ValueTests {
         }
 
         // Test basic map conversion
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "a");
         map.put("b", "b");
         ValueMap mappedMap = new ValueMap("map", map);

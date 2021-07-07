@@ -20,7 +20,7 @@ public class BodyTemplate extends XMLElementDefinition {
         this.bodyType = parseAttribute("type", false, "");
     }
 
-    Value resolve(ValueMap input) {
+    Value<?> resolve(ValueMap input) {
         return new StringValue(new StringTemplate(bodyTemplate).resolveParameters(input).getResult());
     }
 

@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 
 public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
 
-    PlanItemEntry(PlanItem target) {
+    PlanItemEntry(PlanItem<?> target) {
         super(target);
     }
 
@@ -26,7 +26,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
      */
     void release() {
         item.addDebugInfo(() -> "Releasing all " + criteria.size() + " entry criteria for " + item);
-        criteria.forEach(c -> c.release());
+        criteria.forEach(Criterion::release);
     }
 
     /**
@@ -101,7 +101,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
             return;
         }
         planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
-        for (Criterion criterion : criteria) {
+        for (Criterion<?> criterion : criteria) {
             criterion.dumpMemoryStateToXML(planItemXML, true);
         }
     }

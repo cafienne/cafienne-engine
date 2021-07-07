@@ -27,7 +27,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     private final String subCaseId;
     private final Case mainCase;
 
-    public CaseTask(String id, int index, ItemDefinition itemDefinition, CaseTaskDefinition definition, Stage stage) {
+    public CaseTask(String id, int index, ItemDefinition itemDefinition, CaseTaskDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage);
         subCaseId = getId(); // Our planitem id will also be the id of the subcase.
         mainCase = getCaseInstance();

@@ -18,7 +18,7 @@ public class SentryNetwork {
     /**
      * List of sentries active within the case.
      */
-    private Collection<Criterion> criteria = new ArrayList();
+    private final Collection<Criterion<?>> criteria = new ArrayList<>();
 
     public SentryNetwork(Case caseInstance) {
         this.caseInstance = caseInstance;
@@ -29,7 +29,7 @@ public class SentryNetwork {
      * @param item
      */
     public void connect(CaseFileItem item) {
-        for (Criterion criterion : criteria) {
+        for (Criterion<?> criterion : criteria) {
             criterion.establishPotentialConnection(item);
         }
     }
@@ -38,8 +38,8 @@ public class SentryNetwork {
      * Connect a new {@link PlanItem} to the network
      * @param item
      */
-    public void connect(PlanItem item) {
-        for (Criterion criterion : criteria) {
+    public void connect(PlanItem<?> item) {
+        for (Criterion<?> criterion : criteria) {
             criterion.establishPotentialConnection(item);
         }
         item.getEntryCriteria().connect();
@@ -50,7 +50,7 @@ public class SentryNetwork {
      * Add a criterion to the network
      * @param criterion
      */
-    void add(Criterion criterion) {
+    void add(Criterion<?> criterion) {
         criteria.add(criterion);
     }
 
@@ -58,7 +58,7 @@ public class SentryNetwork {
      * Remove a criterion from the network
      * @param criterion
      */
-    void remove(Criterion criterion) {
+    void remove(Criterion<?> criterion) {
         this.criteria.remove(criterion);
     }
 
@@ -75,8 +75,8 @@ public class SentryNetwork {
      * @param definition
      * @return
      */
-    Criterion findRelatedExitCriterion(PlanItem item, ExitCriterionDefinition definition) {
-       for (Criterion criterion : criteria) {
+    Criterion<?> findRelatedExitCriterion(PlanItem<?> item, ExitCriterionDefinition definition) {
+       for (Criterion<?> criterion : criteria) {
            if (criterion.getDefinition().equals(definition)) {
                 if (criterion.getTarget() == item) {
                         return criterion;

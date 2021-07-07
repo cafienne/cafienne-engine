@@ -1,11 +1,9 @@
 package org.cafienne.service.api.cases
 
-import org.cafienne.json.{Value, ValueList, ValueMap}
-import org.cafienne.json.ValueList
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
-import org.cafienne.json.CafienneJson
-import org.cafienne.service.db.record.{CaseBusinessIdentifierRecord, CaseDefinitionRecord, CaseFileRecord, CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
+import org.cafienne.service.db.record._
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan, identifiers: CaseIdentifiers) extends CafienneJson {
   override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.members, "file", file.toValue, "planitems", planitems.toValue, "identifiers", identifiers.toValue))
@@ -24,7 +22,7 @@ final case class CasePlan(items: Seq[PlanItemRecord]) extends CafienneJson {
 }
 
 final case class CaseIdentifiers(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
-  override def toValue(): Value[_] = {
+  override def toValue: Value[_] = {
     val list = new ValueList
     records.foreach(record => list.add(new ValueMap("name", record.name, "value", record.value.getOrElse(null))))
     list

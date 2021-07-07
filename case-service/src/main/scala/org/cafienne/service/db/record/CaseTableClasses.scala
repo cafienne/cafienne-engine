@@ -1,11 +1,9 @@
 package org.cafienne.service.db.record
 
-import org.cafienne.json.{JSONReader, Value, ValueList, ValueMap}
+import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
+import org.cafienne.json._
 
 import java.time.Instant
-import org.cafienne.json.JSONReader
-import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
-import org.cafienne.json.CafienneJson
 
 final case class CaseRecord(id: String,
                             tenant: String,

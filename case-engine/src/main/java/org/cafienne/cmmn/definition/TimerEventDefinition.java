@@ -44,7 +44,7 @@ public class TimerEventDefinition extends PlanItemDefinitionDefinition {
     }
 
     @Override
-    public TimerEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public TimerEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new TimerEvent(id, index, itemDefinition, this, stage);
     }
 

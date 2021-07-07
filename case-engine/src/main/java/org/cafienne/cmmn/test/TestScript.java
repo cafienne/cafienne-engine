@@ -124,7 +124,7 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.collection.JavaConverters.asScalaBuffer(Arrays.asList(roles)), "hard-coded-test-tenant", false, "", "", true);
+        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSeq(), "hard-coded-test-tenant", false, "", "", true);
     }
 
     /**
@@ -135,7 +135,7 @@ public class TestScript {
      * @return
      */
     public static CaseTeam getCaseTeam(Object... users) {
-        List<CaseTeamMember> members = new ArrayList();
+        List<CaseTeamMember> members = new ArrayList<>();
         for (Object user : users) {
             if (user instanceof TenantUser) {
                 members.add(getMember((TenantUser) user));
@@ -155,7 +155,7 @@ public class TestScript {
      * @return
      */
     public static CaseTeamMember getOwner(TenantUser user) {
-        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(true), new scala.collection.immutable.Vector(0, 0, 0));
+        return CaseTeamMember.apply(new MemberKey(user.id(), "user"), user.roles(), true);
     }
 
     /**
@@ -165,7 +165,7 @@ public class TestScript {
      * @return
      */
     public static CaseTeamMember getMember(TenantUser user) {
-        return new CaseTeamMember(new MemberKey(user.id(), "user"), user.roles(), new Some(false), new scala.collection.immutable.Vector(0, 0, 0));
+        return CaseTeamMember.apply(new MemberKey(user.id(), "user"), user.roles(), false);
     }
 
     /**
@@ -378,12 +378,16 @@ public class TestScript {
 
     private File getNextErrorFile() {
         int index = 0;
+        File logDirectory = new File("logs");
+        if (!logDirectory.exists()) {
+            logDirectory.mkdirs();
+        }
         String fileName = testName + "_" + index + "_error.txt";
-        File nextErrorFile = new File(fileName);
+        File nextErrorFile = new File(logDirectory, fileName);
         while (nextErrorFile.exists()) {
             index++;
             fileName = testName + "_" + index + "_error.txt";
-            nextErrorFile = new File(fileName);
+            nextErrorFile = new File(logDirectory, fileName);
             if (index > 1000) {
                 System.err.println("Clean up your error files");
                 System.exit(-1);

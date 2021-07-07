@@ -16,7 +16,7 @@ import java.util.Collection;
 
 public class UserEventDefinition extends PlanItemDefinitionDefinition {
     private final String authorizedRoleRefs;
-    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList();
+    private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList<>();
 
     public UserEventDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -38,7 +38,7 @@ public class UserEventDefinition extends PlanItemDefinitionDefinition {
         return authorizedRoles;
     }
 
-    public UserEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage stage, Case caseInstance) {
+    public UserEvent createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new UserEvent(id, index, itemDefinition, this, stage);
     }
 

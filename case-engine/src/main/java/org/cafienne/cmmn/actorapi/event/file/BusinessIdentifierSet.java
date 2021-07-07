@@ -15,20 +15,20 @@ import java.io.IOException;
  */
 @Manifest
 public class BusinessIdentifierSet extends BusinessIdentifierEvent {
-    public final Value value;
+    public final Value<?> value;
 
-    public BusinessIdentifierSet(CaseFileItem caseFileItem, PropertyDefinition property, Value businessIdentifierValue) {
+    public BusinessIdentifierSet(CaseFileItem caseFileItem, PropertyDefinition property, Value<?> businessIdentifierValue) {
         super(caseFileItem, property);
         this.value = businessIdentifierValue;
     }
 
     public BusinessIdentifierSet(ValueMap json) {
         super(json);
-        this.value = json.get(Fields.value.toString());
+        this.value = json.get(Fields.value);
     }
 
     @Override
-    public Value getValue() {
+    public Value<?> getValue() {
         return value;
     }
 

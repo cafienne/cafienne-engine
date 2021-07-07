@@ -4,11 +4,10 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.exception.AuthorizationException
 import org.cafienne.actormodel.command.response.ActorLastModified
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.TenantReader
+import org.cafienne.service.db.query.UserQueries
 
 import scala.concurrent.{ExecutionContext, Future}
 

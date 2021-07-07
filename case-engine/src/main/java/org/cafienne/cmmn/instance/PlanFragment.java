@@ -11,7 +11,7 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanFragmentDefinition;
 
 public abstract class PlanFragment<T extends PlanFragmentDefinition> extends PlanItem<T> {
-    protected PlanFragment(String id, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage parent, int index, StateMachine stateMachine) {
+    protected PlanFragment(String id, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage<?> parent, int index, StateMachine stateMachine) {
         super(id, index, itemDefinition, definition, caseInstance, parent, stateMachine);
     }
 }

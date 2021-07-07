@@ -34,7 +34,7 @@ class JobScheduler {
         // Now schedule pending updates one at a time as a job (if there are any).
         //  Note that storage.getBatches is expected to ony give new batches, otherwise we keep sending same job over and over again.
         List<BatchJob> newBatchJobs = storage.getNewBatches();
-        List<InformJob> jobs = new ArrayList();
+        List<InformJob> jobs = new ArrayList<>();
         newBatchJobs.forEach(batch -> jobs.addAll(batch.getJobs()));
         if (jobs.isEmpty()) {
             return;

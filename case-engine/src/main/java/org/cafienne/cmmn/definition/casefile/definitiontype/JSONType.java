@@ -12,7 +12,7 @@ import org.cafienne.json.Value;
 public class JSONType extends DefinitionType {
 
     @Override
-    public void validate(CaseFileItemDefinition itemDefinition, Value value) throws CaseFileError {
+    public void validate(CaseFileItemDefinition itemDefinition, Value<?> value) throws CaseFileError {
         if (value.isMap()) {
             validateItem(value.asMap(), itemDefinition);
         } else if (value.isList() && itemDefinition.getMultiplicity().isIterable()) {
@@ -41,7 +41,7 @@ public class JSONType extends DefinitionType {
         });
     }
 
-    private void validateProperty(PropertyDefinition propertyDefinition, Value propertyValue) {
+    private void validateProperty(PropertyDefinition propertyDefinition, Value<?> propertyValue) {
         if (propertyValue == null || propertyValue == Value.NULL) { // Null-valued properties match any type, let's just continue.
             return;
         }

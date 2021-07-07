@@ -113,7 +113,7 @@ public class CalendarInvite {
      * @param value
      * @return
      */
-    private Attendee getAttendee(Value value) throws InvalidMailException {
+    private Attendee getAttendee(Value<?> value) throws InvalidMailException {
 //        System.out.println("Converting value to attendee: " + value);
         String email = "";
         String name = "";

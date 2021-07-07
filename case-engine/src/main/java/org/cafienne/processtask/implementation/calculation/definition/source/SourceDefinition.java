@@ -16,7 +16,7 @@ public interface SourceDefinition {
      */
     boolean hasDependency(StepDefinition stepDefinition);
 
-    Source createInstance(Calculation calculation);
+    Source<?> createInstance(Calculation calculation);
 
     String getIdentifier();
 

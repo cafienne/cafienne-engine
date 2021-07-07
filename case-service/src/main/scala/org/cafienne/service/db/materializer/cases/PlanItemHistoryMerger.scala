@@ -1,15 +1,15 @@
 package org.cafienne.service.db.materializer.cases
 
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.TransactionEvent
-import org.cafienne.cmmn.actorapi.event._
-import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemEvent, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
+import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.service.db.record.PlanItemHistoryRecord
 
-object PlanItemHistoryMerger {
-  def mapEventToHistory(evt: PlanItemEvent): PlanItemHistoryRecord = {
+object PlanItemHistoryMerger extends LazyLogging {
+  def mapEventToHistory(evt: PlanItemEvent): Option[PlanItemHistoryRecord] = {
     evt match {
       case event: PlanItemCreated =>
-        PlanItemHistoryRecord(
+        Some(PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           stageId = event.stageId,
@@ -22,9 +22,9 @@ object PlanItemHistoryMerger {
           modifiedBy = event.getUser.id,
           eventType = event.getClass.getName,
           sequenceNr = event.getSequenceNumber
-        )
+        ))
       case event: PlanItemTransitioned =>
-        PlanItemHistoryRecord(
+        Some(PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId(),
@@ -37,9 +37,9 @@ object PlanItemHistoryMerger {
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
-        )
+        ))
       case event: RepetitionRuleEvaluated =>
-        PlanItemHistoryRecord(
+        Some(PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId(),
@@ -50,9 +50,9 @@ object PlanItemHistoryMerger {
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
-        )
+        ))
       case event: RequiredRuleEvaluated =>
-        PlanItemHistoryRecord(
+        Some(PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId(),
@@ -63,7 +63,10 @@ object PlanItemHistoryMerger {
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
-        )
+        ))
+      case other =>
+        logger.warn(s"Cannot handle plan item events of type ${evt.getClass.getName}")
+        None
     }
   }
   def merge(modified: TransactionEvent[_], current: PlanItemHistoryRecord): PlanItemHistoryRecord =

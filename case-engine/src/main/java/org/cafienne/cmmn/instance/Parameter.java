@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class Parameter<T extends ParameterDefinition> extends CMMNElement<T> implements Serializable {
     protected Value<?> value; // Default value is Null.
 
-    protected Parameter(T definition, Case caseInstance, Value value) {
+    protected Parameter(T definition, Case caseInstance, Value<?> value) {
         super(caseInstance, definition);
         this.value = value == null ? Value.NULL : value;
     }

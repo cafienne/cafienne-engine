@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 public class PlanningTableAssertion extends ModelTestCommandAssertion {
 
-    private final Collection<DiscretionaryItemAssertion> discretionaries = new ArrayList();
+    private final Collection<DiscretionaryItemAssertion> discretionaries = new ArrayList<>();
     private final GetDiscretionaryItemsResponse response;
     private ValueList items = new ValueList();
 

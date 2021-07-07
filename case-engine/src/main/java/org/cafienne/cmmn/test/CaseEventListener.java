@@ -28,8 +28,8 @@ import java.util.List;
 public class CaseEventListener {
     private final static Logger logger = LoggerFactory.getLogger(CaseEventListener.class);
 
-    private List<ModelEvent> publishedEvents = new ArrayList();
-    private List<ModelEvent> newEvents = new ArrayList();
+    private List<ModelEvent> publishedEvents = new ArrayList<>();
+    private List<ModelEvent> newEvents = new ArrayList<>();
     private CaseModified lastCaseModifiedEvent;
     private final ActorRef caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
@@ -49,7 +49,7 @@ public class CaseEventListener {
     }
 
     void sendCommand(Object command) {
-        newEvents = new ArrayList();
+        newEvents = new ArrayList<>();
         caseMessageRouter.tell(command, responseHandlingActor);
     }
 
@@ -79,7 +79,7 @@ public class CaseEventListener {
      * @return
      */
     public PublishedEventsAssertion getNewEvents() {
-        return new PublishedEventsAssertion(new ArrayList(newEvents));
+        return new PublishedEventsAssertion(new ArrayList<>(newEvents));
     }
 
     /**
@@ -88,7 +88,7 @@ public class CaseEventListener {
      * @return
      */
     public PublishedEventsAssertion getEvents() {
-        return new PublishedEventsAssertion(new ArrayList(publishedEvents));
+        return new PublishedEventsAssertion(new ArrayList<>(publishedEvents));
     }
 
     /**

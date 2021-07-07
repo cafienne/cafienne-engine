@@ -77,7 +77,7 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
         }
         validateValueMap(newContent).getValue().entrySet().stream().forEach(entry -> {
             String itemName = entry.getKey();
-            Value newItemContent = entry.getValue();
+            Value<?> newItemContent = entry.getValue();
             CaseFileItem item = getItem(itemName);
             if (item == null) {
                 throw new CaseFileError("Item '" + itemName + "' is not found in the Case File definition");

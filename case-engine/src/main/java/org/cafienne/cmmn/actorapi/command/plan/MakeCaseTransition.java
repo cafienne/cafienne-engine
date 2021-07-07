@@ -51,7 +51,7 @@ public class MakeCaseTransition extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        PlanItem casePlan = caseInstance.getCasePlan();
+        PlanItem<?> casePlan = caseInstance.getCasePlan();
         caseInstance.makePlanItemTransition(casePlan, transition);
         return new CaseResponse(this);
     }

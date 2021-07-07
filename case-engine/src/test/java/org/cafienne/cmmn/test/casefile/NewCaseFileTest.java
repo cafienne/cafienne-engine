@@ -105,7 +105,7 @@ public class NewCaseFileTest {
 
         testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, updateDeeperProperty, rootPath), result -> {
             result.getEvents().printEventList();
-            Value v = new CaseFileAssertion(result.getTestCommand()).assertCaseFileItem(rootPath).getValue();
+            Value<?> v = new CaseFileAssertion(result.getTestCommand()).assertCaseFileItem(rootPath).getValue();
             result.getEvents().assertSize(3);
             result.getEvents().filter(CaseFileEvent.class).getEvents().forEach(event -> TestScript.debugMessage(event +" with value " + event.getValue()));
             TestScript.debugMessage("\n\nCF: " + v);

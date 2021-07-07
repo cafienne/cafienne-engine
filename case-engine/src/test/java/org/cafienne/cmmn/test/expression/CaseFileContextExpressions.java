@@ -35,12 +35,11 @@ public class CaseFileContextExpressions {
                 TestScript.debugMessage("Mapped input: " + taskInput);
 
                 ValueMap inputObject = taskInput.with("Input");
-                Value expectingChild2 = inputObject.get("arrayProp1");
+                Value<?> expectingChild2 = inputObject.get("arrayProp1");
                 if (! expectingChild2.getValue().equals("child2")) {
                     throw new AssertionError("Expecting child2 inside arrayProp1, but found " + expectingChild2);
                 }
-                Value arrayLength = taskInput.get("Input2");
-                Object arrayLengthValue = arrayLength.getValue();
+                Value<?> arrayLength = taskInput.get("Input2");
                 if (!arrayLength.getValue().equals(2L)) {
                     throw new AssertionError("Expecting 2L to be the value of Input2, but found " + arrayLength);
                 }

@@ -19,7 +19,7 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItem;
  * That is, if a {@link Task} assigns input parameters, the value of that parameter is typically retrieved from the case file.
  */
 public class TaskInputParameter extends TaskParameter<InputParameterDefinition> {
-    public TaskInputParameter(InputParameterDefinition definition, Task task) {
+    public TaskInputParameter(InputParameterDefinition definition, Task<?> task) {
         // TaskInputParameters get a value when the task is activated, not when the task is instantiated
         super(definition, task, null);
         // If we have a binding defined, link this parameter to the case file via that binding

@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.team;
 
-import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Team;
@@ -15,8 +14,8 @@ import java.util.stream.Collectors;
  */
 public class CaseTeamAPI extends APIObject<Case> {
     private final Team team;
-    private final Map<String, CaseRoleAPI> rolesByName = new HashMap();
-    private final List<MemberAPI> members = new ArrayList();
+    private final Map<String, CaseRoleAPI> rolesByName = new HashMap<>();
+    private final List<MemberAPI> members = new ArrayList<>();
     private final RoleAPI roleAPI;
 
     public CaseTeamAPI(Team team) {

@@ -21,8 +21,8 @@ import org.w3c.dom.Element;
 import java.util.*;
 
 public class CalculationDefinition extends InlineSubProcessDefinition {
-    private final Collection<StepDefinition> steps = new ArrayList();
-    private final Map<String, SourceDefinition> sources = new HashMap();
+    private final Collection<StepDefinition> steps = new ArrayList<>();
+    private final Map<String, SourceDefinition> sources = new HashMap<>();
 
     public CalculationDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);

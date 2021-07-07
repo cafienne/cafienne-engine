@@ -31,7 +31,7 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
     private final CalculationExpressionDefinition expression;
 
     private final List<String> inputs;
-    private final List<InputReference> inputReferences = new ArrayList();
+    private final List<InputReference> inputReferences = new ArrayList<>();
     private final String identifier;
     private final ConditionDefinition condition;
 
@@ -65,7 +65,7 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
     }
 
     @Override
-    public Source createInstance(Calculation calculation) {
+    public Source<?> createInstance(Calculation calculation) {
         return new CalculationStep(calculation, this);
     }
 
@@ -73,7 +73,7 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
         return condition;
     }
 
-    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value> inputs) {
+    public Result getResult(Calculation calculation, CalculationStep step, Map<InputReference, Value<?>> inputs) {
         return expression.getResult(calculation, step, inputs);
     }
 
