@@ -412,6 +412,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     }
 
     public void migrateCaseDefinition(CaseDefinition definition) {
+        CMMNElement.MigDevConsoleStatic("\n\nMigrating case " + getDefinition().getName() + " with id " + getId());
         setDefinition(definition);
         getCaseTeam().migrateDefinition(definition.getCaseTeamModel());
         getCaseFile().migrateDefinition(definition.getCaseFileModel());
