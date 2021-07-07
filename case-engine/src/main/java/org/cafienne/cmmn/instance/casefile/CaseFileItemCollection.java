@@ -155,4 +155,20 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     public Path getPath() {
         return new Path("");
     }
+
+    @Override
+    public void migrateDefinition(T newDefinition) {
+        super.migrateDefinition(newDefinition);
+        MigDevConsole("CFI[" + getPath()+"] gets a new definition");
+        getItems().forEach(child -> {
+            CaseFileItemDefinition childDefinition = child.getDefinition();
+            CaseFileItemDefinition newChildDefinition = newDefinition.getChildren().stream().filter(newChild -> newChild.getName().equals(childDefinition.getName()) || newChild.getId().equals(childDefinition.getId())).findFirst().orElse(null);
+            if (newChildDefinition == null) {
+                // Now what?
+            } else {
+                child.migrateDefinition(newChildDefinition);
+            }
+        });
+    }
+
 }
