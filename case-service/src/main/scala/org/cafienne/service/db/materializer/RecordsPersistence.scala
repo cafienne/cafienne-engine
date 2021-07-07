@@ -15,6 +15,8 @@ trait RecordsPersistence {
 
   def delete(record: AnyRef): Unit
 
+  def removeCaseRoles(caseInstanceId: String): Unit
+
   def commit(): Future[Done]
 
   def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]]

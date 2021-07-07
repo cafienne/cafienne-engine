@@ -71,6 +71,10 @@ class SlickRecordsPersistence
     dbStatements += action
   }
 
+  override def removeCaseRoles(caseInstanceId: String): Unit = {
+    addStatement(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).delete)
+  }
+
   def commit(): Future[Done] = {
     val transaction = dbStatements.toSeq
     // Clear statement buffer (the "transaction")

@@ -8,7 +8,9 @@ import org.cafienne.cmmn.instance.CMMNElement;
 import org.w3c.dom.Element;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A member in the case team. Consists of a user id and associated roles (that have been defined in the {@link CaseTeamDefinition#getCaseRoles()})
@@ -44,6 +46,7 @@ public class Member extends CMMNElement<CaseTeamDefinition> {
 
     /**
      * Clone construct;
+     *
      * @param key
      * @param source
      */
@@ -147,5 +150,46 @@ public class Member extends CMMNElement<CaseTeamDefinition> {
         // memberXML.appendChild(roleXML);
         // roleXML.appendChild(parentElement.getOwnerDocument().createTextNode(role.getName()));
         // });
+    }
+
+    @Override
+    public void migrateDefinition(CaseTeamDefinition newDefinition) {
+        super.migrateDefinition(newDefinition);
+        MigDevConsole("Updating team member " + key +" (existing roles: " + this.roles +")");
+        // Now iterate through the existing roles, and determine which roles are retained and which roles are removed for this member
+        //  Note: currently not possible to _add_ roles to a member by means of case definition migration
+        Set<CaseRoleDefinition> rolesToRemove = new HashSet<>();
+        Set<CaseRoleDefinition> rolesToReplace = new HashSet<>();
+        Set<CaseRoleDefinition> rolesToAdd = new HashSet<>();
+
+        Map<String, CaseRoleDefinition> newRoleNames = newDefinition.getCaseRoles().stream().collect(Collectors.toMap(CaseRoleDefinition::getName, role -> role));
+        Map<String, CaseRoleDefinition> newRoleIds = newDefinition.getCaseRoles().stream().collect(Collectors.toMap(CaseRoleDefinition::getId, role -> role));
+
+        this.roles.forEach(oldRole -> {
+            String name = oldRole.getName();
+            String id = oldRole.getId();
+            CaseRoleDefinition roleWithMatchingName = newRoleNames.get(name);
+            CaseRoleDefinition roleWithMatchingId = newRoleIds.get(id);
+
+            if (roleWithMatchingName != null) {
+                MigDevConsole("- Member " + key +" gets a new version of role " + name +" (with id " + id +")");
+                rolesToReplace.add(roleWithMatchingName);
+            } else if (roleWithMatchingId != null) {
+                MigDevConsole("- Member " + key +" gets a changed role name: " + name +" becomes " + roleWithMatchingId.getName());
+                rolesToRemove.add(oldRole);
+                rolesToAdd.add(roleWithMatchingId);
+            } else {
+                MigDevConsole("- Member " + key +" drops role: " + name +", as it is no longer part of the case definition");
+                rolesToRemove.add(oldRole);
+            }
+        });
+        // Clear the existing array.
+        this.roles.clear();
+        // Simply dump the roles that have the same name as before (no need to generate events, since events only carry role names)
+        this.roles.addAll(rolesToReplace);
+        // Generate events for the roles that are no longer in this user
+        rolesToRemove.forEach(role -> team.removeMemberRole(key, role.getName()));
+        // Generate events for the new roles that the user now gets
+        rolesToAdd.forEach(role -> team.addMemberRole(key, role.getName()));
     }
 }

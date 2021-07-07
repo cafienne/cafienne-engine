@@ -54,6 +54,9 @@ class CaseProjection(persistence: RecordsPersistence, caseFileProjection: CaseFi
   }
 
   private def migrateCaseDefinition(event: CaseDefinitionMigrated): Future[Done] = {
+    // Remove existing roles
+    persistence.removeCaseRoles(event.getCaseInstanceId)
+    // Upsert case definition will add the new roles
     upsertCaseDefinitionRecords(event)
     changeCaseRecord(event, instance => instance.copy(caseName = event.getDefinition.getName))
   }
