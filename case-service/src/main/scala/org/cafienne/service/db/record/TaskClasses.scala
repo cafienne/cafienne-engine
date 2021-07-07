@@ -1,6 +1,6 @@
 package org.cafienne.service.db.record
 
-import org.cafienne.json.{CafienneJson, JSONReader, Value, ValueMap}
+import org.cafienne.json.{CafienneJson, JSONReader, StringValue, Value, ValueMap}
 
 import java.time.Instant
 
@@ -22,7 +22,15 @@ final case class TaskRecord(id: String,
                             taskModel: String = ""
                      ) extends CafienneJson {
 
-  def getJSON(value: String): Value[_] = if (value == "" || value == null) new ValueMap else JSONReader.parse(value)
+  def getJSON(value: String): Value[_] = {
+    if (value == "" || value == null) new ValueMap else {
+      try {
+        JSONReader.parse(value)
+      } catch {
+        case _ => new StringValue(value)
+      }
+    }
+  }
 
   override def toValue: Value[_] = {
     val v = new ValueMap

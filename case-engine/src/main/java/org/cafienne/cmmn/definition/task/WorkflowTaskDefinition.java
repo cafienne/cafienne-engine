@@ -10,11 +10,12 @@ package org.cafienne.cmmn.definition.task;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.WorkflowTask;
+import org.cafienne.json.JSONParseFailure;
+import org.cafienne.json.JSONReader;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -24,11 +25,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class WorkflowTaskDefinition extends CMMNElementDefinition implements TaskImplementationContract {
-    private final static Logger logger = LoggerFactory.getLogger(WorkflowTaskDefinition.class);
-
     private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap<>();
     private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap<>();
-    private final ValueMap taskModel;
+    private final Value<?> taskModel;
     private final DueDateDefinition dueDate;
     private final AssignmentDefinition assignment;
 
@@ -74,24 +73,18 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
      * Get the task-model / Json schema for task
      * @return task-model / Json schema for the task
      */
-    public ValueMap getTaskModel() {
+    public Value<?> getTaskModel() {
         return taskModel;
     }
 
-    private ValueMap parseTaskModel() {
-        String taskModelStr = parseString("task-model", false, "{}");
-        if (taskModelStr.trim().isEmpty()) {
-            taskModelStr = "{}";
-        }
+    private Value<?> parseTaskModel() {
+        String taskModelStr = parseString("task-model", false, "");
 
         try {
             return JSONReader.parse(taskModelStr);
         } catch (IOException | JSONParseFailure e) {
-            logger.error("Cannot parse task model of HumanTask " + getParentElement().getId() + " into json\n" + taskModelStr, e);
-            getModelDefinition().fatalError("Cannot parse the task-model json from the implementation of HumanTask " + getId() + " (" + getName() + ")", e);
+            return new StringValue(taskModelStr);
         }
-
-        return null;
     }
 
     public AssignmentDefinition getAssignmentExpression() {
