@@ -11,13 +11,14 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
-import org.cafienne.cmmn.instance.sentry.*;
+import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
+import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
 
-public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> implements TransitionGenerator<PlanItem<T>, PlanItemTransitioned> {
+public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends CMMNElement<T> implements TransitionGenerator<PlanItemTransitioned> {
     /**
      * Unique identifier of the plan item, typically a guid
      */
@@ -55,7 +56,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Current state machine state and last transition and history state.
      */
-    private final TransitionPublisher transitionPublisher = new TransitionPublisher(this);
+    private final PlanItemTransitionPublisher transitionPublisher = new PlanItemTransitionPublisher(this);
     private Transition lastTransition = Transition.None;
     private State state = State.Null;
     private State historyState = State.Null;
@@ -307,11 +308,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.requiredRuleOutcome = event.isRequired();
     }
 
-    public void updateState(PlanItemTransitioned event) {
+    public void publishTransition(PlanItemTransitioned event) {
         this.transitionPublisher.addEvent(event);
     }
 
-    public void updateState(PlanItemTransitioned event, TransitionPublisher publisher) {
+    public void updateStandardEvent(PlanItemTransitioned event) {
         this.state = event.getCurrentState();
         this.historyState = event.getHistoryState();
         this.lastTransition = event.getTransition();

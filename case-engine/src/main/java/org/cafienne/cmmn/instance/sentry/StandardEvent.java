@@ -3,7 +3,7 @@ package org.cafienne.cmmn.instance.sentry;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.instance.Case;
 
-public interface StandardEvent<T extends Enum, C extends TransitionGenerator> extends ModelEvent<Case> {
+public interface StandardEvent<T extends Enum<?>, C extends TransitionGenerator<?>> extends ModelEvent<Case> {
     T getTransition();
 
     C getSource();

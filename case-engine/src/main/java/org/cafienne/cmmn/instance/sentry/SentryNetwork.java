@@ -3,7 +3,6 @@ package org.cafienne.cmmn.instance.sentry;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.TransitionPublisher;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 import java.util.ArrayList;

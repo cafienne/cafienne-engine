@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Transition;

@@ -8,36 +8,33 @@
 package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.event.file.*;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.TransitionPublisher;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> implements TransitionGenerator<CaseFileItem, CaseFileEvent> {
+public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> implements TransitionGenerator<CaseFileEvent> {
     /**
      * History of events on this item
      */
-    protected TransitionPublisher transitionPublisher;
+    protected CaseFileTransitionPublisher transitionPublisher;
     private State state = State.Null; // Current state of the item
     private CaseFileItemTransition lastTransition; // Last transition
 
     private Value<?> value = Value.NULL;
-    private Map<String, BusinessIdentifier> businessIdentifiers = new HashMap<>();
+    private final Map<String, BusinessIdentifier> businessIdentifiers = new HashMap<>();
     /**
      * The parent case file item that we are contained in, or null if we are contained in the top level case file.
      */
@@ -104,12 +101,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void releaseBootstrapEvents() {
         // From now onwards we can handle case file events the regular way
         // Creating the normal publisher will release events from bootstrap publisher
-        transitionPublisher = new TransitionPublisher(transitionPublisher);
+        transitionPublisher = new CaseFileTransitionPublisher(transitionPublisher);
         // Now release child item bootstrap events
         super.releaseBootstrapEvents();
     }
 
-    private TransitionPublisher createTransitionPublisher() {
+    private CaseFileTransitionPublisher createTransitionPublisher() {
         // If the case plan is not yet available, we need to preserve the case file events and
         //  only trigger entry/exit criteria after case plan has become available.
         //  This happens in the release method.
@@ -122,7 +119,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             return this.container.transitionPublisher;
         } else {
             // NOTE: see above note: apparently normal transition publisher does not use the parent array...
-            return new TransitionPublisher(this);
+            return new CaseFileTransitionPublisher(this);
         }
     }
 
@@ -168,12 +165,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         super.addEvent(event);
     }
 
-    public void updateState(CaseFileEvent event) {
+    public void publishTransition(CaseFileEvent event) {
         addDebugInfo(() -> "CaseFile[" + getName() + "]: updating CaseFileItem state based on CaseFileEvent");
         this.transitionPublisher.addEvent(event);
     }
 
-    public void updateState(CaseFileEvent event, TransitionPublisher publisher) {
+    public void updateStandardEvent(CaseFileEvent event) {
         // Hack to make sure that we use the right case file item in case of BootstrapPublisher,
         // as that is registered on the array instead of the item that received the event.
         CaseFileItem item = this instanceof CaseFileItemArray ? ((CaseFileItemArray) this).get(event.getIndex()) : this;
@@ -184,7 +181,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         item.setValue(event.getValue());
     }
 
-    public void updateState(BusinessIdentifierEvent event) {
+    public void publishTransition(BusinessIdentifierEvent event) {
         businessIdentifiers.get(event.name).updateState(event);
     }
 
