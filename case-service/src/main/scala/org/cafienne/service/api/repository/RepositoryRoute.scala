@@ -164,7 +164,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
   @RequestBody(description = "Definitions XML file", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/xml"))
   def deployModel = post {
-    path("deploy" / Segment) { modelName =>
+    path("deploy" / Remaining ) { modelName =>
       // For deploying files through the network, authorization is mandatory
       userWithTenant { (platformUser, tenant) => {
         entity(as[Document]) { xmlDocument =>
