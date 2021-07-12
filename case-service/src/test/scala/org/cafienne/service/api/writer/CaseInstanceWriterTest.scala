@@ -1,19 +1,21 @@
 package org.cafienne.service.api.writer
 
-import java.time.Instant
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
+import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.json.ValueMap
 import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
-import org.cafienne.service.db.record.CaseRecord
-import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.cafienne.service.db.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.wordspec.AnyWordSpecLike
 
+import java.time.Instant
 import scala.concurrent.duration._
 
 class CaseInstanceWriterTest
@@ -53,6 +55,7 @@ class CaseInstanceWriterTest
   val caseDefinitionApplied = eventFactory.createCaseDefinitionApplied()
   val caseModifiedEvent = eventFactory.createCaseModified(Instant.now())
 
+  val emptyCaseFile = new ValueMap().toString
 
   "CaseProjectionsWriter" must {
     "add a case instance" in {
@@ -60,8 +63,17 @@ class CaseInstanceWriterTest
       sendEvent(caseModifiedEvent)
 
       eventually {
-        persistence.records.length shouldBe 6
-        persistence.records.head shouldBe a[CaseRecord]
+        // A 'simple' CaseDefinitionApplied results always in 6 records, as below, with an empty case file record
+        persistence.records.length shouldBe 6 // Events generate below 6 records
+        persistence.records.count(_.isInstanceOf[CaseDefinitionRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[CaseRoleRecord]) shouldBe 2
+        persistence.records.count(_.isInstanceOf[CaseRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[CaseFileRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[OffsetRecord]) shouldBe 1
+        persistence.records.find(_.isInstanceOf[CaseFileRecord]) match {
+          case Some(cs: CaseFileRecord) => cs.data shouldBe emptyCaseFile
+          case other => assert(false, "Empty CaseFile object expected, found " + other.getClass.getName)
+        }
       }
     }
   }
