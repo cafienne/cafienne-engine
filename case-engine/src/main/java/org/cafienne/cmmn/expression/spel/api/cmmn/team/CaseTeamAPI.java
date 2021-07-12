@@ -36,7 +36,7 @@ public class CaseTeamAPI extends APIObject<Case> {
 
     private Map<String, CaseRoleAPI> getRolesByName() {
         if (rolesByName.isEmpty()) {
-            team.getCaseInstance().getDefinition().getCaseTeamModel().getCaseRoles().forEach(role -> {
+            team.getDefinition().getCaseRoles().forEach(role -> {
                 rolesByName.put(role.getName(), new CaseRoleAPI(team, role));
             });
         }

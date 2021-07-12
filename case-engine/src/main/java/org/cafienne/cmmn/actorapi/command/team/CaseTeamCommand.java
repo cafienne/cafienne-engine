@@ -5,6 +5,7 @@ import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
+import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
@@ -65,7 +66,8 @@ abstract class CaseTeamCommand extends CaseCommand {
         newMember.validateRolesExist(caseInstance.getDefinition());
 
         // Now also validate that the new roles do not mutex each other
-        List<CaseRoleDefinition> newRoles = newMember.getCaseRoles().stream().map(caseInstance.getDefinition().getCaseTeamModel()::getCaseRole).collect(Collectors.toList());
+        CaseTeamDefinition team = caseInstance.getDefinition().getCaseTeamModel();
+        List<CaseRoleDefinition> newRoles = newMember.getCaseRoles().stream().map(team::getCaseRole).collect(Collectors.toList());
         newRoles.forEach(role -> {
             newRoles.stream().filter(otherRole -> otherRole != role).forEach(otherRole -> {
                 if (otherRole.getMutexRoles().contains(role)) {

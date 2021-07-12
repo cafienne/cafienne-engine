@@ -30,7 +30,7 @@ public class CurrentMember extends Member {
 
     @Override
     public boolean isOwner() {
-        return getMatchingMembers().filter(member -> member.isOwner()).count() > 0;
+        return getMatchingMembers().anyMatch(Member::isOwner);
     }
 
     /**
