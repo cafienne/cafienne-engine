@@ -25,5 +25,5 @@ import slick.jdbc.JdbcProfile
   */
 
 trait QueryDBSchema extends CafienneJDBCConfig {
-  lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.queryDB.config)
+  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.queryDB.config)
 }

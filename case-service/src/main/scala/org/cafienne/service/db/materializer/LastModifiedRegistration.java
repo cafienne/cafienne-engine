@@ -32,7 +32,7 @@ public class LastModifiedRegistration {
     private final static Instant startupMoment = Instant.now();
     private final Map<String, Instant> lastModifiedRegistration = new HashMap<>();
     private final Map<String, List<Waiter>> waiters = new HashMap<>();
-    private final String name;
+    public final String name;
 
     public LastModifiedRegistration(String name) {
         this.name = name;

@@ -289,26 +289,24 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   override def commit(offsetName: String, offset: Offset, caseModified: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
+    this.caseInstance.foreach(instance => persistence.upsert(instance))
+    persistence.upsert(this.caseDefinition)
+    // Update case file and identifiers
+    this.caseFile.map{getNewCaseFile}.foreach(caseFile => persistence.upsert(caseFile))
+    this.businessIdentifiers.toSeq.foreach(item => persistence.upsert(item))
 
-    val records = ListBuffer.empty[AnyRef]
-    this.caseInstance.foreach(instance => records += instance)
-    records += this.caseDefinition
-    this.caseFile.foreach { caseFile =>
-      records += getNewCaseFile(caseFile)
-    }
-    records ++= this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item))
-    records ++= this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item))
-    records ++= this.caseInstanceRoles.values
-    records ++= this.caseInstanceTeamMembers.values
-    records ++= this.businessIdentifiers.toSeq
-    records ++= this.tasks.values.map(current => TaskMerger(caseModified, current))
+    // Add lastModified field to plan items and tasks
+    this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item)).foreach(item => persistence.upsert(item))
+    this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item)).foreach(item => persistence.upsert(item))
+    this.tasks.values.map(current => TaskMerger(caseModified, current)).foreach(item => persistence.upsert(item))
 
-    // If we reach this point, we have real events handled and content added,
-    // so also update the offset of the last event handled in this projection
-    records += OffsetRecord(offsetName, offset)
+    // Update case team changes
+    this.caseInstanceRoles.values.foreach(item => persistence.upsert(item))
+    this.caseInstanceTeamMembers.values.foreach(item => persistence.upsert(item))
 
-    //    println("Committing "+records.size+" records into the database for "+offset)
+    // Update the offset of the last event handled in this projection
+    persistence.upsert(OffsetRecord(offsetName, offset))
 
-    persistence.bulkUpdate(records.toSeq.filter(r => r != null))
+    persistence.commit()
   }
 }
