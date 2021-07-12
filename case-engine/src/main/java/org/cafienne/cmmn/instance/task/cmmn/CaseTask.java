@@ -9,15 +9,13 @@ package org.cafienne.cmmn.instance.task.cmmn;
 
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +87,17 @@ public class CaseTask extends Task<CaseTaskDefinition> {
             getCaseInstance().askCase(command, left ->
                 // Is logging an error sufficient? Or should we go Fault?!
                 logger.error("Could not make transition " + transition + " on sub case implementation for task " + subCaseId + "\n" + left));
+        }
+    }
+
+    @Override
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, CaseTaskDefinition newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+        if (this.getState() != State.Null && this.getState() != State.Available) {
+            MigDevConsole("Migrating definition into subcase!!!");
+            CaseDefinition subCaseDefinition = newDefinition.getImplementationDefinition();
+            getCaseInstance().askCase(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), subCaseDefinition),
+                left -> logger.error("Failure while migrating definition of case task " + this.getDescription() +": " + left.toJson()));
         }
     }
 }
