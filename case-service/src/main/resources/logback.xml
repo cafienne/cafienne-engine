@@ -7,19 +7,23 @@
 
     <logger name="org.cafienne" level="WARN" />
 
-<!-- The settings below can be enabled to show the HTTP traffic errors and so, without the ubiquitous info from the projections -->
-<!--    <logger name="org.cafienne.service.api" level="DEBUG" />-->
-<!--    <logger name="org.cafienne.service.api.projection" level="WARN" />-->
+    <!-- Show HTTP traffic logging -->
+    <!--    <logger name="org.cafienne.service.api" level="DEBUG" />-->
 
-<!-- Show logging for engine -->
-<!--        <logger name="org.cafienne.cmmn"    level="DEBUG" />-->
+    <!-- Show logging for offset of projections -->
+    <!--    <logger name="org.cafienne.service.db.materializer.cases.CaseProjectionsWriter" level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.service.db.materializer.tenant.TenantProjectionsWriter"    level="DEBUG" />-->
 
-<!-- Show logging for HTTP traffic and projections -->
-<!--        <logger name="org.cafienne.service"    level="DEBUG" />-->
+    <!-- Show all projections logging, including info on event being handled -->
+    <!--    <logger name="org.cafienne.service.db.materializer" level="DEBUG" />-->
+
+    <!-- Show logging for engine -->
+    <!--        <logger name="org.cafienne.cmmn"    level="DEBUG" />-->
 
     <logger name="com.datastax" level="WARN"/>
     <logger name="com.wordnik" level="ERROR"/>
     <logger name="com.gettyimages" level="ERROR"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
 
     <logger name="slick" level="INFO"/>
 <!--    <logger name="slick.basic.BasicBackend.action" level="DEBUG"/>-->
