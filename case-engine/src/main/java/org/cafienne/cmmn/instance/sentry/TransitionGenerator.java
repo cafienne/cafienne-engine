@@ -7,5 +7,9 @@ public interface TransitionGenerator<E extends StandardEvent<?,?>> {
 
     String getDescription();
 
+    Object getPath();
+
     Case getCaseInstance();
+
+    TransitionPublisher<E,?,?> getPublisher();
 }

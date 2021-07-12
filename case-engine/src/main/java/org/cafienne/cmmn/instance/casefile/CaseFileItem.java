@@ -16,6 +16,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
+import org.cafienne.cmmn.instance.sentry.TransitionPublisher;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
@@ -101,7 +102,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void releaseBootstrapEvents() {
         // From now onwards we can handle case file events the regular way
         // Creating the normal publisher will release events from bootstrap publisher
-        transitionPublisher = new CaseFileTransitionPublisher(transitionPublisher);
+        transitionPublisher = new CaseFileTransitionPublisher(getPublisher());
         // Now release child item bootstrap events
         super.releaseBootstrapEvents();
     }
@@ -113,10 +114,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         if (getCaseInstance().getCasePlan() == null) {
             // NOTE: weirdly enough the case file item events before bootstrap need to be done on the array instead of the item. Unclear why ...
             //  We use this.container => this is either the CaseFileItemArray or a non-array-element CaseFileItem
-            if (this.container.transitionPublisher == null) {
+            if (this.container.getPublisher() == null) {
                 this.container.transitionPublisher = new BootstrapCaseFileTransitionPublisher(this.container);
             }
-            return this.container.transitionPublisher;
+            return this.container.getPublisher();
         } else {
             // NOTE: see above note: apparently normal transition publisher does not use the parent array...
             return new CaseFileTransitionPublisher(this);
@@ -146,11 +147,11 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param onPart
      */
     public void connectOnPart(CaseFileItemOnPart onPart) {
-        transitionPublisher.connectOnPart(onPart);
+        getPublisher().connectOnPart(onPart);
     }
 
     public void releaseOnPart(CaseFileItemOnPart onPart) {
-        transitionPublisher.releaseOnPart(onPart);
+        getPublisher().releaseOnPart(onPart);
     }
 
     private void addCaseFileEvent(CaseFileEvent event) {
@@ -167,7 +168,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void publishTransition(CaseFileEvent event) {
         addDebugInfo(() -> "CaseFile[" + getName() + "]: updating CaseFileItem state based on CaseFileEvent");
-        this.transitionPublisher.addEvent(event);
+        this.getPublisher().addEvent(event);
     }
 
     public void updateStandardEvent(CaseFileEvent event) {
@@ -187,12 +188,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public void informConnectedEntryCriteria(CaseFileEvent event) {
         // Inform the activating sentries
-        transitionPublisher.informEntryCriteria(event);
+        getPublisher().informEntryCriteria(event);
     }
 
     public void informConnectedExitCriteria(CaseFileEvent event) {
         // Finally iterate the terminating sentries and inform them
-        transitionPublisher.informExitCriteria(event);
+        getPublisher().informExitCriteria(event);
         addDebugInfo(() -> "CaseFile[" + getName() + "]: Completed behavior for transition " + event.getTransition());
     }
 
@@ -475,6 +476,11 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     public String getDescription() {
         return "CaseFileItem["+getPath()+"]";
+    }
+
+    @Override
+    public CaseFileTransitionPublisher getPublisher() {
+        return transitionPublisher;
     }
 
     @Override

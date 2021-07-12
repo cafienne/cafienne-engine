@@ -25,12 +25,12 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     // The source can only be a PlanItemDefinition or a CaseFileItemDefinition. We have taken the first
     // level parent class (CMMNElementDefinition) for this. So, technically we might also store on parts
     // with a different type of key ... but the logic prevents this from happening.
-    private final Map<CMMNElementDefinition, OnPart> onParts = new LinkedHashMap<>();
+    private final Map<CMMNElementDefinition, OnPart<?, ?, ?>> onParts = new LinkedHashMap<>();
 
     /**
      * Simple set to be able to quickly check whether the criterion may become active
      */
-    private final Set<OnPart> inactiveOnParts = new HashSet<>();
+    private final Set<OnPart<?, ?, ?>> inactiveOnParts = new HashSet<>();
 
     boolean isActive;
 
@@ -38,7 +38,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         super(target.item, definition);
         this.target = target;
         for (OnPartDefinition onPartDefinition : getDefinition().getSentryDefinition().getOnParts()) {
-            OnPart onPart = onPartDefinition.createInstance(this);
+            OnPart<?, ?, ?> onPart = onPartDefinition.createInstance(this);
             onParts.put(onPartDefinition.getSourceDefinition(), onPart);
             inactiveOnParts.add(onPart);
         }
@@ -67,12 +67,12 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
      * Whenever an on part is satisfied, it will try
      * to activate the Sentry.
      */
-    void activate(OnPart<?, ?> activator) {
+    void activate(OnPart<?, ?, ?> activator) {
         inactiveOnParts.remove(activator);
         if (inactiveOnParts.isEmpty()) {
             addDebugInfo(() -> this + " has become active", this);
         } else {
-            addDebugInfo(() -> this + " has "+inactiveOnParts.size()+" remaining inactive on parts", this);
+            addDebugInfo(() -> this + " has " + inactiveOnParts.size() + " remaining inactive on parts", this);
         }
         if (isSatisfied()) {
             isActive = true;
@@ -85,10 +85,10 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
      * If the on part is no longer satisfied,
      * it will dissatisfy the criterion too.
      */
-    void deactivate(OnPart<?, ?> activator) {
+    void deactivate(OnPart<?, ?, ?> activator) {
         isActive = false;
         inactiveOnParts.add(activator);
-        addDebugInfo(() -> this + " now has "+inactiveOnParts.size()+" inactive on parts", this);
+        addDebugInfo(() -> this + " now has " + inactiveOnParts.size() + " inactive on parts", this);
     }
 
     protected abstract void satisfy();
@@ -126,7 +126,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     public String toString() {
         boolean activated = isActive();
 
-        String listeners = onParts.values().stream().map(part -> part.toString()).collect(Collectors.joining(","));
+        String listeners = onParts.values().stream().map(OnPart::toString).collect(Collectors.joining(","));
         return getDefinition().getType() + " for " + getTarget() + " on " + "[" + listeners + "] - " + (activated ? "active" : "inactive");
     }
 
@@ -166,9 +166,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
             sentryXML.setAttribute("stage", getStage().getItemDefinition().getName());
         }
 
-        this.onParts.forEach((d, onPart) -> {
-            onPart.dumpMemoryStateToXML(sentryXML, showConnectedPlanItems);
-        });
+        this.onParts.forEach((d, onPart) -> onPart.dumpMemoryStateToXML(sentryXML, showConnectedPlanItems));
 
         return sentryXML;
     }
@@ -186,6 +184,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
 
     public void release() {
         getCaseInstance().getSentryNetwork().remove(this);
-        onParts.values().forEach(onPart -> onPart.releaseFromCase());
+        onParts.values().forEach(OnPart::releaseFromCase);
     }
 }

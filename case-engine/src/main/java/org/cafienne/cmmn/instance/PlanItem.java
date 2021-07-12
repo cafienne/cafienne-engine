@@ -13,6 +13,7 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
+import org.cafienne.cmmn.instance.sentry.TransitionPublisher;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
@@ -103,12 +104,17 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         getCaseInstance().getSentryNetwork().connect(this);
     }
 
+    @Override
+    public PlanItemTransitionPublisher getPublisher() {
+        return transitionPublisher;
+    }
+
     public void connectOnPart(PlanItemOnPart onPart) {
-        transitionPublisher.connectOnPart(onPart);
+        getPublisher().connectOnPart(onPart);
     }
 
     public void releaseOnPart(PlanItemOnPart onPart) {
-        transitionPublisher.releaseOnPart(onPart);
+        getPublisher().releaseOnPart(onPart);
     }
 
     /**
@@ -309,7 +315,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void publishTransition(PlanItemTransitioned event) {
-        this.transitionPublisher.addEvent(event);
+        getPublisher().addEvent(event);
     }
 
     public void updateStandardEvent(PlanItemTransitioned event) {
@@ -331,7 +337,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void informConnectedEntryCriteria(PlanItemTransitioned event) {
-        transitionPublisher.informEntryCriteria(event);
+        getPublisher().informEntryCriteria(event);
     }
 
     public void runStageCompletionCheck(PlanItemTransitioned event) {
@@ -348,7 +354,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     public void informConnectedExitCriteria(PlanItemTransitioned event) {
         // Finally iterate the terminating sentries and inform them
-        transitionPublisher.informExitCriteria(event);
+        getPublisher().informExitCriteria(event);
 
         addDebugInfo(() -> this + ": completed handling transition '" + event.getTransition().getValue() + "' from " + event.getHistoryState() + " to " + event.getCurrentState());
     }

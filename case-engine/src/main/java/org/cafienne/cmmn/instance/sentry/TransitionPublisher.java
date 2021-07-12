@@ -6,7 +6,7 @@ import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransitionPublisher<E extends StandardEvent<?,?>, I extends TransitionGenerator<E>, P extends OnPart<?,I>> {
+public class TransitionPublisher<E extends StandardEvent<?,?>, I extends TransitionGenerator<E>, P extends OnPart<?, E, I>> {
     protected final I item;
     private final List<E> transitions = new ArrayList<>();
     private final List<P> connectedEntryCriteria = new ArrayList<>();

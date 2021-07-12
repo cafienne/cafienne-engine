@@ -7,27 +7,23 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
-import java.util.stream.Collectors;
-
-public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItem> {
+public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileEvent, CaseFileItem> {
     private boolean isActive;
-    private StandardEvent lastEvent;
+    private CaseFileEvent lastEvent;
 
     public CaseFileItemOnPart(Criterion<?> criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(criterion, caseFileItemOnPartDefinition);
     }
 
-    private String getSourceName() {
-        return getDefinition().getSourceDefinition().getName();
-    }
-
-    private CaseFileItemTransition getStandardEvent() {
+    @Override
+    CaseFileItemTransition getStandardEvent() {
         return getDefinition().getStandardEvent();
     }
 
@@ -53,7 +49,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         caseFileItem.connectOnPart(this);
     }
 
-    public void inform(CaseFileItem item, StandardEvent event) {
+    public void inform(CaseFileItem item, CaseFileEvent event) {
         addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
         lastEvent = event;
         isActive = getStandardEvent().equals(event.getTransition());
@@ -66,12 +62,6 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     }
 
     @Override
-    public String toString() {
-        String printedItems = connectedItems.isEmpty() ? "No items '" + getSourceName() + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
-        return getStandardEvent() + " of " + printedItems;
-    }
-
-    @Override
     ValueMap toJson() {
         return new ValueMap("casefile-item", getSourceName(),
             "active", isActive,
@@ -81,7 +71,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     }
 
     @Override
-    Element dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {
+    void dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {
         Element onPartXML = parentElement.getOwnerDocument().createElement("onPart");
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
@@ -98,6 +88,5 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
             }
         }
 
-        return onPartXML;
     }
 }
