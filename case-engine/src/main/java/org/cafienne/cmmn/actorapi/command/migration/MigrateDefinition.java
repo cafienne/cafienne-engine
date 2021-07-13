@@ -46,7 +46,12 @@ public class MigrateDefinition extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        caseInstance.migrate(definition);
+        if (definition.getDefinitionsDocument().equals(caseInstance.getDefinition().getDefinitionsDocument())) {
+            // ??? why again???? ;)
+            caseInstance.addDebugInfo(() -> "No need to migrate definition of case " + caseInstance.getId() + " (proposed definition already in use by the case instance)");
+        } else {
+            caseInstance.migrate(definition);
+        }
         return new MigrationStartedResponse(this);
     }
 

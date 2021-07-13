@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 public class DefinitionsDocument implements Serializable {
     private final static Logger logger = LoggerFactory.getLogger(DefinitionsDocument.class);
@@ -330,5 +331,18 @@ public class DefinitionsDocument implements Serializable {
 
     void addFatalError(ModelDefinition source, String msg, Throwable t) {
         getFatals().add(new InvalidDefinitionException(source.getId() + ": " + msg, t));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DefinitionsDocument that = (DefinitionsDocument) o;
+        return document == that.document || Objects.equals(sourceDocument, that.sourceDocument);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sourceDocument);
     }
 }
