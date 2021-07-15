@@ -56,4 +56,14 @@ public class TimerEventDefinition extends EventListenerDefinition {
     public Transition getEntryTransition() {
         return Transition.Occur;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameTimerEvent);
+    }
+
+    public boolean sameTimerEvent(TimerEventDefinition other) {
+        return samePlanItemDefinitionDefinition(other)
+                && same(timerExpression, other.timerExpression);
+    }
 }

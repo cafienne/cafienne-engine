@@ -85,4 +85,14 @@ public class ExpressionDefinition extends CMMNElementDefinition {
     public CMMNExpressionEvaluator getEvaluator() {
         return evaluator;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameExpression);
+    }
+
+    protected boolean sameExpression(ExpressionDefinition other) {
+        return same(this.language, other.language)
+                && same(this.body, other.body);
+    }
 }

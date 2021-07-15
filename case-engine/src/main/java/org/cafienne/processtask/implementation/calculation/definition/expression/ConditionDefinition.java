@@ -38,4 +38,9 @@ public class ConditionDefinition extends CalculationExpressionDefinition {
     public String getType() {
         return "Condition";
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

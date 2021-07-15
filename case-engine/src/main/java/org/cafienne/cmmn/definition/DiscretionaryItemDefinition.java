@@ -177,4 +177,17 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
         if (definition == null) return super.toString();
         return "DiscretionaryItem[" + definition.getType() + " '" + getName() + "']";
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameDiscretionaryItem);
+    }
+
+    public boolean sameDiscretionaryItem(DiscretionaryItemDefinition other) {
+        return sameTableItem(other)
+                && same(definition, other.definition)
+                && same(planItemControl, other.planItemControl)
+                && same(entryCriteria, other.entryCriteria)
+                && same(exitCriteria, other.exitCriteria);
+    }
 }

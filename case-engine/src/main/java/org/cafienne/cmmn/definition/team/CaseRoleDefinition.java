@@ -38,4 +38,13 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
         emptyXMLRole.setAttribute("description", "");
         return new CaseRoleDefinition(emptyXMLRole, definitionElement.getModelDefinition(), definitionElement);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameRole);
+    }
+
+    public boolean sameRole(CaseRoleDefinition other) {
+        return sameIdentifiers(other);
+    }
 }

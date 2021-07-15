@@ -92,4 +92,16 @@ public class CaseDefinition extends ModelDefinition implements TaskImplementatio
     public CaseFileItemDefinition findCaseFileItem(String name) {
         return getCaseFileModel().findCaseFileItem(name);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameCaseDefinition);
+    }
+
+    public boolean sameCaseDefinition(CaseDefinition other) {
+        return sameModelDefinition(other)
+                && same(caseFileModel, other.caseFileModel)
+                && same(casePlanModel, other.casePlanModel)
+                && same(caseTeamModel, other.caseTeamModel);
+    }
 }

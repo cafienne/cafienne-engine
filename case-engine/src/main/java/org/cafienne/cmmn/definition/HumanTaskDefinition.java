@@ -97,4 +97,17 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     public WorkflowTaskDefinition getImplementationDefinition() {
         return workflowDefinition;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameHumanTask);
+    }
+
+    public boolean sameHumanTask(HumanTaskDefinition other) {
+        return sameTask(other)
+                && same(planningTable, other.planningTable)
+                && same(performer, other.performer)
+                && same(workflowDefinition, other.workflowDefinition)
+                && same(taskOutputValidator, other.taskOutputValidator);
+    }
 }

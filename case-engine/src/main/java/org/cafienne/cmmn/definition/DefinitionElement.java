@@ -6,4 +6,6 @@ public interface DefinitionElement {
     String getName();
 
     String getType();
+
+    boolean differs(Object object);
 }

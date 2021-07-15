@@ -124,4 +124,17 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
     public Collection<PropertyDefinition> getBusinessIdentifiers() {
         return getCaseFileItemDefinition().getBusinessIdentifiers();
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameCaseFileItem);
+    }
+
+    public boolean sameCaseFileItem(CaseFileItemDefinition other) {
+        return sameCaseFileItemChildren(other)
+                && same(multiplicity, other.multiplicity)
+                && same(typeDefinition, other.typeDefinition)
+                && same(sourceRef, other.sourceRef)
+                && same(targetRefs, other.targetRefs);
+    }
 }

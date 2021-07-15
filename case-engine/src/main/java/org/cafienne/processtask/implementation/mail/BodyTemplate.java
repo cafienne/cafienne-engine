@@ -24,4 +24,8 @@ public class BodyTemplate extends XMLElementDefinition {
         return new StringValue(new StringTemplate(bodyTemplate).resolveParameters(input).getResult());
     }
 
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

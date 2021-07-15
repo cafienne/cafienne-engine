@@ -28,4 +28,9 @@ public class AddressTemplate extends XMLElementDefinition {
         name.resolveParameters(processInputParameters);
         return name.toString();
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

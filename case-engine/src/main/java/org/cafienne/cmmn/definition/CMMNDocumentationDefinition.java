@@ -46,4 +46,14 @@ public class CMMNDocumentationDefinition extends XMLElementDefinition {
     public String getText() {
         return text;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameDocumentation);
+    }
+
+    public boolean sameDocumentation(CMMNDocumentationDefinition other) {
+        return same(textFormat, other.textFormat)
+                && same(text, other.text);
+    }
 }

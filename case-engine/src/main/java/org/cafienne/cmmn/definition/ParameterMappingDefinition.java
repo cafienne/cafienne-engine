@@ -232,4 +232,16 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
         }
         return targetValue;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameMapping);
+    }
+
+    public boolean sameMapping(ParameterMappingDefinition other) {
+        return same(isInputMapping, other.isInputMapping)
+                && same(source, other.source)
+                && same(target, other.target)
+                && same(transformation, other.transformation);
+    }
 }

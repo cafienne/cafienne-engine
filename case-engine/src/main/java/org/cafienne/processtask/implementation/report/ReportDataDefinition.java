@@ -39,4 +39,9 @@ public class ReportDataDefinition extends CMMNElementDefinition {
         Value<?> jsonData = report.getInputParameters().get(name);
         return new ByteArrayInputStream(jsonData.toString().getBytes(StandardCharsets.UTF_8));
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

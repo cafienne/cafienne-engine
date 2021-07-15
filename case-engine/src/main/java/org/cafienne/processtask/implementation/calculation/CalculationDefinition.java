@@ -59,4 +59,9 @@ public class CalculationDefinition extends InlineSubProcessDefinition {
     protected Set<String> getRawOutputParameterNames() {
         return super.getExceptionParameterNames();
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

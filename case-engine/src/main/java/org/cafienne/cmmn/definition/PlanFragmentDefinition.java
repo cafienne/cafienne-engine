@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
+public abstract class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     private final static Logger logger = LoggerFactory.getLogger(PlanFragmentDefinition.class);
 
     private final Collection<PlanItemDefinition> planItems = new ArrayList<>();
@@ -92,5 +92,19 @@ public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     @Override
     public Transition getEntryTransition() {
         return Transition.Start;
+    }
+
+    public boolean samePlanItems(PlanFragmentDefinition other) {
+        return same(planItems, other.planItems);
+    }
+
+    public boolean sameSentries(PlanFragmentDefinition other) {
+        return same(sentries, other.sentries);
+    }
+
+    public boolean samePlanFragment(PlanFragmentDefinition other) {
+        return samePlanItemDefinitionDefinition(other)
+                && samePlanItems(other)
+                && sameSentries(other);
     }
 }

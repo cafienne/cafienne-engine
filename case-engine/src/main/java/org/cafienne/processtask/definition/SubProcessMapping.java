@@ -26,8 +26,8 @@ public class SubProcessMapping extends CMMNElementDefinition {
     private final String sourceRef;
     private final String targetRef;
     private final ExpressionDefinition transformation;
-    private ParameterDefinition target;
     private ParameterDefinition source;
+    private ParameterDefinition target;
 
     public SubProcessMapping(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -81,5 +81,16 @@ public class SubProcessMapping extends CMMNElementDefinition {
 
     public ParameterDefinition getSource() {
         return source;
+    }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameMapping);
+    }
+
+    public boolean sameMapping(SubProcessMapping other) {
+        return same(transformation, other.transformation)
+                && same(source, other.source)
+                && same(target, other.target);
     }
 }

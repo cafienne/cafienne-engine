@@ -37,4 +37,13 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
      * @return
      */
     public abstract Transition getEntryTransition();
+
+    protected boolean sameItemControl(PlanItemDefinitionDefinition other) {
+        return same(defaultControl, other.defaultControl);
+    }
+
+    public boolean samePlanItemDefinitionDefinition(PlanItemDefinitionDefinition other) {
+        return sameIdentifiers(other)
+                && sameItemControl(other);
+    }
 }

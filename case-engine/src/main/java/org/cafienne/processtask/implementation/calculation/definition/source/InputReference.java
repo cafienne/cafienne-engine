@@ -44,4 +44,9 @@ public class InputReference extends CMMNElementDefinition {
     public SourceDefinition getSource() {
         return source;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

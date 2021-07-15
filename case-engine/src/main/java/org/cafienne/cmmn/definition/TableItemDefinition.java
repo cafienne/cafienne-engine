@@ -119,4 +119,10 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
 
         return tableItemXML;
     }
+
+    protected boolean sameTableItem(TableItemDefinition other) {
+        return sameIdentifiers(other)
+                && same(applicabilityRules, other.applicabilityRules)
+                && same(authorizedRoles, other.authorizedRoles);
+    }
 }

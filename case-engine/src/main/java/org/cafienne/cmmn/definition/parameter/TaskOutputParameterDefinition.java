@@ -56,4 +56,14 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
     public boolean isMandatory() {
         return isMandatory;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameTaskParameter);
+    }
+
+    public boolean sameTaskParameter(TaskOutputParameterDefinition other) {
+        return sameParameter(other)
+                && same(isMandatory, other.isMandatory);
+    }
 }

@@ -11,17 +11,22 @@ import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Base class for parsing XML elements defined in the CMMN specification.
  */
 public abstract class XMLElementDefinition implements DefinitionElement {
+    private static final Logger logger = LoggerFactory.getLogger(XMLElementDefinition.class);
+
     protected final static String NAMESPACE_URI = "org.cafienne";
     private final String id;
     private String name;
@@ -159,17 +164,11 @@ public abstract class XMLElementDefinition implements DefinitionElement {
             Constructor<T> tConstructor = typeClass.getConstructor(Element.class, ModelDefinition.class, CMMNElementDefinition.class);
             T childDefinition = tConstructor.newInstance(xmlElement, getModelDefinition(), this);
             return childDefinition;
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | InvocationTargetException | IllegalArgumentException e) {
             String msg = "The class " + typeClass.getName() + " cannot be instantiated";
             getModelDefinition().fatalError(msg, e);
         } catch (IllegalAccessException e) {
             String msg = "The class " + typeClass.getName() + " cannot be accessed";
-            getModelDefinition().fatalError(msg, e);
-        } catch (IllegalArgumentException e) {
-            String msg = "The class " + typeClass.getName() + " cannot be instantiated";
-            getModelDefinition().fatalError(msg, e);
-        } catch (InvocationTargetException e) {
-            String msg = "The class " + typeClass.getName() + " cannot be instantiated";
             getModelDefinition().fatalError(msg, e);
         } catch (NoSuchMethodException e) {
             String msg = "The class " + typeClass.getName() + " must have a constructor with 3 arguments: org.w3c.dom.Element, Definition and  CMMNElementDefinition";
@@ -436,5 +435,119 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         } else {
             return "";
         }
+    }
+
+    protected boolean sameClass(Object object) {
+        return object != null && this.getClass().equals(object.getClass());
+    }
+
+    public boolean sameName(XMLElementDefinition other) {
+        return same(getName(), other.getName());
+    }
+
+    public boolean sameId(XMLElementDefinition other) {
+        return same(this.getId(), other.getId());
+    }
+
+    /**
+     * Check whether name and id match on the other element.
+     * @param other
+     * @return
+     */
+    public boolean sameIdentifiers(XMLElementDefinition other) {
+        return sameName(other)
+                && sameId(other);
+    }
+
+    @Override
+    public boolean differs(Object object) {
+        return !equalsWith(object);
+    }
+
+    /**
+     * Custom compare method. Comparable to Object.equals(), but elements are expected
+     * to implement a semantic comparison.
+     * @param object
+     * @return
+     */
+    protected abstract boolean equalsWith(Object object);
+
+    /**
+     * This checks that other has Class[E] and invokes the matcher on it
+     *
+     * @param object
+     * @param matcher
+     * @param <E>
+     * @return
+     */
+    protected <E extends XMLElementDefinition> boolean equalsWith(Object object, DefinitionComparer<E> matcher) {
+//        System.out.println("Running EW WIHT MATCHER ON A " + this.getClass().getSimpleName() +" with name " + getName());
+        if (!sameClass(object)) {
+            return false;
+        }
+        return matcher.match((E) object);
+    }
+
+    private static boolean logging = true;
+
+    /**
+     * Find an equal definition in the collection, using the equalsWith method.
+     * @param mine The element that we want to find an alternative for
+     * @param theirs The collection to search the element
+     * @param <T> Target type to cast to
+     * @param <Z> Base type to compare on, to help also search in generics based collections (e.g. Collection[OnPartDefinition])
+     * @return Null if the element was not found in the collection
+     */
+    public static <T extends Z, Z extends XMLElementDefinition> T findDefinition(T mine, Collection<Z> theirs) {
+        for (Z his : theirs) {
+            if (his.equalsWith(mine)) {
+                return (T) his; // Cast is ok, because it is checked inside the equalsWith method to be the same class.
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check equality of both collections
+     * @param ours Source to compare
+     * @param theirs Target to compare against
+     * @param <X> Type to compare about
+     * @return false if sizes differ or at leas one element differs.
+     */
+    protected <X extends XMLElementDefinition> boolean same(Collection<X> ours, Collection<X> theirs) {
+        if (ours.size() != theirs.size()) {
+            return false;
+        }
+        for (X mine : ours) { // Iterate all our elements, and check if there is one that does not match any of theirs. If so, return false.
+            if (findDefinition(mine, theirs) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Determine whether both definition elements are the same.
+     * Done through regular null check and then invoking the equalsWith method.
+     */
+    protected <X extends XMLElementDefinition> boolean same(X obj1, X obj2) {
+        return obj1 == null && obj2 == null || obj1 != null && obj2 != null && obj1.equalsWith(obj2);
+    }
+
+    /**
+     * Shortcut to Objects.equalsWith()
+     */
+    protected boolean same(Object obj1, Object obj2) {
+        return Objects.equals(obj1, obj2);
+    }
+
+    @FunctionalInterface
+    protected interface DefinitionComparer<X extends XMLElementDefinition> {
+        boolean match(X other);
+    }
+
+    protected boolean notYetImplemented() {
+        logger.error("Definition comparison is not yet implemented on definition elements of type " + getClass().getName());
+        return false;
     }
 }

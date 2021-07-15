@@ -27,4 +27,9 @@ public class MilestoneDefinition extends PlanItemDefinitionDefinition {
     public Transition getEntryTransition() {
         return Transition.Occur;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, super::samePlanItemDefinitionDefinition);
+    }
 }

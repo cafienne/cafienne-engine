@@ -92,4 +92,14 @@ public class PropertyDefinition extends CMMNElementDefinition {
         return type;
     }
 
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::samePropertyDefinition);
+    }
+
+    public boolean samePropertyDefinition(PropertyDefinition other) {
+        return sameName(other)
+                && same(type, other.type)
+                && same(isBusinessIdentifier, other.isBusinessIdentifier);
+    }
 }

@@ -45,4 +45,9 @@ public class CalculationExpressionDefinition extends CMMNElementDefinition {
     public String getType() {
         return "Step";
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }
