@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,6 @@ import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -71,6 +69,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
 
     /**
      * Get the task-model / Json schema for task
+     *
      * @return task-model / Json schema for the task
      */
     public Value<?> getTaskModel() {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,26 +36,27 @@ public class PropertyDefinition extends CMMNElementDefinition {
         QName("http://www.omg.org/spec/CMMN/PropertyType/QName"),
         Decimal("http://www.omg.org/spec/CMMN/PropertyType/decimal"),
         Unspecified("http://www.omg.org/spec/CMMN/PropertyType/Unspecified");
-        
+
         private final String uri;
-        PropertyType(String uri)
-        {
+
+        PropertyType(String uri) {
             this.uri = uri;
         }
-        
+
         @Override
         public java.lang.String toString() {
             return uri;
         }
-        
+
         public static PropertyType getEnum(String value) {
             if (value == null) return null;
             for (PropertyType type : values())
                 if (type.toString().equals(value)) return type;
-            
+
             return null;
         }
     }
+
     private final PropertyType type;
     private final boolean isBusinessIdentifier;
 
@@ -64,7 +65,7 @@ public class PropertyDefinition extends CMMNElementDefinition {
         String typeDescription = parseAttribute("type", false, "");
         type = PropertyType.getEnum(typeDescription);
         if (type == null) {
-            getModelDefinition().addDefinitionError(getParentElement().getType()+" " + getParentElement().getName()+" is invalid, because property "+getName()+" has unrecognized type "+typeDescription);
+            getModelDefinition().addDefinitionError(getParentElement().getType() + " " + getParentElement().getName() + " is invalid, because property " + getName() + " has unrecognized type " + typeDescription);
         }
         isBusinessIdentifier = readBusinessIdentifiership();
     }

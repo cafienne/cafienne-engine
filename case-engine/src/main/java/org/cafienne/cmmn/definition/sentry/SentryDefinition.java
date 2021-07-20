@@ -7,12 +7,12 @@
  */
 package org.cafienne.cmmn.definition.sentry;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SentryDefinition extends CMMNElementDefinition {
     private final Collection<OnPartDefinition> onParts = new ArrayList<>();

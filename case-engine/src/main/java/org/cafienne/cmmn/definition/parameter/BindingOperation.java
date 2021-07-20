@@ -31,7 +31,8 @@ public enum BindingOperation {
      * Use Add to create a new CaseFileItem in an array
      */
     Add,
-    /**`
+    /**
+     * `
      * Use Replace to replace a single CaseFileItem's content with the output.
      * For Arrays, this will replace the entire array with a single element
      */

@@ -7,10 +7,10 @@
  */
 package org.cafienne.processtask.implementation.calculation.definition.expression;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.expression.spel.ExpressionEvaluator;
+import org.cafienne.json.Value;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;

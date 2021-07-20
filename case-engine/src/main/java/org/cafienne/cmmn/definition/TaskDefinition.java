@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,17 +7,17 @@
  */
 package org.cafienne.cmmn.definition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import org.cafienne.cmmn.definition.parameter.TaskInputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
 import org.cafienne.cmmn.definition.task.TaskImplementationContract;
 import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 public abstract class TaskDefinition<T extends TaskImplementationContract> extends PlanItemDefinitionDefinition {
     private final boolean isBlocking;
@@ -38,7 +38,7 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
                 getCaseDefinition().addDefinitionError("The non blocking task " + getName() + " may not have output parameters");
             }
         }
-        
+
         // We just implement this for all tasks, but in practice this is only done for Case- and ProcessTasks
         parse("parameterMapping", ParameterMappingDefinition.class, mappings);
     }
@@ -94,6 +94,7 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
 
     /**
      * This method returns the definition for the actual task implementation
+     *
      * @return
      */
     abstract T getImplementationDefinition();

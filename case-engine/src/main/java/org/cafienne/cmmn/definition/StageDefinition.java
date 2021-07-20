@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,6 +45,7 @@ public class StageDefinition extends PlanFragmentDefinition {
 
     /**
      * Returns the definition of the discretionary item with the specified name - in this stage or it's human tasks (so not in one of it's children).
+     *
      * @param identifier
      * @return
      */

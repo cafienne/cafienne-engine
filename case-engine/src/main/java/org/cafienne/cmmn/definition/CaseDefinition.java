@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -51,6 +51,7 @@ public class CaseDefinition extends ModelDefinition implements TaskImplementatio
 
     /**
      * Returns the case team model in this definition. Contains the roles and optionally some extensions.
+     *
      * @return
      */
     public CaseTeamDefinition getCaseTeamModel() {

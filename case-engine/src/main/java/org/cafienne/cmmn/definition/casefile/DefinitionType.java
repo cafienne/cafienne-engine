@@ -1,10 +1,6 @@
 package org.cafienne.cmmn.definition.casefile;
 
-import org.cafienne.cmmn.definition.casefile.definitiontype.UnknownType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.UnspecifiedType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.XMLComplexType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.XMLElementType;
-import org.cafienne.cmmn.definition.casefile.definitiontype.XMLSimpleType;
+import org.cafienne.cmmn.definition.casefile.definitiontype.*;
 import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +33,15 @@ public class DefinitionType {
         } else if (uri.equals("http://www.omg.org/spec/CMMN/DefinitionType/Unspecified")) {
             return new UnspecifiedType();
         }
-        logger.debug("Creating UnknownType wrapper for unrecognized type "+uri);
+        logger.debug("Creating UnknownType wrapper for unrecognized type " + uri);
         return new UnknownType(uri);
     }
-    
+
     /**
      * Validate the given value for the case file item. DefinitionType may use the case file item's definition
      * to determine whether the value can be set within the case file item.
      * The default implementation is empty - anything goes. Subclasses can override this to do type specific validations.
+     *
      * @param item
      * @param value
      */

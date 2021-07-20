@@ -1,13 +1,13 @@
 package org.cafienne.cmmn.definition.casefile.definitiontype;
 
-import java.util.Map;
-
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.DefinitionType;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
-import org.cafienne.json.ValueMap;
 import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
+
+import java.util.Map;
 
 public class JSONType extends DefinitionType {
 

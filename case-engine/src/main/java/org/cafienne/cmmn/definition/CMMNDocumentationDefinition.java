@@ -19,6 +19,7 @@ public class CMMNDocumentationDefinition extends XMLElementDefinition {
      * Constructor used to create an instance if the documentation node does not exist in the definition.
      * Also converts a potential CMMN1.0 description into the new documentation element.
      * Note: this does not modify the underlying XML!
+     *
      * @param definition
      * @param parentElement
      */
@@ -30,6 +31,7 @@ public class CMMNDocumentationDefinition extends XMLElementDefinition {
 
     /**
      * Returns text format
+     *
      * @return
      */
     public String getTextFormat() {
@@ -38,6 +40,7 @@ public class CMMNDocumentationDefinition extends XMLElementDefinition {
 
     /**
      * Returns text
+     *
      * @return
      */
     public String getText() {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,6 +17,7 @@ import org.w3c.dom.Element;
 import java.util.Properties;
 
 /**
+ *
  */
 public class SMTPCallDefinition extends MailDefinition {
     private final static Logger logger = LoggerFactory.getLogger(SMTPCallDefinition.class);

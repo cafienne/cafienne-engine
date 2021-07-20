@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,14 +7,13 @@
  */
 package org.cafienne.cmmn.definition.team;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Implementation of CMMN 1.0 5.2.2: Roles.
@@ -23,7 +22,6 @@ import org.w3c.dom.Element;
  * that exclude each other.
  * The singleton element indicates that only one person in the case team is allowed to have that role. Through this mechanism it is possible to enable
  * multiple tasks to be handled by the same person.
- *
  */
 public class CaseRoleDefinition extends CMMNElementDefinition {
     private Collection<CaseRoleDefinition> mutexRoles = new ArrayList<>();
@@ -60,6 +58,7 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
     /**
      * Returns the roles that are mutually exclusive to this role, i.e., users can not have this role
      * as well as one of the roles in the collection both assigned to them.
+     *
      * @return
      */
     public Collection<CaseRoleDefinition> getMutexRoles() {
@@ -68,6 +67,7 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
 
     /**
      * If a role is a singleton role, only one user can be assigned to this role.
+     *
      * @return
      */
     public boolean isSingleton() {

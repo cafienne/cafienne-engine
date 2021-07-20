@@ -18,6 +18,6 @@ public class JasperSubReportDefinition extends JasperDefinition {
 
     @Override
     public String toString() {
-        return "Sub report definition '"+getName()+"'";
+        return "Sub report definition '" + getName() + "'";
     }
 }

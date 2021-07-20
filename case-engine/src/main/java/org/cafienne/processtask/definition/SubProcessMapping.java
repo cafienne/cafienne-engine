@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,13 +7,13 @@
  */
 package org.cafienne.processtask.definition;
 
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ExpressionDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
@@ -28,29 +28,29 @@ public class SubProcessMapping extends CMMNElementDefinition {
     private final ExpressionDefinition transformation;
     private ParameterDefinition target;
     private ParameterDefinition source;
-    
-	public SubProcessMapping(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+
+    public SubProcessMapping(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
         this.sourceRef = parseAttribute("sourceRef", true);
         this.targetRef = parseAttribute("targetRef", true);
         this.transformation = parse("transformation", ExpressionDefinition.class, false);
-	}
+    }
 
-	@Override
-	protected void resolveReferences() {
-		super.resolveReferences();
+    @Override
+    protected void resolveReferences() {
+        super.resolveReferences();
 
-		target = getProcessDefinition().getOutputParameters().get(targetRef);
-		if (target == null) {
-			getModelDefinition().addReferenceError("Invalid mapping " + getId() + ": target parameter " + targetRef + " is missing");
-		}
-		
-		SubProcessDefinition spd = getParentElement();
+        target = getProcessDefinition().getOutputParameters().get(targetRef);
+        if (target == null) {
+            getModelDefinition().addReferenceError("Invalid mapping " + getId() + ": target parameter " + targetRef + " is missing");
+        }
+
+        SubProcessDefinition spd = getParentElement();
         source = spd.getRawOutputParameters().get(sourceRef);
-		if (source == null) {
-            getModelDefinition().addReferenceError("Invalid mapping in process definition " + spd.getParentElement().getId() + ": source parameter " + sourceRef + " cannot be used; use one of "+spd.getRawOutputParameterNames());
-		}
-	}
+        if (source == null) {
+            getModelDefinition().addReferenceError("Invalid mapping in process definition " + spd.getParentElement().getId() + ": source parameter " + sourceRef + " cannot be used; use one of " + spd.getRawOutputParameterNames());
+        }
+    }
 
     @Override
     public String getContextDescription() {
@@ -61,6 +61,7 @@ public class SubProcessMapping extends CMMNElementDefinition {
 
     /**
      * This method to transform the raw output values of a SubProcess implementation to Process output parameters
+     *
      * @param processTaskActor
      * @param rawOutputParameters
      * @return transformed output value

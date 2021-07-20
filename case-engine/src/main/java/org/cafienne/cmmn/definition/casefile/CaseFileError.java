@@ -4,7 +4,6 @@ import org.cafienne.actormodel.command.exception.InvalidCommandException;
 
 /**
  * Thrown when an error is found while trying to modify the case file.
- *
  */
 public class CaseFileError extends InvalidCommandException {
     public CaseFileError(String string) {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,7 +7,10 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Stage;
+import org.cafienne.cmmn.instance.TimerEvent;
+import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
 
 import java.time.Duration;
@@ -23,6 +26,7 @@ public class TimerEventDefinition extends PlanItemDefinitionDefinition {
 
     /**
      * Returns the expression of the timer event.
+     *
      * @return
      */
     public ExpressionDefinition getTimerExpression() {
@@ -34,7 +38,7 @@ public class TimerEventDefinition extends PlanItemDefinitionDefinition {
         String parentType = getParentElement().getType();
         String parentId = getParentElement().getId();
         // This will return something like "The parametermapping in HumanTask 'abc'
-        return "The expression in " + parentType + " '" + parentId+"'";
+        return "The expression in " + parentType + " '" + parentId + "'";
     }
 
     public Instant getMoment(TimerEvent timerEvent) {

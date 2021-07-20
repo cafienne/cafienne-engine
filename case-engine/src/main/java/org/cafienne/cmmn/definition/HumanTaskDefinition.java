@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     private final PlanningTableDefinition planningTable;
     private final String performerRef;
     private CaseRoleDefinition performer;
-    private final WorkflowTaskDefinition wtd;
+    private final WorkflowTaskDefinition workflowDefinition;
     private final String taskOutputValidatorRef;
     private TaskOutputValidatorDefinition taskOutputValidator;
 
@@ -36,9 +36,9 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
                 getCaseDefinition().addDefinitionError("HumanTask " + getName() + " is non blocking and therefore may not have a planning table");
             }
         }
-        
-        wtd = parseWorkflowTaskDefinition();
-        taskOutputValidatorRef = wtd.getElement().getAttribute("validatorRef");
+
+        workflowDefinition = parseWorkflowTaskDefinition();
+        taskOutputValidatorRef = workflowDefinition.getElement().getAttribute("validatorRef");
     }
 
     private WorkflowTaskDefinition parseWorkflowTaskDefinition() {
@@ -57,6 +57,7 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
 
     /**
      * Returns the process that can validate output for this task
+     *
      * @return
      */
     public TaskOutputValidatorDefinition getTaskOutputValidator() {
@@ -94,6 +95,6 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
 
     @Override
     public WorkflowTaskDefinition getImplementationDefinition() {
-        return wtd;
+        return workflowDefinition;
     }
 }

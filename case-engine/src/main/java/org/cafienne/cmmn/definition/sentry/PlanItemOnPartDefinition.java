@@ -36,7 +36,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
         sourceRef = parseAttribute("sourceRef", true);
         String sentryRef = parseAttribute("sentryRef", false);
         if (!sentryRef.isEmpty()) {
-            logger.warn("Converting old sentry ref '"+sentryRef+"' in on part. Please upgrade the model.");
+            logger.warn("Converting old sentry ref '" + sentryRef + "' in on part. Please upgrade the model.");
         }
         exitCriterionRef = parseAttribute("exitCriterionRef", false, sentryRef);
     }
@@ -55,7 +55,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
                 exitCriterion = (ExitCriterionDefinition) potentialCriterion;
             } else if (potentialCriterion instanceof SentryDefinition) {
                 // old style model... ok let's support for now...
-                exitCriterion = getCaseDefinition().findElement(e -> e instanceof ExitCriterionDefinition && ((ExitCriterionDefinition)e).getSentryDefinition() == potentialCriterion);
+                exitCriterion = getCaseDefinition().findElement(e -> e instanceof ExitCriterionDefinition && ((ExitCriterionDefinition) e).getSentryDefinition() == potentialCriterion);
             }
             if (exitCriterion == null) {
                 getCaseDefinition().addReferenceError("The exit criterion with name '" + exitCriterionRef + "' is referenced from the entry criterion " + getParentElement().getName() + " in plan item " + getParentElement().getName() + ", but it does not exist in the case plan model");
@@ -70,7 +70,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
 
     @Override
     public String getContextDescription() {
-        return source.getType() +"["+ source.getName()+"]." + standardEvent;
+        return source.getType() + "[" + source.getName() + "]." + standardEvent;
     }
 
     public Transition getStandardEvent() {

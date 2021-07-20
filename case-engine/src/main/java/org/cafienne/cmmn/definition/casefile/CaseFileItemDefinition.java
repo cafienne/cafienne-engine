@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -6,8 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package org.cafienne.cmmn.definition.casefile;
-
-import java.util.Collection;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
@@ -19,6 +17,8 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.json.Value;
 import org.w3c.dom.Element;
+
+import java.util.Collection;
 
 public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
     private final Multiplicity multiplicity;
@@ -109,6 +109,7 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
      * and, if there are children in the value, then also matches those children against our children.
      * Only checks the CaseFileItemDefinition properties for their type; json properties that are not defined
      * are accepted as "blob" content.
+     *
      * @param value
      */
     public void validatePropertyTypes(Value<?> value) throws CaseFileError {
@@ -117,6 +118,7 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
 
     /**
      * Returns a collection with the business identifiers of this case file item. Can be empty.
+     *
      * @return
      */
     public Collection<PropertyDefinition> getBusinessIdentifiers() {

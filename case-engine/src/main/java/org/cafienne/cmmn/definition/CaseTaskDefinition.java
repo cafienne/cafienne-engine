@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,8 +37,8 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
         return new CaseTask(id, index, itemDefinition, this, stage);
     }
 
-	@Override
-	public CaseDefinition getImplementationDefinition() {
-		return subCaseDefinition;
-	}
+    @Override
+    public CaseDefinition getImplementationDefinition() {
+        return subCaseDefinition;
+    }
 }

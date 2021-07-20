@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class ReportDataDefinition extends CMMNElementDefinition {
+    static InputStream EMPTY_STREAM = new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8));
     private final String name;
 
     public ReportDataDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
@@ -29,8 +30,8 @@ public class ReportDataDefinition extends CMMNElementDefinition {
             return EMPTY_STREAM;
         }
 
-        if (! report.getInputParameters().has(name)) {
-            throw new MissingParameterException("Report data '"+name+"' cannot be found in the task input parameters");
+        if (!report.getInputParameters().has(name)) {
+            throw new MissingParameterException("Report data '" + name + "' cannot be found in the task input parameters");
         }
 
         // Take the parameter value, flatten it to string and then return it as a stream. Can probably be done
@@ -38,6 +39,4 @@ public class ReportDataDefinition extends CMMNElementDefinition {
         Value<?> jsonData = report.getInputParameters().get(name);
         return new ByteArrayInputStream(jsonData.toString().getBytes(StandardCharsets.UTF_8));
     }
-
-    static InputStream EMPTY_STREAM = new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8));
 }

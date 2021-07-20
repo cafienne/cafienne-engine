@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -6,9 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package org.cafienne.cmmn.definition;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import org.cafienne.cmmn.definition.sentry.SentryDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -18,6 +15,9 @@ import org.cafienne.cmmn.instance.Transition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class PlanFragmentDefinition extends PlanItemDefinitionDefinition {
     private final static Logger logger = LoggerFactory.getLogger(PlanFragmentDefinition.class);

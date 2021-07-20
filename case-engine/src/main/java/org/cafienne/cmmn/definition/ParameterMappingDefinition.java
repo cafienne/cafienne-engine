@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,14 +7,14 @@
  */
 package org.cafienne.cmmn.definition;
 
-import java.util.Map;
-
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.task.TaskImplementationContract;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
+import org.cafienne.json.Value;
 import org.w3c.dom.Element;
+
+import java.util.Map;
 
 public class ParameterMappingDefinition extends CMMNElementDefinition {
     private final TaskDefinition<?> taskDefinition;
@@ -41,17 +41,18 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
             source = new ParameterDefinition(null, getModelDefinition(), taskDefinition);
         }
     }
-    
+
     /**
      * Recursively searches the CMMN definition tree until it finds a Task.
-     * This is done because the ParameterMapping is defined inside CaseTask and inside ProcessTask, but for HumanTask it is defined in the 
+     * This is done because the ParameterMapping is defined inside CaseTask and inside ProcessTask, but for HumanTask it is defined in the
      * custom implementation tag which is not a direct child of the Task definition itself.
+     *
      * @param parentElement
      * @return
      */
     private TaskDefinition<?> findTask(CMMNElementDefinition parentElement) {
         if (parentElement == null) {
-            getModelDefinition().addDefinitionError("The parameter mapping '" + getId()+"' has no surrounding Task element, and can therefore not be used");
+            getModelDefinition().addDefinitionError("The parameter mapping '" + getId() + "' has no surrounding Task element, and can therefore not be used");
             return null;
         }
         if (parentElement instanceof TaskDefinition) {
@@ -124,7 +125,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
 
     private String getTaskDefinitionName() {
         CMMNElementDefinition parent = getParentElement();
-        while (parent!=null && ! (parent instanceof TaskDefinition)) {
+        while (parent != null && !(parent instanceof TaskDefinition)) {
             parent = parent.getParentElement();
         }
         if (parent != null) {
@@ -136,11 +137,12 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
     private String getDescriptionForError() {
         String taskName = getTaskDefinitionName();
         String caseName = getCaseDefinition().getName();
-        return getId() +"' in task '"+taskName+"' in case '" + caseName;
+        return getId() + "' in task '" + taskName + "' in case '" + caseName;
     }
 
     /**
      * Helper to identify parameter from a collection (supporting reference both by name and by id)
+     *
      * @param definitions
      * @param identifier
      * @return
@@ -153,7 +155,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
         }).findFirst().orElse(null);
         return p;
     }
-    
+
     /**
      * Returns the source of the mapping.
      *
@@ -183,6 +185,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
 
     /**
      * Returns true if the mapping has a transformation element with an actual expression in it.
+     *
      * @return
      */
     public boolean hasTransformation() {

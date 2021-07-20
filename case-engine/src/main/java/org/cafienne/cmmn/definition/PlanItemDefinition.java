@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,7 +32,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
 
     @Override
     public String toString() {
-        return definition.getType() + "['" + getName() +"']";
+        return definition.getType() + "['" + getName() + "']";
     }
 
     public ItemControlDefinition getPlanItemControl() {
@@ -77,7 +77,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         if (this.definition instanceof TaskDefinition) {
             if (!((TaskDefinition<?>) this.definition).isBlocking()) {
                 if (!this.exitCriteria.isEmpty()) {
-                    getCaseDefinition().addDefinitionError(getContextDescription()  + " has exit sentries, but these are not allowed for a non blocking task");
+                    getCaseDefinition().addDefinitionError(getContextDescription() + " has exit sentries, but these are not allowed for a non blocking task");
                     return;
                 }
             }
@@ -86,7 +86,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         // CMMN 1.1 spec 5.4.11 page 53 says:
         //  A PlanItem that has a PlanItemControl that contains a RepetitionRule, MUST have either an entry criterion
         //   that refers to a Sentry that has at least one OnPart or no entry criteria at all.
-        if (! this.planItemControl.getRepetitionRule().isDefault()) {
+        if (!this.planItemControl.getRepetitionRule().isDefault()) {
             if (this.entryCriteria.isEmpty()) {
                 // Stages and Tasks are ok without entry criteria. But milestones must have entry criteria if they have a repetition rule
                 if (this.definition instanceof MilestoneDefinition) {
@@ -95,7 +95,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
             } else {
                 // Check whether there is at least one entry criterion having an on part.
                 if (this.getEntryCriteria().stream().filter(e -> e.hasOnParts()).count() == 0) {
-                    getCaseDefinition().addDefinitionError( getContextDescription() + " has a repetition rule defined, but no entry criteria with at least one on part. This is mandatory.");
+                    getCaseDefinition().addDefinitionError(getContextDescription() + " has a repetition rule defined, but no entry criteria with at least one on part. This is mandatory.");
                 }
             }
         }

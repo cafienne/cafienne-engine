@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,12 +7,12 @@
  */
 package org.cafienne.cmmn.definition;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
 import org.cafienne.cmmn.expression.DefaultValueEvaluator;
 import org.w3c.dom.Element;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Implementation of 5.4.7 Expressions have a language and a body. When an expression is encountered (e.g., inside a repetition rule) then an Evaluator will be instantiated for that expression. This
@@ -49,9 +49,8 @@ public class ExpressionDefinition extends CMMNElementDefinition {
             }
             Constructor<?> implementationConstructor = evaluatorClass.getConstructor(ExpressionDefinition.class);
             this.evaluator = (CMMNExpressionEvaluator) implementationConstructor.newInstance(this);
-        }
-        catch (ClassNotFoundException e) {
-            getModelDefinition().fatalError("The expression language '" + language +"' is not supported", e);
+        } catch (ClassNotFoundException e) {
+            getModelDefinition().fatalError("The expression language '" + language + "' is not supported", e);
         } catch (NoSuchMethodException e) {
             getModelDefinition().fatalError("The class " + evaluatorClassName + " does not have a constructor that takes " + ExpressionDefinition.class.getName() + " as an argument", e);
         } catch (SecurityException e) {
@@ -70,11 +69,11 @@ public class ExpressionDefinition extends CMMNElementDefinition {
     @Override
     public String getContextDescription() {
         String description = "";
-        if (getParentElement()!=null) {
+        if (getParentElement() != null) {
             description = getParentElement().getContextDescription();
         }
         if (description.trim().isEmpty()) {
-            description = "The expression with id "+this.getId();
+            description = "The expression with id " + this.getId();
         }
         return description;
     }

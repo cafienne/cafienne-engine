@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,6 +27,7 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
 
     /**
      * Returns the value of the extension element with the mandatory attribute.
+     *
      * @return
      */
     private boolean getMandatoryValue() {
@@ -41,7 +42,7 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
             return false;
         } else {
             TaskDefinition task = getParentElement();
-            getModelDefinition().addDefinitionError("Output parameter "+getName()+" in task "+task.getName()+" has an invalid value for the required attribute: '" + isRequired+ "'");
+            getModelDefinition().addDefinitionError("Output parameter " + getName() + " in task " + task.getName() + " has an invalid value for the required attribute: '" + isRequired + "'");
             return false;
         }
     }
@@ -49,6 +50,7 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
     /**
      * Returns true if an extension element is defined on the task that has the attribute 'required' set to true (case insensitive)
      * It may be interpreted as 'tasks of this type cannot complete if the parameter is not filled with a non-null value'.
+     *
      * @return
      */
     public boolean isMandatory() {

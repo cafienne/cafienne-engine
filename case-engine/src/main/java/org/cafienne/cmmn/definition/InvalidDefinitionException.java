@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -46,6 +46,7 @@ public class InvalidDefinitionException extends Exception {
 
     /**
      * Returns a ValueList of the errors, basically a json array.
+     *
      * @return
      */
     public Value<?> toJSON() {
@@ -55,6 +56,7 @@ public class InvalidDefinitionException extends Exception {
     /**
      * Returns an XML Document &lt;invalid-definition&gt; with error tags inside
      * for each error found in the definitions document
+     *
      * @return
      */
     public Document toXML() {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -54,8 +54,10 @@ public class PlanningTableDefinition extends TableItemDefinition {
 
         return planningTableXML;
     }
+
     /**
      * Indicates whether or not there are instances of DiscretionaryItem available within this table;
+     *
      * @return
      */
     public boolean hasItems(PlanItem<?> containingPlanItem) {
@@ -66,7 +68,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
         for (TableItemDefinition item : tableItems) {
             if (item instanceof DiscretionaryItemDefinition) {
                 return true;
-            } else if (item instanceof PlanningTableDefinition){
+            } else if (item instanceof PlanningTableDefinition) {
                 if (((PlanningTableDefinition) item).hasItems(containingPlanItem)) {
                     return true;
                 }
@@ -105,9 +107,10 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
         applicabilityRuleRefs = parseAttribute("applicabilityRuleRefs", false, "");
         authorizedRoleRefs = parseAttribute("authorizedRoleRefs", false, "");
     }
-    
+
     /**
      * Fetch a discretionary item from this table item or one of it's children
+     *
      * @param identifier
      * @return
      */
@@ -186,6 +189,7 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
 
     /**
      * Evaluates the applicability on this table item within the context of the containing plan item (i.e., the stage or task in which the item could be plannable)
+     *
      * @param containingPlanItem
      * @param items
      */

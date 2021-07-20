@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,7 +7,8 @@
  */
 package org.cafienne.cmmn.definition.team;
 
-import org.cafienne.cmmn.definition.*;
+import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
@@ -55,6 +56,7 @@ public class CaseTeamDefinition extends CMMNElementDefinition {
 
     /**
      * Returns the role definition with the specified name or id, if it exists, or null if it does not exist.
+     *
      * @param roleName
      * @return
      */

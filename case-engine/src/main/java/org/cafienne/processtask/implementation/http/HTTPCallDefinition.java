@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,31 +9,27 @@ package org.cafienne.processtask.implementation.http;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class HTTPCallDefinition extends SubProcessDefinition {
-    private final String contentTemplate;
-    private final String httpMethod;
-    private final String sourceURL;
-    private final List<Header> httpHeaders = new ArrayList<>();
-
     // Raw, hard coded output parameter names
     public static final String RESPONSE_PAYLOAD_PARAMETER = "responsePayload";
     public static final String RESPONSE_CODE_PARAMETER = "responseCode";
     public static final String RESPONSE_MESSAGE_PARAMETER = "responseMessage";
     public static final String RESPONSE_HEADERS_PARAMETER = "responseHeaders";
+    private final String contentTemplate;
+    private final String httpMethod;
+    private final String sourceURL;
+    private final List<Header> httpHeaders = new ArrayList<>();
 
     public HTTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
@@ -77,6 +73,15 @@ public class HTTPCallDefinition extends SubProcessDefinition {
         return new StringTemplate(contentTemplate);
     }
 
+    @Override
+    public HTTPCall createInstance(ProcessTaskActor processTaskActor) {
+        return new HTTPCall(processTaskActor, this);
+    }
+
+    public TaskOutputValidator createValidator(HumanTask task) {
+        return new TaskOutputValidator(this, task);
+    }
+
     public class Header {
         private final String sourceName;
         private final String sourceValue;
@@ -97,14 +102,5 @@ public class HTTPCallDefinition extends SubProcessDefinition {
             valueTemplate.resolveParameters(processInputParameters);
             return valueTemplate.toString();
         }
-    }
-
-    @Override
-    public HTTPCall createInstance(ProcessTaskActor processTaskActor) {
-        return new HTTPCall(processTaskActor, this);
-    }
-
-    public TaskOutputValidator createValidator(HumanTask task) {
-        return new TaskOutputValidator(this, task);
     }
 }
