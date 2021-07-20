@@ -16,7 +16,7 @@ import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 public class CaseFileItemOnPartDefinition extends OnPartDefinition {
-    private CaseFileItemTransition standardEvent;
+    private final CaseFileItemTransition standardEvent;
     private final String sourceRef;
     private CaseFileItemDefinition source;
 

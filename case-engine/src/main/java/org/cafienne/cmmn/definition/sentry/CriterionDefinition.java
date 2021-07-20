@@ -28,7 +28,7 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
 
     @Override
     public String toString() {
-        String onParts = getSentryDefinition().getOnParts().stream().map(part -> part.getContextDescription()).collect(Collectors.joining(","));
+        String onParts = getSentryDefinition().getOnParts().stream().map(OnPartDefinition::getContextDescription).collect(Collectors.joining(","));
         return getType() + " for " + getParentElement() + " on " + onParts;
     }
 

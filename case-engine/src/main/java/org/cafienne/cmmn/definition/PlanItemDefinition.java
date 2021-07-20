@@ -94,7 +94,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
                 }
             } else {
                 // Check whether there is at least one entry criterion having an on part.
-                if (this.getEntryCriteria().stream().filter(e -> e.hasOnParts()).count() == 0) {
+                if (this.getEntryCriteria().stream().noneMatch(EntryCriterionDefinition::hasOnParts)) {
                     getCaseDefinition().addDefinitionError(getContextDescription() + " has a repetition rule defined, but no entry criteria with at least one on part. This is mandatory.");
                 }
             }

@@ -17,20 +17,23 @@ import org.w3c.dom.Element;
 
 public class ConstraintDefinition extends CMMNElementDefinition {
     private final ExpressionDefinition expression;
+    private final String expressionType;
     private final String contextRef;
     private CaseFileItemDefinition context;
     private Path pathToContext;
 
-    protected ConstraintDefinition(ModelDefinition definition, CMMNElementDefinition parentElement, boolean defaultValue) {
+    protected ConstraintDefinition(ModelDefinition definition, CMMNElementDefinition parentElement, String expressionType, boolean defaultValue) {
         super(null, definition, parentElement);
-        this.expression = new ExpressionDefinition(definition, parentElement, defaultValue);
+        this.expression = new ExpressionDefinition(definition, this, defaultValue);
+        this.expressionType = expressionType;
         this.contextRef = "";
     }
 
     public ConstraintDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        expression = parse("condition", ExpressionDefinition.class, true);
+        this.expression = parse("condition", ExpressionDefinition.class, true);
         this.contextRef = parseAttribute("contextRef", false);
+        this.expressionType = element.getTagName();
     }
 
     @Override
@@ -49,10 +52,12 @@ public class ConstraintDefinition extends CMMNElementDefinition {
 
     @Override
     public String getContextDescription() {
-        String parentType = getParentElement().getType();
-        String parentId = getParentElement().getId();
+        CMMNElementDefinition parent = getParentElement().getParentElement() != null ? getParentElement().getParentElement() : getParentElement();
+        String parentType = parent.getType();
+        String parentId = parent.getId();
+        String parentName = parent.getName();
         // This will return something like "The required rule in HumanTask 'abc'
-        return "The " + getType() + " in " + parentType + " '" + parentId + "'";
+        return "The " + getType() + " in " + parentType + " '" + parentName + "' with id '" + parentId + "'";
     }
 
     /**
@@ -95,6 +100,6 @@ public class ConstraintDefinition extends CMMNElementDefinition {
      * @return
      */
     public String getType() {
-        return getElement().getTagName();
+        return expressionType;
     }
 }
