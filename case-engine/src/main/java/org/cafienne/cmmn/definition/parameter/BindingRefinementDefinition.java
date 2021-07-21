@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.definition.parameter;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.ExpressionDefinition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
 
 public class BindingRefinementDefinition extends ExpressionDefinition {

@@ -11,8 +11,8 @@ public class TaskOutputValidatorDefinition {
 
     public TaskOutputValidatorDefinition(ProcessDefinition definition) {
         this.processDef = definition;
-        if (! (this.processDef.getImplementation() instanceof HTTPCallDefinition)) {
-            definition.addDefinitionError("Task validator "+definition+"");
+        if (!(this.processDef.getImplementation() instanceof HTTPCallDefinition)) {
+            definition.addDefinitionError("Task validator " + definition + "");
         }
         this.httpDefinition = (HTTPCallDefinition) this.processDef.getImplementation();
     }

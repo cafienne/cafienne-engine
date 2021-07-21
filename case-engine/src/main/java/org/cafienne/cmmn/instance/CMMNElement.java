@@ -9,9 +9,9 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.json.Value;
 
 public class CMMNElement<T extends CMMNElementDefinition> {
     private final Case caseInstance;

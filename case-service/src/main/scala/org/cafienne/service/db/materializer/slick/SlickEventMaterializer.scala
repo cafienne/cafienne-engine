@@ -28,7 +28,10 @@ trait SlickEventMaterializer[M <: ModelEvent[_], T <: SlickTransaction[M]] exten
             case commitEvent: TransactionEvent[_] => {
               transactionCache.remove(evt.getActorId)
               for {
-                commitTransaction <- transaction.commit(offsetStorage.storageName, newOffset, commitEvent)
+                commitTransaction <- {
+                  logger.whenDebugEnabled(logger.debug(s"Updating '${offsetStorage.storageName}' offset to $newOffset"))
+                  transaction.commit(offsetStorage.storageName, newOffset, commitEvent)
+                }
                 informPendingQueries <- {
                   lastModifiedRegistration.handle(commitEvent)
                   Future.successful(Done)

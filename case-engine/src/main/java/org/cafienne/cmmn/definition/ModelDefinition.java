@@ -50,6 +50,7 @@ public class ModelDefinition extends CMMNElementDefinition {
     /**
      * Returns the default expression language used in this model.
      * If that is not defined, it will take if from the DefinitionsDocument;
+     *
      * @return
      */
     public String getDefaultExpressionLanguage() {

@@ -7,12 +7,12 @@
  */
 package org.cafienne.cmmn.definition.sentry;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SentryDefinition extends CMMNElementDefinition {
     private final Collection<OnPartDefinition> onParts = new ArrayList<>();
@@ -21,7 +21,7 @@ public class SentryDefinition extends CMMNElementDefinition {
     public SentryDefinition(Element element, ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement, true);
         // XMLHelper.printXMLNode(element);
-        this.ifPart = parse("ifPart", IfPartDefinition.class, false);
+        this.ifPart = parse(IfPartDefinition.TAG_NAME, IfPartDefinition.class, false);
         parse("caseFileItemOnPart", CaseFileItemOnPartDefinition.class, onParts);
         parse("planItemOnPart", PlanItemOnPartDefinition.class, onParts);
 
@@ -30,7 +30,7 @@ public class SentryDefinition extends CMMNElementDefinition {
         }
 
         if (ifPart == null) {
-            // Create a default ifPart
+            // Create a default ifPart that always returns true
             ifPart = new IfPartDefinition(definition, this);
         }
     }

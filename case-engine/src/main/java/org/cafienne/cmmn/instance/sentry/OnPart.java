@@ -14,8 +14,9 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
-public abstract class OnPart<T extends OnPartDefinition, I extends TransitionGenerator> extends CMMNElement<T> {
+public abstract class OnPart<T extends OnPartDefinition, E extends StandardEvent<?, ?>, I extends TransitionGenerator<E>> extends CMMNElement<T> {
     protected final Criterion<?> criterion;
     protected Collection<I> connectedItems = new ArrayList<>();
 
@@ -28,13 +29,25 @@ public abstract class OnPart<T extends OnPartDefinition, I extends TransitionGen
         return criterion;
     }
 
+    @Override
+    public String toString() {
+        String printedItems = connectedItems.isEmpty() ? "No items '" + getSourceName() + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
+        return getStandardEvent() + " of " + printedItems;
+    }
+
+    protected String getSourceName() {
+        return getDefinition().getSourceDefinition().getName();
+    }
+
+    abstract Enum<?> getStandardEvent();
+
     abstract void connectToCase();
 
     abstract void releaseFromCase();
 
-    public abstract void inform(I item, StandardEvent event);
+    public abstract void inform(I item, E event);
 
     abstract ValueMap toJson();
 
-    abstract Element dumpMemoryStateToXML(Element sentryXML, boolean showConnectedPlanItems);
+    abstract void dumpMemoryStateToXML(Element sentryXML, boolean showConnectedPlanItems);
 }

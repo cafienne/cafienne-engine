@@ -194,7 +194,11 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         while (numberToRemove-- > 0) {
             // Now clean up the items that "vanished" while replacing;
             CaseFileItem removable = actualArrayItems.get(numberToReplace + numberToRemove);
-            getParent().removeChildItem(removable);
+            if (getParent() != null) {
+                getParent().removeChildItem(removable);
+            } else {
+                getCaseInstance().getCaseFile().removeChildItem(removable);
+            }
         }
     }
 

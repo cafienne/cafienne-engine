@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Transition;
@@ -14,23 +15,19 @@ import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
-public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>> {
+public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTransitioned, PlanItem<?>> {
     private boolean isActive;
     private Criterion<?> relatedExitCriterion;
-    private StandardEvent lastEvent;
+    private PlanItemTransitioned lastEvent;
 
     public PlanItemOnPart(Criterion<?> criterion, PlanItemOnPartDefinition definition) {
         super(criterion, definition);
     }
 
-    private Transition getStandardEvent() {
+    @Override
+    Transition getStandardEvent() {
         return getDefinition().getStandardEvent();
-    }
-
-    private String getSourceName() {
-        return getDefinition().getSourceDefinition().getName();
     }
 
     /**
@@ -89,7 +86,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
         connectedItems.forEach(planItem -> planItem.releaseOnPart(this));
     }
 
-    public void inform(PlanItem<?> item, StandardEvent event) {
+    public void inform(PlanItem<?> item, PlanItemTransitioned event) {
         addDebugInfo(() -> item + " informs " + criterion + " about transition " + event.getTransition());
         lastEvent = event;
         isActive = getStandardEvent().equals(event.getTransition());
@@ -110,12 +107,6 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     }
 
     @Override
-    public String toString() {
-        String printedItems = connectedItems.isEmpty() ? "'" + getSourceName()+"'" : connectedItems.stream().map(item -> item.getPath()).collect(Collectors.joining(","));
-        return getStandardEvent() +" of " + printedItems;
-    }
-
-    @Override
     ValueMap toJson() {
         return new ValueMap("planitem", getSourceName(),
             "active", isActive,
@@ -125,7 +116,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
     }
 
     @Override
-    Element dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {
+    void dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {
         Element onPartXML = parentElement.getOwnerDocument().createElement("onPart");
         parentElement.appendChild(onPartXML);
         onPartXML.setAttribute("active", "" + isActive);
@@ -143,6 +134,5 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItem<?>
             }
         }
 
-        return onPartXML;
     }
 }

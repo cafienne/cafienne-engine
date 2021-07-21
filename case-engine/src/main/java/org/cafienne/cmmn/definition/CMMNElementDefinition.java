@@ -49,6 +49,7 @@ public abstract class CMMNElementDefinition extends XMLElementDefinition {
     /**
      * If documentation is not present, we'll create dummy place holder to avoid nullpointerexceptions when reading the documentation.
      * Note that the dummy placeholder also converts a potential CMMN1.0 "description" attribute if that is still present
+     *
      * @return
      */
     private CMMNDocumentationDefinition parseDocumentation() {

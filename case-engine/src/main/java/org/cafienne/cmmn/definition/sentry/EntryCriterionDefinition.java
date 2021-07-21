@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.definition.sentry;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinition;
 import org.cafienne.cmmn.instance.Transition;
 import org.w3c.dom.Element;
@@ -31,12 +31,13 @@ public class EntryCriterionDefinition extends CriterionDefinition {
         } else if (parent instanceof DiscretionaryItemDefinition) {
             entryTransition = ((DiscretionaryItemDefinition) parent).getPlanItemDefinition().getEntryTransition();
         } else {
-            getCaseDefinition().addReferenceError(getContextDescription()+"Found an entry criterion inside a "+parent.getClass().getSimpleName()+", but that type is not supported for entry criteria");
+            getCaseDefinition().addReferenceError(getContextDescription() + "Found an entry criterion inside a " + parent.getClass().getSimpleName() + ", but that type is not supported for entry criteria");
         }
     }
 
     /**
      * Returns true if there is at least one on part in this definition
+     *
      * @return
      */
     public boolean hasOnParts() {

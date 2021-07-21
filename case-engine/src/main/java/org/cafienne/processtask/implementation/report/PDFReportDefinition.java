@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,9 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
 public class PDFReportDefinition extends SubProcessDefinition {
     final static String PDF_REPORT_DATA = "pdfReportData";
@@ -48,7 +50,7 @@ public class PDFReportDefinition extends SubProcessDefinition {
     }
 
     JasperDefinition getReportDefinition() {
-        return  mainReportDefinition;
+        return mainReportDefinition;
     }
 
     Collection<JasperSubReportDefinition> getSubReportDefinitions() {

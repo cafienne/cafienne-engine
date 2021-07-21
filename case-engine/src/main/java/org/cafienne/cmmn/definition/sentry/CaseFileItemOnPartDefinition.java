@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,13 +10,13 @@ package org.cafienne.cmmn.definition.sentry;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
+import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 public class CaseFileItemOnPartDefinition extends OnPartDefinition {
-    private CaseFileItemTransition standardEvent;
+    private final CaseFileItemTransition standardEvent;
     private final String sourceRef;
     private CaseFileItemDefinition source;
 
@@ -42,7 +42,7 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
 
     @Override
     public String getContextDescription() {
-        return source.getType() +"["+ source.getPath()+"]." + standardEvent;
+        return source.getType() + "[" + source.getPath() + "]." + standardEvent;
     }
 
     public CaseFileItemTransition getStandardEvent() {

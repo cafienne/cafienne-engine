@@ -7,9 +7,9 @@
  */
 package org.cafienne.processtask.implementation.calculation.definition;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
+import org.cafienne.json.Value;
 import org.cafienne.processtask.implementation.calculation.Calculation;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
@@ -50,6 +50,7 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
 
     /**
      * Utility method for stream steps. Assures a single input only and returns that name
+     *
      * @return
      */
     public InputReference assertOneInput() {

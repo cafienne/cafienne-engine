@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,6 +30,7 @@ public abstract class InlineSubProcessDefinition extends SubProcessDefinition {
      * Note, and inline SubProcessDefinition is ran within the thread of the creation of the task in the case.
      * Also, the createInstance() method will be invoked with the Task as parameter, instead of the ProcessTaskActor.
      * This method returns false by default - every process runs within it's own Akka Actor context.
+     *
      * @return
      */
     public final boolean isInline() {

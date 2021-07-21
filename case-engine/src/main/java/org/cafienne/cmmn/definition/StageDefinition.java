@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,8 +17,8 @@ import java.util.Collection;
 public class StageDefinition extends PlanFragmentDefinition {
     private final Collection<PlanItemDefinitionDefinition> planItemDefinitions = new ArrayList<>(); // Only in the root stage
 
-    private boolean autoComplete;
-    private PlanningTableDefinition planningTable;
+    private final boolean autoComplete;
+    private final PlanningTableDefinition planningTable;
 
     public StageDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -45,6 +45,7 @@ public class StageDefinition extends PlanFragmentDefinition {
 
     /**
      * Returns the definition of the discretionary item with the specified name - in this stage or it's human tasks (so not in one of it's children).
+     *
      * @param identifier
      * @return
      */
@@ -78,6 +79,6 @@ public class StageDefinition extends PlanFragmentDefinition {
 
     @Override
     public Stage<?> createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
-        return new Stage(id, index, itemDefinition, this, stage, caseInstance);
+        return new Stage<>(id, index, itemDefinition, this, stage, caseInstance);
     }
 }

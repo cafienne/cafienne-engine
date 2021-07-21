@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,8 +9,8 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.cafienne.processtask.definition.ProcessDefinition;
 import org.w3c.dom.Element;
 
 public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
@@ -37,8 +37,8 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
         return new ProcessTask(id, index, itemDefinition, this, stage);
     }
 
-	@Override
-	public ProcessDefinition getImplementationDefinition() {
-		return processDefinition;
-	}
+    @Override
+    public ProcessDefinition getImplementationDefinition() {
+        return processDefinition;
+    }
 }

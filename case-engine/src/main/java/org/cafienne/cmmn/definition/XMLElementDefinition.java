@@ -111,7 +111,7 @@ public abstract class XMLElementDefinition {
             if (typeClass.equals(String.class)) {
                 @SuppressWarnings("unchecked")
                 // we just checked it...
-                        T t = (T) xmlElement.getTextContent();
+                T t = (T) xmlElement.getTextContent();
                 return t;
             }
 
@@ -322,7 +322,7 @@ public abstract class XMLElementDefinition {
                 throw new RuntimeException("The implementation class " + implementationClassName + " must implement " + typeClass.getName() + ", but it does not");
             }
             @SuppressWarnings("unchecked") // Well, we just did, right?
-                    T implementationObject = (T) instantiateT(implementationElement, implementationClass);
+            T implementationObject = (T) instantiateT(implementationElement, implementationClass);
             return implementationObject;
         } catch (ClassNotFoundException e) {
             String msg = "Cannot find class to parse the custom " + elementName + " - " + implementationClassName;

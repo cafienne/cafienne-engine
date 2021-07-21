@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
         defaultControl = parse("defaultControl", ItemControlDefinition.class, false);
         if (defaultControl == null) {
             // Make an item control with the default values
-            defaultControl = new ItemControlDefinition(modelDefinition, parentElement);
+            defaultControl = new ItemControlDefinition(getModelDefinition(), this);
         }
     }
 

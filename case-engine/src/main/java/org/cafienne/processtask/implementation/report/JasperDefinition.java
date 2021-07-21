@@ -61,7 +61,7 @@ public class JasperDefinition extends CMMNElementDefinition {
 
     @Override
     public String toString() {
-        return "Report definition '"+name+"'";
+        return "Report definition '" + name + "'";
     }
 
     private JasperReport compile(String xml) throws JRException {

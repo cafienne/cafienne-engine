@@ -1,16 +1,14 @@
-package org.cafienne.cmmn.instance;
+package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
-import org.cafienne.cmmn.instance.sentry.OnPart;
-import org.cafienne.cmmn.instance.sentry.StandardEvent;
-import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart<?,I>> {
+public class TransitionPublisher<E extends StandardEvent<?,?>, I extends TransitionGenerator<E>, P extends OnPart<?, E, I>> {
     protected final I item;
-    private final List<StandardEvent> transitions = new ArrayList<>();
+    private final List<E> transitions = new ArrayList<>();
     private final List<P> connectedEntryCriteria = new ArrayList<>();
     private final List<P> connectedExitCriteria = new ArrayList<>();
 
@@ -23,7 +21,7 @@ public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart
      * It inherits the already bound entry and exit criteria.
      * @param bootstrapPublisher
      */
-    public TransitionPublisher(TransitionPublisher<I, P> bootstrapPublisher) {
+    protected TransitionPublisher(TransitionPublisher<E, I, P> bootstrapPublisher) {
         // Release bootstrap publishers' events. This potentially releases some of the entry and exit criteria
         bootstrapPublisher.releaseBootstrapEvents();
         // After release of bootstrap events, we start listening ourselves, with updated set of entry and exit criteria
@@ -32,17 +30,17 @@ public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart
         this.connectedExitCriteria.addAll(bootstrapPublisher.connectedExitCriteria);
     }
 
-    public void addEvent(StandardEvent event) {
+    public void addEvent(E event) {
         transitions.add(0, event);
         updateItemState(event);
         informSentryNetwork(event);
     }
 
-    protected void updateItemState(StandardEvent event) {
-        item.updateState(event, this);
+    protected void updateItemState(E event) {
+        item.updateStandardEvent(event);
     }
 
-    protected void informSentryNetwork(StandardEvent event) {
+    protected void informSentryNetwork(E event) {
         addDebugInfo(() -> "Informing sentry network about " + event.getTransition() +" in " + item.getDescription());
         item.getCaseInstance().getSentryNetwork().handleTransition(event, this);
     }
@@ -86,7 +84,7 @@ public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart
         list.add(i, onPart);
     }
 
-    public void informEntryCriteria(StandardEvent transition) {
+    public void informEntryCriteria(E transition) {
         if (! connectedEntryCriteria.isEmpty()) {
             addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() +" entry criteria that listen to item " + item);
         }
@@ -94,7 +92,7 @@ public class TransitionPublisher<I extends TransitionGenerator, P extends OnPart
         new ArrayList<>(connectedEntryCriteria).forEach(onPart -> onPart.inform(item, transition));
     }
 
-    public void informExitCriteria(StandardEvent transition) {
+    public void informExitCriteria(E transition) {
         if (! connectedExitCriteria.isEmpty()) {
             addDebugInfo(() -> "Informing " + connectedExitCriteria.size() +" exit criteria that listen to item " + item);
         }

@@ -122,6 +122,7 @@ public class DefinitionsDocument implements Serializable {
     /**
      * Returns the default expression language used in this set of models.
      * If not defined, it returns an empty string.
+     *
      * @return
      */
     public String getDefaultExpressionLanguage() {
@@ -246,9 +247,8 @@ public class DefinitionsDocument implements Serializable {
     /**
      * Returns the element with the given identifier if it exists; does a cast for you.
      *
-     * @param guid The id that the element
+     * @param guid   The id that the element
      * @param tClass The class that the element must match with
-     *
      * @return
      */
     public <T extends CMMNElementDefinition> T getElement(String guid, Class<T> tClass) {

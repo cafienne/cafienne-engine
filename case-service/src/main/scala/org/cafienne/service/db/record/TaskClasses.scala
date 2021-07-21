@@ -27,7 +27,7 @@ final case class TaskRecord(id: String,
       try {
         JSONReader.parse(value)
       } catch {
-        case _ => new StringValue(value)
+        case _: Throwable => new StringValue(value)
       }
     }
   }

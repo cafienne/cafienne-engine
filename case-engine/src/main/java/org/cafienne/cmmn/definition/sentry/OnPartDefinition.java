@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,5 +20,5 @@ public abstract class OnPartDefinition extends CMMNElementDefinition {
 
     public abstract CMMNElementDefinition getSourceDefinition();
 
-    public abstract OnPart<?, ?> createInstance(Criterion<?> criterion);
+    public abstract OnPart<?, ?, ?> createInstance(Criterion<?> criterion);
 }

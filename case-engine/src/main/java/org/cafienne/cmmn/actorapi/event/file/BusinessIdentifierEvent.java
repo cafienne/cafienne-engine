@@ -41,7 +41,7 @@ public abstract class BusinessIdentifierEvent extends CaseEvent {
             // Resolve the path on the case file
             // Have to recover it this way in order to overcome fact that Path.definition is not serializable
             CaseFileItem item = path.resolve(caseInstance);
-            item.updateState(this);
+            item.publishTransition(this);
         } catch (InvalidPathException shouldNotHappen) {
             logger.error("Could not recover path on case instance?!", shouldNotHappen);
         }

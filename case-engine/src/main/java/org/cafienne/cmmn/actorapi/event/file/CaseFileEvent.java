@@ -8,14 +8,15 @@
 package org.cafienne.cmmn.actorapi.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +115,7 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         try {
             // Resolve the path on the case file
             caseFileItem = path.resolve(caseInstance);
-            caseFileItem.updateState(this);
+            caseFileItem.publishTransition(this);
         } catch (InvalidPathException shouldNotHappen) {
             logger.error("Could not recover path on case instance?!", shouldNotHappen);
         }

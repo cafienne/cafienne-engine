@@ -234,8 +234,9 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
 
     public CaseTeam createSubCaseTeam(CaseDefinition subCaseDefinition) {
         List<CaseTeamMember> members = new ArrayList<>();
+        CaseTeamDefinition subCaseTeamDefinition = subCaseDefinition.getCaseTeamModel();
         this.getMembers().forEach(teamMember -> {
-            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).filter(name -> subCaseDefinition.getCaseTeamModel().getCaseRole(name)!=null).collect(Collectors.toList()).toArray(new String[]{});
+            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).filter(name -> subCaseTeamDefinition.getCaseRole(name) != null).collect(Collectors.toList()).toArray(new String[]{});
             CaseTeamMember member = CaseTeamMember.apply(teamMember.key, roleNames, teamMember.isOwner());
             members.add(member);
         });

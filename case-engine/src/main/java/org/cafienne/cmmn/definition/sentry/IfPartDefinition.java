@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,12 +14,14 @@ import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 public class IfPartDefinition extends ConstraintDefinition {
+    static final String TAG_NAME = "ifPart";
+
     public IfPartDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
     }
 
     IfPartDefinition(ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
-        super(modelDefinition, parentElement, true); // Default ifPart: evaluates always to true
+        super(modelDefinition, parentElement, TAG_NAME, true); // Default ifPart: evaluates always to true
     }
 
     public boolean evaluate(Criterion<?> criterion) {

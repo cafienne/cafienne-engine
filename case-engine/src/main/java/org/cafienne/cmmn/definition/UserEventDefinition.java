@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,7 +8,10 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Stage;
+import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.UserEvent;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;

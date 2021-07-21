@@ -1,14 +1,12 @@
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.cmmn.instance.TransitionPublisher;
-import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
-import org.cafienne.cmmn.instance.sentry.StandardEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BootstrapCaseFileTransitionPublisher extends TransitionPublisher<CaseFileItem, CaseFileItemOnPart> {
-    private final List<StandardEvent> bootstrapEvents = new ArrayList<>();
+public class BootstrapCaseFileTransitionPublisher extends CaseFileTransitionPublisher {
+    private final List<CaseFileEvent> bootstrapEvents = new ArrayList<>();
 
     BootstrapCaseFileTransitionPublisher(CaseFileItem item) {
         super(item);
@@ -16,7 +14,7 @@ public class BootstrapCaseFileTransitionPublisher extends TransitionPublisher<Ca
     }
 
     @Override
-    public void addEvent(StandardEvent event) {
+    public void addEvent(CaseFileEvent event) {
         addDebugInfo(() -> "Adding delayed event " + event.getTransition() + " to myself");
         bootstrapEvents.add(event);
         super.updateItemState(event);

@@ -9,8 +9,8 @@ import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record._
 import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
 
-import scala.concurrent.Future
-
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.{ExecutionContext, Future}
 
 class SlickRecordsPersistence
   extends RecordsPersistence
@@ -21,41 +21,64 @@ class SlickRecordsPersistence
 
   import dbConfig.profile.api._
 
-  implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
+  implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
-  val caseInstanceQuery = TableQuery[CaseInstanceTable]
-  val caseInstanceDefinitionQuery = TableQuery[CaseInstanceDefinitionTable]
-  val caseFileQuery = TableQuery[CaseFileTable]
-  val identifierQuery = TableQuery[CaseBusinessIdentifierTable]
+  val dbStatements = ListBuffer[DBIO[_]]()
 
-  val planItemTableQuery = TableQuery[PlanItemTable]
-  val planItemHistoryTableQuery = TableQuery[PlanItemHistoryTable]
-  val taskQuery = TableQuery[TaskTable]
-  val caseInstanceRoleQuery = TableQuery[CaseInstanceRoleTable]
-  val caseInstanceTeamMemberQuery = TableQuery[CaseInstanceTeamMemberTable]
-  val tenantsQuery = TableQuery[TenantTable]
-  val tenantOwnersQuery = TableQuery[TenantOwnersTable]
-  val rolesQuery = TableQuery[UserRoleTable]
-  val offsetQuery = TableQuery[OffsetStoreTable]
-
-  override def bulkUpdate(records: Seq[AnyRef]) = {
-    val actions = records.collect {
-      case value: TaskRecord => taskQuery.insertOrUpdate(value)
-      case value: PlanItemRecord => planItemTableQuery.insertOrUpdate(value)
-      case value: PlanItemHistoryRecord => planItemHistoryTableQuery.insertOrUpdate(value) // Enable restarting with noOffset
-      case value: CaseRecord => caseInstanceQuery.insertOrUpdate(value)
-      case value: CaseDefinitionRecord => caseInstanceDefinitionQuery.insertOrUpdate(value)
-      case value: CaseFileRecord => caseFileQuery.insertOrUpdate(value)
-      case value: CaseBusinessIdentifierRecord => identifierQuery.insertOrUpdate(value)
-      case value: CaseRoleRecord => caseInstanceRoleQuery.insertOrUpdate(value)
-      case value: CaseTeamMemberRecord => caseInstanceTeamMemberQuery.insertOrUpdate(value)
-      case value: OffsetRecord => offsetQuery.insertOrUpdate(value)
-      case value: UserRoleRecord => rolesQuery.insertOrUpdate(value)
-      case value: TenantRecord => tenantsQuery.insertOrUpdate(value)
-      case value: TenantOwnerRecord => tenantOwnersQuery.insertOrUpdate(value)
-      case other => throw new IllegalArgumentException("Bulk update not supported for objects of type " + other.getClass.getName)
+  //
+  override def upsert(record: AnyRef) = {
+    if (record != null) {
+      val upsertStatement = record match {
+        case value: TaskRecord => TableQuery[TaskTable].insertOrUpdate(value)
+        case value: PlanItemRecord => TableQuery[PlanItemTable].insertOrUpdate(value)
+        case value: PlanItemHistoryRecord => TableQuery[PlanItemHistoryTable].insertOrUpdate(value)
+        case value: CaseRecord => TableQuery[CaseInstanceTable].insertOrUpdate(value)
+        case value: CaseDefinitionRecord => TableQuery[CaseInstanceDefinitionTable].insertOrUpdate(value)
+        case value: CaseFileRecord => TableQuery[CaseFileTable].insertOrUpdate(value)
+        case value: CaseBusinessIdentifierRecord => TableQuery[CaseBusinessIdentifierTable].insertOrUpdate(value)
+        case value: CaseRoleRecord => TableQuery[CaseInstanceRoleTable].insertOrUpdate(value)
+        case value: CaseTeamMemberRecord => TableQuery[CaseInstanceTeamMemberTable].insertOrUpdate(value)
+        case value: OffsetRecord => TableQuery[OffsetStoreTable].insertOrUpdate(value)
+        case value: UserRoleRecord => TableQuery[UserRoleTable].insertOrUpdate(value)
+        case value: TenantRecord => TableQuery[TenantTable].insertOrUpdate(value)
+        case value: TenantOwnerRecord => TableQuery[TenantOwnersTable].insertOrUpdate(value)
+        case other => throw new IllegalArgumentException("Upsert not supported for objects of type " + other.getClass.getName)
+      }
+      addStatement(upsertStatement)
     }
-    db.run(DBIO.sequence(actions).transactionally).map { _ => Done }
+  }
+
+  override def delete(record: AnyRef) = {
+    if (record != null) {
+      val upsertStatement = record match {
+        case value: TaskRecord => TableQuery[TaskTable].filter(_.id === value.id).delete
+        case value: PlanItemRecord => TableQuery[PlanItemTable].filter(_.id === value.id).delete
+        case value: PlanItemHistoryRecord => TableQuery[PlanItemHistoryTable].filter(_.id === value.id).delete
+        case value: CaseRecord => TableQuery[CaseInstanceTable].filter(_.id === value.id).delete
+        case value: CaseDefinitionRecord => TableQuery[CaseInstanceDefinitionTable].filter(_.caseInstanceId === value.caseInstanceId).delete
+        case value: CaseFileRecord => TableQuery[CaseFileTable].filter(_.caseInstanceId === value.caseInstanceId).delete
+        case value: CaseBusinessIdentifierRecord => TableQuery[CaseBusinessIdentifierTable].filter(_.caseInstanceId === value.caseInstanceId).filter(_.name === value.name).delete
+        case value: CaseRoleRecord => TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === value.caseInstanceId).filter(_.roleName === value.roleName).delete
+        case value: CaseTeamMemberRecord => TableQuery[CaseInstanceTeamMemberTable].filter(r => r.caseInstanceId === value.caseInstanceId && r.caseRole === value.caseRole && r.memberId === value.memberId && r.isTenantUser === value.isTenantUser).delete
+        case value: UserRoleRecord => TableQuery[UserRoleTable].filter(r => r.userId === value.userId && r.tenant === value.tenant && r.role_name === value.role_name).delete
+        case value: TenantOwnerRecord => TableQuery[TenantOwnersTable].filter(_.tenant === value.tenant).filter(_.userId === value.userId).delete
+        case other => throw new IllegalArgumentException("Delete not supported for objects of type " + other.getClass.getName)
+      }
+      addStatement(upsertStatement)
+    }
+  }
+
+  def addStatement(action: dbConfig.profile.api.DBIO[_]): Unit = {
+    dbStatements += action
+  }
+
+  def commit(): Future[Done] = {
+    val transaction = dbStatements.toSeq
+    // Clear statement buffer (the "transaction")
+    dbStatements.clear()
+
+    // Run the actions
+    db.run(DBIO.sequence(transaction).transactionally).map { _ => Done }
   }
 
   override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = {
@@ -106,10 +129,10 @@ class SlickRecordsPersistence
               val newUsersAndRoles: Seq[UserRoleRecord] = {
                 // New user record
                 Seq(UserRoleRecord(newMemberId, tenant, role_name = "", name = name, email = email, isOwner = isOwner, enabled = accountIsEnabled)) ++
-                // Active roles of the user
-                distinctActiveRoles.map(roleName => UserRoleRecord(newMemberId, tenant, role_name = roleName, name = "", email = "", isOwner = false, enabled = true)) ++
-                // Inactive roles of the user
-                distinctInactiveRoles.map(roleName => UserRoleRecord(newMemberId, tenant, role_name = roleName, name = "", email = "", isOwner = false, enabled = false))
+                  // Active roles of the user
+                  distinctActiveRoles.map(roleName => UserRoleRecord(newMemberId, tenant, role_name = roleName, name = "", email = "", isOwner = false, enabled = true)) ++
+                  // Inactive roles of the user
+                  distinctInactiveRoles.map(roleName => UserRoleRecord(newMemberId, tenant, role_name = roleName, name = "", email = "", isOwner = false, enabled = false))
               }
               newUsersAndRoles.map(record => TableQuery[UserRoleTable].insertOrUpdate(record))
             })
@@ -131,7 +154,7 @@ class SlickRecordsPersistence
     newUserIds.map(newUserId => (newUserId, info.filter(_.newUserId == newUserId).map(_.existingUserId).toSet))
   }
 
-  private def constructCaseTeamUserIdUpdates(caseId: String, info: Seq[NewUserInformation]) = {
+  private def constructCaseTeamUserIdUpdates(caseId: String, info: Seq[NewUserInformation]): Future[Seq[DBIO[_]]] = {
     val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
     val hasNoDuplicates = infoPerNewUserId.exists(update => update._2.size <= 1)
 
@@ -233,17 +256,17 @@ class SlickRecordsPersistence
     val caseteamUpdates = constructCaseTeamUserIdUpdates(caseId, info)
     caseteamUpdates.flatMap(sql => {
       db.run(DBIO.sequence(updateQueries ++ sql).transactionally).map(_ => {
-//        println(s"---- updated case $caseId")
+        //        println(s"---- updated case $caseId")
         Done
       })
     })
   }
 
   //  var nr = 0L
-  def getOffsetRecord(offsetName: String, offset: Offset) = {
+  private def getOffsetRecord(offsetName: String, offset: Offset): Seq[DBIO[_]] = {
     //    println(s"$nr: Updating $offsetName to $offset")
     //    nr += 1
-    Seq(offsetQuery.insertOrUpdate(OffsetRecord(offsetName, offset)))
+    Seq(TableQuery[OffsetStoreTable].insertOrUpdate(OffsetRecord(offsetName, offset)))
   }
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {

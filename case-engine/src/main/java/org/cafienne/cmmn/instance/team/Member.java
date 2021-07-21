@@ -62,7 +62,7 @@ public class Member extends CMMNElement<CaseTeamDefinition> {
     }
 
     private void addRole(String roleName) {
-        CaseRoleDefinition role = getCaseInstance().getDefinition().getCaseTeamModel().getCaseRole(roleName);
+        CaseRoleDefinition role = getDefinition().getCaseRole(roleName);
         roles.add(role);
     }
 

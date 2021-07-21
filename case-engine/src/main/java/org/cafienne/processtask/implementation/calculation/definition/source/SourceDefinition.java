@@ -30,6 +30,7 @@ public interface SourceDefinition {
 
     /**
      * Return sources that this source is dependent on.
+     *
      * @return
      */
     default Collection<InputReference> getInputs() {

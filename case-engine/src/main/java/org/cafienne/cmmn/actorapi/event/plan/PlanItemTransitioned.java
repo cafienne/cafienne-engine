@@ -95,6 +95,6 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
 
     @Override
     protected void updatePlanItemState(PlanItem<?> planItem) {
-        planItem.updateState(this);
+        planItem.publishTransition(this);
     }
 }

@@ -17,7 +17,7 @@ import slick.sql.SqlProfile.ColumnOption.SqlType
   * Includes some helpers for queries and MS SQL Server support
   */
 trait CafienneJDBCConfig {
-  val dbConfig: DatabaseConfig[JdbcProfile]
+  lazy val dbConfig: DatabaseConfig[JdbcProfile] = ???
 
   lazy val db = dbConfig.db
 

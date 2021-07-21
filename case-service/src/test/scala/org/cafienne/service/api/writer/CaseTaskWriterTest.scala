@@ -1,20 +1,21 @@
 package org.cafienne.service.api.writer
 
-import java.time.Instant
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.instance.{State, Transition}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
+import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
-import org.cafienne.service.db.record.CaseRecord
-import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.cafienne.service.db.record._
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.wordspec.AnyWordSpecLike
 
+import java.time.Instant
 import scala.concurrent.duration._
 
 class CaseTaskWriterTest
@@ -66,8 +67,14 @@ class CaseTaskWriterTest
 
       Thread.sleep(2000)
       eventually {
+        println(s"Found ${persistence.records.length} records, of types ${persistence.records.map(_.getClass.getSimpleName).toSet.mkString(",")}")
         persistence.records.length shouldBe 7
-        persistence.records.exists(x => x.isInstanceOf[CaseRecord]) shouldBe (true)
+        persistence.records.count(_.isInstanceOf[CaseDefinitionRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[CaseRoleRecord]) shouldBe 2
+        persistence.records.count(_.isInstanceOf[CaseRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[CaseFileRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[PlanItemHistoryRecord]) shouldBe 1  // so ... then why is this called CaseTaskWriterTest???
+        persistence.records.count(_.isInstanceOf[OffsetRecord]) shouldBe 1
       }
     }
   }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,12 +7,12 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
+import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.cafienne.util.StringTemplate;
@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
+ *
  */
 public class MailDefinition extends SubProcessDefinition {
     private final StringTemplate subject;
@@ -76,7 +77,7 @@ public class MailDefinition extends SubProcessDefinition {
         if (body != null) {
             mailParameters.put("body", body.resolve(input));
         }
-        if (! attachmentList.isEmpty()) {
+        if (!attachmentList.isEmpty()) {
             attachmentList.forEach(attachmentTemplate -> mailParameters.withArray("attachments").add(attachmentTemplate.resolve(input)));
         }
 

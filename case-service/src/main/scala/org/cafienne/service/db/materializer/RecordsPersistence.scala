@@ -8,7 +8,14 @@ import org.cafienne.service.db.record._
 import scala.concurrent.Future
 
 trait RecordsPersistence {
-  def bulkUpdate(records: Seq[AnyRef]): Future[Done]
+
+  //  def upsert[M: AnyRef, T <: CafienneTable[M]](record: M)
+  // Not sure how to get something like above working here, would actually be great if we can achieve that (use ClassTag or so?)
+  def upsert(record: AnyRef): Unit
+
+  def delete(record: AnyRef): Unit
+
+  def commit(): Future[Done]
 
   def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]]
 

@@ -13,7 +13,6 @@ import org.cafienne.service.db.materializer.slick.SlickTransaction
 import org.cafienne.tenant.actorapi.event._
 import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: RecordsPersistence, userCache: IdentityProvider)(implicit val executionContext: ExecutionContext) extends SlickTransaction[TenantEvent] with LazyLogging {
@@ -74,14 +73,13 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
 
   override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
-    val records = ListBuffer.empty[AnyRef]
-    this.users.values.foreach(role => records += role)
-    records ++= tenants.values
+    this.users.values.foreach(record => persistence.upsert(record))
+    this.tenants.values.foreach(record => persistence.upsert(record))
 
     // Even if there are no new records, we will still update the offset store
-    records += OffsetRecord(offsetName, offset)
+    persistence.upsert(OffsetRecord(offsetName, offset))
 
-    persistence.bulkUpdate(records.filter(r => r != null).toSeq)
+    persistence.commit()
   }
 
   private def getUserRoleRecord(key: UserRoleKey): Future[UserRoleRecord] = {

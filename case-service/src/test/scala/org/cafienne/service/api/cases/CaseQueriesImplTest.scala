@@ -1,21 +1,21 @@
 package org.cafienne.service.api.cases
 
-import java.time.Instant
-import java.util.UUID
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.db.query.CaseQueriesImpl
-import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
-import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
 import org.cafienne.service.api.writer.TestConfig
+import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
+import org.cafienne.service.db.query.CaseQueriesImpl
 import org.cafienne.service.db.query.filter.CaseFilter
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers
 
+import java.time.Instant
+import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -63,8 +63,8 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   override def beforeAll {
     QueryDB.verifyConnectivity()
     val records = Seq(activeCase, planItem1_1, terminatedCase, completedCase, planItem2_1, planItemHistory2_1) ++ caseTeamMemberRecords ++ TestIdentityFactory.asDatabaseRecords(user)
-    updater.bulkUpdate(records)
-    //    Await.ready(Future.sequence(caseQueries.bulkUpdate(records), 1.seconds)
+    records.foreach(record => updater.upsert(record))
+    Await.ready(updater.commit(), 1.seconds)
   }
 
   // *******************************************************************************************************************

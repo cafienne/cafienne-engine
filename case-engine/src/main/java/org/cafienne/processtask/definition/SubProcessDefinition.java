@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,17 +7,17 @@
  */
 package org.cafienne.processtask.definition;
 
-import java.util.*;
-
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
+import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.json.ValueMap;
+import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
+
+import java.util.*;
 
 /**
  * Process Tasks in the engine can be implemented by extending {@link SubProcess}.
@@ -59,15 +59,15 @@ import org.w3c.dom.Element;
  */
 public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
-    private final Collection<SubProcessMapping> mappings = new ArrayList<>();
-    private final Collection<SubProcessMapping> successMappings = new ArrayList<>();
-    private final Collection<SubProcessMapping> failureMappings = new ArrayList<>();
-    private final boolean isAsync;
     /**
      * Default exception parameter, can be used to store Throwables.
      * Note: these parameters are convention only.
      */
     public final static String EXCEPTION_PARAMETER = "exception";
+    private final Collection<SubProcessMapping> mappings = new ArrayList<>();
+    private final Collection<SubProcessMapping> successMappings = new ArrayList<>();
+    private final Collection<SubProcessMapping> failureMappings = new ArrayList<>();
+    private final boolean isAsync;
 
     protected SubProcessDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
@@ -84,6 +84,7 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      * Note, and inline SubProcessDefinition is ran within the thread of the creation of the task in the case.
      * Also, the createInstance() method will be invoked with the Task as parameter, instead of the ProcessTaskActor.
      * This method returns false by default - every process runs within it's own Akka Actor context.
+     *
      * @return
      */
     public boolean isInline() {
@@ -133,6 +134,7 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
     /**
      * Returns the default exception parameter name.
+     *
      * @return
      */
     protected Set<String> getExceptionParameterNames() {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -85,7 +85,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     }
 
     /**
-     * Calculates whether the discretionary item is currently applicable within the context of 
+     * Calculates whether the discretionary item is currently applicable within the context of
      * the containing plan item. Note: the containing plan item must be of type Stage or HumanTask.
      *
      * @param containingPlanItem
@@ -112,6 +112,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
 
     /**
      * Checks if the discretionary item is already planned
+     *
      * @param containingPlanItem
      * @return
      */
@@ -155,6 +156,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
 
     /**
      * Create a new instance of this definition inside the specified parent.
+     *
      * @param parent The stage or task in which the discretionary item can be planned
      * @return
      */

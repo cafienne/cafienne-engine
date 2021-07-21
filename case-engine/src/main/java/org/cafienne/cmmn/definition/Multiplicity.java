@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,17 +9,16 @@ package org.cafienne.cmmn.definition;
 
 /**
  * Enum specifying the multiplicity of a case file item.
- *
  */
 public enum Multiplicity {
     ZeroOrOne, ZeroOrMore, ExactlyOne, OneOrMore, Unspecified, Unknown;
-    
+
     /**
      * Indicates whether this multiplicity is iterable (i.e., whether the case file item may contain multiple contents or just one)
+     *
      * @return
      */
-    public boolean isIterable()
-    {
+    public boolean isIterable() {
         return this == ZeroOrMore || this == OneOrMore;
     }
 }

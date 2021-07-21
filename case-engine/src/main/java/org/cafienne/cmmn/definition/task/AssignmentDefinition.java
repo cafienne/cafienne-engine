@@ -16,7 +16,7 @@ public class AssignmentDefinition extends ConstraintDefinition {
         String parentType = getParentElement().getType();
         String parentId = getParentElement().getId();
         // This will return something like "The required rule in HumanTask 'abc'
-        return "The "+getType()+" in " + parentType + " '" + parentId + "'";
+        return "The " + getType() + " in " + parentType + " '" + parentId + "'";
     }
 
     public String evaluate(HumanTask task) {
