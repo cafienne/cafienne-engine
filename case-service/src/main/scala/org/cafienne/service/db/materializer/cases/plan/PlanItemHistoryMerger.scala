@@ -2,6 +2,7 @@ package org.cafienne.service.db.materializer.cases.plan
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseModified
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.service.db.record.PlanItemHistoryRecord
 
@@ -64,6 +65,20 @@ object PlanItemHistoryMerger extends LazyLogging {
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
         ))
+      case event: PlanItemMigrated => {
+        Some(PlanItemHistoryRecord(
+          id = event.getId,
+          planItemId = event.getPlanItemId,
+          caseInstanceId = event.getCaseInstanceId(),
+          index = event.index,
+          tenant = event.tenant,
+          name = event.planItemName,
+          lastModified = null,
+          modifiedBy = event.getUser.id,
+          eventType = evt.getClass.getName,
+          sequenceNr = evt.getSequenceNumber
+        ))
+      }
       case other =>
         logger.warn(s"Cannot handle plan item events of type ${evt.getClass.getName}")
         None

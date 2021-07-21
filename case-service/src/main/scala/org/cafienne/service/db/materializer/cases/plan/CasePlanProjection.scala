@@ -3,6 +3,7 @@ package org.cafienne.service.db.materializer.cases.plan
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseModified
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.service.db.materializer.RecordsPersistence
@@ -40,6 +41,7 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
               case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RepetitionRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case evt: RequiredRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
+              case evt: PlanItemMigrated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
               case _ => // Nothing to do for the other events
             }
             Done

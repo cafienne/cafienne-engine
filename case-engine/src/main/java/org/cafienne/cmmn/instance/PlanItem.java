@@ -9,7 +9,9 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
 import org.cafienne.cmmn.actorapi.event.plan.*;
+import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
@@ -598,6 +600,31 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         MigDevConsole("\n==================== Giving " + this.getClass().getSimpleName() + " " + getName() + " a new item definition:\n");
         super.migrateDefinition(newDefinition);
         setItemDefinition(newItemDefinition);
+        if (getState() != State.Null) {
+            if (hasNewNameOrId()) {
+                // Add a migration event if name or id has changed
+                addEvent(new PlanItemMigrated(this));
+            }
+            // Check if there is a need to evaluate required rule again
+            if (!getState().isSemiTerminal() || getState() == State.Failed) {
+                if (hasNewRequiredRule()) {
+                    evaluateRequiredRule();
+                }
+            }
+        }
+    }
+
+    private boolean hasNewNameOrId() {
+        String oldName = getPreviousItemDefinition().getName();
+        String oldId = getPreviousItemDefinition().getId();
+        String newName = getItemDefinition().getName();
+        String newId = getItemDefinition().getId();
+        return !oldName.equals(newName) || !oldId.equals(newId);
+    }
+
+    private boolean hasNewRequiredRule() {
+        ConstraintDefinition oldRequiredRule = getPreviousItemDefinition().getPlanItemControl().getRequiredRule();
+        return getItemDefinition().getPlanItemControl().getRequiredRule().differs(oldRequiredRule);
     }
 
     @Override

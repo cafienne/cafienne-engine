@@ -6,10 +6,8 @@ import org.cafienne.actormodel.event.SentryEvent;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.file.*;
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
+import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.*;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
@@ -61,6 +59,7 @@ public class EventSerializer extends CafienneSerializer {
     private static void registerCasePlanEvents() {
         addManifestWrapper(PlanItemCreated.class, PlanItemCreated::new);
         addManifestWrapper(PlanItemTransitioned.class, PlanItemTransitioned::new);
+        addManifestWrapper(PlanItemMigrated.class, PlanItemMigrated::new);
         addManifestWrapper(RepetitionRuleEvaluated.class, RepetitionRuleEvaluated::new);
         addManifestWrapper(RequiredRuleEvaluated.class, RequiredRuleEvaluated::new);
         addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
