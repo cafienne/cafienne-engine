@@ -21,19 +21,60 @@ import java.util.Map;
 /**
  * Base class for parsing XML elements defined in the CMMN specification.
  */
-public abstract class XMLElementDefinition {
+public abstract class XMLElementDefinition implements DefinitionElement {
     protected final static String NAMESPACE_URI = "org.cafienne";
+    private final String id;
+    private String name;
 
-    private final ModelDefinition definition;
+    private final ModelDefinition modelDefinition;
     private final XMLElementDefinition parentElement;
     private final Element element;
 
     private static final String EXTENSIONELEMENTS = "extensionElements";
 
-    protected XMLElementDefinition(Element element, ModelDefinition definition, XMLElementDefinition parentElement) {
+    protected XMLElementDefinition(Element element, ModelDefinition modelDefinition, XMLElementDefinition parentElement, boolean... identifierRequired) {
         this.element = element;
-        this.definition = definition;
+        this.modelDefinition = modelDefinition;
         this.parentElement = parentElement;
+        this.id = parseAttribute("id", false);
+        this.name = parseAttribute("name", false);
+        if (identifierRequired.length > 0 && identifierRequired[0] == true) {
+            if (this.getName().isEmpty() && this.getId().isEmpty()) {
+                getModelDefinition().addDefinitionError("An element of type '" + printElement() + "' does not have an identifier " + XMLHelper.printXMLNode(element));
+            }
+        }
+    }
+
+    /**
+     * Returns the name of the element. Can be used in combination with the id of the element to resolve an XSD IDREF to this element.
+     *
+     * @return
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Subclasses are allowed to give a different name than what is specified in the element itself.
+     *
+     * @param name
+     */
+    protected void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Returns the identifier of the element. Can be used in combination with the name of the element to resolve an XSD IDREF to this element.
+     *
+     * @return
+     */
+    public String getId() {
+        if (this.id == null || this.id.isEmpty()) {
+            return this.name;
+        } else {
+            return this.id;
+        }
     }
 
     /**
@@ -53,7 +94,7 @@ public abstract class XMLElementDefinition {
      * @return
      */
     public ModelDefinition getModelDefinition() {
-        return definition;
+        return modelDefinition;
     }
 
     public CaseDefinition getCaseDefinition() {
@@ -396,9 +437,4 @@ public abstract class XMLElementDefinition {
             return "";
         }
     }
-
-    public String getName() {
-        return "";
-    }
-
 }

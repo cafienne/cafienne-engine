@@ -27,20 +27,10 @@ import java.io.IOException;
 public abstract class CMMNElementDefinition extends XMLElementDefinition {
     private final static Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
     public final CMMNDocumentationDefinition documentation;
-    private final String id;
-    private String name;
 
     protected CMMNElementDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement, boolean... identifierRequired) {
-        super(element, modelDefinition, parentElement);
-
-        this.name = parseAttribute("name", false);
-        this.id = parseAttribute("id", false);
+        super(element, modelDefinition, parentElement, identifierRequired);
         this.documentation = parseDocumentation();
-        if (identifierRequired.length > 0 && identifierRequired[0] == true) {
-            if (this.name.isEmpty() && this.id.isEmpty()) {
-                getModelDefinition().addDefinitionError("An element of type '" + printElement() + "' does not have an identifier " + XMLHelper.printXMLNode(element));
-            }
-        }
         if (modelDefinition != null) {
             modelDefinition.addCMMNElement(this);
         }
@@ -59,37 +49,6 @@ public abstract class CMMNElementDefinition extends XMLElementDefinition {
         }
 
         return documentation;
-    }
-
-    /**
-     * Subclasses are allowed to give a different name than what is specified in the element itself.
-     *
-     * @param name
-     */
-    protected void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Returns the name of the element. Can be used in combination with the id of the element to resolve an XSD IDREF to this element.
-     *
-     * @return
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the identifier of the element. Can be used in combination with the name of the element to resolve an XSD IDREF to this element.
-     *
-     * @return
-     */
-    public String getId() {
-        if (this.id == null || this.id.isEmpty()) {
-            return this.name;
-        } else {
-            return this.id;
-        }
     }
 
     /**
@@ -133,14 +92,6 @@ public abstract class CMMNElementDefinition extends XMLElementDefinition {
             ancestor = ancestor.getParentElement();
         }
         return (StageDefinition) ancestor;
-    }
-
-    public String getType() {
-        String simpleName = getClass().getSimpleName();
-        if (simpleName.endsWith("Definition")) {
-            simpleName = simpleName.substring(0, simpleName.length() - "Definition".length());
-        }
-        return simpleName;
     }
 
     public static <T extends CMMNElementDefinition> T fromJSON(String sourceClassName, ValueMap json, Class<T> tClass) {
