@@ -97,7 +97,7 @@ class SlickRecordsPersistence
     })
 
     val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
-    val hasNoDuplicates = infoPerNewUserId.exists(update => update._2.size <= 1)
+    val hasNoDuplicates = !infoPerNewUserId.exists(update => update._2.size <= 1)
 
     // If there are no updates on different user id's to one new user id, then the update is simple
 
@@ -156,7 +156,7 @@ class SlickRecordsPersistence
 
   private def constructCaseTeamUserIdUpdates(caseId: String, info: Seq[NewUserInformation]): Future[Seq[DBIO[_]]] = {
     val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
-    val hasNoDuplicates = infoPerNewUserId.exists(update => update._2.size <= 1)
+    val hasNoDuplicates = !infoPerNewUserId.exists(update => update._2.size <= 1)
 
     // If there are no duplicates (i.e., no situations where multiple old user id's map to the same new id)
     //  then the update is simple.
