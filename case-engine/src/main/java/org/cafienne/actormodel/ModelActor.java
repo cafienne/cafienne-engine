@@ -20,8 +20,6 @@ import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.handler.*;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.infrastructure.Cafienne;
@@ -491,16 +489,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
         if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
             StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
-            events.forEach(e -> {
-                msg.append("\n\t");
-                if (e instanceof PlanItemEvent) {
-                    msg.append(e.toString());
-                } else if (e instanceof CaseFileEvent) {
-                    msg.append(e.getClass().getSimpleName() + "." + ((CaseFileEvent) e).getTransition() + "()[" + ((CaseFileEvent) e).getPath() + "]");
-                } else {
-                    msg.append(e.getClass().getSimpleName() + ", ");
-                }
-            });
+            events.forEach(e -> msg.append("\n\t" + e));
             getLogger().debug(msg + "\n");
             EngineDeveloperConsole.debugIndentedConsoleLogging(msg + "\n");
         }

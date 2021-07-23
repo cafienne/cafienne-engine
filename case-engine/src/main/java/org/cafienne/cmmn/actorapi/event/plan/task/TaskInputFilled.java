@@ -17,7 +17,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class TaskInputFilled extends TaskEvent {
+public class TaskInputFilled extends TaskEvent<Task<?>> {
     private final ValueMap taskParameters;
     private final ValueMap mappedInputParameters;
 

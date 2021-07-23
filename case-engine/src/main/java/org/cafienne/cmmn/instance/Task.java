@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
+import org.cafienne.cmmn.definition.casefile.CaseFileError;
+import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
@@ -202,16 +204,23 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
             }
         }
 
-        // Now check that all mandatory parameters have a non-null value
+        // Now check that all mandatory parameters have a non-null value and also that binding to case file is proper
         if (validateOutput) {
-            Vector<String> validationErrors = new Vector();
+            Vector<String> validationErrors = new Vector<>();
             getDefinition().getOutputParameters().forEach((name, parameterDefinition) -> {
+                Value<?> parameterValue = newTaskOutput.get(name);
                 if (parameterDefinition.isMandatory()) {
 //                    System.out.println("Validating mandatory output parameter "+name);
-                    Value<?> parameterValue = newTaskOutput.get(name);
                     if (parameterValue.equals(Value.NULL)) {
                         validationErrors.add("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
                     }
+                }
+
+                TaskOutputParameter outputParameter = new TaskOutputParameter(parameterDefinition, this, parameterValue);
+                try {
+                    outputParameter.validate(); // Validate each property
+                } catch (CaseFileError | TransitionDeniedException invalid) {
+                    validationErrors.add(invalid.getMessage());
                 }
             });
 
@@ -258,9 +267,13 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     public void updateState(TaskOutputFilled event) {
         this.givenOutput = event.getRawOutputParameters();
         this.taskOutput = event.getTaskOutputParameters();
+        if (getCaseInstance().recoveryRunning()) {
+            // No need to bind task output to the case file, as case file events will take care of setting right values
+            return;
+        }
         this.taskOutput.getValue().forEach((name, value) -> {
             // Note, this code assumes all task output keys have a correspondingly defined parameter.
-            ParameterDefinition definition = getDefinition().getOutputParameters().get(name);
+            TaskOutputParameterDefinition definition = getDefinition().getOutputParameters().get(name);
             TaskOutputParameter outputParameter = new TaskOutputParameter(definition, this, value);
             outputParameter.bind();
         });
