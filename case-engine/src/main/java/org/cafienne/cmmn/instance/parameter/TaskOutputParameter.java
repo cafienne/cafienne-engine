@@ -9,8 +9,8 @@ package org.cafienne.cmmn.instance.parameter;
 
 import org.cafienne.cmmn.definition.parameter.BindingOperation;
 import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
+import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
@@ -20,14 +20,24 @@ import org.cafienne.json.Value;
  * A TaskOutputParameter is created right before a task completes.
  * If its value is set (after it is mapped from the raw output of the task), it is bound to the case file.
  */
-public class TaskOutputParameter extends TaskParameter<ParameterDefinition> {
-    public TaskOutputParameter(ParameterDefinition definition, Task<?> task, Value<?> value) {
+public class TaskOutputParameter extends TaskParameter<TaskOutputParameterDefinition> {
+    public TaskOutputParameter(TaskOutputParameterDefinition definition, Task<?> task, Value<?> value) {
         super(definition, task, value);
     }
 
-    @Override
-    public TaskOutputParameterDefinition getDefinition() {
-        return (TaskOutputParameterDefinition) super.getDefinition();
+    public void validate() {
+        if (!hasBinding()) {
+            addDebugInfo(() -> "Parameter '" + getName() + "' has no case file binding binding");
+            return;
+        }
+        CaseFileItem item = getBinding().getPath().resolve(getCaseInstance());
+        addDebugInfo(() -> "Validating property types of a " + item.getName() + " against value ", value);
+        item.getDefinition().validatePropertyTypes(value);
+
+        if (item.getState() == State.Discarded) {
+            addDebugInfo(() -> "Cannot bind parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "], since the item is in state Discarded");
+            throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
+        }
     }
 
     /**
@@ -39,15 +49,15 @@ public class TaskOutputParameter extends TaskParameter<ParameterDefinition> {
             return;
         }
         CaseFileItem item = getBinding().getPath().resolve(getCaseInstance());
-        item.getDefinition().validatePropertyTypes(value);
 
         // Spec says (table 5.3.4, page 36): "just trigger the proper transition, as that will be obvious." But is it?
         //  We have implemented specific type of BindingRefinement to make more predictable what to do
 
         switch (item.getState()) {
             case Discarded: {
+                // This check is also done during task output parameter creation, nevertheless adding debug info warning and return with no further action
                 addDebugInfo(() -> "Cannot bind parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "], since the item is in state Discarded");
-                throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
+                return;
             }
             case Null: {
                 // In all cases we will try to create content if state is Null;

@@ -48,7 +48,7 @@ public class JSONType extends DefinitionType {
         PropertyDefinition.PropertyType type = propertyDefinition.getPropertyType();
         try {
             if (!propertyValue.matches(type)) {
-                throw new CaseFileError("Property '" + propertyDefinition.getName() + "' has wrong type, expecting " + type);
+                throw new CaseFileError("Property '" + propertyDefinition.getName() + "' has wrong type, expecting " + type + ", found a " + propertyValue.getClass().getSimpleName());
             }
         } catch (IllegalArgumentException improperType) {
             throw new CaseFileError("Property '" + propertyDefinition.getName() + "' has wrong type, expecting " + type + ", found exception " + improperType.getMessage());
