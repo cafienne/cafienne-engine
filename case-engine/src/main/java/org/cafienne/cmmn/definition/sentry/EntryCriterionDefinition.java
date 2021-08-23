@@ -5,6 +5,8 @@ import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinition;
 import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.sentry.CriteriaListener;
+import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.w3c.dom.Element;
 
 public class EntryCriterionDefinition extends CriterionDefinition {
@@ -48,5 +50,10 @@ public class EntryCriterionDefinition extends CriterionDefinition {
     @Override
     public Transition getTransition() {
         return entryTransition;
+    }
+
+    @Override
+    public EntryCriterion createInstance(CriteriaListener listener) {
+        return new EntryCriterion(listener, this);
     }
 }

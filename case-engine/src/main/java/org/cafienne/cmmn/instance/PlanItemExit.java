@@ -1,25 +1,16 @@
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.CriteriaListener;
-import org.cafienne.cmmn.instance.sentry.ExitCriterion;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
-public class PlanItemExit extends CriteriaListener<ExitCriterion> {
-
-    PlanItemExit(PlanItem<?> target) {
-        super(target);
+public class PlanItemExit extends CriteriaListener {
+    PlanItemExit(PlanItem<?> item) {
+        super(item, item.getItemDefinition().getExitCriteria());
     }
 
-    public void connect() {
-        item.getItemDefinition().getExitCriteria().forEach(c -> criteria.add(new ExitCriterion(this, c)));
-    }
-
-    void release() {
-        criteria.forEach(c -> c.release());
-    }
-
-    public void satisfy(ExitCriterion criterion) {
+    @Override
+    public void satisfy(Criterion<?> criterion) {
         item.addDebugInfo(() -> criterion + " is satisfied, triggering exit on " + item);
         release();
         item.makeTransition(item.getExitTransition());

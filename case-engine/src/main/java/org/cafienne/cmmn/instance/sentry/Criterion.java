@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
@@ -12,44 +11,41 @@ import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class Criterion<D extends CriterionDefinition> extends CMMNElement<D> {
-    protected final CriteriaListener target;
-
-    // On parts are stored by their source for easy lookup.
-    // The source can only be a PlanItemDefinition or a CaseFileItemDefinition. We have taken the first
-    // level parent class (CMMNElementDefinition) for this. So, technically we might also store on parts
-    // with a different type of key ... but the logic prevents this from happening.
-    private final Map<CMMNElementDefinition, OnPart<?, ?, ?>> onParts = new LinkedHashMap<>();
-
+    private final CriteriaListener listener;
+    private final Collection<OnPart<?,?,?>> onParts = new ArrayList<>();
     /**
      * Simple set to be able to quickly check whether the criterion may become active
      */
     private final Set<OnPart<?, ?, ?>> inactiveOnParts = new HashSet<>();
+    /**
+     * Flag switched when all on parts are active, and the if part also returned true
+     * Gets de-activated when an on part becomes inactive.
+     */
+    private boolean isActive;
 
-    boolean isActive;
-
-    protected Criterion(CriteriaListener target, D definition) {
-        super(target.item, definition);
-        this.target = target;
+    protected Criterion(CriteriaListener listener, D definition) {
+        super(listener.item, definition);
+        this.listener = listener;
         for (OnPartDefinition onPartDefinition : getDefinition().getSentryDefinition().getOnParts()) {
             OnPart<?, ?, ?> onPart = onPartDefinition.createInstance(this);
-            onParts.put(onPartDefinition.getSourceDefinition(), onPart);
+            onParts.add(onPart);
             inactiveOnParts.add(onPart);
         }
         // Add ourselves to the sentry network
         getCaseInstance().getSentryNetwork().add(this);
         // Tell our onparts to connect to the case network
-        onParts.values().forEach(OnPart::connectToCase);
+        onParts.forEach(OnPart::connectToCase);
     }
 
     public PlanItem<?> getTarget() {
-        return target.item;
+        return listener.item;
     }
 
     public Stage<?> getStage() {
@@ -76,7 +72,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         }
         if (isSatisfied()) {
             isActive = true;
-            satisfy();
+            listener.satisfy(this);
             // isActive = false;
         }
     }
@@ -90,8 +86,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         inactiveOnParts.add(activator);
         addDebugInfo(() -> this + " now has " + inactiveOnParts.size() + " inactive on parts", this);
     }
-
-    protected abstract void satisfy();
 
     public boolean isActive() {
         return isActive;
@@ -118,7 +112,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     /**
      * Whether this is an activating or terminating criterion. This information is important for the order in which sentries are triggered.
      *
-     * @return
      */
     public abstract boolean isEntryCriterion();
 
@@ -126,7 +119,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     public String toString() {
         boolean activated = isActive();
 
-        String listeners = onParts.values().stream().map(OnPart::toString).collect(Collectors.joining(","));
+        String listeners = onParts.stream().map(OnPart::toString).collect(Collectors.joining(","));
         return getDefinition().getType() + " for " + getTarget() + " on " + "[" + listeners + "] - " + (activated ? "active" : "inactive");
     }
 
@@ -134,23 +127,16 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
      * Connects to the plan item if there is an on part in the criterion that matches the plan item definition.
      * Skips plan items that belong to sibling stages.
      *
-     * @param planItem
      */
     void establishPotentialConnection(PlanItem<?> planItem) {
-        PlanItemOnPart onPart = (PlanItemOnPart) onParts.get(planItem.getItemDefinition());
-        if (onPart != null) {
-            onPart.connect(planItem);
-        }
+        onParts.forEach(onPart -> onPart.establishPotentialConnection(planItem));
     }
 
     /**
      * Connects to the case file item if there is an on part in the criterion that matches the case file item definition.
      */
     void establishPotentialConnection(CaseFileItem caseFileItem) {
-        CaseFileItemOnPart onPart = (CaseFileItemOnPart) onParts.get(caseFileItem.getDefinition());
-        if (onPart != null) {
-            onPart.connect(caseFileItem);
-        }
+        onParts.forEach(onPart -> onPart.establishPotentialConnection(caseFileItem));
     }
 
 
@@ -166,14 +152,14 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
             sentryXML.setAttribute("stage", getStage().getItemDefinition().getName());
         }
 
-        this.onParts.forEach((d, onPart) -> onPart.dumpMemoryStateToXML(sentryXML, showConnectedPlanItems));
+        this.onParts.forEach(onPart -> onPart.dumpMemoryStateToXML(sentryXML, showConnectedPlanItems));
 
         return sentryXML;
     }
 
     public ValueMap toJson() {
         ValueList onPartsJson = new ValueList();
-        this.onParts.forEach((d, onPart) -> onPartsJson.add(onPart.toJson()));
+        this.onParts.forEach(onPart -> onPartsJson.add(onPart.toJson()));
         return new ValueMap(
                 "target", this.toString(),
                 "active", inactiveOnParts.isEmpty(),
@@ -184,6 +170,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
 
     public void release() {
         getCaseInstance().getSentryNetwork().remove(this);
-        onParts.values().forEach(OnPart::releaseFromCase);
+        this.onParts.forEach(OnPart::releaseFromCase);
     }
 }

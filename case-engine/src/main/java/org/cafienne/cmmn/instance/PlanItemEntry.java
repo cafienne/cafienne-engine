@@ -1,32 +1,13 @@
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.CriteriaListener;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
-public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
+public class PlanItemEntry extends CriteriaListener {
 
-    PlanItemEntry(PlanItem<?> target) {
-        super(target);
-    }
-
-    /**
-     * Connect the plan item to the sentry network
-     */
-    public void connect() {
-        item.getItemDefinition().getEntryCriteria().forEach(c -> criteria.add(new EntryCriterion(this, c)));
-        if (! criteria.isEmpty()) {
-            item.addDebugInfo(() -> "Connected " + item + " to " + criteria.size() +" entry criteria");
-        }
-    }
-
-    /**
-     * Disconnect the plan item from the sentry network
-     */
-    void release() {
-        item.addDebugInfo(() -> "Releasing all " + criteria.size() + " entry criteria for " + item);
-        criteria.forEach(Criterion::release);
+    PlanItemEntry(PlanItem<?> item) {
+        super(item, item.getItemDefinition().getEntryCriteria());
     }
 
     /**
@@ -45,7 +26,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
                 handleCriterionSatiesfied(earlyBird);
             } else {
                 // Evaluate sentries to see whether one is already active, and, if so, make the transition
-                for (EntryCriterion criterion : criteria) {
+                for (Criterion<?> criterion : criteria) {
                     if (criterion.isSatisfied()) {
                         item.addDebugInfo(() -> item + ": an EntryCriterion is satisfied, making transition " + transition);
                         handleCriterionSatiesfied(criterion);
@@ -61,9 +42,10 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
         return criteria.isEmpty();
     }
 
-    private EntryCriterion earlyBird = null;
+    private Criterion<?> earlyBird = null;
 
-    public void satisfy(EntryCriterion criterion) {
+    @Override
+    public void satisfy(Criterion<?> criterion) {
         if (item.getState() == State.Null) {
             // Criterion is an early bird considering our state, let's put it in the waiting room until our lifecycle starts
             earlyBird = criterion;
@@ -72,12 +54,12 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterion> {
         handleCriterionSatiesfied(criterion);
     }
 
-    private void handleCriterionSatiesfied(EntryCriterion criterion) {
+    private void handleCriterionSatiesfied(Criterion<?> criterion) {
         if (item.getIndex() == 0 && item.getState() == State.Available) {
             // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
             //  and also for the very first time. Therefore we should not yet repeat, but only make the
             //  entry transition.
-            item.addDebugInfo(() -> criterion + " is satisfied and will trigger "+ item.getEntryTransition());
+            item.addDebugInfo(() -> criterion + " is satisfied and will trigger " + item.getEntryTransition());
             if (this.willNotRepeat()) {
                 release();
             }

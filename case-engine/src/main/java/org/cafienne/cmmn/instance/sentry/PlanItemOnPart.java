@@ -58,13 +58,19 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
     void connectToCase() {
         // Try to connect with all plan items in the case
         for (PlanItem<?> item : new ArrayList<>(getCaseInstance().getPlanItems())) {
-            criterion.establishPotentialConnection(item);
+            establishPotentialConnection(item);
         }
     }
 
-    void connect(PlanItem<?> potentialNewSource) {
+    @Override
+    protected void establishPotentialConnection(PlanItem<?> potentialNewSource) {
         if (connectedItems.contains(potentialNewSource)) {
             // Avoid repeated additions
+            return;
+        }
+
+        // Only connect if the plan item has the same definition as our source definition.
+        if (! getDefinition().getSourceDefinition().equals(potentialNewSource.getItemDefinition())) {
             return;
         }
 

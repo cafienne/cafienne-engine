@@ -44,8 +44,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Our entry and exit criteria (i.e., to plan items and case file items of interest to us)
      */
-    private final PlanItemEntry entryCriteria = new PlanItemEntry(this);
-    private final PlanItemExit exitCriteria = new PlanItemExit(this);
+    private final PlanItemEntry entryCriteria;
+    private final PlanItemExit exitCriteria;
     /**
      * Whether we repeat or not
      */
@@ -88,6 +88,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.stage = parent;
         this.index = index;
         this.stateMachine = stateMachine;
+        this.entryCriteria = new PlanItemEntry(this);
+        this.exitCriteria = new PlanItemExit(this);
 
         addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (stage == null ? " in case" : " in " + stage));
 

@@ -3,6 +3,8 @@ package org.cafienne.cmmn.definition.sentry;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.sentry.CriteriaListener;
+import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.w3c.dom.Element;
 
 import java.util.stream.Collectors;
@@ -53,4 +55,6 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
             getCaseDefinition().addReferenceError("A sentry with name " + sentryRef + " is referenced from a plan item, but it cannot be found in the case plan");
         }
     }
+
+    public abstract Criterion<?> createInstance(CriteriaListener listener);
 }
