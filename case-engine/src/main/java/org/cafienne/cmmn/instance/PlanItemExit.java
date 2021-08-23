@@ -1,7 +1,9 @@
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.sentry.CriteriaListener;
 import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.cmmn.instance.sentry.ExitCriterion;
 import org.w3c.dom.Element;
 
 public class PlanItemExit extends CriteriaListener {
@@ -25,5 +27,10 @@ public class PlanItemExit extends CriteriaListener {
         for (Criterion<?> criterion : criteria) {
             criterion.dumpMemoryStateToXML(planItemXML, true);
         }
+    }
+
+    @Override
+    protected void migrateCriteria(ItemDefinition newItemDefinition) {
+        migrateCriteria(newItemDefinition.getExitCriteria(), criteria.stream().map(ec -> (ExitCriterion) ec));
     }
 }

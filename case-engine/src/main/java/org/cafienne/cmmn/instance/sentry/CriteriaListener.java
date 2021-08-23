@@ -1,11 +1,14 @@
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
+import org.cafienne.cmmn.definition.XMLElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 public abstract class CriteriaListener {
     protected final PlanItem<?> item;
@@ -41,4 +44,20 @@ public abstract class CriteriaListener {
 
     public abstract void satisfy(Criterion<?> criterion);
 
+    protected abstract void migrateCriteria(ItemDefinition newItemDefinition);
+
+    protected <T extends CriterionDefinition> void migrateCriteria(Collection<T> newCriteria, Stream<Criterion<T>> existingCriteria) {
+        item.MigDevConsole(getClass().getSimpleName() + "["+item.getName()+"]: migrating " + criteria.size() + " criteria");
+        existingCriteria.forEach(criterion -> {
+            T oldDefinition = criterion.getDefinition();
+            T newDefinition = XMLElementDefinition.findDefinition(oldDefinition, newCriteria);
+            if (newDefinition != null) {
+                criterion.migrateDefinition(newDefinition);
+            } else {
+                // Not sure what to do here. Remove the criterion?
+                // Search for a 'nearby' alternative?
+                item.MigDevConsole("Cannot migrate criterion");
+            }
+        });
+    }
 }

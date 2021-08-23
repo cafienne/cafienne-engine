@@ -612,6 +612,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
                 }
             }
         }
+        getEntryCriteria().migrateCriteria(newItemDefinition);
+        getExitCriteria().migrateCriteria(newItemDefinition);
     }
 
     private boolean hasNewNameOrId() {

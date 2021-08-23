@@ -1,7 +1,10 @@
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.definition.XMLElementDefinition;
+import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
+import org.cafienne.cmmn.definition.sentry.PlanItemOnPartDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.CasePlan;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -119,7 +122,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     public String toString() {
         boolean activated = isActive();
 
-        String listeners = onParts.stream().map(OnPart::toString).collect(Collectors.joining(","));
+        String listeners = this.onParts.stream().map(OnPart::toString).collect(Collectors.joining(","));
         return getDefinition().getType() + " for " + getTarget() + " on " + "[" + listeners + "] - " + (activated ? "active" : "inactive");
     }
 
@@ -138,7 +141,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     void establishPotentialConnection(CaseFileItem caseFileItem) {
         onParts.forEach(onPart -> onPart.establishPotentialConnection(caseFileItem));
     }
-
 
     public Element dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {
         Element sentryXML = parentElement.getOwnerDocument().createElement("Sentry");
@@ -171,5 +173,39 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     public void release() {
         getCaseInstance().getSentryNetwork().remove(this);
         this.onParts.forEach(OnPart::releaseFromCase);
+    }
+
+    @Override
+    public void migrateDefinition(D newDefinition) {
+        getTarget().MigDevConsole("Migrating " + newDefinition.getType() +" for item " + getTarget().getName());
+        super.migrateDefinition(newDefinition);
+        this.onParts.forEach(onPart -> {
+            if (onPart instanceof CaseFileItemOnPart) {
+                migrateCaseFileItemOnPart((CaseFileItemOnPart) onPart, newDefinition);
+            } else if (onPart instanceof PlanItemOnPart) {
+                migratePlanItemOnPart((PlanItemOnPart) onPart, newDefinition);
+            }
+        });
+    }
+
+    private void migrateCaseFileItemOnPart(CaseFileItemOnPart onPart, D newDefinition) {
+        CaseFileItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
+        CaseFileItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
+        if (newOnPartDefinition != null) {
+            getTarget().MigDevConsole("Migrating CaseFileItemOnPart in " + newDefinition.getType() +" for item " + getTarget().getName());
+            onPart.migrateDefinition(newOnPartDefinition);
+        } else {
+            // perhaps search for a 'similar' on part, i.e. one with same source reference and potentially different standard event?
+            // But then make sure that there is not another similar on part with the same source reference ;)
+        }
+    }
+
+    private void migratePlanItemOnPart(PlanItemOnPart onPart, D newDefinition) {
+        PlanItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
+        PlanItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
+        if (newOnPartDefinition != null) {
+            getTarget().MigDevConsole("Migrating PlanItemOnPart in " + newDefinition.getType() +" for item " + getTarget().getName());
+            onPart.migrateDefinition(newOnPartDefinition);
+        }
     }
 }
