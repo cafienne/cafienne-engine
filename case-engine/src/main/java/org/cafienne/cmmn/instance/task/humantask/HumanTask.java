@@ -171,4 +171,10 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     public void updateState(CaseAppliedPlatformUpdate event) {
         getImplementation().updateState(event);
     }
+
+    @Override
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, HumanTaskDefinition newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+        getImplementation().migrateDefinition(newDefinition.getImplementationDefinition());
+    }
 }

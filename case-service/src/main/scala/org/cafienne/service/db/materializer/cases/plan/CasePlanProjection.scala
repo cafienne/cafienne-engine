@@ -6,6 +6,7 @@ import org.cafienne.cmmn.actorapi.event.CaseModified
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record._
 
@@ -104,6 +105,7 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
             }
           }
         }))
+        case evt: HumanTaskMigrated => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
         case _ => Future.successful(None) // Ignore and error on other events
       }
     }

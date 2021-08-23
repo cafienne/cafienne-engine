@@ -3,6 +3,7 @@ package org.cafienne.humantask.instance;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.task.AssignmentDefinition;
 import org.cafienne.cmmn.definition.task.DueDateDefinition;
 import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
@@ -12,6 +13,7 @@ import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.ValidationError;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.event.*;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
@@ -188,10 +190,10 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         // First validate task output. Note: this may result in "CommandException", instead of "InvalidCommandException". For that reason this cannot be done right now in validate method.
         ValidationResponse validate = task.validateOutput(taskOutput);
         if (validate instanceof ValidationError) {
-            throw new InvalidCommandException("Output for task "+task.getName()+" could not be validated due to an error", validate.getException());
+            throw new InvalidCommandException("Output for task " + task.getName() + " could not be validated due to an error", validate.getException());
         } else {
-            if (! validate.getContent().getValue().isEmpty()) {
-                throw new InvalidCommandException("Output for task "+task.getName()+" is invalid\n" + validate.getContent());
+            if (!validate.getContent().getValue().isEmpty()) {
+                throw new InvalidCommandException("Output for task " + task.getName() + " is invalid\n" + validate.getContent());
             }
         }
 
@@ -201,7 +203,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     public void setDueDate(Instant newDueDate) {
-        if (newDueDate != null && ! Objects.equals(this.currentDueDate, newDueDate)) {
+        if (newDueDate != null && !Objects.equals(this.currentDueDate, newDueDate)) {
             addEvent(new HumanTaskDueDateFilled(task, newDueDate));
         }
     }
@@ -221,5 +223,41 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
             addDebugInfo(() -> "Updating owner of " + this.task + " with new user id " + updatedOwner.newUserId());
             this.currentOwner = updatedOwner.newUserId();
         }
+    }
+
+    @Override
+    public void migrateDefinition(WorkflowTaskDefinition newDefinition) {
+        super.migrateDefinition(newDefinition);
+        if (currentTaskState == TaskState.Null) {
+            // Task has not yet been activated, and has not yet published any events. No need to do any migration.
+            return;
+        }
+
+        if (hasNewName() || hasNewPerformerRole() || hasNewTaskModel()) {
+            addEvent(new HumanTaskMigrated(this.task, getPerformerRole(), getTaskModel()));
+            // There may be a new assignment or due date from the definition
+            // Currently this gives issues, e.g. because new different due date may not be caused by
+            //  different expression (i.e., by the new definition), but simply by re-evaluating the expression.
+            // Therefore not catering for such kind of changes currently.
+            //  It actually requires a definition comparison (e.g., an implementation of equals and differences on CMMNElementDefinition)
+        }
+    }
+
+    private boolean hasNewName() {
+        return !task.getPreviousDefinition().getName().equals(task.getDefinition().getName());
+    }
+
+    private String getRoleName(HumanTaskDefinition htd) {
+        return htd.getPerformer() != null ? htd.getPerformer().getName() : null;
+    }
+
+    private boolean hasNewPerformerRole() {
+        String formerPerformerName = getRoleName(task.getPreviousDefinition());
+        String currentPerformerName = getRoleName(task.getDefinition());
+        return !Objects.equals(formerPerformerName, currentPerformerName);
+    }
+
+    private boolean hasNewTaskModel() {
+        return !getPreviousDefinition().getTaskModel().equals(getDefinition().getTaskModel());
     }
 }

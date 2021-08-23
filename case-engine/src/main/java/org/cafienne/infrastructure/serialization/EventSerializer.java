@@ -13,6 +13,7 @@ import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.actorapi.event.team.*;
 import org.cafienne.humantask.actorapi.event.*;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
 import org.cafienne.processtask.actorapi.event.*;
 import org.cafienne.tenant.actorapi.event.*;
 import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
@@ -98,6 +99,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(HumanTaskRevoked.class, HumanTaskRevoked::new);
         addManifestWrapper(HumanTaskSuspended.class, HumanTaskSuspended::new);
         addManifestWrapper(HumanTaskTerminated.class, HumanTaskTerminated::new);
+        addManifestWrapper(HumanTaskMigrated.class, HumanTaskMigrated::new);
     }
 
     private static void registerProcessEvents() {
