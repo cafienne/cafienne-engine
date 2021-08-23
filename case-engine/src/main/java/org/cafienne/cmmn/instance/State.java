@@ -25,7 +25,7 @@ public enum State {
     Suspended,
     Terminated;
 
-    boolean isSemiTerminal() {
+    public boolean isSemiTerminal() {
         return this == Closed || this == Completed || this == Disabled || this == Failed || this == Terminated;
     }
 }

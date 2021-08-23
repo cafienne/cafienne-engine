@@ -194,9 +194,6 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         if (outcome instanceof java.util.Date) {
             return ((java.util.Date) outcome).toInstant();
         }
-        if (outcome instanceof java.sql.Date) {
-            return ((java.sql.Date) outcome).toInstant();
-        }
         if (outcome instanceof Long) {
             return Instant.ofEpochMilli((Long) outcome);
         }

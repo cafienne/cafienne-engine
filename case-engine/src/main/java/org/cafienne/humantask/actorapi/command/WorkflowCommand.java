@@ -58,10 +58,10 @@ public abstract class WorkflowCommand extends CaseCommand {
         // Good. It's a HumanTask
         task = (HumanTask) planItem;
 
-        // TODO: validate that this is a proper check (e.g. why could i not Delegate a suspended or failed task??)
+        // Commands can be sent when the task is Active or Suspended or Failed (and when Enabled/Disabled, but that is hardly in use).
         State currentState = task.getState();
-        if (currentState != State.Active) {
-            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be done because task " + planItem.getName() + " (" + taskId + ") is not in Active but in " + currentState + " state");
+        if ((currentState.isSemiTerminal() && currentState != State.Failed) || currentState == State.Null || currentState == State.Available) {
+            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be done because task " + planItem.getName() + " (" + taskId + ") is in state " + currentState);
         }
 
         // Now have the actual command do its own validation on the task

@@ -8,11 +8,11 @@
 package org.cafienne.cmmn.instance.task.humantask;
 
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
@@ -27,20 +27,10 @@ import java.util.Collection;
 
 public class HumanTask extends Task<HumanTaskDefinition> {
 
-    private final WorkflowTask workflow;
-    private final TaskOutputValidator validator;
+    private WorkflowTask workflow;
 
     public HumanTask(String id, int index, ItemDefinition itemDefinition, HumanTaskDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage);
-
-        // Create an instance of the output validator if we have one
-        TaskOutputValidatorDefinition outputValidator = getDefinition().getTaskOutputValidator();
-        if (outputValidator != null) {
-            validator = outputValidator.createInstance(this);
-        } else {
-            validator = null;
-        }
-        this.workflow = getDefinition().getImplementationDefinition().createInstance(this);
     }
 
     /**
@@ -49,12 +39,18 @@ public class HumanTask extends Task<HumanTaskDefinition> {
      * @return
      */
     public WorkflowTask getImplementation() {
+        if (workflow == null) {
+            workflow = getDefinition().getImplementationDefinition().createInstance(this);
+        }
         return workflow;
     }
 
     @Override
     public ValidationResponse validateOutput(ValueMap potentialRawOutput) {
-        if (validator != null) {
+        // Create an instance of the output validator if we have one
+        TaskOutputValidatorDefinition outputValidator = getDefinition().getTaskOutputValidator();
+        if (outputValidator != null) {
+            TaskOutputValidator validator = outputValidator.createInstance(this);
             ValidationResponse response = validator.validate(potentialRawOutput);
             if (!response.isValid()) {
                 addDebugInfo(() -> "Output validation for task " + getName() + "[" + getId() + "] failed with ", response.getContent());
@@ -170,7 +166,6 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     @Override
     protected void dumpImplementationToXML(Element planItemXML) {
         super.dumpImplementationToXML(planItemXML);
-//        workflow.dumpMemoryStateToXML(planItemXML);
         CaseRoleDefinition performer = getPerformer();
         if (performer != null) {
             String roleName = performer.getName();
@@ -180,20 +175,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         }
     }
 
-//	public void goComplete(ValueMap rawOutput) {
-//        ValidationResponse validate = this.validateOutput(rawOutput);
-//        if (validate instanceof ValidationError) {
-//            throw new InvalidCommandException("Output for task "+this.getName()+" could not be validated due to an error", validate.getException());
-//        } else {
-//            if (! validate.getContent().getValue().isEmpty()) {
-//                throw new InvalidCommandException("Output for task "+this.getName()+" is invalid\n" + validate.getContent());
-//            }
-//        }
-//		super.goComplete(workflow.saveOutput(rawOutput));
-//		workflow.goComplete();
-//	}
-
     public void updateState(CaseAppliedPlatformUpdate event) {
-        this.workflow.updateState(event);
+        getImplementation().updateState(event);
     }
 }
