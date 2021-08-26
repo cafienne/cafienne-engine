@@ -11,7 +11,7 @@ jobs:
           name: Clone CMMN-test framework
           command: |
             cd ..
-            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
       - run:
           name: Updating Java and sbt versions
           command: |
@@ -240,7 +240,7 @@ jobs:
           name: Clone CMMN-test framework
           command: |
             cd ..
-            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
       - run:
           name: Updating Java and sbt versions
           command: |
@@ -347,7 +347,7 @@ jobs:
           name: Clone CMMN-test framework
           command: |
             cd ..
-            git clone https://$GIT_USER:$GIT_PASS@github.com/cafienne/cmmn-test-framework.git
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
       - run:
           name: Updating Java and sbt versions
           command: |
