@@ -22,7 +22,7 @@ import java.io.IOException;
  * Event caused by replacement of a CaseFileItem for children of that item that have to be removed
  */
 @Manifest
-public class CaseFileItemChildRemoved extends CaseFileEvent {
+public class CaseFileItemChildRemoved extends CaseFileItemTransitioned {
     private final Path childPath;
 
     public CaseFileItemChildRemoved(CaseFileItemCollection item, Path childPath) {

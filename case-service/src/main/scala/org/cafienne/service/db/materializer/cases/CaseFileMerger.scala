@@ -7,7 +7,7 @@ import org.cafienne.json.{Value, ValueMap}
 
 object CaseFileMerger extends LazyLogging {
 
-  def merge(event: CaseFileEvent, currentCaseFile: ValueMap): Unit = {
+  def merge(event: CaseFileItemTransitioned, currentCaseFile: ValueMap): Unit = {
     val path: Path = event.getPath
     val parentValue = path.resolveParent(currentCaseFile)
     val itemName = path.getName

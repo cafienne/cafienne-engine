@@ -6,7 +6,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.event._
-import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent}
+import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierEvent, BusinessIdentifierSet, CaseFileEvent, CaseFileItemTransitioned}
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.humantask.actorapi.event._
@@ -16,7 +16,6 @@ import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.slick.SlickTransaction
 import org.cafienne.service.db.record._
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 class CaseTransaction(caseInstanceId: String, tenant: String, persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends SlickTransaction[CaseEvent] with LazyLogging {
@@ -44,7 +43,6 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
       case event: CaseAppliedPlatformUpdate => updateUserIds(event, offsetName, offset)
       case event: CaseModified => updateCaseInstance(event)
-      case event: BusinessIdentifierEvent => handleBusinessIdentifierEvent(event)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -99,6 +97,14 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     }
   }
 
+  private def handleCaseFileEvent(event: CaseFileEvent): Future[Done] = {
+    event match {
+      case itemEvent: CaseFileItemTransitioned => handleCaseFileItemEvent(itemEvent)
+      case identifierEvent: BusinessIdentifierEvent => handleBusinessIdentifierEvent(identifierEvent)
+      case other => Future.successful(Done) // Ignore other events
+    }
+  }
+
   private def handleBusinessIdentifierEvent(event: BusinessIdentifierEvent): Future[Done] = {
     event match {
       case event: BusinessIdentifierSet => businessIdentifiers.add(CaseIdentifierMerger.merge(event))
@@ -110,7 +116,7 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
 
   private val bufferedCaseFileEvents = new CaseFileEventBuffer()
 
-  private def handleCaseFileEvent(event: CaseFileEvent): Future[Done] = {
+  private def handleCaseFileItemEvent(event: CaseFileItemTransitioned): Future[Done] = {
     bufferedCaseFileEvents.addEvent(event)
     getCaseFile(event.getCaseInstanceId, event.getUser)
       .map { data =>

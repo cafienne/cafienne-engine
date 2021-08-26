@@ -1,8 +1,9 @@
 package org.cafienne.cmmn.test.assertions.file;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.cmmn.test.ModelTestCommand;
+import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
@@ -11,27 +12,27 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class CaseFileAssertion extends ModelTestCommandAssertion {
+public class CaseFileAssertion extends ModelTestCommandAssertion<CaseTestCommand> {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileAssertion.class);
     private final Map<Path, CaseFileItemAssertion> assertions = new HashMap<>();
 
-    public CaseFileAssertion(ModelTestCommand command) {
+    public CaseFileAssertion(CaseTestCommand command) {
         super(command);
-        PublishedEventsAssertion<CaseFileEvent> allCaseFileEvents = command.getEventListener().getEvents().filter(CaseFileEvent.class);
-        allCaseFileEvents.getEvents().forEach(e -> assertCaseFileItem(e.getPath()).addEvent(e));
+        PublishedEventsAssertion<CaseFileItemTransitioned> allCaseFileItemTransitioneds = command.getEventListener().getEvents().filter(CaseFileItemTransitioned.class);
+        allCaseFileItemTransitioneds.filter(CaseFileItemTransitioned.class).getEvents().forEach(e -> assertCaseFileItem(e.getPath()).addEvent(e));
 //        System.out.println("\n\nWe have "+assertions.size()+" assertions: " + assertions.keySet());
     }
 
     /**
-     * Wait for a CaseFileEvent with the specified path to match the filter
+     * Wait for a CaseFileItemTransitioned with the specified path to match the filter
      * @param path
      * @param filter
      * @param optionalDuration
      * @return
      */
-    public CaseFileEvent awaitCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter, long... optionalDuration) {
+    public CaseFileItemTransitioned awaitCaseFileEvent(Path path, EventFilter<CaseFileItemTransitioned> filter, long... optionalDuration) {
         logger.debug("Waiting for case file event on path "+path);
-        return testCommand.getEventListener().waitUntil("CaseFileEvent-"+path, CaseFileEvent.class, event -> {
+        return testCommand.getEventListener().waitUntil("CaseFileItemTransitioned-"+path, CaseFileItemTransitioned.class, event -> {
             boolean pathMatches = path.matches(event.getPath());
             if (pathMatches) {
                 logger.debug("Receiving case file event "+event);

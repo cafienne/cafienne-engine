@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> implements TransitionGenerator<CaseFileEvent> {
+public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition> implements TransitionGenerator<CaseFileItemTransitioned> {
     /**
      * History of events on this item
      */
@@ -154,7 +154,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         getPublisher().releaseOnPart(onPart);
     }
 
-    private void addCaseFileEvent(CaseFileEvent event) {
+    private void addCaseFileEvent(CaseFileItemTransitioned event) {
         if (event.getValue().isMap()) {
             this.businessIdentifiers.values().forEach(bi -> bi.update(event.getValue().asMap()));
         }
@@ -166,12 +166,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         super.addEvent(event);
     }
 
-    public void publishTransition(CaseFileEvent event) {
+    public void publishTransition(CaseFileItemTransitioned event) {
         addDebugInfo(() -> "CaseFile[" + getName() + "]: updating CaseFileItem state based on CaseFileEvent");
         this.getPublisher().addEvent(event);
     }
 
-    public void updateStandardEvent(CaseFileEvent event) {
+    public void updateStandardEvent(CaseFileItemTransitioned event) {
         // Hack to make sure that we use the right case file item in case of BootstrapPublisher,
         // as that is registered on the array instead of the item that received the event.
         CaseFileItem item = this instanceof CaseFileItemArray ? ((CaseFileItemArray) this).get(event.getIndex()) : this;
@@ -186,12 +186,12 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         businessIdentifiers.get(event.name).updateState(event);
     }
 
-    public void informConnectedEntryCriteria(CaseFileEvent event) {
+    public void informConnectedEntryCriteria(CaseFileItemTransitioned event) {
         // Inform the activating sentries
         getPublisher().informEntryCriteria(event);
     }
 
-    public void informConnectedExitCriteria(CaseFileEvent event) {
+    public void informConnectedExitCriteria(CaseFileItemTransitioned event) {
         // Finally iterate the terminating sentries and inform them
         getPublisher().informExitCriteria(event);
         addDebugInfo(() -> "CaseFile[" + getName() + "]: Completed behavior for transition " + event.getTransition());

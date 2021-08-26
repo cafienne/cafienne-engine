@@ -7,16 +7,16 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
-public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileEvent, CaseFileItem> {
+public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItemTransitioned, CaseFileItem> {
     private boolean isActive;
-    private CaseFileEvent lastEvent;
+    private CaseFileItemTransitioned lastEvent;
 
     public CaseFileItemOnPart(Criterion<?> criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(criterion, caseFileItemOnPartDefinition);
@@ -49,7 +49,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         caseFileItem.connectOnPart(this);
     }
 
-    public void inform(CaseFileItem item, CaseFileEvent event) {
+    public void inform(CaseFileItem item, CaseFileItemTransitioned event) {
         addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
         lastEvent = event;
         isActive = getStandardEvent().equals(event.getTransition());
