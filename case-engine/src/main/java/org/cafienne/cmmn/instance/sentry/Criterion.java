@@ -136,10 +136,24 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     }
 
     /**
+     * Disconnect the item from our on parts, as the item is no longer part of the sentry network
+     */
+    void removeConnection(PlanItem<?> planItem) {
+        onParts.forEach(onPart -> onPart.removeConnection(planItem));
+    }
+
+    /**
      * Connects to the case file item if there is an on part in the criterion that matches the case file item definition.
      */
     void establishPotentialConnection(CaseFileItem caseFileItem) {
         onParts.forEach(onPart -> onPart.establishPotentialConnection(caseFileItem));
+    }
+
+    /**
+     * Disconnect the item from our on parts, as the item is no longer part of the sentry network
+     */
+    void removeConnection(CaseFileItem caseFileItem) {
+        onParts.forEach(onPart -> onPart.removeConnection(caseFileItem));
     }
 
     public Element dumpMemoryStateToXML(Element parentElement, boolean showConnectedPlanItems) {

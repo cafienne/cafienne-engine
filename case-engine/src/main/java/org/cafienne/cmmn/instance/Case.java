@@ -420,6 +420,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     }
 
     public void removeDroppedPlanItem(PlanItem<?> item) {
+        getSentryNetwork().disconnect(item);
         planItems.remove(item);
     }
 }

@@ -25,7 +25,6 @@ public class SentryNetwork {
 
     /**
      * Connect a new {@link CaseFileItem} to the network
-     * @param item
      */
     public void connect(CaseFileItem item) {
         for (Criterion<?> criterion : criteria) {
@@ -34,8 +33,14 @@ public class SentryNetwork {
     }
 
     /**
+     * Disconnect the item from the network (typically when the case file item is lost in migration)
+     */
+    public void disconnect(CaseFileItem item) {
+        criteria.forEach(criterion -> criterion.removeConnection(item));
+    }
+
+    /**
      * Connect a new {@link PlanItem} to the network
-     * @param item
      */
     public void connect(PlanItem<?> item) {
         for (Criterion<?> criterion : criteria) {
@@ -43,6 +48,14 @@ public class SentryNetwork {
         }
         item.getEntryCriteria().connect();
         item.getExitCriteria().connect();
+    }
+
+
+    /**
+     * Disconnect the item from the network (typically when the plan item is lost in migration)
+     */
+    public void disconnect(PlanItem<?> item) {
+        criteria.forEach(criterion -> criterion.removeConnection(item));
     }
 
     /**

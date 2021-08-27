@@ -88,6 +88,11 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
     }
 
     @Override
+    protected void removeConnection(PlanItem<?> planItem) {
+        connectedItems.remove(planItem);
+    }
+
+    @Override
     public void releaseFromCase() {
         connectedItems.forEach(planItem -> planItem.releaseOnPart(this));
     }
@@ -139,6 +144,5 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
                 onPartXML.appendChild(planItemXML);
             }
         }
-
     }
 }

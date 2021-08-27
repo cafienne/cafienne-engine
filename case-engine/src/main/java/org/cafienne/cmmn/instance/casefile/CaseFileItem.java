@@ -595,6 +595,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     protected void lostDefinition() {
         super.lostDefinition();
         businessIdentifiers.values().forEach(BusinessIdentifier::lostDefinition);
+        getCaseInstance().getSentryNetwork().disconnect(this);
     }
 
     public void updateState(CaseFileItemMigrated event) {

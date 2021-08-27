@@ -66,11 +66,23 @@ public abstract class OnPart<T extends OnPartDefinition, E extends StandardEvent
     }
 
     /**
+     * Disconnect the item from this on part, as the item is no longer part of the sentry network
+     */
+    protected void removeConnection(CaseFileItem caseFileItem) {
+    }
+
+    /**
      * Determine whether this on part wants to listen to transitions in the plan item, and if so, connect to it.
      * @param planItem Item to potentially connect to
      */
     protected void establishPotentialConnection(PlanItem<?> planItem) {
         // By default, an empty implementation; Only PlanItemOnPart has an implementation.
+    }
+
+    /**
+     * Disconnect the item from this on part, as the item is no longer part of the sentry network
+     */
+    protected void removeConnection(PlanItem<?> planItem) {
     }
 
     public abstract void inform(I item, E event);
