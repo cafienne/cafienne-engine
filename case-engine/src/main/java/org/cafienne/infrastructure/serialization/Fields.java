@@ -45,6 +45,7 @@ public enum Fields {
     content,
     path,
     childPath,
+    formerPath,
     memberId,
     memberType,
     team,

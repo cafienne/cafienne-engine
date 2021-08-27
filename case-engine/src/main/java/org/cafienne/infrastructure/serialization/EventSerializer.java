@@ -7,6 +7,7 @@ import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.file.*;
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
+import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemMigrated;
 import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.*;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
@@ -82,6 +83,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseFileItemTransitioned.class, CaseFileItemTransitioned::new);
         addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
         addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);
+        addManifestWrapper(CaseFileItemMigrated.class, CaseFileItemMigrated::new);
     }
 
     private static void registerHumanTaskEvents() {

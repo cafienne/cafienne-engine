@@ -7,8 +7,8 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.file.*;
+import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemMigrated;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
@@ -557,6 +557,62 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 addDebugInfo(() -> "CFI[" + getPath() + "] is in state " + getState() + " and then we cannot do transition " + intendedTransition);
                 return false;
             }
+        }
+    }
+
+    @Override
+    public void migrateDefinition(CaseFileItemDefinition newDefinition) {
+        super.migrateDefinition(newDefinition);
+        migrateIdentifiers(newDefinition);
+    }
+
+    private void migrateIdentifiers(CaseFileItemDefinition newDefinition) {
+        // All identifiers will be removed, unless ...
+        Map<String, BusinessIdentifier> identifiersToRemove = new HashMap<>(businessIdentifiers);
+        newDefinition.getBusinessIdentifiers().forEach(newPropertyDefinition -> {
+            String name = newPropertyDefinition.getName();
+            BusinessIdentifier identifier = businessIdentifiers.get(name);
+            if (identifier == null) {
+                // Let's add a new one
+                BusinessIdentifier newIdentifier = new BusinessIdentifier(this, newPropertyDefinition);
+                businessIdentifiers.put(name, newIdentifier);
+                if (this.getValue().isMap()) {
+                    newIdentifier.update(this.getValue().asMap());
+                }
+            } else {
+                // Migrate the identifier to the new definition
+                identifier.migrateDefinition(newPropertyDefinition);
+                // Make sure this one will not be deleted.
+                identifiersToRemove.remove(name);
+            }
+        });
+
+        // Tell these identifiers to get lost.
+        identifiersToRemove.values().forEach(BusinessIdentifier::lostDefinition);
+    }
+
+    @Override
+    protected void lostDefinition() {
+        super.lostDefinition();
+        businessIdentifiers.values().forEach(BusinessIdentifier::lostDefinition);
+    }
+
+    public void updateState(CaseFileItemMigrated event) {
+        if (parent != null) {
+            parent.renameChildItem(event.formerPath.getName(), event.path.getName());
+        }
+    }
+
+    public void migrateName(CaseFileItemDefinition newChildDefinition) {
+        addEvent(new CaseFileItemMigrated(this));
+    }
+
+    protected void renameChildItem(String formerName, String newName) {
+        if (getValue().isMap()) {
+            ValueMap map = getValue().asMap();
+            Value<?> childValue = map.get(formerName);
+            map.put(newName, childValue);
+            map.getValue().remove(formerName);
         }
     }
 }

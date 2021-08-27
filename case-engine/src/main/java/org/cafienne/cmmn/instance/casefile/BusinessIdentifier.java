@@ -33,4 +33,13 @@ class BusinessIdentifier extends CMMNElement<PropertyDefinition> {
     void updateState(BusinessIdentifierEvent event) {
         this.currentValue = event.getValue();
     }
+
+    protected void lostDefinition() {
+        // Ehm ... introduce a special event for this???
+        // but ... we also must check whether a business identifier with the same name now exists
+        //  somewhere else in the case file???
+        //
+        // For now simply clear the identifier
+        clear();
+    }
 }
