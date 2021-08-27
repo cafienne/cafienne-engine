@@ -418,4 +418,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         getCaseFile().migrateDefinition(definition.getCaseFileModel());
         getCasePlan().migrateDefinition(definition.getCasePlanModel());
     }
+
+    public void removeDroppedPlanItem(PlanItem<?> item) {
+        planItems.remove(item);
+    }
 }

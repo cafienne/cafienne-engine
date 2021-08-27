@@ -10,6 +10,7 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
@@ -639,6 +640,14 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     protected void lostDefinition() {
         // Scenario not yet supported... What to do with existing items that cannot be found in the new stage definition?
-        addDebugInfo(() -> "Not possible to migrate plan item " + getPath() + ", as a new definition is not found for it.");
+        addDebugInfo(() -> "Dropping plan item " + getPath() + " upon case migration, as a new definition is not found for the plan item.");
+        addEvent(new PlanItemDropped(this));
+    }
+
+    public void updateState(PlanItemDropped event) {
+        getEntryCriteria().release();
+        getExitCriteria().release();
+        getStage().removeDroppedPlanItem(this);
+        getCaseInstance().removeDroppedPlanItem(this);
     }
 }

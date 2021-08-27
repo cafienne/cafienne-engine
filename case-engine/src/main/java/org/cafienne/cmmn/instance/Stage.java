@@ -9,6 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.*;
@@ -286,12 +287,24 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         if (newChildItemDefinition != null) {
             migrateChild(child, newChildItemDefinition);
         } else {
-            child.lostDefinition();
+            dropChild(child);
         }
     }
 
     private boolean doesNotHaveChild(PlanItemDefinition newChildDefinition) {
         return this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().getId().equals(newChildDefinition.getId()) || item.getName().equals(newChildDefinition.getName()));
+    }
+
+    private void dropChild(PlanItem<?> child) {
+        child.lostDefinition();
+    }
+
+    @Override
+    protected void lostDefinition() {
+        // First drop our children
+        planItems.forEach(PlanItem::lostDefinition);
+        // Then generate our own event
+        super.lostDefinition();
     }
 
     private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition) {
@@ -304,5 +317,9 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             // Scenario not yet supported...
             addDebugInfo(() -> "Not possible to migrate from " + currentChildDefinition.getType() + " to " + newChildDefinition.getType());
         }
+    }
+
+    void removeDroppedPlanItem(PlanItem<?> item) {
+        planItems.remove(item);
     }
 }
