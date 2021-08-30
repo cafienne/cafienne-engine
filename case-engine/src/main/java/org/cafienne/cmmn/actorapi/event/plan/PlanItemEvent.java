@@ -57,7 +57,7 @@ public abstract class PlanItemEvent extends CaseEvent {
     }
 
     public void writePlanItemEvent(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
         writeField(generator, Fields.planItemId, planItemId);
         writeField(generator, Fields.type, type);
 

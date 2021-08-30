@@ -56,7 +56,7 @@ public abstract class BusinessIdentifierEvent extends CaseEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
         writeField(generator, Fields.path, path);
         writeField(generator, Fields.name, name);
         writeField(generator, Fields.type, type);

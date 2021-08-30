@@ -20,6 +20,6 @@ public abstract class CaseTeamEvent extends CaseEvent {
     }
 
     protected void writeCaseTeamEvent(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
     }
 }

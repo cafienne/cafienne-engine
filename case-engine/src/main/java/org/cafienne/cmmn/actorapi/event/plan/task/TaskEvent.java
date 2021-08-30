@@ -49,7 +49,7 @@ public abstract class TaskEvent<T extends Task<?>> extends CaseEvent {
     }
 
     public void writeTaskEvent(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
         writeField(generator, Fields.taskId, taskId);
         writeField(generator, Fields.type, type);
     }
