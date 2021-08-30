@@ -1,4 +1,4 @@
-package org.cafienne.service.db.materializer.cases
+package org.cafienne.service.db.materializer.cases.plan
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.TransactionEvent
@@ -69,6 +69,7 @@ object PlanItemHistoryMerger extends LazyLogging {
         None
     }
   }
+
   def merge(modified: TransactionEvent[_], current: PlanItemHistoryRecord): PlanItemHistoryRecord =
     current.copy(lastModified = modified.lastModified(), modifiedBy = modified.getUser.id)
 }

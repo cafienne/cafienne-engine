@@ -1,7 +1,7 @@
-package org.cafienne.service.db.materializer.cases;
+package org.cafienne.service.db.materializer.cases.file;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.instance.casefile.Path;
 
 import java.util.ArrayList;

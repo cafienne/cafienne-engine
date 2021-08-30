@@ -1,4 +1,4 @@
-package org.cafienne.service.db.materializer.cases
+package org.cafienne.service.db.materializer.cases.plan
 
 import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.cmmn.actorapi.event.plan.task.{TaskInputFilled, TaskOutputFilled}
