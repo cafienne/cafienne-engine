@@ -67,15 +67,14 @@ public class PlanItemCreated extends PlanItemEvent {
         return stageId;
     }
 
-    private transient PlanItem<?> planItem;
-
     public PlanItem<?> getCreatedPlanItem() {
-        return planItem;
+        return getPlanItem();
     }
 
     @Override
     public void updateState(Case actor) {
-        planItem = actor.add(this);
+        PlanItem<?> item = actor.add(this);
+        setPlanItem(item);
     }
 
     @Override

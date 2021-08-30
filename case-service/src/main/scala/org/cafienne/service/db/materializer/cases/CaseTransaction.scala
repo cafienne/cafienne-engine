@@ -34,15 +34,12 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
   override def handleEvent(evt: CaseEvent, offsetName: String, offset: Offset): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " in case " + caseInstanceId)
     evt match {
-      case event: CaseDefinitionApplied => createCaseInstance(event)
-      case event: PlanItemEvent => handlePlanItemEvent(event)
+      case event: CasePlanEvent[_] => handleCasePlanEvent(event)
       case event: CaseFileEvent => handleCaseFileEvent(event)
       case event: CaseTeamEvent => handleCaseTeamEvent(event)
-      case event: HumanTaskCreated => deprecatedCreateTask(event)
-      case event: HumanTaskActivated => createTask(event)
-      case event: HumanTaskEvent => handleHumanTaskEvent(event)
-      case event: CaseAppliedPlatformUpdate => updateUserIds(event, offsetName, offset)
+      case event: CaseDefinitionApplied => createCaseInstance(event)
       case event: CaseModified => updateCaseInstance(event)
+      case event: CaseAppliedPlatformUpdate => updateUserIds(event, offsetName, offset)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -53,6 +50,16 @@ class CaseTransaction(caseInstanceId: String, tenant: String, persistence: Recor
     this.caseFile = Some(new ValueMap()) // Always create an empty case file
     CaseInstanceRoleMerger.merge(event).map(role => caseInstanceRoles.put(role.roleName, role))
     Future.successful(Done)
+  }
+
+  private def handleCasePlanEvent(event: CasePlanEvent[_]): Future[Done] = {
+    event match {
+      case event: PlanItemEvent => handlePlanItemEvent(event)
+      case event: HumanTaskCreated => deprecatedCreateTask(event)
+      case event: HumanTaskActivated => createTask(event)
+      case event: HumanTaskEvent => handleHumanTaskEvent(event)
+      case _ => Future.successful(Done) // ignore other events
+    }
   }
 
   private def handlePlanItemEvent(event: PlanItemEvent): Future[Done] = {

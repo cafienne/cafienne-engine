@@ -251,7 +251,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         String stageId = event.getStageId();
         if (stageId.isEmpty()) {
             CasePlanDefinition definition = this.getDefinition().getCasePlanModel();
-            this.casePlan = definition.createInstance(event.planItemId, 0, definition, null, this);
+            this.casePlan = definition.createInstance(event.getPlanItemId(), 0, definition, null, this);
             return this.casePlan;
         } else {
             // Lookup the stage to which the plan item belongs,

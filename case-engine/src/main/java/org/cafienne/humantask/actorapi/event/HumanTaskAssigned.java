@@ -8,13 +8,13 @@
 package org.cafienne.humantask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.TaskAction;
 import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.humantask.instance.WorkflowTask;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
@@ -40,9 +40,9 @@ public class HumanTaskAssigned extends HumanTaskTransitioned {
     }
 
     @Override
-    public void updateState(Case caseInstance) {
-        super.updateState(caseInstance);
-        getTask().getImplementation().updateState(this);
+    public void updateState(WorkflowTask task) {
+        super.updateState(task);
+        task.updateState(this);
     }
 
     @Override
