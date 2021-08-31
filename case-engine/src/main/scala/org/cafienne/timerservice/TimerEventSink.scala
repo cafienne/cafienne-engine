@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: CaseSystem, implicit val system: ActorSystem) extends TaggedEventConsumer {
 
   val storage: TimerStore = new TimerStoreProvider()(system).store
-  override val offsetStorage: OffsetStorage = storage
+  override def offsetStorage: OffsetStorage = storage
   override val tag: String = TimerBaseEvent.TAG
   private val schedule: mutable.Map[String, Scheduled] = mutable.Map()
 
