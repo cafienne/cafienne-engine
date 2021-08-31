@@ -1,6 +1,5 @@
 package org.cafienne.service.api.repository
 
-import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
@@ -35,7 +34,7 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
     */
   def testValidationRoute(testName: String, fileName: String, expectedResponseMessage: String, expectedResponseCode: StatusCode) = {
     import scala.concurrent.duration._
-    implicit def default(implicit system: ActorSystem) = RouteTestTimeout(5.second) // Validation likes to take some of your time ;)
+    implicit def default = RouteTestTimeout(5.second) // Validation likes to take some of your time ;)
 
     val entity = createHTTPEntity(fileName)
 
@@ -53,7 +52,7 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
     if (fileStream == null) {
       throw new IllegalArgumentException("The file with name "+fileName+" cannot be loaded from the classpath")
     }
-    val fileBytes = Stream.continually(fileStream.read).takeWhile(b => b != -1).map(_.toByte).toArray
+    val fileBytes = LazyList.continually(fileStream.read).takeWhile(b => b != -1).map(_.toByte).toArray
     HttpEntity(ValueMarshallers.`application/xml`, fileBytes)
   }
 }

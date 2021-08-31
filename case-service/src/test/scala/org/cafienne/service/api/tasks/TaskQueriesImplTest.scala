@@ -29,7 +29,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val userWithAandB = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, List("A", "B"))
   val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, List("B", "C"))
 
-  override def beforeAll {
+  override def beforeAll() = {
     QueryDB.verifyConnectivity()
 
     println("Writing cases")
@@ -77,7 +77,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "retrieve a caseinstanceId by taskId" in {
     val res = Await.result(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId("1", testUser), 1.second)
-    res must be(case33, tenant)
+    res must be((case33, tenant))
   }
 
   it should "retrieve nothing by unknown taskId" in {

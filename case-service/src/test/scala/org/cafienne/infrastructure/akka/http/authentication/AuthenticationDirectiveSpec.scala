@@ -1,30 +1,28 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import java.security.KeyPairGenerator
-import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
-import java.util.Date
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.OAuth2BearerToken
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.source.{ImmutableJWKSet, JWKSource}
 import com.nimbusds.jose.jwk.{JWKSet, RSAKey}
 import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
 import org.cafienne.actormodel.command.exception.AuthorizationException
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
-import scala.jdk.CollectionConverters._
+import java.security.KeyPairGenerator
+import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
+import java.util.Date
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 
 class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with SprayJsonSupport with ScalatestRouteTest {
   //TODO add a test with a non UUID subject
@@ -32,7 +30,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   final val tokenWithoutRole = generateTokenAndSource("subject2", List.empty[String])
   final val tokenWithoutUUID = generateTokenAndSource("nouuidsubject", List("A_ROLE"))
 
-  implicit val ec = ExecutionContext.global
+  implicit val executionContext = ExecutionContext.global
 
   implicit val requestServiceExceptionHandler = ExceptionHandler {
     case e: Exception => rc => rc.complete(StatusCodes.Unauthorized -> e.getMessage)
@@ -51,7 +49,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       }
       override def clear(userId: String): Unit = ???
     }
-    override implicit val ec: ExecutionContext = ec
+    override implicit val ec: ExecutionContext = executionContext
   }
 
   object RouteWithRoles {
@@ -78,7 +76,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       }
       override def clear(userId: String): Unit = ???
     }
-    override implicit val ec: ExecutionContext = ec
+    override implicit val ec: ExecutionContext = executionContext
   }
 
   object RouteWithoutRolesAndDifferentKeyPair {
@@ -105,7 +103,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       }
       override def clear(userId: String): Unit = ???
     }
-    override implicit val ec: ExecutionContext = ec
+    override implicit val ec: ExecutionContext = executionContext
   }
 
   object RouteNoUUIDinUser {
@@ -164,7 +162,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     val kp         = keyGenerator.genKeyPair
     val publicKey  = kp.getPublic.asInstanceOf[RSAPublicKey]
     val privateKey = kp.getPrivate.asInstanceOf[RSAPrivateKey]
-    val builder = new RSAKey.Builder(publicKey.asInstanceOf[RSAPublicKey])
+    val builder = new RSAKey.Builder(publicKey)
       .privateKey(privateKey)
       .algorithm(JWSAlgorithm.RS256)
 
@@ -177,10 +175,10 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
       .expirationTime(new Date(new Date().getTime + 60 * 1000))
 
     //empty roles give a claims set without the roles inside (for testing)
-    if (!roles.isEmpty) claimsSetBuilder.claim("groups", jsonArray)
+    if (roles.nonEmpty) claimsSetBuilder.claim("groups", jsonArray)
 
     val claimsSet = claimsSetBuilder.build()
-    var signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet)
+    val signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet)
     val signer    = new RSASSASigner(privateKey)
     signedJWT.sign(signer)
     (signedJWT.serialize, jwkSet)
