@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,12 +10,11 @@ package org.cafienne.cmmn.actorapi.event.file;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.*;
-import org.cafienne.cmmn.instance.sentry.StandardEvent;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
+import org.cafienne.cmmn.instance.casefile.InvalidPathException;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,38 +22,24 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * Event caused by a transition on a CaseFileItem
+ * Event caused on the Case File
  */
-@Manifest
-public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileItemTransition, CaseFileItem> {
+public abstract class CaseFileEvent extends CaseEvent {
     protected final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
-    private final CaseFileItemTransition transition;
-    private final Value<?> value;
-    protected final Path path;
-    private final State state;
+    /**
+     * The path to the case file item on which this event occurred (e.g., Order/Line[3])
+     */
+    public final Path path;
 
-    protected transient CaseFileItem caseFileItem;
-
-    public CaseFileEvent(CaseFileItemCollection<?> item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
+    protected CaseFileEvent(CaseFileItemCollection<?> item) {
         super(item.getCaseInstance());
-        this.transition = transition;
-        this.value = newValue;
         this.path = item.getPath();
-        this.state = newState;
     }
 
-    public CaseFileEvent(ValueMap json) {
+    protected CaseFileEvent(ValueMap json) {
         super(json);
-        this.transition = json.getEnum(Fields.transition, CaseFileItemTransition.class);
-        this.value = json.get(Fields.value.toString());
         this.path = readPath(json, Fields.path);
-        this.state = readEnum(json, Fields.state, State.class);
-    }
-
-    @Override
-    public CaseFileItem getSource() {
-        return caseFileItem;
     }
 
     @Override
@@ -62,44 +47,7 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         return getDescription();
     }
 
-    @Override
-    public String getDescription() {
-        return this.getClass().getSimpleName() + "['" + path + "']." + getTransition().toString().toLowerCase() + "() ===> " + getState();
-    }
-
-    /**
-     * Returns the transition that the case file item went through.
-     *
-     * @return
-     */
-    public CaseFileItemTransition getTransition() {
-        return transition;
-    }
-
-    /**
-     * Returns the state of the case file item
-     * @return
-     */
-    public State getState() {
-        return state;
-    }
-
-    /**
-     * Returns the index of the case file item within it's parent (or -1 if it is not an iterable case file item)
-     * @return
-     */
-    public int getIndex() {
-        return path.getIndex();
-    }
-
-    /**
-     * Returns the new value of the case file item.
-     *
-     * @return
-     */
-    public Value<?> getValue() {
-        return value;
-    }
+    protected transient CaseFileItem caseFileItem;
 
     /**
      * Return the case file item's path through which the change was made (e.g., Order/Line)
@@ -110,38 +58,35 @@ public class CaseFileEvent extends CaseEvent implements StandardEvent<CaseFileIt
         return path;
     }
 
+    /**
+     * Returns the index of the case file item within it's parent (or -1 if it is not an iterable case file item)
+     *
+     * @return
+     */
+    public int getIndex() {
+        return path.getIndex();
+    }
+
     @Override
     public void updateState(Case caseInstance) {
         try {
             // Resolve the path on the case file
             caseFileItem = path.resolve(caseInstance);
-            caseFileItem.publishTransition(this);
+            updateState(caseFileItem);
         } catch (InvalidPathException shouldNotHappen) {
-            logger.error("Could not recover path on case instance?!", shouldNotHappen);
+            logger.error("Could not recover path '" + path + "' on case instance?!", shouldNotHappen);
         }
     }
 
-    @Override
-    public boolean hasBehavior() {
-        return true;
-    }
+    abstract protected void updateState(CaseFileItem item);
 
     @Override
-    public void runImmediateBehavior() {
-        caseFileItem.informConnectedEntryCriteria(this);
+    public String getDescription() {
+        return this.getClass().getSimpleName() + "['" + path + "']";
     }
 
-    @Override
-    public void runDelayedBehavior() {
-        caseFileItem.informConnectedExitCriteria(this);
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
-        writeField(generator, Fields.transition, transition);
+    public void writeCaseFileEvent(JsonGenerator generator) throws IOException {
+        super.writeCaseEvent(generator);
         writeField(generator, Fields.path, path);
-        writeField(generator, Fields.value, value);
-        writeField(generator, Fields.state, state);
     }
 }

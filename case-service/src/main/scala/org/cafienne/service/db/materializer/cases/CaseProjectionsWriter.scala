@@ -12,7 +12,7 @@ class CaseProjectionsWriter(persistence: RecordsPersistence, offsetStorageProvid
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override val offsetStorage: OffsetStorage = offsetStorageProvider.storage("CaseProjectionsWriter")
+  override def offsetStorage: OffsetStorage = offsetStorageProvider.storage("CaseProjectionsWriter")
   override val tag: String = CaseEvent.TAG
   override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
 

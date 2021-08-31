@@ -21,10 +21,11 @@ public class CaseResponseWithValueMap extends CaseResponse {
     }
 
     /**
-     * Returns a JSON representation of the discretionary items that are currently applicable in the case
+     * Returns a JSON representation of this object
      * @return
      */
-    public ValueMap getResponse() {
+    @Override
+    public ValueMap toJson() {
         return value;
     }
 
@@ -36,6 +37,6 @@ public class CaseResponseWithValueMap extends CaseResponse {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ": " + getResponse();
+        return getClass().getSimpleName() + ": " + toJson();
     }
 }

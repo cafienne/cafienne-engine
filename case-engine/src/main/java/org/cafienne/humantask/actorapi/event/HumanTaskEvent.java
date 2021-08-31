@@ -8,10 +8,11 @@
 package org.cafienne.humantask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.humantask.instance.WorkflowTask;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
@@ -39,16 +40,23 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
     }
 
     protected void writeHumanTaskEvent(JsonGenerator generator) throws IOException {
-        super.writeModelEvent(generator);
+        super.writeCasePlanEvent(generator);
         writeField(generator, Fields.taskName, taskName);
         writeField(generator, Fields.taskId, taskId);
     }
 
-    /**
-     * Get the task id
-     * @return id of the task
-     */
-    public String getTaskId() {
+    @Override
+    public final void updateState(HumanTask task) {
+        updateState(task.getImplementation());
+    }
+
+    protected void updateState(WorkflowTask task) {
+    }
+
+    @Override
+    public String getPlanItemId() {
+        // Unfortunately need to override this, because recovery uses the plan item id,
+        // and older versions of HumanTaskEvent did not invoke parent's serializer.
         return taskId;
     }
 

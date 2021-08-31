@@ -22,7 +22,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   /**
     * Offset Storage to keep track of last handled event's offset
     */
-  val offsetStorage: OffsetStorage
+  def offsetStorage: OffsetStorage
   /**
     * Tag to scan events for
     */
@@ -92,7 +92,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
         //  consuming that were consumed already successfully before the source had to be restarted.
         offsetStorage.getOffset().map { offset: Offset =>
-          logger.debug("Starting from offset " + offset)
+          logger.warn(s"Starting to read '$tag' events from offset " + offset)
           journal().eventsByTag(tag, offset)
         }
       })

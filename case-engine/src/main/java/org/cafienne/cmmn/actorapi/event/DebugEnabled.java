@@ -34,6 +34,6 @@ public class DebugEnabled extends CaseEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
     }
 }

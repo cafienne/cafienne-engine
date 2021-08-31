@@ -4,7 +4,7 @@ import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 import org.cafienne.cmmn.actorapi.event._
-import org.cafienne.cmmn.actorapi.event.file.{CaseFileEvent, CaseFileItemCreated}
+import org.cafienne.cmmn.actorapi.event.file.{CaseFileItemTransitioned, CaseFileItemCreated}
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
@@ -85,7 +85,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
   }
 
 
-  def createCaseFileEvent(path: String, value: ValueMap, transition: CaseFileItemTransition, index: Int = -1, user: TenantUser = user): CaseFileEvent = {
+  def createCaseFileEvent(path: String, value: ValueMap, transition: CaseFileItemTransition, index: Int = -1, user: TenantUser = user): CaseFileItemTransitioned = {
     val json = new ValueMap(
       Fields.path, path
       ,Fields.value, value

@@ -1,21 +1,21 @@
-package org.cafienne.service.db.materializer.cases;
+package org.cafienne.service.db.materializer.cases.file;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.instance.casefile.Path;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class CaseFileEventBuffer {
-    private List<CaseFileEvent> events = new ArrayList<>();
-    private List<CaseFileEvent> removedChildren = new ArrayList<>();
+    private List<CaseFileItemTransitioned> events = new ArrayList<>();
+    private List<CaseFileItemTransitioned> removedChildren = new ArrayList<>();
 
     /**
      * Return the list of events to be handled in the current transaction
      * @return
      */
-    public List<CaseFileEvent> events() {
+    public List<CaseFileItemTransitioned> events() {
         events.addAll(removedChildren);
         return events;
     }
@@ -24,7 +24,7 @@ class CaseFileEventBuffer {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < events.size(); i++) {
-            CaseFileEvent event = events.get(i);
+            CaseFileItemTransitioned event = events.get(i);
             sb.append(i +":\t" + event.getClass().getSimpleName() + "["+event.getPath()+"]\n");
         }
         return sb.toString();
@@ -37,7 +37,7 @@ class CaseFileEventBuffer {
      * Only special case is for RemoveChild, as that has parent and child path in itself.
      * @param newEvent
      */
-    void addEvent(CaseFileEvent newEvent) {
+    void addEvent(CaseFileItemTransitioned newEvent) {
         // Store RemoveChild events separately
         if (newEvent instanceof CaseFileItemChildRemoved) {
             removedChildren.add(newEvent);
@@ -45,7 +45,7 @@ class CaseFileEventBuffer {
         }
         // First check to see if any of the existing events overrides our event; if so, just ignore the event.
         for (int i = 0; i < events.size(); i++) {
-            CaseFileEvent current = events.get(i);
+            CaseFileItemTransitioned current = events.get(i);
             Path currentPath = current.getPath();
             if (currentPath.hasChild(newEvent.getPath())) {
 //                System.out.println("Event[" + i + "] on path " + currentPath + " overrides new event on path " + newPath);
@@ -55,7 +55,7 @@ class CaseFileEventBuffer {
         // Apparently the new event has a top-level path; start removing all existing events that are under the new event.
         // Reversely go through our array to avoid strange index behavior
         for (int i = events.size() - 1 ; i >= 0 ; i--) {
-            CaseFileEvent current = events.get(i);
+            CaseFileItemTransitioned current = events.get(i);
             Path currentPath = current.getPath();
             Path newPath = newEvent.getPath();
             if (newPath.hasChild(currentPath)) {

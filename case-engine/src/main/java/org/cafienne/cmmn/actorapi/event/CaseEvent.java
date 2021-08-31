@@ -29,7 +29,7 @@ public abstract class CaseEvent extends BaseModelEvent<Case> {
         return this.getActorId();
     }
 
-    protected void writeCaseInstanceEvent(JsonGenerator generator) throws IOException {
+    protected void writeCaseEvent(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
     }
 

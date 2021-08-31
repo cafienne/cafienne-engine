@@ -16,7 +16,7 @@ class TenantProjectionsWriter
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override val offsetStorage: OffsetStorage = offsetStorageProvider.storage("TenantProjectionsWriter")
+  override def offsetStorage: OffsetStorage = offsetStorageProvider.storage("TenantProjectionsWriter")
   override val tag: String = TenantEvent.TAG
 
   override def createTransaction(actorId: String, tenant: String): TenantTransaction = new TenantTransaction(actorId, userQueries, updater, userCache)

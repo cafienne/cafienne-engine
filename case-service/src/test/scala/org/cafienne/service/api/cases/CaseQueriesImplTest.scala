@@ -60,7 +60,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     CaseTeamMemberRecord(caseInstanceId = idOfCompletedCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
   )
 
-  override def beforeAll {
+  override def beforeAll() = {
     QueryDB.verifyConnectivity()
     val records = Seq(activeCase, planItem1_1, terminatedCase, completedCase, planItem2_1, planItemHistory2_1) ++ caseTeamMemberRecords ++ TestIdentityFactory.asDatabaseRecords(user)
     records.foreach(record => updater.upsert(record))

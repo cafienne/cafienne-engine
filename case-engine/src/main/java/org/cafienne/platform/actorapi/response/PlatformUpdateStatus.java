@@ -37,7 +37,8 @@ public class PlatformUpdateStatus extends PlatformResponse {
         writeField(generator, Fields.update, map);
     }
 
-    public ValueMap getValue() {
+    @Override
+    public ValueMap toJson() {
         return map;
     }
 

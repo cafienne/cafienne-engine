@@ -38,7 +38,7 @@ public abstract class TimerBaseEvent extends CaseEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
         writeField(generator, Fields.timerId, timerId);
     }
 

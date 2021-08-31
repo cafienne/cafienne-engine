@@ -1,32 +1,32 @@
 package org.cafienne.cmmn.test.assertions.file;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.instance.State;
+import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CaseFileItemAssertion extends ModelTestCommandAssertion {
+public class CaseFileItemAssertion extends ModelTestCommandAssertion<CaseTestCommand> {
     private final Path path;
-    private final PublishedEventsAssertion<CaseFileEvent> events = new PublishedEventsAssertion(new ArrayList<>());
+    private final PublishedEventsAssertion<CaseFileItemTransitioned> events = new PublishedEventsAssertion(new ArrayList<>());
     private final CaseFileAssertion caseFileAssertion;
     private final boolean isArrayElement;
     private int indexInArray = -1;
 
-    CaseFileItemAssertion(CaseFileAssertion caseFileAssertion, ModelTestCommand command, Path path) {
+    CaseFileItemAssertion(CaseFileAssertion caseFileAssertion, CaseTestCommand command, Path path) {
         super(command);
         this.caseFileAssertion = caseFileAssertion;
         this.path = path;
         this.isArrayElement = path.isArrayElement();
     }
 
-    void addEvent(CaseFileEvent event) {
+    void addEvent(CaseFileItemTransitioned event) {
         // Reverse order of events; most recent one always at front
         this.events.getEvents().add(0, event);
         indexInArray = event.getIndex();
@@ -125,7 +125,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
      * @return
      */
     public Value<?> getValue() {
-        Value<?> value = getEventValue(CaseFileEvent::getValue, Value.NULL);
+        Value<?> value = getEventValue(CaseFileItemTransitioned::getValue, Value.NULL);
         if (!isArrayElement && value == Value.NULL) {
 
             final List<CaseFileItemAssertion> arrayElements = caseFileAssertion.getArrayElements(this.path);
@@ -141,7 +141,7 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     }
 
     private State getState() {
-        return getEventValue(CaseFileEvent::getState, State.Null);
+        return getEventValue(CaseFileItemTransitioned::getState, State.Null);
     }
 
     private String getName() {
@@ -154,6 +154,6 @@ public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     }
 
     interface EventValuePicker<T> {
-        T pick(CaseFileEvent e);
+        T pick(CaseFileItemTransitioned e);
     }
 }

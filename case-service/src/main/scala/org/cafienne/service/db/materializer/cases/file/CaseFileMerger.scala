@@ -1,13 +1,13 @@
-package org.cafienne.service.db.materializer.cases
+package org.cafienne.service.db.materializer.cases.file
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.file._
+import org.cafienne.cmmn.actorapi.event.file.{CaseFileItemChildRemoved, CaseFileItemTransitioned}
 import org.cafienne.cmmn.instance.casefile.{CaseFileItemTransition, Path}
 import org.cafienne.json.{Value, ValueMap}
 
 object CaseFileMerger extends LazyLogging {
 
-  def merge(event: CaseFileEvent, currentCaseFile: ValueMap): Unit = {
+  def merge(event: CaseFileItemTransitioned, currentCaseFile: ValueMap): Unit = {
     val path: Path = event.getPath
     val parentValue = path.resolveParent(currentCaseFile)
     val itemName = path.getName

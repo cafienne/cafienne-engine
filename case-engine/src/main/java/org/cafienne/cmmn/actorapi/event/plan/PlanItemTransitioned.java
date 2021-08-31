@@ -40,7 +40,7 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
 
     @Override
     public PlanItem<?> getSource() {
-        return planItem;
+        return getPlanItem();
     }
 
     public State getCurrentState() {
@@ -61,14 +61,14 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
 
     @Override
     public void runImmediateBehavior() {
-        planItem.runStateMachineAction(this);
-        planItem.informConnectedEntryCriteria(this);
+        getPlanItem().runStateMachineAction(this);
+        getPlanItem().informConnectedEntryCriteria(this);
     }
 
     @Override
     public void runDelayedBehavior() {
-        planItem.runStageCompletionCheck(this);
-        planItem.informConnectedExitCriteria(this);
+        getPlanItem().runStageCompletionCheck(this);
+        getPlanItem().informConnectedExitCriteria(this);
     }
 
     public Transition getTransition() {

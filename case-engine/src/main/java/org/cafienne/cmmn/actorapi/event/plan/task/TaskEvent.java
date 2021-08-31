@@ -1,57 +1,31 @@
 package org.cafienne.cmmn.actorapi.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.json.ValueMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public abstract class TaskEvent<T extends Task<?>> extends CaseEvent {
-    private final static Logger logger = LoggerFactory.getLogger(TaskEvent.class);
-
-    private final String taskId;
-    private final String type;
-
+public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent<T> {
     protected TaskEvent(T task) {
-        super(task.getCaseInstance());
-        this.taskId = task.getId();
-        this.type = task.getType();
+        super(task);
     }
 
     protected TaskEvent(ValueMap json) {
         super(json);
-        this.taskId = json.raw(Fields.taskId);
-        this.type = json.raw(Fields.type);
-    }
-
-    protected T getTask() {
-        T task = actor.getPlanItemById(getTaskId());
-        if (task == null) {
-            logger.error("MAJOR ERROR: Cannot recover task event for task with id " + getTaskId() + ", because the plan item cannot be found");
-        }
-        return task;
     }
 
     /**
-     * Returns type of task, taken from plan item. Typically HumanTask, ProcessTask or CaseTask.
-     * @return
+     * Get the task id
+     * @return id of the task
      */
-    public String getType() {
-        return this.type;
-    }
-
     public String getTaskId() {
-        return taskId;
+        return getPlanItemId();
     }
 
     public void writeTaskEvent(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
-        writeField(generator, Fields.taskId, taskId);
-        writeField(generator, Fields.type, type);
+        super.writeCasePlanEvent(generator);
     }
 
     @Override

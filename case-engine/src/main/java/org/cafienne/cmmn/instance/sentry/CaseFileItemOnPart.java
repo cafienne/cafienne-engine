@@ -7,16 +7,16 @@
  */
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 
-public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileEvent, CaseFileItem> {
+public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, CaseFileItemTransitioned, CaseFileItem> {
     private boolean isActive;
-    private CaseFileEvent lastEvent;
+    private CaseFileItemTransitioned lastEvent;
 
     public CaseFileItemOnPart(Criterion<?> criterion, CaseFileItemOnPartDefinition caseFileItemOnPartDefinition) {
         super(criterion, caseFileItemOnPartDefinition);
@@ -31,7 +31,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     void connectToCase() {
         // Try to connect with the case file item that is referenced from our definition
         CaseFileItem item = getDefinition().getSourceDefinition().getPath().resolve(getCaseInstance());
-        criterion.establishPotentialConnection(item);
+        establishPotentialConnection(item);
     }
 
     @Override
@@ -39,9 +39,14 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         connectedItems.forEach(caseFileItem -> caseFileItem.releaseOnPart(this));
     }
 
-    void connect(CaseFileItem caseFileItem) {
+    @Override
+    protected void establishPotentialConnection(CaseFileItem caseFileItem) {
         if (connectedItems.contains(caseFileItem)) {
             // Avoid repeated additions
+            return;
+        }
+        // Only connect if the case file item has the same definition as our source definition.
+        if (!getDefinition().getSourceDefinition().equals(caseFileItem.getDefinition())) {
             return;
         }
         addDebugInfo(() -> "Connecting case file item " + caseFileItem + " to " + criterion);
@@ -49,7 +54,7 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         caseFileItem.connectOnPart(this);
     }
 
-    public void inform(CaseFileItem item, CaseFileEvent event) {
+    public void inform(CaseFileItem item, CaseFileItemTransitioned event) {
         addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
         lastEvent = event;
         isActive = getStandardEvent().equals(event.getTransition());
@@ -64,9 +69,9 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
     @Override
     ValueMap toJson() {
         return new ValueMap("casefile-item", getSourceName(),
-            "active", isActive,
-            "awaiting-transition", getStandardEvent(),
-            "last-found-transition", "" + lastEvent
+                "active", isActive,
+                "awaiting-transition", getStandardEvent(),
+                "last-found-transition", "" + lastEvent
         );
     }
 

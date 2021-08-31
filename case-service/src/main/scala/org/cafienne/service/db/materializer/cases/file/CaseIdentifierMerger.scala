@@ -1,4 +1,4 @@
-package org.cafienne.service.db.materializer.cases
+package org.cafienne.service.db.materializer.cases.file
 
 import org.cafienne.cmmn.actorapi.event.file.{BusinessIdentifierCleared, BusinessIdentifierSet}
 import org.cafienne.service.db.record.CaseBusinessIdentifierRecord

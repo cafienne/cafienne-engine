@@ -8,10 +8,9 @@
 package org.cafienne.cmmn.actorapi.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.instance.Task;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Task;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -34,8 +33,8 @@ public class TaskOutputFilled extends TaskEvent<Task<?>> {
     }
 
     @Override
-    public void updateState(Case caseInstance) {
-        getTask().updateState(this);
+    public void updateState(Task<?> task) {
+        task.updateState(this);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class TaskOutputFilled extends TaskEvent<Task<?>> {
 
     @Override
     public String toString() {
-        return "Plan item " + getTaskId() + " has output:\n" + parameters;
+        return "Task " + getTaskId() + " has output:\n" + parameters;
     }
 
     public ValueMap getTaskOutputParameters() {

@@ -16,11 +16,7 @@ import java.util.Collection;
 /**
  * Interface to generalize across PlanItemDefinition and DiscretionaryItemDefinition (and CasePlanDefinition)
  */
-public interface ItemDefinition {
-    String getId();
-
-    String getName();
-
+public interface ItemDefinition extends DefinitionElement {
     ItemControlDefinition getPlanItemControl();
 
     PlanItemDefinitionDefinition getPlanItemDefinition();

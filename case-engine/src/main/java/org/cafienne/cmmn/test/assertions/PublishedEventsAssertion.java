@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.CaseTestCommand;
@@ -99,9 +99,9 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param filter
      * @return
      */
-    public CaseFileEvent assertCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter) {
+    public CaseFileItemTransitioned assertCaseFileEvent(Path path, EventFilter<CaseFileItemTransitioned> filter) {
 //        logger.debug("Searching for case file event on path "+path);
-        return assertEvent("CaseFileEvent-"+path, CaseFileEvent.class, event -> path.matches(event.getPath()) && filter.matches(event));
+        return assertEvent("CaseFileItemTransitioned-"+path, CaseFileItemTransitioned.class, event -> path.matches(event.getPath()) && filter.matches(event));
     }
 
     /**
@@ -114,14 +114,14 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
     }
 
     /**
-     * Assert that there are no CaseFileEvent inside this set of events matching the case file item path
+     * Assert that there are no CaseFileItemTransitioned inside this set of events matching the case file item path
      * and the additional filter
      * @param path CaseFileItem path, e.g. /Root/Top/List[3]
      * @param filter
      * @return
      */
-    public PublishedEventsAssertion assertNoCaseFileEvent(Path path, EventFilter<CaseFileEvent> filter) {
-        filter(CaseFileEvent.class).getEvents().forEach(event -> {
+    public PublishedEventsAssertion assertNoCaseFileEvent(Path path, EventFilter<CaseFileItemTransitioned> filter) {
+        filter(CaseFileItemTransitioned.class).getEvents().forEach(event -> {
             if (path.matches(event.getPath()) && filter.matches(event)) {
                 throw new AssertionError("Did not expect to find a matching case file event on path "+path+", but found\n" + event);
             }

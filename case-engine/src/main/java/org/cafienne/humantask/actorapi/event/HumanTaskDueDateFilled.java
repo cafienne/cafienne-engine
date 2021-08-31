@@ -8,10 +8,11 @@
 package org.cafienne.humantask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -28,6 +29,11 @@ public class HumanTaskDueDateFilled extends HumanTaskEvent {
     public HumanTaskDueDateFilled(ValueMap json) {
         super(json);
         this.dueDate = json.rawInstant(Fields.dueDate);
+    }
+
+    @Override
+    protected void updateState(WorkflowTask task) {
+        task.updateState(this);
     }
 
     @Override

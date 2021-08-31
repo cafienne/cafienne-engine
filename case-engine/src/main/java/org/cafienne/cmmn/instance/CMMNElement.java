@@ -8,12 +8,12 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.DefinitionElement;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.json.Value;
 
-public class CMMNElement<T extends CMMNElementDefinition> {
+public class CMMNElement<T extends DefinitionElement> {
     private final Case caseInstance;
     private final T definition;
 

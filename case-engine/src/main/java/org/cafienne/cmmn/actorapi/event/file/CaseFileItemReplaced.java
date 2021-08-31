@@ -18,7 +18,7 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
  * Event caused by creation of a CaseFileItem
  */
 @Manifest
-public class CaseFileItemReplaced extends CaseFileEvent {
+public class CaseFileItemReplaced extends CaseFileItemTransitioned {
     public CaseFileItemReplaced(CaseFileItem item, Value<?> newValue) {
         super(item, State.Available, CaseFileItemTransition.Replace, newValue);
     }

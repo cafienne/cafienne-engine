@@ -86,7 +86,7 @@ public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseInstanceEvent(generator);
+        super.writeCaseEvent(generator);
         writeField(generator, Fields.numFailures, new LongValue(numFailures));
         writeField(generator, Fields.state, state);
         writeField(generator, Fields.lastModified, lastModified);

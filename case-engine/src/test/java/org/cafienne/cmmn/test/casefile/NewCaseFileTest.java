@@ -8,7 +8,7 @@ import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent;
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
@@ -107,7 +107,7 @@ public class NewCaseFileTest {
             result.getEvents().printEventList();
             Value<?> v = new CaseFileAssertion(result.getTestCommand()).assertCaseFileItem(rootPath).getValue();
             result.getEvents().assertSize(3);
-            result.getEvents().filter(CaseFileEvent.class).getEvents().forEach(event -> TestScript.debugMessage(event +" with value " + event.getValue()));
+            result.getEvents().filter(CaseFileItemTransitioned.class).getEvents().forEach(event -> TestScript.debugMessage(event +" with value " + event.getValue()));
             TestScript.debugMessage("\n\nCF: " + v);
             result.print();
 

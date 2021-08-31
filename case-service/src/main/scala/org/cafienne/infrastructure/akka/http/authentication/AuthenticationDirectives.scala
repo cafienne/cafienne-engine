@@ -6,7 +6,6 @@ import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.Configured
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
   *
   *
   */
-trait AuthenticationDirectives extends Configured {
+trait AuthenticationDirectives {
   self: Directives =>
 
   //  implicit val ec = ExecutionContext.global
