@@ -1,8 +1,8 @@
 package org.cafienne.service.db.materializer
 
 import akka.Done
-import akka.persistence.query.Offset
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
+import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.db.record._
 
 import scala.concurrent.Future
@@ -27,7 +27,7 @@ trait RecordsPersistence {
 
   def getTask(taskId: String): Future[Option[TaskRecord]]
 
-  def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done]
+  def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done]
 
-  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done]
+  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done]
 }

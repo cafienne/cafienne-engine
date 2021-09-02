@@ -1,7 +1,6 @@
 package org.cafienne.service.db.materializer.slick
 
 import akka.Done
-import akka.persistence.query.Offset
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
@@ -89,7 +88,7 @@ class SlickRecordsPersistence
     db.run(TableQuery[UserRoleTable].filter(record => record.userId === key.userId && record.tenant === key.tenant && record.role_name === key.role_name).result.headOption)
   }
 
-  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = {
+  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = {
     // Update logic has some complexity when the multiple old user id's are mapped to the same new user id
     //  In that case, duplicate key insertion may occur with the earlier approach that is done through 'simpleUpdate' below.
     val simpleUpdate = info.filter(u => u.newUserId != u.existingUserId).map(user => {
@@ -146,7 +145,7 @@ class SlickRecordsPersistence
       sql
     }
 
-    statements.flatMap(sql => db.run(DBIO.sequence(sql ++ getOffsetRecord(offsetName, offset)).transactionally).map(_ => Done))
+    statements.flatMap(sql => db.run(DBIO.sequence(sql ++ addOffsetRecord(offset)).transactionally).map(_ => Done))
   }
 
   private def convertUserUpdate(info: Seq[NewUserInformation]): Set[(String, Set[String])] = {
@@ -211,7 +210,7 @@ class SlickRecordsPersistence
     }
   }
 
-  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = {
+  def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = {
     // When the user id is updated, then all records relating to the case instance need to be updated
     //  - Case itself on [createdBy, modifiedBy]
     //  - CaseDefinition on [modifiedBy]
@@ -250,7 +249,7 @@ class SlickRecordsPersistence
     }) ++ info.map(user => {
       // Update 'owner' field in task table
       (for {cases <- TableQuery[TaskTable].filter(r => r.caseInstanceId === caseId && r.owner === user.existingUserId)} yield cases.owner).update(user.newUserId)
-    }) ++ getOffsetRecord(offsetName, offset)
+    }) ++ addOffsetRecord(offset)
 
     // Now retrieve the future with the case team updates, and combine it with the above statements and run it
     val caseteamUpdates = constructCaseTeamUserIdUpdates(caseId, info)
@@ -263,10 +262,10 @@ class SlickRecordsPersistence
   }
 
   //  var nr = 0L
-  private def getOffsetRecord(offsetName: String, offset: Offset): Seq[DBIO[_]] = {
+  private def addOffsetRecord(offset: OffsetRecord): Seq[DBIO[_]] = {
     //    println(s"$nr: Updating $offsetName to $offset")
     //    nr += 1
-    Seq(TableQuery[OffsetStoreTable].insertOrUpdate(OffsetRecord(offsetName, offset)))
+    Seq(TableQuery[OffsetStoreTable].insertOrUpdate(offset))
   }
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {

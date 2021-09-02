@@ -1,8 +1,8 @@
 package org.cafienne.service.api.writer
 
 import akka.Done
-import akka.persistence.query.Offset
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
+import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record._
 
@@ -33,8 +33,8 @@ class TestPersistence() extends RecordsPersistence {
 
   override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = Future.successful(None)
 
-  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = Future.successful(Done)
+  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = Future.successful(Done)
 
-  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offsetName: String, offset: Offset): Future[Done] = Future.successful(Done)
+  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = Future.successful(Done)
 
 }

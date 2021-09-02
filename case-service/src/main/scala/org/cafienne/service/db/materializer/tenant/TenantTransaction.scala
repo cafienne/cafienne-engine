@@ -3,19 +3,21 @@ package org.cafienne.service.db.materializer.tenant
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
+import org.cafienne.actormodel.event.TransactionEvent
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
 import org.cafienne.service.db.materializer.RecordsPersistence
+import org.cafienne.service.db.materializer.slick.SlickTransaction
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.db.record.{TenantRecord, UserRoleKey, UserRoleRecord}
-import org.cafienne.service.db.materializer.slick.SlickTransaction
 import org.cafienne.tenant.actorapi.event._
 import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: RecordsPersistence, userCache: IdentityProvider)(implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
+class TenantTransaction
+  (tenant: String, userQueries: UserQueries, persistence: RecordsPersistence, userCache: IdentityProvider, offsetStorage: OffsetStorage)
+  (implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
 
   val tenants = scala.collection.mutable.HashMap[String, TenantRecord]()
   val users = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
@@ -25,14 +27,13 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     users.keySet.map(key => key.userId).toSet
   }
 
-  
-  def handleEvent(evt: ModelEvent[_], offsetName: String, offset: Offset): Future[Done] = {
-    logger.debug("Handling event of type " + evt.getClass.getSimpleName + " on tenant " + tenant)
+  override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
+    logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " on tenant " + tenant)
 
-    evt match {
+    envelope.event match {
       case p: PlatformEvent => handlePlatformEvent(p)
       case t: TenantUserEvent => handleUserEvent(t)
-      case u: TenantAppliedPlatformUpdate => updateUserIds(u, offsetName, offset)
+      case u: TenantAppliedPlatformUpdate => updateUserIds(u, envelope.offset)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -40,8 +41,8 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
   def handlePlatformEvent(event: PlatformEvent): Future[Done] = {
     event match {
       case newTenant: TenantCreated => tenants.put(newTenant.tenantName, TenantRecord(newTenant.tenantName()))
-      case disabledTenant: TenantDisabled => tenants.put(disabledTenant.tenantName(), TenantRecord(disabledTenant.tenantName(), false))
-      case enabledTenant: TenantEnabled => tenants.put(enabledTenant.tenantName(), TenantRecord(enabledTenant.tenantName(), true))
+      case disabledTenant: TenantDisabled => tenants.put(disabledTenant.tenantName(), TenantRecord(disabledTenant.tenantName(), enabled = false))
+      case enabledTenant: TenantEnabled => tenants.put(enabledTenant.tenantName(), TenantRecord(enabledTenant.tenantName(), enabled = true))
       case _ => Future.successful(Done) // Ignore other events
     }
     Future.successful(Done)
@@ -67,17 +68,17 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
     })
   }
 
-  def updateUserIds(event: TenantAppliedPlatformUpdate, offsetName: String, offset: Offset): Future[Done] = {
-    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, offsetName, offset)
+  private def updateUserIds(event: TenantAppliedPlatformUpdate, offset: Offset): Future[Done] = {
+    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, offsetStorage.createOffsetRecord(offset))
   }
 
-  override def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done] = {
+  override def commit(envelope: ModelEventEnvelope, transactionEvent: TransactionEvent[_]): Future[Done] = {
     // Gather all records inserted/updated in this transaction, and give them for bulk update
     this.users.values.foreach(record => persistence.upsert(record))
     this.tenants.values.foreach(record => persistence.upsert(record))
 
     // Even if there are no new records, we will still update the offset store
-    persistence.upsert(OffsetRecord(offsetName, offset))
+    persistence.upsert(offsetStorage.createOffsetRecord(envelope.offset))
 
     persistence.commit()
   }

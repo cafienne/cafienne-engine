@@ -19,4 +19,10 @@ trait OffsetStorage extends LazyLogging {
     * @return
     */
   def getOffset(): Future[Offset]
+  /**
+    * Creates a record for the given offset with the storage name. Does not store the record.
+    * @param offset
+    * @return
+    */
+  def createOffsetRecord(offset: Offset): OffsetRecord = OffsetRecord(storageName, offset)
 }

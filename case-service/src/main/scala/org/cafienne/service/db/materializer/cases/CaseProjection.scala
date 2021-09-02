@@ -1,9 +1,8 @@
 package org.cafienne.service.db.materializer.cases
 
 import akka.Done
-import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.{CaseAppliedPlatformUpdate, CaseDefinitionApplied, CaseEvent, CaseModified}
+import org.cafienne.cmmn.actorapi.event.{CaseDefinitionApplied, CaseEvent, CaseModified}
 import org.cafienne.cmmn.instance.State
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.cases.file.CaseFileProjection
@@ -15,11 +14,10 @@ class CaseProjection(persistence: RecordsPersistence, caseFileProjection: CaseFi
   private var caseInstance: Option[CaseRecord] = None
   private var caseDefinition: Option[CaseDefinitionRecord] = None
 
-  def handleCaseEvent(event: CaseEvent, offsetName: String, offset: Offset): Future[Done] = {
+  def handleCaseEvent(event: CaseEvent): Future[Done] = {
     event match {
       case event: CaseDefinitionApplied => createCaseInstance(event)
       case event: CaseModified => updateCaseModified(event)
-      case event: CaseAppliedPlatformUpdate => persistence.updateCaseUserInformation(event.getCaseInstanceId, event.newUserInformation.info, offsetName, offset)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
