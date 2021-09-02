@@ -3,8 +3,8 @@ package org.cafienne.service.db.materializer.slick
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
-import org.cafienne.infrastructure.cqrs.TaggedEventConsumer
+import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage, TaggedEventConsumer}
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 
 import scala.concurrent.Future
@@ -16,18 +16,29 @@ trait SlickEventMaterializer extends TaggedEventConsumer with LazyLogging {
   val lastModifiedRegistration: LastModifiedRegistration
   private val transactionCache = new scala.collection.mutable.HashMap[String, SlickTransaction]
 
+  /**
+    * Offset Storage to keep track of last handled event's offset
+    *
+    * @return
+    */
+  def offsetStorage: OffsetStorage
+
+  override def getOffset(): Future[Offset] = offsetStorage.getOffset()
+
   def createTransaction(actorId: String, tenant: String): SlickTransaction
 
-  def consumeModelEvent(newOffset: Offset, persistenceId: String, sequenceNr: Long, modelEvent: ModelEvent[_]): Future[Done] = {
-    val transaction = getTransaction(modelEvent.getActorId, modelEvent.tenant)
-    transaction.handleEvent(modelEvent, offsetStorage.storageName, newOffset).flatMap(_ => {
-      modelEvent match {
+  override def consumeModelEvent(envelope: ModelEventEnvelope): Future[Done] = {
+    val actorId = envelope.persistenceId
+    val offset = envelope.offset
+    val transaction = getTransaction(actorId, envelope.event.tenant)
+    transaction.handleEvent(envelope.event, offsetStorage.storageName, envelope.offset).flatMap(_ => {
+      envelope.event match {
         case commitEvent: TransactionEvent[_] => {
-          transactionCache.remove(modelEvent.getActorId)
+          transactionCache.remove(actorId)
           for {
             commitTransaction <- {
-              logger.whenDebugEnabled(logger.debug(s"Updating '${offsetStorage.storageName}' offset to $newOffset"))
-              transaction.commit(offsetStorage.storageName, newOffset, commitEvent)
+              logger.whenDebugEnabled(logger.debug(s"Updating '${offsetStorage.storageName}' offset to $offset"))
+              transaction.commit(offsetStorage.storageName, offset, commitEvent)
             }
             informPendingQueries <- {
               lastModifiedRegistration.handle(commitEvent)
