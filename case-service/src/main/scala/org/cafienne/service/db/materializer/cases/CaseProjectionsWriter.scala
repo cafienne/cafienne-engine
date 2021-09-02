@@ -8,7 +8,7 @@ import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.db.materializer.slick.SlickEventMaterializer
 import org.cafienne.service.db.materializer.{LastModifiedRegistration, RecordsPersistence}
 
-class CaseProjectionsWriter(persistence: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)(implicit override val system: ActorSystem) extends SlickEventMaterializer[CaseEvent, CaseTransaction] with LazyLogging {
+class CaseProjectionsWriter(persistence: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)(implicit override val system: ActorSystem) extends SlickEventMaterializer with LazyLogging {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 

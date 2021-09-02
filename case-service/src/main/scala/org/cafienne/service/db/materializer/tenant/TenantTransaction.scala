@@ -3,7 +3,7 @@ package org.cafienne.service.db.materializer.tenant
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.db.materializer.RecordsPersistence
@@ -15,7 +15,7 @@ import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: RecordsPersistence, userCache: IdentityProvider)(implicit val executionContext: ExecutionContext) extends SlickTransaction[TenantEvent] with LazyLogging {
+class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: RecordsPersistence, userCache: IdentityProvider)(implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
 
   val tenants = scala.collection.mutable.HashMap[String, TenantRecord]()
   val users = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
@@ -26,7 +26,7 @@ class TenantTransaction(tenant: String, userQueries: UserQueries, persistence: R
   }
 
   
-  def handleEvent(evt: TenantEvent, offsetName: String, offset: Offset): Future[Done] = {
+  def handleEvent(evt: ModelEvent[_], offsetName: String, offset: Offset): Future[Done] = {
     logger.debug("Handling event of type " + evt.getClass.getSimpleName + " on tenant " + tenant)
 
     evt match {

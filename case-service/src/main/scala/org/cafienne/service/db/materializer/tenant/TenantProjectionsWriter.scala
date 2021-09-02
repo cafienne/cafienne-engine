@@ -12,7 +12,7 @@ import org.cafienne.tenant.actorapi.event.TenantEvent
 
 class TenantProjectionsWriter
   (userQueries: UserQueries, updater: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)
-  (implicit val system: ActorSystem, implicit val userCache: IdentityProvider) extends SlickEventMaterializer[TenantEvent, TenantTransaction] with LazyLogging {
+  (implicit val system: ActorSystem, implicit val userCache: IdentityProvider) extends SlickEventMaterializer with LazyLogging {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 

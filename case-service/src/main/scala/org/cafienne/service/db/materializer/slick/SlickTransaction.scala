@@ -6,8 +6,8 @@ import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
 
 import scala.concurrent.Future
 
-trait SlickTransaction[M <: ModelEvent[_]] {
-  def handleEvent(event: M, offsetName: String, offset: Offset): Future[Done]
+trait SlickTransaction {
+  def handleEvent(event: ModelEvent[_], offsetName: String, offset: Offset): Future[Done]
 
   def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done]
 }

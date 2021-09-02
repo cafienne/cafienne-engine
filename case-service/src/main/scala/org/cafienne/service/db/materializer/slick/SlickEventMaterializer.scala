@@ -9,43 +9,36 @@ import org.cafienne.service.db.materializer.LastModifiedRegistration
 
 import scala.concurrent.Future
 
-trait SlickEventMaterializer[M <: ModelEvent[_], T <: SlickTransaction[M]] extends TaggedEventConsumer with LazyLogging {
+trait SlickEventMaterializer extends TaggedEventConsumer with LazyLogging {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def createTransaction(actorId: String, tenant: String): T
   val lastModifiedRegistration: LastModifiedRegistration
+  private val transactionCache = new scala.collection.mutable.HashMap[String, SlickTransaction]
 
-  private val transactionCache = new scala.collection.mutable.HashMap[String, T]
-  private def getTransaction(actorId: String, tenant: String) = transactionCache.getOrElseUpdate(actorId, createTransaction(actorId, tenant))
+  def createTransaction(actorId: String, tenant: String): SlickTransaction
 
   def consumeModelEvent(newOffset: Offset, persistenceId: String, sequenceNr: Long, modelEvent: ModelEvent[_]): Future[Done] = {
-    modelEvent match {
-      case evt: M => {
-        val transaction = getTransaction(evt.getActorId, evt.tenant)
-        transaction.handleEvent(evt, offsetStorage.storageName, newOffset).flatMap(_ => {
-          evt match {
-            case commitEvent: TransactionEvent[_] => {
-              transactionCache.remove(evt.getActorId)
-              for {
-                commitTransaction <- {
-                  logger.whenDebugEnabled(logger.debug(s"Updating '${offsetStorage.storageName}' offset to $newOffset"))
-                  transaction.commit(offsetStorage.storageName, newOffset, commitEvent)
-                }
-                informPendingQueries <- {
-                  lastModifiedRegistration.handle(commitEvent)
-                  Future.successful(Done)
-                }
-              } yield (commitTransaction, informPendingQueries)._2
+    val transaction = getTransaction(modelEvent.getActorId, modelEvent.tenant)
+    transaction.handleEvent(modelEvent, offsetStorage.storageName, newOffset).flatMap(_ => {
+      modelEvent match {
+        case commitEvent: TransactionEvent[_] => {
+          transactionCache.remove(modelEvent.getActorId)
+          for {
+            commitTransaction <- {
+              logger.whenDebugEnabled(logger.debug(s"Updating '${offsetStorage.storageName}' offset to $newOffset"))
+              transaction.commit(offsetStorage.storageName, newOffset, commitEvent)
             }
-            case _ => Future.successful(Done)
-          }
-        })
+            informPendingQueries <- {
+              lastModifiedRegistration.handle(commitEvent)
+              Future.successful(Done)
+            }
+          } yield (commitTransaction, informPendingQueries)._2
+        }
+        case _ => Future.successful(Done)
       }
-      case other => {
-        logger.error("Ignoring unexpected model event of type '" + other.getClass.getName() + ". Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
-        Future.successful(Done)
-      }
-    }
+    })
   }
+
+  private def getTransaction(actorId: String, tenant: String) = transactionCache.getOrElseUpdate(actorId, createTransaction(actorId, tenant))
 }
