@@ -1,16 +1,17 @@
 package org.cafienne.tenant.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.event.CommitEvent;
+import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.tenant.TenantActor;
 
 import java.io.IOException;
 
 @Manifest
-public class TenantAppliedPlatformUpdate extends TenantEvent {
+public class TenantAppliedPlatformUpdate extends TenantEvent implements CommitEvent {
     public final PlatformUpdate newUserInformation;
 
     public TenantAppliedPlatformUpdate(TenantActor tenant, PlatformUpdate newUserInformation) {
@@ -25,7 +26,7 @@ public class TenantAppliedPlatformUpdate extends TenantEvent {
 
     @Override
     public String getDescription() {
-        return super.getDescription() + " on " + newUserInformation.info().size() +" users";
+        return super.getDescription() + " on " + newUserInformation.info().size() + " users";
     }
 
     @Override

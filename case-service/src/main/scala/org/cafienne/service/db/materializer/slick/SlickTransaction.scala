@@ -1,13 +1,14 @@
 package org.cafienne.service.db.materializer.slick
 
 import akka.Done
-import akka.persistence.query.Offset
-import org.cafienne.actormodel.event.{ModelEvent, TransactionEvent}
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.event.CommitEvent
+import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 
 import scala.concurrent.Future
 
-trait SlickTransaction[M <: ModelEvent[_]] {
-  def handleEvent(event: M, offsetName: String, offset: Offset): Future[Done]
+trait SlickTransaction extends LazyLogging {
+  def handleEvent(envelope: ModelEventEnvelope): Future[Done]
 
-  def commit(offsetName: String, offset: Offset, transactionEvent: TransactionEvent[_]): Future[Done]
+  def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Future[Done]
 }

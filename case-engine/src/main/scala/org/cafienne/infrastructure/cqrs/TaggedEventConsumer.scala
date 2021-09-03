@@ -20,24 +20,22 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   /**
-    * Offset Storage to keep track of last handled event's offset
+    * Provide the offset from which we should start consuming events
     */
-  def offsetStorage: OffsetStorage
+  def getOffset(): Future[Offset]
+
   /**
     * Tag to scan events for
     */
   val tag: String
 
   /**
-    * This method must be implemented by the consumer to handle the tagged ModelEvent
+    * This method must be implemented by the consumer to handle the wrapped ModelEvent
     *
-    * @param newOffset
-    * @param persistenceId
-    * @param sequenceNr
-    * @param modelEvent
+    * @param envelope Wrapper around Akka EventEnvelop with a typed event (typed as ModelEvent[_])
     * @return
     */
-  def consumeModelEvent(newOffset: Offset, persistenceId: String, sequenceNr: Long, modelEvent: ModelEvent[_]): Future[Done]
+  def consumeModelEvent(envelope: ModelEventEnvelope): Future[Done]
 
   /**
     * Start reading and processing events
@@ -53,49 +51,50 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   }
 
   def runStream(): Future[Done] = {
-    restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1) {
-      element => {
-        HealthMonitor.readJournal.isOK()
-        handleSourceElement(element)
-      }
-    }.runWith(Sink.ignore)
+    restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1)(consumeModelEvent).runWith(Sink.ignore)
   }
 
-  def handleSourceElement(element: AnyRef): Future[Done] = element match {
-    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: ModelEvent[_]) => {
-      consumeModelEvent(newOffset, persistenceId, sequenceNr, evt)
-    }
-    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: DeserializationFailure) => {
-      logger.error("Ignoring event of type '" + evt.manifest + "' with invalid contents. It could not be deserialized. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr, evt.exception)
-      logger.debug("Event blob: " + new String(evt.blob))
-      Future.successful(Done)
-    }
-    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: UnrecognizedManifest) => {
-      logger.error("Ignoring unrecognized event of type '" + evt.manifest + "'. Event type is probably deprecated. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
-      logger.debug("Event contents: " + new String(evt.blob))
-      Future.successful(Done)
-    }
-    case EventEnvelope(newOffset, persistenceId, sequenceNr, evt: Any) => {
-      logger.error("Ignoring unknown event of type '" + evt.getClass.getName + "'. Event type is perhaps created through some other product. Event has offset: " + newOffset + ", persistenceId: " + persistenceId + ", sequenceNumber: " + sequenceNr)
-      Future.successful(Done)
-    }
-    case other => {
-      logger.error("Received something from the Stream that is not even an EventEnvelope?! It has class " + other.getClass.getName)
-      Future.successful(Done)
-    }
-  }
-
-  private def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
+  private def restartableTaggedEventSourceFromLastKnownOffset: Source[ModelEventEnvelope, NotUsed] = {
     RestartSource.withBackoff(Cafienne.config.queryDB.restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
         //  consuming that were consumed already successfully before the source had to be restarted.
-        offsetStorage.getOffset().map { offset: Offset =>
+        getOffset().map { offset: Offset =>
           logger.warn(s"Starting to read '$tag' events from offset " + offset)
-          journal().eventsByTag(tag, offset)
+          journal().eventsByTag(tag, offset).filter(modelEventFilter).map(ModelEventEnvelope)
         }
       })
+    }
+  }
+
+  /**
+    * Filter out only ModelEvents. Also log error messages when other events are encountered (as this is unexpected)
+    *
+    * @param element
+    * @return
+    */
+  private def modelEventFilter(element: EventEnvelope): Boolean = {
+    // The fact that we receive an event here is an indication that the readJournal is healthy
+    HealthMonitor.readJournal.isOK()
+    element match {
+      case EventEnvelope(_, _, _, _: ModelEvent[_]) => true
+      case _ =>
+        val offset = element.offset
+        val persistenceId = element.persistenceId
+        val sequenceNr = element.sequenceNr
+        val eventDescriptor = s"Encountered unexpected event with offset=$offset, persistenceId=$persistenceId, sequenceNumber=$sequenceNr"
+        element.event match {
+          case evt: DeserializationFailure =>
+            logger.error("Ignoring event of type '" + evt.manifest + s"' with invalid contents. It could not be deserialized. $eventDescriptor", evt.exception)
+            logger.whenDebugEnabled(logger.debug("Event blob: " + new String(evt.blob)))
+          case evt: UnrecognizedManifest =>
+            logger.error("Ignoring unrecognized event of type '" + evt.manifest + s"'. Event type is probably deprecated. $eventDescriptor")
+            logger.whenDebugEnabled(logger.debug("Event contents: " + new String(evt.blob)))
+          case other =>
+            logger.error("Ignoring unknown event of type '" + other.getClass.getName + s"'. Event type is perhaps created through some other product. $eventDescriptor")
+        }
+        false
     }
   }
 }

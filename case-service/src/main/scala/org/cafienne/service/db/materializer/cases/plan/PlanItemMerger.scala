@@ -1,6 +1,6 @@
 package org.cafienne.service.db.materializer.cases.plan
 
-import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.cmmn.actorapi.event.CaseModified
 import org.cafienne.cmmn.actorapi.event.plan.task.{TaskInputFilled, TaskOutputFilled}
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
 import org.cafienne.service.db.record.PlanItemRecord
@@ -23,7 +23,7 @@ object PlanItemMerger {
       createdBy = event.getUser.id)
   }
 
-  def merge(event: TransactionEvent[_], current: PlanItemRecord): PlanItemRecord =
+  def merge(event: CaseModified, current: PlanItemRecord): PlanItemRecord =
     current.copy(
       lastModified = event.lastModified(),
       modifiedBy = event.getUser.id)

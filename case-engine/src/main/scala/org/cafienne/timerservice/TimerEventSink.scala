@@ -4,9 +4,8 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import org.cafienne.actormodel.command.response.{CommandFailure, ModelResponse}
-import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
-import org.cafienne.infrastructure.cqrs.{OffsetStorage, TaggedEventConsumer}
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventConsumer}
 import org.cafienne.system.CaseSystem
 import org.cafienne.timerservice.persistence.{TimerStore, TimerStoreProvider}
 
@@ -17,7 +16,8 @@ import scala.concurrent.Future
 class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: CaseSystem, implicit val system: ActorSystem) extends TaggedEventConsumer {
 
   val storage: TimerStore = new TimerStoreProvider()(system).store
-  override def offsetStorage: OffsetStorage = storage
+
+  override def getOffset(): Future[Offset] = storage.getOffset()
   override val tag: String = TimerBaseEvent.TAG
   private val schedule: mutable.Map[String, Scheduled] = mutable.Map()
 
@@ -84,10 +84,10 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
     * @param modelEvent
     * @return
     */
-  override def consumeModelEvent(offset: Offset, persistenceId: String, sequenceNr: Long, modelEvent: ModelEvent[_]): Future[Done] = {
-    modelEvent match {
-      case event: TimerSet => setTimer(event, offset)
-      case event: TimerCleared => removeTimer(event, offset)
+  override def consumeModelEvent(envelope: ModelEventEnvelope): Future[Done] = {
+    envelope.event match {
+      case event: TimerSet => setTimer(event, envelope.offset)
+      case event: TimerCleared => removeTimer(event, envelope.offset)
       case other =>
         logger.warn(s"Timer Service received an unexpected event of type ${other.getClass.getName}")
         Future.successful(Done)

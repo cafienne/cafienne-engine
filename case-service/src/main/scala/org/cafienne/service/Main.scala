@@ -21,19 +21,19 @@ import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.identifiers.route.IdentifierRoutes
 import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
-import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
-import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
-import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
-import org.cafienne.service.db.materializer.tenant.TenantProjectionsWriter
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.swagger.SwaggerHttpServiceRoute
 import org.cafienne.service.api.tasks.TaskRoutes
 import org.cafienne.service.api.tenant.route.TenantRoutes
+import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
+import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
+import org.cafienne.service.db.materializer.tenant.TenantProjectionsWriter
+import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.db.schema.QueryDB
 import org.cafienne.system.CaseSystem
 
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.util.{Failure, Success} // required for combining routes
 
 object Main extends App {
@@ -77,7 +77,7 @@ object Main extends App {
     implicit val userCache = new IdentityCache(userQueries)
 
     new CaseProjectionsWriter(updater, offsetStorage).start()
-    new TenantProjectionsWriter(userQueries, updater, offsetStorage).start()
+    new TenantProjectionsWriter(updater, offsetStorage).start()
 
     // When running with H2, you can start a debug web server on port 8082.
     checkH2InDebugMode()
