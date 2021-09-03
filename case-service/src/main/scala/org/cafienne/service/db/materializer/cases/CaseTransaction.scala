@@ -8,6 +8,7 @@ import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
+import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.cases.file.CaseFileProjection
 import org.cafienne.service.db.materializer.cases.plan.CasePlanProjection
@@ -16,9 +17,8 @@ import org.cafienne.service.db.materializer.slick.SlickTransaction
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseTransaction
-(caseInstanceId: String, tenant: String, persistence: RecordsPersistence, offsetStorage: OffsetStorage)
-(implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
+class CaseTransaction(caseInstanceId: String, tenant: String, persistence: RecordsPersistence, offsetStorage: OffsetStorage)
+                     (implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
 
   private val caseTeamProjection = new CaseTeamProjection(persistence)
   private val caseFileProjection = new CaseFileProjection(persistence, caseInstanceId, tenant)
@@ -38,20 +38,25 @@ class CaseTransaction
 
   override def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Future[Done] = {
     transactionEvent match {
-      case caseModified: CaseModified =>
-        // Tell the projections to prepare for commit, i.e. let them update the persistence.
-        caseProjection.prepareCommit()
-        caseTeamProjection.prepareCommit()
-        caseFileProjection.prepareCommit()
-        casePlanProjection.prepareCommit(caseModified)
+      case caseModified: CaseModified => commitCaseRecords(envelope, caseModified)
       case event: CaseAppliedPlatformUpdate => updateUserIds(event, envelope)
-      case _ => logger.warn(s"CaseTransaction unexpectedly receives a commit event of type ${transactionEvent.getClass.getName}. This event is ignored.")
+      case _ =>
+        logger.warn(s"CaseTransaction unexpectedly receives a commit event of type ${transactionEvent.getClass.getName}. This event is ignored.")
+        Future.successful(Done)
     }
+  }
 
-    // Update the offset of the last event handled in this projection
+  private def commitCaseRecords(envelope: ModelEventEnvelope, caseModified: CaseModified): Future[Done] = {
+    // Tell the projections to prepare for commit, i.e. let them update the persistence.
+    caseProjection.prepareCommit()
+    caseTeamProjection.prepareCommit()
+    caseFileProjection.prepareCommit()
+    casePlanProjection.prepareCommit(caseModified)
+    // Update the offset storage with the latest & greatest offset we handled
     persistence.upsert(offsetStorage.createOffsetRecord(envelope.offset))
 
-    persistence.commit()
+    // Commit and then inform the last modified registration
+    persistence.commit().andThen(_ => CaseReader.lastModifiedRegistration.handle(caseModified))
   }
 
   private def updateUserIds(event: CaseAppliedPlatformUpdate, envelope: ModelEventEnvelope): Future[Done] = {

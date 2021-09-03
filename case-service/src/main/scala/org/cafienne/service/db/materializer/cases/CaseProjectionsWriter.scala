@@ -4,10 +4,9 @@ import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.infrastructure.cqrs.{OffsetStorage, OffsetStorageProvider}
-import org.cafienne.service.api.cases.CaseReader
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage, OffsetStorageProvider}
+import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.slick.SlickEventMaterializer
-import org.cafienne.service.db.materializer.{LastModifiedRegistration, RecordsPersistence}
 
 import scala.concurrent.Future
 
@@ -19,9 +18,8 @@ class CaseProjectionsWriter
 
   lazy val offsetStorage: OffsetStorage = offsetStorageProvider.storage("CaseProjectionsWriter")
   override val tag: String = CaseEvent.TAG
-  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
 
   override def getOffset(): Future[Offset] = offsetStorage.getOffset()
 
-  override def createTransaction(caseInstanceId: String, tenant: String) = new CaseTransaction(caseInstanceId, tenant, persistence, offsetStorage)
+  override def createTransaction(envelope: ModelEventEnvelope) = new CaseTransaction(envelope.persistenceId, envelope.event.tenant, persistence, offsetStorage)
 }
