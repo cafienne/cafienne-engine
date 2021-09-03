@@ -2,7 +2,7 @@ package org.cafienne.service.db.materializer.cases.plan
 
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.cmmn.actorapi.event.CaseModified
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.service.db.materializer.RecordsPersistence
@@ -121,7 +121,7 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
     }
   }
 
-  def prepareCommit(caseModified: TransactionEvent[_]): Unit = {
+  def prepareCommit(caseModified: CaseModified): Unit = {
     // Add lastModified field to plan items and tasks
     this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item)).foreach(item => persistence.upsert(item))
     this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item)).foreach(item => persistence.upsert(item))

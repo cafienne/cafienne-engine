@@ -10,7 +10,7 @@ import java.time.Instant;
  *
  * @param <M>
  */
-public interface TransactionEvent<M extends ModelActor<?,?>> extends ModelEvent<M> {
+public interface TransactionEvent<M extends ModelActor<?,?>> extends ModelEvent<M>, CommitEvent {
     Instant lastModified();
 
     /**

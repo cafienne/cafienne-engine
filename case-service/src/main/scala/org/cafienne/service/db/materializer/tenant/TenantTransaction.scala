@@ -3,7 +3,7 @@ package org.cafienne.service.db.materializer.tenant
 import akka.Done
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.actormodel.event.{CommitEvent, TransactionEvent}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
 import org.cafienne.service.db.materializer.RecordsPersistence
@@ -33,7 +33,6 @@ class TenantTransaction
     envelope.event match {
       case p: PlatformEvent => handlePlatformEvent(p)
       case t: TenantUserEvent => handleUserEvent(t)
-      case u: TenantAppliedPlatformUpdate => updateUserIds(u, envelope.offset)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -72,10 +71,14 @@ class TenantTransaction
     persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, offsetStorage.createOffsetRecord(offset))
   }
 
-  override def commit(envelope: ModelEventEnvelope, transactionEvent: TransactionEvent[_]): Future[Done] = {
-    // Gather all records inserted/updated in this transaction, and give them for bulk update
-    this.users.values.foreach(record => persistence.upsert(record))
-    this.tenants.values.foreach(record => persistence.upsert(record))
+  override def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Future[Done] = {
+    transactionEvent match {
+      case _: TenantModified =>
+        // Gather all records inserted/updated in this transaction, and give them for bulk update
+        this.users.values.foreach(record => persistence.upsert(record))
+        this.tenants.values.foreach(record => persistence.upsert(record))
+      case tenantAppliedPlatformUpdate: TenantAppliedPlatformUpdate => updateUserIds(tenantAppliedPlatformUpdate, envelope.offset)
+    }
 
     // Even if there are no new records, we will still update the offset store
     persistence.upsert(offsetStorage.createOffsetRecord(envelope.offset))

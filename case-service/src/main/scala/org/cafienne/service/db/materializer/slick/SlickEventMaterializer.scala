@@ -2,7 +2,7 @@ package org.cafienne.service.db.materializer.slick
 
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.actormodel.event.{CommitEvent, TransactionEvent}
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventConsumer}
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 
@@ -23,18 +23,23 @@ trait SlickEventMaterializer extends TaggedEventConsumer with LazyLogging {
     val transaction = getTransaction(actorId, envelope.event.tenant)
     transaction.handleEvent(envelope).flatMap(_ => {
       envelope.event match {
-        case commitEvent: TransactionEvent[_] => {
+        case transactionEvent: TransactionEvent[_] => {
           transactionCache.remove(actorId)
           for {
             commitTransaction <- {
               logger.whenDebugEnabled(logger.debug(s"'${getClass.getSimpleName}' handled events up to offset $offset"))
-              transaction.commit(envelope, commitEvent)
+              transaction.commit(envelope, transactionEvent)
             }
             informPendingQueries <- {
-              lastModifiedRegistration.handle(commitEvent)
+              lastModifiedRegistration.handle(transactionEvent)
               Future.successful(Done)
             }
           } yield (commitTransaction, informPendingQueries)._2
+        }
+        case commitEvent: CommitEvent => {
+          transactionCache.remove(actorId)
+            logger.whenDebugEnabled(logger.debug(s"'${getClass.getSimpleName}' handled events up to offset $offset"))
+            transaction.commit(envelope, commitEvent)
         }
         case _ => Future.successful(Done)
       }

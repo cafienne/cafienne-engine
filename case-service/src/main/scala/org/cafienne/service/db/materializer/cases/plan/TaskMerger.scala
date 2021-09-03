@@ -1,6 +1,6 @@
 package org.cafienne.service.db.materializer.cases.plan
 
-import org.cafienne.actormodel.event.TransactionEvent
+import org.cafienne.cmmn.actorapi.event.CaseModified
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.service.db.record.TaskRecord
 
@@ -29,5 +29,5 @@ object TaskMerger {
 
   def apply(evt: HumanTaskInputSaved, current: TaskRecord): TaskRecord = current.copy(input = evt.getInput.toString)
 
-  def apply(evt: TransactionEvent[_], current: TaskRecord): TaskRecord = current.copy(modifiedBy = evt.getUser.id, lastModified = evt.lastModified)
+  def apply(evt: CaseModified, current: TaskRecord): TaskRecord = current.copy(modifiedBy = evt.getUser.id, lastModified = evt.lastModified)
 }
