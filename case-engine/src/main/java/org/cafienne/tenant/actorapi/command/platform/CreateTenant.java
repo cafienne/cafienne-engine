@@ -61,11 +61,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.name, name);
-        generator.writeArrayFieldStart(Fields.users.toString());
-        for (TenantUserInformation user : users) {
-            user.writeThisObject(generator);
-        }
-        generator.writeEndArray();
+        writeListField(generator, Fields.users, users);
     }
 }
 

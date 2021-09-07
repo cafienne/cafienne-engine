@@ -18,12 +18,14 @@ final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOw
     * @param generator
     */
   override def write(generator: JsonGenerator): Unit = {
+    generator.writeStartObject()
     writeField(generator, Fields.userId, id)
     writeField(generator, Fields.roles, roles.asJava)
     writeField(generator, Fields.tenant, tenant)
     writeField(generator, Fields.name, name)
     writeField(generator, Fields.email, email)
     writeField(generator, Fields.isOwner, isOwner)
+    generator.writeEndObject()
   }
 
   override def toValue: Value[_] = new ValueMap(

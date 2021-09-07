@@ -47,11 +47,7 @@ public class ReplaceTenant extends TenantCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        generator.writeArrayFieldStart(Fields.users.toString());
-        for (TenantUserInformation user : users) {
-            user.writeThisObject(generator);
-        }
-        generator.writeEndArray();
+        writeListField(generator, Fields.users, users);
     }
 }
 

@@ -3,7 +3,6 @@ package org.cafienne.tenant.actorapi.command
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json._
-import scala.jdk.CollectionConverters._
 
 final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = None, name: Option[String] = None, email: Option[String] = None, owner: Option[Boolean] = None, enabled: Option[Boolean] = None) extends CafienneJson {
 
@@ -19,56 +18,39 @@ final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = 
     * @param generator
     */
   override def write(generator: JsonGenerator): Unit = {
+    generator.writeStartObject()
     writeField(generator, Fields.userId, id)
     // Write optional fields through foreach pattern
-    name.foreach(name => writeField(generator, Fields.name, name))
-    email.foreach(email => writeField(generator, Fields.email, email))
-    roles.foreach(roles => writeField(generator, Fields.roles, roles.asJava))
-    owner.foreach(value => writeField(generator, Fields.isOwner, value))
-    enabled.foreach(value => writeField(generator, Fields.enabled, value))
+    writeStringField(generator, Fields.name, name)
+    writeStringField(generator, Fields.email, email)
+    writeListField(generator, Fields.roles, roles)
+    writeBooleanField(generator, Fields.isOwner, owner)
+    writeBooleanField(generator, Fields.enabled, enabled)
+    generator.writeEndObject()
   }
+
+  override def writeThisObject(generator: JsonGenerator): Unit = super.writeThisObject(generator)
 
   override def toValue: Value[_] = {
     val json: ValueMap = new ValueMap(Fields.userId, id)
-    name.map(name => json.put(Fields.name, new StringValue(name)))
-    email.map(email => json.put(Fields.email, new StringValue(email)))
-    owner.map(owner => json.put(Fields.isOwner, new BooleanValue(owner)))
-    enabled.map(enabled => json.put(Fields.enabled, new BooleanValue(enabled)))
-
-    roles.foreach(roles => {
-      val list: ValueList = json.withArray(Fields.roles)
-      roles.foreach(role => list.add(new StringValue(role)))
-    })
-
+    putStringField(json, Fields.name, name)
+    putStringField(json, Fields.email, email)
+    putBooleanField(json, Fields.isOwner, owner)
+    putBooleanField(json, Fields.enabled, enabled)
+    putStringList(json, Fields.roles, roles)
     json
   }
 }
 
 object TenantUserInformation {
   def from(json: ValueMap) : TenantUserInformation = {
-    def readOptionalStringList(field:Fields): Option[Seq[String]] = {
-      json.get(field) match {
-        case list: ValueList => Some(list.getValue.asScala.toSeq.map(v => v.getValue.asInstanceOf[String]))
-        case _ => None
-      }
-    }
-    def readOptionalString(field: Fields): Option[String] = json.get(field) match {
-      case value: StringValue => Some(value.getValue)
-      case _ => None
-    }
-    def readOptionalBoolean(field: Fields): Option[Boolean] = json.get(field) match {
-      case value: BooleanValue => Some(value.getValue)
-      case _ => None
-    }
-
     val userId: String = json.raw(Fields.userId)
-    val roles = readOptionalStringList(Fields.roles)
-    val name = readOptionalString(Fields.name)
-    val email = readOptionalString(Fields.email)
-    val owner = readOptionalBoolean(Fields.isOwner)
-    val enabled = readOptionalBoolean(Fields.enabled)
+    val roles = CafienneJson.readOptionalStringList(json, Fields.roles)
+    val name = CafienneJson.readOptionalString(json, Fields.name)
+    val email = CafienneJson.readOptionalString(json, Fields.email)
+    val owner = CafienneJson.readOptionalBoolean(json, Fields.isOwner)
+    val enabled = CafienneJson.readOptionalBoolean(json, Fields.enabled)
 
     TenantUserInformation(userId, roles, name, email, owner, enabled)
-
   }
 }

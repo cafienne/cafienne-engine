@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.json.CafienneJson;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.json.CafienneJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.collection.Seq;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public interface CafienneSerializable {
             this.writeThisObject(generator);
             generator.close();
         } catch (IOException e) {
-            throw new RuntimeException("Failure in serialization of an object with type " + this.getClass().getName()+"\n"+e.getMessage(), e);
+            throw new RuntimeException("Failure in serialization of an object with type " + this.getClass().getName() + "\n" + e.getMessage(), e);
         } catch (Throwable t) {
             logger.error("Failed to serialize an object of type " + this.getClass().getName(), t);
             throw t;
@@ -45,6 +46,7 @@ public interface CafienneSerializable {
 
     /**
      * Writes this CafienneSerializable object with a start and end object. In between invokes the write method.
+     *
      * @param generator
      * @throws IOException
      */
@@ -54,11 +56,11 @@ public interface CafienneSerializable {
         generator.writeEndObject();
     }
 
-    void write(JsonGenerator generator) throws IOException ;
+    void write(JsonGenerator generator) throws IOException;
 
-    default void writeListField(JsonGenerator generator, Fields fieldName, Collection<? extends CafienneJson> stringList) throws IOException {
+    default void writeListField(JsonGenerator generator, Fields fieldName, Collection<? extends CafienneJson> list) throws IOException {
         generator.writeArrayFieldStart(fieldName.toString());
-        for (CafienneJson string : stringList) {
+        for (CafienneJson string : list) {
             if (string == null) {
                 generator.writeNull();
             } else {
@@ -131,6 +133,15 @@ public interface CafienneSerializable {
             generator.writeNullField(fieldName.toString());
         } else {
             generator.writeStringField(fieldName.toString(), String.valueOf(value));
+        }
+    }
+
+    default void writeField(JsonGenerator generator, Fields fieldName, CafienneJson value) throws IOException {
+        if (value == null) {
+            generator.writeNullField(fieldName.toString());
+        } else {
+            generator.writeFieldName(fieldName.toString());
+            value.write(generator);
         }
     }
 
