@@ -85,7 +85,6 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     responses = Array(
       new ApiResponse(description = "Tasks found and returned", responseCode = "200"),
       new ApiResponse(description = "Case not found", responseCode = "404"),
-      new ApiResponse(description = "Some processing error occurred", responseCode = "505")
     )
   )
   @Produces(Array("application/json"))
@@ -133,7 +132,6 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     ),
     responses = Array(
       new ApiResponse(description = "Count of assigned and other tasks", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[TaskCount])))),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @Produces(Array("application/json"))

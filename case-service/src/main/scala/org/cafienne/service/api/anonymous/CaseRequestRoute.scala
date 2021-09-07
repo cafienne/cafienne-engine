@@ -52,7 +52,6 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider, override implic
     responses = Array(
       new ApiResponse(description = "Case is created and started", responseCode = "201"),
       new ApiResponse(description = "Case definition not available", responseCode = "400"),
-      new ApiResponse(description = "Something went wrong", responseCode = "500")
     )
   )
   @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[AnonymousStartCaseFormat]))))

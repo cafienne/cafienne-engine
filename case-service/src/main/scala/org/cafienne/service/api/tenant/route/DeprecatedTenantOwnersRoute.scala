@@ -38,7 +38,6 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
     responses = Array(
       new ApiResponse(responseCode = "204", description = "Owner added successfully"),
       new ApiResponse(responseCode = "400", description = "Owner information is invalid"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
   )
   @Consumes(Array("application/json"))
@@ -63,7 +62,6 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
     responses = Array(
       new ApiResponse(responseCode = "204", description = "Owner removed successfully"),
       new ApiResponse(responseCode = "400", description = "Owner information is invalid"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
     )
   )
   @Consumes(Array("application/json"))
@@ -88,7 +86,6 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
     responses = Array(
       new ApiResponse(description = "Tenant user disabled successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   def disableTenantUser = put {
@@ -112,7 +109,6 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
     responses = Array(
       new ApiResponse(description = "Tenant user enabled successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   def enableTenantUser = put {

@@ -40,8 +40,8 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "PlanItems found", responseCode = "200"),
-      new ApiResponse(description = "No PlanItems found based on the query params", responseCode = "404")
+      new ApiResponse(description = "Plan items found", responseCode = "200"),
+      new ApiResponse(description = "No plan items found based on the query params", responseCode = "404")
     )
   )
   @Produces(Array("application/json"))
@@ -61,7 +61,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "planItemId", description = "Unique id of the planItem", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "planItemId", description = "Unique id of the plan item", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
@@ -81,19 +81,19 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @Path("/{caseInstanceId}/planitems/{identifier}/{transition}")
   @POST
   @Operation(
-    summary = "Apply a transition on a planItem",
-    description = "Applies a transition to all planItems in the case that have the identifier. If it is the planItemId there will be only one instance. If planItemName is given, more instances may be found",
+    summary = "Apply a transition on a plan item",
+    description = "Applies a transition to all plan items in the case that have the identifier. If it is the planItemId there will be only one instance. If planItemName is given, more instances may be found",
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "identifier", description = "Identifier for the planItem; either a plan item id or a plan item name", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "identifier", description = "Identifier for the plan item; either a plan item id or a plan item name", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "transition", description = "Transition to apply", in = ParameterIn.PATH,
         schema = new Schema(implementation = classOf[String], allowableValues = Array("complete", "close", "create", "enable", "disable", "exit", "fault", "manualStart", "occur", "parentResume", "parentSuspend", "reactivate", "reenable", "resume", "start", "suspend", "terminate")),
         required = true),
     ),
     responses = Array(
       new ApiResponse(description = "Transition applied successfully", responseCode = "202"),
-      new ApiResponse(description = "Unable to apply transition", responseCode = "500")
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @Produces(Array("application/json"))

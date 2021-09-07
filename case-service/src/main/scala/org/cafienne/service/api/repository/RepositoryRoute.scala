@@ -51,7 +51,6 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
     responses = Array(
       new ApiResponse(description = "Model found and returned", responseCode = "200"),
       new ApiResponse(description = "Model not found", responseCode = "404"),
-      new ApiResponse(description = "Some error occured", responseCode = "500")
     )
   )
   @Produces(Array("application/xml"))
@@ -88,7 +87,6 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
     ),
     responses = Array(
       new ApiResponse(description = "List of models returned", responseCode = "200"),
-      new ApiResponse(description = "An error occurred", responseCode = "500")
     )
   )
   @Consumes(Array("application/json"))
@@ -126,7 +124,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
     tags = Array("repository"),
     responses = Array(
       new ApiResponse(description = "Model validated", responseCode = "200"),
-      new ApiResponse(description = "Model is invalid", responseCode = "500")
+      new ApiResponse(description = "Model is invalid", responseCode = "400")
     )
   )
   @RequestBody(description = "Definitions file", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
@@ -158,8 +156,10 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
       new Parameter(name = "fileName", description = "File name of the model without extension", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Model deployed/saved", responseCode = "201"),
-      new ApiResponse(description = "Some error occured", responseCode = "500")
+      new ApiResponse(description = "Model deployed/saved", responseCode = "204"),
+      new ApiResponse(description = "Invalid model or failure while writing", responseCode = "400"),
+      new ApiResponse(description = "Not Authorized", responseCode = "401"),
+      new ApiResponse(description = "Some unexpected error occured", responseCode = "500")
     )
   )
   @RequestBody(description = "Definitions XML file", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))

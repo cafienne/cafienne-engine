@@ -42,7 +42,6 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     ),
     responses = Array(
       new ApiResponse(description = "Count of assigned and other tasks", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[TaskCount])))),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @Produces(Array("application/json"))
@@ -68,7 +67,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     responses = Array(
       new ApiResponse(description = "Task output validated successfully", responseCode = "200"),
       new ApiResponse(description = "Task output invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
+      new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
@@ -95,7 +94,6 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     responses = Array(
       new ApiResponse(description = "Task updated successfully", responseCode = "202"),
       new ApiResponse(description = "Task not found", responseCode = "404"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
@@ -121,8 +119,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     ),
     responses = Array(
       new ApiResponse(description = "Task claimed successfully", responseCode = "202"),
-      new ApiResponse(description = "Task with the specified id cannot be found", responseCode = "404"),
-      new ApiResponse(description = "Unable to claim the task due to an internal failure", responseCode = "500")
+      new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
   @Produces(Array("application/json"))
@@ -146,8 +143,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     ),
     responses = Array(
       new ApiResponse(description = "Task revoked successfully", responseCode = "202"),
-      new ApiResponse(description = "Task with the specified id cannot be found", responseCode = "404"),
-      new ApiResponse(description = "Unable to revoke the task due to an internal failure", responseCode = "500")
+      new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
   @Produces(Array("application/json"))
@@ -171,8 +167,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     ),
     responses = Array(
       new ApiResponse(description = "Task assigned successfully", responseCode = "202"),
-      new ApiResponse(description = "Task with the specified id cannot be found", responseCode = "404"),
-      new ApiResponse(description = "Unable to assign the task due to an internal failure", responseCode = "500")
+      new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Id of the user to which the task must be assigned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseCommandModels.Assignee]))))
@@ -206,8 +201,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     ),
     responses = Array(
       new ApiResponse(description = "Task delegated successfully", responseCode = "202"),
-      new ApiResponse(description = "Task with the specified id cannot be found", responseCode = "404"),
-      new ApiResponse(description = "Unable to delegate the task due to an internal failure", responseCode = "500")
+      new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Id of the user to which the task must be assigned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseCommandModels.Assignee]))))
@@ -241,9 +235,8 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     ),
     responses = Array(
       new ApiResponse(description = "Task completed successfully", responseCode = "202"),
-      new ApiResponse(description = "Task with the specified id cannot be found", responseCode = "404"),
+      new ApiResponse(description = "Task not found", responseCode = "404"),
       new ApiResponse(description = "Unable to complete the task because the task output is invalid", responseCode = "400"),
-      new ApiResponse(description = "Unable to complete the task due to an internal failure", responseCode = "500")
     )
   )
   @RequestBody(description = "Output (optional) to complete the task with", required = false, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))

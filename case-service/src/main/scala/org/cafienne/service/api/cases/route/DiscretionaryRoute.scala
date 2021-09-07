@@ -63,8 +63,8 @@ class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val use
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Your request to set a case team has been accepted", responseCode = "201", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem])))),
-      new ApiResponse(description = "Internal server error", responseCode = "500")
+      new ApiResponse(description = "Item is planned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem])))),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Item to be planned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem]))))
