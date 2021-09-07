@@ -48,7 +48,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     @Override
-    public TransactionEvent createTransactionEvent() {
+    public TenantModified createTransactionEvent() {
         return new TenantModified(this, getTransactionTimestamp());
     }
 
