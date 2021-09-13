@@ -7,24 +7,28 @@
  */
 package org.cafienne.cmmn.expression.json;
 
-import com.jayway.jsonpath.JsonPathException;
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
-import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.json.Value;
-import org.cafienne.cmmn.definition.*;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.JsonPathException;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.cmmn.definition.ApplicabilityRuleDefinition;
+import org.cafienne.cmmn.definition.ConstraintDefinition;
+import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
+import org.cafienne.cmmn.definition.ExpressionDefinition;
+import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
+import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
+import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
+import org.cafienne.cmmn.expression.InvalidExpressionException;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Task;
+import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
+import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.json.Value;
+import org.cafienne.processtask.instance.ProcessTaskActor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     private final static Logger logger = LoggerFactory.getLogger(ExpressionEvaluator.class);

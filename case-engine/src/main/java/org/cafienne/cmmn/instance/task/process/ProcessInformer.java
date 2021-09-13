@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.instance.task.process;
 
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.definition.ProcessTaskDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.json.ValueMap;
 
 abstract class ProcessInformer {
     static ProcessInformer getInstance(ProcessTask task, ProcessTaskDefinition definition) {

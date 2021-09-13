@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.actorapi.event.plan.eventlistener;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.TimerEvent;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

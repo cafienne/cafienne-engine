@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.cmmn.actorapi.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 
 import scala.jdk.CollectionConverters._
 

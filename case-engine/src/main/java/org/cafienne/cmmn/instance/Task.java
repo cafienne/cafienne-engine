@@ -7,25 +7,24 @@
  */
 package org.cafienne.cmmn.instance;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
 import org.cafienne.cmmn.instance.parameter.TaskOutputParameter;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     private ValueMap taskInput = new ValueMap();

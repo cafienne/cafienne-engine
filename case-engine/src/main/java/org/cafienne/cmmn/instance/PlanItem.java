@@ -13,7 +13,6 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
-import org.cafienne.cmmn.instance.sentry.TransitionPublisher;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 

@@ -7,7 +7,8 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.cmmn.actorapi.command.*;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
@@ -19,7 +20,6 @@ import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.junit.Test;
 
 public class Planning {

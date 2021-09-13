@@ -8,13 +8,13 @@
 package org.cafienne.cmmn.actorapi.command.casefile;
 
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 
 /**
  * Replaces case file item content.

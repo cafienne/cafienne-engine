@@ -1,7 +1,6 @@
 package org.cafienne.tenant;
 
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;

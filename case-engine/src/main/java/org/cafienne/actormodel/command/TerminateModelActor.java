@@ -1,11 +1,11 @@
 package org.cafienne.actormodel.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
-import org.cafienne.infrastructure.serialization.CafienneSerializer;
 
 import java.io.IOException;
 

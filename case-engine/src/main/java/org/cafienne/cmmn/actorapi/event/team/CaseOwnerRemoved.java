@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.actorapi.event.team;
 
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 /**

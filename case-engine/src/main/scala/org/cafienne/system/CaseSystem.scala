@@ -10,8 +10,8 @@ package org.cafienne.system
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.router.{ClusterRouter, LocalRouter}
 import org.cafienne.platform.PlatformService
+import org.cafienne.system.router.{ClusterRouter, LocalRouter}
 import org.cafienne.timerservice.TimerService
 
 /**

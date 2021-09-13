@@ -2,8 +2,8 @@ package org.cafienne.cmmn.actorapi.command.plan.task;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest

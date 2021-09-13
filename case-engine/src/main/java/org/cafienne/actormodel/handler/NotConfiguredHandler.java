@@ -1,9 +1,9 @@
 package org.cafienne.actormodel.handler;
 
-import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.TenantUserMessage;
+import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.command.response.CommandFailure;
 import org.cafienne.actormodel.event.ModelEvent;

@@ -1,10 +1,10 @@
 package org.cafienne.humantask.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.humantask.actorapi.command.WorkflowCommand;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-import org.cafienne.humantask.actorapi.command.WorkflowCommand;
 
 import java.io.IOException;
 

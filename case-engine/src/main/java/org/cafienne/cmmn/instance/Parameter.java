@@ -7,9 +7,9 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
+import org.cafienne.json.Value;
 
 import java.io.Serializable;
 

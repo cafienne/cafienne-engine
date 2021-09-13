@@ -7,8 +7,8 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 
 import java.util.Collection;
 import java.util.Set;

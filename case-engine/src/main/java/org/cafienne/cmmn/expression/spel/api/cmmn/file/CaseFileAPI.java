@@ -3,7 +3,6 @@ package org.cafienne.cmmn.expression.spel.api.cmmn.file;
 import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFile;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 import java.util.HashMap;
 import java.util.Map;

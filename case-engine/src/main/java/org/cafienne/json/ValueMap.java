@@ -10,11 +10,11 @@ package org.cafienne.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cafienne.cmmn.expression.spel.SpelReadable;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;
-import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

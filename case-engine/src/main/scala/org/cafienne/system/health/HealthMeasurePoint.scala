@@ -1,8 +1,9 @@
 package org.cafienne.system.health
 
-import java.time.Instant
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.json.ValueMap
+
+import java.time.Instant
 
 class HealthMeasurePoint(val key: String) extends LazyLogging {
   private var healthy = true

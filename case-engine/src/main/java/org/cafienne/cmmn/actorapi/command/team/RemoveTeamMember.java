@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.actorapi.command.team;
 
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
 /**
  * Command to remove a member from the case team, based on the user id of the member.

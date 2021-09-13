@@ -7,9 +7,9 @@ import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Member;
+import org.cafienne.json.ValueMap;
 
 import java.util.List;
 import java.util.stream.Collectors;

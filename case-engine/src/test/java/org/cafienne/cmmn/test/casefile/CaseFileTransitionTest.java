@@ -7,22 +7,22 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
+import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 

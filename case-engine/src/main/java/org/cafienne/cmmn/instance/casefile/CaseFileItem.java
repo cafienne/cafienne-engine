@@ -16,7 +16,6 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
-import org.cafienne.cmmn.instance.sentry.TransitionPublisher;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;

@@ -12,11 +12,11 @@ import org.cafienne.actormodel.command.exception.CommandException;
 import org.cafienne.actormodel.command.exception.InvalidCommandException;
 import org.cafienne.actormodel.command.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.json.ValueMap;
 
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.

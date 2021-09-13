@@ -1,7 +1,6 @@
 package org.cafienne.cmmn.test.assertions.file;
 
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.assertions.ModelTestCommandAssertion;

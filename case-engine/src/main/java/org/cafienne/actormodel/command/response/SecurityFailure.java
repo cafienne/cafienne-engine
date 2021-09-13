@@ -7,9 +7,9 @@
  */
 package org.cafienne.actormodel.command.response;
 
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.command.exception.AuthorizationException;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 /**

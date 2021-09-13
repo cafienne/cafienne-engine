@@ -7,10 +7,10 @@
  */
 package org.cafienne.processtask.implementation.calculation;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.cafienne.json.Value;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.InlineSubProcess;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;

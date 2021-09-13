@@ -4,8 +4,6 @@ import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 
-import java.util.HashMap;
-
 /**
  *
  */

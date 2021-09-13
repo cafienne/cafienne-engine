@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.instance.task.process;
 
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.State;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
 
 class ProcessTaskActorInformer extends ProcessInformer {

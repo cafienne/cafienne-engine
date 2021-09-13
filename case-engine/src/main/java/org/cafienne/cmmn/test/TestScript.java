@@ -7,10 +7,8 @@
  */
 package org.cafienne.cmmn.test;
 
-import org.cafienne.system.CaseSystem;
 import org.cafienne.actormodel.command.response.CommandFailure;
 import org.cafienne.actormodel.command.response.ModelResponse;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
@@ -22,9 +20,10 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
+import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Some;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 

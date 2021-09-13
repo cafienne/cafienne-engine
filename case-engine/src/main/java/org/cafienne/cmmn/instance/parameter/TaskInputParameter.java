@@ -7,12 +7,12 @@
  */
 package org.cafienne.cmmn.instance.parameter;
 
-import org.cafienne.json.StringValue;
 import org.cafienne.cmmn.definition.parameter.BindingOperation;
 import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.json.StringValue;
 
 /**
  * TaskInputParameter is specific from other parameters, in that its value is typically bound to the case file.

@@ -1,12 +1,12 @@
 package org.cafienne.infrastructure.config
 
 import com.typesafe.config.{Config, ConfigObject}
-import org.cafienne.infrastructure.config.util.{ChildConfigReader, ConfigReader}
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.json.ValueMap
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.config.util.{ChildConfigReader, ConfigReader}
+import org.cafienne.json.ValueMap
 
 class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
   val path = "anonymous-access"

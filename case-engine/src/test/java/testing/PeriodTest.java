@@ -7,11 +7,11 @@
  */
 package testing;
 
+import org.cafienne.cmmn.test.TestScript;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
-
-import org.cafienne.cmmn.test.TestScript;
 
 public class PeriodTest {
 

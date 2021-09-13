@@ -13,7 +13,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
-import org.cafienne.json.CafienneJson;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import scala.collection.Seq;
