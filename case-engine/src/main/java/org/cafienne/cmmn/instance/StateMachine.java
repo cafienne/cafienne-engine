@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.actormodel.command.exception.CommandException;
+import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 
 import java.util.HashMap;

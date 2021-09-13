@@ -11,7 +11,7 @@ import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
-import org.cafienne.actormodel.command.exception.AuthorizationException
+import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
 import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures

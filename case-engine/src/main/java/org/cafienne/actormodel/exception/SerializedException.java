@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.command.exception;
+package org.cafienne.actormodel.exception;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;

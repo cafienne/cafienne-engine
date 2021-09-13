@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team;
 
-import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;

@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.actorapi.command.platform
 
-import org.cafienne.actormodel.command.exception.InvalidCommandException
+import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.json.{CafienneJson, Value, ValueList}
 
 case class PlatformUpdate(info: Seq[NewUserInformation]) extends CafienneJson {

@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.instance.Case;

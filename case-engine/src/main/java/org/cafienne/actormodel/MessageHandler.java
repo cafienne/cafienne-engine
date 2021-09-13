@@ -1,7 +1,7 @@
 package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;

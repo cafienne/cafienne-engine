@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.team;
 
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 
 /**
  * Thrown when an error is found while trying to modify the case team.

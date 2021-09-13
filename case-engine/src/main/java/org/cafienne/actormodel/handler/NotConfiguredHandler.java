@@ -5,7 +5,7 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

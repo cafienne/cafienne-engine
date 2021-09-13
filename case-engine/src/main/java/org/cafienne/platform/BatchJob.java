@@ -1,7 +1,7 @@
 package org.cafienne.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;

@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.expression.xpath;
 
-import org.cafienne.actormodel.command.exception.CommandException;
+import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;

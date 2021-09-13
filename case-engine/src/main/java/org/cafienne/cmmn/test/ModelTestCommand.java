@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.test;
 
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.response.CommandFailure;
-import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 
 public interface ModelTestCommand<C extends ModelCommand, R extends ModelResponse> {

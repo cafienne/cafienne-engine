@@ -9,7 +9,7 @@
 package org.cafienne.service.db.materializer;
 
 import akka.dispatch.Futures;
-import org.cafienne.actormodel.command.response.ActorLastModified;
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.actormodel.event.TransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

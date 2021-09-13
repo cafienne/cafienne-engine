@@ -8,8 +8,8 @@
 package org.cafienne.cmmn.test;
 
 import org.cafienne.actormodel.command.BootstrapCommand;
-import org.cafienne.actormodel.command.response.CommandFailure;
-import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;

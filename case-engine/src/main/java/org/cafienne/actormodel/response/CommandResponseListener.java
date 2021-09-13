@@ -1,6 +1,7 @@
-package org.cafienne.actormodel.command.response;
+package org.cafienne.actormodel.response;
 
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 
 /**
@@ -11,10 +12,10 @@ import org.cafienne.cmmn.instance.Case;
  *
  */
 @FunctionalInterface
-public interface CommandFailureListener {
+public interface CommandResponseListener {
     /**
-     * The handleFailure method can be implemented to handle {@link CommandFailure} coming back as a result from sending a command to the other model that could not be handled.
-     * @param failure
+     * The handleResponse method can be implemented to handle a valid {@link CaseResponse} coming back as a result of sending a command to another model.
+     * @param response
      */
-    void handleFailure(CommandFailure failure);
+    void handleResponse(ModelResponse response);
 }

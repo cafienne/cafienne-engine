@@ -7,8 +7,8 @@
  */
 package org.cafienne.humantask.actorapi.command;
 
-import org.cafienne.actormodel.command.response.CommandFailure;
-import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;

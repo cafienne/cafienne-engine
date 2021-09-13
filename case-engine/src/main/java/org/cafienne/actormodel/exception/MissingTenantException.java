@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.command.exception;
+package org.cafienne.actormodel.exception;
 
 import org.cafienne.actormodel.command.ModelCommand;
 

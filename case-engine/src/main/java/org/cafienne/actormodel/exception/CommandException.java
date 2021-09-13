@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.command.exception;
+package org.cafienne.actormodel.exception;
 
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;

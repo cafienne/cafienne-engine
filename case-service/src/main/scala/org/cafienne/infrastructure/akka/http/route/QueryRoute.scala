@@ -3,8 +3,8 @@ package org.cafienne.infrastructure.akka.http.route
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName}
 import akka.http.scaladsl.server.{Directive1, Route}
-import org.cafienne.actormodel.command.exception.AuthorizationException
-import org.cafienne.actormodel.command.response.ActorLastModified
+import org.cafienne.actormodel.exception.AuthorizationException
+import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases.CaseDefinitionDocument

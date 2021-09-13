@@ -8,10 +8,10 @@
 package org.cafienne.tenant.actorapi.command;
 
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.actormodel.command.exception.CommandException;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
-import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.CommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;

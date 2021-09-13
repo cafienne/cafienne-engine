@@ -3,7 +3,7 @@ package org.cafienne.timerservice
 import akka.Done
 import akka.actor.ActorSystem
 import akka.persistence.query.Offset
-import org.cafienne.actormodel.command.response.{CommandFailure, ModelResponse}
+import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventConsumer}
 import org.cafienne.system.CaseSystem
