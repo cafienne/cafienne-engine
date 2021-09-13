@@ -43,9 +43,6 @@ public abstract class ModelCommand<T extends ModelActor<?,?>> implements Incomin
         if (tenantUser == null || tenantUser.id() == null || tenantUser.id().trim().isEmpty()) {
             throw new InvalidCommandException("Tenant user cannot be null");
         }
-        if (tenantUser.tenant() == null || tenantUser.tenant().isEmpty()) {
-            throw new InvalidCommandException("Tenant information is missing for the "+this.getClass().getSimpleName()+" command");
-        }
         this.msgId = new Guid().toString();
         this.user = tenantUser;
         this.actorId = actorId;

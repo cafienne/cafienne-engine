@@ -4,7 +4,6 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
@@ -55,16 +54,6 @@ public abstract class MessageHandler<M, C extends ModelCommand<A>, E extends Mod
         this.actor.setCurrentUser(user);
         this.msg = msg;
         this.user = user;
-    }
-
-    /**
-     * Lifecycle method
-     * Returns null if there are no security issues, or an exception if some are found
-     *
-     * @return
-     */
-    protected AuthorizationException runSecurityChecks() {
-        return null;
     }
 
     protected void checkEngineVersion() {

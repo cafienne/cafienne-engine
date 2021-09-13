@@ -31,20 +31,6 @@ public class CommandHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, 
         return logger;
     }
 
-    /**
-     * Runs the case security checks on user context and case tenant.
-     */
-    @Override
-    protected AuthorizationException runSecurityChecks() {
-        AuthorizationException issue = validateUserAndTenant();
-        if (issue != null) {
-            addDebugInfo(() -> issue, logger);
-            setNextResponse(new SecurityFailure(command, issue));
-        }
-
-        return issue;
-    }
-
     @Override
     protected void process() {
         addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getCommandDescription() , command.toJson(), getLogger());

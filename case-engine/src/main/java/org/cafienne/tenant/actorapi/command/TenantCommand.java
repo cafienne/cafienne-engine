@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link TenantCommand#process} methods.
- * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
+ * When the case has successfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */
 public abstract class TenantCommand extends ModelCommand<TenantActor> {
     /**
@@ -63,11 +63,6 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
         if (!tenant.exists()) {
             throw new TenantException("Not allowed to access this tenant from " + getUser().tenant());
 //            throw new SecurityException("This tenant does not exist");
-        }
-
-        // User must do it in the right tenant
-        if (!tenant.getTenant().equals(getUser().tenant())) {
-            throw new TenantException("Not allowed to access this tenant from " + getUser().tenant());
         }
 
         if (!tenant.isOwner(this.getUser())) {

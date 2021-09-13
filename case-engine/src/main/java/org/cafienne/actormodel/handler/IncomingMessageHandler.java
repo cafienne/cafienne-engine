@@ -4,9 +4,6 @@ import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.EmptyTenantException;
-import org.cafienne.actormodel.exception.InvalidTenantException;
 import org.cafienne.actormodel.response.ModelResponse;
 
 public abstract class IncomingMessageHandler<M extends IncomingActorMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<M, C, E, A> {
@@ -17,24 +14,6 @@ public abstract class IncomingMessageHandler<M extends IncomingActorMessage, C e
 
     protected IncomingMessageHandler(A actor, M msg) {
         super(actor, msg);
-    }
-
-    protected AuthorizationException validateUserAndTenant() {
-        // Security checks:
-        // - need a proper user.
-        // - is the case tenant already available, and is the user in that same tenant?
-        // Same exception is needed for security reasons: do not expose more info than needed.
-        if (this.user == null || user.id() == null || user.id().trim().isEmpty()) {
-            // Note: this check is also done in ModelCommand itself
-            return new AuthorizationException("The user id must not be null or empty");
-        } else if (user.tenant() == null) {
-            // Note: this check is also done in ModelCommand itself
-            return new EmptyTenantException("User must provide tenant information in order to execute a command");
-        } else if (actor.getTenant() != null && !actor.getTenant().equals(user.tenant())) {
-            // Note: this check can only be done here
-            return new InvalidTenantException(user, msg, actor);
-        }
-        return null;
     }
 
     protected void complete() {

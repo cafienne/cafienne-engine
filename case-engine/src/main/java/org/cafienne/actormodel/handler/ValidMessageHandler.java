@@ -2,12 +2,12 @@ package org.cafienne.actormodel.handler;
 
 import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.TenantUserMessage;
+import org.cafienne.actormodel.UserMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.response.ModelResponse;
 
-public abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
+public abstract class ValidMessageHandler<M extends UserMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
     /**
      * Valid Messages may lead to a response to the sender.
      */

@@ -10,7 +10,6 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.handler.*;
 import org.cafienne.actormodel.identity.TenantUser;
@@ -316,12 +315,8 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      */
     private void runHandler(MessageHandler handler) {
         this.currentMessageHandler = handler;
-
-        AuthorizationException securityIssue = this.currentMessageHandler.runSecurityChecks();
-        if (securityIssue == null) {
-            // Only process if we did not find any security issues.
-            this.currentMessageHandler.process();
-        }
+        // First process, then complete
+        this.currentMessageHandler.process();
         this.currentMessageHandler.complete();
     }
 
