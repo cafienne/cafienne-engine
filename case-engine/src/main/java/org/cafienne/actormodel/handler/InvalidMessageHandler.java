@@ -9,7 +9,7 @@ import org.cafienne.actormodel.identity.TenantUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InvalidMessageHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
+public class InvalidMessageHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(InvalidMessageHandler.class);
 
     public InvalidMessageHandler(A actor, Object msg) {

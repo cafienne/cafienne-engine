@@ -6,7 +6,7 @@ import org.cafienne.actormodel.event.ModelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RecoveryEventHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<E, C, E, A> {
+public class RecoveryEventHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<E, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(RecoveryEventHandler.class);
 
     public RecoveryEventHandler(A actor, E msg) {

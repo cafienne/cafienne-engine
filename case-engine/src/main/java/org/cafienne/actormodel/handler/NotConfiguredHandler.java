@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @param <E>
  * @param <A>
  */
-public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
+public class NotConfiguredHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(NotConfiguredHandler.class);
 
     public NotConfiguredHandler(A actor, TenantUserMessage msg) {

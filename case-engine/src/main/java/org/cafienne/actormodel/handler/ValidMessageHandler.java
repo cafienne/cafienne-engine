@@ -11,7 +11,7 @@ import org.cafienne.actormodel.command.response.ModelResponse;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.event.TransactionEvent;
 
-abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
+abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
     /**
      * Valid Messages may lead to a response to the sender.
      */

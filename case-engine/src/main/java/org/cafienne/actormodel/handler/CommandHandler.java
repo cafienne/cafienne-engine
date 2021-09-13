@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-public class CommandHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
+public class CommandHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<C, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
     protected final C command;

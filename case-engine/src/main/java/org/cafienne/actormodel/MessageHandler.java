@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @param <M>
  */
-public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> {
+public abstract class MessageHandler<M, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> {
     /**
      * The ModelActor to which the message was sent
      */
