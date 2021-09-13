@@ -97,7 +97,12 @@ public class CaseTask extends Task<CaseTaskDefinition> {
             MigDevConsole("Migrating definition into subcase!!!");
             CaseDefinition subCaseDefinition = newDefinition.getImplementationDefinition();
             getCaseInstance().askCase(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), subCaseDefinition),
-                left -> logger.error("Failure while migrating definition of case task " + this.getDescription() +": " + left.toJson()));
+                left -> logger.error("Failure while migrating definition of case task " + this.getDescription() + ": " + left.toJson()));
         }
+    }
+
+    @Override
+    protected void lostDefinition() {
+        addDebugInfo(() -> "Dropping CaseTasks through migration is not possible. Task[" + getPath() + "] remains in the case with current state '" + getState() + "'");
     }
 }

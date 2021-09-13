@@ -18,6 +18,7 @@ import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.actorapi.event.team.*;
 import org.cafienne.humantask.actorapi.event.*;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
 import org.cafienne.processtask.actorapi.event.*;
 import org.cafienne.tenant.actorapi.event.*;
@@ -76,6 +77,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(TimerTerminated.class, TimerTerminated::new);
         addManifestWrapper(TimerSuspended.class, TimerSuspended::new);
         addManifestWrapper(TimerResumed.class, TimerResumed::new);
+        addManifestWrapper(TimerDropped.class, TimerDropped::new);
     }
 
     private static void registerCaseFileEvents() {
@@ -107,6 +109,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(HumanTaskSuspended.class, HumanTaskSuspended::new);
         addManifestWrapper(HumanTaskTerminated.class, HumanTaskTerminated::new);
         addManifestWrapper(HumanTaskMigrated.class, HumanTaskMigrated::new);
+        addManifestWrapper(HumanTaskDropped.class, HumanTaskDropped::new);
     }
 
     private static void registerProcessEvents() {

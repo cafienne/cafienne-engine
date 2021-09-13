@@ -19,6 +19,7 @@ import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.event.HumanTaskResumed;
 import org.cafienne.humantask.actorapi.event.HumanTaskSuspended;
 import org.cafienne.humantask.actorapi.event.HumanTaskTerminated;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
@@ -176,5 +177,11 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     public void migrateItemDefinition(ItemDefinition newItemDefinition, HumanTaskDefinition newDefinition) {
         super.migrateItemDefinition(newItemDefinition, newDefinition);
         getImplementation().migrateDefinition(newDefinition.getImplementationDefinition());
+    }
+
+    @Override
+    protected void lostDefinition() {
+        super.lostDefinition();
+        addEvent(new HumanTaskDropped(this));
     }
 }

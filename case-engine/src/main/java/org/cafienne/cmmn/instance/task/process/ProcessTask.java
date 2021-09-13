@@ -15,6 +15,7 @@ import org.cafienne.json.ValueMap;
 
 public class ProcessTask extends Task<ProcessTaskDefinition> {
     private final ProcessInformer informer;
+
     public ProcessTask(String id, int index, ItemDefinition itemDefinition, ProcessTaskDefinition definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage);
         informer = ProcessInformer.getInstance(this, definition);
@@ -32,7 +33,7 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
 
     @Override
     protected void resumeInstance() {
-        informer.resumeInstance();;
+        informer.resumeInstance();
     }
 
     @Override
@@ -43,5 +44,15 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
     @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
         informer.reactivateImplementation(inputParameters);
+    }
+
+    @Override
+    protected void migrateItemDefinition(ItemDefinition newItemDefinition, ProcessTaskDefinition newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+    }
+
+    @Override
+    protected void lostDefinition() {
+        addDebugInfo(() -> "Dropping ProcessTasks through migration is not possible. Task[" + getPath() + "] remains in the case with current state '" + getState() + "'");
     }
 }
