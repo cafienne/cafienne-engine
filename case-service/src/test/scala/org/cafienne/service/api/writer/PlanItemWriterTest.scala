@@ -1,6 +1,5 @@
 package org.cafienne.service.api.writer
 
-import java.time.Instant
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
@@ -15,6 +14,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.wordspec.AnyWordSpecLike
 
+import java.time.Instant
 import scala.concurrent.duration._
 
 class PlanItemWriterTest

@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command._
 

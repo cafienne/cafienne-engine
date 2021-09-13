@@ -9,8 +9,7 @@ import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.response.ModelResponse
-import org.cafienne.json.Value
-import org.cafienne.json.CafienneJson
+import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.service.api.Headers
 import org.cafienne.system.CaseSystem
 
