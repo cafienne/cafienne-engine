@@ -98,7 +98,8 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
       userWithTenant { (platformUser, tenant) => {
         import scala.jdk.CollectionConverters._
 
-        val models = new ValueMap // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
+        val models = new ValueMap()
+        models.withArray("models") // Resulting JSON structure: { 'models': [ {}, {}, {} ] }
         for (file <- Cafienne.config.repository.DefinitionProvider.list(platformUser, tenant).asScala) {
           var description = "Description"
           try {
