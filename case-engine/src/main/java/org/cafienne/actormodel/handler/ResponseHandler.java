@@ -42,7 +42,7 @@ public class ResponseHandler<C extends ModelCommand, E extends ModelEvent, A ext
         } else {
             if (msg instanceof CommandFailure) {
                 handler.left.handleFailure((CommandFailure) msg);
-            } else if (msg instanceof ModelResponse) {
+            } else {
                 handler.right.handleResponse(msg);
             }
         }
