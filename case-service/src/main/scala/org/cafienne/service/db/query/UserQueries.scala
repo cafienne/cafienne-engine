@@ -1,7 +1,6 @@
 package org.cafienne.service.db.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
 import org.cafienne.service.db.query.exception.UserSearchFailure
 import org.cafienne.service.db.record.UserRoleRecord
@@ -45,7 +44,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
         val roles = records.filter(record => record.tenant == tenant && !record.role_name.isBlank)
         createTenantUser(user, roles)
       })
-      identity.PlatformUser(userId, tenantUsers)
+      PlatformUser(userId, tenantUsers)
     })
   }
 

@@ -16,15 +16,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.json.Value
-
-import javax.ws.rs._
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
+import org.cafienne.json.Value
 import org.cafienne.service.api.Headers
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
+
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -67,8 +67,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = "path", description = "The path to create the item at", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Transition applied successfully", responseCode = "202"),
-      new ApiResponse(description = "Unable to apply transition", responseCode = "500")
+      new ApiResponse(description = "Transition applied successfully", responseCode = "200"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
@@ -88,8 +88,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = "path", description = "The path of the item to replace", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Transition applied successfully", responseCode = "201"),
-      new ApiResponse(description = "Unable to apply transition", responseCode = "500")
+      new ApiResponse(description = "Transition applied successfully", responseCode = "200"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
@@ -109,8 +109,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = "path", description = "The path of the item to update", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Transition applied successfully", responseCode = "201"),
-      new ApiResponse(description = "Unable to apply transition", responseCode = "500")
+      new ApiResponse(description = "Transition applied successfully", responseCode = "200"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
@@ -129,8 +129,8 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new Parameter(name = "path", description = "The path of the item to delete", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Case file item deleted sucessfully", responseCode = "204"),
-      new ApiResponse(description = "Unable to apply transition", responseCode = "500")
+      new ApiResponse(description = "Case file item deleted successfully", responseCode = "200"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @Consumes(Array("application/json"))

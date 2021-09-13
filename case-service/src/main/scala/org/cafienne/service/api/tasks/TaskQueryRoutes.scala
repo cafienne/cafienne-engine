@@ -13,14 +13,14 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-
-import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.db.query.filter.TaskFilter
 import org.cafienne.service.db.query.{TaskCount, TaskQueries}
 import org.cafienne.system.CaseSystem
+
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
@@ -85,7 +85,6 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     responses = Array(
       new ApiResponse(description = "Tasks found and returned", responseCode = "200"),
       new ApiResponse(description = "Case not found", responseCode = "404"),
-      new ApiResponse(description = "Some processing error occurred", responseCode = "505")
     )
   )
   @Produces(Array("application/json"))
@@ -133,7 +132,6 @@ class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCa
     ),
     responses = Array(
       new ApiResponse(description = "Count of assigned and other tasks", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[TaskCount])))),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @Produces(Array("application/json"))

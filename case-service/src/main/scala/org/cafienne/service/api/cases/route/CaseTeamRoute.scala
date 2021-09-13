@@ -14,8 +14,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-
-import javax.ws.rs._
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
@@ -23,6 +21,8 @@ import org.cafienne.service.api.Headers
 import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, Examples}
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
+
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -43,7 +43,6 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "The case team", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[Examples.CaseTeamResponseFormat])))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
-      new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
   @Produces(Array("application/json"))
@@ -67,7 +66,6 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Your request to set a case team has been accepted", responseCode = "202"),
       new ApiResponse(description = "Case not found", responseCode = "404"),
-      new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
   @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.StartCaseTeamFormat]))))
@@ -96,7 +94,6 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Your request to update a case team has been accepted", responseCode = "202"),
       new ApiResponse(description = "Case not found", responseCode = "404"),
-      new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
   @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMemberFormat]))))
@@ -139,7 +136,6 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Your request to delete a case team member has been accepted", responseCode = "202"),
       new ApiResponse(description = "Case not found", responseCode = "404"),
-      new ApiResponse(description = "Internal server error", responseCode = "500")
     )
   )
   @Consumes(Array("application/json"))

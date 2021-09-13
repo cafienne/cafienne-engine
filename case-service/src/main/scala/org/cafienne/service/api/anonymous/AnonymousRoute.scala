@@ -11,8 +11,8 @@ import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.actormodel.command.exception.SerializedException
-import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure}
+import org.cafienne.actormodel.exception.SerializedException
+import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.service.Main

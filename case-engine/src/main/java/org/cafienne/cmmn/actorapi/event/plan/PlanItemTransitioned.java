@@ -8,13 +8,13 @@
 package org.cafienne.cmmn.actorapi.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.sentry.StandardEvent;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

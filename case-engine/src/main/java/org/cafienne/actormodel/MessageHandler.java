@@ -1,7 +1,7 @@
 package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @param <M>
  */
-public abstract class MessageHandler<M, C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> {
+public abstract class MessageHandler<M, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> {
     /**
      * The ModelActor to which the message was sent
      */

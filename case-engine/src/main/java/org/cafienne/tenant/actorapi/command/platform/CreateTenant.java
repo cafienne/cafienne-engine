@@ -2,7 +2,7 @@ package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapCommand;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -61,11 +61,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.name, name);
-        generator.writeArrayFieldStart(Fields.users.toString());
-        for (TenantUserInformation user : users) {
-            user.writeThisObject(generator);
-        }
-        generator.writeEndArray();
+        writeListField(generator, Fields.users, users);
     }
 }
 

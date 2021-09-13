@@ -1,7 +1,7 @@
 package org.cafienne.infrastructure.config
 
-import org.cafienne.infrastructure.config.util.MandatoryConfig
 import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.infrastructure.config.util.MandatoryConfig
 
 import java.util.List
 

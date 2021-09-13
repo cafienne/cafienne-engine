@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.actormodel.command.ModelCommand
-import org.cafienne.actormodel.command.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
+import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
 import org.cafienne.cmmn.actorapi.response.CaseResponse
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._

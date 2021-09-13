@@ -1,11 +1,11 @@
 package org.cafienne.actormodel.handler;
 
-import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.TenantUserMessage;
+import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @param <E>
  * @param <A>
  */
-public class NotConfiguredHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
+public class NotConfiguredHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(NotConfiguredHandler.class);
 
     public NotConfiguredHandler(A actor, TenantUserMessage msg) {

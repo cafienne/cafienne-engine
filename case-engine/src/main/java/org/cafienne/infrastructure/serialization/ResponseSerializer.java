@@ -1,8 +1,8 @@
 package org.cafienne.infrastructure.serialization;
 
-import org.cafienne.actormodel.command.response.CommandFailure;
-import org.cafienne.actormodel.command.response.EngineChokedFailure;
-import org.cafienne.actormodel.command.response.SecurityFailure;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.EngineChokedFailure;
+import org.cafienne.actormodel.response.SecurityFailure;
 import org.cafienne.cmmn.actorapi.response.AddDiscretionaryItemResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.CaseStartedResponse;

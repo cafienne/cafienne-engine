@@ -3,13 +3,13 @@ package org.cafienne.actormodel.handler;
 import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InvalidMessageHandler<C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
+public class InvalidMessageHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<Object, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(InvalidMessageHandler.class);
 
     public InvalidMessageHandler(A actor, Object msg) {

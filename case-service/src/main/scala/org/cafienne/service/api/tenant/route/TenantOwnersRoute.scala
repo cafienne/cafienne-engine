@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model.TenantAPI
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command._
 
@@ -42,8 +42,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     ),
     responses = Array(
       new ApiResponse(responseCode = "204", description = "List of user ids of that are owner of the tenant", content = Array(new Content(schema = new Schema(implementation = classOf[Set[String]])))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+      new ApiResponse(responseCode = "404", description = "Tenant not found"),
     )
   )
   @Produces(Array("application/json"))
@@ -67,7 +66,6 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Tenant replaced successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "Users to update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UpdateTenantFormat]))))
@@ -100,7 +98,6 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Tenant updated successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "Users to update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UpdateTenantFormat]))))
@@ -133,7 +130,6 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Tenant user registered successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UserFormat]))))
@@ -163,7 +159,6 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "Tenant user registered successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant user information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.UserFormat]))))
@@ -195,7 +190,6 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "User roles updated successfully", responseCode = "204"),
       new ApiResponse(description = "User role information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "Roles", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[List[String]], example = "[\"role1\", \"role2\"]"))))
@@ -222,7 +216,6 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
     responses = Array(
       new ApiResponse(description = "User role removed successfully", responseCode = "204"),
       new ApiResponse(description = "User role information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   def removeTenantUserRole = delete {
@@ -243,9 +236,8 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
       new Parameter(name = "tenant", description = "The tenant to retrieve accounts from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user accounts that have been disabled in the tenant", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TenantUser]])))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+      new ApiResponse(responseCode = "200", description = "List of user accounts that have been disabled in the tenant", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TenantUser]])))),
+      new ApiResponse(responseCode = "404", description = "Tenant not found"),
     )
   )
   @Produces(Array("application/json"))

@@ -1,7 +1,7 @@
 package org.cafienne.infrastructure.config
 
-import org.cafienne.infrastructure.config.util.MandatoryConfig
 import org.cafienne.cmmn.repository.DefinitionProvider
+import org.cafienne.infrastructure.config.util.MandatoryConfig
 
 class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
   val path = "definitions"

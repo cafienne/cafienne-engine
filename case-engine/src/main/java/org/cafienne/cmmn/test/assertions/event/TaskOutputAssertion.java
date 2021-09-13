@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions.event;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
+import org.cafienne.json.Value;
 
 /**
  * Assertions around a TaskOutputFilled event

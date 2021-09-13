@@ -2,11 +2,11 @@ package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.cmmn.test.assertions.file.CaseFileItemAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
-import org.cafienne.cmmn.test.CaseTestCommand;
 
 import java.util.stream.Stream;
 

@@ -3,9 +3,8 @@ package org.cafienne.cmmn.test.task;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.json.*;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
@@ -17,6 +16,7 @@ import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.humantask.actorapi.command.SaveTaskOutput;
 import org.cafienne.humantask.actorapi.command.ValidateTaskOutput;
 import org.cafienne.humantask.actorapi.event.HumanTaskOutputSaved;
+import org.cafienne.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 

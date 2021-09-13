@@ -3,7 +3,7 @@ package org.cafienne.service.api.platform
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.response.{CommandFailure, ModelResponse}
+import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.Main

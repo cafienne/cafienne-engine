@@ -7,15 +7,15 @@
  */
 package org.cafienne.cmmn.instance.process;
 
-import static org.junit.Assert.assertEquals;
+import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.json.ValueMap;
+import org.cafienne.util.StringTemplate;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.cafienne.json.ValueMap;
-import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.util.StringTemplate;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class StringTemplateTest {
 

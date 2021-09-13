@@ -5,7 +5,6 @@ import org.cafienne.cmmn.expression.spel.api.cmmn.file.CaseFileAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.team.CaseTeamAPI;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.casefile.CaseFile;
 
 import java.util.Collection;
 import java.util.HashMap;

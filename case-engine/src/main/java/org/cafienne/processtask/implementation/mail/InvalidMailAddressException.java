@@ -1,6 +1,6 @@
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 
 public class InvalidMailAddressException extends InvalidCommandException {
     public InvalidMailAddressException(String msg, Throwable cause) {

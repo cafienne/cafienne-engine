@@ -7,12 +7,12 @@
  */
 package org.cafienne.processtask.implementation;
 
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.InlineSubProcessDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.definition.SubProcessMapping;

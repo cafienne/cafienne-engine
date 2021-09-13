@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.actormodel.command.exception.SerializedException;
-import org.cafienne.actormodel.command.response.CommandFailure;
+import org.cafienne.actormodel.exception.SerializedException;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.cmmn.test.ModelTestCommand;
 import org.cafienne.cmmn.test.TestScript;
 

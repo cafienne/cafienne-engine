@@ -1,9 +1,7 @@
 package org.cafienne.actormodel;
 
-import org.cafienne.actormodel.command.response.CommandFailureListener;
-import org.cafienne.actormodel.command.response.CommandResponseListener;
-import org.cafienne.actormodel.command.response.CommandFailureListener;
-import org.cafienne.actormodel.command.response.CommandResponseListener;
+import org.cafienne.actormodel.response.CommandFailureListener;
+import org.cafienne.actormodel.response.CommandResponseListener;
 
 public class Responder {
     public final CommandResponseListener right;

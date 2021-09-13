@@ -7,14 +7,14 @@
  */
 package org.cafienne.humantask.actorapi.command;
 
-import org.cafienne.actormodel.command.response.CommandFailure;
-import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
 /**
  * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.

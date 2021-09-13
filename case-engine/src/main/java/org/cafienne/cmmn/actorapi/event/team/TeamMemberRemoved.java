@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.actorapi.event.team;
 
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.team.Member;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
 /**
  * Event caused when a member is removed from the case team.

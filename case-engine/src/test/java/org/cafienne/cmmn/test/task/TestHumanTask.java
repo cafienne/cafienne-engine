@@ -5,13 +5,13 @@ import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
 import org.cafienne.humantask.actorapi.command.*;
 import org.cafienne.humantask.instance.TaskState;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
 import java.time.Instant;

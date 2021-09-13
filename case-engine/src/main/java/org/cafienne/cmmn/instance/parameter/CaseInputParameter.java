@@ -7,11 +7,11 @@
  */
 package org.cafienne.cmmn.instance.parameter;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Parameter;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.json.Value;
 
 /**
  * CaseInputParameters are passed upon Case creation. They are then bound to the case file (possibly triggering sentries in the case).

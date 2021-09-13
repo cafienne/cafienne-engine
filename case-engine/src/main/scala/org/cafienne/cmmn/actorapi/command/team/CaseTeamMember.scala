@@ -1,10 +1,9 @@
 package org.cafienne.cmmn.actorapi.command.team
 
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.json.{BooleanValue, StringValue, Value, ValueMap}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
-import org.cafienne.json.CafienneJson
+import org.cafienne.json._
 
 import scala.jdk.CollectionConverters._
 

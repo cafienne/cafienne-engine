@@ -8,7 +8,7 @@
 package org.cafienne.util;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.cafienne.actormodel.command.exception.CommandException;
+import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.json.ValueMap;
 
 import java.net.MalformedURLException;

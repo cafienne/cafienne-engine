@@ -14,15 +14,14 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.command.exception.AuthorizationException
-
-import javax.ws.rs._
+import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.api.tenant.model._
+import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.db.query.exception.UserSearchFailure
 import org.cafienne.system.CaseSystem
 
+import javax.ws.rs._
 import scala.util.{Failure, Success}
 
 
@@ -42,9 +41,8 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
+      new ApiResponse(responseCode = "404", description = "Tenant not found"),
     )
   )
   @Produces(Array("application/json"))
@@ -67,9 +65,8 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "204", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
+      new ApiResponse(responseCode = "404", description = "User (or tenant) not found"),
     )
   )
   @Produces(Array("application/json"))

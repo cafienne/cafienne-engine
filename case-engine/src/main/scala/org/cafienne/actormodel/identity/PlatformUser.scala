@@ -1,6 +1,6 @@
 package org.cafienne.actormodel.identity
 
-import org.cafienne.actormodel.command.exception.{AuthorizationException, MissingTenantException}
+import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}

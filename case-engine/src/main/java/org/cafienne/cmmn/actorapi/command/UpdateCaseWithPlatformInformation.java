@@ -1,17 +1,17 @@
 package org.cafienne.cmmn.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.platform.CaseUpdate;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 

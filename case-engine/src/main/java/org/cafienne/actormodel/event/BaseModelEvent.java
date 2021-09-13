@@ -110,8 +110,7 @@ public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements Model
         writeField(generator, Fields.actorId, this.getActorId());
         writeField(generator, Fields.tenant, this.tenant);
         writeField(generator, Fields.timestamp, this.timestamp);
-        generator.writeFieldName(Fields.user.toString());
-        tenantUser.writeThisObject(generator);
+        writeField(generator, Fields.user, tenantUser);
         generator.writeEndObject();
     }
 

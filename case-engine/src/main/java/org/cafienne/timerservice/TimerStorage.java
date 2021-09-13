@@ -1,9 +1,9 @@
 package org.cafienne.timerservice;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.snapshot.ModelActorSnapshot;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.actormodel.snapshot.ModelActorSnapshot;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;

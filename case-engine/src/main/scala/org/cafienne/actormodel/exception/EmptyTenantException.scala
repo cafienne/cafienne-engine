@@ -1,4 +1,4 @@
-package org.cafienne.actormodel.command.exception
+package org.cafienne.actormodel.exception
 
 /**
   * This exception is typically raised during the {@link ModelCommand#validate(ModelActor)} method.

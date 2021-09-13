@@ -1,9 +1,6 @@
 package org.cafienne.cmmn.test.casefile;
 
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
@@ -13,6 +10,9 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueList;
+import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 

@@ -13,12 +13,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-
-import javax.ws.rs._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.api.Headers
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
+
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -37,8 +37,8 @@ class CaseHistoryRoute(val caseQueries: CaseQueries)(override implicit val userC
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "PlanItems found", responseCode = "200"),
-      new ApiResponse(description = "No PlanItems found based on the query params", responseCode = "404")
+      new ApiResponse(description = "Plan items found", responseCode = "200"),
+      new ApiResponse(description = "No plan items found based on the query params", responseCode = "404")
     )
   )
   @Produces(Array("application/json"))
@@ -58,11 +58,11 @@ class CaseHistoryRoute(val caseQueries: CaseQueries)(override implicit val userC
     tags = Array("case plan"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "planItemId", description = "Unique id of the planItem (cannot be the plan item name, must be the id)", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "planItemId", description = "Unique id of the plan item (cannot be the plan item name, must be the id)", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "PlanItem found", responseCode = "200"),
-      new ApiResponse(description = "No PlanItem found", responseCode = "404")
+      new ApiResponse(description = "Plan item found", responseCode = "200"),
+      new ApiResponse(description = "No plan item found", responseCode = "404")
     )
   )
   @Produces(Array("application/json"))

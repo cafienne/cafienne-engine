@@ -9,7 +9,7 @@ package org.cafienne.system.router
 
 import akka.actor.{Actor, ActorPath, InvalidActorNameException, Terminated}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.response.CommandFailure
+import org.cafienne.actormodel.response.CommandFailure
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 
 /**

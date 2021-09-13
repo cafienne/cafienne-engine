@@ -1,6 +1,6 @@
 package org.cafienne.service.db.record
 
-import org.cafienne.json.{CafienneJson, JSONReader, StringValue, Value, ValueMap}
+import org.cafienne.json._
 
 import java.time.Instant
 

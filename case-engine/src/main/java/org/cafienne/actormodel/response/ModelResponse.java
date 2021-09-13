@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.actormodel.command.response;
+package org.cafienne.actormodel.response;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 

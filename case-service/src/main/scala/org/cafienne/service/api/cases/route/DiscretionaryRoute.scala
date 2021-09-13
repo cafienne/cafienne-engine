@@ -14,15 +14,15 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-
-import javax.ws.rs._
-import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
 import org.cafienne.cmmn.actorapi.command.CaseCommandModels
+import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
 import org.cafienne.cmmn.actorapi.response.CaseResponseModels
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
+
+import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
@@ -63,8 +63,8 @@ class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val use
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Your request to set a case team has been accepted", responseCode = "201", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem])))),
-      new ApiResponse(description = "Internal server error", responseCode = "500")
+      new ApiResponse(description = "Item is planned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem])))),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
   @RequestBody(description = "Item to be planned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem]))))

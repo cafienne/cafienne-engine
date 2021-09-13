@@ -1,10 +1,10 @@
 package org.cafienne.service.db.schema.table
 
-import java.time.Instant
-
 import org.cafienne.service.db.record._
 import org.cafienne.service.db.schema.QueryDBSchema
 import slick.lifted.ColumnOrdered
+
+import java.time.Instant
 
 trait CaseTables extends QueryDBSchema {
 

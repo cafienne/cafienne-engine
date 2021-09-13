@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.expression;
 
-import org.cafienne.actormodel.command.exception.CommandException;
+import org.cafienne.actormodel.exception.CommandException;
 
 public class InvalidExpressionException extends CommandException {
     public InvalidExpressionException(String message, Throwable t) {

@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.test.CaseTestCommand;
+import org.cafienne.json.ValueMap;
 
 /**
  * Some assertions for discretionary items.

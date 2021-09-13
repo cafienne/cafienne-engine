@@ -8,11 +8,11 @@
 package org.cafienne.service.api.tasks
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-
-import javax.ws.rs.Path
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.query.TaskQueries
 import org.cafienne.system.CaseSystem
+
+import javax.ws.rs.Path
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")

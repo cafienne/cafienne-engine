@@ -37,7 +37,6 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     responses = Array(
       new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   @RequestBody(description = "Tenant", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.TenantFormat]))))
@@ -69,7 +68,6 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     responses = Array(
       new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   def disableTenant = put {
@@ -92,7 +90,6 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     responses = Array(
       new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
-      new ApiResponse(description = "Not able to perform the action", responseCode = "500")
     )
   )
   def enableTenant = put {
@@ -111,8 +108,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     tags = Array("platform"),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUserFormat])))),
-      new ApiResponse(responseCode = "400", description = "Invalid request"),
-      new ApiResponse(responseCode = "500", description = "Not able to perform the action")
+      new ApiResponse(responseCode = "401", description = "User is not registered in the case system"),
     )
   )
   @Produces(Array("application/json"))

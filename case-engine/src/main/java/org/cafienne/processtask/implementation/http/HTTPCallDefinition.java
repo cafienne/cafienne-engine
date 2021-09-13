@@ -18,7 +18,10 @@ import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public class HTTPCallDefinition extends SubProcessDefinition {
     // Raw, hard coded output parameter names

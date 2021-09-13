@@ -4,14 +4,14 @@ import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.actormodel.command.exception.EmptyTenantException;
-import org.cafienne.actormodel.command.exception.InvalidTenantException;
-import org.cafienne.actormodel.command.response.ModelResponse;
+import org.cafienne.actormodel.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.EmptyTenantException;
+import org.cafienne.actormodel.exception.InvalidTenantException;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.event.TransactionEvent;
 
-abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelCommand, E extends ModelEvent, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
+abstract class ValidMessageHandler<M extends TenantUserMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
     /**
      * Valid Messages may lead to a response to the sender.
      */

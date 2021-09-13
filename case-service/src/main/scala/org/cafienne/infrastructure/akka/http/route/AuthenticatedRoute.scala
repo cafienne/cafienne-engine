@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives.{complete, extractUri, _}
 import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
 import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
-import org.cafienne.actormodel.command.exception.{AuthorizationException, InvalidCommandException}
+import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne

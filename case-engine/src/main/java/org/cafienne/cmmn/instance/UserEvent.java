@@ -7,10 +7,10 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
+import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.w3c.dom.Element;
 

@@ -7,6 +7,31 @@
  */
 package org.cafienne.cmmn.expression.xpath;
 
+import org.cafienne.actormodel.exception.CommandException;
+import org.cafienne.cmmn.definition.*;
+import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
+import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
+import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
+import org.cafienne.cmmn.expression.InvalidExpressionException;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Task;
+import org.cafienne.cmmn.instance.TimerEvent;
+import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
+import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.json.BooleanValue;
+import org.cafienne.json.Value;
+import org.cafienne.util.XMLHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Duration;
@@ -15,29 +40,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
-import org.cafienne.actormodel.command.exception.CommandException;
-import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
-import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
-import org.cafienne.cmmn.expression.CMMNExpressionEvaluator;
-import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.cmmn.instance.*;
-import org.cafienne.json.BooleanValue;
-import org.cafienne.json.Value;
-import org.cafienne.cmmn.instance.parameter.TaskInputParameter;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.util.XMLHelper;
-import org.cafienne.cmmn.definition.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 public class ExpressionEvaluator implements CMMNExpressionEvaluator {
     private final static Logger logger = LoggerFactory.getLogger(ExpressionEvaluator.class);

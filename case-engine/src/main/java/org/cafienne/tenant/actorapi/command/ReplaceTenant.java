@@ -1,7 +1,7 @@
 package org.cafienne.tenant.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -47,11 +47,7 @@ public class ReplaceTenant extends TenantCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        generator.writeArrayFieldStart(Fields.users.toString());
-        for (TenantUserInformation user : users) {
-            user.writeThisObject(generator);
-        }
-        generator.writeEndArray();
+        writeListField(generator, Fields.users, users);
     }
 }
 

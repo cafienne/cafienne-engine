@@ -6,10 +6,10 @@ import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 

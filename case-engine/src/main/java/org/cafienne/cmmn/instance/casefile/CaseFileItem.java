@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.actormodel.command.exception.InvalidCommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.file.*;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
@@ -16,7 +16,6 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
-import org.cafienne.cmmn.instance.sentry.TransitionPublisher;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;

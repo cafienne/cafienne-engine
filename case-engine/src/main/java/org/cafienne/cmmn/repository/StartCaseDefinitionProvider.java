@@ -1,13 +1,13 @@
 package org.cafienne.cmmn.repository;
 
 import com.typesafe.config.Config;
-import org.cafienne.actormodel.command.exception.AuthorizationException;
-import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.file.SimpleLRUCache;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.util.XMLHelper;
 import org.xml.sax.SAXException;
 

@@ -1,20 +1,18 @@
 package org.cafienne.cmmn.instance.casefile;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.cafienne.cmmn.definition.Multiplicity;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
+import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.State;
+import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
-import org.cafienne.cmmn.instance.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import java.util.*;
 
 /**
  * Container for case file item with multiplicity {@link Multiplicity#ZeroOrMore} or {@link Multiplicity#OneOrMore}

@@ -1,8 +1,8 @@
 package org.cafienne.actormodel.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;

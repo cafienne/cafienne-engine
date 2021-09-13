@@ -1,9 +1,9 @@
 package org.cafienne.cmmn.test.assertions;
 
+import org.cafienne.cmmn.instance.State;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.cafienne.cmmn.instance.State;
 
 /**
  * Some assertions for collections of plan items with the same name in a stage (typically used when a plan item is repeatable)

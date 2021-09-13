@@ -1,8 +1,8 @@
 package org.cafienne.cmmn.expression.spel.api.cmmn.mapping;
 
-import org.cafienne.json.Value;
 import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
 import org.cafienne.cmmn.instance.Task;
+import org.cafienne.json.Value;
 
 /**
  * Provides context for input/output transformation of parameters.

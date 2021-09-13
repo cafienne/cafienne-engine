@@ -3,9 +3,8 @@ package org.cafienne.service.db.query
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
 
+import scala.collection.mutable.{Map, Set}
 import scala.concurrent.Future
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
 
 
 trait PlatformQueries {

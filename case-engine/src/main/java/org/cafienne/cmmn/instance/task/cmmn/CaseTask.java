@@ -8,8 +8,8 @@
 package org.cafienne.cmmn.instance.task.cmmn;
 
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
