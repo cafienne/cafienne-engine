@@ -19,7 +19,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class CaseModified extends CaseEvent implements TransactionEvent<Case> {
+public class CaseModified extends CaseBaseEvent implements TransactionEvent<Case> {
     private final Instant lastModified;
     private final int numFailures;
     private final State state;

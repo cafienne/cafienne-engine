@@ -18,7 +18,7 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugDisabled extends CaseEvent {
+public class DebugDisabled extends CaseBaseEvent {
     public DebugDisabled(Case caseInstance) {
         super(caseInstance);
     }

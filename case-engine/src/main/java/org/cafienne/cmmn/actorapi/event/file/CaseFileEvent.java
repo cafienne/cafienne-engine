@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.event.file;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.CaseBaseEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Event caused on the Case File
  */
-public abstract class CaseFileEvent extends CaseEvent {
+public abstract class CaseFileEvent extends CaseBaseEvent {
     protected final static Logger logger = LoggerFactory.getLogger(CaseFileEvent.class);
 
     /**

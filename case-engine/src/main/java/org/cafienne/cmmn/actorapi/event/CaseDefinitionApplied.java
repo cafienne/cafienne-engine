@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class CaseDefinitionApplied extends CaseEvent {
+public class CaseDefinitionApplied extends CaseBaseEvent {
     private final CafienneVersion engineVersion;
     private final String caseName;
     private final String parentCaseId;
