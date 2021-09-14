@@ -11,7 +11,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class CaseAppliedPlatformUpdate extends CaseEvent implements CommitEvent {
+public class CaseAppliedPlatformUpdate extends CaseBaseEvent implements CommitEvent {
     public final PlatformUpdate newUserInformation;
 
     public CaseAppliedPlatformUpdate(Case tenant, PlatformUpdate newUserInformation) {

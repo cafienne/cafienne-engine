@@ -10,10 +10,11 @@ package org.cafienne.cmmn.actorapi.command;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
@@ -82,4 +83,10 @@ public abstract class CaseCommand extends ModelCommand<Case> {
      * @throws CommandException Implementations of this method may throw this exception if a failure happens while processing the command
      */
     public abstract ModelResponse process(Case caseInstance);
+
+    @Override
+    public void done() {
+        int numFailedPlanItems = Long.valueOf(actor.getPlanItems().stream().filter(p -> p.getState() == org.cafienne.cmmn.instance.State.Failed).count()).intValue();
+        actor.addEvent(new CaseModified(this, actor, numFailedPlanItems));
+    }
 }

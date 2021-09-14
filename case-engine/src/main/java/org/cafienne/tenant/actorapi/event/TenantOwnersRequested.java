@@ -5,7 +5,7 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 
 @Manifest
-public class TenantOwnersRequested extends TenantEvent {
+public class TenantOwnersRequested extends TenantBaseEvent {
 
     public TenantOwnersRequested(TenantActor tenant) {
         super(tenant);

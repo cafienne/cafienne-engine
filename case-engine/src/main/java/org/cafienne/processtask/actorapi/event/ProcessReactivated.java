@@ -10,7 +10,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import java.io.IOException;
 
 @Manifest
-public class ProcessReactivated extends ProcessInstanceEvent {
+public class ProcessReactivated extends BaseProcessEvent {
     public final ValueMap inputParameters;
 
     public ProcessReactivated(ProcessTaskActor actor, ReactivateProcess command) {

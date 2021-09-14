@@ -2,7 +2,6 @@ package org.cafienne.cmmn.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.platform.CaseUpdate;
@@ -34,8 +33,7 @@ public class UpdateCaseWithPlatformInformation extends CaseCommand {
     }
 
     @Override
-    public TransactionEvent createTransactionEvent(Case actor) {
-        return null;
+    public void done() { // Avoid adding a CaseModified
     }
 
     @Override

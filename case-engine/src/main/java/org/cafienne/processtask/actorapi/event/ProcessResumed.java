@@ -5,7 +5,7 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
-public class ProcessResumed extends ProcessInstanceEvent {
+public class ProcessResumed extends BaseProcessEvent {
     public ProcessResumed(ProcessTaskActor actor) {
         super(actor);
     }

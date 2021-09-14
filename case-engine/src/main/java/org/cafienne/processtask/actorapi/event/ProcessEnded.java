@@ -7,7 +7,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 
 import java.io.IOException;
 
-public abstract class ProcessEnded extends ProcessInstanceEvent {
+public abstract class ProcessEnded extends BaseProcessEvent {
 
     public final ValueMap output;
 

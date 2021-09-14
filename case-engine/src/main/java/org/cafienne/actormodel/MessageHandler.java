@@ -1,10 +1,10 @@
 package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;

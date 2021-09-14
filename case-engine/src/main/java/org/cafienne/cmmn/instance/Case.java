@@ -10,7 +10,10 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.*;
+import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.DebugDisabled;
+import org.cafienne.cmmn.actorapi.event.DebugEnabled;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
@@ -102,12 +105,6 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     @Override
     public String getRootActorId() {
         return this.getRootCaseId();
-    }
-
-    @Override
-    public CaseModified createTransactionEvent() {
-        int numFailedPlanItems = Long.valueOf(planItems.stream().filter(p -> p.getState() == org.cafienne.cmmn.instance.State.Failed).count()).intValue();
-        return new CaseModified(this, getTransactionTimestamp(), numFailedPlanItems);
     }
 
     /**

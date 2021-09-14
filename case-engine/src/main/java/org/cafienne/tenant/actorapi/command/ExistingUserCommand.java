@@ -2,8 +2,8 @@ package org.cafienne.tenant.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;

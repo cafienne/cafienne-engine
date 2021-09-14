@@ -69,4 +69,8 @@ public abstract class PlatformCommand extends ModelCommand<PlatformService> impl
     public String tenant() {
         return "";
     }
+
+    @Override
+    public void done() { // Avoid generating ActorModified event
+    }
 }

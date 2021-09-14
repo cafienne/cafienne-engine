@@ -1,7 +1,6 @@
 package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.identity.PlatformUser;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.command.platform.TenantUpdate;
@@ -28,8 +27,7 @@ public class UpdateTenantWithPlatformInformation extends PlatformTenantCommand {
     }
 
     @Override
-    public TransactionEvent createTransactionEvent(TenantActor actor) {
-        return null;
+    public void done() { // Avoid adding a TenantModified
     }
 
     @Override

@@ -10,7 +10,7 @@ package org.cafienne.service.db.materializer;
 
 import akka.dispatch.Futures;
 import org.cafienne.actormodel.response.ActorLastModified;
-import org.cafienne.actormodel.event.TransactionEvent;
+import org.cafienne.actormodel.event.ActorModified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Promise;
@@ -66,7 +66,7 @@ public class LastModifiedRegistration {
         logger.debug(msg);
     }
 
-    public void handle(TransactionEvent<?> event) {
+    public void handle(ActorModified event) {
         handle(event.getActorId(), event.lastModified());
     }
 

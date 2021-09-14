@@ -4,6 +4,7 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.json.ValueMap;
+import org.cafienne.processtask.actorapi.event.ProcessModified;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 public abstract class ProcessCommand extends ModelCommand<ProcessTaskActor> {
@@ -23,5 +24,10 @@ public abstract class ProcessCommand extends ModelCommand<ProcessTaskActor> {
     @Override
     public void validate(ProcessTaskActor modelActor) throws InvalidCommandException {
         // Nothing to validate
+    }
+
+    @Override
+    public void done() {
+        actor.addEvent(new ProcessModified(this, actor, actor.getTransactionTimestamp()));
     }
 }

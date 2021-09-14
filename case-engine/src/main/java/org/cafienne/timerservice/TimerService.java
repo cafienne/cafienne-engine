@@ -4,7 +4,6 @@ import akka.persistence.SnapshotOffer;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
@@ -31,11 +30,6 @@ public class TimerService extends ModelActor<ModelCommand, ModelEvent> {
     @Override
     public String persistenceId() {
         return CAFIENNE_TIMER_SERVICE;
-    }
-
-    @Override
-    public TransactionEvent createTransactionEvent() {
-        return null;
     }
 
     @Override

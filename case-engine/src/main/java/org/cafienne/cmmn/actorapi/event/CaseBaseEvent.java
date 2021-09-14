@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,32 +8,26 @@
 package org.cafienne.cmmn.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.event.BaseModelEvent;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-/**
- * DebugEvent
- */
-@Manifest
-public class DebugEnabled extends CaseBaseEvent {
-    public DebugEnabled(Case caseInstance) {
+public abstract class CaseBaseEvent extends BaseModelEvent<Case> implements CaseEvent {
+    protected CaseBaseEvent(Case caseInstance) {
         super(caseInstance);
     }
 
-    public DebugEnabled(ValueMap json) {
+    protected CaseBaseEvent(ValueMap json) {
         super(json);
+    }
+
+    protected void writeCaseEvent(JsonGenerator generator) throws IOException {
+        super.writeModelEvent(generator);
     }
 
     @Override
     public void updateState(Case actor) {
-        actor.setDebugMode(true);
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseEvent(generator);
     }
 }

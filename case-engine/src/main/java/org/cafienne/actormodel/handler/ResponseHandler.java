@@ -3,10 +3,10 @@ package org.cafienne.actormodel.handler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.Responder;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.actormodel.event.ModelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * Responses are typically the result of a command that the {@link ModelActor} has sent to another model
  *
  */
-public class ResponseHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<ModelResponse, C, E, A> {
+public class ResponseHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends IncomingMessageHandler<ModelResponse, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
 
     public ResponseHandler(A actor, ModelResponse msg) {

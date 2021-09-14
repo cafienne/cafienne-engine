@@ -7,18 +7,17 @@ import akka.persistence.RecoveryCompleted;
 import akka.persistence.SnapshotMetadata;
 import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.event.DebugEvent;
+import org.cafienne.actormodel.event.EngineVersionChanged;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;
+import org.cafienne.actormodel.handler.*;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.actormodel.event.DebugEvent;
-import org.cafienne.actormodel.event.EngineVersionChanged;
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.event.TransactionEvent;
-import org.cafienne.actormodel.handler.*;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
@@ -381,16 +380,6 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     public <EV extends E> EV addEvent(EV event) {
         return (EV) currentMessageHandler.addEvent(event);
     }
-
-    /**
-     * This method must be implemented by CommandHandlers to handle the fact that state changes
-     * have taken place while handling the command. The ModelActor may return an event for that to the log,
-     * so that projections can use that to handle a bulk of events and commit a transaction scope.
-     * Note that the method may return null.
-     *
-     * @return
-     */
-    public abstract TransactionEvent createTransactionEvent();
 
     public Responder getResponseListener(String msgId) {
         synchronized (responseListeners) {
