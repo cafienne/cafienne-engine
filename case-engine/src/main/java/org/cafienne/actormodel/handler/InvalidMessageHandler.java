@@ -3,9 +3,9 @@ package org.cafienne.actormodel.handler;
 import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

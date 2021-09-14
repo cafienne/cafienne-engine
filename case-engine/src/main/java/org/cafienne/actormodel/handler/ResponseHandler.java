@@ -3,10 +3,10 @@ package org.cafienne.actormodel.handler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.Responder;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.actormodel.event.ModelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
