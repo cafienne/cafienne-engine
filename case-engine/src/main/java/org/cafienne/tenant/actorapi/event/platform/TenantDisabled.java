@@ -5,7 +5,7 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 
 @Manifest
-public class TenantDisabled extends PlatformEvent {
+public class TenantDisabled extends PlatformBaseEvent {
 
     public TenantDisabled(TenantActor tenant) {
         super(tenant);

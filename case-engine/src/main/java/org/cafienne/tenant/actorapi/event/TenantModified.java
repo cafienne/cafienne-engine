@@ -16,7 +16,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class TenantModified extends TenantEvent implements TransactionEvent<TenantActor> {
+public class TenantModified extends TenantBaseEvent implements TransactionEvent<TenantActor> {
     private final Instant lastModified;
     private String source;
 

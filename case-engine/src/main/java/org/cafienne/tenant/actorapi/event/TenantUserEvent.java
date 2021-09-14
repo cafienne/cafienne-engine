@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * TenantUserEvents are generated on tenant users.
  */
-public abstract class TenantUserEvent extends TenantEvent {
+public abstract class TenantUserEvent extends TenantBaseEvent {
     public final String userId;
 
     protected TenantUserEvent(TenantActor tenant, String userId) {

@@ -11,7 +11,7 @@ import org.cafienne.tenant.TenantActor;
 import java.io.IOException;
 
 @Manifest
-public class TenantCreated extends PlatformEvent {
+public class TenantCreated extends PlatformBaseEvent {
     public final CafienneVersion engineVersion;
 
     public TenantCreated(TenantActor tenant) {

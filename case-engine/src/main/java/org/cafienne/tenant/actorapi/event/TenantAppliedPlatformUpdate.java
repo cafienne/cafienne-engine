@@ -11,7 +11,7 @@ import org.cafienne.tenant.TenantActor;
 import java.io.IOException;
 
 @Manifest
-public class TenantAppliedPlatformUpdate extends TenantEvent implements CommitEvent {
+public class TenantAppliedPlatformUpdate extends TenantBaseEvent implements CommitEvent {
     public final PlatformUpdate newUserInformation;
 
     public TenantAppliedPlatformUpdate(TenantActor tenant, PlatformUpdate newUserInformation) {
