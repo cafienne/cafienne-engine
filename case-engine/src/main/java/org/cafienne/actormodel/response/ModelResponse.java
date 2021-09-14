@@ -9,6 +9,7 @@ package org.cafienne.actormodel.response;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.TenantUser;
@@ -23,7 +24,7 @@ import java.time.Instant;
 /**
  * Interface for creating responses to {@link ModelCommand}
  */
-public class ModelResponse implements CafienneSerializable, TenantUserMessage {
+public class ModelResponse implements IncomingActorMessage {
     /**
      * Recipient is assigned during construction of the response message.
      * It is the current value of sender() in the actor.
@@ -127,5 +128,9 @@ public class ModelResponse implements CafienneSerializable, TenantUserMessage {
     @Override
     public String toString() {
         return asString();
+    }
+
+    @Override
+    public void done() {
     }
 }

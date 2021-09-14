@@ -28,11 +28,6 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     }
 
     @Override
-    public ProcessModified createTransactionEvent() {
-        return new ProcessModified(this, getTransactionTimestamp());
-    }
-
-    @Override
     public String getParentActorId() {
         return parentActorId;
     }

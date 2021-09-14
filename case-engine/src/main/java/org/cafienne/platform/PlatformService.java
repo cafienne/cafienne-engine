@@ -5,7 +5,6 @@ import akka.persistence.SaveSnapshotSuccess;
 import akka.persistence.SnapshotOffer;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.event.TransactionEvent;
 import org.cafienne.actormodel.handler.AkkaSystemMessageHandler;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.platform.actorapi.command.GetUpdateStatus;
@@ -50,11 +49,6 @@ public class PlatformService extends ModelActor<PlatformCommand, ModelEvent> {
             jobScheduler.wakeUp();
         }
         return super.createAkkaSystemMessageHandler(message);
-    }
-
-    @Override
-    public TransactionEvent createTransactionEvent() {
-        return null;
     }
 
     @Override

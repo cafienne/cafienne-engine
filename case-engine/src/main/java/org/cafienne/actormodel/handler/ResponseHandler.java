@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * Responses are typically the result of a command that the {@link ModelActor} has sent to another model
  *
  */
-public class ResponseHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<ModelResponse, C, E, A> {
+public class ResponseHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends IncomingMessageHandler<ModelResponse, C, E, A> {
     private final static Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
 
     public ResponseHandler(A actor, ModelResponse msg) {

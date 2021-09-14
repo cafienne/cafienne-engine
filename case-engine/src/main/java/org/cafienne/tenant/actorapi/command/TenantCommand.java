@@ -20,6 +20,7 @@ import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
+import org.cafienne.tenant.actorapi.event.TenantModified;
 import org.cafienne.tenant.actorapi.exception.TenantException;
 
 import java.util.List;
@@ -97,4 +98,9 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
      * @throws CommandException Implementations of this method may throw this exception if a failure happens while processing the command
      */
     public abstract ModelResponse process(TenantActor tenant);
+
+    @Override
+    public void done() {
+        actor.addEvent(new TenantModified(this));
+    }
 }

@@ -46,11 +46,6 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         return logger;
     }
 
-    @Override
-    public TenantModified createTransactionEvent() {
-        return new TenantModified(this, getTransactionTimestamp());
-    }
-
     public boolean exists() {
         return this.creationEvent != null;
     }

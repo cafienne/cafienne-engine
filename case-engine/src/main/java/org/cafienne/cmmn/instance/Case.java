@@ -104,12 +104,6 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         return this.getRootCaseId();
     }
 
-    @Override
-    public CaseModified createTransactionEvent() {
-        int numFailedPlanItems = Long.valueOf(planItems.stream().filter(p -> p.getState() == org.cafienne.cmmn.instance.State.Failed).count()).intValue();
-        return new CaseModified(this, getTransactionTimestamp(), numFailedPlanItems);
-    }
-
     /**
      * Returns the user context under which the current actions in the engine are being processed
      *

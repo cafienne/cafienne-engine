@@ -4,6 +4,7 @@ import akka.actor.ActorPath;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.TenantUserMessage;
 import org.cafienne.actormodel.exception.InvalidCommandException;
@@ -21,7 +22,7 @@ import org.cafienne.util.Guid;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public abstract class ModelCommand<T extends ModelActor<?,?>> implements CafienneSerializable, TenantUserMessage<T> {
+public abstract class ModelCommand<T extends ModelActor<?,?>> implements IncomingActorMessage {
     protected final String msgId;
     public final String actorId;
     protected transient T actor;
