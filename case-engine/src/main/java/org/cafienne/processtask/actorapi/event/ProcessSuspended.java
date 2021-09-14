@@ -5,7 +5,7 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
-public class ProcessSuspended extends ProcessInstanceEvent {
+public class ProcessSuspended extends BaseProcessEvent {
     public ProcessSuspended(ProcessTaskActor actor) {
         super(actor);
     }

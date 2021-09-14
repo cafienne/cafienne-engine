@@ -16,7 +16,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class ProcessModified extends ProcessInstanceEvent implements TransactionEvent<ProcessTaskActor> {
+public class ProcessModified extends BaseProcessEvent implements TransactionEvent<ProcessTaskActor> {
     private final Instant lastModified;
     private String source;
 

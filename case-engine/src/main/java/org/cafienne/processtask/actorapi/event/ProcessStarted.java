@@ -13,7 +13,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import java.io.IOException;
 
 @Manifest
-public class ProcessStarted extends ProcessInstanceEvent {
+public class ProcessStarted extends BaseProcessEvent {
     public final String parentActorId;
     public final String rootActorId;
     public final String name;
