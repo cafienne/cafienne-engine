@@ -22,29 +22,6 @@ public class NewCaseFileTest {
     private final TenantUser user = TestScript.getTestUser("Anonymous");
 
     private final Path rootPath = new Path("RootCaseFileItem");
-    private final Path grandChildArrayPath = new Path("RootCaseFileItem/ChildItem/GrandChildArray");
-
-    @Test
-    public void testCreateGrandChildWithoutFirstCreatingParents() {
-
-        String caseInstanceId = new Guid().toString();
-        TestScript testCase = new TestScript(caseName);
-
-        StartCase startCase = new StartCase(user, caseInstanceId, definitions, new ValueMap(), null);
-
-        testCase.addStep(startCase, casePlan -> {
-            casePlan.print();
-        });
-
-        ValueList grandChildren = new ValueList(createGrandChildItem(), createGrandChildItem());
-        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, grandChildren, grandChildArrayPath), result -> {
-            result.print();
-            result.getEvents().printEventList();
-            result.getEvents().assertSize(3);
-        });
-
-        testCase.runTest();
-    }
 
     @Test
     public void testCreateAndModifyFullCaseFile() {
