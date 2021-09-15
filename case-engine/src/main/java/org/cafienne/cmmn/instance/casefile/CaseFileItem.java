@@ -532,6 +532,11 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     @Override
     public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> content) {
+        if (parent != null) {
+            if (parent.getState() == State.Discarded || parent.getState() == State.Null) {
+                throw new CaseFileError(intendedTransition + "CaseFileItem[" + getPath() + "] cannot be done because the parent is in state " + parent.getState());
+            }
+        }
         // Validate current state against transition
         if (!allowTransition(intendedTransition)) {
             throw new CaseFileError(intendedTransition + "CaseFileItem[" + getPath() + "] cannot be done because item is in state " + getState());

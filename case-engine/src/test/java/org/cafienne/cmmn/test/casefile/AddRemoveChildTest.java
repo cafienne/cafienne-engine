@@ -101,7 +101,7 @@ public class AddRemoveChildTest {
         childItem.putRaw("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         // In case the parent does not have state == Active, CaseFileItemChildAdded should not be triggered
-        testCase.addStep(createChild2, caseFile -> caseFile.assertCaseFileItem(testPath).assertState(State.Null));
+        testCase.assertStepFails(createChild2);
 
         testCase.runTest();
     }

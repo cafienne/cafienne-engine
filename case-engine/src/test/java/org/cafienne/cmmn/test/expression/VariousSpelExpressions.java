@@ -72,6 +72,10 @@ public class VariousSpelExpressions {
             testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active);
         });
 
+        testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new ValueMap(), new Path("SpecialOutput")), result -> {
+            result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
+            result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
+        });
         testCase.addStep(new CreateCaseFileItem(user, caseInstanceId, new LongValue(1), new Path("SpecialOutput/Multi")), result -> {
             result.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);
             result.assertPlanItems("Milestone").assertSize(1).assertStates(State.Available);
