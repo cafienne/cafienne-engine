@@ -10,6 +10,7 @@ package org.cafienne.cmmn.instance.casefile;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.file.*;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -533,7 +534,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> content) {
         // Validate current state against transition
         if (!allowTransition(intendedTransition)) {
-            throw new InvalidCommandException(intendedTransition + "CaseFileItem[" + getPath() + "] cannot be done because item is in state " + getState());
+            throw new CaseFileError(intendedTransition + "CaseFileItem[" + getPath() + "] cannot be done because item is in state " + getState());
         }
 
         // Validate type of new content
@@ -543,7 +544,8 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         switch (getState()) {
             case Null:
-                return intendedTransition == CaseFileItemTransition.Create;
+                // Also support upserting a case file item; note: we explicitly do NOT check whether the parent CFI is in state Available. Not sure if that is required...
+                return intendedTransition == CaseFileItemTransition.Create || intendedTransition == CaseFileItemTransition.Update || intendedTransition == CaseFileItemTransition.Replace;
             case Available:
                 return intendedTransition == CaseFileItemTransition.Update || intendedTransition == CaseFileItemTransition.Replace || intendedTransition == CaseFileItemTransition.Delete;
             default: {

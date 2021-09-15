@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.instance.casefile;
 
-import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.instance.Case;
@@ -37,12 +36,12 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
         if (newContent.isMap()) {
             newContent.asMap().fieldNames().forEachRemaining(name -> {
                 if (getItem(name) == null) {
-                    throw new InvalidCommandException("A case file item with name '" + name + "' is not defined");
+                    throw new CaseFileError("A case file item with name '" + name + "' is not defined");
                 }
             });
             return newContent.asMap();
         }
-        throw new InvalidCommandException("Operations on entire case file need a JSON object structure");
+        throw new CaseFileError("Operations on entire case file need a JSON object structure");
     }
 
     @Override
