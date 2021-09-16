@@ -67,9 +67,7 @@ class CaseQueriesImpl
   override def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = {
     val result = for {
       caseInstance <- getCaseInstance(caseInstanceId, user)
-      caseTeam <- db.run(caseInstanceTeamMemberQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map {
-        fillCaseTeam
-      }
+      caseTeam <- getCaseTeam(caseInstanceId, user)
       caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.getOrElse(null)))
       casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map {
         CasePlan

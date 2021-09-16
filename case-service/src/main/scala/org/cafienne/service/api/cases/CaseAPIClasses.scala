@@ -6,7 +6,7 @@ import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.service.db.record._
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeam, planitems: CasePlan, identifiers: CaseIdentifiers) extends CafienneJson {
-  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team.members, "file", file.toValue, "planitems", planitems.toValue, "identifiers", identifiers.toValue))
+  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team, "file", file.toValue, "planitems", planitems.toValue, "identifiers", identifiers.toValue))
 }
 
 final case class CaseDefinitionDocument(record: CaseDefinitionRecord) {
