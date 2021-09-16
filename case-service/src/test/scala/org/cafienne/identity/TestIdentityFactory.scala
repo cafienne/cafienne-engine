@@ -1,7 +1,7 @@
 package org.cafienne.identity
 
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.service.db.record.UserRoleRecord
+import org.cafienne.service.db.record.{CaseTeamMemberRecord, UserRoleRecord}
 
 object TestIdentityFactory {
 
@@ -11,6 +11,10 @@ object TestIdentityFactory {
 
   def createPlatformUser(userId: String, tenant: String, roles: Seq[String]) : PlatformUser = {
     PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, name = "", email = "")))
+  }
+
+  def createTeamMember(caseId: String, tenant: String, user: PlatformUser, caseRole: String): CaseTeamMemberRecord = {
+    CaseTeamMemberRecord(caseInstanceId = caseId, tenant = tenant, memberId = user.userId, caseRole = caseRole, isTenantUser = true, isOwner = true, active = true)
   }
 
   def asDatabaseRecords(user: TenantUser) : Seq[UserRoleRecord] = {

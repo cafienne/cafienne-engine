@@ -6,7 +6,7 @@ import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
 import org.cafienne.service.db.query.TaskQueriesImpl
 import org.cafienne.service.db.query.exception.TaskSearchFailure
-import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord, TaskRecord}
+import org.cafienne.service.db.record.{CaseRecord, TaskRecord}
 import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -38,18 +38,18 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Await.ready(updater.commit(), 2.seconds)
 
     println("Writing case team members")
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = testUser.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = testUser.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = testUser.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = userWithAandB.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = userWithAandB.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case33, tenant = tenant, memberId = userWithAandB.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = testUser.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "A", isTenantUser = true, isOwner = true, active = true))
-    updater.upsert(CaseTeamMemberRecord(caseInstanceId = case44, tenant = tenant, memberId = userWithAandB.userId, caseRole = "B", isTenantUser = true, isOwner = true, active = true))
+    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, ""))
+    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, "A"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, "B"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, ""))
+    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, "A"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, "B"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, ""))
+    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, "A"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, "B"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, ""))
+    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "A"))
+    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "B"))
     Await.ready(updater.commit(), 2.seconds)
 
     println("Writing tasks and tenant users")
