@@ -1,7 +1,11 @@
 package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.actorapi.event.team.*;
+import org.cafienne.cmmn.actorapi.event.team.deprecated.TeamMemberAdded;
+import org.cafienne.cmmn.actorapi.event.team.member.CaseOwnerAdded;
+import org.cafienne.cmmn.actorapi.event.team.member.CaseOwnerRemoved;
+import org.cafienne.cmmn.actorapi.event.team.member.TeamRoleCleared;
+import org.cafienne.cmmn.actorapi.event.team.member.TeamRoleFilled;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;

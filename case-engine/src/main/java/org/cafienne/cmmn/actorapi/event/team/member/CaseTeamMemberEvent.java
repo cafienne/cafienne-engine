@@ -1,7 +1,8 @@
-package org.cafienne.cmmn.actorapi.event.team;
+package org.cafienne.cmmn.actorapi.event.team.member;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;

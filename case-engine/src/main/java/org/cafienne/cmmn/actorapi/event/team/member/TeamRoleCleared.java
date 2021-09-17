@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.actorapi.event.team;
+package org.cafienne.cmmn.actorapi.event.team.member;
 
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.instance.Case;

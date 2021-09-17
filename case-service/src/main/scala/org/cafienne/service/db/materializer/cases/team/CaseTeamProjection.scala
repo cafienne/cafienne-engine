@@ -3,6 +3,8 @@ package org.cafienne.service.db.materializer.cases.team
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.team._
+import org.cafienne.cmmn.actorapi.event.team.deprecated.{DeprecatedCaseTeamEvent, TeamMemberAdded}
+import org.cafienne.cmmn.actorapi.event.team.member.{CaseOwnerAdded, CaseOwnerRemoved, CaseTeamMemberEvent, TeamRoleCleared, TeamRoleFilled}
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record.CaseTeamMemberRecord
 

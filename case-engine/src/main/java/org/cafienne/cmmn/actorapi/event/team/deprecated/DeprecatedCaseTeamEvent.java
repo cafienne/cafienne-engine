@@ -1,7 +1,8 @@
-package org.cafienne.cmmn.actorapi.event.team;
+package org.cafienne.cmmn.actorapi.event.team.deprecated;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Member;

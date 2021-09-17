@@ -13,7 +13,12 @@ import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.*;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
-import org.cafienne.cmmn.actorapi.event.team.*;
+import org.cafienne.cmmn.actorapi.event.team.deprecated.TeamMemberAdded;
+import org.cafienne.cmmn.actorapi.event.team.deprecated.TeamMemberRemoved;
+import org.cafienne.cmmn.actorapi.event.team.member.CaseOwnerAdded;
+import org.cafienne.cmmn.actorapi.event.team.member.CaseOwnerRemoved;
+import org.cafienne.cmmn.actorapi.event.team.member.TeamRoleCleared;
+import org.cafienne.cmmn.actorapi.event.team.member.TeamRoleFilled;
 import org.cafienne.humantask.actorapi.event.*;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
@@ -52,10 +57,18 @@ public class EventSerializer extends CafienneSerializer {
     }
 
     private static void registerCaseTeamEvents() {
+        registerCaseTeamMemberEvents();
+        registerDeprecatedCaseTeamEvents();
+    }
+
+    private static void registerCaseTeamMemberEvents() {
         addManifestWrapper(TeamRoleFilled.class, TeamRoleFilled::new);
         addManifestWrapper(TeamRoleCleared.class, TeamRoleCleared::new);
         addManifestWrapper(CaseOwnerAdded.class, CaseOwnerAdded::new);
         addManifestWrapper(CaseOwnerRemoved.class, CaseOwnerRemoved::new);
+    }
+
+    private static void registerDeprecatedCaseTeamEvents() {
         addManifestWrapper(TeamMemberAdded.class, TeamMemberAdded::new);
         addManifestWrapper(TeamMemberRemoved.class, TeamMemberRemoved::new);
     }

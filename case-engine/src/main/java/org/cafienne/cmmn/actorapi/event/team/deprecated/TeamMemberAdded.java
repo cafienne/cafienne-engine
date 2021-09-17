@@ -1,4 +1,4 @@
-package org.cafienne.cmmn.actorapi.event.team;
+package org.cafienne.cmmn.actorapi.event.team.deprecated;
 
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Member;

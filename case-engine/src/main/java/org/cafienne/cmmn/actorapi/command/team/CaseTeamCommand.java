@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Generic abstraction for commands relating to CaseTeam.
  */
-abstract class CaseTeamCommand extends CaseCommand {
+public abstract class CaseTeamCommand extends CaseCommand {
     protected CaseTeamCommand(TenantUser tenantUser, String caseInstanceId) {
         super(tenantUser, caseInstanceId);
     }

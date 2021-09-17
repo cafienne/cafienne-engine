@@ -1,6 +1,7 @@
-package org.cafienne.cmmn.actorapi.command.team;
+package org.cafienne.cmmn.actorapi.command.team.member;
 
 import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Team;
