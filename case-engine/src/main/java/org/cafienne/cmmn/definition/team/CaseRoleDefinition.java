@@ -12,9 +12,6 @@ import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
  * Implementation of CMMN 1.0 5.2.2: Roles.
  * A case role in the engine has 2 possible extensions: mutex and singleton.
@@ -24,9 +21,6 @@ import java.util.Collection;
  * multiple tasks to be handled by the same person.
  */
 public class CaseRoleDefinition extends CMMNElementDefinition {
-    private Collection<CaseRoleDefinition> mutexRoles = new ArrayList<>();
-    private Collection<String> mutexRoleReferences = new ArrayList<>();
-    private final boolean isSingleton;
     private final CaseTeamDefinition teamDefinition;
 
     public CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
@@ -35,43 +29,6 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
         if (getName() == null) {
             modelDefinition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
         }
-
-        // Parse mutex roles.
-        parseExtension("cafienne:mutex", String.class, mutexRoleReferences);
-
-        // Figure out if we are singleton role.
-        isSingleton = Boolean.parseBoolean(parseExtension("cafienne:singleton", String.class));
-    }
-
-    @Override
-    protected void resolveReferences() {
-        super.resolveReferences();
-
-        for (String string : mutexRoleReferences) {
-            String errorMessage = "Case role " + this.getName();
-            CaseRoleDefinition mutexRole = teamDefinition.resolveRoleReference(string, errorMessage);
-            mutexRoles.add(mutexRole);
-            mutexRole.mutexRoles.add(this);
-        }
-    }
-
-    /**
-     * Returns the roles that are mutually exclusive to this role, i.e., users can not have this role
-     * as well as one of the roles in the collection both assigned to them.
-     *
-     * @return
-     */
-    public Collection<CaseRoleDefinition> getMutexRoles() {
-        return mutexRoles;
-    }
-
-    /**
-     * If a role is a singleton role, only one user can be assigned to this role.
-     *
-     * @return
-     */
-    public boolean isSingleton() {
-        return isSingleton;
     }
 
     static CaseRoleDefinition createEmptyDefinition(CMMNElementDefinition definitionElement) {
