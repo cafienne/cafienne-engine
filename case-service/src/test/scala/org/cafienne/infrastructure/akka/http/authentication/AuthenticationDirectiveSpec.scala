@@ -11,8 +11,6 @@ import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
-import org.cafienne.actormodel.exception.AuthorizationException
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
 import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -21,7 +19,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import java.security.KeyPairGenerator
 import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 import java.util.Date
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
 class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with SprayJsonSupport with ScalatestRouteTest {
@@ -40,15 +38,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   object IncludeAuthDirectives extends Directives with AuthenticationDirectives {
     override val keySource: JWKSource[SecurityContext] = tokenWithRole._2
     override protected val issuer: String              = "issuerString"
-    override protected val userCache: IdentityProvider = new IdentityProvider {
-      override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
-        userId match {
-          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
-          case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
-        }
-      }
-      override def clear(userId: String): Unit = ???
-    }
+    override protected val userCache: IdentityProvider = new IdentityProvider{}
     override implicit val ec: ExecutionContext = executionContext
   }
 
@@ -67,15 +57,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   object AuthDirectivesWithoutRoles extends Directives with AuthenticationDirectives {
     override val keySource: JWKSource[SecurityContext] = tokenWithoutRole._2
     override protected val issuer: String              = "issuerString"
-    override protected val userCache: IdentityProvider = new IdentityProvider {
-      override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
-        userId match {
-          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
-          case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
-        }
-      }
-      override def clear(userId: String): Unit = ???
-    }
+    override protected val userCache: IdentityProvider = new IdentityProvider{}
     override implicit val ec: ExecutionContext = executionContext
   }
 
@@ -94,15 +76,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   object AuthDirectivesNoUUID extends Directives with AuthenticationDirectives {
     override val keySource: JWKSource[SecurityContext] = tokenWithoutUUID._2
     override protected val issuer: String              = "issuerString"
-    override protected val userCache: IdentityProvider = new IdentityProvider {
-      override def getUser(userId: String, tlm: Option[String]): Future[PlatformUser] = {
-        userId match {
-          case "match" => Future { PlatformUser("match", Seq(TenantUser("match", Seq.empty, "tenant", name = "Match Name", email = "match@cafienne.io")))}
-          case _ => Future.failed(AuthorizationException("Not a matched user for this test"))
-        }
-      }
-      override def clear(userId: String): Unit = ???
-    }
+    override protected val userCache: IdentityProvider = new IdentityProvider{}
     override implicit val ec: ExecutionContext = executionContext
   }
 

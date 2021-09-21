@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.authentication
+package org.cafienne.authentication
 
 class TokenVerificationException(val msg: String) extends AuthenticationException(msg) {
   def this(msg: String, cause: Throwable) = {
