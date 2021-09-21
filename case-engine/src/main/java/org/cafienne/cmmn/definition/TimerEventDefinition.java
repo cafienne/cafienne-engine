@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 import java.time.Duration;
 import java.time.Instant;
 
-public class TimerEventDefinition extends PlanItemDefinitionDefinition {
+public class TimerEventDefinition extends EventListenerDefinition {
     private final ExpressionDefinition timerExpression;
 
     public TimerEventDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {

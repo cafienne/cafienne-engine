@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class UserEventDefinition extends PlanItemDefinitionDefinition {
+public class UserEventDefinition extends EventListenerDefinition {
     private final String authorizedRoleRefs;
     private final Collection<CaseRoleDefinition> authorizedRoles = new ArrayList<>();
 

@@ -13,9 +13,9 @@ import org.cafienne.cmmn.definition.TimerEventDefinition;
 
 import java.time.Instant;
 
-public class TimerEvent extends PlanItem<TimerEventDefinition> {
+public class TimerEvent extends EventListener<TimerEventDefinition> {
     public TimerEvent(String id, int index, ItemDefinition itemDefinition, TimerEventDefinition definition, Stage<?> stage) {
-        super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
+        super(id, index, itemDefinition, definition, stage);
     }
 
     private Instant targetMoment = null;
