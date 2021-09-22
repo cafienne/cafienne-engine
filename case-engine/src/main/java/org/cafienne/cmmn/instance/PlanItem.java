@@ -196,17 +196,19 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @param transition
      */
-    public void makeTransition(Transition transition) {
+    public boolean makeTransition(Transition transition) {
         if (!hasLock(transition)) { // First check to determine whether we are allowed to make this transition.
             addDebugInfo(() -> "StateMachine-" + this + ": cannot acquire lock for transition " + transition + " since currently transitioning " + nextTransition);
-            return;
+            return false;
         }
         PlanItemTransitioned event = stateMachine.transition(this, transition);
         if (event != null) { // means, a transition happened.
             addDebugInfo(() -> "StateMachine-" + this + ": allows transition: " + event.getHistoryState() + "." + event.getTransition().getValue() + "() ===> " + event.getCurrentState());
             addEvent(event);
+            return true;
         } else {
             addDebugInfo(() -> "StateMachine-" + this + ": transition " + transition + " has no effect, current state remains " + getState());
+            return false;
         }
     }
 

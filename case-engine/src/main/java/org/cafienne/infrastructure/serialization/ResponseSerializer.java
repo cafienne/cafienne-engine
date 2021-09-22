@@ -3,10 +3,7 @@ package org.cafienne.infrastructure.serialization;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.EngineChokedFailure;
 import org.cafienne.actormodel.response.SecurityFailure;
-import org.cafienne.cmmn.actorapi.response.AddDiscretionaryItemResponse;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.actorapi.response.CaseStartedResponse;
-import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
+import org.cafienne.cmmn.actorapi.response.*;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.platform.actorapi.response.PlatformResponse;
@@ -30,6 +27,7 @@ public class ResponseSerializer extends CafienneSerializer {
         addManifestWrapper(GetDiscretionaryItemsResponse.class, GetDiscretionaryItemsResponse::new);
         addManifestWrapper(CaseStartedResponse.class, CaseStartedResponse::new);
         addManifestWrapper(CaseResponse.class, CaseResponse::new);
+        addManifestWrapper(CaseNotModifiedResponse.class, CaseNotModifiedResponse::new);
     }
 
     private static void addHumanTaskResponses() {

@@ -12,6 +12,7 @@ import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.response.CaseNotModifiedResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -104,9 +105,13 @@ public class MakePlanItemTransition extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
+        boolean transitioned = false;
         List<PlanItem<?>> planItemsByName = getTargetPlanItems(caseInstance);
         for (int i = planItemsByName.size() - 1; i >= 0; i--) {
-            caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
+            transitioned = transitioned || caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
+        }
+        if (! transitioned) {
+            return new CaseNotModifiedResponse(this);
         }
         return new CaseResponse(this);
     }
