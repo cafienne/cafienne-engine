@@ -9,11 +9,13 @@ package org.cafienne.cmmn.actorapi.command.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.CommandException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -67,22 +69,42 @@ public class MakePlanItemTransition extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void validate(Case caseInstance) throws InvalidCommandException {
+        super.validate(caseInstance);
+        validateTransition(caseInstance);
+    }
+
+    protected void validateTransition(Case caseInstance) {
+        getTargetPlanItems(caseInstance).forEach(item -> item.validateTransition(transition));
+    }
+
+    private List<PlanItem<?>> getTargetPlanItems(Case caseInstance) {
+        List<PlanItem<?>> targets = new ArrayList<PlanItem<?>>();
         if (identifier != null && !identifier.trim().isEmpty()) {
+            // First check if we can find the plan item by id.
+            //  If none is found, let's see if the identifier matches any plan item name.
             PlanItem<?> planItem = caseInstance.getPlanItemById(identifier);
             if (planItem != null) {
-                // When Plan item exists by id
-                caseInstance.makePlanItemTransition(planItem, transition);
-                return new CaseResponse(this);
+                // When Plan item exists by id, return just that
+                targets.add(planItem);
+            } else {
+                // Trying to find plan items with a matching name; but only those in Active stages.
+                caseInstance.getPlanItems()
+                        .stream()
+                        .filter(item -> item.getName().equals(identifier) && item.hasActiveParent())
+                        .forEach(targets::add);
             }
         }
-        //when the Plan Item is not found by id, check if it is found by name.
-        //if the name was not set, it will use the planItemId as name.
-        List<PlanItem<?>> planItemsByName = new ArrayList<PlanItem<?>>();
-        caseInstance.getPlanItems().stream().filter(p -> p.getName().equals(identifier)).forEach(p -> planItemsByName.add(p));
-        if (planItemsByName.isEmpty()) {
-            throw new CommandException("There is no plan item with identifier " + identifier + " in case " + caseInstance.getId());
+
+        if (targets.isEmpty()) {
+            throw new CommandException("There is no plan item with identifier '" + identifier + "' in case " + caseInstance.getId());
         }
+        return targets;
+    }
+
+    @Override
+    public CaseResponse process(Case caseInstance) {
+        List<PlanItem<?>> planItemsByName = getTargetPlanItems(caseInstance);
         for (int i = planItemsByName.size() - 1; i >= 0; i--) {
             caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
         }

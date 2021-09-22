@@ -42,12 +42,8 @@ public class StageCompletion {
             casePlan.assertStage("Stage3").assertState(State.Available);
         });
 
-        // Trying to complete the stage should not change anything
-        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Stage1", Transition.Complete), casePlan -> {
-            casePlan.assertStage("Stage1").assertLastTransition(Transition.Start, State.Active, State.Available);
-            casePlan.assertStage("Stage1").assertPlanItem("Task1").assertState(State.Active);
-            casePlan.assertStage("Stage1").assertPlanItem("Task2").assertState(State.Available);
-        });
+        // Trying to complete the stage should not succeed, since the stage still has active children
+        testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, "Stage1", Transition.Complete));
 
         // Let's complete Task1
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task1", Transition.Complete), casePlan -> {

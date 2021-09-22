@@ -28,17 +28,15 @@ public class UserEvent extends EventListener<UserEventDefinition> {
     }
 
     @Override
-    protected boolean isTransitionAllowed(Transition transition) {
-        if (!getCaseInstance().recoveryRunning() && getStage().getState() != State.Active) {
-            throw new InvalidCommandException("Cannot raise an event, since it's surrounding stage is not active");
-        }
+    public void validateTransition(Transition transition) {
+        super.validateTransition(transition);
         if (transition != Transition.Occur) { // Only validating whether current user can make this event 'Occur'
-            return true;
+            return;
         }
 
         Collection<CaseRoleDefinition> authorizedRoles = getAuthorizedRoles();
         if (authorizedRoles.isEmpty()) { // No roles defined, so it is allowed.
-            return true;
+            return;
         }
 
         CurrentMember currentUser = getCaseInstance().getCurrentTeamMember();
@@ -46,10 +44,11 @@ public class UserEvent extends EventListener<UserEventDefinition> {
         Set<CaseRoleDefinition> rolesOfCurrentUser = currentUser.getRoles();
         for (CaseRoleDefinition role : authorizedRoles) {
             if (rolesOfCurrentUser.contains(role)) {
-                return true; // You're free to go
+                return; // You're free to go
             }
         }
-        // Apparently no matching role was found.s
+
+        // Apparently no matching role was found.
         throw new AuthorizationException("User '"+currentUser.getMemberId()+"' does not have the permission to raise the event " + getName());
     }
 

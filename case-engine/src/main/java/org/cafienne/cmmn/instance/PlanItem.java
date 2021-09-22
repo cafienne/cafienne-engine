@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
@@ -90,15 +91,15 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.entryCriteria = new PlanItemEntry(this);
         this.exitCriteria = new PlanItemExit(this);
 
-        addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (stage == null ? " in case" : " in " + stage));
+        addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (getStage() == null ? " in case" : " in " + getStage()));
 
         // Register at case level
         getCaseInstance().registerPlanItem(this);
 
         // Now connect to the rest of the network of plan items and sentries
-        if (stage != null) {
+        if (getStage() != null) {
             // Register with parent stage
-            stage.register(this);
+            getStage().register(this);
         }
 
         // Link ourselves to any existing sentries in the case
@@ -144,7 +145,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             String repeatItemId = new Guid().toString();
             // Create a new plan item
             addDebugInfo(() -> this + ": creating repeat item " + (index + 1) + " with id " + repeatItemId);
-            PlanItemCreated pic = new PlanItemCreated(stage, getItemDefinition(), repeatItemId, index + 1);
+            PlanItemCreated pic = new PlanItemCreated(getStage(), getItemDefinition(), repeatItemId, index + 1);
             addEvent(pic);
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
             pic.getCreatedPlanItem().makeTransition(getEntryTransition());
@@ -348,8 +349,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
 
         // Check stage completion (only done for transitions into semi terminal state)
-        if (stage != null && newState.isSemiTerminal()) {
-            stage.tryCompletion(event);
+        if (getStage() != null && newState.isSemiTerminal()) {
+            getStage().tryCompletion(event);
         }
     }
 
@@ -489,14 +490,24 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Default Guard implementation for an intended transition on the plan item. Typical implementation inside a Stage to check whether completion is allowed, or in HumanTask to check whether the
-     * current user has sufficient roles to e.g. complete a task.
-     *
-     * @param transition - The transition that the plan item is about to undergo
+     * Returns true if the plan item's parent is in active state.
+     * Returns always true for the case plan.
      * @return
      */
-    protected boolean isTransitionAllowed(Transition transition) {
-        return true;
+    public boolean hasActiveParent() {
+        return getStage() == null || getStage().getState().isActive();
+    }
+
+    /**
+     * Method that can be used by MakePlanItemTransition command to determine whether this plan item
+     * can go through the suggested transition.
+     * Checks whether the parent stage is in Active state.
+     * @param transition
+     */
+    public void validateTransition(Transition transition) {
+        if (! hasActiveParent()) {
+            throw new InvalidCommandException("Cannot perform action '"+transition +"' on '" + getName()+"', since the surrounding stage is not active");
+        }
     }
 
     protected void createInstance() {

@@ -100,10 +100,6 @@ class StateMachine {
                 // We have to fetch the target again, based on the history state, as that will contain the proper action
                 target = getTarget(planItem.getHistoryState());
             }
-            // Evaluate the guard (if any)
-            if (!planItem.isTransitionAllowed(transition)) {
-                return null;
-            }
             return new PlanItemTransitioned(planItem, target.state, currentState, transition);
         } else {
             return null; // no transition
