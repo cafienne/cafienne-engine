@@ -8,7 +8,7 @@ import org.cafienne.service.api.writer.TestConfig
 import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
 import org.cafienne.service.db.query.CaseQueriesImpl
 import org.cafienne.service.db.query.filter.CaseFilter
-import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.service.db.record.{CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -55,9 +55,9 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   val user = TestIdentityFactory.createPlatformUser("user1", tenant, List("A", "B"))
 
   val caseTeamMemberRecords = Seq(
-    CaseTeamMemberRecord(caseInstanceId = idOfActiveCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
-    CaseTeamMemberRecord(caseInstanceId = idOfTerminatedCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
-    CaseTeamMemberRecord(caseInstanceId = idOfCompletedCase, tenant = tenant, memberId = user.userId, caseRole = "", isTenantUser = true, false, active = true),
+    TestIdentityFactory.createTeamMember(idOfActiveCase, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(idOfTerminatedCase, tenant, user, ""),
+    TestIdentityFactory.createTeamMember(idOfCompletedCase, tenant, user, ""),
   )
 
   override def beforeAll() = {

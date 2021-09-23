@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
@@ -22,9 +23,6 @@ import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
-
-    // Below are two flags that are required for the checking of stage completion
-    private boolean isManualCompletion = true; // This is a status keeping track of the cause of the attempt to complete (this info cannot be passed through the statemachine)
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
         this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);
@@ -61,15 +59,13 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
             return;
         }
         addDebugInfo(() -> "*** " + this + ": checking completion because of " + event);
-        this.isManualCompletion = false; // Now switch this flag. It is set back in
-        if (this.isCompletionAllowed()) {
+        if (this.isCompletionAllowed(false)) {
             addDebugInfo(() -> "*** " + this + ": triggering stage completion");
             makeTransition(Transition.Complete);
         }
-        this.isManualCompletion = true; // Now switch the flag back. Is only required if isCompletionAllowed returns false.
     }
 
-    private boolean isCompletionAllowed() {
+    private boolean isCompletionAllowed(boolean isManualCompletion) {
         /**
          * Quote from the spec chapter 7.6.1 (cmmn 1.1: chapter 8.6.1):
          *
@@ -95,7 +91,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
                 return false;
             }
             if (!childItem.getState().isSemiTerminal()) {
-                if (getDefinition().autoCompletes() || this.isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
+                if (getDefinition().autoCompletes() || isManualCompletion) { // All required items must be semi-terminal; but only when the stage auto completes OR when there is manual completion
                     if (childItem.isRequired()) { // Stage cannot complete if required items are not in semi-terminal state
                         addDebugInfo(() -> "*** " + this + " cannot auto complete, because " + childItem.toDescription() + " is required and has state " + childItem.getState());
                         return false;
@@ -121,16 +117,12 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     @Override
-    protected boolean isTransitionAllowed(Transition transition) {
+    public void validateTransition(Transition transition) {
+        super.validateTransition(transition);
         if (transition == Transition.Complete) {
-            if (!this.isManualCompletion) {
-                this.isManualCompletion = true; // Switch back the flag; completion allowed is already checked, so no need to check it again.
-                return true;
-            } else {
-                return isCompletionAllowed();
+            if (!isCompletionAllowed(true)) {
+                throw new InvalidCommandException("Cannot complete the stage as there are active items remaining");
             }
-        } else {
-            return true;
         }
     }
 

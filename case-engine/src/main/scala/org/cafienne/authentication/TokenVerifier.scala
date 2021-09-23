@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.authentication
+package org.cafienne.authentication
 
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.{BadJOSEException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
@@ -17,7 +17,7 @@ trait TokenVerifier[T] {
 }
 
 class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(implicit ec: ExecutionContext)
-    extends TokenVerifier[ServiceUserContext] with LazyLogging {
+    extends TokenVerifier[AuthenticatedUser] with LazyLogging {
   import java.util
 
   val jwtProcessor: ConfigurableJWTProcessor[SecurityContext] = new DefaultJWTProcessor()
@@ -47,8 +47,7 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
     )
   )
 
-  override def verifyToken(token: String): Future[ServiceUserContext] = Future {
-    import scala.jdk.CollectionConverters._
+  override def verifyToken(token: String): Future[AuthenticatedUser] = Future {
     var claimsSet: Option[JWTClaimsSet] = None
     if (token.isEmpty) {
       throw MissingTokenException
@@ -60,18 +59,17 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
       claimsSet.fold(throw new TokenVerificationException("Unable to create claimSet for " + token))(
         cS => {
           HealthMonitor.idp.isOK()
-          ServiceUserContext(TokenSubject(cS.getSubject), Option(cS.getStringListClaim("groups")).fold(List.empty[String])(groups => groups.asScala.toList))
+          new AuthenticatedUser(token, cS)
         }
       )
     } catch {
-      case rp: RemoteKeySourceException => {
+      case rp: RemoteKeySourceException =>
         // TODO: this should return a HTTP code 503 Service Unavailable!
         logger.error("Failure in contacting IDP. Check IDP configuration settings of the case engine.", rp)
         val failure = new CannotReachIDPException("Cannot reach the IDP to validate credentials", rp)
         HealthMonitor.idp.hasFailed(failure)
         throw  failure
-      }
-      case other: Throwable => {
+      case other: Throwable =>
         HealthMonitor.idp.isOK()
         other match {
           case nje: BadJWTException =>
@@ -96,15 +94,12 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
             // This captures both JWS and JWE exceptions. These are really technical, and logger.debug must be enabled to understand them
             logger.debug("Encountered JWT issues", e)
             throw TokenVerificationException("Token cannot be verified: " + e.getLocalizedMessage)
-          case e: ParseException => {
+          case e: ParseException =>
             throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
-          }
-          case e: Throwable => {
+          case e: Throwable =>
             logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
             throw new TokenVerificationException("Token verification failure of type " + e.getClass.getSimpleName, e)
-          }
         }
-      }
     }
   }
 }

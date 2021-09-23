@@ -2,6 +2,7 @@ package org.cafienne.service.db.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.service.db.query.exception.UserSearchFailure
 import org.cafienne.service.db.record.UserRoleRecord
 import org.cafienne.service.db.schema.table.TenantTables
@@ -9,7 +10,7 @@ import org.cafienne.service.db.schema.table.TenantTables
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserQueries {
-  def getPlatformUser(userId: String) : Future[PlatformUser] = ???
+  def getPlatformUser(user: AuthenticatedUser): Future[PlatformUser] = ???
 
   def getSelectedTenantUsers(tenant: String, users: Seq[String]): Future[Seq[TenantUser]] = ???
 
@@ -30,11 +31,9 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
 
   val rolesQuery = TableQuery[UserRoleTable]
 
-  case class User(id: String, tenant: String, name: String, email: String = "", isOwner: Boolean, enabled: Boolean)
-
-
-  override def getPlatformUser(userId: String): Future[PlatformUser] = {
-    val query = TableQuery[UserRoleTable].filter(_.userId === userId).filter(_.enabled === true)
+  override def getPlatformUser(user: AuthenticatedUser): Future[PlatformUser] = {
+    val userId = user.userId
+    val query = TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.enabled === true)
 
     db.run(query.result).map(records => {
       val users = records.filter(record => record.role_name == "")

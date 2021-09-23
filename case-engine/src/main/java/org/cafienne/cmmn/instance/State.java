@@ -28,4 +28,8 @@ public enum State {
     public boolean isSemiTerminal() {
         return this == Closed || this == Completed || this == Disabled || this == Failed || this == Terminated;
     }
+
+    public boolean isActive() {
+        return this == Active;
+    }
 }

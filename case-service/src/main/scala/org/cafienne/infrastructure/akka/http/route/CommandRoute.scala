@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
-import org.cafienne.cmmn.actorapi.response.CaseResponse
+import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.platform.actorapi.response.{PlatformResponse, PlatformUpdateStatus}
@@ -30,6 +30,7 @@ trait CommandRoute extends AuthenticatedRoute {
           case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case value: HumanTaskResponse => completeWithLMH(StatusCodes.Accepted, value)
+          case value: CaseNotModifiedResponse => complete(StatusCodes.NotModified, "Transition has no effect")
           case value: CaseResponse => completeWithLMH(StatusCodes.OK, value)
           case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
           case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)

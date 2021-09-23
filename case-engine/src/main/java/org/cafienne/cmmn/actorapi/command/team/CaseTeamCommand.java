@@ -39,42 +39,10 @@ abstract class CaseTeamCommand extends CaseCommand {
         if (role == null) {
             throw new CaseTeamError("A role with name " + roleName + " is not defined within the case");
         }
-
-        Member existingMember = caseInstance.getCaseTeam().getMember(memberId);
-        if (existingMember != null) {
-            // means, it is an existing member; hence we need to check whether the member does not already have a mutex role
-            // Check the mutex roles
-            for (CaseRoleDefinition assignedRole : existingMember.getRoles()) {
-                if (assignedRole.getMutexRoles().contains(role)) {
-                    // not allowed
-                    throw new CaseTeamError("Role " + role + " is not allowed for " + memberId + " since " + memberId + " also has role " + assignedRole);
-                }
-            }
-        }
-
-        // Check that a singleton role is not yet assigned to one of the other team members
-        if (role.isSingleton()) {
-            for (Member member : caseInstance.getCaseTeam().getMembers()) {
-                if (!member.key.equals(memberId) && member.hasRole(roleName)) {
-                    throw new CaseTeamError("Role " + role + " is already assigned to another user");
-                }
-            }
-        }
     }
 
     protected void validateCaseTeamRoles(Case caseInstance, CaseTeamMember newMember) {
         newMember.validateRolesExist(caseInstance.getDefinition());
-
-        // Now also validate that the new roles do not mutex each other
-        CaseTeamDefinition team = caseInstance.getDefinition().getCaseTeamModel();
-        List<CaseRoleDefinition> newRoles = newMember.getCaseRoles().stream().map(team::getCaseRole).collect(Collectors.toList());
-        newRoles.forEach(role -> {
-            newRoles.stream().filter(otherRole -> otherRole != role).forEach(otherRole -> {
-                if (otherRole.getMutexRoles().contains(role)) {
-                    throw new CaseTeamError("Role " + role + " is not allowed for " + newMember.key() + " since this member also has role " + otherRole);
-                }
-            });
-        });
 
         // First validate the new roles against existing case team
         for (String role : newMember.getCaseRoles()) {

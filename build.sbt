@@ -96,6 +96,7 @@ lazy val engine = project("case-engine")
       Deps.akkaSlf4j,
       Deps.akkaStream,
       Deps.apacheCommonsText,
+      Deps.bcrypt,
       Deps.cassandraPersistence,
       Deps.cassandraExtras,
       Deps.config,
@@ -106,6 +107,7 @@ lazy val engine = project("case-engine")
       Deps.jasperReports,
       Deps.jasperReportFonts,
       Deps.javaMail,
+      Deps.joseJwt,
       Deps.ical4j,
       Deps.javaxws,
       Deps.jsonJava,
@@ -169,11 +171,9 @@ lazy val service = project("case-service")
     Deps.compile(
       Deps.akkaHttpCore,
       Deps.akkaHtppJackson,
-      Deps.bcrypt,
       Deps.hikariCP,
       Deps.jacksonScala,
       Deps.javaxws,
-      Deps.joseJwt,
       Deps.sw4jj,
     ) ++
       Deps.test(

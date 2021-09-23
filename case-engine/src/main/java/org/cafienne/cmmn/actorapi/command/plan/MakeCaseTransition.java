@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.actorapi.command.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
@@ -47,6 +48,12 @@ public class MakeCaseTransition extends CaseCommand {
     @Override
     public String toString() {
         return "Transition Case." + transition;
+    }
+
+    @Override
+    public void validate(Case caseInstance) throws InvalidCommandException {
+        super.validate(caseInstance);
+        caseInstance.getCasePlan().validateTransition(transition);
     }
 
     @Override

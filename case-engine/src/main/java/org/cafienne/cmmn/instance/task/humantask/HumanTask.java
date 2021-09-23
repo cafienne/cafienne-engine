@@ -131,17 +131,14 @@ public class HumanTask extends Task<HumanTaskDefinition> {
      * Completing the task is here interpreted as "performing the task", see spec page 14, section 5.2.2 on Role.
      */
     @Override
-    protected boolean isTransitionAllowed(Transition transition) {
-        if (transition != Transition.Complete) {
-            return true;
+    public void validateTransition(Transition transition) {
+        super.validateTransition(transition);
+        if (transition == Transition.Complete) {
+            // Now check if the user has the performer role.
+            if (!currentUserIsAuthorized()) {
+                throw new TransitionDeniedException("You do not have the permission to perform the task " + getName());
+            }
         }
-
-        // Now check if the user has the performer role.
-        if (!currentUserIsAuthorized()) {
-            throw new TransitionDeniedException("You do not have the permission to perform the task " + getName());
-        }
-
-        return true;
     }
 
     /**

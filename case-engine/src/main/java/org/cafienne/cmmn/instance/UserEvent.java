@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.AuthorizationException;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
@@ -17,9 +18,9 @@ import org.w3c.dom.Element;
 import java.util.Collection;
 import java.util.Set;
 
-public class UserEvent extends PlanItem<UserEventDefinition> {
+public class UserEvent extends EventListener<UserEventDefinition> {
     public UserEvent(String id, int index, ItemDefinition itemDefinition, UserEventDefinition definition, Stage<?> stage) {
-        super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
+        super(id, index, itemDefinition, definition, stage);
     }
 
     public Collection<CaseRoleDefinition> getAuthorizedRoles() {
@@ -27,14 +28,15 @@ public class UserEvent extends PlanItem<UserEventDefinition> {
     }
 
     @Override
-    protected boolean isTransitionAllowed(Transition transition) {
+    public void validateTransition(Transition transition) {
+        super.validateTransition(transition);
         if (transition != Transition.Occur) { // Only validating whether current user can make this event 'Occur'
-            return true;
+            return;
         }
 
         Collection<CaseRoleDefinition> authorizedRoles = getAuthorizedRoles();
         if (authorizedRoles.isEmpty()) { // No roles defined, so it is allowed.
-            return true;
+            return;
         }
 
         CurrentMember currentUser = getCaseInstance().getCurrentTeamMember();
@@ -42,10 +44,11 @@ public class UserEvent extends PlanItem<UserEventDefinition> {
         Set<CaseRoleDefinition> rolesOfCurrentUser = currentUser.getRoles();
         for (CaseRoleDefinition role : authorizedRoles) {
             if (rolesOfCurrentUser.contains(role)) {
-                return true; // You're free to go
+                return; // You're free to go
             }
         }
-        // Apparently no matching role was found.s
+
+        // Apparently no matching role was found.
         throw new AuthorizationException("User '"+currentUser.getMemberId()+"' does not have the permission to raise the event " + getName());
     }
 

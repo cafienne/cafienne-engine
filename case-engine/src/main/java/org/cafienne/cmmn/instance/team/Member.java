@@ -116,23 +116,6 @@ public class Member extends CMMNElement<CaseTeamDefinition> {
             return; // already assigned, no sweat.
         }
 
-        // Check the mutex roles
-        for (CaseRoleDefinition assignedRole : roles) {
-            if (assignedRole.getMutexRoles().contains(role)) {
-                // not allowed
-                throw new CaseTeamError("Role " + role + " is not allowed for " + getMemberId() + " since " + getMemberId() + " also has role " + assignedRole);
-            }
-        }
-
-        // Check that a singleton role is not yet assigned to one of the other team members
-        if (role.isSingleton()) {
-            for (Member member : getTeam().getMembers()) {
-                if (member.getRoles().contains(role)) {
-                    throw new CaseTeamError("Role " + role + " is already assigned to another user");
-                }
-            }
-        }
-
         roles.add(role);
     }
 

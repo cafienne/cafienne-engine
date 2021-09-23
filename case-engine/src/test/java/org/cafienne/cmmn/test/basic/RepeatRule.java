@@ -125,13 +125,7 @@ public class RepeatRule {
         });
 
         // keeping completing should not lead to more items ;)
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
-            casePlan.print();
-            casePlan.assertPlanItem("Item1").assertState(State.Completed);
-            casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(11);
-            casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(0);
-            casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(0);
-        });
+        testCase.assertStepFails(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete));
 
         testCase.runTest();
     }

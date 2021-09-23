@@ -5,6 +5,7 @@ import akka.http.scaladsl.server.{Directive1, Directives}
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.authentication.{AuthenticatedUser, JwtTokenVerifier, MissingTokenException}
 import org.cafienne.identity.IdentityProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,12 +39,23 @@ trait AuthenticationDirectives {
     })
   }
 
+  def authenticatedUser(): Directive1[AuthenticatedUser] = {
+    authenticateOAuth2Async("service", verifyJWTToken)
+  }
+
+  private def verifyJWTToken(credentials: Credentials): Future[Option[AuthenticatedUser]] = {
+    credentials match {
+      case Credentials.Provided(token) => jwtTokenVerifier.verifyToken(token).map(ctx => Some(ctx))
+      case Credentials.Missing => Future.failed(MissingTokenException)
+    }
+  }
+
   private def jwtToServiceUserAuthenticator(credentials: Credentials, tlm: Option[String]): Future[Option[PlatformUser]] = {
     credentials match {
       case Credentials.Provided(token) => {
         for {
-          usrCtx <- jwtTokenVerifier.verifyToken(token)
-          cachedUser <- userCache.getUser(usrCtx.subject.value, tlm)
+          authenticatedUser <- jwtTokenVerifier.verifyToken(token)
+          cachedUser <- userCache.getPlatformUser(authenticatedUser, tlm)
         } yield Some(cachedUser)
       }
       case Credentials.Missing => Future.failed(MissingTokenException)

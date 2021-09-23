@@ -354,8 +354,8 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     /**
      * Internal framework method to support Akka command handling and recovery
      */
-    public void makePlanItemTransition(PlanItem<?> planItem, Transition transition) {
-        planItem.makeTransition(transition);
+    public boolean makePlanItemTransition(PlanItem<?> planItem, Transition transition) {
+        return planItem.makeTransition(transition);
     }
 
     /**
