@@ -47,6 +47,15 @@ class SlickRecordsPersistence
     }
   }
 
+  override def deleteTaskRecord(taskId: String): Unit = {
+    addStatement(TableQuery[TaskTable].filter(_.id === taskId).delete)
+  }
+
+  override def deletePlanItemRecordAndHistory(planItemId: String): Unit = {
+    addStatement(TableQuery[PlanItemTable].filter(_.id === planItemId).delete)
+    addStatement(TableQuery[PlanItemHistoryTable].filter(_.id === planItemId).delete)
+  }
+
   override def delete(record: AnyRef) = {
     if (record != null) {
       val upsertStatement = record match {

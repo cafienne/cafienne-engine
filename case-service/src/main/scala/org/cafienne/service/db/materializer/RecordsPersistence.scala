@@ -15,6 +15,10 @@ trait RecordsPersistence {
 
   def delete(record: AnyRef): Unit
 
+  def deleteTaskRecord(taskId: String): Unit = ???
+
+  def deletePlanItemRecordAndHistory(planItemId: String): Unit = ???
+
   def removeCaseRoles(caseInstanceId: String): Unit
 
   def commit(): Future[Done]
