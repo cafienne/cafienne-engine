@@ -25,11 +25,27 @@ public enum State {
     Suspended,
     Terminated;
 
+    /**
+     * As per the spec
+     * @return
+     */
     public boolean isSemiTerminal() {
         return this == Closed || this == Completed || this == Disabled || this == Failed || this == Terminated;
     }
 
     public boolean isActive() {
         return this == Active;
+    }
+
+    public boolean isNull() {
+        return this == Null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isAlive() {
+        return this == Active || this == Suspended || this == Failed || this == Enabled || this == Disabled;
     }
 }

@@ -71,7 +71,7 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
      * @return
      */
     public void plan(String planItemId) {
-        containingStage.plan(this, planItemId);
+        containingStage.planChild(this, planItemId);
     }
 
     /**
