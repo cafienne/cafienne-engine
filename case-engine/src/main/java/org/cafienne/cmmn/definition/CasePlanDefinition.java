@@ -43,4 +43,14 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
     public Collection<ExitCriterionDefinition> getExitCriteria() {
         return exitCriteria;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameCasePlan);
+    }
+
+    public boolean sameCasePlan(CasePlanDefinition other) {
+        return sameStage(other)
+                && same(exitCriteria, other.exitCriteria);
+    }
 }

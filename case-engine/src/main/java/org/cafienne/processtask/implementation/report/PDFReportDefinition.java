@@ -63,4 +63,9 @@ public class PDFReportDefinition extends SubProcessDefinition {
         }
         return reportDataDefinition.createDataStream(report);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

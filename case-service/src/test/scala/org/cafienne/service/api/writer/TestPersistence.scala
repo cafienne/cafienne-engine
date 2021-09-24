@@ -21,6 +21,9 @@ class TestPersistence() extends RecordsPersistence {
     throw new IllegalArgumentException("Deletion probably requires an implementation in testing")
   }
 
+  override def removeCaseRoles(caseInstanceId: String): Unit = {
+  }
+
   override def commit(): Future[Done] = Future.successful(Done)
 
   override def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]] = Future.successful(None)

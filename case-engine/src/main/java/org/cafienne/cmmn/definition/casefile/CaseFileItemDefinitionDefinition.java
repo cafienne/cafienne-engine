@@ -69,6 +69,19 @@ public class CaseFileItemDefinitionDefinition extends ModelDefinition {
     }
 
     public Collection<PropertyDefinition> getBusinessIdentifiers() {
-        return properties.values().stream().filter(property -> property.isBusinessIdentifier()).collect(Collectors.toList());
+        return properties.values().stream().filter(PropertyDefinition::isBusinessIdentifier).collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameCaseFileItemDefinitionDefinition);
+    }
+
+    public boolean sameCaseFileItemDefinitionDefinition(CaseFileItemDefinitionDefinition other) {
+        return sameModelDefinition(other)
+                && same(definitionType, other.definitionType)
+                && same(structureRef, other.structureRef)
+                && same(importDefinition, other.importDefinition)
+                && same(properties.values(), other.properties.values());
     }
 }

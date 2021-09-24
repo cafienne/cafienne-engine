@@ -60,4 +60,23 @@ public class ParameterDefinition extends CMMNElementDefinition {
     public BindingRefinementDefinition getBindingRefinement() {
         return bindingRefinement;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameParameter);
+    }
+
+    public boolean sameBinding(ParameterDefinition other) {
+        return same(binding, other.binding);
+    }
+
+    public boolean sameBindingRefinement(ParameterDefinition other) {
+        return same(bindingRefinement, other.bindingRefinement);
+    }
+
+    public boolean sameParameter(ParameterDefinition other) {
+        return sameIdentifiers(other)
+                && sameBinding(other)
+                && sameBindingRefinement(other);
+    }
 }

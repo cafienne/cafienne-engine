@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,8 @@ import org.cafienne.json.Value;
 
 public class CMMNElement<T extends DefinitionElement> {
     private final Case caseInstance;
-    private final T definition;
+    private T definition;
+    private T previousDefinition;
 
     protected CMMNElement() {
         // NOTE: this constructor is added to overcome serialization issues for task parameters. To be reviewed when we review the whole serialization structure again.
@@ -53,6 +54,19 @@ public class CMMNElement<T extends DefinitionElement> {
         return definition;
     }
 
+    public T getPreviousDefinition() {
+        return previousDefinition;
+    }
+
+    public void migrateDefinition(T newDefinition) {
+        this.previousDefinition = this.definition;
+        this.definition = newDefinition;
+    }
+
+    protected boolean hasNewDefinition() {
+        return this.previousDefinition != null && this.definition.differs(previousDefinition);
+    }
+
     public Case getCaseInstance() {
         return caseInstance;
     }
@@ -64,5 +78,21 @@ public class CMMNElement<T extends DefinitionElement> {
 
     protected <T extends CaseEvent> T addEvent(T event) {
         return getCaseInstance().addEvent(event);
+    }
+
+    /**
+     * Temp method to keep track of all system.out.println statements
+     * @param msg
+     */
+    public void MigDevConsole(String msg) {
+        MigDevConsoleStatic(getClass().getSimpleName() +": " + msg);
+    }
+
+    /**
+     * Temp method to keep track of all system.out.println statements
+     * @param msg
+     */
+    public static void MigDevConsoleStatic(String msg) {
+        System.out.println(msg);
     }
 }

@@ -81,4 +81,15 @@ public class StageDefinition extends PlanFragmentDefinition {
     public Stage<?> createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new Stage<>(id, index, itemDefinition, this, stage, caseInstance);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameStage);
+    }
+
+    public boolean sameStage(StageDefinition other) {
+        return samePlanFragment(other)
+                && same(autoComplete, other.autoComplete)
+                && same(planningTable, other.planningTable);
+    }
 }

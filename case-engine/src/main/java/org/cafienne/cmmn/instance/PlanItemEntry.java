@@ -1,35 +1,43 @@
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
+import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.instance.sentry.CriteriaListener;
 import org.cafienne.cmmn.instance.sentry.Criterion;
+import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.w3c.dom.Element;
 
-public class PlanItemEntry extends CriteriaListener {
+public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, EntryCriterion> {
 
     PlanItemEntry(PlanItem<?> item) {
         super(item, item.getItemDefinition().getEntryCriteria());
+    }
+
+    @Override
+    protected EntryCriterion createCriterion(EntryCriterionDefinition definition) {
+        return definition.createInstance(this);
     }
 
     /**
      * Method invoked by the various state machines when the plan item becomes available;
      * typically determines whether it must be started or should wait for entry criteria to become active
      *
-     * @param transition
      */
-    public void beginLifeCycle(Transition transition) {
+    public void beginLifeCycle() {
+        Transition transition = item.getEntryTransition();
         if (criteria.isEmpty()) { // No entry criteria means get started immediately
             item.addDebugInfo(() -> item + ": Starting lifecycle with " + transition + " because there are no entry criteria defined");
             item.makeTransition(transition);
         } else {
             if (earlyBird != null) {
                 item.addDebugInfo(() -> item + ": Starting lifecycle with " + transition + " because of " + earlyBird);
-                handleCriterionSatiesfied(earlyBird);
+                handleCriterionSatisfied(earlyBird);
             } else {
                 // Evaluate sentries to see whether one is already active, and, if so, make the transition
                 for (Criterion<?> criterion : criteria) {
                     if (criterion.isSatisfied()) {
                         item.addDebugInfo(() -> item + ": an EntryCriterion is satisfied, making transition " + transition);
-                        handleCriterionSatiesfied(criterion);
+                        handleCriterionSatisfied(criterion);
                         return;
                     }
                 }
@@ -51,10 +59,10 @@ public class PlanItemEntry extends CriteriaListener {
             earlyBird = criterion;
             return;
         }
-        handleCriterionSatiesfied(criterion);
+        handleCriterionSatisfied(criterion);
     }
 
-    private void handleCriterionSatiesfied(Criterion<?> criterion) {
+    private void handleCriterionSatisfied(Criterion<?> criterion) {
         if (item.getIndex() == 0 && item.getState() == State.Available) {
             // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
             //  and also for the very first time. Therefore we should not yet repeat, but only make the
@@ -85,6 +93,14 @@ public class PlanItemEntry extends CriteriaListener {
         planItemXML.appendChild(planItemXML.getOwnerDocument().createComment(" Entry criteria "));
         for (Criterion<?> criterion : criteria) {
             criterion.dumpMemoryStateToXML(planItemXML, true);
+        }
+    }
+
+    @Override
+    protected void migrateCriteria(ItemDefinition newItemDefinition) {
+        migrateCriteria(newItemDefinition.getEntryCriteria());
+        if (criteria.isEmpty()) {
+            beginLifeCycle();
         }
     }
 }

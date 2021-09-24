@@ -41,4 +41,14 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
     public ProcessDefinition getImplementationDefinition() {
         return processDefinition;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameProcessTask);
+    }
+
+    public boolean sameProcessTask(ProcessTaskDefinition other) {
+        return sameTask(other)
+                && same(processDefinition, other.processDefinition);
+    }
 }

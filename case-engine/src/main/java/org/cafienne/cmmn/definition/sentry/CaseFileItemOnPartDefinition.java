@@ -58,4 +58,14 @@ public class CaseFileItemOnPartDefinition extends OnPartDefinition {
     public CaseFileItemOnPart createInstance(Criterion<?> criterion) {
         return new CaseFileItemOnPart(criterion, this);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameOnPart);
+    }
+
+    public boolean sameOnPart(CaseFileItemOnPartDefinition other) {
+        return same(standardEvent, other.standardEvent)
+                && same(source, other.source);
+    }
 }

@@ -1,6 +1,7 @@
 package org.cafienne.service.db.materializer.cases.plan
 
 import org.cafienne.cmmn.actorapi.event.CaseModified
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan.task.{TaskInputFilled, TaskOutputFilled}
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned, RepetitionRuleEvaluated, RequiredRuleEvaluated}
 import org.cafienne.service.db.record.PlanItemRecord
@@ -33,6 +34,12 @@ object PlanItemMerger {
       transition = event.getTransition.toString,
       currentState = event.getCurrentState.toString,
       historyState = event.getHistoryState.toString,
+    )
+
+  def merge(event: PlanItemMigrated, current: PlanItemRecord): PlanItemRecord =
+    current.copy(
+      name = event.planItemName,
+      definitionId = event.definitionId,
     )
 
   def merge(event: RepetitionRuleEvaluated, current: PlanItemRecord): PlanItemRecord =

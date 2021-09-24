@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
+public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     private ValueMap taskInput = new ValueMap();
     private ValueMap implementationInput = new ValueMap();
 
@@ -34,11 +34,8 @@ public abstract class Task<D extends TaskDefinition<?>> extends PlanItem<D> {
     private ValueMap taskOutput = new ValueMap();
 
     protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage<?> stage) {
-        super(id, index, itemDefinition, definition, stage, StateMachine.TaskStage);
+        super(id, index, itemDefinition, definition, stage.getCaseInstance(), stage, StateMachine.TaskStage);
     }
-
-    @Override
-    abstract protected void createInstance();
 
     @Override
     final protected void completeInstance() {

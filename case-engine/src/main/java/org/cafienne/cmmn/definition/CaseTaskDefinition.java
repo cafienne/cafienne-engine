@@ -41,4 +41,14 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
     public CaseDefinition getImplementationDefinition() {
         return subCaseDefinition;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameCaseTask);
+    }
+
+    public boolean sameCaseTask(CaseTaskDefinition other) {
+        return sameTask(other)
+                && subCaseDefinition.sameIdentifiers(other.subCaseDefinition);
+    }
 }

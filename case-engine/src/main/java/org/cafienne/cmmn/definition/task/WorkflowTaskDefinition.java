@@ -98,4 +98,17 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
         Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(NAMESPACE_URI, "implementation");
         return new WorkflowTaskDefinition(customTag, taskDefinition.getModelDefinition(), taskDefinition);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameWorkflow);
+    }
+
+    public boolean sameWorkflow(WorkflowTaskDefinition other) {
+        return same(taskModel, other.taskModel)
+                && same(dueDate, other.dueDate)
+                && same(assignment, other.assignment)
+                && same(inputParameters.values(), other.inputParameters.values())
+                && same(outputParameters.values(), other.outputParameters.values());
+    }
 }

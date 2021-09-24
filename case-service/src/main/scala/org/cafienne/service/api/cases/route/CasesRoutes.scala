@@ -27,4 +27,5 @@ class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache:
   addSubRoute(new CaseDocumentationRoute(caseQueries)(userCache, caseSystem))
   addSubRoute(new CaseHistoryRoute(caseQueries)(userCache, caseSystem))
   addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new CaseMigrationRoute(caseQueries)(userCache, caseSystem))
 }

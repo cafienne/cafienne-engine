@@ -21,4 +21,9 @@ public class MapStepDefinition extends StepDefinition {
     public String getType() {
         return "Mapping step";
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

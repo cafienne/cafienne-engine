@@ -98,4 +98,13 @@ public class CaseTeamDefinition extends CMMNElementDefinition {
         }
         return null;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameTeam);
+    }
+
+    public boolean sameTeam(CaseTeamDefinition other) {
+        return same(caseRoles, other.caseRoles);
+    }
 }

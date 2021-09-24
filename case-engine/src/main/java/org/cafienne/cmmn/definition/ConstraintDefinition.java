@@ -102,4 +102,14 @@ public class ConstraintDefinition extends CMMNElementDefinition {
     public String getType() {
         return expressionType;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameConstraint);
+    }
+
+    public boolean sameConstraint(ConstraintDefinition other) {
+        return same(expression, other.expression)
+                && same(context, other.context);
+    }
 }

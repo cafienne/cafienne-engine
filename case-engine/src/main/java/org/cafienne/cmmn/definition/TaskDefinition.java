@@ -27,7 +27,7 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
 
     protected TaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        isBlocking = Boolean.valueOf(parseAttribute("isBlocking", false, "true")).booleanValue();
+        isBlocking = Boolean.parseBoolean(parseAttribute("isBlocking", false, "true"));
 
         parse("inputs", TaskInputParameterDefinition.class, inputs);
         parse("outputs", TaskOutputParameterDefinition.class, outputs);
@@ -80,7 +80,7 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
     }
 
     public Stream<ParameterMappingDefinition> getInputMappings() {
-        return mappings.stream().filter(m -> m.isInputParameterMapping());
+        return mappings.stream().filter(ParameterMappingDefinition::isInputParameterMapping);
     }
 
     public Stream<ParameterMappingDefinition> getOutputMappings() {
@@ -98,4 +98,17 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
      * @return
      */
     abstract T getImplementationDefinition();
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameTask);
+    }
+
+    public boolean sameTask(TaskDefinition<T> other) {
+        return samePlanItemDefinitionDefinition(other)
+                && same(isBlocking, other.isBlocking)
+                && same(inputs.values(), other.inputs.values())
+                && same(outputs.values(), other.outputs.values())
+                && same(mappings, other.mappings);
+    }
 }

@@ -3,8 +3,10 @@ package org.cafienne.service.db.materializer.cases.plan
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseModified
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
+import org.cafienne.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record._
 
@@ -27,31 +29,37 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
   }
 
   private def handlePlanItemEvent(event: PlanItemEvent): Future[Done] = {
-      // Always insert new items into history, no need to first fetch them from db.
-      PlanItemHistoryMerger.mapEventToHistory(event).foreach(item => planItemsHistory += item)
-      event match {
-        case evt: PlanItemCreated =>
-          val planItem = PlanItemMerger.merge(evt)
-          planItems.put(planItem.id, planItem)
-          Future.successful(Done)
-        case other: PlanItemEvent => getPlanItem(event.getPlanItemId).map {
-          case Some(planItem) =>
-            other match {
-              case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
-              case evt: RepetitionRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
-              case evt: RequiredRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
-              case _ => // Nothing to do for the other events
-            }
-            Done
-          case None =>
-            // But ... if not found, then should we create a new one here? With the PlanItemMerger that can be done ...
-            logger.error("Expected PlanItem " + event.getPlanItemId + " in " + event.getCaseInstanceId + ", but not found in the database")
-            Done
+    event match {
+      case dropped: PlanItemDropped =>
+        persistence.deletePlanItemRecordAndHistory(dropped.getPlanItemId)
+        Future.successful(Done)
+      case _ =>
+        // Always insert new items into history, no need to first fetch them from db.
+        PlanItemHistoryMerger.mapEventToHistory(event).foreach(item => planItemsHistory += item)
+        event match {
+          case evt: PlanItemCreated =>
+            val planItem = PlanItemMerger.merge(evt)
+            planItems.put(planItem.id, planItem)
+            Future.successful(Done)
+          case other: PlanItemEvent => getPlanItem(event.getPlanItemId).map {
+            case Some(planItem) =>
+              other match {
+                case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
+                case evt: RepetitionRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
+                case evt: RequiredRuleEvaluated => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
+                case _ => // Nothing to do for the other events
+              }
+              Done
+            case None =>
+              // But ... if not found, then should we create a new one here? With the PlanItemMerger that can be done ...
+              logger.error("Expected PlanItem " + event.getPlanItemId + " in " + event.getCaseInstanceId + ", but not found in the database")
+              Done
+          }
+          case unknownPlanItemEvent =>
+            logger.error("Apparently we have a new type of PlanItemEvent that is not being handled by this Projection. The type is " + unknownPlanItemEvent.getClass.getName)
+            Future.successful(Done)
         }
-        case unknownPlanItemEvent =>
-          logger.error("Apparently we have a new type of PlanItemEvent that is not being handled by this Projection. The type is " + unknownPlanItemEvent.getClass.getName)
-          Future.successful(Done)
-      }
+    }
   }
 
   private def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = {
@@ -83,6 +91,13 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
   }
 
   private def handleHumanTaskEvent(event: HumanTaskEvent): Future[Done] = {
+    event match {
+      case dropped: HumanTaskDropped =>
+        persistence.deleteTaskRecord(dropped.taskId)
+        return Future.successful(Done)
+      case _ =>
+    }
+
     val fTask: Future[Option[TaskRecord]] = {
       event match {
         case evt: HumanTaskInputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
@@ -102,6 +117,7 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
             }
           }
         }))
+        case evt: HumanTaskMigrated => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
         case _ => Future.successful(None) // Ignore and error on other events
       }
     }

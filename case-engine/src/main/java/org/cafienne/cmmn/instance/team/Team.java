@@ -49,11 +49,11 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         addEvent(new TeamRoleFilled(getCaseInstance(), key, ""));
     }
 
-    private void addMemberRole(MemberKey key, String roleName) {
+    void addMemberRole(MemberKey key, String roleName) {
         addEvent(new TeamRoleFilled(getCaseInstance(), key, roleName));
     }
 
-    private void removeMemberRole(MemberKey key, String roleName) {
+    void removeMemberRole(MemberKey key, String roleName) {
         addEvent(new TeamRoleCleared(getCaseInstance(), key, roleName));
     }
 
@@ -309,5 +309,11 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
             }
             return userInfo;
         });
+    }
+
+    @Override
+    public void migrateDefinition(CaseTeamDefinition newDefinition) {
+        super.migrateDefinition(newDefinition);
+        members.forEach(member -> member.migrateDefinition(newDefinition));
     }
 }

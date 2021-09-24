@@ -42,4 +42,14 @@ public class SentryDefinition extends CMMNElementDefinition {
     public IfPartDefinition getIfPart() {
         return ifPart;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameSentry);
+    }
+
+    public boolean sameSentry(SentryDefinition other) {
+        return same(ifPart, other.ifPart)
+                && same(onParts, other.onParts);
+    }
 }

@@ -91,5 +91,15 @@ public class PlanningTableDefinition extends TableItemDefinition {
         }
         return null;
     }
-}
 
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::samePlanningTable);
+    }
+
+    public boolean samePlanningTable(PlanningTableDefinition other) {
+        return sameTableItem(other)
+                && same(tableItems, other.tableItems)
+                && same(ruleDefinitions, other.ruleDefinitions);
+    }
+}

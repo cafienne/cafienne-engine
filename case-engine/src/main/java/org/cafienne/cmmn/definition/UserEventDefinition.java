@@ -49,4 +49,14 @@ public class UserEventDefinition extends EventListenerDefinition {
     public Transition getEntryTransition() {
         return Transition.Occur;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameUserEvent);
+    }
+
+    public boolean sameUserEvent(UserEventDefinition other) {
+        return samePlanItemDefinitionDefinition(other)
+                && same(authorizedRoles, other.authorizedRoles);
+    }
 }

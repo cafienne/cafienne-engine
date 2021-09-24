@@ -4,6 +4,7 @@ import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.EngineChokedFailure;
 import org.cafienne.actormodel.response.SecurityFailure;
 import org.cafienne.cmmn.actorapi.response.*;
+import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.platform.actorapi.response.PlatformResponse;
@@ -26,6 +27,7 @@ public class ResponseSerializer extends CafienneSerializer {
         addManifestWrapper(AddDiscretionaryItemResponse.class, AddDiscretionaryItemResponse::new);
         addManifestWrapper(GetDiscretionaryItemsResponse.class, GetDiscretionaryItemsResponse::new);
         addManifestWrapper(CaseStartedResponse.class, CaseStartedResponse::new);
+        addManifestWrapper(MigrationStartedResponse.class, MigrationStartedResponse::new);
         addManifestWrapper(CaseResponse.class, CaseResponse::new);
         addManifestWrapper(CaseNotModifiedResponse.class, CaseNotModifiedResponse::new);
     }

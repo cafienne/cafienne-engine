@@ -54,6 +54,11 @@ public class CaseFileItemOnPart extends OnPart<CaseFileItemOnPartDefinition, Cas
         caseFileItem.connectOnPart(this);
     }
 
+    @Override
+    protected void removeConnection(CaseFileItem caseFileItem) {
+        connectedItems.remove(caseFileItem);
+    }
+
     public void inform(CaseFileItem item, CaseFileItemTransitioned event) {
         addDebugInfo(() -> "Case file item " + item.getPath() + " informs " + criterion + " about transition " + event.getTransition() + ".");
         lastEvent = event;

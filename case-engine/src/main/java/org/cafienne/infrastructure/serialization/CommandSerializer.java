@@ -7,6 +7,7 @@ import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode;
+import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
@@ -37,6 +38,7 @@ public class CommandSerializer extends CafienneSerializer {
 
     private static void addCaseCommands() {
         addManifestWrapper(StartCase.class, StartCase::new);
+        addManifestWrapper(MigrateDefinition.class, MigrateDefinition::new);
         addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
         addManifestWrapper(UpdateCaseWithPlatformInformation.class, UpdateCaseWithPlatformInformation::new);
         addCasePlanCommands();

@@ -90,4 +90,15 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
     public PlanItemOnPart createInstance(Criterion<?> criterion) {
         return new PlanItemOnPart(criterion, this);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameOnPart);
+    }
+
+    public boolean sameOnPart(PlanItemOnPartDefinition other) {
+        return same(standardEvent, other.standardEvent)
+                && source.sameIdentifiers(other.source)
+                && same(exitCriterion, other.exitCriterion);
+    }
 }

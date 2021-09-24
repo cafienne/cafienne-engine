@@ -10,10 +10,8 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.actorapi.event.DebugDisabled;
-import org.cafienne.cmmn.actorapi.event.DebugEnabled;
+import org.cafienne.cmmn.actorapi.event.*;
+import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
@@ -133,10 +131,10 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     public String stateToXMLString() {
         Document xmlDocument;
         try {
-            if (definition == null) {
+            if (getDefinition() == null) {
                 xmlDocument = XMLHelper.loadXML("<Case id=\"" + getId() + "\"/>");
             } else {
-                xmlDocument = XMLHelper.loadXML("<Case name=\"" + definition.getName() + "\" id=\"" + getId() + "\"/>");
+                xmlDocument = XMLHelper.loadXML("<Case name=\"" + getDefinition().getName() + "\" id=\"" + getId() + "\"/>");
                 getCaseTeam().dumpMemoryStateToXML(xmlDocument.getDocumentElement());
                 getCaseFile().dumpMemoryStateToXML(xmlDocument.getDocumentElement());
                 getCasePlan().dumpMemoryStateToXML(xmlDocument.getDocumentElement());
@@ -163,6 +161,10 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public CaseDefinition getDefinition() {
         return definition;
+    }
+
+    private void setDefinition(CaseDefinition definition) {
+        this.definition = definition;
     }
 
     /**
@@ -309,7 +311,7 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
      */
     public void applyCaseDefinition(CaseDefinition definition, String parentCaseId, String rootCaseId) {
         // Set the definition and tenant.
-        this.definition = definition;
+        setDefinition(definition);
         // Link the (optional) ancestor information
         this.parentCaseId = parentCaseId;
         this.rootCaseId = rootCaseId;
@@ -403,5 +405,22 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     public void updateState(CaseAppliedPlatformUpdate event) {
         getCaseTeam().updateState(event);
         getCasePlan().updateState(event);
+    }
+
+    public void migrate(CaseDefinition definition) {
+        addEvent(new CaseDefinitionMigrated(this, definition));
+    }
+
+    public void migrateCaseDefinition(CaseDefinition definition) {
+        CMMNElement.MigDevConsoleStatic("\n\nMigrating case " + getDefinition().getName() + " with id " + getId());
+        setDefinition(definition);
+        getCaseTeam().migrateDefinition(definition.getCaseTeamModel());
+        getCaseFile().migrateDefinition(definition.getCaseFileModel());
+        getCasePlan().migrateDefinition(definition.getCasePlanModel());
+    }
+
+    public void removeDroppedPlanItem(PlanItem<?> item) {
+        getSentryNetwork().disconnect(item);
+        planItems.remove(item);
     }
 }

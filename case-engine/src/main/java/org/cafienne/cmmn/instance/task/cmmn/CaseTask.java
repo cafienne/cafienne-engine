@@ -9,15 +9,13 @@ package org.cafienne.cmmn.instance.task.cmmn;
 
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +29,6 @@ public class CaseTask extends Task<CaseTaskDefinition> {
         super(id, index, itemDefinition, definition, stage);
         subCaseId = getId(); // Our planitem id will also be the id of the subcase.
         mainCase = getCaseInstance();
-    }
-
-    @Override
-    protected void createInstance() {
-        // Nothing to be done here; when we start, we invoke StartCase, which will also create the instance
     }
 
     @Override
@@ -95,5 +88,21 @@ public class CaseTask extends Task<CaseTaskDefinition> {
                 // Is logging an error sufficient? Or should we go Fault?!
                 logger.error("Could not make transition " + transition + " on sub case implementation for task " + subCaseId + "\n" + left));
         }
+    }
+
+    @Override
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, CaseTaskDefinition newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+        if (this.getState() != State.Null && this.getState() != State.Available) {
+            MigDevConsole("Migrating definition into subcase!!!");
+            CaseDefinition subCaseDefinition = newDefinition.getImplementationDefinition();
+            getCaseInstance().askCase(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), subCaseDefinition),
+                left -> logger.error("Failure while migrating definition of case task " + this.getDescription() + ": " + left.toJson()));
+        }
+    }
+
+    @Override
+    protected void lostDefinition() {
+        addDebugInfo(() -> "Dropping CaseTasks through migration is not possible. Task[" + getPath() + "] remains in the case with current state '" + getState() + "'");
     }
 }

@@ -37,4 +37,14 @@ public class ProcessDefinition extends ModelDefinition implements TaskImplementa
     public InlineSubProcessDefinition getInlineImplementation() {
         return (InlineSubProcessDefinition) subProcessDefinition;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameProcessDefinition);
+    }
+
+    public boolean sameProcessDefinition(ProcessDefinition other) {
+        return sameModelDefinition(other)
+                && same(subProcessDefinition, other.subProcessDefinition);
+    }
 }

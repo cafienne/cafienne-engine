@@ -18,6 +18,7 @@ import org.cafienne.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -154,5 +155,45 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
 
     public Path getPath() {
         return new Path("");
+    }
+
+    @Override
+    public void migrateDefinition(T newDefinition) {
+        super.migrateDefinition(newDefinition);
+        MigDevConsole("CFI[" + getPath() + "] gets a new definition");
+        Map<String, CaseFileItemDefinition> newItemsByName = newDefinition.getChildren().stream().collect(Collectors.toMap(CaseFileItemDefinition::getName, item -> item));
+        Map<String, CaseFileItemDefinition> newItemsById = newDefinition.getChildren().stream().collect(Collectors.toMap(CaseFileItemDefinition::getId, item -> item));
+        getItems().forEach(child -> {
+            CaseFileItemDefinition childDefinition = child.getDefinition();
+            // First check if we can find the child in the new definition by it's existing name....
+            CaseFileItemDefinition newChildDefinition = newItemsByName.get(childDefinition.getName());
+            if (newChildDefinition != null) {
+                // Found the new definition for the child by it's existing name. Simply invoke "migrate" on it.
+                child.migrateDefinition(newChildDefinition);
+            } else {
+                // Since we cannot find the child by name, let's try to find it by id.
+                newChildDefinition = newItemsById.get(childDefinition.getId());
+                if (newChildDefinition != null) {
+                    // We found the child, migrate it. Rename logic to be added
+                    // TODO: Also replace name inside the value map and generate an event for it.
+                    MigDevConsole("Migrating child definition and name: CFI[" + childDefinition.getName()+"] --> CFI["+newChildDefinition.getName()+"]");
+                    child.migrateDefinition(newChildDefinition);
+                    child.migrateName(newChildDefinition);
+                } else {
+                    // We can also not find the child by id. That means we can simply drop it.
+                    //  Alternatively we might check whether there's a child in the new definition that has the exact same properties and children
+                    //  but perhaps that's more for a migration dsl...
+                    child.lostDefinition();
+                }
+            }
+        });
+    }
+
+    protected void childDropped(CaseFileItem child) {
+        items.remove(child);
+    }
+
+    protected void renameChildItem(String formerName, String newName) {
+        // Base implementation is empty, since CaseFile needs not change the name, as it does not keep track of the name (other than through definition)
     }
 }

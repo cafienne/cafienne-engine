@@ -110,4 +110,17 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
     private void resolvePlanItemDefinition() {
         this.definition = getCaseDefinition().findPlanItemDefinition(planItemDefinitionRefValue);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::samePlanItem);
+    }
+
+    public boolean samePlanItem(PlanItemDefinition other) {
+        return sameIdentifiers(other)
+                && same(this.planItemControl, other.planItemControl)
+                && same(this.definition, other.definition)
+                && same(this.entryCriteria, other.entryCriteria)
+                && same(this.exitCriteria, other.exitCriteria);
+    }
 }

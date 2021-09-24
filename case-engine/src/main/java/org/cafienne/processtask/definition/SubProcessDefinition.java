@@ -155,4 +155,11 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
         }
         return rawOutputParameters;
     }
+
+    public boolean sameSubProcess(SubProcessDefinition other) {
+        return same(isAsync, other.isAsync)
+                && same(mappings, other.mappings)
+                && same(successMappings, other.successMappings)
+                && same(failureMappings, other.failureMappings);
+    }
 }

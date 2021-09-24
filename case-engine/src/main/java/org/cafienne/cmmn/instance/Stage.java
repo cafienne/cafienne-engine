@@ -9,11 +9,10 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.PlanningTableDefinition;
-import org.cafienne.cmmn.definition.StageDefinition;
+import org.cafienne.cmmn.definition.*;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class Stage<T extends StageDefinition> extends PlanFragment<T> {
+public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
@@ -29,7 +28,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance, StateMachine stateMachine) {
-        super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
+        super(id, index, itemDefinition, definition, caseInstance, parent, stateMachine);
     }
 
     void register(PlanItem<?> child) {
@@ -45,6 +44,87 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
 
     public Collection<PlanItem<?>> getPlanItems() {
         return planItems;
+    }
+
+    /**
+     * Adds an item to the stage, by adding a PlanItemCreated event for it.
+     * Also starts the lifecycle of the new plan item if the Stage is currently active.
+     * @param discretionaryItem
+     * @param planItemId
+     */
+    void planChild(DiscretionaryItem discretionaryItem, String planItemId) {
+        // Determine index by iterating sibling plan items (i.e., those that have the same item definition).
+        int index = Long.valueOf(this.planItems.stream().filter(item -> item.getItemDefinition().equals(discretionaryItem.getDefinition())).count()).intValue();
+        addChild(discretionaryItem.getDefinition(), planItemId, index);
+    }
+
+    PlanItem<?> addChild(ItemDefinition itemDefinition, String planItemId, int index) {
+        if (getCaseInstance().recoveryRunning()) {
+            return null;
+        }
+        PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, planItemId, index));
+        if (this.getState() == State.Active) {
+            // Only generate a start transition for the new discretionary item if this stage is active.
+            //  Otherwise the start transition will be generated when this stage becomes active.
+            pic.getCreatedPlanItem().makeTransition(Transition.Create);
+        }
+        return pic.getCreatedPlanItem();
+    }
+
+    private void createChild(PlanItemDefinition itemDefinition) {
+        addChild(itemDefinition, new Guid().toString(), 0);
+    }
+
+    /**
+     * If the Stage is not Active (either because it is in state Available, or Suspended or Fault)
+     * new items may have been added from either planning discretionaries or migrating the case definition.
+     * This method iterates all items in State.Null and triggers a create transition for them.
+     *  These may have been created due to case definition migration while stage was in Fault state
+     */
+    private void createNullItems() {
+        addDebugInfo(() -> "Instantiating life cycle for null items. Total plan items in Stage[" + getName()+ " is " + planItems.size());
+        addDebugInfo(() -> {
+            StringBuilder sb = new StringBuilder("Items:\n");
+            planItems.forEach(item -> sb.append("Item["+item.getName()+"."+item.getIndex() +"] in state "+ item.getState()));
+            return sb.toString();
+        });
+        planItems.stream().filter(item -> item.getState().isNull()).forEach(item -> item.makeTransition(Transition.Create));
+    }
+
+    @Override
+    protected void startInstance() {
+        // First start the discretionary items that have already been planned.
+        createNullItems();
+
+        // Create the child plan items and begin their life-cycle
+        getDefinition().getPlanItems().forEach(this::createChild);
+    }
+
+    @Override
+    protected void suspendInstance() {
+        propagateTransition(Transition.ParentSuspend);
+    }
+
+    @Override
+    protected void resumeInstance() {
+        propagateTransition(Transition.ParentResume);
+        createNullItems();
+    }
+
+    @Override
+    protected void reactivateInstance() {
+        super.reactivateInstance();
+        createNullItems();
+    }
+
+    @Override
+    protected void terminateInstance() {
+        disconnectChildren(true);
+    }
+
+    @Override
+    protected void completeInstance() {
+        disconnectChildren(false);
     }
 
     /**
@@ -82,7 +162,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         // Here we check both.
         addDebugInfo(() -> {
             String msg = getPlanItems().stream().map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
-            return "*   checking " + planItems.size() +" plan items for completion:" + msg;
+            return "*   checking " + planItems.size() + " plan items for completion:" + msg;
         });
         for (PlanItem<?> childItem : planItems) {
             // There shouldn't be any active item.
@@ -127,20 +207,6 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     @Override
-    protected void startInstance() {
-        // First start the discretionary items that have already been planned.
-        planItems.forEach(item -> item.makeTransition(Transition.Create));
-
-        // Create the child plan items and begin their life-cycle
-        getDefinition().getPlanItems().forEach(itemDefinition -> {
-            // Generate an id for the child item
-            String childItemId = new Guid().toString();
-            PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, childItemId, 0));
-            pic.getCreatedPlanItem().makeTransition(Transition.Create);
-        });
-    }
-
-    @Override
     protected boolean hasDiscretionaryItems() {
         PlanningTableDefinition table = getDefinition().getPlanningTable();
         if (table != null && table.hasItems(this)) {
@@ -165,29 +231,9 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         getPlanItems().forEach(p -> p.retrieveDiscretionaryItems(items));
     }
 
-    @Override
-    protected void suspendInstance() {
-        propagateTransition(Transition.ParentSuspend);
-    }
-
-    @Override
-    protected void resumeInstance() {
-        propagateTransition(Transition.ParentResume);
-    }
-
-    @Override
-    protected void terminateInstance() {
-        disconnectChildren(true);
-    }
-
-    @Override
-    protected void completeInstance() {
-        disconnectChildren(false);
-    }
-
     private void disconnectChildren(boolean makeTerminationTransition) {
         for (PlanItem<?> child : planItems) {
-            if (makeTerminationTransition ) {
+            if (makeTerminationTransition) {
                 child.makeTransition(child.getTerminationTransition());
             }
             child.getEntryCriteria().release();
@@ -239,19 +285,91 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
         return contains(planItemsParent);
     }
 
-    void plan(DiscretionaryItem discretionaryItem, String planItemId) {
-        int index = Long.valueOf(this.planItems.stream().filter(planItem -> planItem.getName().equals(discretionaryItem.getDefinition().getName())).count()).intValue();
-
-        PlanItemCreated pic = addEvent(new PlanItemCreated(this, discretionaryItem.getDefinition(), planItemId, index));
-        if (this.getState() == State.Active) {
-            // Only generate a start transition for the new discretionary item if this stage is active.
-            //  Otherwise the start transition will be generated when this stage becomes active.
-            pic.getCreatedPlanItem().makeTransition(Transition.Create);
-        }
-    }
-
     @Override
     public void updateState(CaseAppliedPlatformUpdate event) {
         planItems.forEach(item -> item.updateState(event));
+    }
+
+    @Override
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+        // Migrate existing children (potentially dropping and removing them)
+        new ArrayList<>(planItems).forEach(this::migrateChild);
+
+        // When the Stage is in state Available, it is not yet active, and starting the Stage
+        //  will make it active and then the new children will be instantiated automatically.
+        // When Stage is Active, or Failed or Suspended or Enabled or Disabled we can create; whether it is started depends on the state
+        // When Stage is Terminated or Completed, there is nothing to be done in the remainder. E.g., we cannot re-activate a completed Stage.
+        if (this.getState().isAlive()) {
+            // Iterate for newly added children and create them.
+            newDefinition.getPlanItems().stream().filter(this::doesNotHaveChild).forEach(this::createChild);
+        }
+    }
+
+    private void migrateChild(PlanItem<?> child) {
+        String childDefinitionId = child.getItemDefinition().getId();
+        String childName = child.getItemDefinition().getName();
+
+        // Figure out if we can find a new definition for the child
+        ItemDefinition newChildItemDefinition = getDefinition().getPlanItem(childDefinitionId);
+        if (newChildItemDefinition == null) {
+            // Perhaps get by name?
+            newChildItemDefinition = getDefinition().getPlanItem(childName);
+            if (newChildItemDefinition == null) {
+                // Perhaps it is a discretionary item?
+                newChildItemDefinition = getDefinition().getDiscretionaryItem(childDefinitionId);
+                if (newChildItemDefinition == null) {
+                    newChildItemDefinition = getDefinition().getDiscretionaryItem(childName);
+                }
+            }
+        }
+
+        // If we found a new definition, let's migrate it; otherwise tell the child to get lost.
+        if (newChildItemDefinition != null) {
+            migrateChild(child, newChildItemDefinition);
+        } else {
+            dropChild(child);
+        }
+    }
+
+    private boolean doesNotHaveChild(PlanItemDefinition newChildDefinition) {
+        boolean notHasChild = this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().getId().equals(newChildDefinition.getId()) || item.getName().equals(newChildDefinition.getName()));
+        if (notHasChild) {
+            MigDevConsole("Stage does not have a child with definition " + newChildDefinition.getName() +" of type " + newChildDefinition.getType() +", hence creating a new one");
+        }
+        return notHasChild;
+    }
+
+    private void dropChild(PlanItem<?> child) {
+        // No need to drop children when recovery is running, as the below generated PlanItemDropped event will be recovered soon enough...
+        if (getCaseInstance().recoveryRunning()) {
+            return;
+        }
+        child.lostDefinition();
+    }
+
+    @Override
+    protected void lostDefinition() {
+        // First drop our children
+        new ArrayList<>(planItems).forEach(PlanItem::lostDefinition);
+        // Then generate our own event
+        super.lostDefinition();
+    }
+
+    private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition) {
+        MigDevConsole("Migrating Stage child " + child +" to a new definition");
+        DefinitionElement currentChildDefinition = child.getDefinition();
+        PlanItemDefinitionDefinition newChildDefinition = newChildItemDefinition.getPlanItemDefinition();
+        if (currentChildDefinition.getClass().isAssignableFrom(newChildDefinition.getClass())) {
+            child.migrateItemDefinition(newChildItemDefinition, newChildDefinition);
+        } else {
+            // Apparently what was once a Task is now a Stage or so?
+            // Scenario not yet supported...
+            addDebugInfo(() -> "Not possible to migrate from " + currentChildDefinition.getType() + " to " + newChildDefinition.getType());
+        }
+    }
+
+    void removeDroppedPlanItem(PlanItem<?> item) {
+        planItems.remove(item);
     }
 }

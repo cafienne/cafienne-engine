@@ -5,6 +5,7 @@ import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.SentryEvent;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.file.*;
+import org.cafienne.cmmn.actorapi.event.migration.*;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
@@ -14,6 +15,8 @@ import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.actorapi.event.team.*;
 import org.cafienne.humantask.actorapi.event.*;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
 import org.cafienne.processtask.actorapi.event.*;
 import org.cafienne.tenant.actorapi.event.*;
 import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
@@ -42,6 +45,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseModified.class, CaseModified::new);
         addManifestWrapper(CaseAppliedPlatformUpdate.class, CaseAppliedPlatformUpdate::new);
         addManifestWrapper(EngineVersionChanged.class, EngineVersionChanged::new);
+        addManifestWrapper(CaseDefinitionMigrated.class, CaseDefinitionMigrated::new);
         registerCaseTeamEvents();
         registerCasePlanEvents();
         registerCaseFileEvents();
@@ -59,6 +63,8 @@ public class EventSerializer extends CafienneSerializer {
     private static void registerCasePlanEvents() {
         addManifestWrapper(PlanItemCreated.class, PlanItemCreated::new);
         addManifestWrapper(PlanItemTransitioned.class, PlanItemTransitioned::new);
+        addManifestWrapper(PlanItemMigrated.class, PlanItemMigrated::new);
+        addManifestWrapper(PlanItemDropped.class, PlanItemDropped::new);
         addManifestWrapper(RepetitionRuleEvaluated.class, RepetitionRuleEvaluated::new);
         addManifestWrapper(RequiredRuleEvaluated.class, RequiredRuleEvaluated::new);
         addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
@@ -68,6 +74,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(TimerTerminated.class, TimerTerminated::new);
         addManifestWrapper(TimerSuspended.class, TimerSuspended::new);
         addManifestWrapper(TimerResumed.class, TimerResumed::new);
+        addManifestWrapper(TimerDropped.class, TimerDropped::new);
     }
 
     private static void registerCaseFileEvents() {
@@ -80,6 +87,8 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(CaseFileItemTransitioned.class, CaseFileItemTransitioned::new);
         addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
         addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);
+        addManifestWrapper(CaseFileItemMigrated.class, CaseFileItemMigrated::new);
+        addManifestWrapper(CaseFileItemDropped.class, CaseFileItemDropped::new);
     }
 
     private static void registerHumanTaskEvents() {
@@ -97,6 +106,8 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(HumanTaskRevoked.class, HumanTaskRevoked::new);
         addManifestWrapper(HumanTaskSuspended.class, HumanTaskSuspended::new);
         addManifestWrapper(HumanTaskTerminated.class, HumanTaskTerminated::new);
+        addManifestWrapper(HumanTaskMigrated.class, HumanTaskMigrated::new);
+        addManifestWrapper(HumanTaskDropped.class, HumanTaskDropped::new);
     }
 
     private static void registerProcessEvents() {

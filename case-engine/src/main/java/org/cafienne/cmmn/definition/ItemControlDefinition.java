@@ -52,4 +52,17 @@ public class ItemControlDefinition extends CMMNElementDefinition {
     public ConstraintDefinition getManualActivationRule() {
         return manualActivationRule;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameItemControl);
+    }
+
+    public boolean sameItemControl(ItemControlDefinition other) {
+        boolean sameSuper = super.sameClass(other); // Name and id are not relevant
+        boolean sameRequiredRule = same(requiredRule, other.requiredRule);
+        boolean sameRepetitionRule = same(repetitionRule, other.repetitionRule);
+        boolean sameManualActivationRule = same(manualActivationRule, other.manualActivationRule);
+        return sameSuper && sameRequiredRule && sameRepetitionRule && sameManualActivationRule;
+    }
 }

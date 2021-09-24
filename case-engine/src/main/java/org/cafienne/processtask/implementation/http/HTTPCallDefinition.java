@@ -18,10 +18,7 @@ import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class HTTPCallDefinition extends SubProcessDefinition {
     // Raw, hard coded output parameter names
@@ -105,5 +102,43 @@ public class HTTPCallDefinition extends SubProcessDefinition {
             valueTemplate.resolveParameters(processInputParameters);
             return valueTemplate.toString();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Header)) return false;
+            Header header = (Header) o;
+            return Objects.equals(sourceName, header.sourceName) && Objects.equals(sourceValue, header.sourceValue);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sourceName, sourceValue);
+        }
+    }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameHTTPCall);
+    }
+
+    public boolean sameHTTPCall(HTTPCallDefinition other) {
+        return super.sameSubProcess(other)
+                && same(this.contentTemplate, other.contentTemplate)
+                && same(httpMethod, other.httpMethod)
+                && same(sourceURL, other.sourceURL)
+                && sameCollection(httpHeaders, other.httpHeaders);
+    }
+
+    private boolean sameCollection(Collection<?> ours, Collection<?> theirs) {
+        if (ours.size() != theirs.size()) {
+            return false;
+        }
+        for (Object mine : ours) {
+            if (theirs.stream().noneMatch(his -> same(mine, his))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

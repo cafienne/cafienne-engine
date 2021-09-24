@@ -33,4 +33,9 @@ public class AttachmentTemplate extends XMLElementDefinition {
         StringValue value = new StringValue(new StringTemplate(parameter).resolveParameters(input).getResult());
         output.put(parameterName, value);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

@@ -21,4 +21,9 @@ public class FilterStepDefinition extends StepDefinition {
     public String getType() {
         return "Filter";
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

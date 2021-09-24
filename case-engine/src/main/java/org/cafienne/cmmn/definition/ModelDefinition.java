@@ -22,7 +22,7 @@ import java.util.Map;
  * Base class for top-level elements inside the <code>&lt;definitions&gt;</code> tag, such as
  * {@link CaseDefinition}, {@link ProcessDefinition}, {@link CaseFileItemDefinitionDefinition}, etc.
  */
-public class ModelDefinition extends CMMNElementDefinition {
+public abstract class ModelDefinition extends CMMNElementDefinition {
     private final String defaultExpressionLanguage;
     /**
      * Collection with all elements belonging to the case definition.
@@ -150,5 +150,12 @@ public class ModelDefinition extends CMMNElementDefinition {
      */
     public Map<String, OutputParameterDefinition> getOutputParameters() {
         return outputParameters;
+    }
+
+    public boolean sameModelDefinition(ModelDefinition other) {
+        return sameIdentifiers(other)
+                && same(defaultExpressionLanguage, other.defaultExpressionLanguage)
+                && same(inputParameters.values(), other.inputParameters.values())
+                && same(outputParameters.values(), other.outputParameters.values());
     }
 }

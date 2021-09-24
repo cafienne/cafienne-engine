@@ -68,4 +68,9 @@ public class JasperDefinition extends CMMNElementDefinition {
         InputStream is = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         return JasperCompileManager.compileReport(is);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

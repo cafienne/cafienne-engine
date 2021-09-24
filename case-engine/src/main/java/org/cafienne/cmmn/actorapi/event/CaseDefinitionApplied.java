@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.infrastructure.Cafienne;
@@ -20,24 +21,19 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class CaseDefinitionApplied extends CaseBaseEvent {
+public class CaseDefinitionApplied extends CaseDefinitionEvent {
     private final CafienneVersion engineVersion;
-    private final String caseName;
     private final String parentCaseId;
     private final String rootCaseId;
     public final Instant createdOn;
     public final String createdBy;
 
-    private final transient CaseDefinition definition;
-
-    public CaseDefinitionApplied(Case caseInstance, String rootCaseId, String parentCaseId, CaseDefinition definition, String caseName) {
-        super(caseInstance);
+    public CaseDefinitionApplied(Case caseInstance, String rootCaseId, String parentCaseId, CaseDefinition definition) {
+        super(caseInstance, definition);
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;
-        this.definition = definition;
-        this.caseName = caseName;
         // Whenever a new case is started, a case definition is applied.
         //  So, at that moment we also store the engine version.
         //  TODO: perhaps better to distinguish CaseStarted or CaseCreated from CaseDefinitionApplied
@@ -51,18 +47,7 @@ public class CaseDefinitionApplied extends CaseBaseEvent {
         this.createdBy = readField(json, Fields.createdBy);
         this.rootCaseId = readField(json, Fields.rootActorId);
         this.parentCaseId = readField(json, Fields.parentActorId);
-        this.caseName = readField(json, Fields.caseName);
-        this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
         this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
-    }
-
-    /**
-     * Returns the name of the case definition
-     *
-     * @return
-     */
-    public final String getCaseName() {
-        return caseName;
     }
 
     /**
@@ -107,13 +92,11 @@ public class CaseDefinitionApplied extends CaseBaseEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeCaseEvent(generator);
+        super.writeCaseDefinitionEvent(generator);
         writeField(generator, Fields.createdOn, createdOn);
         writeField(generator, Fields.createdBy, createdBy);
         writeField(generator, Fields.rootActorId, rootCaseId);
         writeField(generator, Fields.parentActorId, parentCaseId);
-        writeField(generator, Fields.caseName, caseName);
-        writeField(generator, Fields.definition, definition);
         writeField(generator, Fields.engineVersion, engineVersion.json());
     }
 }

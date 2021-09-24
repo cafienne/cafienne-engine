@@ -56,5 +56,15 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
         }
     }
 
-    public abstract Criterion<?> createInstance(CriteriaListener listener);
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameCriterion);
+    }
+
+    public boolean sameCriterion(CriterionDefinition other) {
+        return same(sentry, other.sentry)
+                && same(this.getTransition(), other.getTransition());
+    }
+
+    public abstract Criterion<?> createInstance(CriteriaListener<?,?> listener);
 }

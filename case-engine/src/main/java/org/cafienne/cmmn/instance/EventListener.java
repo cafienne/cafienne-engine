@@ -14,4 +14,20 @@ public abstract class EventListener<D extends EventListenerDefinition> extends P
     protected EventListener(String id, int index, ItemDefinition itemDefinition, D definition, Stage<?> stage) {
         super(id, index, itemDefinition, definition, stage, StateMachine.EventMilestone);
     }
+
+    @Override
+    void evaluateRepetitionRule(boolean firstEvaluation) {
+        // EventListeners have no repetition
+    }
+
+    @Override
+    void evaluateRequiredRule() {
+        // EventListeners are never 'required'
+    }
+
+    @Override
+    protected Transition getEntryTransition() {
+        // EventListeners do not have an entry transition
+        return Transition.None;
+    }
 }

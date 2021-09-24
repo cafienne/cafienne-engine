@@ -124,4 +124,9 @@ public class MailDefinition extends SubProcessDefinition {
     private ValueMap resolveAddress(AddressTemplate template, ValueMap input) {
         return new ValueMap("name", template.getName(input), "email", template.getEmail(input));
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

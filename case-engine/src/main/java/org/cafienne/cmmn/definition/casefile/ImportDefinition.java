@@ -39,4 +39,16 @@ public class ImportDefinition extends ModelDefinition {
     public String getNamespace() {
         return namespace;
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameImportDefinition);
+    }
+
+    public boolean sameImportDefinition(ImportDefinition other) {
+        return sameModelDefinition(other)
+                && same(importType, other.importType)
+                && same(location, other.location)
+                && same(namespace, other.namespace);
+    }
 }

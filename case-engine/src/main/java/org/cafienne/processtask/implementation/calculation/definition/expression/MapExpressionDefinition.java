@@ -65,4 +65,9 @@ public class MapExpressionDefinition extends CalculationExpressionDefinition {
             return evaluateExpression(calculation, step, mappableInput);
         }
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return notYetImplemented();
+    }
 }

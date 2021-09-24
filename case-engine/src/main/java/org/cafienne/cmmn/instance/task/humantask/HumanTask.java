@@ -19,6 +19,7 @@ import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.event.HumanTaskResumed;
 import org.cafienne.humantask.actorapi.event.HumanTaskSuspended;
 import org.cafienne.humantask.actorapi.event.HumanTaskTerminated;
+import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.json.ValueMap;
 import org.w3c.dom.Element;
@@ -62,10 +63,6 @@ public class HumanTask extends Task<HumanTaskDefinition> {
             // Using default validation (checks mandatory parameters to have a value, should also check against case file definition)
             return super.validateOutput(potentialRawOutput);
         }
-    }
-
-    @Override
-    protected void createInstance() {
     }
 
     @Override
@@ -174,5 +171,17 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
     public void updateState(CaseAppliedPlatformUpdate event) {
         getImplementation().updateState(event);
+    }
+
+    @Override
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, HumanTaskDefinition newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+        getImplementation().migrateDefinition(newDefinition.getImplementationDefinition());
+    }
+
+    @Override
+    protected void lostDefinition() {
+        super.lostDefinition();
+        addEvent(new HumanTaskDropped(this));
     }
 }
