@@ -66,5 +66,5 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
                 && same(this.getTransition(), other.getTransition());
     }
 
-    public abstract Criterion<?> createInstance(CriteriaListener listener);
+    public abstract Criterion<?> createInstance(CriteriaListener<?,?> listener);
 }
