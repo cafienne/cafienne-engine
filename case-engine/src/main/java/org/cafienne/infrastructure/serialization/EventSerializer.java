@@ -5,10 +5,7 @@ import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.SentryEvent;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.file.*;
-import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
-import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemMigrated;
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
+import org.cafienne.cmmn.actorapi.event.migration.*;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
@@ -91,6 +88,7 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(BusinessIdentifierSet.class, BusinessIdentifierSet::new);
         addManifestWrapper(BusinessIdentifierCleared.class, BusinessIdentifierCleared::new);
         addManifestWrapper(CaseFileItemMigrated.class, CaseFileItemMigrated::new);
+        addManifestWrapper(CaseFileItemDropped.class, CaseFileItemDropped::new);
     }
 
     private static void registerHumanTaskEvents() {

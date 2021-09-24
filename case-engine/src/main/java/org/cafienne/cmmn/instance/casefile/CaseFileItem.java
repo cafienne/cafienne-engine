@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.cmmn.actorapi.event.file.*;
+import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemDropped;
 import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemMigrated;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
@@ -591,9 +592,24 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         identifiersToRemove.values().forEach(BusinessIdentifier::lostDefinition);
     }
 
-    @Override
     protected void lostDefinition() {
-        super.lostDefinition();
+        // Also tell children to get dropped, and then only tell ourselves.
+        getItems().forEach(CaseFileItem::lostDefinition);
+        addEvent(new CaseFileItemDropped(this));
+    }
+
+    @Override
+    protected void childDropped(CaseFileItem child) {
+        // Tell collection to remove child from the items list.
+        super.childDropped(child);
+        // Also remove the child from our value (if it is a map, otherwise the child will not exist in it)
+        if (value.isMap()) {
+            value.asMap().getValue().remove(child.getName());
+        }
+    }
+
+    public void updateState(CaseFileItemDropped event) {
+        parent.childDropped(this);
         businessIdentifiers.values().forEach(BusinessIdentifier::lostDefinition);
         getCaseInstance().getSentryNetwork().disconnect(this);
     }

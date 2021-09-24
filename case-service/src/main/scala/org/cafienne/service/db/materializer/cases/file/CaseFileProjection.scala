@@ -3,7 +3,7 @@ package org.cafienne.service.db.materializer.cases.file
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.file._
-import org.cafienne.cmmn.actorapi.event.migration.CaseFileItemMigrated
+import org.cafienne.cmmn.actorapi.event.migration.{CaseFileItemDropped, CaseFileItemMigrated}
 import org.cafienne.json.{JSONReader, ValueMap}
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record._
@@ -24,6 +24,7 @@ class CaseFileProjection(persistence: RecordsPersistence, caseInstanceId: String
       case itemEvent: CaseFileItemTransitioned => handleCaseFileItemEvent(itemEvent)
       case identifierEvent: BusinessIdentifierEvent => handleBusinessIdentifierEvent(identifierEvent)
       case migrated: CaseFileItemMigrated => handleCaseFileMigration(migrated)
+      case dropped: CaseFileItemDropped => handleCaseFileDropped(dropped)
       case _ => Future.successful(Done) // Ignore other events
     }
   }
@@ -49,6 +50,15 @@ class CaseFileProjection(persistence: RecordsPersistence, caseInstanceId: String
       val parent = event.formerPath.resolveParent(json)
       parent.put(event.path.name, parent.get(event.formerPath.name))
       parent.getValue.remove(event.formerPath.name)
+    })
+    Future.successful(Done)
+  }
+
+  private def handleCaseFileDropped(event: CaseFileItemDropped): Future[Done] = {
+    // Fetch the existing case file data, and then change the existing path to which the event is pointing into the new one
+    getCaseFile(caseInstanceId).map(json => {
+      val parent = event.path.resolveParent(json)
+      parent.getValue.remove(event.path.name)
     })
     Future.successful(Done)
   }

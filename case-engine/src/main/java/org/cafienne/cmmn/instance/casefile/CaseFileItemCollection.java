@@ -189,11 +189,8 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
         });
     }
 
-    protected void lostDefinition() {
-        // Now what?
-        //  - remove value?
-        //  - remove business identifiers for the child and it's children ...
-        getItems().forEach(CaseFileItem::lostDefinition);
+    protected void childDropped(CaseFileItem child) {
+        items.remove(child);
     }
 
     protected void renameChildItem(String formerName, String newName) {
