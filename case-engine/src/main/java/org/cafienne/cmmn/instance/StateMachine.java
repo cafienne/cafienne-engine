@@ -19,12 +19,10 @@ import java.util.Map;
 class StateMachine {
     private final Map<State, Map<Transition, Target>> transitions = new HashMap<>();
     private final Map<State, Target> states = new HashMap<>();
-    final Transition entryTransition;
     final Transition exitTransition;
     final Transition terminationTransition;
 
-    private StateMachine(Transition entryTransition, Transition exitTransition, Transition terminationTransition) {
-        this.entryTransition = entryTransition;
+    private StateMachine(Transition exitTransition, Transition terminationTransition) {
         this.exitTransition = exitTransition;
         this.terminationTransition = terminationTransition;
         // Register all states by default.
@@ -135,7 +133,7 @@ class StateMachine {
     }
 
     // State machine configuration for events and milestones
-    static final StateMachine EventMilestone = new StateMachine(Transition.Occur, Transition.Exit, Transition.ParentTerminate);
+    static final StateMachine EventMilestone = new StateMachine(Transition.Exit, Transition.ParentTerminate);
 
     static {
         EventMilestone.addTransition(Transition.Create, State.Available, State.Null);
@@ -153,11 +151,6 @@ class StateMachine {
         EventMilestone.setAction(State.Available, (PlanItem<?> p, Transition t) -> {
             if (t == Transition.Create) {
                 p.createInstance();
-                if (p instanceof Milestone) {
-                    p.evaluateRepetitionRule(true);
-                    p.evaluateRequiredRule();
-                    p.getEntryCriteria().beginLifeCycle(Transition.Occur);
-                }
             } else if (t == Transition.Resume || t == Transition.ParentResume) {
                 p.resumeInstance();
             }
@@ -165,7 +158,7 @@ class StateMachine {
     }
 
     // State machine configuration for tasks and stages
-    static final StateMachine TaskStage = new StateMachine(Transition.Start, Transition.Exit, Transition.Exit);
+    static final StateMachine TaskStage = new StateMachine(Transition.Exit, Transition.Exit);
 
     static {
         TaskStage.addTransition(Transition.Create, State.Available, State.Null);
@@ -186,12 +179,6 @@ class StateMachine {
 
         TaskStage.setAction(State.Available, (PlanItem<?> p, Transition t) -> {
             p.createInstance();
-            p.evaluateRepetitionRule(true);
-            p.evaluateRequiredRule();
-
-            // Now evaluate manual activation and trigger the associated transition on the plan item
-            Transition transition = p.evaluateManualActivationRule();
-            p.getEntryCriteria().beginLifeCycle(transition);
         });
         TaskStage.setAction(State.Active, (PlanItem<?> p, Transition t) -> {
             if (t == Transition.Start || t == Transition.ManualStart) {
@@ -200,9 +187,6 @@ class StateMachine {
                 p.resumeInstance();
             } else if (t == Transition.Reactivate) {
                 p.reactivateInstance();
-            } else {
-                // Ignoring it...; but for now throw an exception to see if we ever run into this code.
-                throw new CommandException("FIRST TIME EXCEPTION: I am an unexpected transition on this stage/task");
             }
         });
         TaskStage.setAction(State.Enabled, (PlanItem<?> p, Transition t) -> p.makeTransition(Transition.Start));
@@ -223,7 +207,7 @@ class StateMachine {
     }
 
     // State machine configuration for the case plan
-    static final StateMachine CasePlan = new StateMachine(Transition.Start, Transition.Terminate, Transition.Exit);
+    static final StateMachine CasePlan = new StateMachine(Transition.Terminate, Transition.Exit);
 
     static {
         CasePlan.addTransition(Transition.Create, State.Active, State.Null);

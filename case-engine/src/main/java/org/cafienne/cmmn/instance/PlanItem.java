@@ -513,6 +513,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void createInstance() {
+        evaluateRepetitionRule(true);
+        evaluateRequiredRule();
+        getEntryCriteria().beginLifeCycle();
     }
 
     protected void completeInstance() {
@@ -554,9 +557,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    final Transition getEntryTransition() {
-        return stateMachine.entryTransition;
-    }
+    abstract protected Transition getEntryTransition();
 
     /**
      * Returns the exit transition (trigger when ExitCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Exit}, and

@@ -21,10 +21,6 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
     }
 
     @Override
-    protected void createInstance() {
-    }
-
-    @Override
     protected void startImplementation(ValueMap inputParameters) {
         informer.startImplementation(inputParameters);
     }

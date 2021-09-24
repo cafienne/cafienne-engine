@@ -65,10 +65,6 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     @Override
-    protected void createInstance() {
-    }
-
-    @Override
     protected void startImplementation(ValueMap inputParameters) {
         getImplementation().beginLifeCycle();
     }

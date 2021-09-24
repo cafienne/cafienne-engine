@@ -34,11 +34,6 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     }
 
     @Override
-    protected void createInstance() {
-        // Nothing to be done here; when we start, we invoke StartCase, which will also create the instance
-    }
-
-    @Override
     protected void terminateInstance() {
         tell(Transition.Terminate);
     }

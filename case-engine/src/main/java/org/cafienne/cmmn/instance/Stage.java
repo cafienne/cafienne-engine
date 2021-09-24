@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class Stage<T extends StageDefinition> extends PlanFragment<T> {
+public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
@@ -29,7 +29,7 @@ public class Stage<T extends StageDefinition> extends PlanFragment<T> {
     }
 
     protected Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance, StateMachine stateMachine) {
-        super(id, itemDefinition, definition, caseInstance, parent, index, stateMachine);
+        super(id, index, itemDefinition, definition, caseInstance, parent, stateMachine);
     }
 
     void register(PlanItem<?> child) {

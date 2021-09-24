@@ -14,9 +14,9 @@ public class PlanItemEntry extends CriteriaListener {
      * Method invoked by the various state machines when the plan item becomes available;
      * typically determines whether it must be started or should wait for entry criteria to become active
      *
-     * @param transition
      */
-    public void beginLifeCycle(Transition transition) {
+    public void beginLifeCycle() {
+        Transition transition = item.getEntryTransition();
         if (criteria.isEmpty()) { // No entry criteria means get started immediately
             item.addDebugInfo(() -> item + ": Starting lifecycle with " + transition + " because there are no entry criteria defined");
             item.makeTransition(transition);
