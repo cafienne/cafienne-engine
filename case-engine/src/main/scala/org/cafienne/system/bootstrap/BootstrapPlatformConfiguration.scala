@@ -1,12 +1,11 @@
-package org.cafienne.service.api.platform
+package org.cafienne.system.bootstrap
 
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.Main
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.TenantUserInformation
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant
@@ -14,6 +13,7 @@ import org.cafienne.tenant.actorapi.response.TenantResponse
 
 import java.io.File
 import scala.concurrent._
+import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 
 /**
@@ -33,39 +33,42 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     }
   }
 
-  private def findConfigFile(): Option[File] = {
+  private def findConfigFile(): Seq[File] = {
     logger.info("Checking presence of bootstrap configuration for the case system")
-    val bootstrapTenantConfFileName = Cafienne.config.platform.bootstrapFile
-    if (!bootstrapTenantConfFileName.isBlank) {
-      val configFile = new File(bootstrapTenantConfFileName)
-      if (!configFile.exists()) {
-        logger.warn("Sleeping a bit, because file " + bootstrapTenantConfFileName + " seems to not (yet) exist")
-        Thread.sleep(1000) // Sometimes in docker, volume is not mounted fast enough it seems. Therefore we put a wait statement of 1 second and then check again.
+    val bootstrapTenantConfFiles = Cafienne.config.platform.bootstrapFile
+    if (bootstrapTenantConfFiles.nonEmpty) {
+      val files = bootstrapTenantConfFiles.map(fileName => {
+        val configFile = new File(fileName)
         if (!configFile.exists()) {
-          throw new BootstrapFailure(s"The configured bootstrap tenant file cannot be found at '${configFile.getAbsolutePath}' (conf value: '$bootstrapTenantConfFileName')")
+          logger.warn("Sleeping a bit, because file " + fileName + " seems to not (yet) exist")
+          Thread.sleep(1000) // Sometimes in docker, volume is not mounted fast enough it seems. Therefore we put a wait statement of 1 second and then check again.
+          if (!configFile.exists()) {
+            throw new BootstrapFailure(s"The configured bootstrap tenant file cannot be found at '${configFile.getAbsolutePath}' (conf value: '$fileName')")
+          }
+          logger.warn("Sleeping a bit helped, because file " + fileName + " now exists")
         }
-        logger.warn("Sleeping a bit helped, because file " + bootstrapTenantConfFileName + " now exists")
-      }
-      return Some(configFile)
+        configFile
+      })
+      return files
     }
 
     val defaultTenant = Cafienne.config.platform.defaultTenant
     if (defaultTenant.isBlank) {
       logger.warn("Default tenant is empty and bootstrap-file is not filled. Skipping bootstrap attempts")
-      return None
+      return Seq()
     }
 
     val confFile = new File(defaultTenant + ".conf")
-    if (confFile.exists()) return Some(confFile)
+    if (confFile.exists()) return Seq(confFile)
     val jsonFile = new File(defaultTenant + ".json")
-    if (jsonFile.exists()) return Some(jsonFile)
+    if (jsonFile.exists()) return Seq(jsonFile)
     val ymlFile = new File(defaultTenant + ".yml")
-    if (ymlFile.exists()) return Some(ymlFile)
+    if (ymlFile.exists()) return Seq(ymlFile)
     val yamlFile = new File(defaultTenant + ".yaml")
-    if (yamlFile.exists()) return Some(yamlFile)
+    if (yamlFile.exists()) return Seq(yamlFile)
 
     logger.warn(s"Skipping bootstrap tenant configuration for '$defaultTenant', because a file '$confFile', '$jsonFile', '$ymlFile' or '$yamlFile' cannot be found")
-    None
+    Seq()
   }
 
   private def parseConfigFile(configFile: File): CreateTenant = {
@@ -76,22 +79,27 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
     try {
       val tenantName: String = tenantConfig.getString("name")
-      if (!tenantConfig.hasPath("owners")) {
-        throw new BootstrapFailure("Bootstrap file should contain a list of owners, with at least one owner for the tenant")
-      }
-      val ownerIds = tenantConfig.getStringList("owners").asScala // Owners MUST exist
-      if (ownerIds.isEmpty) {
-        throw new BootstrapFailure("Bootstrap file should contain a list of owners, with at least one owner for the tenant")
-      }
+
+      val ownerIds = {
+        if (tenantConfig.hasPath("owners")) {
+          tenantConfig.getStringList("owners").asScala
+        } else {
+          Seq()
+        }
+      } // Owners MUST exist
 
       val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.toSeq.map(user => {
         val userId = user.getString("id")
         val roles = readStringList(user, "roles")
         val name = readStringOr(user, "name", "")
         val email = readStringOr(user, "email", "")
-        val isOwner = ownerIds.contains(userId)
+        val isOwner = readBooleanOr(user, "isOwner", ownerIds.contains(userId))
         TenantUserInformation(userId, roles = Some(roles), name = Some(name), email = Some(email), owner = Some(isOwner), enabled = Some(true))
       })
+
+      if (!users.exists(_.isOwner())) {
+        throw new BootstrapFailure(s"Bootstrap tenant '$tenantName' misses a mandatory tenant owner. File ${configFile.getAbsolutePath}")
+      }
 
       val undefinedOwners = ownerIds.filter(id => !users.map(u => u.id).contains(id))
       if (undefinedOwners.nonEmpty) {
@@ -104,6 +112,14 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
     } catch {
       case c: ConfigException => throw new BootstrapFailure("Bootstrap file " + configFile.getAbsolutePath + " is invalid: " + c.getMessage, c)
+    }
+  }
+
+  private def readBooleanOr(config: Config, path: String, defaultValue: Boolean): Boolean = {
+    if (config.hasPath(path)) {
+      config.getBoolean(path)
+    } else {
+      defaultValue
     }
   }
 
@@ -125,7 +141,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant) = {
     import akka.pattern.ask
-    implicit val timeout: Timeout = Main.caseSystemTimeout
+    implicit val timeout: Timeout = Timeout(10.seconds)
     implicit val ec: ExecutionContextExecutor = ExecutionContext.global
 
     caseSystem.router().ask(bootstrapTenant).map {

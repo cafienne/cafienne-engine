@@ -20,7 +20,7 @@ import org.cafienne.service.api.anonymous.AnonymousRequestRoutes
 import org.cafienne.service.api.cases.route.CasesRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.identifiers.route.IdentifierRoutes
-import org.cafienne.service.api.platform.{BootstrapPlatformConfiguration, CaseEngineHealthRoute, PlatformRoutes}
+import org.cafienne.service.api.platform.{CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.swagger.SwaggerHttpServiceRoute
 import org.cafienne.service.api.tasks.TaskRoutes
@@ -63,9 +63,6 @@ object Main extends App {
       println("Shutting down the case service")
       Await.result(system.terminate(), 20.seconds)
     }
-
-    // First, start platform bootstrap configuration
-    BootstrapPlatformConfiguration.run(caseSystem)
 
     val taskQueries = new TaskQueriesImpl
     val caseQueries = new CaseQueriesImpl
