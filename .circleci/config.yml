@@ -8,10 +8,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Clone CMMN-test framework
+          name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
             git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
+            cd ./cmmn-test-framework
+            echo "Trying to checkout corresponding test branch" 
+            echo
+            git checkout $CIRCLE_BRANCH || git checkout master
       - run:
           name: Compile code
           command: sbt compile
@@ -19,11 +23,10 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Install dependencies
+          name: Compile CMMN Test Framwork
           command: |
             cd ..
             cd ./cmmn-test-framework
-            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -217,10 +220,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Clone CMMN-test framework
+          name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
             git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
+            cd ./cmmn-test-framework
+            echo "Trying to checkout corresponding test branch" 
+            echo
+            git checkout $CIRCLE_BRANCH || git checkout master
       - run:
           name: Compile code
           command: sbt compile
@@ -228,11 +235,10 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Install dependencies
+          name: Compile CMMN Test Framwork
           command: |
             cd ..
             cd ./cmmn-test-framework
-            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -304,10 +310,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Clone CMMN-test framework
+          name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
             git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
+            cd ./cmmn-test-framework
+            echo "Trying to checkout corresponding test branch" 
+            echo
+            git checkout $CIRCLE_BRANCH || git checkout master
       - run:
           name: Check for version TAG
           command: |
@@ -321,11 +331,10 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Install dependencies
+          name: Compile CMMN Test Framwork
           command: |
             cd ..
             cd ./cmmn-test-framework
-            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
