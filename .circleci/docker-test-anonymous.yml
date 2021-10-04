@@ -13,9 +13,6 @@ services:
     expose:
       - 1025
       - 1080
-    ports:
-      - "1025:1025"
-      - "1080:1080"
     hostname: mailcatcher
     container_name: mailcatcher
 
@@ -26,8 +23,6 @@ services:
     network_mode: host
     expose:
       - 2377
-    ports:
-      - "2377:2377"
     hostname: cafienne-test-token-service
     container_name: cafienne-test-token-service
     environment:
@@ -41,8 +36,6 @@ services:
     network_mode: host
     expose:
       - 2027
-    ports:
-      - "2027:2027"
     hostname: cafienne
     container_name: cafienne
     healthcheck:

@@ -3,35 +3,19 @@ jobs:
   master-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-1604:202007-01
+      image: ubuntu-2004:202107-02
     resource_class: large
     steps:
       - checkout
       - run:
-          name: Clone CMMN-test framework
+          name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
             git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
-      - run:
-          name: Updating Java and sbt versions
-          command: |
-            echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
-            echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
-            curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
-            sudo apt-get update
-            sudo apt install openjdk-11-jdk
-            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
-            java -version
-            sudo apt-get install sbt
-            sbt sbtVersion
-            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
-            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-      - run:
-          name: Updating node version to 10.22.0
-          command: |
-            nvm install v10.22.0
-            nvm alias default v10.22.0
-            node -v
+            cd ./cmmn-test-framework
+            echo "Trying to checkout corresponding test branch" 
+            echo
+            git checkout $CIRCLE_BRANCH || git checkout master
       - run:
           name: Compile code
           command: sbt compile
@@ -39,11 +23,10 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Install dependencies
+          name: Compile CMMN Test Framwork
           command: |
             cd ..
             cd ./cmmn-test-framework
-            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -88,7 +71,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -110,7 +93,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev TestAnonymousStartCase
+            npm run prod TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -129,7 +112,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -148,7 +131,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne sql-server
@@ -167,7 +150,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cassandra postgres
@@ -191,7 +174,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -210,7 +193,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
@@ -232,35 +215,19 @@ jobs:
   branch-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-1604:202007-01
+      image: ubuntu-2004:202107-02
     resource_class: large
     steps:
       - checkout
       - run:
-          name: Clone CMMN-test framework
+          name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
             git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
-      - run:
-          name: Updating Java and sbt versions
-          command: |
-            echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
-            echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
-            curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
-            sudo apt-get update
-            sudo apt install openjdk-11-jdk
-            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
-            java -version
-            sudo apt-get install sbt
-            sbt sbtVersion
-            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
-            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-      - run:
-          name: Updating node version to 10.22.0
-          command: |
-            nvm install v10.22.0
-            nvm alias default v10.22.0
-            node -v
+            cd ./cmmn-test-framework
+            echo "Trying to checkout corresponding test branch" 
+            echo
+            git checkout $CIRCLE_BRANCH || git checkout master
       - run:
           name: Compile code
           command: sbt compile
@@ -268,11 +235,10 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Install dependencies
+          name: Compile CMMN Test Framwork
           command: |
             cd ..
             cd ./cmmn-test-framework
-            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -303,7 +269,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev TestAnonymousStartCase
+            npm run prod TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -325,7 +291,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
@@ -339,35 +305,19 @@ jobs:
   release-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-1604:202007-01
+      image: ubuntu-2004:202107-02
     resource_class: large
     steps:
       - checkout
       - run:
-          name: Clone CMMN-test framework
+          name: Clone CMMN-test framework (and optionally checkout corresponding test branch)
           command: |
             cd ..
             git clone https://$GIT_USER:$GIT_TOKEN@github.com/cafienne/cmmn-test-framework.git
-      - run:
-          name: Updating Java and sbt versions
-          command: |
-            echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
-            echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
-            curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
-            sudo apt-get update
-            sudo apt install openjdk-11-jdk
-            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
-            java -version
-            sudo apt-get install sbt
-            sbt sbtVersion
-            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
-            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-      - run:
-          name: Updating node version to 10.22.0
-          command: |
-            nvm install v10.22.0
-            nvm alias default v10.22.0
-            node -v
+            cd ./cmmn-test-framework
+            echo "Trying to checkout corresponding test branch" 
+            echo
+            git checkout $CIRCLE_BRANCH || git checkout master
       - run:
           name: Check for version TAG
           command: |
@@ -381,11 +331,10 @@ jobs:
           name: Unit tests
           command: sbt test
       - run:
-          name: Install dependencies
+          name: Compile CMMN Test Framwork
           command: |
             cd ..
             cd ./cmmn-test-framework
-            git checkout $CIRCLE_BRANCH || git checkout master
             npm install
       - run:
           name: Docker login
@@ -430,7 +379,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -452,7 +401,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev TestAnonymousStartCase
+            npm run prod TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -471,7 +420,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -490,7 +439,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne sql-server
@@ -509,7 +458,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cassandra postgres
@@ -533,7 +482,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -552,7 +501,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Docker logs of engine
           command: docker logs cafienne

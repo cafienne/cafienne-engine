@@ -13,9 +13,6 @@ services:
     expose:
       - 1025
       - 1080
-    ports:
-      - "1025:1025"
-      - "1080:1080"
     hostname: mailcatcher
     container_name: mailcatcher
 
@@ -26,8 +23,6 @@ services:
     network_mode: host
     expose:
       - 1433
-    ports:
-      - "1433:1433"
     hostname: sql-server
     container_name: sql-server
     environment:
@@ -38,12 +33,9 @@ services:
 
   cafienne-event-db:
     image: batav/circle-ci:postgres-event-data
-    networks:
-      - dev
+    network_mode: host
     expose:
-      - 5432
-    ports:
-      - "5431:5432"
+      - 5431
     hostname: cafienne-event-db
     container_name: cafienne-event-db
     environment:
@@ -51,21 +43,20 @@ services:
       POSTGRES_PASSWORD: mysecret
       POSTGRES_DB: cafienne-eventstore
       PGDATA: event-data
+    command: postgres --port=5431
 
   cafienne-query-db:
     image: postgres:12.1-alpine
-    networks:
-      - dev
+    network_mode: host
     expose:
-      - 5432
-    ports:
-      - "5430:5432"
+      - 5430
     hostname: cafienne-query-db
     container_name: cafienne-query-db
     environment:
       POSTGRES_USER: postgresuser
       POSTGRES_PASSWORD: mysecret
       POSTGRES_DB: cafienne-query
+    command: postgres --port=5430
 
   cafienne-test-token-service:
     image: spectare/oidc-token-test-service:latest
@@ -74,8 +65,6 @@ services:
     network_mode: host
     expose:
       - 2377
-    ports:
-      - "2377:2377"
     hostname: cafienne-test-token-service
     container_name: cafienne-test-token-service
     environment:
@@ -89,8 +78,6 @@ services:
     network_mode: host
     expose:
       - 2027
-    ports:
-      - "2027:2027"
     hostname: cafienne-sqlserver
     container_name: cafienne
     restart: on-failure
@@ -126,8 +113,6 @@ services:
     network_mode: host
     expose:
       - 2027
-    ports:
-      - "2027:2027"
     hostname: cafienne-postgres
     container_name: cafienne
     environment:
@@ -155,7 +140,3 @@ services:
       - cafienne-event-db
       - cafienne-query-db
       - cafienne-test-token-service
-
-networks:
-  dev:
-    driver: bridge
