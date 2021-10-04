@@ -68,7 +68,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -90,7 +90,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev TestAnonymousStartCase
+            npm run prod TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -109,7 +109,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -128,7 +128,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne sql-server
@@ -147,7 +147,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cassandra postgres
@@ -171,7 +171,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -190,7 +190,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
@@ -263,7 +263,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev TestAnonymousStartCase
+            npm run prod TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -285,7 +285,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
@@ -370,7 +370,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -392,7 +392,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev TestAnonymousStartCase
+            npm run prod TestAnonymousStartCase
       - run:
           name: Stop the cafienne container
           command: docker rm -f cafienne
@@ -411,7 +411,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -430,7 +430,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne sql-server
@@ -449,7 +449,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cassandra postgres
@@ -473,7 +473,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Stop the containers
           command: docker rm -f cafienne cafienne-event-db cafienne-query-db
@@ -492,7 +492,7 @@ jobs:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run dev
+            npm run prod
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
