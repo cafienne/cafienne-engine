@@ -155,7 +155,7 @@ public class Member extends CMMNElement<CaseTeamDefinition> {
     @Override
     public void migrateDefinition(CaseTeamDefinition newDefinition) {
         super.migrateDefinition(newDefinition);
-        MigDevConsole("Updating team member " + key +" (existing roles: " + this.roles +")");
+        addDebugInfo(() -> "Migrating team member " + key +" (existing roles: " + this.roles +")");
         // Now iterate through the existing roles, and determine which roles are retained and which roles are removed for this member
         //  Note: currently not possible to _add_ roles to a member by means of case definition migration
         Set<CaseRoleDefinition> rolesToRemove = new HashSet<>();
@@ -172,14 +172,14 @@ public class Member extends CMMNElement<CaseTeamDefinition> {
             CaseRoleDefinition roleWithMatchingId = newRoleIds.get(id);
 
             if (roleWithMatchingName != null) {
-                MigDevConsole("- Member " + key +" gets a new version of role " + name +" (with id " + id +")");
+                addDebugInfo(() -> "- Member " + key +" gets a new version of role " + name +" (with id " + id +")");
                 rolesToReplace.add(roleWithMatchingName);
             } else if (roleWithMatchingId != null) {
-                MigDevConsole("- Member " + key +" gets a changed role name: " + name +" becomes " + roleWithMatchingId.getName());
+                addDebugInfo(() -> "- Member " + key +" gets a changed role name: " + name +" becomes " + roleWithMatchingId.getName());
                 rolesToRemove.add(oldRole);
                 rolesToAdd.add(roleWithMatchingId);
             } else {
-                MigDevConsole("- Member " + key +" drops role: " + name +", as it is no longer part of the case definition");
+                addDebugInfo(() -> "- Member " + key +" drops role: " + name +", as it is no longer part of the case definition");
                 rolesToRemove.add(oldRole);
             }
         });

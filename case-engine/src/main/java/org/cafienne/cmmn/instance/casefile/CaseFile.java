@@ -98,6 +98,13 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
     }
 
     @Override
+    public void migrateDefinition(CaseFileDefinition newDefinition) {
+        addDebugInfo(() -> "\nMigrating Case File");
+        super.migrateDefinition(newDefinition);
+        addDebugInfo(() -> "Completed Case File migration\n");
+    }
+
+    @Override
     public String toString() {
         Document xmlDocument;
         try {

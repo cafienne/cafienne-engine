@@ -10,7 +10,10 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.*;
+import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
+import org.cafienne.cmmn.actorapi.event.CaseEvent;
+import org.cafienne.cmmn.actorapi.event.DebugDisabled;
+import org.cafienne.cmmn.actorapi.event.DebugEnabled;
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -411,12 +414,12 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         addEvent(new CaseDefinitionMigrated(this, definition));
     }
 
-    public void migrateCaseDefinition(CaseDefinition definition) {
-        CMMNElement.MigDevConsoleStatic("\n\nMigrating case " + getDefinition().getName() + " with id " + getId());
-        setDefinition(definition);
-        getCaseTeam().migrateDefinition(definition.getCaseTeamModel());
-        getCaseFile().migrateDefinition(definition.getCaseFileModel());
-        getCasePlan().migrateDefinition(definition.getCasePlanModel());
+    public void migrateCaseDefinition(CaseDefinition newDefinition) {
+        addDebugInfo(() -> "====== Migrating Case["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + newDefinition.getName() +"\n");
+        setDefinition(newDefinition);
+        getCaseTeam().migrateDefinition(newDefinition.getCaseTeamModel());
+        getCaseFile().migrateDefinition(newDefinition.getCaseFileModel());
+        getCasePlan().migrateDefinition(newDefinition.getCasePlanModel());
     }
 
     public void removeDroppedPlanItem(PlanItem<?> item) {

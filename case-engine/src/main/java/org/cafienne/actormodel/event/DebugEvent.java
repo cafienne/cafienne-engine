@@ -35,7 +35,9 @@ public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
     }
 
     public void addMessage(String msg) {
-        add(new StringValue(msg));
+        for (String s : msg.split("\n")) {
+            add(new StringValue(s));
+        }
     }
 
     public void addMessage(Value<?> json) {

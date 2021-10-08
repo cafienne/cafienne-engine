@@ -71,7 +71,9 @@ public class CasePlan extends Stage<CasePlanDefinition> {
 
     @Override
     public void migrateDefinition(CasePlanDefinition newDefinition) {
+        addDebugInfo(() -> "\nMigrating Case Plan");
         migrateItemDefinition(newDefinition, newDefinition);
+        addDebugInfo(() -> "Completed Case Plan migration\n");
     }
 
     @FunctionalInterface

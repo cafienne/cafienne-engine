@@ -191,7 +191,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
 
     @Override
     public void migrateDefinition(D newDefinition) {
-        getTarget().MigDevConsole("Migrating " + newDefinition.getType() +" for item " + getTarget().getName());
         super.migrateDefinition(newDefinition);
         this.onParts.forEach(onPart -> {
             if (onPart instanceof CaseFileItemOnPart) {
@@ -200,13 +199,13 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
                 migratePlanItemOnPart((PlanItemOnPart) onPart, newDefinition);
             }
         });
+        addDebugInfo(() -> "Migrated " + this);
     }
 
     private void migrateCaseFileItemOnPart(CaseFileItemOnPart onPart, D newDefinition) {
         CaseFileItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
         CaseFileItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
         if (newOnPartDefinition != null) {
-            getTarget().MigDevConsole("Migrating CaseFileItemOnPart in " + newDefinition.getType() +" for item " + getTarget().getName());
             onPart.migrateDefinition(newOnPartDefinition);
         } else {
             // perhaps search for a 'similar' on part, i.e. one with same source reference and potentially different standard event?
@@ -218,7 +217,6 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         PlanItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
         PlanItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
         if (newOnPartDefinition != null) {
-            getTarget().MigDevConsole("Migrating PlanItemOnPart in " + newDefinition.getType() +" for item " + getTarget().getName());
             onPart.migrateDefinition(newOnPartDefinition);
         }
     }

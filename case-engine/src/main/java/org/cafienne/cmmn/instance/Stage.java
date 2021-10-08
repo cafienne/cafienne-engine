@@ -335,7 +335,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private boolean doesNotHaveChild(PlanItemDefinition newChildDefinition) {
         boolean notHasChild = this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().getId().equals(newChildDefinition.getId()) || item.getName().equals(newChildDefinition.getName()));
         if (notHasChild) {
-            MigDevConsole("Stage does not have a child with definition " + newChildDefinition.getName() +" of type " + newChildDefinition.getType() +", hence creating a new one");
+            addDebugInfo(() -> this + ": migration found a new child definition " + newChildDefinition.getName() +" of type " + newChildDefinition.getType());
         }
         return notHasChild;
     }
@@ -357,7 +357,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition) {
-        MigDevConsole("Migrating Stage child " + child +" to a new definition");
+        addDebugInfo(() -> this + ": migrating child " + child +" to a new definition");
         DefinitionElement currentChildDefinition = child.getDefinition();
         PlanItemDefinitionDefinition newChildDefinition = newChildItemDefinition.getPlanItemDefinition();
         if (currentChildDefinition.getClass().isAssignableFrom(newChildDefinition.getClass())) {
