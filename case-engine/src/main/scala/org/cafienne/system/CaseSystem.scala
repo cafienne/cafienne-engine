@@ -11,6 +11,7 @@ import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.platform.PlatformService
+import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.{ClusterRouter, LocalRouter}
 import org.cafienne.timerservice.TimerService
 
@@ -47,5 +48,8 @@ class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging 
   def router(): ActorRef = {
     messageRouterService
   }
+
+  // First, start platform bootstrap configuration
+  BootstrapPlatformConfiguration.run(this)
 }
 

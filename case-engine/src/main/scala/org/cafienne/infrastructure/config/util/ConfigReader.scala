@@ -1,6 +1,7 @@
 package org.cafienne.infrastructure.config.util
 
 import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.scalalogging.LazyLogging
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
@@ -9,8 +10,12 @@ import scala.jdk.CollectionConverters._
 /**
   * Some utility methods to easily read properties from a scala Config object with e.g. default values
   */
-trait ConfigReader {
+trait ConfigReader extends LazyLogging {
   val config: Config
+
+  def warn(msg: String) = {
+    logger.warn(msg)
+  }
 
   def fail(msg: String) = {
     throw ConfigurationException(msg)

@@ -19,9 +19,6 @@ import java.io.IOException;
 public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
     public static final String TAG = "cafienne:task";
 
-    public final String taskId; // taskName is same as the planItem id
-    private final String taskName; // taskName is same as the planItemName
-
     /**
      * Constructor used by HumanTaskCreated event, since at that moment the task name is not yet known
      * inside the task actor.
@@ -29,20 +26,14 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
      */
     protected HumanTaskEvent(HumanTask task) {
         super(task);
-        this.taskName = task.getName();
-        this.taskId = task.getId();
     }
 
     protected HumanTaskEvent(ValueMap json) {
         super(json);
-        this.taskName = readField(json, Fields.taskName);
-        this.taskId = readField(json, Fields.taskId);
     }
 
     protected void writeHumanTaskEvent(JsonGenerator generator) throws IOException {
-        super.writeCasePlanEvent(generator);
-        writeField(generator, Fields.taskName, taskName);
-        writeField(generator, Fields.taskId, taskId);
+        super.writeTaskEvent(generator);
     }
 
     @Override
@@ -51,20 +42,5 @@ public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
     }
 
     protected void updateState(WorkflowTask task) {
-    }
-
-    @Override
-    public String getPlanItemId() {
-        // Unfortunately need to override this, because recovery uses the plan item id,
-        // and older versions of HumanTaskEvent did not invoke parent's serializer.
-        return taskId;
-    }
-
-    /**
-     * Get the name of the task
-     * @return
-     */
-    public String getTaskName() {
-        return taskName;
     }
 }

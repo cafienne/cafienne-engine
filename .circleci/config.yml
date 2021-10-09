@@ -197,7 +197,6 @@ jobs:
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
-          when: on_fail
       - run:
           name: Stop the containers
           command: docker rm -f cafienne sql-server cafienne-test-token-service
@@ -295,7 +294,6 @@ jobs:
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
-          when: on_fail
       - run:
           name: Stop the containers
           command: |
@@ -505,7 +503,6 @@ jobs:
       - run:
           name: Docker logs of engine
           command: docker logs cafienne
-          when: on_fail
       - run:
           name: Stop the containers
           command: docker rm -f cafienne sql-server cafienne-test-token-service
