@@ -123,7 +123,7 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSeq(), "hard-coded-test-tenant", false, "", "", true);
+        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSet(), "hard-coded-test-tenant", false, "", "", true);
     }
 
     /**

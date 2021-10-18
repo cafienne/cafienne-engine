@@ -176,7 +176,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
 
             val tenantUser = platformUser.getTenantUser(tenant)
             tenantUser.isOwner match {
-              case false => complete(StatusCodes.Unauthorized, "User '" + platformUser.userId + "' does not have the privileges to deploy a definition")
+              case false => complete(StatusCodes.Unauthorized, "User '" + platformUser.id + "' does not have the privileges to deploy a definition")
               case true => {
                 Cafienne.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
                 complete(StatusCodes.NoContent)

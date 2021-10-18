@@ -86,7 +86,7 @@ class AnonymousUserConfig(val config: Config) extends ConfigReader {
   if (userId.isBlank) {
     fail("Anonymous user configuration must have a valid user id")
   }
-  val roles = readStringList("roles")
+  val roles = readStringList("roles").toSet
   val name = readString("name")
   val email = readString("email")
 

@@ -71,7 +71,7 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
           logger.error(s"Cassandra database table contains an invalid record ($timerId, $caseInstanceId, $tenant, $userId, $moment). Record will be ignored")
           null
         } else {
-          Timer(caseInstanceId, timerId, moment.toInstant, new TenantUser(userId, Seq(), tenant, false, ""))
+          Timer(caseInstanceId, timerId, moment.toInstant, TenantUser(userId, Set(), tenant, false, ""))
         }
       }).filter(timer => timer != null) // Filter out the records that have missing column information
     })

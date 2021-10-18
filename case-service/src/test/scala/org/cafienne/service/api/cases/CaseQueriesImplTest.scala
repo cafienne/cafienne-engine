@@ -52,7 +52,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   val caseListDDDEEEFFF = CaseList(caseName = "ddd EeE fff", numTerminated = 1L, numCompleted = 1L)
   val caseListTerminated = CaseList(caseName = "ddd EeE fff", numTerminated = 1L)
 
-  val user = TestIdentityFactory.createPlatformUser("user1", tenant, List("A", "B"))
+  val user = TestIdentityFactory.createPlatformUser("user1", tenant, Set("A", "B"))
 
   val caseTeamMemberRecords = Seq(
     TestIdentityFactory.createTeamMember(idOfActiveCase, tenant, user, ""),

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{BooleanValue, CafienneJson, Value, ValueMap}
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneJson {
+final case class TenantUser(id: String, roles: Set[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneJson {
 
   import scala.jdk.CollectionConverters._
 
@@ -32,7 +32,7 @@ final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOw
     Fields.tenant, tenant,
     Fields.name, name,
     Fields.email, email,
-    Fields.isOwner, new BooleanValue(isOwner))
+    Fields.isOwner, isOwner)
 }
 
 object TenantUser {
@@ -42,24 +42,24 @@ object TenantUser {
     * @param json
     * @return instance of user context
     */
-  def from(json: ValueMap): TenantUser = {
-    val name: String = json.readString(Fields.name, "")
+  def deserialize(json: ValueMap): TenantUser = {
     val id: String = json.readString(Fields.userId)
+    val name: String = json.readString(Fields.name, "")
     val email: String = json.readString(Fields.email, "")
     val tenant: String = json.readString(Fields.tenant)
-    val isOwner: Boolean = json.readBoolean(Fields.isOwner, false)
-    val roles = json.readStringList(Fields.roles).toSeq
+    val isOwner: Boolean = json.readBoolean(Fields.isOwner)
+    val roles = json.readStringList(Fields.roles).toSet
 
     TenantUser(id, roles, tenant, isOwner, name, email)
   }
 
   final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {
-    if (!Cafienne.isPlatformOwner(user.userId)) throw AuthorizationException("Only platform owners can execute this type of command")
-    TenantUser(user.userId, Seq(), tenantId, name = "")
+    if (!Cafienne.isPlatformOwner(user.id)) throw AuthorizationException("Only platform owners can execute this type of command")
+    TenantUser(user.id, Set(), tenantId, name = "")
   }
 
   /**
     * An empty TenantUser (can be used in invalid messages)
     */
-  val NONE = TenantUser("", Seq(), "", name = "", email = "", enabled = false)
+  val NONE = TenantUser("", Set(), "", name = "", email = "", enabled = false)
 }

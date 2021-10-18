@@ -25,9 +25,9 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val case33 = "33"
   val case44 = "44"
 
-  val testUser = TestIdentityFactory.createPlatformUser("test", tenant, List("A", "B"))
-  val userWithAandB = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, List("A", "B"))
-  val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, List("B", "C"))
+  val testUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
+  val userWithAandB = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
+  val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
 
   override def beforeAll() = {
     QueryDB.verifyConnectivity()

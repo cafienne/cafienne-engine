@@ -24,7 +24,7 @@ class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBC
 
   override def getTimers(): Future[Seq[Timer]] = {
     val query = TableQuery[TimerServiceTable]
-    db.run(query.distinct.result).map(records => records.map(record => new Timer(record.caseInstanceId, record.timerId, record.moment, new TenantUser(record.user, roles = Seq(), tenant = record.tenant, isOwner = false, name = ""))))
+    db.run(query.distinct.result).map(records => records.map(record => Timer(record.caseInstanceId, record.timerId, record.moment, TenantUser(record.user, roles = Set(), tenant = record.tenant, isOwner = false, name = ""))))
   }
 
   override def storeTimer(job: Timer, offset: Option[Offset]): Future[Done] = {

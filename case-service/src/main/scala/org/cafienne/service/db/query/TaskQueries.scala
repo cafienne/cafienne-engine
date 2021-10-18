@@ -111,7 +111,7 @@ class TaskQueriesImpl extends TaskQueries
         // Select all tasks
         tasks <- TableQuery[TaskTable]
         // In tenants where i am a user
-        tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tasks.tenant)
+        tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.tenant === tasks.tenant)
         // Where my case team roles map to the task role (or where i am a case owner)
         tasksForMyCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
           // Tasks for cases in which i belong to the case team ...
@@ -125,7 +125,7 @@ class TaskQueriesImpl extends TaskQueries
                 (member.caseRole === tasks.role || member.isOwner === true)
                   &&
               // Now filter by either user id or tenant role (depending on the type of case team membership)
-              ((member.isTenantUser === true && member.memberId === user.userId) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
+              ((member.isTenantUser === true && member.memberId === user.id) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
             )
           )
       } yield tasks
@@ -169,7 +169,7 @@ class TaskQueriesImpl extends TaskQueries
   }
 
   override def getCountForUser(user: PlatformUser, tenant: Option[String]): Future[TaskCount] = {
-    val claimedTasksQuery = TableQuery[TaskTable].filter(_.assignee === user.userId)
+    val claimedTasksQuery = TableQuery[TaskTable].filter(_.assignee === user.id)
       .filterNot(_.taskState === "Completed")
       .filterNot(_.taskState === "Terminated")
       .filterOpt(tenant)(_.tenant === _)
@@ -180,7 +180,7 @@ class TaskQueriesImpl extends TaskQueries
         // And only active tasks, not completed or terminated
         .filterNot(_.taskState === "Completed").filterNot(_.taskState === "Terminated")
       // In tenants where i am a user
-      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === unclaimedTasks.tenant)
+      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.tenant === unclaimedTasks.tenant)
       // Where my case team roles map to the task role
       tasksForMyCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
         // Tasks for cases in which i belong to the case team ...
@@ -194,7 +194,7 @@ class TaskQueriesImpl extends TaskQueries
             (member.caseRole === unclaimedTasks.role || member.isOwner === true)
               &&
               // Now filter by either user id or tenant role (depending on the type of case team membership)
-              ((member.isTenantUser === true && member.memberId === user.userId) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
+              ((member.isTenantUser === true && member.memberId === user.id) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
             )
         )
     } yield unclaimedTasks

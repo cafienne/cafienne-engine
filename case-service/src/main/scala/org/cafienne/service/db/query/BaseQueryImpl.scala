@@ -38,14 +38,14 @@ trait BaseQueryImpl
   def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String], tenant: Rep[String], identifiers: Option[String]) = {
     val query = for {
       // Validate tenant membership
-      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.tenant === tenant)
+      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.tenant === tenant)
       // Validate case team membership: either user is explicit member or has a matching tenant role
       teamMembership <- TableQuery[CaseInstanceTeamMemberTable]
         .filter(_.caseInstanceId === caseInstanceId)
         .filter(_.active === true) // Only search in active team members
         .filter(_.caseRole === "") // Only search by base membership, not in certain roles
         .filter(member => { // Search by user id or by one of the user's tenant roles
-          (member.isTenantUser === true && member.memberId === user.userId) ||
+          (member.isTenantUser === true && member.memberId === user.id) ||
             (member.isTenantUser === false && member.memberId === tenantMembership.role_name)
         })
       _ <- {

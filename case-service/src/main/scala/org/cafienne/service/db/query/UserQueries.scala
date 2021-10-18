@@ -14,11 +14,11 @@ trait UserQueries {
 
   def getSelectedTenantUsers(tenant: String, users: Seq[String]): Future[Seq[TenantUser]] = ???
 
-  def getTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
+  def getTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
 
-  def getDisabledTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
+  def getDisabledTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
 
-  def getTenantUser(user: PlatformUser, tenant: String, userId: String): Future[TenantUser] = ???
+  def getTenantUser(platformUser: PlatformUser, tenant: String, userId: String): Future[TenantUser] = ???
 }
 
 
@@ -32,7 +32,6 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   val rolesQuery = TableQuery[UserRoleTable]
 
   override def getPlatformUser(user: AuthenticatedUser): Future[PlatformUser] = {
-    val userId = user.userId
     val query = TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.enabled === true)
 
     db.run(query.result).map(records => {
@@ -43,7 +42,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
         val roles = records.filter(record => record.tenant == tenant && !record.role_name.isBlank)
         createTenantUser(user, roles)
       })
-      PlatformUser(userId, tenantUsers)
+      PlatformUser(user.userId, tenantUsers)
     })
   }
 
@@ -76,18 +75,18 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     })
   }
 
-  override def getTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
-    readAllTenantUsers(user, tenant).map(p => p.filter(t => t.enabled))
+  override def getTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
+    readAllTenantUsers(platformUser, tenant).map(p => p.filter(t => t.enabled))
   }
 
-  override def getDisabledTenantUsers(user: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
-    readAllTenantUsers(user, tenant).map(p => p.filterNot(t => t.enabled))
+  override def getDisabledTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
+    readAllTenantUsers(platformUser, tenant).map(p => p.filterNot(t => t.enabled))
   }
 
   // Note: this also returns a user if the account for that user has been disabled
-  override def getTenantUser(user: PlatformUser, tenant: String, userId: String): Future[TenantUser] = {
+  override def getTenantUser(platformUser: PlatformUser, tenant: String, userId: String): Future[TenantUser] = {
     // First a security check
-    user.shouldBelongTo(tenant);
+    platformUser.shouldBelongTo(tenant)
     val users = TableQuery[UserRoleTable].filter(_.tenant === tenant).filter(_.userId === userId)
     db.run(users.result).map(roleRecords => {
       // Filter out user
@@ -101,6 +100,6 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   }
 
   private def createTenantUser(user: UserRoleRecord, roles: Seq[UserRoleRecord]): TenantUser = {
-    TenantUser(user.userId, roles.map(role => role.role_name), user.tenant, isOwner = user.isOwner, user.name, user.email, enabled = user.enabled)
+    TenantUser(user.userId, roles.map(role => role.role_name).toSet, user.tenant, isOwner = user.isOwner, user.name, user.email, enabled = user.enabled)
   }
 }

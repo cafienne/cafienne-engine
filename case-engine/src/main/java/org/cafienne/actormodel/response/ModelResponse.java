@@ -55,7 +55,7 @@ public class ModelResponse implements IncomingActorMessage {
         this.messageId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.lastModified = json.readInstant(Fields.lastModified);
-        this.user = json.readObject(Fields.user, TenantUser::from);
+        this.user = json.readObject(Fields.user, TenantUser::deserialize);
         this.commandType = json.readString(Fields.commandType);
     }
 

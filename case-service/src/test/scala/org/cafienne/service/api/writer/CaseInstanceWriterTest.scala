@@ -47,7 +47,7 @@ class CaseInstanceWriterTest
   cpw.start()
 
   val caseInstanceId = "9fc49257_7d33_41cb_b28a_75e665ee3b2c"
-  val user = TestIdentityFactory.createPlatformUser("test", "", List())
+  val user = TestIdentityFactory.createPlatformUser("test", "", Set())
   val caseDefinition = TestScript.getCaseDefinition("helloworld.xml")
 
   val eventFactory = new EventFactory(caseInstanceId, caseDefinition, user.getTenantUser(""))

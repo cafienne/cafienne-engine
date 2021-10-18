@@ -35,7 +35,7 @@ public class TimerJob implements CafienneSerializable {
         this.caseInstanceId = json.readString(Fields.caseInstanceId);
         this.moment = json.readInstant(Fields.moment);
         this.timerId = json.readString(Fields.timerId);
-        this.user = json.readObject(Fields.user, TenantUser::from);
+        this.user = json.readObject(Fields.user, TenantUser::deserialize);
     }
 
     @Override

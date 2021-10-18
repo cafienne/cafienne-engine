@@ -80,9 +80,9 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
             } else {
               // TODO: perhaps this should be allowed for tenant owners?
               if (platformUser.getTenantUser(tenant).isOwner) {
-                logger.warn(s"Tenant owner '${platformUser.userId}' tries to fetch tenant user '$userId' but that account has been disabled, hence no response is given")
+                logger.warn(s"Tenant owner '${platformUser.id}' tries to fetch tenant user '$userId' but that account has been disabled, hence no response is given")
               } else {
-                logger.warn(s"User with id '${platformUser.userId}' tries to fetch tenant user '$userId' but that account has been disabled")
+                logger.warn(s"User with id '${platformUser.id}' tries to fetch tenant user '$userId' but that account has been disabled")
               }
               complete(StatusCodes.NotFound)
             }

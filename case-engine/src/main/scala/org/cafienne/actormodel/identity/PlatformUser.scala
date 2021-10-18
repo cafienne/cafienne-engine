@@ -5,15 +5,15 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends CafienneJson {
-  final def tenants: Seq[String] = users.map(u => u.tenant)
+final case class PlatformUser(id: String, users: Seq[TenantUser]) extends CafienneJson {
+  def tenants: Seq[String] = users.map(u => u.tenant)
 
   /**
     * If the user is registered in one tenant only, that tenant is returned.
     * Otherwise, the default tenant of the platform is returned, but it fails when the user is not a member of that tenant
     * @return
     */
-  final def defaultTenant: String = {
+  def defaultTenant: String = {
     if (tenants.length == 1) {
       tenants.head
     } else {
@@ -32,7 +32,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
     }
   }
 
-  final def resolveTenant(optionalTenant: Option[String]): String = {
+  def resolveTenant(optionalTenant: Option[String]): String = {
     optionalTenant match {
       case None => defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
       case Some(string) => string.isBlank match {
@@ -44,22 +44,17 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
   }
 
   override def toValue: Value[_] = {
-    val map = new ValueMap(Fields.userId, userId)
-    val userList = map.withArray(Fields.tenants)
-    users.foreach(user => {
-      userList.add(user.toValue)
-    })
-    map
+    new ValueMap(Fields.userId, id, Fields.tenants, users)
   }
 
-  final def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw AuthorizationException("Tenant '" + tenant +"' does not exist, or user '"+userId+"' is not registered in it"))
+  def shouldBelongTo(tenant: String) : Unit = users.find(u => u.tenant == tenant).getOrElse(throw AuthorizationException("Tenant '" + tenant +"' does not exist, or user '"+id+"' is not registered in it"))
 
-  final def isPlatformOwner: Boolean = Cafienne.isPlatformOwner(userId)
+  def isPlatformOwner: Boolean = Cafienne.isPlatformOwner(id)
 
-  final def getTenantUser(tenant: String) = users.find(u => u.tenant == tenant).getOrElse({
+  def getTenantUser(tenant: String): TenantUser = users.find(u => u.tenant == tenant).getOrElse({
     val message = tenants.isEmpty match {
-      case true => s"User '$userId' is not registered in a tenant"
-      case false => s"User '$userId' is not registered in tenant '$tenant'; user is registered in ${tenants.size} other tenant(s) "
+      case true => s"User '$id' is not registered in a tenant"
+      case false => s"User '$id' is not registered in tenant '$tenant'; user is registered in ${tenants.size} other tenant(s) "
     }
     throw AuthorizationException(message)
   })

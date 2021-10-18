@@ -39,7 +39,7 @@ public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements Model
         this.actorId = modelEventJson.readString(Fields.actorId);
         this.tenant = modelEventJson.readString(Fields.tenant);
         this.timestamp = modelEventJson.readInstant(Fields.timestamp);
-        this.tenantUser = TenantUser.from(modelEventJson.with(Fields.user));
+        this.tenantUser = TenantUser.deserialize(modelEventJson.with(Fields.user));
     }
 
     @Override
