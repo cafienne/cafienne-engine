@@ -2,7 +2,6 @@ package org.cafienne.cmmn.expression.spel.api;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +14,12 @@ import java.util.Set;
  * Base context for SPEL expressions, enabling access to the case and it's public members from any expression.
  * <p>Some example expressions:
  * <ul>
- * <li><code>caseInstance.id</code> - The id of the case</li>
+ * <li><code>case.id</code> - The id of the case</li>
  * <li><code>user.id</code> - The unique id of the user executing the current command in the case</li>
- * <li><code>caseInstance.planItems.size()</code> - The number of plan items currently in the case</li>
- * <li><code>caseInstance.definition.name</code> - The name of case definition</li>
- * <li><code>caseInstance.definition.caseRoles</code> - The roles defined in the case</li>
+ * <li><code>case.plan.MyTaskName</code> - A reference to the task with the name 'MyTaskName' in the case plan</li>
+ * <li><code>case.name</code> - The name of the case definition</li>
  * </ul>
  * <p>
- * See {@link Case} itself for it's members.
  */
 public abstract class APIObject<T extends ModelActor<?,?>> implements SpelReadable {
     private final static Logger logger = LoggerFactory.getLogger(APIObject.class);
@@ -36,8 +33,6 @@ public abstract class APIObject<T extends ModelActor<?,?>> implements SpelReadab
 
     protected APIObject(T actor) {
         this.actor = actor;
-        UserContext user = new UserContext(actor.getCurrentUser());
-        addPropertyReader("user", () -> user);
     }
 
     public T getActor() {
@@ -73,6 +68,15 @@ public abstract class APIObject<T extends ModelActor<?,?>> implements SpelReadab
     protected void addDeprecatedReader(String deprecatedName, String newPropertyName, ExpressionObjectPropertyReader reader) {
         addReader(deprecatedName, () -> {
             warnDeprecation(deprecatedName, newPropertyName);
+            return reader.get();
+        });
+    }
+
+    protected void addDeprecatedReader(String deprecatedName, ExpressionObjectPropertyReader reader) {
+        addReader(deprecatedName, () -> {
+            String msg = "Expression contains unsupported property '" + deprecatedName + "'. An empty value is given.";
+            logger.warn(msg);
+            getActor().addDebugInfo(() -> msg);
             return reader.get();
         });
     }
