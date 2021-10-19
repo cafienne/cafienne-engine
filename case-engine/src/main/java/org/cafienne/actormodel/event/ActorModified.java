@@ -15,11 +15,11 @@ import java.time.Instant;
  *
  * @param <M>
  */
-public abstract class ActorModified<M extends ModelActor<?,?>> extends BaseModelEvent<M> implements CommitEvent {
+public abstract class ActorModified<M extends ModelActor> extends BaseModelEvent<M> implements CommitEvent {
     public final String source;
     public final Instant lastModified;
 
-    protected ActorModified(ModelCommand<M> command) {
+    protected ActorModified(ModelCommand<M, ?> command) {
         super(command.getActor());
         this.source = command.getClass().getName();
         this.lastModified = command.getActor().getTransactionTimestamp();

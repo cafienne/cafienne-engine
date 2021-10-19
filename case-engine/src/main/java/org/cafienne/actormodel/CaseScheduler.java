@@ -14,7 +14,7 @@ import java.util.Map;
  * the Case.java invokes Actor.supervisor.restartChild(this), but it means we also need to cleanup the jobs).
  */
 public class CaseScheduler {
-    private final ModelActor<?,?> actor;
+    private final ModelActor actor;
     private final akka.actor.Scheduler akkaScheduler;
     private final Map<String, Cancellable> jobs = new HashMap<>();
 
@@ -22,7 +22,7 @@ public class CaseScheduler {
      * Simple wrapper to manage jobs that run asynchronously inside the case.
      * @param actor
      */
-    CaseScheduler(ModelActor<?,?> actor) {
+    CaseScheduler(ModelActor actor) {
         this.actor = actor;
         this.akkaScheduler = actor.getContext().system().scheduler();
     }

@@ -94,7 +94,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
      * @return
      */
     private <T> T evaluateExpression(APIRootObject<?> rootObject) {
-        ModelActor<?,?> actor = rootObject.getActor();
+        ModelActor actor = rootObject.getActor();
         // System.out.println("Now evaluating the expression " + definition.getBody());
         StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
         // The case file accessor can be used to dynamically resolve properties that belong to the case file

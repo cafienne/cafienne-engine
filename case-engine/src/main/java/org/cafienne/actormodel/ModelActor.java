@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> extends AbstractPersistentActor {
+public abstract class ModelActor extends AbstractPersistentActor {
 
     private final static Logger logger = LoggerFactory.getLogger(ModelActor.class);
     /**
@@ -49,15 +49,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     /**
      * The identifier of the model. Is expected to be unique. However, in practice it is derived from the Actor's path.
      */
-    private String id;
-    /**
-     * Base class of commands that this ModelActor can handle
-     */
-    private final Class<C> commandClass;
-    /**
-     * Base class of events that this ModelActor can generate
-     */
-    private final Class<E> eventClass;
+    private final String id;
     /**
      * Reference to handler for the current message being processed by the ModelActor.
      */
@@ -101,13 +93,15 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     protected final CaseSystem caseSystem;
 
-    protected ModelActor(Class<C> commandClass, Class<E> eventClass, CaseSystem caseSystem) {
+    protected ModelActor(CaseSystem caseSystem) {
         this.caseSystem = caseSystem;
         this.id = self().path().name();
-        this.commandClass = commandClass;
-        this.eventClass = eventClass;
         this.scheduler = new CaseScheduler(this);
     }
+
+    abstract protected boolean supportsCommand(Object msg);
+
+    abstract protected boolean supportsEvent(Object msg);
 
     public CafienneVersion getEngineVersion() {
         return this.engineVersion;
@@ -180,7 +174,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         return currentUser;
     }
 
-    final void setCurrentUser(TenantUser user) {
+    public final void setCurrentUser(TenantUser user) {
         this.currentUser = user;
     }
 
@@ -210,12 +204,12 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
         // Step 1
         // Step 2
-        if (eventClass.isAssignableFrom(event.getClass()) || event instanceof EngineVersionChanged) {
+        if (supportsEvent(event) || event instanceof EngineVersionChanged) {
             if (tenant == null && event instanceof ModelEvent) {
-                tenant = ((ModelEvent) event).getTenant();
+                tenant = ((ModelEvent<?>) event).getTenant();
             }
             // Step 2a.
-            runHandler(createRecoveryHandler((E) event));
+            runHandler(createRecoveryHandler((ModelEvent<?>) event));
         } else if (event instanceof DebugEvent) {
             // Step 2b.
             // No recovery from debug events ...
@@ -276,22 +270,22 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
     }
 
     private MessageHandler createMessageHandler(Object msg) {
-        if (commandClass.isAssignableFrom(msg.getClass())) {
+        if (supportsCommand(msg)) {
             if (inNeedOfTenantInformation()) {
                 if (msg instanceof BootstrapCommand) {
                     this.tenant = ((BootstrapCommand) msg).tenant();
                 } else {
-                    return new NotConfiguredHandler(this, (ModelCommand) msg);
+                    return new NotConfiguredHandler(this, msg);
                 }
             }
-            C command = (C) msg;
+            ModelCommand<?, ?> command = (ModelCommand<?, ?>) msg;
             command.setActor(this);
-            CommandHandler c = createCommandHandler(command);
+            CommandHandler<?, ?> c = createCommandHandler(command);
             return c;
         } else if (msg instanceof ModelResponse) {
             if (inNeedOfTenantInformation()) {
                 // We cannot handle responses if we have not been properly initialized.
-                return new NotConfiguredHandler(this, (ModelResponse) msg);
+                return new NotConfiguredHandler(this, msg);
             }
             return createResponseHandler((ModelResponse) msg);
         } else if (msg.getClass().getPackage().equals(SnapshotMetadata.class.getPackage())) {
@@ -326,7 +320,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      *
      * @param command
      */
-    protected CommandHandler createCommandHandler(C command) {
+    protected CommandHandler<?, ?> createCommandHandler(ModelCommand<?, ?> command) {
         return new CommandHandler(this, command);
     }
 
@@ -352,6 +346,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Handler for akka system messages (e.g. SnapshotOffer, SnapshotSaveSuccess, RecoveryCompleted, etc)
+     *
      * @param message
      * @return
      */
@@ -365,7 +360,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      *
      * @param event
      */
-    protected RecoveryEventHandler createRecoveryHandler(E event) {
+    protected RecoveryEventHandler<?, ?> createRecoveryHandler(ModelEvent<?> event) {
         return new RecoveryEventHandler(this, event);
     }
 
@@ -376,8 +371,9 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param <EV>
      * @return
      */
-    public <EV extends E> EV addEvent(EV event) {
-        return (EV) currentMessageHandler.addEvent(event);
+    public <EV extends ModelEvent<?>> EV addEvent(EV event) {
+        currentMessageHandler.addEvent(event);
+        return event;
     }
 
     public Responder getResponseListener(String msgId) {
@@ -401,6 +397,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
 
     /**
      * Similar to {@link #askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)}
+     *
      * @param command
      * @param left
      * @param right
@@ -490,7 +487,7 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
             persistAll(events, e -> {
                 HealthMonitor.writeJournal().isOK();
                 if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(this.getDescription() + " - persisted event [" + lastSequenceNr() +"] of type " + e.getClass().getName());
+                    getLogger().debug(this.getDescription() + " - persisted event [" + lastSequenceNr() + "] of type " + e.getClass().getName());
                 }
                 if (e == lastEvent) {
                     reply(response);
@@ -506,11 +503,11 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
      * @param handler
      * @param exception
      */
-    public void failedWithInvalidState(CommandHandler handler, Throwable exception) {
+    public void failedWithInvalidState(MessageHandler handler, Throwable exception) {
         this.getScheduler().clearSchedules(); // Remove all schedules.
         if (exception instanceof CommandException) {
             getLogger().error("Restarting " + this + ". Handling msg of type " + handler.msg.getClass().getName() + " resulted in invalid state.");
-            getLogger().error("  Cause: "+exception.getClass().getSimpleName()+" - " + exception.getMessage());
+            getLogger().error("  Cause: " + exception.getClass().getSimpleName() + " - " + exception.getMessage());
         } else {
             getLogger().error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
         }

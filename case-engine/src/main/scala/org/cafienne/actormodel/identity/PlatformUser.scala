@@ -3,9 +3,9 @@ package org.cafienne.actormodel.identity
 import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import org.cafienne.json.{Value, ValueMap}
 
-final case class PlatformUser(id: String, users: Seq[TenantUser]) extends CafienneJson {
+final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserIdentity {
   def tenants: Seq[String] = users.map(u => u.tenant)
 
   /**
@@ -61,5 +61,5 @@ final case class PlatformUser(id: String, users: Seq[TenantUser]) extends Cafien
 }
 
 object PlatformUser {
-  def from(tenantUser: TenantUser) = new PlatformUser(tenantUser.id, Seq())
+  def from(user: UserIdentity) = new PlatformUser(user.id, Seq())
 }

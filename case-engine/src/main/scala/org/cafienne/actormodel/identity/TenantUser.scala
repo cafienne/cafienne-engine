@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import org.cafienne.json.{Value, ValueMap}
 
-final case class TenantUser(id: String, roles: Set[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneJson {
+final case class TenantUser(id: String, roles: Set[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends UserIdentity {
 
   import scala.jdk.CollectionConverters._
 
@@ -57,9 +57,4 @@ object TenantUser {
     if (!Cafienne.isPlatformOwner(user.id)) throw AuthorizationException("Only platform owners can execute this type of command")
     TenantUser(user.id, Set(), tenantId, name = "")
   }
-
-  /**
-    * An empty TenantUser (can be used in invalid messages)
-    */
-  val NONE = TenantUser("", Set(), "", name = "", email = "", enabled = false)
 }

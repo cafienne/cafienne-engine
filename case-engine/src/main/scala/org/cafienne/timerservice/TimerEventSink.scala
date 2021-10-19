@@ -3,6 +3,7 @@ package org.cafienne.timerservice
 import akka.Done
 import akka.actor.ActorSystem
 import akka.persistence.query.Offset
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventConsumer}
@@ -39,7 +40,7 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
 
   def setTimer(event: TimerSet, offset: Offset): Future[Done] = {
     logger.debug(s"${event.getClass.getSimpleName} on timer ${event.getTimerId} in case ${event.getActorId} (triggering at ${event.getTargetMoment})")
-    val job: Timer = Timer(event.getCaseInstanceId, event.getTimerId, event.getTargetMoment, event.getUser)
+    val job: Timer = Timer(event.getCaseInstanceId, event.getTimerId, event.getTargetMoment, event.getUser.asInstanceOf[TenantUser])
     scheduleTimer(job)
     storage.storeTimer(job, Some(offset))
   }

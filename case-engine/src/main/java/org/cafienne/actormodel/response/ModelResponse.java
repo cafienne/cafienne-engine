@@ -11,7 +11,7 @@ import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
@@ -22,7 +22,7 @@ import java.time.Instant;
 /**
  * Interface for creating responses to {@link ModelCommand}
  */
-public class ModelResponse implements IncomingActorMessage {
+public abstract class ModelResponse implements IncomingActorMessage {
     /**
      * Recipient is assigned during construction of the response message.
      * It is the current value of sender() in the actor.
@@ -31,10 +31,10 @@ public class ModelResponse implements IncomingActorMessage {
     private final String messageId;
     private final String actorId;
     private Instant lastModified;
-    private final TenantUser user;
+    private final UserIdentity user;
     private final String commandType;
 
-    protected ModelResponse(ModelCommand<?> command) {
+    protected ModelResponse(ModelCommand<?, ?> command) {
         // Make sure that we capture the recipient during creation.
         //  This is required since sending the response is done after events are persisted,
         //  and that in itself may or may not happen asynchronously, and if it is happening
@@ -55,7 +55,7 @@ public class ModelResponse implements IncomingActorMessage {
         this.messageId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.lastModified = json.readInstant(Fields.lastModified);
-        this.user = json.readObject(Fields.user, TenantUser::deserialize);
+        this.user = json.readObject(Fields.user, UserIdentity::deserialize);
         this.commandType = json.readString(Fields.commandType);
     }
 
@@ -106,7 +106,7 @@ public class ModelResponse implements IncomingActorMessage {
         return new ActorLastModified(actorId, getLastModified());
     }
 
-    public TenantUser getUser() {
+    public UserIdentity getUser() {
         return user;
     }
 

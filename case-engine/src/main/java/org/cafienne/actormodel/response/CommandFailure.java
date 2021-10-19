@@ -32,7 +32,7 @@ public class CommandFailure extends ModelResponse {
      * @param command
      * @param failure The reason why the command failed
      */
-    public CommandFailure(ModelCommand<?> command, Throwable failure) {
+    public CommandFailure(ModelCommand<?, ?> command, Throwable failure) {
         super(command);
         this.exception = failure;
         this.exceptionAsJSON = Value.convertThrowable(failure);

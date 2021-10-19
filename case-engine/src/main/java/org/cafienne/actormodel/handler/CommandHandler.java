@@ -3,7 +3,6 @@ package org.cafienne.actormodel.handler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.DebugEvent;
-import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
@@ -16,13 +15,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-public class CommandHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends IncomingMessageHandler<C, C, E, A> {
+public class CommandHandler<C extends ModelCommand<A, ?>, A extends ModelActor> extends IncomingMessageHandler {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
     protected final C command;
 
+    protected final A actor;
+
     public CommandHandler(A actor, C msg) {
         super(actor, msg);
+        this.actor = actor;
         this.command = msg;
         addDebugInfo(() -> "\n\n\txxxxxxxxxxxxxxxxxxxx new command " + command.getCommandDescription() +" xxxxxxxxxxxxxxx\n\n", logger);
     }

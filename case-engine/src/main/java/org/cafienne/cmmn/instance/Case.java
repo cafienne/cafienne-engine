@@ -41,7 +41,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Case extends ModelActor<CaseCommand, CaseEvent> {
+public class Case extends ModelActor {
 
     private final static Logger logger = LoggerFactory.getLogger(Case.class);
 
@@ -86,11 +86,21 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     private Team caseTeam;
 
     public Case(CaseSystem caseSystem) {
-        super(CaseCommand.class, CaseEvent.class, caseSystem);
+        super(caseSystem);
         this.createdOn = getTransactionTimestamp();
         this.sentryNetwork = new SentryNetwork(this);
 
         logger.info("Recovering/creating case " + this.getId() + " with path " + self().path());
+    }
+
+    @Override
+    protected boolean supportsCommand(Object msg) {
+        return msg instanceof CaseCommand;
+    }
+
+    @Override
+    protected boolean supportsEvent(Object msg) {
+        return msg instanceof CaseEvent;
     }
 
     @Override

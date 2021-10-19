@@ -21,7 +21,7 @@ import java.util.Set;
  * </ul>
  * <p>
  */
-public abstract class APIObject<T extends ModelActor<?,?>> implements SpelReadable {
+public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     private final static Logger logger = LoggerFactory.getLogger(APIObject.class);
 
     /**

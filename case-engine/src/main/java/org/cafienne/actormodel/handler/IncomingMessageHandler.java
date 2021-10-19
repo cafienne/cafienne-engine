@@ -2,18 +2,22 @@ package org.cafienne.actormodel.handler;
 
 import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.response.ModelResponse;
 
-public abstract class IncomingMessageHandler<M extends IncomingActorMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<M, C, E, A> {
+public abstract class IncomingMessageHandler extends ValidMessageHandler {
+    /**
+     * The message that was sent to the actor that is being handled by this handler.
+     */
+    protected final IncomingActorMessage msg;
+
     /**
      * Valid Messages may lead to a response to the sender.
      */
     protected ModelResponse response = null;
 
-    protected IncomingMessageHandler(A actor, M msg) {
+    protected IncomingMessageHandler(ModelActor actor, IncomingActorMessage msg) {
         super(actor, msg);
+        this.msg = msg;
     }
 
     protected void complete() {

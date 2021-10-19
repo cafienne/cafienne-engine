@@ -9,15 +9,8 @@ package org.cafienne.tenant.actorapi.command;
 
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.event.TenantModified;
@@ -26,11 +19,9 @@ import org.cafienne.tenant.actorapi.exception.TenantException;
 import java.util.List;
 
 /**
- * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
- * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link TenantCommand#process} methods.
- * When the case has successfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
+ * Base class for sending commands to a TenantActor
  */
-public abstract class TenantCommand extends ModelCommand<TenantActor> {
+public abstract class TenantCommand extends ModelCommand<TenantActor, TenantUser> {
     /**
      * Create a new command that can be sent to the tenant.
      *
@@ -43,6 +34,11 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
 
     protected TenantCommand(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    protected TenantUser readUser(ValueMap json) {
+        return TenantUser.deserialize(json);
     }
 
     @Override
@@ -59,8 +55,7 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
     public void validate(TenantActor tenant) throws InvalidCommandException {
         // Tenant must exist
         if (!tenant.exists()) {
-            throw new TenantException("Not allowed to access this tenant from " + getUser().tenant());
-//            throw new SecurityException("This tenant does not exist");
+            throw new TenantException("Not allowed to access this tenant");
         }
 
         if (!tenant.isOwner(this.getUser())) {
@@ -82,15 +77,6 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
             }
         }
     }
-
-    /**
-     * Method invoked by the case in order to perform the actual command logic on the case.
-     *
-     * @param tenant
-     * @return
-     * @throws CommandException Implementations of this method may throw this exception if a failure happens while processing the command
-     */
-    public abstract ModelResponse process(TenantActor tenant);
 
     @Override
     public void done() {

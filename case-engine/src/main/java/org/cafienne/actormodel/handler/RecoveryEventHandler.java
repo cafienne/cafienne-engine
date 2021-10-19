@@ -1,16 +1,24 @@
 package org.cafienne.actormodel.handler;
 
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RecoveryEventHandler<C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends ValidMessageHandler<E, C, E, A> {
+public class RecoveryEventHandler<E extends ModelEvent<A>, A extends ModelActor> extends ValidMessageHandler {
+    /**
+     * The message that was sent to the actor that is being handled by this handler.
+     */
+    protected final E msg;
+
+    protected final A actor;
+
     private final static Logger logger = LoggerFactory.getLogger(RecoveryEventHandler.class);
 
     public RecoveryEventHandler(A actor, E msg) {
         super(actor, msg);
+        this.actor = actor;
+        this.msg = msg;
     }
 
     protected void process() {
@@ -18,7 +26,7 @@ public class RecoveryEventHandler<C extends ModelCommand<A>, E extends ModelEven
     }
 
     @Override
-    public <EV extends E> EV addEvent(EV event) {
+    public ModelEvent<?> addEvent(ModelEvent<?> event) {
         // NOTE: This commit makes it possible to handle actor state updates from events only.
         //  Such has been implemented for TenantActor and ProcessTaskActor, and partly for Case.
         //  Enabling the logging will showcase where this pattern has not been completely done.
@@ -30,5 +38,4 @@ public class RecoveryEventHandler<C extends ModelCommand<A>, E extends ModelEven
 
     protected void complete() {
     }
-
 }

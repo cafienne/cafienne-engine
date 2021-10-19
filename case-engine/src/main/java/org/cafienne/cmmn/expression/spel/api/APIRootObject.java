@@ -18,7 +18,7 @@ import org.cafienne.json.ValueMap;
  * <p>
  * See {@link Case} itself for it's members.
  */
-public abstract class APIRootObject<T extends ModelActor<?,?>> extends APIObject<T> {
+public abstract class APIRootObject<T extends ModelActor> extends APIObject<T> {
     /**
      * Option to pass a custom reader for the "user" property, e.g. a case team member instead of a Tenant user
      * @param model

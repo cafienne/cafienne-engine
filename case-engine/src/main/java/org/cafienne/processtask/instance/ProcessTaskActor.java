@@ -1,6 +1,7 @@
 package org.cafienne.processtask.instance;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.cafienne.json.ValueMap;
@@ -10,10 +11,11 @@ import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.system.CaseSystem;
+import org.cafienne.tenant.actorapi.event.platform.PlatformEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstanceEvent> {
+public class ProcessTaskActor extends ModelActor {
 
     private final static Logger logger = LoggerFactory.getLogger(ProcessTaskActor.class);
     private ProcessDefinition definition;
@@ -24,7 +26,17 @@ public class ProcessTaskActor extends ModelActor<ProcessCommand, ProcessInstance
     private ValueMap inputParameters;
 
     public ProcessTaskActor(CaseSystem caseSystem) {
-        super(ProcessCommand.class, ProcessInstanceEvent.class, caseSystem);
+        super(caseSystem);
+    }
+
+    @Override
+    protected boolean supportsCommand(Object msg) {
+        return msg instanceof ProcessCommand;
+    }
+
+    @Override
+    protected boolean supportsEvent(Object msg) {
+        return msg instanceof ProcessInstanceEvent;
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.cafienne.tenant.actorapi.event.TenantAppliedPlatformUpdate;
 import org.cafienne.tenant.actorapi.event.TenantEvent;
 import org.cafienne.tenant.actorapi.event.TenantModified;
 import org.cafienne.tenant.actorapi.event.TenantUserCreated;
+import org.cafienne.tenant.actorapi.event.platform.PlatformEvent;
 import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
 import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
 import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * TenantActor manages users and their roles inside a tenant.
  */
-public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
+public class TenantActor extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(TenantActor.class);
 
     private TenantCreated creationEvent;
@@ -33,7 +34,17 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     private boolean disabled = false; // TODO: we can add some behavior behind this...
 
     public TenantActor(CaseSystem caseSystem) {
-        super(TenantCommand.class, TenantEvent.class, caseSystem);
+        super(caseSystem);
+    }
+
+    @Override
+    protected boolean supportsCommand(Object msg) {
+        return msg instanceof TenantCommand;
+    }
+
+    @Override
+    protected boolean supportsEvent(Object msg) {
+        return msg instanceof TenantEvent;
     }
 
     @Override

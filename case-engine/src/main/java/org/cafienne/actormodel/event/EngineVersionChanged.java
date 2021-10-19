@@ -10,11 +10,11 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class EngineVersionChanged extends BaseModelEvent<ModelActor<?,?>> {
+public class EngineVersionChanged extends BaseModelEvent<ModelActor> {
 
     private final CafienneVersion version;
 
-    public EngineVersionChanged(ModelActor<?,?> actor, CafienneVersion version) {
+    public EngineVersionChanged(ModelActor actor, CafienneVersion version) {
         super(actor);
         this.version = version;
     }
@@ -25,7 +25,7 @@ public class EngineVersionChanged extends BaseModelEvent<ModelActor<?,?>> {
     }
 
     @Override
-    public void updateState(ModelActor<?,?> actor) {
+    public void updateState(ModelActor actor) {
         actor.setEngineVersion(this.version);
     }
 

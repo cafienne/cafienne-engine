@@ -3,18 +3,24 @@ package org.cafienne.actormodel.handler;
 import org.cafienne.actormodel.MessageHandler;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.UserMessage;
-import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 
-public abstract class ValidMessageHandler<M extends UserMessage, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> extends MessageHandler<M, C, E, A> {
+public abstract class ValidMessageHandler extends MessageHandler {
+
+    protected final UserIdentity user;
+
     /**
      * Valid Messages may lead to a response to the sender.
      */
     protected ModelResponse response = null;
 
-    protected ValidMessageHandler(A actor, M msg) {
-        super(actor, msg, msg.getUser());
+    protected ValidMessageHandler(ModelActor actor, UserMessage msg) {
+        super(actor, msg);
+        this.user = msg.getUser();
+        // NOTE: replace this with some kind of "start transaction"
+        this.actor.setCurrentUser((TenantUser) user); // For now always cast to TenantUser
     }
 
     protected void complete() {

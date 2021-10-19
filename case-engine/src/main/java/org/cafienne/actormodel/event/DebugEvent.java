@@ -21,10 +21,10 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
+public class DebugEvent extends BaseModelEvent<ModelActor> {
     private final ValueMap messages;
 
-    public DebugEvent(ModelActor<?,?> modelActor) {
+    public DebugEvent(ModelActor modelActor) {
         super(modelActor);
         this.messages = new ValueMap();
     }
@@ -58,7 +58,7 @@ public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
     }
 
     @Override
-    public void updateState(ModelActor<?,?> actor) {
+    public void updateState(ModelActor actor) {
         // nothing to update
     }
 
