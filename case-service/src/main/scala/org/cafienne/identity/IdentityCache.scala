@@ -1,9 +1,8 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.exception.AuthorizationException
-import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.infrastructure.Cafienne
@@ -14,7 +13,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentityProvider {
   def getPlatformUser(user: AuthenticatedUser, tlm: Option[String]): Future[PlatformUser] = ???
+
   def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = ???
+
   def clear(userId: String): Unit = ???
 }
 
@@ -37,19 +38,15 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
     }
   }
 
+  private def cacheUser(user: PlatformUser) = {
+    cache.put(user.id, user)
+    user
+  }
+
   private def executeUserQuery(user: AuthenticatedUser): Future[PlatformUser] = {
     cache.get(user.userId) match {
       case user: PlatformUser => Future(user)
-      case null => {
-        userQueries.getPlatformUser(user).map(u => {
-          if (u.users.isEmpty && !u.isPlatformOwner) {
-            logger.info(s"User ${user.userId} has a valid token, but is not registered in the case system")
-            throw AuthorizationException(s"User ${user.userId} is not registered in the case system")
-          }
-          cache.put(user.userId, u)
-          u
-        })
-      }
+      case null => userQueries.getPlatformUser(user).map(cacheUser)
     }
   }
 
