@@ -31,166 +31,166 @@ trait CaseTables extends QueryDBSchema {
       case _ => lastModified
     }
 
-    def id = idColumn[String]("id", O.PrimaryKey)
+    lazy val id = idColumn[String]("id", O.PrimaryKey)
 
-    def caseName = idColumn[String]("case_name")
+    lazy val caseName = idColumn[String]("case_name")
 
-    def state = stateColumn[String]("state")
+    lazy val state = stateColumn[String]("state")
 
-    def failures = column[Int]("failures")
+    lazy val failures = column[Int]("failures")
 
-    def parentCaseId = idColumn[String]("parent_case_id")
+    lazy val parentCaseId = idColumn[String]("parent_case_id")
 
-    def rootCaseId = idColumn[String]("root_case_id")
+    lazy val rootCaseId = idColumn[String]("root_case_id")
 
-    def lastModified = column[Instant]("last_modified")
+    lazy val lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = userColumn[String]("modified_by")
+    lazy val modifiedBy = userColumn[String]("modified_by")
 
-    def createdOn = column[Instant]("created_on")
+    lazy val createdOn = column[Instant]("created_on")
 
-    def createdBy = userColumn[String]("created_by")
+    lazy val createdBy = userColumn[String]("created_by")
 
-    def caseInput = jsonColumn[String]("case_input")
+    lazy val caseInput = jsonColumn[String]("case_input")
 
-    def caseOutput = jsonColumn[String]("case_output")
+    lazy val caseOutput = jsonColumn[String]("case_output")
 
     // Some indexes to optimize GetCases queries
-    def indexState = index(state)
-    def indexTenant = index(tenant)
-    def indexRootCaseId = index(rootCaseId)
-    def indexCaseName = index(caseName)
-    def indexCreatedBy = index(createdBy)
-    def indexModifiedBy = index(modifiedBy)
+    lazy val indexState = oldStyleIndex(state)
+    lazy val indexTenant = oldStyleIndex(tenant)
+    lazy val indexRootCaseId = oldStyleIndex(rootCaseId)
+    lazy val indexCaseName = oldStyleIndex(caseName)
+    lazy val indexCreatedBy = oldStyleIndex(createdBy)
+    lazy val indexModifiedBy = oldStyleIndex(modifiedBy)
 
-    def * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput).mapTo[CaseRecord]
+    lazy val * = (id, tenant, caseName, state, failures, parentCaseId, rootCaseId, lastModified, modifiedBy, createdOn, createdBy, caseInput, caseOutput).mapTo[CaseRecord]
   }
 
   final class CaseInstanceDefinitionTable(tag: Tag) extends CafienneTenantTable[CaseDefinitionRecord](tag, "case_instance_definition") {
 
-    def caseInstanceId = idColumn[String]("caseInstanceId", O.PrimaryKey)
+    lazy val caseInstanceId = idColumn[String]("caseInstanceId", O.PrimaryKey)
 
-    def name = idColumn[String]("name")
+    lazy val name = idColumn[String]("name")
 
-    def description = column[String]("description")
+    lazy val description = column[String]("description")
 
-    def elementId = idColumn[String]("element_id")
+    lazy val elementId = idColumn[String]("element_id")
 
-    def content = column[String]("content")
+    lazy val content = column[String]("content")
 
-    def lastModified = column[Instant]("last_modified")
+    lazy val lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = userColumn[String]("modified_by")
+    lazy val modifiedBy = userColumn[String]("modified_by")
 
-    def * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy).mapTo[CaseDefinitionRecord]
+    lazy val * = (caseInstanceId, name, description, elementId, content, tenant, lastModified, modifiedBy).mapTo[CaseDefinitionRecord]
   }
 
   class PlanItemTable(tag: Tag) extends CafienneTenantTable[PlanItemRecord](tag, "plan_item") {
 
-    def id = idColumn[String]("id", O.PrimaryKey)
+    lazy val id = idColumn[String]("id", O.PrimaryKey)
 
-    def definitionId = idColumn[String]("definition_id", O.Default(""))
+    lazy val definitionId = idColumn[String]("definition_id", O.Default(""))
 
-    def stageId = idColumn[String]("stage_id")
+    lazy val stageId = idColumn[String]("stage_id")
 
-    def name = column[String]("name")
+    lazy val name = column[String]("name")
 
-    def index = column[Int]("index")
+    lazy val index = column[Int]("index")
 
-    def caseInstanceId = idColumn[String]("case_instance_id")
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
-    def currentState = stateColumn[String]("current_state")
+    lazy val currentState = stateColumn[String]("current_state")
 
-    def historyState = stateColumn[String]("history_state")
+    lazy val historyState = stateColumn[String]("history_state")
 
-    def transition = stateColumn[String]("transition")
+    lazy val transition = stateColumn[String]("transition")
 
-    def planItemType = stateColumn[String]("plan_item_type")
+    lazy val planItemType = stateColumn[String]("plan_item_type")
 
-    def repeating = column[Boolean]("repeating")
+    lazy val repeating = column[Boolean]("repeating")
 
-    def required = column[Boolean]("required")
+    lazy val required = column[Boolean]("required")
 
-    def lastModified = column[Instant]("last_modified")
+    lazy val lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = userColumn[String]("modified_by")
+    lazy val modifiedBy = userColumn[String]("modified_by")
 
-    def createdOn = column[Instant]("created_on")
+    lazy val createdOn = column[Instant]("created_on")
 
-    def createdBy = userColumn[String]("created_by")
+    lazy val createdBy = userColumn[String]("created_by")
 
-    def taskInput = jsonColumn[String]("task_input")
+    lazy val taskInput = jsonColumn[String]("task_input")
 
-    def taskOutput = jsonColumn[String]("task_output")
+    lazy val taskOutput = jsonColumn[String]("task_output")
 
-    def mappedInput = jsonColumn[String]("mapped_input")
+    lazy val mappedInput = jsonColumn[String]("mapped_input")
 
-    def rawOutput = jsonColumn[String]("raw_output")
+    lazy val rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput).mapTo[PlanItemRecord]
+    lazy val * = (id, definitionId, stageId, name, index, caseInstanceId, tenant, currentState, historyState, transition, planItemType, repeating, required, lastModified, modifiedBy, createdOn, createdBy, taskInput, taskOutput, mappedInput, rawOutput).mapTo[PlanItemRecord]
 
-    def indexCaseInstanceId = index(caseInstanceId)
-    def indexCreatedBy = index(createdBy)
-    def indexModifiedBy = index(modifiedBy)
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
+    lazy val indexCreatedBy = oldStyleIndex(createdBy)
+    lazy val indexModifiedBy = oldStyleIndex(modifiedBy)
   }
 
   final class PlanItemHistoryTable(tag: Tag) extends CafienneTenantTable[PlanItemHistoryRecord](tag, "plan_item_history") {
 
-    def id = idColumn[String]("id", O.PrimaryKey)
+    lazy val id = idColumn[String]("id", O.PrimaryKey)
 
-    def planItemId = idColumn[String]("plan_item_id")
+    lazy val planItemId = idColumn[String]("plan_item_id")
 
-    def stageId = idColumn[String]("stage_id")
+    lazy val stageId = idColumn[String]("stage_id")
 
-    def name = column[String]("name")
+    lazy val name = column[String]("name")
 
-    def index = column[Int]("index")
+    lazy val index = column[Int]("index")
 
-    def caseInstanceId = idColumn[String]("case_instance_id")
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
-    def currentState = stateColumn[String]("current_state")
+    lazy val currentState = stateColumn[String]("current_state")
 
-    def historyState = stateColumn[String]("history_state")
+    lazy val historyState = stateColumn[String]("history_state")
 
-    def transition = stateColumn[String]("transition")
+    lazy val transition = stateColumn[String]("transition")
 
-    def planItemType = stateColumn[String]("plan_item_type")
+    lazy val planItemType = stateColumn[String]("plan_item_type")
 
-    def repeating = column[Boolean]("repeating")
+    lazy val repeating = column[Boolean]("repeating")
 
-    def required = column[Boolean]("required")
+    lazy val required = column[Boolean]("required")
 
-    def lastModified = column[Instant]("last_modified")
+    lazy val lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = userColumn[String]("modified_by")
+    lazy val modifiedBy = userColumn[String]("modified_by")
 
-    def eventType = column[String]("eventType")
+    lazy val eventType = column[String]("eventType")
 
-    def sequenceNr = column[Long]("sequenceNr")
+    lazy val sequenceNr = column[Long]("sequenceNr")
 
-    def taskInput = jsonColumn[String]("task_input")
+    lazy val taskInput = jsonColumn[String]("task_input")
 
-    def taskOutput = jsonColumn[String]("task_output")
+    lazy val taskOutput = jsonColumn[String]("task_output")
 
-    def mappedInput = jsonColumn[String]("mapped_input")
+    lazy val mappedInput = jsonColumn[String]("mapped_input")
 
-    def rawOutput = jsonColumn[String]("raw_output")
+    lazy val rawOutput = jsonColumn[String]("raw_output")
 
-    def * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput).mapTo[PlanItemHistoryRecord]
+    lazy val * = (id, planItemId, stageId, name, index, caseInstanceId, tenant, currentState, historyState,transition, planItemType, repeating, required, lastModified, modifiedBy, eventType, sequenceNr, taskInput, taskOutput, mappedInput, rawOutput).mapTo[PlanItemHistoryRecord]
 
-    def idx = index("idx_plan_item_history__plain_item_id", planItemId)
-    def indexModifiedBy = index(modifiedBy)
+    lazy val idx = index("idx_plan_item_history__plain_item_id", planItemId)
+    lazy val indexModifiedBy = oldStyleIndex(modifiedBy)
   }
 
   class CaseFileTable(tag: Tag) extends CafienneTenantTable[CaseFileRecord](tag, "case_file") {
 
-    def caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
+    lazy val caseInstanceId = idColumn[String]("case_instance_id", O.PrimaryKey)
 
-    def data = jsonColumn[String]("data")
+    lazy val data = jsonColumn[String]("data")
 
-    def * = (caseInstanceId, tenant, data).mapTo[CaseFileRecord]
+    lazy val * = (caseInstanceId, tenant, data).mapTo[CaseFileRecord]
 
-    val indexCaseInstanceId = index(caseInstanceId)
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
   }
 
   final class CaseBusinessIdentifierTable(tag: Tag) extends CafienneTenantTable[CaseBusinessIdentifierRecord](tag, "case_business_identifier") {
@@ -202,60 +202,60 @@ trait CaseTables extends QueryDBSchema {
       case _ => name
     }
 
-    def caseInstanceId = idColumn[String]("case_instance_id")
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
-    def name = idColumn[String]("name")
+    lazy val name = idColumn[String]("name")
 
-    def value = column[Option[String]]("value")
+    lazy val value = column[Option[String]]("value")
 
-    def active = column[Boolean]("active")
+    lazy val active = column[Boolean]("active")
 
-    def path = column[String]("path")
+    lazy val path = column[String]("path")
 
-    def * = (caseInstanceId, tenant, name, value, active, path).mapTo[CaseBusinessIdentifierRecord]
+    lazy val * = (caseInstanceId, tenant, name, value, active, path).mapTo[CaseBusinessIdentifierRecord]
 
-    val caseInstanceTable = TableQuery[CaseInstanceTable]
+    lazy val caseInstanceTable = TableQuery[CaseInstanceTable]
 
-    def pk = primaryKey("pk_case_business_identifier", (caseInstanceId, name))
+    lazy val pk = primaryKey(pkName, (caseInstanceId, name))
 
-    val indexCaseInstanceId = index(caseInstanceId)
-    val indexName = index(name)
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
+    lazy val indexName = oldStyleIndex(name)
   }
 
   class CaseInstanceRoleTable(tag: Tag) extends CafienneTenantTable[CaseRoleRecord](tag, "case_instance_role") {
 
-    def caseInstanceId = idColumn[String]("case_instance_id")
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
-    def roleName = idColumn[String]("role_name")
+    lazy val roleName = idColumn[String]("role_name")
 
-    def assigned = column[Boolean]("assigned") // true if team members are assigned for this role
+    lazy val assigned = column[Boolean]("assigned") // true if team members are assigned for this role
 
-    def pk = primaryKey("pk_case_instance_role", (caseInstanceId, roleName))
+    lazy val pk = primaryKey(pkName, (caseInstanceId, roleName))
 
-    def * = (caseInstanceId, tenant, roleName, assigned).mapTo[CaseRoleRecord]
+    lazy val * = (caseInstanceId, tenant, roleName, assigned).mapTo[CaseRoleRecord]
 
-    val indexCaseInstanceId = index(caseInstanceId)
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
   }
 
   class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
 
-    def caseInstanceId = idColumn[String]("case_instance_id")
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
-    def caseRole = idColumn[String]("case_role")
+    lazy val caseRole = idColumn[String]("case_role")
 
-    def memberId = userColumn[String]("member_id")
+    lazy val memberId = userColumn[String]("member_id")
 
-    def isTenantUser = column[Boolean]("isTenantUser")
+    lazy val isTenantUser = column[Boolean]("isTenantUser")
 
-    def isOwner = column[Boolean]("isOwner")
+    lazy val isOwner = column[Boolean]("isOwner")
 
-    def active = column[Boolean]("active")
+    lazy val active = column[Boolean]("active")
 
-    def pk = primaryKey("pk_case_instance_team_member", (caseInstanceId, caseRole, memberId, isTenantUser))
+    lazy val pk = primaryKey(pkName, (caseInstanceId, caseRole, memberId, isTenantUser))
 
-    def * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active).mapTo[CaseTeamMemberRecord]
+    lazy val * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active).mapTo[CaseTeamMemberRecord]
 
-    val indexCaseInstanceId = index(caseInstanceId)
-    def indexMemberId = index(generateIndexName(memberId), (memberId, isTenantUser))
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
+    lazy val indexMemberId = index(oldStyleIxName(memberId), (memberId, isTenantUser))
   }
 }

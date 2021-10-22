@@ -10,47 +10,47 @@ trait TenantTables extends QueryDBSchema {
   // Schema for the "tenant-owner" table:
   final class TenantOwnersTable(tag: Tag) extends CafienneTenantTable[TenantOwnerRecord](tag, "tenant_owners") {
 
-    def * = (tenant, userId, enabled).mapTo[TenantOwnerRecord]
+    lazy val * = (tenant, userId, enabled).mapTo[TenantOwnerRecord]
 
-    def enabled = column[Boolean]("enabled", O.Default(true))
+    lazy val enabled = column[Boolean]("enabled", O.Default(true))
 
-    def pk = primaryKey("pk_tenant_owner", (tenant, userId))
+    lazy val pk = primaryKey(pkName, (tenant, userId))
 
-    def userId = userColumn[String]("userId")
+    lazy val userId = userColumn[String]("userId")
   }
 
   // Schema for the "tenant" table:
   final class TenantTable(tag: Tag) extends CafienneTable[TenantRecord](tag, "tenant") {
 
     // Columsn
-    def name = idColumn[String]("name", O.PrimaryKey)
-    def enabled = column[Boolean]("enabled", O.Default(true))
+    lazy val name = idColumn[String]("name", O.PrimaryKey)
+    lazy val enabled = column[Boolean]("enabled", O.Default(true))
 
     // Constraints
-    def pk = primaryKey("pk_tenant", name)
-    def * = (name, enabled).mapTo[TenantRecord]
+    lazy val pk = primaryKey(pkName, name)
+    lazy val * = (name, enabled).mapTo[TenantRecord]
   }
 
   class UserRoleTable(tag: Tag) extends CafienneTenantTable[UserRoleRecord](tag, "user_role") {
-    def pk = primaryKey("pk_userrole", (userId, tenant, role_name))
+    lazy val pk = primaryKey("pk_userrole", (userId, tenant, role_name)) // Note: cannot use pkName becauase pk_userrole deviates from the actual table name :(
 
-    def * = (userId, tenant, role_name, name, email, isOwner, enabled).mapTo[UserRoleRecord]
+    lazy val * = (userId, tenant, role_name, name, email, isOwner, enabled).mapTo[UserRoleRecord]
 
-    def userId = userColumn[String]("user_id")
+    lazy val userId = userColumn[String]("user_id")
 
-    def role_name = idColumn[String]("role_name")
+    lazy val role_name = idColumn[String]("role_name")
 
-    def name = column[String]("name")
+    lazy val name = column[String]("name")
 
-    def email = column[String]("email")
+    lazy val email = column[String]("email")
 
-    def isOwner = column[Boolean]("isOwner", O.Default(false))
+    lazy val isOwner = column[Boolean]("isOwner", O.Default(false))
 
     // By default when inserting a user or role, enabled is true;
     //  right now, it does not make sense to enter a user without enabling it
-    def enabled = column[Boolean]("enabled", O.Default(true))
+    lazy val enabled = column[Boolean]("enabled", O.Default(true))
 
-    def indexOwnership = index(generateIndexName(isOwner), (userId, tenant, role_name, isOwner))
+    lazy val indexOwnership = index(oldStyleIxName(isOwner), (userId, tenant, role_name, isOwner))
   }
 
 }

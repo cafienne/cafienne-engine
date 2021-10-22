@@ -28,10 +28,10 @@ trait TimerServiceTables extends CafienneJDBCConfig {
     def user = column[String]("user", O.Default(""))
 
     // Various indices for optimizing getAllTasks queries
-    def indexCaseInstanceId = index(caseInstanceId)
-    def indexTimerId = index(timerId)
-    def indexTenant = index(tenant)
-    def indexMoment = index(generateIndexName(moment), moment)
+    def indexCaseInstanceId = oldStyleIndex(caseInstanceId)
+    def indexTimerId = oldStyleIndex(timerId)
+    def indexTenant = oldStyleIndex(tenant)
+    def indexMoment = index(oldStyleIxName(moment), moment)
 
     def * = (timerId, caseInstanceId, moment, tenant, user).mapTo[TimerServiceRecord]
   }

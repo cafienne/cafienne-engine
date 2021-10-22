@@ -18,7 +18,7 @@ trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables {
 
   final class CaseInstanceTeamMemberTableV1(tag: Tag) extends CaseInstanceTeamMemberTable(tag) {
 
-    def pk_V1 = primaryKey("pk_case_instance_team_member", (caseInstanceId, role, userId))
+    def pk_V1 = primaryKey(pkName, (caseInstanceId, role, userId))
 
     def role = idColumn[String]("role")
 
