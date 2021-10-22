@@ -25,9 +25,9 @@ import org.cafienne.service.api.repository.RepositoryRoute
 import org.cafienne.service.api.swagger.SwaggerHttpServiceRoute
 import org.cafienne.service.api.tasks.TaskRoutes
 import org.cafienne.service.api.tenant.route.TenantRoutes
-import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
+import org.cafienne.service.db.materializer.cases.CaseEventSink
 import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
-import org.cafienne.service.db.materializer.tenant.TenantProjectionsWriter
+import org.cafienne.service.db.materializer.tenant.TenantEventSink
 import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
 import org.cafienne.service.db.schema.QueryDB
 import org.cafienne.system.CaseSystem
@@ -73,8 +73,8 @@ object Main extends App {
 
     implicit val userCache = new IdentityCache(userQueries)
 
-    new CaseProjectionsWriter(updater, offsetStorage).start()
-    new TenantProjectionsWriter(updater, offsetStorage).start()
+    new CaseEventSink(updater, offsetStorage).start()
+    new TenantEventSink(updater, offsetStorage).start()
 
     // When running with H2, you can start a debug web server on port 8082.
     checkH2InDebugMode()

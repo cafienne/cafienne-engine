@@ -6,7 +6,7 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.lifted.{ColumnOrdered, Index}
 import slick.migration.api.org.cafienne.infrastructure.jdbc.sqlserver.SQLServerDialect
-import slick.migration.api.{Dialect, GenericDialect, SqlMigration}
+import slick.migration.api.{Dialect, GenericDialect, MigrationSeq, SqlMigration}
 import slick.relational.RelationalProfile.ColumnOption.Length
 import slick.sql.SqlAction
 import slick.sql.SqlProfile.ColumnOption.SqlType
@@ -247,7 +247,7 @@ trait CafienneJDBCConfig {
     * @param action
     * @return
     */
-  def asSqlMigration(action: SqlAction[_,_,_]): SqlMigration = {
+  def asSqlMigration(action: SqlAction[_,_,_]): MigrationSeq = {
     asSqlMigration(action.statements.toSeq:_*)
   }
 
@@ -256,9 +256,9 @@ trait CafienneJDBCConfig {
     * @param action
     * @return
     */
-  def asSqlMigration(sql: String*): SqlMigration = {
-    val statements = sql.mkString(";\n")
+  def asSqlMigration(sql: String*): MigrationSeq = {
+//    val statements = sql.mkString(";\n")
 //    println(s"SQL:\n\t$statements\n")
-    SqlMigration(statements)
+    MigrationSeq(sql.map(statement => SqlMigration(statement)):_*)
   }
 }

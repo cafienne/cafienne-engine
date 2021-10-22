@@ -3,8 +3,7 @@ package org.cafienne.service.db.schema.versions
 import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
 import org.cafienne.service.db.schema.QueryDBSchema
 import org.cafienne.service.db.schema.table.{CaseTables, TaskTables}
-import org.cafienne.service.db.schema.versions.util.Projections
-import slick.migration.api.TableMigration
+import slick.migration.api.{SqlMigration, TableMigration}
 
 object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
   with CaseTables
@@ -28,7 +27,7 @@ object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
     addTaskTableIndices &
 
     // Add ownership field to user role table for faster and simpler querying
-    addUserRoleOwnerColumn & Projections.resetTenantProjectionWriter & dropTenantOwnersTable &
+    addUserRoleOwnerColumn & resetTenantProjection & dropTenantOwnersTable &
 
     // Add a new table to store business identifiers
     addBusinessIdentifierTable
@@ -62,6 +61,8 @@ object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
   def addTaskTableIndices = TableMigration(TableQuery[TaskTable]).addIndexes(_.indexAssignee, _.indexCaseInstanceId, _.indexDueDate, _.indexTaskState, _.indexTenant)
 
   def addUserRoleOwnerColumn = TableMigration(TableQuery[UserRoleTable]).addColumns(_.isOwner)
+
+  def resetTenantProjection = SqlMigration(s"""DELETE FROM "offset_storage" where "name" = 'TenantProjectionsWriter' """)
 
   def dropTenantOwnersTable = TableMigration(TableQuery[TenantOwnersTable]).drop
 
