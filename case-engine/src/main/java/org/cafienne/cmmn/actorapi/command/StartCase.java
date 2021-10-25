@@ -39,7 +39,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     private final String parentCaseId;
     private final ValueMap inputParameters;
     private transient CaseDefinition definition;
-    private CaseTeam caseTeamInput;
+    private CaseTeam caseTeam;
     private final boolean debugMode;
 
     /**
@@ -48,10 +48,10 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param inputs              The case input parameters
      * @param caseInstanceId      The instance identifier for the new case
      * @param definition          The case definition (according to the CMMN xsd) that is being used to execute the model
-     * @param caseTeamInput       The CaseTeam for the case
+     * @param caseTeam            The CaseTeam for the case
      */
-    public StartCase(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeamInput) {
-        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeamInput, Cafienne.config().actor().debugEnabled());
+    public StartCase(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeam) {
+        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeam, Cafienne.config().actor().debugEnabled());
     }
 
     /**
@@ -60,12 +60,12 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param inputs              The case input parameters
      * @param caseInstanceId      The instance identifier for the new case
      * @param definition          The case definition (according to the CMMN xsd) that is being used to execute the model
-     * @param caseTeamInput       The CaseTeam for the case
+     * @param caseTeam            The CaseTeam for the case
      * @param debugMode           Indication whether case should run in debug mode or not
      *
      */
-    public StartCase(String tenant, TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeamInput, boolean debugMode) {
-        this(tenant, tenantUser, caseInstanceId, definition, inputs, caseTeamInput, debugMode, "", caseInstanceId);
+    public StartCase(String tenant, TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeam, boolean debugMode) {
+        this(tenant, tenantUser, caseInstanceId, definition, inputs, caseTeam, debugMode, "", caseInstanceId);
     }
 
     /**
@@ -74,10 +74,12 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param caseInstanceId      The instance identifier for the new case
      * @param definition          The case definition (according to the CMMN xsd) that is being used to execute the model
      * @param caseInputParameters The case input parameters
+     * @param caseTeam            The CaseTeam for the case
+     * @param debugMode           Indication whether case should run in debug mode or not
      * @param parentCaseId        The id of the parent case, if it exists
      * @param rootCaseId          The root case id, if it exists.
      */
-    public StartCase(String tenant, TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap caseInputParameters, CaseTeam caseTeamInput, boolean debugMode, String parentCaseId, String rootCaseId) {
+    public StartCase(String tenant, TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap caseInputParameters, CaseTeam caseTeam, boolean debugMode, String parentCaseId, String rootCaseId) {
         super(tenantUser, caseInstanceId);
         // First validate the tenant information.
         this.tenant = tenant;
@@ -88,7 +90,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;
         this.inputParameters = caseInputParameters == null ? new ValueMap() : caseInputParameters;
-        this.caseTeamInput = caseTeamInput == null ? CaseTeam.apply() : caseTeamInput;
+        this.caseTeam = caseTeam == null ? CaseTeam.apply() : caseTeam;
         this.debugMode = debugMode;
     }
 
@@ -100,7 +102,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
         this.inputParameters = json.readMap(Fields.inputParameters);
         this.debugMode = json.readBoolean(Fields.debugMode);
-        this.caseTeamInput = CaseTeam.deserialize(json.withArray(Fields.team));
+        this.caseTeam = CaseTeam.deserialize(json.withArray(Fields.team));
     }
 
     @Override
@@ -130,17 +132,17 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
 
         // If the case team is empty, add current user both as member and as owner,
         //  including default mapping of tenant roles to case team roles
-        if (caseTeamInput.getMembers().isEmpty()) {
+        if (caseTeam.getMembers().isEmpty()) {
             caseInstance.addDebugInfo(() -> "Adding user '" + getUser().id() + "' to the case team (as owner) because new team is empty");
-            caseTeamInput = CaseTeam.apply(CaseTeamMember.createBootstrapMember(getUser()));
+            caseTeam = CaseTeam.apply(CaseTeamMember.createBootstrapMember(getUser()));
         }
 
-        if (caseTeamInput.owners().isEmpty()) {
+        if (caseTeam.owners().isEmpty()) {
             throw new CaseTeamError("The case team needs to have at least one owner");
         }
 
         // Validates the member and roles
-        caseTeamInput.validate(definition);
+        caseTeam.validate(definition);
 
         // Should we also check whether all parameters have been made available in the input list? Not sure ...
     }
@@ -158,7 +160,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         caseInstance.addEvent(new CaseDefinitionApplied(caseInstance, rootCaseId, parentCaseId, definition));
 
         // First setup the case team, so that triggers or expressions in the case plan or case file can reason about the case team.
-        caseInstance.getCaseTeam().fillFrom(caseTeamInput);
+        caseInstance.getCaseTeam().create(caseTeam);
 
         // Apply input parameters. This may also fill the CaseFile
         caseInstance.addDebugInfo(() -> "Input parameters for new case of type "+ definition.getName(), inputParameters);
@@ -181,7 +183,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
         writeField(generator, Fields.tenant, tenant);
-        writeListField(generator, Fields.team, caseTeamInput.getMembers());
+        writeListField(generator, Fields.team, caseTeam.getMembers());
         writeField(generator, Fields.inputParameters, inputParameters);
         writeField(generator, Fields.rootActorId, rootCaseId);
         writeField(generator, Fields.parentActorId, parentCaseId);

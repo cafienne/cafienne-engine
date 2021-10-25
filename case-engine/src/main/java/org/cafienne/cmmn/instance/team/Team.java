@@ -36,12 +36,16 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         super(caseInstance, caseInstance.getDefinition().getCaseTeamModel());
     }
 
-    public void clear() {
-        addDebugInfo(() -> "Clearing existing case team");
-        getMembers().stream().map(member -> member.key).collect(Collectors.toList()).forEach(this::removeMember);
+    public void create(CaseTeam newCaseTeam) {
+        replace(newCaseTeam);
     }
 
-    public void fillFrom(CaseTeam newCaseTeam) {
+    public void replace(CaseTeam newCaseTeam) {
+        new ArrayList<>(members).forEach(member -> {
+            if (newCaseTeam.getMembers().stream().noneMatch(newMember -> newMember.key().same(member.key))) {
+                removeMember(member.key);
+            }
+        });
         newCaseTeam.getMembers().forEach(this::upsert);
     }
 

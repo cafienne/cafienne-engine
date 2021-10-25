@@ -5,7 +5,6 @@ import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
-import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -40,41 +39,39 @@ import java.io.IOException;
 @Manifest
 public class SetCaseTeam extends CaseTeamCommand {
 
-    private final CaseTeam newCaseTeam;
+    private final CaseTeam caseTeam;
 
-    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam newCaseTeam) {
+    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam caseTeam) {
         // TODO: determine how to do authorization on this command.
         super(tenantUser, caseInstanceId);
-        this.newCaseTeam = newCaseTeam;
+        this.caseTeam = caseTeam;
     }
 
     public SetCaseTeam(ValueMap json) {
         super(json);
-        this.newCaseTeam = CaseTeam.deserialize(json.withArray(Fields.team));
+        this.caseTeam = CaseTeam.deserialize(json.withArray(Fields.team));
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeListField(generator, Fields.team, newCaseTeam.getMembers());
+        writeListField(generator, Fields.team, caseTeam.getMembers());
     }
 
     @Override
     public void validate(Case caseInstance) {
         super.validate(caseInstance);
         // New team cannot be empty
-        if (newCaseTeam.members().isEmpty()) throw new CaseTeamError("The new case team cannot be empty");
+        if (caseTeam.members().isEmpty()) throw new CaseTeamError("The new case team cannot be empty");
         // New team also must have owners
-        if (newCaseTeam.owners().isEmpty()) throw new CaseTeamError("The new case team must have owners");
+        if (caseTeam.owners().isEmpty()) throw new CaseTeamError("The new case team must have owners");
         // New team roles must match the case definition
-        newCaseTeam.validate(caseInstance.getDefinition());
+        caseTeam.validate(caseInstance.getDefinition());
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        Team caseTeam = caseInstance.getCaseTeam();
-        caseTeam.clear();
-        caseTeam.fillFrom(newCaseTeam);
+        caseInstance.getCaseTeam().replace(this.caseTeam);
         return new CaseResponse(this);
     }
 
