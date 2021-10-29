@@ -25,7 +25,7 @@ public abstract class TimerBaseEvent extends CaseBaseEvent {
 
     public TimerBaseEvent(ValueMap json) {
         super(json);
-        this.timerId = json.raw(Fields.timerId);
+        this.timerId = json.readString(Fields.timerId);
     }
 
     public String getTimerId() {

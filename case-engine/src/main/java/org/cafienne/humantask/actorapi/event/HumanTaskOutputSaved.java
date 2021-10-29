@@ -26,7 +26,7 @@ public class HumanTaskOutputSaved extends HumanTaskEvent {
 
 	public HumanTaskOutputSaved(ValueMap json) {
 		super(json);
-		this.taskOutput = readMap(json, Fields.taskOutput);
+		this.taskOutput = json.readMap(Fields.taskOutput);
 	}
 
 	public ValueMap getTaskOutput() {

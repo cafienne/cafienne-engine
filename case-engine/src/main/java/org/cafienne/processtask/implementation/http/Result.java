@@ -125,7 +125,7 @@ class Result {
 
     ValueMap getResponseDebugInfo() {
         ValueMap headersConcatenated = new ValueMap(); // Convert header values to concatenated spaced string for ease of reading
-        responseHeaders.forEach((headerName, headerValue) -> headersConcatenated.putRaw(headerName == null ? "" : headerName, String.join(" ", headerValue)));
+        responseHeaders.forEach((headerName, headerValue) -> headersConcatenated.plus(headerName == null ? "" : headerName, String.join(" ", headerValue)));
         ValueMap responseDebugInfo = new ValueMap("code", responseCode, "message", new StringValue(responseMessage), "headers", headersConcatenated, "content", convertPayloadToJSON(responsePayload));
         if (responseCode == -1 && ! errorDescription.isEmpty()) {
             responseDebugInfo.put("error", new StringValue(errorDescription));
@@ -147,7 +147,7 @@ class Result {
         ValueMap headersOutputParameter = new ValueMap();
         // Convert headers to a JSON ValueMap of { "headerName" : [val1, val2] }.
         //  Note: sometimes, odd enough, there is a nameless header ...
-        responseHeaders.forEach((headerName, headerValue) -> headersOutputParameter.putRaw(headerName == null ? "" : headerName, headerValue));
+        responseHeaders.forEach((headerName, headerValue) -> headersOutputParameter.plus(headerName == null ? "" : headerName, headerValue));
         return headersOutputParameter;
     }
 }

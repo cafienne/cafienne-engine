@@ -20,7 +20,7 @@ abstract class RoleCommand extends ExistingUserCommand {
 
     public RoleCommand(ValueMap json) {
         super(json);
-        this.role = readField(json, Fields.role);
+        this.role = json.readString(Fields.role);
     }
 
     @Override

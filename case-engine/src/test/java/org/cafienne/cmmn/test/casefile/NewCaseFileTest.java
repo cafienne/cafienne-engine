@@ -43,7 +43,7 @@ public class NewCaseFileTest {
 
         // Clone entire structure, change a single property and then update should lead to only 1 update event
         ValueMap cfi2 = caseFileItem.cloneValueNode();
-        cfi2.putRaw("RootProperty2", false);
+        cfi2.plus("RootProperty2", false);
         testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, cfi2, rootPath), result -> {
             result.getEvents().printEventList();
             result.getEvents().assertSize(2);
@@ -74,11 +74,11 @@ public class NewCaseFileTest {
         TestScript.debugMessage(updateDeeperProperty);
 
         ValueMap childItem = updateDeeperProperty.with("ChildItem");
-        childItem.putRaw("ChildName", "First name update");
-        childItem.putRaw("ChildAge", 33);
+        childItem.plus("ChildName", "First name update");
+        childItem.plus("ChildAge", 33);
         ValueList grandChildArray = childItem.withArray("GrandChildArray");
         ValueMap firstGrandChildFromArray = grandChildArray.get(0).asMap();
-        firstGrandChildFromArray.putRaw("GrandChildName", "Second name update");
+        firstGrandChildFromArray.plus("GrandChildName", "Second name update");
 
         testCase.addStep(new UpdateCaseFileItem(user, caseInstanceId, updateDeeperProperty, rootPath), result -> {
             result.getEvents().printEventList();

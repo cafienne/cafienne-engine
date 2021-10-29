@@ -35,13 +35,13 @@ public class StartProcess extends ProcessCommand implements BootstrapCommand {
 
     public StartProcess(ValueMap json) {
         super(json);
-        this.name = json.raw(Fields.name);
-        this.tenant = readField(json, Fields.tenant);
-        this.parentActorId = json.raw(Fields.parentActorId);
-        this.rootActorId = json.raw(Fields.rootActorId);
-        this.inputParameters = readMap(json, Fields.inputParameters);
-        this.definition = readDefinition(json, Fields.processDefinition, ProcessDefinition.class);
-        this.debugMode = json.raw(Fields.debugMode);
+        this.name = json.readString(Fields.name);
+        this.tenant = json.readString(Fields.tenant);
+        this.parentActorId = json.readString(Fields.parentActorId);
+        this.rootActorId = json.readString(Fields.rootActorId);
+        this.inputParameters = json.readMap(Fields.inputParameters);
+        this.definition = json.readDefinition(Fields.processDefinition, ProcessDefinition.class);
+        this.debugMode = json.readBoolean(Fields.debugMode);
     }
 
     @Override

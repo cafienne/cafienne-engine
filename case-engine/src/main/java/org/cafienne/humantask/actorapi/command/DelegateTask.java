@@ -30,7 +30,7 @@ public class DelegateTask extends WorkflowCommand {
 
     public DelegateTask(ValueMap json) {
         super(json);
-        this.assignee = readField(json, Fields.assignee);
+        this.assignee = json.readString(Fields.assignee);
     }
 
     @Override

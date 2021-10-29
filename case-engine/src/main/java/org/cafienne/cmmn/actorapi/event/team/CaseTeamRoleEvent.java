@@ -29,7 +29,7 @@ public abstract class CaseTeamRoleEvent extends CaseTeamMemberEvent {
 
     protected CaseTeamRoleEvent(ValueMap json) {
         super(json);
-        this.roleName = json.raw(Fields.role);
+        this.roleName = json.readString(Fields.role);
     }
 
     public String roleName() {

@@ -9,7 +9,7 @@ case class TenantUpdate(tenant: String, platformUpdate: PlatformUpdate) extends 
 
 object TenantUpdate {
   def deserialize(json: ValueMap) = {
-    TenantUpdate(json.raw(Fields.tenant), PlatformUpdate.deserialize(json.withArray(Fields.update)))
+    TenantUpdate(json.readString(Fields.tenant), PlatformUpdate.deserialize(json.withArray(Fields.update)))
   }
 }
 

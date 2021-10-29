@@ -38,7 +38,7 @@ public class MakeCaseTransition extends CaseCommand {
 
     public MakeCaseTransition(ValueMap json) {
         super(json);
-        this.transition = readEnum(json, Fields.transition, Transition.class);
+        this.transition = json.readEnum(Fields.transition, Transition.class);
     }
 
     public Transition getTransition() {

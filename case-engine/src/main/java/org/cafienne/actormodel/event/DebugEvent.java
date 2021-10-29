@@ -31,7 +31,7 @@ public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
 
     public DebugEvent(ValueMap json) {
         super(json);
-        this.messages = readMap(json, Fields.messages);
+        this.messages = json.readMap(Fields.messages);
     }
 
     public void addMessage(String msg) {

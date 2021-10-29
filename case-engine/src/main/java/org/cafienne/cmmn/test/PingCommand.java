@@ -44,7 +44,7 @@ public class PingCommand extends CaseCommand implements CafienneSerializable, Bo
     public PingCommand(ValueMap json) {
         super(json);
         this.waitTime = Long.parseLong(json.raw(Fields.waitTime));
-        this.tenant = readField(json, Fields.tenant);
+        this.tenant = json.readString(Fields.tenant);
     }
 
     @Override

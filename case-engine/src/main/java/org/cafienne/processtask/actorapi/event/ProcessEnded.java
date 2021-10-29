@@ -18,7 +18,7 @@ public abstract class ProcessEnded extends BaseProcessEvent {
 
     protected ProcessEnded(ValueMap json) {
         super(json);
-        this.output = readMap(json, Fields.output);
+        this.output = json.readMap(Fields.output);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class MigrateDefinition extends CaseCommand {
 
     public MigrateDefinition(ValueMap json) {
         super(json);
-        this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
+        this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
     }
 
     @Override

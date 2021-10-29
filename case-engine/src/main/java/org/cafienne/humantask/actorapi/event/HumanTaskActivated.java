@@ -39,9 +39,9 @@ public class HumanTaskActivated extends HumanTaskTransitioned {
 
     public HumanTaskActivated(ValueMap json) {
         super(json);
-        this.createdOn = readInstant(json, Fields.createdOn);
-        this.createdBy = readField(json, Fields.createdBy);
-        this.performer = json.raw(Fields.performer);
+        this.createdOn = json.readInstant(Fields.createdOn);
+        this.createdBy = json.readString(Fields.createdBy);
+        this.performer = json.readString(Fields.performer);
         this.taskModel = json.get(Fields.taskModel);
     }
 

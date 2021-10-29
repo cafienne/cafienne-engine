@@ -28,7 +28,7 @@ public abstract class TenantUserRoleEvent extends TenantUserEvent {
 
     protected TenantUserRoleEvent(ValueMap json) {
         super(json);
-        this.role = readField(json, Fields.role);
+        this.role = json.readString(Fields.role);
     }
 
     @Override

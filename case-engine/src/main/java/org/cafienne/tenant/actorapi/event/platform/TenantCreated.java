@@ -21,7 +21,7 @@ public class TenantCreated extends PlatformBaseEvent {
 
     public TenantCreated(ValueMap json) {
         super(json);
-        this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
+        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
     }
 
     @Override

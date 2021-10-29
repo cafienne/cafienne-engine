@@ -197,7 +197,7 @@ public class SubCase {
         //  to the subcase, the subcase should choke in it.
         // Next, we expect the main case's task to go to Fault state.
         ValueMap invalidMainRequest = new ValueMap();
-        invalidMainRequest.putRaw("aBoolean", "I ought to be boolean but i am a string");
+        invalidMainRequest.plus("aBoolean", "I ought to be boolean but i am a string");
         testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, invalidMainRequest, new Path("InvalidMainRequest")), action -> action.print());
 
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerFailingBlockingSubCaseTask", Transition.Complete), mainCasePlan -> {
@@ -216,7 +216,7 @@ public class SubCase {
             });
 
             ValueMap validMainRequest = new ValueMap();
-            validMainRequest.putRaw("aBoolean", false);
+            validMainRequest.plus("aBoolean", false);
             testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, new Path("InvalidMainRequest")), r -> r.print()); // print the updated case file
 
             testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "FailingBlockingSubCaseTask", Transition.Reactivate), r -> {

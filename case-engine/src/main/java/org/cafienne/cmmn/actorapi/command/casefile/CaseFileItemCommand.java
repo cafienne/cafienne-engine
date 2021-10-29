@@ -47,8 +47,8 @@ abstract class CaseFileItemCommand extends CaseCommand {
 
     protected CaseFileItemCommand(ValueMap json, CaseFileItemTransition intendedTransition) {
         super(json);
-        this.path = readPath(json, Fields.path);
-        this.content = json.get(Fields.content.toString());
+        this.path = json.readPath(Fields.path);
+        this.content = json.get(Fields.content);
         this.intendedTransition = intendedTransition;
     }
 

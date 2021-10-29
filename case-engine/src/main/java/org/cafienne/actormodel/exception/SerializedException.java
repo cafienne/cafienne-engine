@@ -25,8 +25,8 @@ public class SerializedException implements CafienneSerializable {
     }
 
     public SerializedException(ValueMap json) {
-        this.className = readField(json, Fields.className);
-        this.message = readField(json, Fields.message);
+        this.className = json.readString(Fields.className);
+        this.message = json.readString(Fields.message);
         ValueMap jsonCause = json.with(Fields.cause);
         if (!jsonCause.getValue().isEmpty()) {
             this.cause = new SerializedException(jsonCause);

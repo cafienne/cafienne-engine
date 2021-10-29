@@ -73,8 +73,8 @@ public class RepetitiveFileItems {
 
         // And add a first item to 'items'
         ValueMap itemObject = new ValueMap();
-        itemObject.putRaw("item", "Help, doe geen review");
-        itemObject.putRaw("role", "expert");
+        itemObject.plus("item", "Help, doe geen review");
+        itemObject.plus("role", "expert");
         itemArray.add(itemObject); // Also add it to the test object
 
         // We're adding a clone of the item object into the case, so that we properly compare arrays. There must be 1 Review task.
@@ -196,8 +196,8 @@ public class RepetitiveFileItems {
         ValueList itemArray = new ValueList();
         topCaseObject.put("items", itemArray);
         ValueMap itemObject = new ValueMap();
-        itemObject.putRaw("item", "Help, doe geen review");
-        itemObject.putRaw("role", "expert");
+        itemObject.plus("item", "Help, doe geen review");
+        itemObject.plus("role", "expert");
         itemArray.add(itemObject.cloneValueNode()); // [0]
         itemArray.add(itemObject.cloneValueNode()); // [1]
 

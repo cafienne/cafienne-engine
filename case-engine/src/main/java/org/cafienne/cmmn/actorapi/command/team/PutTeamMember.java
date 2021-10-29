@@ -39,7 +39,7 @@ public class PutTeamMember extends CaseTeamMemberCommand {
 
     public PutTeamMember(ValueMap json) {
         super(json);
-        newMember = CaseTeamMember.deserialize(readMap(json, Fields.member));
+        newMember = json.readObject(Fields.member, CaseTeamMember::deserialize);
     }
 
     @Override

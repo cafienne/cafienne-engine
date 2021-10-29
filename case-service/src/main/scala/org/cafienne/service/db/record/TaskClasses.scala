@@ -34,22 +34,22 @@ final case class TaskRecord(id: String,
 
   override def toValue: Value[_] = {
     val v = new ValueMap
-    v.putRaw("id", id)
-    v.putRaw("taskName", taskName)
-    v.putRaw("taskState", taskState)
-    v.putRaw("assignee", assignee)
-    v.putRaw("owner", owner)
-    v.putRaw("tenant", tenant)
-    v.putRaw("caseInstanceId", caseInstanceId)
-    v.putRaw("role", role)
-    v.putRaw("lastModified", lastModified)
-    v.putRaw("modifiedBy", modifiedBy)
-    v.putRaw("dueDate", dueDate.getOrElse(""))
-    v.putRaw("createdOn", createdOn)
-    v.putRaw("createdBy", createdBy)
-    v.putRaw("input", getJSON(input))
-    v.putRaw("output", getJSON(output))
-    v.putRaw("taskModel", getJSON(taskModel))
+    v.plus("id", id)
+    v.plus("taskName", taskName)
+    v.plus("taskState", taskState)
+    v.plus("assignee", assignee)
+    v.plus("owner", owner)
+    v.plus("tenant", tenant)
+    v.plus("caseInstanceId", caseInstanceId)
+    v.plus("role", role)
+    v.plus("lastModified", lastModified)
+    v.plus("modifiedBy", modifiedBy)
+    v.plus("dueDate", dueDate.getOrElse(""))
+    v.plus("createdOn", createdOn)
+    v.plus("createdBy", createdBy)
+    v.plus("input", getJSON(input))
+    v.plus("output", getJSON(output))
+    v.plus("taskModel", getJSON(taskModel))
     v
   }
 }

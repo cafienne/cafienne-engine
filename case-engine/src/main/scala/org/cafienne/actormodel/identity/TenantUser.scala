@@ -6,8 +6,6 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{BooleanValue, CafienneJson, Value, ValueMap}
 
-import scala.collection.mutable
-
 final case class TenantUser(id: String, roles: Seq[String], tenant: String, isOwner: Boolean = false, name: String, email: String = "", enabled: Boolean = true) extends CafienneJson {
 
   import scala.jdk.CollectionConverters._
@@ -45,20 +43,14 @@ object TenantUser {
     * @return instance of user context
     */
   def from(json: ValueMap): TenantUser = {
-    val name: String = json.raw(Fields.name)
-    val id: String = json.raw(Fields.userId)
-    val email: String = json.raw(Fields.email)
-    val tenant: String = json.raw(Fields.tenant)
-    val isOwner: Boolean = {
-      if (json.has(Fields.isOwner.toString)) json.raw(Fields.isOwner)
-      else false
-    }
-    val roles = mutable.Set[String]()
-    json.withArray(Fields.roles).forEach((value: Value[_]) => roles.add(value.getValue.toString))
+    val name: String = json.readString(Fields.name, "")
+    val id: String = json.readString(Fields.userId)
+    val email: String = json.readString(Fields.email, "")
+    val tenant: String = json.readString(Fields.tenant)
+    val isOwner: Boolean = json.readBoolean(Fields.isOwner, false)
+    val roles = json.readStringList(Fields.roles).toSeq
 
-    val rolesSet: Seq[String] = roles.toSeq
-
-    TenantUser(id, rolesSet, tenant, isOwner, name, email)
+    TenantUser(id, roles, tenant, isOwner, name, email)
   }
 
   final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {

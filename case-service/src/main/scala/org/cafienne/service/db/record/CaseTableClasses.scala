@@ -21,26 +21,26 @@ final case class CaseRecord(id: String,
 
   override def toValue: Value[_] = {
     val v = new ValueMap
-    v.putRaw("id", id)
-    v.putRaw("tenant", tenant)
-    v.putRaw("caseName", caseName)
-    v.putRaw("definition", caseName) // Deprecated field
-    v.putRaw("name", caseName) // Deprecated field - todo: check where it must be removed (generic-ui probably)
-    v.putRaw("state", state)
-    v.putRaw("failures", failures)
-    v.putRaw("parentCaseId", parentCaseId)
-    v.putRaw("rootCaseId", rootCaseId)
-    v.putRaw("createdOn", createdOn)
-    v.putRaw("createdBy", createdBy)
-    v.putRaw("lastModified", lastModified)
-    v.putRaw("modifiedBy", modifiedBy)
-    v.putRaw("modifiedBy", modifiedBy)
-    v.putRaw("caseInput", "")
-    v.putRaw("caseOutput", "")
+    v.plus("id", id)
+    v.plus("tenant", tenant)
+    v.plus("caseName", caseName)
+    v.plus("definition", caseName) // Deprecated field
+    v.plus("name", caseName) // Deprecated field - todo: check where it must be removed (generic-ui probably)
+    v.plus("state", state)
+    v.plus("failures", failures)
+    v.plus("parentCaseId", parentCaseId)
+    v.plus("rootCaseId", rootCaseId)
+    v.plus("createdOn", createdOn)
+    v.plus("createdBy", createdBy)
+    v.plus("lastModified", lastModified)
+    v.plus("modifiedBy", modifiedBy)
+    v.plus("modifiedBy", modifiedBy)
+    v.plus("caseInput", "")
+    v.plus("caseOutput", "")
     // Adding default empty values for case plan, case team and case file.
-    v.putRaw("planitems", new ValueList())
-    v.putRaw("team", new ValueList())
-    v.putRaw("file", new ValueMap())
+    v.plus("planitems", new ValueList())
+    v.plus("team", new ValueList())
+    v.plus("file", new ValueMap())
     v
   }
 }
@@ -84,21 +84,21 @@ final case class PlanItemRecord(id: String,
 
   def toValueMap: ValueMap = {
     val v = new ValueMap
-    v.putRaw("id", id)
-    v.putRaw("caseInstanceId", caseInstanceId)
-    v.putRaw("definitionId", definitionId)
-    v.putRaw("stageId", stageId)
-    v.putRaw("name", name)
-    v.putRaw("index", index)
-    v.putRaw("currentState", currentState)
-    v.putRaw("historyState", historyState)
-    v.putRaw("isRequired", required)
-    v.putRaw("isRepeating", repeating)
-    v.putRaw("type", planItemType)
-    v.putRaw("transition", transition)
-    v.putRaw("lastModified", lastModified)
-    v.putRaw("modifiedBy", modifiedBy)
-    v.putRaw("user", modifiedBy) // Temporary compatibility
+    v.plus("id", id)
+    v.plus("caseInstanceId", caseInstanceId)
+    v.plus("definitionId", definitionId)
+    v.plus("stageId", stageId)
+    v.plus("name", name)
+    v.plus("index", index)
+    v.plus("currentState", currentState)
+    v.plus("historyState", historyState)
+    v.plus("isRequired", required)
+    v.plus("isRepeating", repeating)
+    v.plus("type", planItemType)
+    v.plus("transition", transition)
+    v.plus("lastModified", lastModified)
+    v.plus("modifiedBy", modifiedBy)
+    v.plus("user", modifiedBy) // Temporary compatibility
     v
   }
 
@@ -128,22 +128,22 @@ final case class PlanItemHistoryRecord(id: String,
 
   override def toValue: ValueMap = {
     val v = new ValueMap
-    v.putRaw("id", id)
-    v.putRaw("planItemId", id)
-    v.putRaw("name", name)
-    v.putRaw("index", index)
-    v.putRaw("stageId", stageId)
-    v.putRaw("caseInstanceId", caseInstanceId)
-    v.putRaw("currentState", currentState)
-    v.putRaw("historyState", historyState)
-    v.putRaw("type", planItemType)
-    v.putRaw("transition", transition)
-    v.putRaw("repeating", repeating)
-    v.putRaw("required", required)
-    v.putRaw("lastModified", lastModified)
-    v.putRaw("modifiedBy", modifiedBy)
-    v.putRaw("eventType", eventType)
-    v.putRaw("sequenceNr", sequenceNr)
+    v.plus("id", id)
+    v.plus("planItemId", id)
+    v.plus("name", name)
+    v.plus("index", index)
+    v.plus("stageId", stageId)
+    v.plus("caseInstanceId", caseInstanceId)
+    v.plus("currentState", currentState)
+    v.plus("historyState", historyState)
+    v.plus("type", planItemType)
+    v.plus("transition", transition)
+    v.plus("repeating", repeating)
+    v.plus("required", required)
+    v.plus("lastModified", lastModified)
+    v.plus("modifiedBy", modifiedBy)
+    v.plus("eventType", eventType)
+    v.plus("sequenceNr", sequenceNr)
     v
   }
 

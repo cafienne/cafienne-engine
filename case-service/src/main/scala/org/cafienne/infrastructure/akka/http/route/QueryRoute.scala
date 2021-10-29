@@ -38,26 +38,26 @@ trait QueryRoute extends AuthenticatedRoute {
     }
   }
 
-  def runQuery(future: => Future[CafienneJson]): Route = {
+  def runQuery[T <: CafienneJson](future: => Future[T]): Route = {
     readLastModifiedHeader() { caseLastModified =>
       handleQueryResult(handleSyncedQuery(() => future, caseLastModified))
     }
   }
 
-  def runListQuery(future: => Future[Seq[CafienneJson]]): Route = {
+  def runListQuery[T <: CafienneJson](future: => Future[Seq[T]]): Route = {
     readLastModifiedHeader() { caseLastModified =>
       handleQueryResultList(handleSyncedQuery(() => future, caseLastModified))
     }
   }
 
-  def handleQueryResult(future: => Future[CafienneJson]): Route = {
+  def handleQueryResult[T <: CafienneJson](future: => Future[T]): Route = {
     onComplete(future) {
       case Success(value) => completeJsonValue(value.toValue)
       case Failure(t) => handleFailure(t)
     }
   }
 
-  def handleQueryResultList(future: => Future[Seq[CafienneJson]]): Route = {
+  def handleQueryResultList[T <: CafienneJson](future: => Future[Seq[T]]): Route = {
     onComplete(future) {
       case Success(value) => completeJsonValue(Value.convert(value.map(v => v.toValue)))
       case Failure(t) => handleFailure(t)

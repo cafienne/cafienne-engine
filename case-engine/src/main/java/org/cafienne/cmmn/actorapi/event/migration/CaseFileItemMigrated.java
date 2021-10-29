@@ -34,7 +34,7 @@ public class CaseFileItemMigrated extends CaseFileEvent {
 
     public CaseFileItemMigrated(ValueMap json) {
         super(json);
-        this.formerPath = readPath(json, Fields.formerPath);
+        this.formerPath = json.readPath(Fields.formerPath);
     }
 
     @Override

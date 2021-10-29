@@ -31,7 +31,7 @@ public class HumanTaskOwnerChanged extends HumanTaskEvent {
 
     public HumanTaskOwnerChanged(ValueMap json) {
         super(json);
-        this.owner = readField(json, Fields.owner);
+        this.owner = json.readString(Fields.owner);
     }
 
     @Override

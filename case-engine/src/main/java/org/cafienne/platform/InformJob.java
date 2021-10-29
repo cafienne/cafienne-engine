@@ -27,8 +27,8 @@ public class InformJob implements CafienneSerializable {
 
     InformJob(BatchJob batch, ValueMap json) {
         this.batch = batch;
-        this.type = readField(json, Fields.type);
-        this.state = readEnum(json, Fields.state, JobState.class);
+        this.type = json.readField(Fields.type);
+        this.state = json.readEnum(Fields.state, JobState.class);
 
         ValueMap commandJson = json.with(Fields.update);
         if ("UpdateTenantWithPlatformInformation".equals(type)) {

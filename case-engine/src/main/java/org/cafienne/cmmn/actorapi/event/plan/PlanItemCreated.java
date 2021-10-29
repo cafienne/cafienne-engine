@@ -47,11 +47,11 @@ public class PlanItemCreated extends PlanItemEvent {
 
     public PlanItemCreated(ValueMap json) {
         super(json);
-        this.createdOn = readInstant(json, Fields.createdOn);
-        this.createdBy = readField(json, Fields.createdBy);
-        this.planItemName = readField(json, Fields.name);
-        this.definitionId = readField(json, Fields.definitionId, "");
-        this.stageId = readField(json, Fields.stageId);
+        this.createdOn = json.readInstant(Fields.createdOn);
+        this.createdBy = json.readString(Fields.createdBy);
+        this.planItemName = json.readString(Fields.name);
+        this.definitionId = json.readString(Fields.definitionId, "");
+        this.stageId = json.readString(Fields.stageId);
     }
 
     @Override

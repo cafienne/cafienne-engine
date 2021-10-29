@@ -33,10 +33,8 @@ public class UpdatePlatformInformation extends PlatformCommand {
     public UpdatePlatformInformation(ValueMap json) {
         super(json);
         this.platformUpdate = PlatformUpdate.deserialize(json.withArray(Fields.users));
-        this.tenants = new ArrayList<>();
-        this.cases = new ArrayList<>();
-        json.withArray(Fields.tenants).forEach(value -> tenants.add(TenantUpdate.deserialize(value.asMap())));
-        json.withArray(Fields.cases).forEach(value -> cases.add(CaseUpdate.deserialize(value.asMap())));
+        this.tenants = json.readObjects(Fields.tenants, TenantUpdate::deserialize);
+        this.cases = json.readObjects(Fields.cases, CaseUpdate::deserialize);
     }
 
     @Override

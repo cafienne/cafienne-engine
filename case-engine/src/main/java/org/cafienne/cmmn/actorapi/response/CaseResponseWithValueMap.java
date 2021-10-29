@@ -17,7 +17,7 @@ public class CaseResponseWithValueMap extends CaseResponse {
 
     protected CaseResponseWithValueMap(ValueMap json) {
         super(json);
-        this.value = readMap(json, Fields.response);
+        this.value = json.readMap(Fields.response);
     }
 
     /**

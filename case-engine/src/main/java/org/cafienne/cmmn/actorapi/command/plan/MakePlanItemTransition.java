@@ -52,8 +52,8 @@ public class MakePlanItemTransition extends CaseCommand {
 
     public MakePlanItemTransition(ValueMap json) {
         super(json);
-        this.identifier = readField(json, Fields.identifier);
-        this.transition = readEnum(json, Fields.transition, Transition.class);
+        this.identifier = json.readString(Fields.identifier);
+        this.transition = json.readEnum(Fields.transition, Transition.class);
     }
 
     public String getIdentifier() {

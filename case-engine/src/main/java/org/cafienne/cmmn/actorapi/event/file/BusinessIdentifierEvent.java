@@ -24,8 +24,8 @@ public abstract class BusinessIdentifierEvent extends CaseFileEvent {
 
     protected BusinessIdentifierEvent(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
-        this.type = readField(json, Fields.type);
+        this.name = json.readString(Fields.name);
+        this.type = json.readString(Fields.type);
     }
 
     @Override

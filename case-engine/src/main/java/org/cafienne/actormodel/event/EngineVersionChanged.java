@@ -21,7 +21,7 @@ public class EngineVersionChanged extends BaseModelEvent<ModelActor<?,?>> {
 
     public EngineVersionChanged(ValueMap json) {
         super(json);
-        this.version = new CafienneVersion(readMap(json, Fields.version));
+        this.version = json.readObject(Fields.version, CafienneVersion::new);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class HumanTaskAssigned extends HumanTaskTransitioned {
 
     public HumanTaskAssigned(ValueMap json) {
         super(json);
-        this.assignee = readField(json, Fields.assignee);
+        this.assignee = json.readString(Fields.assignee);
     }
 
     @Override

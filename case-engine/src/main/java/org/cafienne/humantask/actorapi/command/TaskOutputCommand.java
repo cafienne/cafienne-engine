@@ -30,7 +30,7 @@ public abstract class TaskOutputCommand extends WorkflowCommand {
 
 	protected TaskOutputCommand(ValueMap json) {
 		super(json);
-		this.taskOutput = readMap(json, Fields.taskOutput);
+		this.taskOutput = json.readMap(Fields.taskOutput);
 	}
 
 	public ValueMap getOutput() {

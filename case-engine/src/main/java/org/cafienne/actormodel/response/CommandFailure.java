@@ -42,7 +42,7 @@ public class CommandFailure extends ModelResponse {
     public CommandFailure(ValueMap json) {
         super(json);
         this.exception = null;
-        this.exceptionAsJSON = readMap(json, Fields.exception);
+        this.exceptionAsJSON = json.readMap(Fields.exception);
         this.serializedException = new SerializedException(exceptionAsJSON);
     }
 

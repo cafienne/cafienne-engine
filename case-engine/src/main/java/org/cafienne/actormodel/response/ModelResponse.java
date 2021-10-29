@@ -52,11 +52,11 @@ public class ModelResponse implements IncomingActorMessage {
 
     protected ModelResponse(ValueMap json) {
         this.recipient = null;
-        this.messageId = readField(json, Fields.messageId);
-        this.actorId = readField(json, Fields.actorId);
-        this.lastModified = readInstant(json, Fields.lastModified);
-        this.user = TenantUser.from(json.with(Fields.user));
-        this.commandType = readField(json, Fields.commandType);
+        this.messageId = json.readString(Fields.messageId);
+        this.actorId = json.readString(Fields.actorId);
+        this.lastModified = json.readInstant(Fields.lastModified);
+        this.user = json.readObject(Fields.user, TenantUser::from);
+        this.commandType = json.readString(Fields.commandType);
     }
 
     /**

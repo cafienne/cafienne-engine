@@ -95,8 +95,8 @@ public abstract class CMMNElementDefinition extends XMLElementDefinition {
     }
 
     public static <T extends CMMNElementDefinition> T fromJSON(String sourceClassName, ValueMap json, Class<T> tClass) {
-        String guid = json.raw(Fields.elementId);
-        String source = json.raw(Fields.source);
+        String guid = json.readString(Fields.elementId);
+        String source = json.readString(Fields.source);
         try {
             DefinitionsDocument def = new DefinitionsDocument(XMLHelper.loadXML(source));
             T element = def.getElement(guid, tClass);

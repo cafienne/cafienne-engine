@@ -55,10 +55,10 @@ public class AddDiscretionaryItem extends CaseCommand {
 
     public AddDiscretionaryItem(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
-        this.planItemId = readField(json, Fields.planItemId);
-        this.definitionId = readField(json, Fields.definitionId);
-        this.parentId = readField(json, Fields.parentId);
+        this.name = json.readString(Fields.name);
+        this.planItemId = json.readString(Fields.planItemId);
+        this.definitionId = json.readString(Fields.definitionId);
+        this.parentId = json.readString(Fields.parentId);
     }
 
     @Override

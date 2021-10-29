@@ -32,8 +32,8 @@ public class AddRemoveChildTest {
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
-        item.putRaw("effe", "root-string");
-        item.putRaw("effe2", "root-string-2");
+        item.plus("effe", "root-string");
+        item.plus("effe2", "root-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, item.cloneValueNode(), testPath);
         testCase.addStep(createChild, caseFile -> {
             caseFile.assertCaseFileItem(testPath).assertValue(item);
@@ -43,7 +43,7 @@ public class AddRemoveChildTest {
 
         // Add child item
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("world", "child-string");
+        childItem.plus("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         testCase.addStep(createChild2, caseFile -> {
             caseFile.assertCaseFileItem(testChildPath).assertValue(childItem);
@@ -69,15 +69,15 @@ public class AddRemoveChildTest {
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
-        item.putRaw("effe", "root-string");
-        item.putRaw("effe2", "root-string-2");
+        item.plus("effe", "root-string");
+        item.plus("effe2", "root-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, item.cloneValueNode(), testPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(item));
 
 
         // Add child item
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("world", "child-string");
+        childItem.plus("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         testCase.addStep(createChild2, caseFile -> caseFile.assertCaseFileItem(testChildPath).assertValue(childItem));
 
@@ -98,7 +98,7 @@ public class AddRemoveChildTest {
 
         // Add child item together with parent
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("world", "child-string");
+        childItem.plus("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         // In case the parent does not have state == Active, CaseFileItemChildAdded should not be triggered
         testCase.assertStepFails(createChild2);

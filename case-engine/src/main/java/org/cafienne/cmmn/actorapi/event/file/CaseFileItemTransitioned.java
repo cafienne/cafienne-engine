@@ -46,9 +46,9 @@ public class CaseFileItemTransitioned extends CaseFileEvent implements StandardE
 
     public CaseFileItemTransitioned(ValueMap json) {
         super(json);
-        this.transition = json.getEnum(Fields.transition, CaseFileItemTransition.class);
+        this.transition = json.readEnum(Fields.transition, CaseFileItemTransition.class);
         this.value = json.get(Fields.value.toString());
-        this.state = readEnum(json, Fields.state, State.class);
+        this.state = json.readEnum(Fields.state, State.class);
     }
 
     @Override

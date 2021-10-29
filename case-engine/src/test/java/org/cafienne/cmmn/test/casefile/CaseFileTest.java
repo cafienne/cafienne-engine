@@ -23,13 +23,13 @@ public class CaseFileTest {
         TestScript testCase = new TestScript(caseName);
 
         ValueMap valueAaa = new ValueMap();
-        valueAaa.putRaw("aaa1", "true");
+        valueAaa.plus("aaa1", "true");
 
         ValueMap rootValue = new ValueMap();
         rootValue.put(inputParameterName, valueAaa);
 
         ValueMap childOfAaa1 = new ValueMap();
-        childOfAaa1.putRaw("child_of_aaa_1", "true");
+        childOfAaa1.plus("child_of_aaa_1", "true");
 
         valueAaa.put("child_of_aaa", childOfAaa1);
 
@@ -58,8 +58,8 @@ public class CaseFileTest {
         ValueMap value1 = new ValueMap();
         rootValue.put(inputParameterName, value1);
         ValueMap x = new ValueMap();
-        x.putRaw("y", "true");
-        value1.putRaw("x", x);
+        x.plus("y", "true");
+        value1.plus("x", x);
 
 
         // This input leads to a crashing ifPart evaluation in the engine.

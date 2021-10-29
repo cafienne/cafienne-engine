@@ -44,7 +44,7 @@ public class MultiplicityTest {
 
         // Add child item
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("myprop", "some parent value");
+        childItem.plus("myprop", "some parent value");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childPath);
         testCase.addStep(createChild, caseFile -> {
             caseFile.assertCaseFileItem(childPath).assertValue(childItem);
@@ -53,7 +53,7 @@ public class MultiplicityTest {
 
 
         ValueMap mchildItem2 = new ValueMap();
-        mchildItem2.putRaw("mprop", "some value");
+        mchildItem2.plus("mprop", "some value");
         CreateCaseFileItem mcreateChild2 = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem2.cloneValueNode(), mChildPath);
         testCase.addStep(mcreateChild2, caseFile -> {
             caseFile.assertCaseFileItem(child0).assertValue(mchildItem2);
@@ -61,7 +61,7 @@ public class MultiplicityTest {
         });
 
         ValueMap mchildItem = new ValueMap();
-        mchildItem.putRaw("mprop", "some other value");
+        mchildItem.plus("mprop", "some other value");
         CreateCaseFileItem mcreateChild = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem.cloneValueNode(), mChildPath);
         testCase.addStep(mcreateChild, caseFile -> {
             caseFile.assertCaseFileItem(child1).assertValue(mchildItem);
@@ -95,7 +95,7 @@ public class MultiplicityTest {
 
         // Add child item
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("myprop", "some parent value");
+        childItem.plus("myprop", "some parent value");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childPath);
         testCase.addStep(createChild, caseFile -> {
             caseFile.assertCaseFileItem(childPath).assertValue(childItem);
@@ -129,7 +129,7 @@ public class MultiplicityTest {
 
 
         ValueMap mchildItem2 = new ValueMap();
-        mchildItem2.putRaw("mprop", "some value");
+        mchildItem2.plus("mprop", "some value");
         CreateCaseFileItem mcreateChild2 = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem2.cloneValueNode(), mChildPath);
         testCase.addStep(mcreateChild2, caseFile -> {
             caseFile.assertCaseFileItem(child0).assertValue(mchildItem2);
@@ -137,7 +137,7 @@ public class MultiplicityTest {
         });
 
         ValueMap mchildItem = new ValueMap();
-        mchildItem.putRaw("mprop", "some other value");
+        mchildItem.plus("mprop", "some other value");
         CreateCaseFileItem mcreateChild = new CreateCaseFileItem(testUser, caseInstanceId, mchildItem.cloneValueNode(), mChildPath);
         testCase.addStep(mcreateChild, caseFile -> {
             caseFile.assertCaseFileItem(child1).assertValue(mchildItem);

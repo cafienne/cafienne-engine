@@ -33,9 +33,9 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
 
     public PlanItemTransitioned(ValueMap json) {
         super(json);
-        this.currentState = json.getEnum(Fields.currentState, State.class);
-        this.historyState = json.getEnum(Fields.historyState, State.class);
-        this.transition = json.getEnum(Fields.transition, Transition.class);
+        this.currentState = json.readEnum(Fields.currentState, State.class);
+        this.historyState = json.readEnum(Fields.historyState, State.class);
+        this.transition = json.readEnum(Fields.transition, Transition.class);
     }
 
     @Override

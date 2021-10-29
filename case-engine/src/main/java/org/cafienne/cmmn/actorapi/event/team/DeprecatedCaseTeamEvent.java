@@ -9,6 +9,7 @@ import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ public abstract class DeprecatedCaseTeamEvent extends CaseTeamEvent {
 
     protected DeprecatedCaseTeamEvent(ValueMap json) {
         super(json);
-        this.userId = json.raw(Fields.userId);
-        json.withArray(Fields.roles).getValue().forEach(role -> roles.add((String) role.getValue()));
+        this.userId = json.readString(Fields.userId);
+        Collections.addAll(roles, json.readStringList(Fields.roles));
         this.key = new MemberKey(userId, "user");
     }
 

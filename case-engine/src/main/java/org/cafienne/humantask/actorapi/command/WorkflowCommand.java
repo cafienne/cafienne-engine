@@ -36,7 +36,7 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     protected WorkflowCommand(ValueMap json) {
         super(json);
-        this.taskId = readField(json, Fields.taskId);
+        this.taskId = json.readString(Fields.taskId);
     }
 
     protected String getTaskId() {

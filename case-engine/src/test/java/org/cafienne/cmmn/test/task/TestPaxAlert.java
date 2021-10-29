@@ -47,16 +47,16 @@ public class TestPaxAlert {
         ValueMap inputs = new ValueMap();
         ValueMap pde = inputs.with("pde");
         ValueMap passenger = pde.with("passenger");
-        passenger.putRaw("firstname", "Shady");
-        passenger.putRaw("lastname", "Person");
+        passenger.plus("firstname", "Shady");
+        passenger.plus("lastname", "Person");
         ValueList bagageList = pde.withArray("bagage");
         ValueMap bagage = new ValueMap();
-        bagage.putRaw("tagid", "1234");
-        bagage.putRaw("weight", "23");
+        bagage.plus("tagid", "1234");
+        bagage.plus("weight", "23");
         bagageList.add(bagage); 
         ValueMap checkin = pde.with("checkin");
-        checkin.putRaw("flight", "KL1234");
-        checkin.putRaw("departuretime", "2015-03-21T12:12:00Z");
+        checkin.plus("flight", "KL1234");
+        checkin.plus("departuretime", "2015-03-21T12:12:00Z");
         
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);

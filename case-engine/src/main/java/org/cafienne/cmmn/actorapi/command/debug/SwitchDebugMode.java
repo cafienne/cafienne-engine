@@ -39,7 +39,7 @@ public class SwitchDebugMode extends CaseCommand {
 
     public SwitchDebugMode(ValueMap json) {
         super(json);
-        this.debugMode = readField(json, Fields.debugMode);
+        this.debugMode = json.readBoolean(Fields.debugMode);
     }
 
     @Override

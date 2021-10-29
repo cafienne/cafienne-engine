@@ -22,8 +22,8 @@ public class TenantUserUpdated extends TenantUserEvent {
 
     public TenantUserUpdated(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
-        this.email = readField(json, Fields.email);
+        this.name = json.readString(Fields.name);
+        this.email = json.readString(Fields.email);
     }
 
     @Override

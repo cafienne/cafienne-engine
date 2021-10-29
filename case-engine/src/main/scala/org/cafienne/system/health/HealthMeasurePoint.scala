@@ -44,7 +44,7 @@ class HealthMeasurePoint(val key: String) extends LazyLogging {
   def asJSON(): ValueMap = {
     val json = new ValueMap("Status", status, "Description", description)
     if (changed != null) {
-      json.putRaw("changed-at", changed)
+      json.plus("changed-at", changed)
     }
     json
   }

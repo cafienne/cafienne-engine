@@ -31,7 +31,7 @@ public class HumanTaskMigrated extends HumanTaskEvent {
 
     public HumanTaskMigrated(ValueMap json) {
         super(json);
-        this.performer = json.raw(Fields.performer);
+        this.performer = json.readString(Fields.performer);
         this.taskModel = json.get(Fields.taskModel);
     }
 

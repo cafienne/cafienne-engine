@@ -26,11 +26,11 @@ public class TestHumanTask {
 
         ValueMap inputs = new ValueMap();
         ValueMap taskInput = inputs.with("TaskInput");
-        taskInput.putRaw("DueDate", "tomorrow");
-        taskInput.putRaw("Assignee", "me, myself and I");
+        taskInput.plus("DueDate", "tomorrow");
+        taskInput.plus("Assignee", "me, myself and I");
         ValueMap taskContent = taskInput.with("Content");
-        taskContent.putRaw("Subject", "Decide on this topic");
-        taskContent.putRaw("Decision", "Yet to be decided");
+        taskContent.plus("Subject", "Decide on this topic");
+        taskContent.plus("Decision", "Yet to be decided");
 
         TenantUser pete = TestScript.getTestUser("pete");
         TenantUser gimy = TestScript.getTestUser("gimy");

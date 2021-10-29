@@ -36,9 +36,9 @@ public class TestPDFReport {
 
         ValueMap inputs = new ValueMap();
         ValueMap request = inputs.with("Request");
-        request.putRaw("customerJrXml", reportXml);
-        request.putRaw("orderJrXml", subReportXml);
-        request.putRaw("jsonData", customerData);
+        request.plus("customerJrXml", reportXml);
+        request.plus("orderJrXml", subReportXml);
+        request.plus("jsonData", customerData);
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
         testCase.addStep(startCase, action -> {

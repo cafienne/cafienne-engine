@@ -9,7 +9,7 @@ case class CaseUpdate(caseId: String, tenant: String, platformUpdate: PlatformUp
 
 object CaseUpdate {
   def deserialize(json: ValueMap) = {
-    CaseUpdate(json.raw(Fields.caseInstanceId), json.raw(Fields.tenant), PlatformUpdate.deserialize(json.withArray(Fields.update)))
+    CaseUpdate(json.readString(Fields.caseInstanceId), json.readString(Fields.tenant), PlatformUpdate.deserialize(json.withArray(Fields.update)))
   }
 }
 

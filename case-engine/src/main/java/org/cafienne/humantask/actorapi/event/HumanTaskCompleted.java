@@ -28,7 +28,7 @@ public class HumanTaskCompleted extends HumanTaskTransitioned {
 
     public HumanTaskCompleted(ValueMap json) {
         super(json);
-        this.taskOutput = readMap(json, Fields.taskOutput);
+        this.taskOutput = json.readMap(Fields.taskOutput);
     }
 
     /**

@@ -44,7 +44,7 @@ final case class TenantUserInformation(id: String, roles: Option[Seq[String]] = 
 
 object TenantUserInformation {
   def from(json: ValueMap) : TenantUserInformation = {
-    val userId: String = json.raw(Fields.userId)
+    val userId: String = json.readString(Fields.userId)
     val roles = CafienneJson.readOptionalStringList(json, Fields.roles)
     val name = CafienneJson.readOptionalString(json, Fields.name)
     val email = CafienneJson.readOptionalString(json, Fields.email)

@@ -152,44 +152,4 @@ public interface CafienneSerializable {
             value.writeThisObject(generator);
         }
     }
-
-    default <T extends Object> T readField(ValueMap json, Fields fieldName) {
-        return json.raw(fieldName);
-    }
-
-    default <T extends Object> T readField(ValueMap json, Fields fieldName, T defaultValue) {
-        if (json.has(fieldName)) {
-            return readField(json, fieldName);
-        } else {
-            return defaultValue;
-        }
-    }
-
-    default <T extends Enum<?>> T readEnum(ValueMap json, Fields fieldName, Class<T> enumClass) {
-        return json.getEnum(fieldName, enumClass);
-    }
-
-    default Instant readInstant(ValueMap json, Fields fieldName) {
-        return json.rawInstant(fieldName);
-    }
-
-    default ValueMap readMap(ValueMap json, Fields fieldName) {
-        return json.with(fieldName);
-    }
-
-    default ValueList readArray(ValueMap json, Fields fieldName) {
-        return json.withArray(fieldName);
-    }
-
-    default <T> Set<T> readSet(ValueMap json, Fields fieldName) {
-        return new HashSet<>(readArray(json, fieldName).rawList());
-    }
-
-    default <T extends CMMNElementDefinition> T readDefinition(ValueMap json, Fields fieldName, Class<T> tClass) {
-        return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(json, fieldName), tClass);
-    }
-
-    default Path readPath(ValueMap json, Fields fieldName) {
-        return new Path((String) json.raw(fieldName));
-    }
 }

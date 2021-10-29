@@ -36,9 +36,9 @@ public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements Model
     protected BaseModelEvent(ValueMap json) {
         this.json = json;
         ValueMap modelEventJson = json.with(Fields.modelEvent);
-        this.actorId = readField(modelEventJson, Fields.actorId);
-        this.tenant = readField(modelEventJson, Fields.tenant);
-        this.timestamp = readInstant(modelEventJson, Fields.timestamp);
+        this.actorId = modelEventJson.readString(Fields.actorId);
+        this.tenant = modelEventJson.readString(Fields.tenant);
+        this.timestamp = modelEventJson.readInstant(Fields.timestamp);
         this.tenantUser = TenantUser.from(modelEventJson.with(Fields.user));
     }
 

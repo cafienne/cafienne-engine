@@ -51,8 +51,8 @@ public class CompleteTask extends CaseCommand {
 
     public CompleteTask(ValueMap json) {
         super(json);
-        this.taskId = readField(json, Fields.taskId);
-        this.taskOutput = readMap(json, Fields.taskOutput);
+        this.taskId = json.readString(Fields.taskId);
+        this.taskOutput = json.readMap(Fields.taskOutput);
     }
 
     @Override

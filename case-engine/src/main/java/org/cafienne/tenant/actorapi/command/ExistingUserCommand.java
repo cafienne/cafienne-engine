@@ -26,7 +26,7 @@ abstract class ExistingUserCommand extends TenantCommand {
 
     public ExistingUserCommand(ValueMap json) {
         super(json);
-        this.userId = readField(json, Fields.userId);
+        this.userId = json.readString(Fields.userId);
     }
 
     @Override

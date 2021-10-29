@@ -23,8 +23,8 @@ abstract class CaseTeamMemberCommand extends CaseTeamCommand {
 
     protected CaseTeamMemberCommand(ValueMap json) {
         super(json);
-        this.memberId = readField(json, Fields.memberId);
-        this.memberType = readField(json, Fields.memberType);
+        this.memberId = json.readString(Fields.memberId);
+        this.memberType = json.readString(Fields.memberType);
     }
 
     public MemberKey key() {

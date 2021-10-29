@@ -28,7 +28,7 @@ public abstract class TenantUserEvent extends TenantBaseEvent {
 
     protected TenantUserEvent(ValueMap json) {
         super(json);
-        this.userId = readField(json, Fields.userId);
+        this.userId = json.readString(Fields.userId);
     }
 
     @Override

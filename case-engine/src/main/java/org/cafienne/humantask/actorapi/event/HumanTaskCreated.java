@@ -24,8 +24,8 @@ public class HumanTaskCreated extends HumanTaskEvent {
 
     public HumanTaskCreated(ValueMap json) {
         super(json);
-        this.createdOn = readInstant(json, Fields.createdOn);
-        this.createdBy = readField(json, Fields.createdBy);
+        this.createdOn = json.readInstant(Fields.createdOn);
+        this.createdBy = json.readString(Fields.createdBy);
     }
 
     public Instant getCreatedOn() {

@@ -40,7 +40,7 @@ public class PlatformStorage extends RelaxedSnapshot<PlatformService> {
         // This is a snapshot being deserialized. Does not have a job queue and will be merged into the one and only later
         super();
 //        getLogger().warn("\n\n\t\tRECOVERING PLATFORM STORAGE WITH JSON " + json + "\n\n\n");
-        json.withArray(Fields.update).forEach(value -> batches.add(new BatchJob(this, value.asMap())));
+        batches.addAll(json.readObjects(Fields.update, batch -> new BatchJob(this, batch)));
         this.history = json.withArray(Fields.historyState);
     }
 

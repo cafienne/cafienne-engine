@@ -94,12 +94,12 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
 
     public StartCase(ValueMap json) {
         super(json);
-        this.tenant = readField(json, Fields.tenant);
-        this.rootCaseId = readField(json, Fields.rootActorId);
-        this.parentCaseId = readField(json, Fields.parentActorId);
-        this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
-        this.inputParameters = readMap(json, Fields.inputParameters);
-        this.debugMode = readField(json, Fields.debugMode);
+        this.tenant = json.readString(Fields.tenant);
+        this.rootCaseId = json.readString(Fields.rootActorId);
+        this.parentCaseId = json.readString(Fields.parentActorId);
+        this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
+        this.inputParameters = json.readMap(Fields.inputParameters);
+        this.debugMode = json.readBoolean(Fields.debugMode);
         this.caseTeamInput = CaseTeam.deserialize(json.withArray(Fields.team));
     }
 

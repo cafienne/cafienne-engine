@@ -45,7 +45,7 @@ final case class PlatformUser(userId: String, users: Seq[TenantUser]) extends Ca
 
   override def toValue: Value[_] = {
     val map = new ValueMap(Fields.userId, userId)
-    val userList = map.withArray("tenants")
+    val userList = map.withArray(Fields.tenants)
     users.foreach(user => {
       userList.add(user.toValue)
     })

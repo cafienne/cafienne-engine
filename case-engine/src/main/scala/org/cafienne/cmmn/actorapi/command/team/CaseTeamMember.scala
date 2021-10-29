@@ -3,6 +3,7 @@ package org.cafienne.cmmn.actorapi.command.team
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
+import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json._
 
 import scala.jdk.CollectionConverters._
@@ -54,8 +55,8 @@ object CaseTeamMember {
   def createBootstrapMember(user: TenantUser) = new CaseTeamMember(MemberKey(user.id, "user"), isOwner = Some(true))
 
   def deserialize(json: ValueMap) = {
-    val memberId = json.get("memberId").getValue.toString
-    val memberType = json.get("memberType").getValue.toString
+    val memberId = json.readString(Fields.memberId)
+    val memberType = json.readString(Fields.memberType)
     val isOwner = {
       val v = json.get("isOwner")
       if (v.equals(Value.NULL)) {
@@ -65,8 +66,8 @@ object CaseTeamMember {
       }
     }
 
-    val caseRoles = json.withArray("caseRoles").getValue.asScala.toSeq.asInstanceOf[Seq[StringValue]].map(sv => sv.getValue)
-    val removeRoles = json.withArray("removeRoles").getValue.asScala.toSeq.asInstanceOf[Seq[StringValue]].map(sv => sv.getValue)
+    val caseRoles = json.readStringList(Fields.caseRoles).toSeq
+    val removeRoles = json.readStringList(Fields.removeRoles).toSeq
     new CaseTeamMember(MemberKey(memberId, memberType), caseRoles = caseRoles, isOwner = isOwner, removeRoles = removeRoles)
   }
 }

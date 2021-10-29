@@ -13,7 +13,6 @@ import org.cafienne.tenant.actorapi.exception.TenantException;
 import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Manifest
@@ -33,9 +32,8 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
 
     public CreateTenant(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
-        this.users = new ArrayList<>();
-        json.withArray(Fields.users).forEach(user -> this.users.add(TenantUserInformation.from(user.asMap())));
+        this.name = json.readString(Fields.name);
+        this.users = json.readObjects(Fields.users, TenantUserInformation::from);
     }
 
     @Override

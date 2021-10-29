@@ -40,12 +40,12 @@ public class BatchJob implements CafienneSerializable {
 
     BatchJob(PlatformStorage snapshot, ValueMap json) {
         this.storage = snapshot;
-        this.batchIdentifier = readField(json, Fields.identifier);
-        json.withArray(Fields.jobs).forEach(job -> jobs.add(new InformJob(this, job.asMap())));
+        this.batchIdentifier = json.readString(Fields.identifier);
+        json.readObjects(Fields.jobs, job -> new InformJob(this, job));
         this.failures = json.withArray(Fields.exception);
-        this.createdOn = readInstant(json, Fields.createdOn);
-        this.completedOn = readInstant(json, Fields.completedOn);
-        this.jobCount = json.with(Fields.jobCount);
+        this.createdOn = json.readInstant(Fields.createdOn);
+        this.completedOn = json.readInstant(Fields.completedOn);
+        this.jobCount = json.readMap(Fields.jobCount);
     }
 
     void adoptStorage(PlatformStorage storage) {
@@ -106,11 +106,11 @@ public class BatchJob implements CafienneSerializable {
 
     public ValueMap getStatus() {
         ValueMap status = new ValueMap(Fields.identifier, batchIdentifier, "started", createdOn);
-        if (completedOn != null) status.putRaw("completed", completedOn);
-        status.putRaw(Fields.jobCount.toString(), jobCount);
-        status.putRaw("active", jobs.stream().filter(InformJob::active).count());
-        status.putRaw("pending", jobs.stream().filter(InformJob::pending).count());
-        status.putRaw("failures", failures);
+        if (completedOn != null) status.plus("completed", completedOn);
+        status.plus(Fields.jobCount, jobCount);
+        status.plus("active", jobs.stream().filter(InformJob::active).count());
+        status.plus("pending", jobs.stream().filter(InformJob::pending).count());
+        status.plus("failures", failures);
         return status;
     }
 }

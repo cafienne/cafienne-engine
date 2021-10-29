@@ -52,9 +52,9 @@ public abstract class ModelCommand<T extends ModelActor<?,?>> implements Incomin
     }
 
     protected ModelCommand(ValueMap json) {
-        this.msgId = json.raw(Fields.messageId);
-        this.actorId = json.raw(Fields.actorId);
-        this.user = TenantUser.from(json.with(Fields.user));
+        this.msgId = json.readString(Fields.messageId);
+        this.actorId = json.readString(Fields.actorId);
+        this.user = json.readObject(Fields.user, TenantUser::from);
     }
 
     /**

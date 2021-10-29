@@ -21,7 +21,7 @@ public class ReactivateProcess extends ProcessCommand {
 
     public ReactivateProcess(ValueMap json) {
         super(json);
-        this.inputParameters = readMap(json, Fields.inputParameters);
+        this.inputParameters = json.readMap(Fields.inputParameters);
     }
 
     public ValueMap getInputParameters() {

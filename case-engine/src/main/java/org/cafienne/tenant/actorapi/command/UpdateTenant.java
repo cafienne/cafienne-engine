@@ -27,8 +27,7 @@ public class UpdateTenant extends TenantCommand {
 
     public UpdateTenant(ValueMap json) {
         super(json);
-        this.users = new ArrayList<>();
-        json.withArray(Fields.users).forEach(user -> this.users.add(TenantUserInformation.from(user.asMap())));
+        this.users = json.readObjects(Fields.users, TenantUserInformation::from);
     }
 
     @Override
@@ -36,9 +35,9 @@ public class UpdateTenant extends TenantCommand {
         super.validate(tenant);
         // Check whether after the filtering there are still owners left. Tenant must have owners.
         Stream<String> currentOwners = tenant.getOwnerList().stream();
-        List<String> userIdsThatWillBeUpdated = this.users.stream().map(user -> user.id()).collect(Collectors.toList());
+        List<String> userIdsThatWillBeUpdated = this.users.stream().map(TenantUserInformation::id).collect(Collectors.toList());
         long untouchedOwners = currentOwners.filter(currentOwner -> !userIdsThatWillBeUpdated.contains(currentOwner)).count();
-        if (untouchedOwners == 0 && this.users.stream().filter(u -> u.isOwner() && u.isEnabled()).count() == 0) {
+        if (untouchedOwners == 0 && this.users.stream().noneMatch(u -> u.isOwner() && u.isEnabled())) {
             throw new TenantException("Cannot update the tenant and remove all tenant owners or disable their accounts");
         }
     }

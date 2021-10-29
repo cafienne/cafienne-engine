@@ -25,8 +25,8 @@ public abstract class CaseTeamMemberEvent extends CaseTeamEvent {
 
     protected CaseTeamMemberEvent(ValueMap json) {
         super(json);
-        this.memberId = json.raw(Fields.memberId);
-        this.isTenantUser = json.raw(Fields.isTenantUser);
+        this.memberId = json.readString(Fields.memberId);
+        this.isTenantUser = json.readBoolean(Fields.isTenantUser);
         this.key = new MemberKey(memberId, isTenantUser ? "user" : "role");
     }
 

@@ -29,8 +29,8 @@ public class PlanItemMigrated extends PlanItemEvent {
 
     public PlanItemMigrated(ValueMap json) {
         super(json);
-        this.planItemName = readField(json, Fields.name);
-        this.definitionId = readField(json, Fields.definitionId, "");
+        this.planItemName = json.readString(Fields.name);
+        this.definitionId = json.readString(Fields.definitionId, "");
     }
 
     @Override

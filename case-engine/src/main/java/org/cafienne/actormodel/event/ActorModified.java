@@ -27,8 +27,8 @@ public abstract class ActorModified<M extends ModelActor<?,?>> extends BaseModel
 
     protected ActorModified(ValueMap json) {
         super(json);
-        this.lastModified = json.rawInstant(Fields.lastModified);
-        this.source = readField(json, Fields.source, "unknown message");
+        this.lastModified = json.readInstant(Fields.lastModified);
+        this.source = json.readString(Fields.source, "unknown message");
     }
 
     public Instant lastModified() {

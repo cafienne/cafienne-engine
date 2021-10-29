@@ -35,15 +35,15 @@ public class TestSMTPServer {
         // Now start a case with a child being set within the JSON input
         ValueMap inputs = new ValueMap();
         ValueMap request = inputs.with("Request");
-        request.putRaw("from", "Joop");
-        request.putRaw("to", "Piet");
-        request.putRaw("subject", "The engine is cool");
-        request.putRaw("body", "Thank you for your contributions. You're still in office?");
-        request.putRaw("replyTo", "Jan");
+        request.plus("from", "Joop");
+        request.plus("to", "Piet");
+        request.plus("subject", "The engine is cool");
+        request.plus("body", "Thank you for your contributions. You're still in office?");
+        request.plus("replyTo", "Jan");
 
         String attachmentContent = Base64.getEncoder().encodeToString("Hello, how are you?".getBytes());
-        request.putRaw("attachment", attachmentContent);
-        request.putRaw("filename", "abc.txt");
+        request.plus("attachment", attachmentContent);
+        request.plus("filename", "abc.txt");
 
         StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
         testCase.addStep(startCase, casePlan -> {

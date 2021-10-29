@@ -59,7 +59,7 @@ public class CaseFileTransitionTest {
 
         ValueMap content = new ValueMap();
         content.put("Customer", getCustomers("Joost", "Piet", "Joop"));
-        content.putRaw("Description", "Help me out");
+        content.plus("Description", "Help me out");
         ValueMap inputs = new ValueMap();
         inputs.put(inputParameterName, content);
 
@@ -71,8 +71,8 @@ public class CaseFileTransitionTest {
 
         // Create the CaseFileItem Request/Helper
         ValueMap helper = new ValueMap();
-        helper.putRaw("Name", "Piet");
-        helper.putRaw("Description", "Piet is a nice guy");
+        helper.plus("Name", "Piet");
+        helper.plus("Description", "Piet is a nice guy");
 
         testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, helperPath), casePlan -> {
             casePlan.print();

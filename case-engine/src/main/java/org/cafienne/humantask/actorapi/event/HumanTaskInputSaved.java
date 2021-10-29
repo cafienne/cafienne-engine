@@ -26,7 +26,7 @@ public class HumanTaskInputSaved extends HumanTaskEvent {
 
 	public HumanTaskInputSaved(ValueMap json) {
 		super(json);
-		this.input = readMap(json, Fields.input);
+		this.input = json.readMap(Fields.input);
 	}
 
 	public ValueMap getInput() {
