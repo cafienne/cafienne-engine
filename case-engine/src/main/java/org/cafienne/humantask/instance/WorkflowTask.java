@@ -185,7 +185,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         addEvent(new HumanTaskOwnerChanged(task, newOwner));
     }
 
-    public void complete(ValueMap taskOutput) {
+    public boolean complete(ValueMap taskOutput) {
         // TTDL
         // First validate task output. Note: this may result in "CommandException", instead of "InvalidCommandException". For that reason this cannot be done right now in validate method.
         ValidationResponse validate = task.validateOutput(taskOutput);
@@ -199,7 +199,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
 
         addEvent(new HumanTaskCompleted(task, taskOutput));
         // This will generate PlanItemTransitioned and CaseFileItem events
-        task.goComplete(taskOutput);
+        return task.goComplete(taskOutput);
     }
 
     public void setDueDate(Instant newDueDate) {

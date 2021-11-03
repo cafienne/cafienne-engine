@@ -47,6 +47,15 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     @Override
+    public boolean makeTransition(Transition transition) {
+        if (transition == Transition.Complete && getState() == State.Active) {
+            return workflow.complete(new ValueMap());
+        } else {
+            return super.makeTransition(transition);
+        }
+    }
+
+    @Override
     public ValidationResponse validateOutput(ValueMap potentialRawOutput) {
         // Create an instance of the output validator if we have one
         TaskOutputValidatorDefinition outputValidator = getDefinition().getTaskOutputValidator();
