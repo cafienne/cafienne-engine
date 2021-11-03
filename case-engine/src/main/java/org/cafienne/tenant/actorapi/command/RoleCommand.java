@@ -13,12 +13,12 @@ import java.io.IOException;
 abstract class RoleCommand extends ExistingUserCommand {
     public final String role;
 
-    public RoleCommand(TenantUser tenantOwner, String userId, String role) {
-        super(tenantOwner, userId);
+    protected RoleCommand(TenantUser tenantOwner, String tenant, String userId, String role) {
+        super(tenantOwner, tenant, userId);
         this.role = role;
     }
 
-    public RoleCommand(ValueMap json) {
+    protected RoleCommand(ValueMap json) {
         super(json);
         this.role = json.readString(Fields.role);
     }

@@ -44,7 +44,7 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
   def addTenantOwner = put {
     validUser { tenantOwner =>
       path(Segment / "owners" / Segment) { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, owner = Some(true))))
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, tenant, TenantUserInformation(userId, owner = Some(true))))
       }
     }
   }
@@ -68,7 +68,7 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
   def removeTenantOwner = delete {
     validUser { tenantOwner =>
       path(Segment / "owners" / Segment) { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, owner = Some(false))))
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, tenant, TenantUserInformation(userId, owner = Some(false))))
       }
     }
   }
@@ -91,7 +91,7 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
   def disableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "disable") { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, enabled = Some(false))))
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, tenant, TenantUserInformation(userId, enabled = Some(false))))
       }
     }
   }
@@ -114,7 +114,7 @@ class DeprecatedTenantOwnersRoute(userQueries: UserQueries)(override implicit va
   def enableTenantUser = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "enable") { (tenant, userId) =>
-        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, TenantUserInformation(userId, enabled = Some(true))))
+        askTenant(tenantOwner, tenant, tenantUser => new UpdateTenantUser(tenantUser, tenant, TenantUserInformation(userId, enabled = Some(true))))
       }
     }
   }

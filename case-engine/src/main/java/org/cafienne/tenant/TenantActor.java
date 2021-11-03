@@ -142,7 +142,7 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public List<String> getOwnerList() {
-        return users.values().stream().filter(user -> user.isOwner()).map(owner -> owner.userId).collect(Collectors.toList());
+        return users.values().stream().filter(User::isOwner).map(owner -> owner.userId).collect(Collectors.toList());
     }
 
     public void updateState(TenantUserCreated event) {

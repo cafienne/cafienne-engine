@@ -15,8 +15,8 @@ import java.io.IOException;
 public class UpdateTenantUser extends ExistingUserCommand {
     private final TenantUserInformation newUser;
 
-    public UpdateTenantUser(TenantUser tenantOwner, TenantUserInformation newUser) {
-        super(tenantOwner, newUser.id());
+    public UpdateTenantUser(TenantUser tenantOwner, String tenant, TenantUserInformation newUser) {
+        super(tenantOwner, tenant, newUser.id());
         this.newUser = newUser;
     }
 

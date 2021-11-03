@@ -11,7 +11,6 @@ import org.cafienne.tenant.actorapi.exception.TenantException;
 import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,8 +19,8 @@ import java.util.stream.Stream;
 public class UpdateTenant extends TenantCommand {
     private final List<TenantUserInformation> users;
 
-    public UpdateTenant(TenantUser tenantOwner, List<TenantUserInformation> users) {
-        super(tenantOwner);
+    public UpdateTenant(TenantUser tenantOwner, String tenant, List<TenantUserInformation> users) {
+        super(tenantOwner, tenant);
         this.users = users;
     }
 

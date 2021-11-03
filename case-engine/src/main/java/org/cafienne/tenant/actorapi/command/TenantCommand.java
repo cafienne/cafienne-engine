@@ -32,12 +32,13 @@ import java.util.List;
  */
 public abstract class TenantCommand extends ModelCommand<TenantActor> {
     /**
-     * Create a new command that can be sent to the case.
-     *  @param tenantOwner The user that issues this command.
+     * Create a new command that can be sent to the tenant.
      *
+     * @param tenantOwner The user that issues this command.
+     * @param tenantId    Id of the tenant to send the command to
      */
-    protected TenantCommand(TenantUser tenantOwner) {
-        super(tenantOwner, tenantOwner.tenant());
+    protected TenantCommand(TenantUser tenantOwner, String tenantId) {
+        super(tenantOwner, tenantId);
     }
 
     protected TenantCommand(ValueMap json) {
@@ -50,10 +51,7 @@ public abstract class TenantCommand extends ModelCommand<TenantActor> {
     }
 
     /**
-     * Before the case starts processing the command, it will first ask to validate the command.
-     * The default implementation is to check whether the case definition is available (i.e., whether StartCase command has been triggered before this command).
-     * Implementations can override this method to implement their own validation logic.
-     * Implementations may throw the {@link InvalidCommandException} if they encounter a validation error
+     * Hook to validate the command.
      *
      * @param tenant
      * @throws InvalidCommandException If the command is invalid

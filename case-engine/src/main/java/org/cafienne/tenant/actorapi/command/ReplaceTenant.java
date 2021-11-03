@@ -11,15 +11,14 @@ import org.cafienne.tenant.actorapi.exception.TenantException;
 import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Manifest
 public class ReplaceTenant extends TenantCommand {
     private final List<TenantUserInformation> users;
 
-    public ReplaceTenant(TenantUser tenantOwner, List<TenantUserInformation> users) {
-        super(tenantOwner);
+    public ReplaceTenant(TenantUser tenantOwner, String tenant, List<TenantUserInformation> users) {
+        super(tenantOwner, tenant);
         this.users = users;
     }
 

@@ -7,8 +7,8 @@ import org.cafienne.tenant.User;
 
 @Manifest
 public class RemoveTenantUserRole extends RoleCommand {
-    public RemoveTenantUserRole(TenantUser tenantOwner, String userId, String role) {
-        super(tenantOwner, userId, role);
+    public RemoveTenantUserRole(TenantUser tenantOwner, String tenant, String userId, String role) {
+        super(tenantOwner, tenant, userId, role);
     }
 
     public RemoveTenantUserRole(ValueMap json) {

@@ -49,7 +49,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def getTenantOwners = get {
     validUser { tenantOwner =>
       path(Segment / "owners") { tenant =>
-        askTenant(tenantOwner, tenant, tenantUser => new GetTenantOwners(tenantUser))
+        askTenant(tenantOwner, tenant, tenantUser => new GetTenantOwners(tenantUser, tenant))
       }
     }
   }
@@ -80,7 +80,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         entity(as[TenantAPI.UpdateTenantFormat]) { newTenantInformation =>
           // Map users from external format to TenantUser case class and convert to java List
           val users = newTenantInformation.users.map(user => asTenantUser(user, tenant)).asJava
-          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenant(tenantOwner, users))
+          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenant(tenantOwner, tenant, users))
         }
       }
     }
@@ -112,7 +112,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         entity(as[TenantAPI.UpdateTenantFormat]) { newTenantInformation =>
           // Map users from external format to TenantUser case class and convert to java List
           val users = newTenantInformation.users.map(user => asTenantUser(user, tenant)).asJava
-          askTenant(platformUser, tenant, tenantOwner => new UpdateTenant(tenantOwner, users))
+          askTenant(platformUser, tenant, tenantOwner => new UpdateTenant(tenantOwner, tenant, users))
         }
       }
     }
@@ -141,7 +141,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat6(TenantAPI.UserFormat)
         entity(as[TenantAPI.UserFormat]) { newUser =>
-          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
+          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
         }
       }
     }
@@ -170,7 +170,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
         import spray.json.DefaultJsonProtocol._
         implicit val format = jsonFormat6(TenantAPI.UserFormat)
         entity(as[TenantAPI.UserFormat]) { newUser =>
-          askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, asTenantUser(newUser, tenant)))
+          askTenant(platformUser, tenant, tenantOwner => new UpsertTenantUser(tenantOwner, tenant, asTenantUser(newUser, tenant)))
         }
       }
     }
@@ -197,7 +197,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def addTenantUserRoles = put {
     validUser { tenantOwner =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-        askTenant(tenantOwner, tenant, tenantUser => new AddTenantUserRole(tenantUser, userId, role))
+        askTenant(tenantOwner, tenant, tenantUser => new AddTenantUserRole(tenantUser, tenant, userId, role))
       }
     }
   }
@@ -221,7 +221,7 @@ class TenantOwnersRoute(userQueries: UserQueries)(override implicit val userCach
   def removeTenantUserRole = delete {
     validUser { platformUser =>
       path(Segment / "users" / Segment / "roles" / Segment) { (tenant, userId, role) =>
-        askTenant(platformUser, tenant, tenantUser => new RemoveTenantUserRole(tenantUser, userId, role))
+        askTenant(platformUser, tenant, tenantUser => new RemoveTenantUserRole(tenantUser, tenant, userId, role))
       }
     }
   }

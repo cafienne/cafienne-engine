@@ -25,7 +25,7 @@ public class CreateTenant extends PlatformTenantCommand implements BootstrapComm
         this.name = name;
         this.users = users;
         // Check whether after the filtering there are still owners left. Tenant must have owners.
-        if (this.users.stream().filter(u -> u.isOwner() && u.isEnabled()).count() == 0) {
+        if (this.users.stream().noneMatch(u -> u.isOwner() && u.isEnabled())) {
             throw new TenantException("Cannot create a tenant without providing tenant owners");
         }
     }

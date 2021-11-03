@@ -57,8 +57,8 @@ public class User {
         scala.collection.Iterable<String> newRolesToAdd = newRolesInfo.filter(roleToAdd -> !this.roles.contains(roleToAdd));
         List<String> oldRolesToRemove = this.roles.stream().filter(roleToRemove -> !newRolesInfo.contains(roleToRemove)).collect(Collectors.toList());
 
-        newRolesToAdd.foreach(role -> addRole(role));
-        oldRolesToRemove.forEach(role -> removeRole(role));
+        newRolesToAdd.foreach(this::addRole);
+        oldRolesToRemove.forEach(this::removeRole);
     }
 
     private void updateAccountEnabled(boolean newEnabled) {

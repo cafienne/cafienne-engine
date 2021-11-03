@@ -3,7 +3,6 @@ package org.cafienne.tenant.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
@@ -19,12 +18,12 @@ import java.io.IOException;
 abstract class ExistingUserCommand extends TenantCommand {
     public final String userId;
 
-    public ExistingUserCommand(TenantUser tenantOwner, String userId) {
-        super(tenantOwner);
+    protected ExistingUserCommand(TenantUser tenantOwner, String tenant, String userId) {
+        super(tenantOwner, tenant);
         this.userId = userId;
     }
 
-    public ExistingUserCommand(ValueMap json) {
+    protected ExistingUserCommand(ValueMap json) {
         super(json);
         this.userId = json.readString(Fields.userId);
     }
@@ -38,7 +37,7 @@ abstract class ExistingUserCommand extends TenantCommand {
     }
 
     @Override
-    public ModelResponse process(TenantActor tenant) {
+    public TenantResponse process(TenantActor tenant) {
         User user = tenant.getUser(userId);
         updateUser(user);
         return new TenantResponse(this);
