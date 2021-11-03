@@ -109,8 +109,8 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
      * This method is called to complete a task
      * @param rawOutputParameters
      */
-    public void goComplete(ValueMap rawOutputParameters) {
-        makeTransitionWithOutput(rawOutputParameters, Transition.Complete);
+    public boolean goComplete(ValueMap rawOutputParameters) {
+        return makeTransitionWithOutput(Transition.Complete, rawOutputParameters);
     }
 
     /**
@@ -118,14 +118,14 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
      * @param rawOutputParameters
      */
     public void goFault(ValueMap rawOutputParameters) {
-        makeTransitionWithOutput(rawOutputParameters, Transition.Fault);
+        makeTransitionWithOutput(Transition.Fault, rawOutputParameters);
     }
 
-    private void makeTransitionWithOutput(ValueMap rawOutputParameters, Transition transition) {
+    private boolean makeTransitionWithOutput(Transition transition, ValueMap rawOutputParameters) {
         prepareTransition(transition);
         ValueMap newTaskOutput = transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
         addEvent(new TaskOutputFilled(this, newTaskOutput, rawOutputParameters));
-        makeTransition(transition);
+        return super.makeTransition(transition);
     }
 
     /**
@@ -156,7 +156,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
         });
         // Check on raw parameters that have no matching definition
         addDebugInfo(() -> {
-            List<String> undefinedParameters = taskImplementationOutput.getValue().keySet().stream().filter(rawOutputParameterName -> mappings.stream().filter(m -> m.getSource().getName().equals(rawOutputParameterName)).count() == 0).collect(Collectors.toList());
+            List<String> undefinedParameters = taskImplementationOutput.getValue().keySet().stream().filter(rawOutputParameterName -> mappings.stream().noneMatch(m -> m.getSource().getName().equals(rawOutputParameterName))).collect(Collectors.toList());
             if (undefinedParameters.isEmpty()) {
                 return "";
             } else if (undefinedParameters.size() == 1) {

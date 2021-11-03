@@ -112,10 +112,7 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
             case evt: HumanTaskActivated => TaskMerger(evt, copy)
             case evt: HumanTaskCompleted => TaskMerger(evt, copy)
             case evt: HumanTaskTerminated => TaskMerger(evt, copy)
-            case other => {
-              logger.error("We missed out on HumanTaskTransition event of type " + other.getClass.getName)
-              copy
-            }
+            case other => copy // No need to do any further updates to the task record
           }
         }))
         case evt: HumanTaskMigrated => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
