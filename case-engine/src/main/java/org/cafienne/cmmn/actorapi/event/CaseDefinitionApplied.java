@@ -22,7 +22,7 @@ import java.time.Instant;
 
 @Manifest
 public class CaseDefinitionApplied extends CaseDefinitionEvent {
-    private final CafienneVersion engineVersion;
+    public final CafienneVersion engineVersion;
     private final String parentCaseId;
     private final String rootCaseId;
     public final Instant createdOn;
@@ -86,8 +86,7 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent {
     }
 
     public void updateState(Case caseInstance) {
-        caseInstance.setEngineVersion(engineVersion);
-        caseInstance.applyCaseDefinition(this.definition, getParentCaseId(), getRootCaseId());
+        caseInstance.updateState(this);
     }
 
     @Override

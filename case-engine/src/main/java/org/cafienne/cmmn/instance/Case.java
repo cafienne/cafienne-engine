@@ -426,4 +426,10 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         getSentryNetwork().disconnect(item);
         planItems.remove(item);
     }
+
+    public void updateState(CaseDefinitionApplied event) {
+        this.createdOn = event.createdOn;
+        setEngineVersion(event.engineVersion);
+        applyCaseDefinition(event.getDefinition(), event.getParentCaseId(), event.getRootCaseId());
+    }
 }
