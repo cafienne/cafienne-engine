@@ -9,15 +9,24 @@ public class DeserializationFailure implements Serializable {
     public final String manifest;
     public final Exception exception;
     public final byte[] blob;
+    private final String msg;
+
+    public DeserializationFailure(String manifest, DeserializationError e, byte[] blob) {
+        this.manifest = manifest;
+        this.exception = e;
+        this.blob = blob;
+        this.msg = "Fatal error in deserializing manifest " + manifest + "\nMessage: " + exception.getMessage() + "\nEvent blob: " + new String(blob);
+    }
 
     public DeserializationFailure(String manifest, Exception e, byte[] blob) {
         this.manifest = manifest;
         this.exception = e;
         this.blob = blob;
+        this.msg = "Unrecognized manifest " + manifest + " gives failure of type " + exception.getClass().getName() + "\nMessage: " + exception.getMessage() + "\nEvent blob: " + new String(blob);
     }
 
     @Override
     public String toString() {
-        return "Unrecognized manifest "+manifest+" gives failure of type " + exception.getClass().getName() +" for blob "+new String(blob);
+        return msg;
     }
 }

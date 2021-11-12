@@ -53,7 +53,7 @@ class CasePlanProjection(persistence: RecordsPersistence)(implicit val execution
               Done
             case None =>
               // But ... if not found, then should we create a new one here? With the PlanItemMerger that can be done ...
-              logger.error("Expected PlanItem " + event.getPlanItemId + " in " + event.getCaseInstanceId + ", but not found in the database")
+              logger.error("Expected PlanItem " + event.getPlanItemId + " in " + event.getCaseInstanceId + ", but not found in the database on event type " + event.getClass.getSimpleName)
               Done
           }
           case unknownPlanItemEvent =>
