@@ -87,7 +87,9 @@ public class CafienneSerializer extends SerializerWithStringManifest {
             // Invoke the deserializer
             ValueMapDeserializer<?> deserializer = manifest.deserializer;
             return deserializer.deserialize(value);
-        } catch (IOException | JSONParseFailure | DeserializationError e) {
+        } catch (DeserializationError e) {
+            return new DeserializationFailure(manifestString, e, bytesProvider.giveMeTheBytes());
+        } catch (Exception e) {
             return new DeserializationFailure(manifestString, e, bytesProvider.giveMeTheBytes());
         }
     }

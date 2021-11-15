@@ -8,6 +8,7 @@
 package org.cafienne.humantask.actorapi.event.migration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.event.HumanTaskEvent;
@@ -27,6 +28,13 @@ public class HumanTaskDropped extends HumanTaskEvent {
 
     public HumanTaskDropped(ValueMap json) {
         super(json);
+    }
+
+    @Override
+    public void updateState(Case actor) {
+        // Make an empty implementation:
+        // - because there is nothing to do here,
+        // - and super implementation tries to find the Task (which has been dropped through PlanItemDropped event)
     }
 
     @Override

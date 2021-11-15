@@ -24,6 +24,7 @@ import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
+import org.cafienne.infrastructure.serialization.DeserializationFailure;
 import org.cafienne.json.Value;
 import org.cafienne.processtask.actorapi.command.ProcessCommand;
 import org.cafienne.system.CaseSystem;
@@ -225,6 +226,9 @@ public abstract class ModelActor<C extends ModelCommand, E extends ModelEvent> e
         } else if (event instanceof ModelEvent) {
             // Step 2c. Weird: ModelEvents in recovery of other models??
             getLogger().warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
+        } else if (event instanceof DeserializationFailure) {
+            // Step 2c. Weird: ModelEvents in recovery of other models??
+            getLogger().error("Event Deserialization Failure: " + event);
         } else {
             // Step 2c.
             getLogger().warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
