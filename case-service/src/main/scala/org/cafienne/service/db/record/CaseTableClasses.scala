@@ -58,7 +58,9 @@ final case class CaseBusinessIdentifierRecord(caseInstanceId: String, tenant: St
 
 final case class CaseRoleRecord(caseInstanceId: String, tenant: String, roleName: String, assigned: Boolean = true)
 
-final case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)
+final case class CaseTeamUserRecord(caseInstanceId: String, tenant: String, userId: String, origin: String, caseRole: String, isOwner: Boolean)
+
+final case class CaseTeamTenantRoleRecord(caseInstanceId: String, tenant: String, tenantRole: String, caseRole: String, isOwner: Boolean)
 
 final case class PlanItemRecord(id: String,
                                 definitionId: String,

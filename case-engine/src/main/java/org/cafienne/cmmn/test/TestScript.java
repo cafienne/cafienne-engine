@@ -12,7 +12,7 @@ import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -129,17 +129,17 @@ public class TestScript {
      * @return
      */
     public static CaseTeam getCaseTeam(Object... users) {
-        List<CaseTeamMember> members = new ArrayList<>();
+        List<CaseTeamUser> members = new ArrayList<>();
         for (Object user : users) {
             if (user instanceof TestUser) {
                 members.add(getMember((TestUser) user));
-            } else if (user instanceof CaseTeamMember) {
-                members.add((CaseTeamMember) user);
+            } else if (user instanceof CaseTeamUser) {
+                members.add((CaseTeamUser) user);
             } else {
                 throw new IllegalArgumentException("Cannot accept users of type " + user.getClass().getName());
             }
         }
-        return CaseTeam.apply(members);
+        return CaseTeam.create(members);
     }
 
     /**
@@ -148,7 +148,7 @@ public class TestScript {
      * @param user
      * @return
      */
-    public static CaseTeamMember getOwner(TestUser user) {
+    public static CaseTeamUser getOwner(TestUser user) {
         return user.asCaseOwner();
     }
 
@@ -158,7 +158,7 @@ public class TestScript {
      * @param user
      * @return
      */
-    public static CaseTeamMember getMember(TestUser user) {
+    public static CaseTeamUser getMember(TestUser user) {
         return user.asCaseMember();
     }
 

@@ -183,7 +183,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
               implicit val format = jsonFormat1(CaseCommandModels.Assignee)
 
               entity(as[CaseCommandModels.Assignee]) { data =>
-                askTaskWithMember(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
+                askTaskWithAssignee(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }
@@ -217,7 +217,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
               implicit val format = jsonFormat1(CaseCommandModels.Assignee)
 
               entity(as[CaseCommandModels.Assignee]) { data =>
-                askTaskWithMember(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
+                askTaskWithAssignee(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }

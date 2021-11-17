@@ -9,6 +9,7 @@ package org.cafienne.service.api.cases.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.service.api.cases.route.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
@@ -26,6 +27,7 @@ class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache:
   addSubRoute(new DiscretionaryRoute(caseQueries)(userCache, caseSystem))
   addSubRoute(new CaseDocumentationRoute(caseQueries)(userCache, caseSystem))
   addSubRoute(new CaseHistoryRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache, caseSystem))
   addSubRoute(new CaseMigrationRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new DeprecatedCaseTeamRoute(caseQueries)(userCache, caseSystem))
 }

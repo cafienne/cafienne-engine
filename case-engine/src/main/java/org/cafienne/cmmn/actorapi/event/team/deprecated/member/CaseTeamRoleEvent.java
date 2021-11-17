@@ -1,8 +1,7 @@
-package org.cafienne.cmmn.actorapi.event.team.member;
+package org.cafienne.cmmn.actorapi.event.team.deprecated.member;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
@@ -11,7 +10,7 @@ import java.io.IOException;
 /**
  * Basic event allowing listeners that are interested only in case team member role events to do initial filtering.
  */
-public abstract class CaseTeamRoleEvent extends CaseTeamMemberEvent {
+public abstract class CaseTeamRoleEvent extends DeprecatedCaseTeamEvent {
     private final String roleName;
 
     /**
@@ -20,11 +19,6 @@ public abstract class CaseTeamRoleEvent extends CaseTeamMemberEvent {
      */
     public boolean isMemberItself() {
         return roleName.isBlank();
-    }
-
-    protected CaseTeamRoleEvent(Case caseInstance, MemberKey member, String roleName) {
-        super(caseInstance, member);
-        this.roleName = roleName;
     }
 
     protected CaseTeamRoleEvent(ValueMap json) {

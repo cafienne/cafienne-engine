@@ -11,107 +11,43 @@ object Examples {
   @Schema(description = "Output parameters example json")
   case class OutputParametersFormat(output1: String, output2: Object, output3: List[String])
 
-  @Schema(description = "Example case team")
-  case class StartCaseTeamFormat(
-                                  @(ArraySchema@field)(schema = new Schema(
-                                    description = "If members is left empty, only current user will be added to the case team",
-                                    required = true,
-                                    implementation = classOf[StartCaseTeamMemberFormat]))
-                                  members: Array[StartCaseTeamMemberFormat]
-                                )
-
   @Schema(description = "Example case team member")
-  case class StartCaseTeamMemberFormat(
-                                        @(Schema@field)(
-                                          description = "Identification of the team member (either user id or tenant role name)",
-                                          example = "Identification of the team member (either user id or tenant role name)",
-                                          required = true,
-                                          implementation = classOf[String])
-                                        memberId: String,
-                                        @(Schema@field)(
-                                          description = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
-                                          required = false,
-                                          implementation = classOf[String],
-                                          example = "This field must contain either 'user' or 'role'. Defaults to 'user'. If 'role' is given, the memberId must contain a tenant role name, otherwise it must be a tenant user id",
-                                          allowableValues = Array("user", "role"))
-                                        memberType: String,
-                                        @(Schema@field)(
-                                          description = "Whether the member is owner to the case",
-                                          required = false,
-                                          implementation = classOf[Boolean],
-                                          example = "false or true")
-                                        isOwner: Boolean = false,
-                                        @(ArraySchema@field)(schema = new Schema(
-                                          description = "Zero or more roles that the member has in the case team. An empty set means that the member has no roles, but is still part of the team",
-                                          required = true,
-                                          implementation = classOf[NewCaseTeamRolesFormat],
-                                          example = "[\"Employee\",  \"Customer\", \"Supplier\"]"))
-                                        caseRoles: Array[String]
-                                      )
-
-  @Schema(description = "Example case team member")
-  case class PutCaseTeamMemberFormat(
-                                      @(Schema@field)(
-                                        description = "Identification of the team member (either user id or tenant role name)",
-                                        example = "Identification of the team member (either user id or tenant role name)",
-                                        required = true,
-                                        implementation = classOf[String])
-                                      memberId: String,
-                                      @(Schema@field)(
-                                        description = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
-                                        required = false,
-                                        implementation = classOf[String],
-                                        example = "This field must contain either 'user' or 'role'. Defaults to 'user'. If 'role' is given, the memberId must contain a tenant role name, otherwise it must be a tenant user id",
-                                        allowableValues = Array("user", "role"))
-                                      memberType: String,
-                                      @(Schema@field)(
-                                        description = "Optional field to fill when ownership needs to change for the member",
-                                        required = false,
-                                        implementation = classOf[Option[Boolean]],
-                                        example = "Optional field to fill when ownership needs to change for the member; passing true will add ownership; passing false removes; not passing does not change existing ownership rights")
-                                      isOwner: Option[Boolean] = None,
-                                      @(ArraySchema@field)(schema = new Schema(
-                                        description = "Zero or more case roles that will be added to the member",
-                                        required = true,
-                                        implementation = classOf[NewCaseTeamRolesFormat],
-                                        example = "Zero or more case roles that will be added to the member"))
-                                      caseRoles: Array[String],
-                                      @(ArraySchema@field)(schema = new Schema(
-                                        description = "Zero or more case roles that need to be removed from the member",
-                                        required = true,
-                                        implementation = classOf[RemoveCaseTeamRolesFormat],
-                                        example = "Zero or more case roles that need to be removed from the member"))
-                                      removeRoles: Array[String]
-                                    )
-
-  case class NewCaseTeamRolesFormat()
-
-  case class RemoveCaseTeamRolesFormat()
-
-  @Schema(description = "Example case team member")
-  case class CaseTeamMemberResponseFormat(
+  case class CaseTeamUserResponseFormat(
                                            @(Schema@field)(
-                                             description = "Identification of the team member (either user id or tenant role name)",
-                                             example = "Identification of the team member (either user id or tenant role name)",
+                                             description = "User id of the team member",
+                                             example = "User id of the team member",
                                              implementation = classOf[String])
-                                           memberId: String,
+                                           userId: String,
                                            @(Schema@field)(
-                                             description = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
-                                             implementation = classOf[String],
-                                             example = "Type of member, either 'user' or 'role'. If a member is of type 'role', then all tenant users with that role belong to the case team",
-                                             allowableValues = Array("user", "role"))
-                                           memberType: String,
-                                           @(Schema@field)(
-                                             description = "True if the member is a Case Owner; Case Owners are authorized to manage the case and the case team",
-                                             implementation = classOf[Option[Boolean]],
-                                             example = "True if the member is a Case Owner; Case Owners are authorized to manage the case and the case team")
+                                             description = "True if the user is a case owner. Case owners are authorized to manage the case and the case team",
+                                             example = "True if the member is a case owner. Case owners are authorized to manage the case and the case team",
+                                             implementation = classOf[CaseTeamUserIsOwnerFormat])
                                            isOwner: Boolean,
                                            @(ArraySchema@field)(schema = new Schema(
-                                             description = "Zero or more case roles that will be added to the member",
-                                             implementation = classOf[NewCaseTeamRolesFormat],
-                                             example = "Zero or more case roles that will be added to the member"))
+                                             description = "Zero or more case roles assigned to the user in this case. An empty set means that the member has no roles, but is still part of the team",
+                                             example = "Zero or more case roles assigned to the user in this case. An empty set means that the member has no roles, but is still part of the team",
+                                             implementation = classOf[CaseTeamUserCaseRolesFormat]))
                                            caseRoles: Array[String],
                                          )
+
+  @Schema(description = "Example case team member")
+  case class CaseTeamTenantRoleResponseFormat(
+                                         @(Schema@field)(
+                                           description = "All users in the tenant with this role are part of the case team",
+                                           example = "All users in the tenant with this role are part of the case team",
+                                           implementation = classOf[String])
+                                         tenantRoleName: String,
+                                         @(Schema@field)(
+                                           description = "True if tenant users with this role are case owner. Case owners are authorized to manage the case and the case team",
+                                           example = "True if tenant users with this role are case owner. Case owners are authorized to manage the case and the case team",
+                                           implementation = classOf[CaseTeamTenantRoleIsOwnerFormat])
+                                         isOwner: Boolean,
+                                         @(ArraySchema@field)(schema = new Schema(
+                                           description = "Zero or more case roles assigned to users with the tenant role in this case",
+                                           example = "Zero or more case roles assigned to users with the tenant role in this case",
+                                           implementation = classOf[CaseTeamTenantRoleCaseRolesFormat]))
+                                         caseRoles: Array[String],
+                                       )
 
   @Schema(description = "Example case team")
   case class CaseTeamResponseFormat(
@@ -121,20 +57,30 @@ object Examples {
                                        implementation = classOf[CaseDefinedRolesFormat]))
                                      caseRoles: Array[String],
                                      @(ArraySchema@field)(schema = new Schema(
-                                       description = "Members of the case team",
-                                       required = true,
-                                       implementation = classOf[CaseTeamMemberResponseFormat]))
-                                     members: Array[CaseTeamMemberResponseFormat],
-                                     @(ArraySchema@field)(schema = new Schema(
-                                       description = "Names of defined roles that are not assigned to any of the team members",
-                                       example = "Names of defined roles that are not assigned to any of the team members",
+                                       description = "Case roles that are not assigned to any of the team members",
+                                       example = "Case roles that are not assigned to any of the team members",
                                        implementation = classOf[UnassignedRolesFormat]))
-                                     unassignedRoles: Array[String]
-                                   )
+                                     unassignedRoles: Array[String],
+                                     @(ArraySchema@field)(schema = new Schema(
+                                       description = "Users in the case team",
+                                       required = true,
+                                       implementation = classOf[CaseTeamUserResponseFormat]))
+                                     users: Array[CaseTeamFormat.CaseTeamUserFormat],
+                                     @(ArraySchema@field)(schema = new Schema(
+                                       description = "List of tenant roles that have access to the case",
+                                       required = true,
+                                       implementation = classOf[CaseTeamTenantRoleResponseFormat]))
+                                     tenantRoles: Array[CaseTeamFormat.TenantRoleFormat])
 
   case class CaseDefinedRolesFormat()
 
   case class UnassignedRolesFormat()
 
-  case class CaseTeamRolesFormat()
+  case class CaseTeamUserIsOwnerFormat()
+
+  case class CaseTeamUserCaseRolesFormat()
+
+  case class CaseTeamTenantRoleCaseRolesFormat()
+
+  case class CaseTeamTenantRoleIsOwnerFormat()
 }

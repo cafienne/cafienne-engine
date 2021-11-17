@@ -14,7 +14,7 @@ public abstract class CaseRootObject extends APIRootObject<Case> {
     private final CaseAPI context;
 
     protected CaseRootObject(Case model) {
-        super(model, new MemberAPI(model.getCurrentTeamMember()));
+        super(model, new MemberAPI(model.getCaseTeam(), model.getCurrentTeamMember()));
         this.context = new CaseAPI(model);
         addContextProperty(this.context, "case", "caseInstance");
     }

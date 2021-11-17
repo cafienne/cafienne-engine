@@ -5,10 +5,54 @@ import org.cafienne.service.db.schema.QueryDBSchema
 import org.cafienne.service.db.schema.table.{CaseTables, TaskTables}
 import slick.migration.api.{SqlMigration, TableMigration}
 
+trait CafienneTablesV2 extends QueryDBSchema with CaseTables {
+
+  import dbConfig.profile.api._
+
+  case class TenantOwnerRecord(tenant: String, userId: String, enabled: Boolean = true)
+  case class CaseTeamMemberRecord(caseInstanceId: String, tenant: String, memberId: String, caseRole: String, isTenantUser: Boolean, isOwner: Boolean, active: Boolean)
+
+  class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
+
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
+
+    lazy val caseRole = idColumn[String]("case_role")
+
+    lazy val memberId = userColumn[String]("member_id")
+
+    lazy val isTenantUser = column[Boolean]("isTenantUser")
+
+    lazy val isOwner = column[Boolean]("isOwner")
+
+    lazy val active = column[Boolean]("active")
+
+    lazy val pk = primaryKey(pkName, (caseInstanceId, caseRole, memberId, isTenantUser))
+
+    lazy val * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active).mapTo[CaseTeamMemberRecord]
+
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
+    lazy val indexMemberId = index(oldStyleIxName(memberId), (memberId, isTenantUser))
+  }
+
+  // Schema for the "tenant-owner" table:
+  final class TenantOwnersTable(tag: Tag) extends CafienneTenantTable[TenantOwnerRecord](tag, "tenant_owners") {
+
+    lazy val * = (tenant, userId, enabled).mapTo[TenantOwnerRecord]
+
+    lazy val enabled = column[Boolean]("enabled", O.Default(true))
+
+    lazy val pk = primaryKey(pkName, (tenant, userId))
+
+    lazy val userId = userColumn[String]("userId")
+  }
+}
+
+
 object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
   with CaseTables
   with TaskTables
-  with CafienneTablesV1 {
+  with CafienneTablesV1
+  with CafienneTablesV2 {
 
   val version = "1.1.6"
   val migrations = (

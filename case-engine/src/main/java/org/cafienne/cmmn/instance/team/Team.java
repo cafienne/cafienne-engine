@@ -2,16 +2,16 @@ package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.command.team.*;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.team.deprecated.TeamMemberAdded;
-import org.cafienne.cmmn.actorapi.event.team.deprecated.TeamMemberRemoved;
-import org.cafienne.cmmn.actorapi.event.team.member.CaseOwnerAdded;
-import org.cafienne.cmmn.actorapi.event.team.member.CaseOwnerRemoved;
-import org.cafienne.cmmn.actorapi.event.team.member.TeamRoleCleared;
-import org.cafienne.cmmn.actorapi.event.team.member.TeamRoleFilled;
+import org.cafienne.cmmn.actorapi.event.team.CaseTeamMemberRemoved;
+import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent;
+import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleAdded;
+import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleChanged;
+import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleRemoved;
+import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserAdded;
+import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserChanged;
+import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserRemoved;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
@@ -19,10 +19,7 @@ import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,10 +28,12 @@ import java.util.stream.Collectors;
  */
 public class Team extends CMMNElement<CaseTeamDefinition> {
 
-    private final Collection<Member> members = new ArrayList<>();
+    private final Map<String, CaseTeamUser> users = new HashMap<>();
+    private final Map<String, CaseTeamTenantRole> tenantRoles = new HashMap<>();
 
     /**
      * Create a new, empty case team.
+     *
      * @param caseInstance
      */
     public Team(Case caseInstance) {
@@ -46,113 +45,97 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
     }
 
     public void replace(CaseTeam newCaseTeam) {
-        new ArrayList<>(members).forEach(member -> {
-            if (newCaseTeam.getMembers().stream().noneMatch(newMember -> newMember.key().same(member.key))) {
-                removeMember(member.key);
-            }
-        });
-        newCaseTeam.getMembers().forEach(this::upsert);
+        users.keySet().stream().filter(newCaseTeam::notHasUser).collect(Collectors.toList()).forEach(this::removeUser);
+        newCaseTeam.getUsers().forEach(this::setUser);
+
+        tenantRoles.keySet().stream().filter(newCaseTeam::notHasTenantRole).collect(Collectors.toList()).forEach(this::removeTenantRole);
+        newCaseTeam.getTenantRoles().forEach(this::setTenantRole);
     }
 
-    private void addMember(MemberKey key) {
-        addEvent(new TeamRoleFilled(getCaseInstance(), key, ""));
+    public CaseTeamUser getUser(String userId) {
+        return users.get(userId);
     }
 
-    void addMemberRole(MemberKey key, String roleName) {
-        addEvent(new TeamRoleFilled(getCaseInstance(), key, roleName));
+    public CaseTeamTenantRole getTenantRole(String tenantRoleName) {
+        return tenantRoles.get(tenantRoleName);
     }
 
-    void removeMemberRole(MemberKey key, String roleName) {
-        addEvent(new TeamRoleCleared(getCaseInstance(), key, roleName));
-    }
-
-    public void upsert(CaseTeamMember newMemberInfo) {
-        MemberKey key = newMemberInfo.key();
-        Member member = getMember(key);
-        if (member == null) {
-            // We need to add a new member;
-            // Always add an empty role
-            addMember(key);
-        }
-        newMemberInfo.getCaseRoles().forEach(caseRole -> {
-            if (!getMember(key).hasRole(caseRole)) {
-                addMemberRole(key, caseRole);
-            } else {
-                addDebugInfo(() -> "Ignoring request to add case role '" + caseRole + "' to member '" + key + "' since the member already has this role");
-            }
-        });
-
-        if (newMemberInfo.isOwner().nonEmpty()) {
-            addDebugInfo(() -> "Updating ownership information for member " + key);
-            if (newMemberInfo.isOwner().getOrElse(() -> false)) {
-                addOwner(key);
-            } else {
-                removeOwner(key);
-            }
-        }
-
-        if (newMemberInfo.removeRoles().nonEmpty()) {
-            addDebugInfo(() -> "Removing roles from member " + key);
-            newMemberInfo.rolesToRemove().forEach(roleName -> removeMemberRole(key, roleName));
-        }
-    }
-
-    /**
-     * Removes a member from the team
-     *
-     * @param key
-     */
-    public void removeMember(MemberKey key) {
-        Member member = getMember(key);
-        if (member != null) {
-            // Make sure to check and remove ownership as well
-            if (member.isOwner()) {
-                removeOwner(key);
-            }
-            new ArrayList<>(member.getRoles()).forEach(role -> removeMemberRole(member.key, role.getName()));
-            addEvent(new TeamRoleCleared(getCaseInstance(), member.key, ""));
+    public void upsert(UpsertMemberData memberData) {
+        if (memberData.isUser()) {
+            CaseTeamUser user = users.get(memberData.id());
+            setUser(memberData.asUser(user));
         } else {
-            addDebugInfo(() -> "Cannot remove case team member '" + key.id() + "', since this member is not in the team");
+            CaseTeamTenantRole role = tenantRoles.get(memberData.id());
+            setTenantRole(memberData.asTenantRole(role));
         }
     }
 
-    /**
-     * Adds a member to the team
-     *
-     * @param key
-     */
-    public void addOwner(MemberKey key) {
-        addDebugInfo(() -> "Trying to add ownership for member " + key);
-        Member member = getMember(key);
-        if (member.isOwner()) {
-            // No need to add owner again
-            addDebugInfo(() -> "Member is already owner");
-            return;
+    public void removeUser(String userId) {
+        CaseTeamUser user = users.get(userId);
+        if (user != null) {
+            addEvent(new CaseTeamUserRemoved(this, user));
         }
-        addEvent(new CaseOwnerAdded(getCaseInstance(), key));
     }
 
-    /**
-     * Adds a member to the team
-     *
-     * @param key
-     */
-    public void removeOwner(MemberKey key) {
-        addDebugInfo(() -> "Trying to remove ownership for member " + key);
-        Member member = getMember(key);
-        if (member.isOwner()) {
-            addEvent(new CaseOwnerRemoved(getCaseInstance(), key));
+    public void removeTenantRole(String tenantRoleName) {
+        CaseTeamTenantRole tenantRole = tenantRoles.get(tenantRoleName);
+        if (tenantRole != null) {
+            addEvent(new CaseTeamTenantRoleRemoved(this, tenantRole));
+        }
+    }
+
+    private Set<String> getRemovedRoles(CaseTeamMember newMemberInfo, CaseTeamMember existingMember) {
+        return existingMember.getCaseRoles().stream().filter(role -> !newMemberInfo.getCaseRoles().contains(role)).collect(Collectors.toSet());
+    }
+
+    private boolean hasChangeInfo(CaseTeamMember newMemberInfo, CaseTeamMember existingMember) {
+        boolean ownershipChanged = newMemberInfo.isOwner() != existingMember.isOwner();
+        Set<String> rolesAdded = newMemberInfo.getCaseRoles().stream().filter(role -> !existingMember.getCaseRoles().contains(role)).collect(Collectors.toSet());
+        return (ownershipChanged || ! rolesAdded.isEmpty());
+    }
+
+    public void setUser(CaseTeamUser newUserInfo) {
+        CaseTeamUser existingUser = users.get(newUserInfo.userId());
+        if (existingUser == null) {
+            addEvent(new CaseTeamUserAdded(this, newUserInfo));
         } else {
-            addDebugInfo(() -> "Member is not an owner");
+            Set<String> rolesRemoved = getRemovedRoles(newUserInfo, existingUser);
+            if (hasChangeInfo(newUserInfo, existingUser) || ! rolesRemoved.isEmpty()) {
+                addEvent(new CaseTeamUserChanged(this, newUserInfo, rolesRemoved));
+            }
+        }
+    }
+
+    public void setTenantRole(CaseTeamTenantRole newMemberInfo) {
+        CaseTeamTenantRole existingTenantRole = tenantRoles.get(newMemberInfo.tenantRoleName());
+        if (existingTenantRole == null) {
+            addEvent(new CaseTeamTenantRoleAdded(this, newMemberInfo));
+        } else {
+            Set<String> rolesRemoved = getRemovedRoles(newMemberInfo, existingTenantRole);
+            if (hasChangeInfo(newMemberInfo, existingTenantRole) || ! rolesRemoved.isEmpty()) {
+                addEvent(new CaseTeamTenantRoleChanged(this, newMemberInfo, rolesRemoved));
+            }
         }
     }
 
     /**
      * Returns the collection of team members
+     *
      * @return
      */
-    public Collection<Member> getMembers() {
+    public Collection<CaseTeamMember> getMembers() {
+        Collection<CaseTeamMember> members = new ArrayList<>();
+        members.addAll(users.values());
+        members.addAll(tenantRoles.values());
         return members;
+    }
+
+    public Collection<CaseTeamUser> getUsers() {
+        return users.values();
+    }
+
+    public Collection<CaseTeamTenantRole> getTenantRoles() {
+        return tenantRoles.values();
     }
 
     /**
@@ -160,81 +143,67 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
      *
      * @return
      */
-    public Collection<Member> getOwners() {
-        return members.stream().filter(Member::isOwner).collect(Collectors.toList());
+    public Collection<CaseTeamMember> getOwners() {
+        return getMembers().stream().filter(CaseTeamMember::isOwner).collect(Collectors.toList());
     }
 
-    /**
-     * Returns the member with the specified key or null.
-     * @param key
-     * @return
-     */
-    public Member getMember(MemberKey key) {
-        for (Member member : members) {
-            if (member.key.equals(key)) {
-                return member;
-            }
+    public void updateState(CaseTeamUser user) {
+        users.put(user.userId(), user);
+    }
+
+    public void updateState(CaseTeamTenantRole tenantRole) {
+        tenantRoles.put(tenantRole.tenantRoleName(), tenantRole);
+    }
+
+    public void updateState(CaseTeamMemberRemoved<?> event) {
+        CaseTeamMember member = event.member;
+        String memberId = member.memberId();
+        switch (member.memberType()) {
+            case TenantRole:
+                tenantRoles.remove(memberId);
+                break;
+            case User:
+                users.remove(memberId);
+                break;
         }
-        return null;
     }
 
-    public void updateState(CaseOwnerAdded event) {
-        getMember(event.key).updateState(event);
-    }
-
-    public void updateState(CaseOwnerRemoved event) {
-        getMember(event.key).updateState(event);
-    }
-
-    public void updateState(TeamRoleCleared event) {
-        if (event.isMemberItself()) {
-            members.remove(getMember(event.key));
+    public void updateState(DeprecatedCaseTeamEvent event) {
+        if (event.isUserEvent()) {
+            CaseTeamUser.handleDeprecatedUserEvent(users, event);
         } else {
-            getMember(event.key).updateState(event);
+            CaseTeamTenantRole.handleDeprecatedTenantRoleEvent(tenantRoles, event);
         }
-    }
-
-    public void updateState(TeamRoleFilled event) {
-        if (event.isMemberItself()) {
-            members.add(new Member(this, event));
-        } else {
-            getMember(event.key).updateState(event);
-        }
-    }
-
-    public void updateState(TeamMemberAdded event) {
-        Member newMember = new Member(this, event);
-        members.add(newMember);
-    }
-
-    public void updateState(TeamMemberRemoved event) {
-        Member member = this.getMember(event.key);
-        members.remove(member);
     }
 
     /**
      * For debugging purposes mostly.
+     *
      * @param parentElement
      */
     public void dumpMemoryStateToXML(Element parentElement) {
         Element caseTeamXML = parentElement.getOwnerDocument().createElement("CaseTeam");
         parentElement.appendChild(caseTeamXML);
-        members.forEach(member -> {
-            member.dumpMemoryStateToXML(caseTeamXML);
-        });
+//        Element usersElement = caseTeamXML.getOwnerDocument().createElement("users");
+//        caseTeamXML.appendChild(usersElement);
+//        users.values().forEach(user -> user.dumpMemoryStateToXML(usersElement));
+//        Element tenantRolesElement = caseTeamXML.getOwnerDocument().createElement("tenant-roles");
+//        caseTeamXML.appendChild(tenantRolesElement);
+//        tenantRoles.values().forEach(tenantRole -> tenantRole.dumpMemoryStateToXML(tenantRolesElement));
     }
 
     /**
      * Returns the first member having the specified role
+     *
      * @param role Case Role
      * @return
      */
     public String getMemberWithRole(String role) {
-        for (Member caseTeamMember : members) {
-            Set<CaseRoleDefinition> roles = caseTeamMember.getRoles();
-            for (CaseRoleDefinition roleDefinition : roles) {
-                if (roleDefinition.getName().equals(role)) {
-                    return caseTeamMember.getMemberId();
+        for (CaseTeamMember caseTeamMember : getMembers()) {
+            Set<String> roles = caseTeamMember.getCaseRoles();
+            for (String roleName : roles) {
+                if (roleName.equals(role)) {
+                    return caseTeamMember.memberId();
                 }
             }
         }
@@ -242,14 +211,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
     }
 
     public CaseTeam createSubCaseTeam(CaseDefinition subCaseDefinition) {
-        List<CaseTeamMember> members = new ArrayList<>();
-        CaseTeamDefinition subCaseTeamDefinition = subCaseDefinition.getCaseTeamModel();
-        this.getMembers().forEach(teamMember -> {
-            String[] roleNames = teamMember.getRoles().stream().map(CaseRoleDefinition::getName).filter(name -> subCaseTeamDefinition.getCaseRole(name) != null).collect(Collectors.toList()).toArray(new String[]{});
-            CaseTeamMember member = CaseTeamMember.apply(teamMember.key, roleNames, teamMember.isOwner());
-            members.add(member);
-        });
-        return CaseTeam.apply(members);
+        return CaseTeam.createSubTeam(this, subCaseDefinition.getCaseTeamModel());
     }
 
     /**
@@ -260,20 +222,10 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
      * @param user
      */
     public void validateMembership(CaseUserIdentity user) {
-        for (Member member : members) {
-            if (member.isUser()) {
-                if (user.id().equals(member.key.id())) {
-                    return;
-                }
-            } else {
-                // Member is a tenant role, check whether the user has it
-                if (user.tenantRoles().contains(member.key.id())) {
-                    return;
-                }
-            }
+        CurrentMember member = new CurrentMember(this, user);
+        if (! member.isValid()) {
+            throw new AuthorizationException("User " + user.id() + " is not part of the case team");
         }
-
-        throw new AuthorizationException("User " + user.id() + " is not part of the case team");
     }
 
     public CurrentMember getTeamMember(CaseUserIdentity currentTenantUser) {
@@ -282,39 +234,31 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
 
     /**
      * Adds a member to the case team upon request of a Task that has dynamic assignment.
+     *
      * @param userId The tenant user id; note that assignment cannot be done on roles, only on users
-     * @param role The (optional) role that the team member must have for executing the task leading to this call
+     * @param role   The (optional) role that the team member must have for executing the task leading to this call
      */
-    public void upsertCaseTeamMember(String userId, CaseRoleDefinition role) {
-        MemberKey key = new MemberKey(userId, "user");
-        List<Member> existingMembers = getMembers().stream().filter(member -> member.isUser() && member.key.id().equals(userId)).collect(Collectors.toList());
-        if (existingMembers.isEmpty()) {
-            // Add the member; as a member, and if a role is required also with the role
-            addDebugInfo(() -> "Adding tenant user '" + userId +"' to case team because of task assignment");
-            addMember(key);
-            if (role != null) {
-                addMemberRole(key, role.getName());
-            }
+    public void upsertCaseTeamUser(String userId, CaseRoleDefinition role) {
+        CaseTeamUser existingMember = users.get(userId);
+        if (existingMember == null) {
+            addDebugInfo(() -> "Adding unknown user '" + userId + "' to case team because of dynamic task assignment");
+            setUser(CaseTeamUser.create(userId, role));
         } else {
-            // If a role is required, then check if "one of" the existing members (there can only be one, actually) has the role; if not, give the role.
-            if (role != null) {
-                Member member = existingMembers.get(0);
-                if (! member.isOwner() && ! member.hasRole(role.getName())) {
-                    addDebugInfo(() -> "Adding case role '" + role.getName()+"' to '" + userId +"' because of task assignment");
-                    addMemberRole(key, role.getName());
-                }
+            if (!existingMember.isOwner() && role != null && !existingMember.getCaseRoles().contains(role.getName())) {
+                addDebugInfo(() -> "Adding case role '" + role.getName() + "' to '" + userId + "' because of task assignment");
+                setUser(existingMember.extend(role.getName()));
             }
         }
     }
 
     public void updateState(CaseAppliedPlatformUpdate event) {
         event.newUserInformation.info().foreach(userInfo -> {
-            Member member = getMember(new MemberKey(userInfo.existingUserId(), "user"));
-            if (member != null) {
+            CaseTeamUser user = getUser(userInfo.existingUserId());
+            if (user != null) {
                 addDebugInfo(() -> "Replace case team member user id from " + userInfo.existingUserId() + " to " + userInfo.newUserId());
-                Member clone = member.cloneMember(new MemberKey(userInfo.newUserId(), "user"));
-                members.remove(member);
-                members.add(clone);
+                CaseTeamUser clone = user.cloneUser(userInfo.newUserId());
+                users.remove(user.userId());
+                users.put(clone.userId(), clone);
             }
             return userInfo;
         });
@@ -323,6 +267,37 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
     @Override
     public void migrateDefinition(CaseTeamDefinition newDefinition) {
         super.migrateDefinition(newDefinition);
-        members.forEach(member -> member.migrateDefinition(newDefinition));
+        Map<String, CaseRoleDefinition> newRoleNames = newDefinition.getCaseRoles().stream().collect(Collectors.toMap(CaseRoleDefinition::getName, role -> role));
+        Map<String, CaseRoleDefinition> newRoleIds = newDefinition.getCaseRoles().stream().collect(Collectors.toMap(CaseRoleDefinition::getId, role -> role));
+        Set<String> droppedRoles = new HashSet<>();
+        Map<String, String> changedRoleNames = new HashMap<>();
+
+        addDebugInfo(() -> "\nMigrating Case Team");
+        getPreviousDefinition().getCaseRoles().forEach(oldRole -> {
+            String name = oldRole.getName();
+            String id = oldRole.getId();
+            CaseRoleDefinition roleWithMatchingName = newRoleNames.get(name);
+            CaseRoleDefinition roleWithMatchingId = newRoleIds.get(id);
+
+            if (roleWithMatchingName != null) {
+                if (! name.isBlank()) { // There are always "no changes" on blank roles, no need to log it.
+                    addDebugInfo(() -> "- role '" + name + "' is not changed");
+                }
+            } else if (roleWithMatchingId != null) {
+                addDebugInfo(() -> "- role '" + name + "' is renamed to '" + roleWithMatchingId.getName() + "'");
+                droppedRoles.add(oldRole.getName());
+                changedRoleNames.put(oldRole.getName(), roleWithMatchingId.getName());
+            } else {
+                addDebugInfo(() -> "- role '" + name + "' is dropped");
+                droppedRoles.add(oldRole.getName());
+            }
+        });
+
+        // Inform each member about member-specific changes
+        getMembers().forEach(member -> {
+            addDebugInfo(() -> "=== Migrating Case Team " + member.memberType() + " '" + member.memberId() + "'");
+            member.migrateRoles(this, changedRoleNames, droppedRoles);
+        });
+        addDebugInfo(() -> "Completed Case Team migration\n");
     }
 }

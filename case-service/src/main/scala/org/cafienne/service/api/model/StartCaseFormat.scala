@@ -21,8 +21,8 @@ case class StartCaseFormat(
                             @(Schema@field)(
                               description = "The team that will be connected to the execution of this case",
                               required = false,
-                              implementation = classOf[Examples.StartCaseTeamFormat])
-                            caseTeam: Option[BackwardCompatibleTeamFormat],
+                              implementation = classOf[CaseTeamFormat.TeamFormat])
+                            caseTeam: BackwardCompatibleTeamFormat = BackwardCompatibleTeamFormat(),
                             @(Schema@field)(description = "Tenant in which to create the case. If empty, default tenant as configured is taken.", required = false, implementation = classOf[Option[String]], example = "Will be taken from settings if omitted or empty")
                             tenant: Option[String],
                             @(Schema@field)(description = "Unique identifier to be used for this case. When there is no identifier given, a UUID will be generated", required = false, example = "Will be generated if omitted or empty")

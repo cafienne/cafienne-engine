@@ -61,11 +61,10 @@ public class Basic {
 
             PublishedEventsAssertion startCaseEvents = casePlan.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 53;
+            int expectedNumberOfEvents = 52;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nCaseDefinitionApplied: 1\n" +
-                        "TeamRoleFilled: 1\n" +
-                        "CaseOwnerAdded: 1\n" +
+                        "CaseTeamUserAdded: 1\n" +
                         "PlanItemCreated: 9\n" +
                         "PlanItemTransitioned: 14\n" +
                         "RepetitionRuleEvaluated: 7\n" +

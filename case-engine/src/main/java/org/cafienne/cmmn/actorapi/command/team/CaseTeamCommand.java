@@ -3,11 +3,11 @@ package org.cafienne.cmmn.actorapi.command.team;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
+import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.team.CaseTeamError;
-import org.cafienne.cmmn.instance.team.Member;
+import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.json.ValueMap;
 
 /**
@@ -28,38 +28,16 @@ public abstract class CaseTeamCommand extends CaseCommand {
         if (! caseInstance.getCurrentTeamMember().isOwner()) {
             throw new AuthorizationException("Only case team owners can perform this action");
         }
+        validate(caseInstance.getCaseTeam());
     }
 
-    protected void validateCaseTeamRole(Case caseInstance, MemberKey memberId, String roleName) {
-        CaseRoleDefinition role = caseInstance.getDefinition().getCaseTeamModel().getCaseRole(roleName);
-        if (role == null) {
-            throw new CaseTeamError("A role with name " + roleName + " is not defined within the case");
-        }
+    protected abstract void validate(Team team) throws InvalidCommandException;
+
+    @Override
+    public ModelResponse process(Case caseInstance) {
+        process(caseInstance.getCaseTeam());
+        return new CaseResponse(this);
     }
 
-    protected void validateCaseTeamRoles(Case caseInstance, CaseTeamMember newMember) {
-        newMember.validateRolesExist(caseInstance.getDefinition());
-
-        // First validate the new roles against existing case team
-        for (String role : newMember.getCaseRoles()) {
-            validateCaseTeamRole(caseInstance, newMember.key(), role);
-        }
-    }
-
-    protected Member validateMembership(Case caseInstance, MemberKey memberId) {
-        Member member = caseInstance.getCaseTeam().getMember(memberId);
-        if (member == null) {
-            throw new CaseTeamError("The case team does not have a member with id " + memberId);
-        }
-        return member;
-    }
-
-    protected void validateWhetherOwnerCanBeRemoved(Case caseInstance, MemberKey key) {
-        Member member = caseInstance.getCaseTeam().getMember(key);
-        if (member != null) {
-            if (member.isOwner() && caseInstance.getCaseTeam().getOwners().size() == 1) {
-                throw new CaseTeamError("Cannot remove case owner " + key);
-            }
-        }
-    }
+    protected abstract void process(Team team);
 }

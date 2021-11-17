@@ -1,7 +1,6 @@
-package org.cafienne.cmmn.actorapi.event.team.member;
+package org.cafienne.cmmn.actorapi.event.team.deprecated.member;
 
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -10,10 +9,6 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class TeamRoleCleared extends CaseTeamRoleEvent {
-    public TeamRoleCleared(Case caseInstance, MemberKey member, String roleName) {
-        super(caseInstance, member, roleName);
-    }
-
     public TeamRoleCleared(ValueMap json) {
         super(json);
     }
@@ -30,7 +25,7 @@ public class TeamRoleCleared extends CaseTeamRoleEvent {
     }
 
     @Override
-    public void updateState(Case actor) {
-        actor.getCaseTeam().updateState(this);
+    protected void updateState(Team team) {
+        team.updateState(this);
     }
 }

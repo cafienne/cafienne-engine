@@ -12,26 +12,27 @@ import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command._
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
-import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
+import org.cafienne.cmmn.actorapi.command.team._
+import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser
+import org.cafienne.infrastructure.akka.http.route.{CaseTeamValidator, CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
-import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat}
-import org.cafienne.service.db.query.exception.CaseSearchFailure
+import org.cafienne.service.db.materializer.LastModifiedRegistration
 import org.cafienne.service.db.query.{CaseMembership, CaseQueries}
+import org.cafienne.service.db.query.exception.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 
-trait CasesRoute extends CommandRoute with QueryRoute {
+trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
+  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
   val caseQueries: CaseQueries
-
-  override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
 
   /**
     * Run the sub route with a valid platform user and case instance id
+    *
     * @param subRoute
     * @return
     */
-  def caseInstanceRoute(subRoute: (PlatformUser, String) => Route) : Route = {
+  def caseInstanceRoute(subRoute: (PlatformUser, String) => Route): Route = {
     validUser { platformUser =>
       path(Segment) { caseInstanceId =>
         pathEndOrSingleSlash {
@@ -43,10 +44,11 @@ trait CasesRoute extends CommandRoute with QueryRoute {
 
   /**
     * Run the sub route with a valid platform user and case instance id
+    *
     * @param subRoute
     * @return
     */
-  def caseInstanceSubRoute(subRoute: (PlatformUser, String) => Route) : Route = {
+  def caseInstanceSubRoute(subRoute: (PlatformUser, String) => Route): Route = {
     validUser { platformUser =>
       pathPrefix(Segment) { caseInstanceId =>
         subRoute(platformUser, caseInstanceId)
@@ -56,10 +58,11 @@ trait CasesRoute extends CommandRoute with QueryRoute {
 
   /**
     * Run the sub route with a valid platform user and case instance id
+    *
     * @param subRoute
     * @return
     */
-  def caseInstanceSubRoute(prefix: String, subRoute: (PlatformUser, String) => Route) : Route = {
+  def caseInstanceSubRoute(prefix: String, subRoute: (PlatformUser, String) => Route): Route = {
     validUser { platformUser =>
       pathPrefix(Segment / prefix) { caseInstanceId =>
         subRoute(platformUser, caseInstanceId)
@@ -67,30 +70,15 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def askCaseWithValidMembers(platformUser: PlatformUser, members: Seq[CaseTeamMember], caseInstanceId: String, command: CaseMembership => CaseCommand): Route = {
-    authorizeCaseAccess(platformUser, caseInstanceId, caseMember => {
-      askCaseWithValidTeam(caseMember.tenant, members, command.apply(caseMember))
-    })
-  }
-
-  def askCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
-    val userIds = members.filter(member => member.isTenantUser()).map(member => member.key.id)
-    onComplete(userCache.getUsers(userIds, tenant)) {
-      case Success(tenantUsers) => {
-        if (tenantUsers.size != userIds.size) {
-          val tenantUserIds = tenantUsers.map(t => t.id)
-          val unfoundUsers = userIds.filterNot(userId => tenantUserIds.contains(userId))
-          val msg = {
-            if (unfoundUsers.size == 1) s"Cannot find an active user '${unfoundUsers.head}' in tenant '$tenant'"
-            else s"The users ${unfoundUsers.map(u => s"'$u'").mkString(", ")} are not active in tenant $tenant"
-          }
-          complete(StatusCodes.NotFound, msg)
-        } else {
-          askModelActor(command)
+  def putCaseTeamUser(platformUser: PlatformUser, caseInstanceId: String, newUser: CaseTeamUser): Route = {
+    authorizeCaseAccess(platformUser, caseInstanceId, {
+      member => {
+        onComplete(userCache.getUserRegistration(newUser.userId)) {
+          case Success(registeredPlatformUser) => askModelActor(new SetCaseTeamUser(member, caseInstanceId, newUser.copy(newOrigin = registeredPlatformUser.origin(member.tenant))))
+          case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
         }
       }
-      case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-    }
+    })
   }
 
   def authorizeCaseAccess(platformUser: PlatformUser, caseInstanceId: String, subRoute: CaseMembership => Route): Route = {
@@ -108,26 +96,5 @@ trait CasesRoute extends CommandRoute with QueryRoute {
 
   def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CaseMembership => CaseCommand): Route = {
     authorizeCaseAccess(platformUser, caseInstanceId, caseMember => askModelActor(createCaseCommand.apply(caseMember)))
-  }
-
-  protected def teamConverter(caseTeam: BackwardCompatibleTeamFormat): CaseTeam = {
-    CaseTeam(caseTeam.members.map {
-      memberConverter
-    })
-  }
-
-  protected def memberConverter(member: BackwardCompatibleTeamMemberFormat): CaseTeamMember = {
-    val memberId = member.memberId.getOrElse(member.user.getOrElse(throw new IllegalArgumentException("Member id is missing")))
-    val memberType = member.memberType.getOrElse("user")
-    val caseRoles = member.caseRoles.getOrElse(member.roles.getOrElse(Seq()))
-    val removeRoles = member.removeRoles.getOrElse(Seq())
-
-    val isOwner = {
-      if (member.isOwner.nonEmpty) member.isOwner // If the value of owner is filled, then that precedes (both in old and new format)
-      else if (member.user.nonEmpty) Some(true) // Old format ==> all users become owner
-      else member.isOwner // New format, take what is set
-    }
-
-    new CaseTeamMember(MemberKey(memberId, memberType), caseRoles = caseRoles, isOwner = isOwner, removeRoles = removeRoles)
   }
 }

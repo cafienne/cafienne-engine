@@ -15,44 +15,28 @@ import org.cafienne.humantask.actorapi.command.WorkflowCommand
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.db.materializer.LastModifiedRegistration
-import org.cafienne.service.db.query.exception.TaskSearchFailure
 import org.cafienne.service.db.query.{CaseMembership, TaskQueries}
+import org.cafienne.service.db.query.exception.TaskSearchFailure
 
 import scala.util.{Failure, Success}
 
 trait TaskRoute extends CommandRoute with QueryRoute {
+  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
   val taskQueries: TaskQueries
 
-  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
-
-  def askTaskWithMember(platformUser: PlatformUser, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
+  def askTaskWithAssignee(platformUser: PlatformUser, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
     onComplete(taskQueries.getCaseMembership(taskId, platformUser)) {
-      case Success(caseMember) => {
-        val tenant = caseMember.tenant
-        onComplete(userCache.getUsers(Seq(assignee), tenant)) {
-          case Success(tenantUsers) => {
-            if (tenantUsers.isEmpty) {
-              // Not found, hence not a valid user (it can be also because the user account is not enabled)
-              complete(StatusCodes.NotFound, s"Cannot find an active user '$assignee' in tenant '$tenant'")
-            } else if (tenantUsers.size > 1) {
-              logger.error(s"Found ${tenantUsers.size} users matching userId '$assignee' in tenant '$tenant'. The query should only result in one user only.")
-              complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$assignee'")
-            } else {
-              val member = tenantUsers.head
-              askModelActor(createTaskCommand.apply(caseMember.caseInstanceId, caseMember, member))
-            }
-          }
-          case Failure(t: Throwable) => {
-            logger.warn(s"An error happened while retrieving user information on user '$assignee' in tenant '$tenant'", t)
+      case Success(caseMember) =>
+        val caseInstanceId = caseMember.caseInstanceId
+        onComplete(userCache.getUserRegistration(assignee)) {
+          case Success(assignee: PlatformUser) => askModelActor(createTaskCommand.apply(caseInstanceId, caseMember, assignee))
+          case Failure(t: Throwable) =>
+            logger.warn(s"An error happened while retrieving user information on user '$assignee'", t)
             complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$assignee'")
-          }
         }
-      }
-      case Failure(error) => {
-        error match {
-          case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-          case _ => throw error
-        }
+      case Failure(error) => error match {
+        case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+        case _ => throw error
       }
     }
   }
@@ -60,12 +44,11 @@ trait TaskRoute extends CommandRoute with QueryRoute {
   def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
     onComplete(taskQueries.getCaseMembership(taskId, platformUser)) {
       case Success(caseMember) => askModelActor(createTaskCommand.apply(caseMember.caseInstanceId, caseMember))
-      case Failure(error) => {
-        error match {
-          case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-          case _ => throw error
-        }
+      case Failure(error) => error match {
+        case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+        case _ => throw error
       }
+
     }
   }
 

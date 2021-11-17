@@ -10,7 +10,7 @@ import org.cafienne.cmmn.actorapi.command.CaseCommandModels
 import org.cafienne.infrastructure.serialization.{ValueMapJacksonDeserializer, ValueMapJacksonSerializer}
 import org.cafienne.json.ValueMap
 import org.cafienne.service.api.anonymous.CaseRequestRoute.AnonymousStartCaseFormat
-import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, MigrationDefinitionFormat, StartCaseFormat}
+import org.cafienne.service.api.model._
 
 /**
   * This file contains some marshallers and unmarshallers for the engine
@@ -36,6 +36,14 @@ object CommandMarshallers {
 
   implicit val CaseTeamMemberUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
     JsonUtil.fromJson[BackwardCompatibleTeamMemberFormat](data)
+  })
+
+  implicit val CaseTeamUserUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
+    JsonUtil.fromJson[CaseTeamFormat.CaseTeamUserFormat](data)
+  })
+
+  implicit val CaseTeamTenantRoleUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
+    JsonUtil.fromJson[CaseTeamFormat.TenantRoleFormat](data)
   })
 
   implicit val DiscretionaryItemUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {

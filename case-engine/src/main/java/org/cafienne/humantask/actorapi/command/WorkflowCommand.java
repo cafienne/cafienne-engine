@@ -6,17 +6,17 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
+import org.cafienne.tenant.User;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -162,7 +162,7 @@ public abstract class WorkflowCommand extends CaseCommand {
             return;
         }
         // Validate that the new assignee is part of the team
-        Member member = task.getCaseInstance().getCaseTeam().getMember(new MemberKey(assignee, "user"));
+        CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(assignee);
         if (member == null) {
             raiseException("There is no case team member with id '" + assignee + "'");
         }
@@ -170,7 +170,7 @@ public abstract class WorkflowCommand extends CaseCommand {
         CaseRoleDefinition role = task.getPerformer();
         if (role != null) {
             // Members need to have the role, Owners don't need to
-            if (!member.isOwner() && !member.getRoles().contains(role)) {
+            if (!member.isOwner() && !member.getCaseRoles().contains(role.getName())) {
                 raiseAuthorizationException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
             }
         }

@@ -1,23 +1,11 @@
 package org.cafienne.service.db.schema.table
 
-import org.cafienne.service.db.record.{TenantOwnerRecord, TenantRecord, UserRoleRecord}
+import org.cafienne.service.db.record.{TenantRecord, UserRoleRecord}
 import org.cafienne.service.db.schema.QueryDBSchema
 
 trait TenantTables extends QueryDBSchema {
 
   import dbConfig.profile.api._
-
-  // Schema for the "tenant-owner" table:
-  final class TenantOwnersTable(tag: Tag) extends CafienneTenantTable[TenantOwnerRecord](tag, "tenant_owners") {
-
-    lazy val * = (tenant, userId, enabled).mapTo[TenantOwnerRecord]
-
-    lazy val enabled = column[Boolean]("enabled", O.Default(true))
-
-    lazy val pk = primaryKey(pkName, (tenant, userId))
-
-    lazy val userId = userColumn[String]("userId")
-  }
 
   // Schema for the "tenant" table:
   final class TenantTable(tag: Tag) extends CafienneTable[TenantRecord](tag, "tenant") {

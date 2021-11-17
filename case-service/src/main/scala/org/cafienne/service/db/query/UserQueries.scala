@@ -2,7 +2,6 @@ package org.cafienne.service.db.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.service.db.query.exception.UserSearchFailure
 import org.cafienne.service.db.record.UserRoleRecord
 import org.cafienne.service.db.schema.table.TenantTables
@@ -10,9 +9,9 @@ import org.cafienne.service.db.schema.table.TenantTables
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserQueries {
-  def getPlatformUser(user: AuthenticatedUser): Future[PlatformUser] = ???
+  def getPlatformUser(userId: String): Future[PlatformUser] = ???
 
-  def getSelectedTenantUsers(tenant: String, users: Seq[String]): Future[Seq[TenantUser]] = ???
+  def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = ???
 
   def getTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
 
@@ -31,28 +30,30 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
 
   val rolesQuery = TableQuery[UserRoleTable]
 
-  override def getPlatformUser(user: AuthenticatedUser): Future[PlatformUser] = {
-    val query = TableQuery[UserRoleTable].filter(_.userId === user.userId).filter(_.enabled === true)
+  override def getPlatformUser(userId: String): Future[PlatformUser] = getPlatformUsers(Seq(userId)).map(_.head)
 
-    db.run(query.result).map(records => {
-      val users = records.filter(record => record.role_name == "")
-      val tenants = users.map(user => user.tenant)
-      val tenantUsers = tenants.map(tenant => {
-        val user = users.find(u => u.tenant == tenant).get// no worries, this always exists (obviously, otherwise there would not be a tenant).
-        val roles = records.filter(record => record.tenant == tenant && !record.role_name.isBlank)
-        createTenantUser(user, roles)
-      })
-      PlatformUser(user.userId, tenantUsers)
-    })
+  private def createPlatformUser(userId: String, tenantRecords: Seq[UserRoleRecord]): PlatformUser = {
+    //    println(s"User $userId has ${tenantRecords.length} tenant roles and ${groupRecords.length} group roles")
+    val tenantUsers = tenantRecords.map(_.tenant).toSet[String].map(tenant => {
+      val userRecords = tenantRecords.filter(_.tenant == tenant)
+      val roles = userRecords.filterNot(_.role_name.isBlank).map(_.role_name).toSet
+      val user = userRecords.find(_.role_name.isBlank)
+      if (user.isEmpty) None // as we filter on 'enabled===true', it can happen that a disabled user account is fetched. This means user is not active in that tenant, and it should not return
+      else Some(createTenantUser(user.get, roles))
+    }).filter(_.nonEmpty).map(_.get).toSeq
+
+    //    println(s"User $userId is member of ${tenantUsers.length} tenants ${tenantUsers.map(_.tenant)} and ${groups.length} groups ${groups.map(_.groupId)}\n")
+    PlatformUser(userId, tenantUsers)
   }
 
-  override def getSelectedTenantUsers(tenant: String, users: Seq[String]): Future[Seq[TenantUser]] = {
-    val query = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.tenant === tenant).filter(_.enabled === true)
-    db.run(query.result).map(records => {
-      val users = records.filter(record => record.role_name == "")
-      users.map(user => {
-        val roles = records.filter(record => record.userId == user.userId && !record.role_name.isBlank)
-        createTenantUser(user, roles)
+  override def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = {
+    val tenantUsersQuery = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.enabled === true)
+
+    val usersQuery = tenantUsersQuery
+
+    db.run(usersQuery.result).map(records => {
+      users.map(userId => {
+        createPlatformUser(userId, records)
       })
     })
   }
@@ -68,7 +69,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
       val roleRecords = records.filter(record => !record.role_name.isBlank && record.enabled)
 
       val users = userRecords.map(user => {
-        val roles = roleRecords.filter(role => role.userId == user.userId)
+        val roles = roleRecords.filter(role => role.userId == user.userId).map(_.role_name).toSet
         createTenantUser(user, roles)
       })
       users
@@ -94,12 +95,12 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
         throw UserSearchFailure(userId)
       })
       // Filter out names of enabled roles
-      val roles = roleRecords.filter(role => role.enabled).filter(role => !role.role_name.isBlank)
+      val roles = roleRecords.filter(role => role.enabled).filter(role => !role.role_name.isBlank).map(_.role_name).toSet
       createTenantUser(user, roles)
     })
   }
 
-  private def createTenantUser(user: UserRoleRecord, roles: Seq[UserRoleRecord]): TenantUser = {
-    TenantUser(user.userId, roles.map(role => role.role_name).toSet, user.tenant, isOwner = user.isOwner, user.name, user.email, enabled = user.enabled)
+  private def createTenantUser(user: UserRoleRecord, roles: Set[String]): TenantUser = {
+    TenantUser(user.userId, roles, user.tenant, isOwner = user.isOwner, user.name, user.email, enabled = user.enabled)
   }
 }

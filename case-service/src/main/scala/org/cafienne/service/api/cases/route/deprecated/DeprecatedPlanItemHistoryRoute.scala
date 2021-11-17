@@ -5,10 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.service.api.cases.route
+package org.cafienne.service.api.cases.route.deprecated
 
 import akka.http.scaladsl.server.Directives._
 import org.cafienne.identity.IdentityProvider
+import org.cafienne.service.api.cases.route.CasesRoute
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 

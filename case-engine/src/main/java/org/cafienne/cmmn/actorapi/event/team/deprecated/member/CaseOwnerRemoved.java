@@ -1,7 +1,7 @@
-package org.cafienne.cmmn.actorapi.event.team.member;
+package org.cafienne.cmmn.actorapi.event.team.deprecated.member;
 
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent;
+import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -9,12 +9,7 @@ import org.cafienne.json.ValueMap;
  * Event caused when a team member is no longer owner
  */
 @Manifest
-public class CaseOwnerRemoved extends CaseTeamMemberEvent {
-
-    public CaseOwnerRemoved(Case caseInstance, MemberKey member) {
-        super(caseInstance, member);
-    }
-
+public class CaseOwnerRemoved extends DeprecatedCaseTeamEvent {
     public CaseOwnerRemoved(ValueMap json) {
         super(json);
     }
@@ -25,7 +20,7 @@ public class CaseOwnerRemoved extends CaseTeamMemberEvent {
     }
 
     @Override
-    public void updateState(Case actor) {
-        actor.getCaseTeam().updateState(this);
+    protected void updateState(Team team) {
+        team.updateState(this);
     }
 }

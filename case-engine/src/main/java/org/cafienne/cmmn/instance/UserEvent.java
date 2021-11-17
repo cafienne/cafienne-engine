@@ -8,11 +8,10 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.cmmn.actorapi.command.team.CurrentMember;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
@@ -49,7 +48,7 @@ public class UserEvent extends EventListener<UserEventDefinition> {
         }
 
         // Apparently no matching role was found.
-        throw new AuthorizationException("User '"+currentUser.getMemberId()+"' does not have the permission to raise the event " + getName());
+        throw new AuthorizationException("User '"+currentUser.userId()+"' does not have the permission to raise the event " + getName());
     }
 
     @Override

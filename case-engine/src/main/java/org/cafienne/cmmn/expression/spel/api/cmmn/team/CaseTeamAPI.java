@@ -4,26 +4,23 @@ import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Team;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  */
-public class CaseTeamAPI extends APIObject<Case> {
-    private final Team team;
+public class CaseTeamAPI extends BaseTeamAPI {
     private final Map<String, CaseRoleAPI> rolesByName = new HashMap<>();
-    private final List<MemberAPI> members = new ArrayList<>();
     private final RoleAPI roleAPI;
 
     public CaseTeamAPI(Team team) {
-        super(team.getCaseInstance());
-        this.team = team;
+        super(team);
         this.roleAPI = new RoleAPI(getActor());
         addPropertyReader("members", this::getMembers);
         addPropertyReader("users", this::getUsers);
+        addPropertyReader("tenantRoles", this::getTenantRoles);
         addPropertyReader("owners", this::getOwners);
         addPropertyReader("roles", () -> getRolesByName().values());
         addPropertyReader("role", this::getRoleAPI);
@@ -43,19 +40,20 @@ public class CaseTeamAPI extends APIObject<Case> {
         return rolesByName;
     }
 
-    private List<MemberAPI> getOwners() {
+    private Collection<MemberAPI> getUsers() {
+        return team.getUsers().stream().map(this::wrap).collect(Collectors.toList());
+    }
+
+    private Collection<MemberAPI> getTenantRoles() {
+        return team.getTenantRoles().stream().map(this::wrap).collect(Collectors.toList());
+    }
+
+    private Collection<MemberAPI> getOwners() {
         return getMembers().stream().filter(MemberAPI::isOwner).collect(Collectors.toList());
     }
 
-    private List<MemberAPI> getUsers() {
-        return getMembers().stream().filter(MemberAPI::isUser).collect(Collectors.toList());
-    }
-
-    private List<MemberAPI> getMembers() {
-        if (members.isEmpty()) {
-            team.getMembers().forEach(MemberAPI::new);
-        }
-        return members;
+    private Collection<MemberAPI> getMembers() {
+        return team.getMembers().stream().map(this::wrap).collect(Collectors.toList());
     }
 
     public String getMemberWithRole(String role) {

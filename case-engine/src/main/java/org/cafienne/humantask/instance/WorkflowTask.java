@@ -140,13 +140,13 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         return !Objects.equals(this.currentAssignee, newAssignee);
     }
 
-    private void addCaseTeamMember(String newMember) {
-        getCaseInstance().getCaseTeam().upsertCaseTeamMember(newMember, task.getPerformer());
+    private void addCaseTeamUser(String newMember) {
+        getCaseInstance().getCaseTeam().upsertCaseTeamUser(newMember, task.getPerformer());
     }
 
     public void assign(String newAssignee) {
         if (isNewAssignee(newAssignee)) {
-            addCaseTeamMember(newAssignee);
+            addCaseTeamUser(newAssignee);
             addEvent(new HumanTaskAssigned(task, newAssignee));
             checkOwnershipChange(newAssignee);
         }
@@ -161,7 +161,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
 
     public void delegate(String newAssignee) {
         if (isNewAssignee(newAssignee)) {
-            addCaseTeamMember(newAssignee);
+            addCaseTeamUser(newAssignee);
             addEvent(new HumanTaskDelegated(task, newAssignee));
         }
     }

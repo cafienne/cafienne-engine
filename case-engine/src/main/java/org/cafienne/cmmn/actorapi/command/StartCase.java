@@ -12,7 +12,6 @@ import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.CaseStartedResponse;
@@ -24,15 +23,11 @@ import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @Manifest
 public class StartCase extends CaseCommand implements BootstrapCommand {
-    private final static Logger logger = LoggerFactory.getLogger(StartCase.class);
-
     private final String tenant;
     private final String rootCaseId;
     private final String parentCaseId;
@@ -89,7 +84,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
         this.inputParameters = json.readMap(Fields.inputParameters);
         this.debugMode = json.readBoolean(Fields.debugMode);
-        this.caseTeam = CaseTeam.deserialize(json.withArray(Fields.team));
+        this.caseTeam = json.readObject(Fields.team, CaseTeam::deserialize);
     }
 
     @Override
@@ -119,9 +114,9 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
 
         // If the case team is empty, add current user both as member and as owner,
         //  including default mapping of tenant roles to case team roles
-        if (caseTeam.getMembers().isEmpty()) {
+        if (caseTeam.isEmpty()) {
             caseInstance.addDebugInfo(() -> "Adding user '" + getUser().id() + "' to the case team (as owner) because new team is empty");
-            caseTeam = CaseTeam.apply(CaseTeamMember.createBootstrapMember(getUser()));
+            caseTeam = CaseTeam.create(getUser());
         }
 
         if (caseTeam.owners().isEmpty()) {
@@ -129,7 +124,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         }
 
         // Validates the member and roles
-        caseTeam.validate(definition);
+        caseTeam.validate(definition.getCaseTeamModel());
 
         // Should we also check whether all parameters have been made available in the input list? Not sure ...
     }
@@ -170,7 +165,7 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
         writeField(generator, Fields.tenant, tenant);
-        writeListField(generator, Fields.team, caseTeam.getMembers());
+        writeField(generator, Fields.team, caseTeam);
         writeField(generator, Fields.inputParameters, inputParameters);
         writeField(generator, Fields.rootActorId, rootCaseId);
         writeField(generator, Fields.parentActorId, parentCaseId);

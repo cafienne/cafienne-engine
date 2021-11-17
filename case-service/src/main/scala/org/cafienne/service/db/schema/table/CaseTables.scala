@@ -3,6 +3,7 @@ package org.cafienne.service.db.schema.table
 import org.cafienne.service.db.record._
 import org.cafienne.service.db.schema.QueryDBSchema
 import slick.lifted.ColumnOrdered
+import slick.relational.RelationalProfile.ColumnOption.Length
 
 import java.time.Instant
 
@@ -237,25 +238,41 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
   }
 
-  class CaseInstanceTeamMemberTable(tag: Tag) extends CafienneTenantTable[CaseTeamMemberRecord](tag, "case_instance_team_member") {
+  class CaseInstanceTeamUserTable(tag: Tag) extends CafienneTenantTable[CaseTeamUserRecord](tag, "case_instance_team_user") {
 
     lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
+    lazy val userId = userColumn[String]("user_id")
+
+    lazy val origin = column[String]("origin", Length(32), O.Default(""))
+
     lazy val caseRole = idColumn[String]("case_role")
-
-    lazy val memberId = userColumn[String]("member_id")
-
-    lazy val isTenantUser = column[Boolean]("isTenantUser")
 
     lazy val isOwner = column[Boolean]("isOwner")
 
-    lazy val active = column[Boolean]("active")
+    lazy val pk = primaryKey(pkName, (caseInstanceId, caseRole, userId))
 
-    lazy val pk = primaryKey(pkName, (caseInstanceId, caseRole, memberId, isTenantUser))
+    lazy val * = (caseInstanceId, tenant, userId, origin, caseRole, isOwner).mapTo[CaseTeamUserRecord]
 
-    lazy val * = (caseInstanceId, tenant, memberId, caseRole, isTenantUser, isOwner, active).mapTo[CaseTeamMemberRecord]
+    lazy val indexCaseInstanceId = index(caseInstanceId)
+    lazy val indexUserId = index(userId)
+  }
 
-    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
-    lazy val indexMemberId = index(oldStyleIxName(memberId), (memberId, isTenantUser))
+  class CaseInstanceTeamTenantRoleTable(tag: Tag) extends CafienneTenantTable[CaseTeamTenantRoleRecord](tag, "case_instance_team_tenant_role") {
+
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
+
+    lazy val tenantRole = userColumn[String]("tenant_role")
+
+    lazy val caseRole = idColumn[String]("case_role")
+
+    lazy val isOwner = column[Boolean]("isOwner")
+
+    lazy val pk = primaryKey(pkName, (caseInstanceId, tenant, tenantRole, caseRole))
+
+    lazy val * = (caseInstanceId, tenant, tenantRole, caseRole, isOwner).mapTo[CaseTeamTenantRoleRecord]
+
+    lazy val indexCaseInstanceId = index(caseInstanceId)
+    lazy val indexTenantRoles = index(ixName(tenantRole), (tenant, tenantRole))
   }
 }

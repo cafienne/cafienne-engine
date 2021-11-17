@@ -14,9 +14,12 @@ import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
-import org.cafienne.cmmn.actorapi.command.team.member.PutTeamMember;
-import org.cafienne.cmmn.actorapi.command.team.member.RemoveTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert;
 import org.cafienne.cmmn.actorapi.command.team.SetCaseTeam;
+import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamTenantRole;
+import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamUser;
+import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamTenantRole;
+import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser;
 import org.cafienne.humantask.actorapi.command.*;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.*;
@@ -60,8 +63,11 @@ public class CommandSerializer extends CafienneSerializer {
     }
 
     private static void addCaseTeamCommands() {
-        addManifestWrapper(PutTeamMember.class, PutTeamMember::new);
-        addManifestWrapper(RemoveTeamMember.class, RemoveTeamMember::new);
+        addManifestWrapper(DeprecatedUpsert.class, DeprecatedUpsert::new);
+        addManifestWrapper(SetCaseTeamUser.class, SetCaseTeamUser::new);
+        addManifestWrapper(SetCaseTeamTenantRole.class, SetCaseTeamTenantRole::new);
+        addManifestWrapper(RemoveCaseTeamUser.class, RemoveCaseTeamUser::new);
+        addManifestWrapper(RemoveCaseTeamTenantRole.class, RemoveCaseTeamTenantRole::new);
         addManifestWrapper(SetCaseTeam.class, SetCaseTeam::new);
     }
 

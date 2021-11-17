@@ -77,12 +77,11 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 32;
+            int expectedNumberOfEvents = 31;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
-                        "TeamRoleFilled: 1\n" +
-                        "CaseOwnerAdded: 1\n" +
+                        "CaseTeamUserAdded: 1\n" +
                         "CaseFileEvent: 1\n" +
                         "PlanItemCreated: 4\n" +
                         "PlanItemTransitioned: 10\n" +
@@ -133,12 +132,11 @@ public class VariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 32;
+            int expectedNumberOfEvents = 31;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
-                        "TeamRoleFilled: 1\n" +
-                        "CaseOwnerAdded: 1\n" +
+                        "CaseTeamUserAdded: 1\n" +
                         "CaseFileEvent: 1\n" +
                         "PlanItemCreated: 4\n" +
                         "PlanItemTransitioned: 10\n" +

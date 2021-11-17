@@ -1,13 +1,13 @@
 package org.cafienne.service.db.query
 
-import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
+import org.cafienne.actormodel.identity.{Origin, PlatformUser}
+import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
 import org.cafienne.service.db.query.exception.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.db.query.filter.CaseFilter
-import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord}
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.concurrent.Future
 
@@ -24,7 +24,7 @@ trait CaseQueries {
 
   def getCaseFileDocumentation(caseInstanceId: String, user: PlatformUser): Future[CaseFileDocumentation] = ???
 
-  def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeam] = ???
+  def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeamResponse] = ???
 
   def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = ???
 
@@ -52,18 +52,15 @@ class CaseQueriesImpl
   override def getCaseMembership(caseInstanceId: String, user: PlatformUser): Future[CaseMembership] = {
     val tenantRoleBasedMembership = for {
       (role, _) <- TableQuery[UserRoleTable].filter(_.userId === user.id)
-        .joinRight(TableQuery[CaseInstanceTeamMemberTable]
-          .filter(_.caseInstanceId === caseInstanceId)
-          .filter(_.isTenantUser === false))
+        .joinRight(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId))
         // The tenant role must be in the case team, and also the user must have the role in the same tenant
-        .on((left, right) => left.role_name === right.memberId && left.tenant === right.tenant)
+        .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
     } yield (caseInstanceId, role.map(_.tenant), role.map(_.role_name))
 
-    val userIdBasedMembership = TableQuery[CaseInstanceTeamMemberTable]
-      .filter(_.isTenantUser === true)
-      .filter(_.memberId === user.id)
+    val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.userId === user.id)
       .filter(_.caseInstanceId === caseInstanceId)
-      .map(user => (caseInstanceId, user.tenant, user.memberId)).distinct
+      .map(user => (caseInstanceId, user.tenant, user.userId)).distinct
 
     val query = userIdBasedMembership
       .joinFull(tenantRoleBasedMembership)
@@ -93,7 +90,7 @@ class CaseQueriesImpl
     val result = for {
       caseInstance <- getCaseInstance(caseInstanceId, user)
       caseTeam <- getCaseTeam(caseInstanceId, user)
-      caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.getOrElse(null)))
+      caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.orNull))
       casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map {
         CasePlan
       }
@@ -110,7 +107,7 @@ class CaseQueriesImpl
       // Get the case file
       baseQuery <- caseDefinitionQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
 
     db.run(query.result.headOption).map {
@@ -124,14 +121,10 @@ class CaseQueriesImpl
       // Get the case
       baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
       // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
 
     db.run(query.result.headOption)
-  }
-
-  override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]) = {
-    TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId)
   }
 
   override def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = {
@@ -139,7 +132,7 @@ class CaseQueriesImpl
       // Get the case file
       baseQuery <- caseFileQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
 
     db.run(query.result.headOption).map {
@@ -153,7 +146,7 @@ class CaseQueriesImpl
       // Get the case file
       baseQuery <- caseDefinitionQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId)
     } yield (baseQuery)
 
     db.run(query.result.headOption).map {
@@ -162,46 +155,49 @@ class CaseQueriesImpl
     }
   }
 
-  override def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeam] = {
-    val query = for {
-      // Get the case team
-      baseQuery <- caseInstanceTeamMemberQuery
-        .filter(_.caseInstanceId === caseInstanceId)
-        .filter(_.active === true)
-      // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
-    } yield baseQuery
+  override def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeamResponse] = {
+    val usersQuery = for {
+      users <- TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === caseInstanceId)
+      _ <- membershipQuery(user, caseInstanceId)
+    } yield users
+    val tenantRolesQuery = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
 
     (for {
-      teamRecords <- db.run(query.distinct.result)
-      roleRecords <- db.run(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).distinct.result)
-    } yield (teamRecords, roleRecords))
+      userRecords <- db.run(usersQuery.result)
+      tenantRoleRecords <- db.run(tenantRolesQuery.result)
+      roleRecords <- db.run(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).map(_.roleName).result)
+    } yield (userRecords, tenantRoleRecords, roleRecords))
       .map(records => {
-        val members = records._1
-        val roles = records._2.map(_.roleName)
-        if (members.isEmpty) {
+        if (records._1.isEmpty) {
           throw CaseSearchFailure(caseInstanceId)
         }
+        val users = records._1
+        val tenantRoles = records._2
+        val caseRoleRecords: Seq[String] = records._3
 
-        val team = fillCaseTeam(members)
-        val caseRoles = roles.filterNot(_.isBlank).distinct
-        val unassignedRoles = caseRoles.filter(caseRole => !members.exists(_.caseRole == caseRole))
-        team.copy(caseRoles = caseRoles, unassignedRoles = unassignedRoles)
+        val team = fillCaseTeam(users, tenantRoles)
+        val caseRoles = caseRoleRecords.filterNot(_.isBlank)
+        val unassignedRoles = caseRoles.filter(caseRole => !users.exists(_.caseRole == caseRole) && !tenantRoles.exists(_.caseRole == caseRole))
+        CaseTeamResponse(team, caseRoles = caseRoles, unassignedRoles = unassignedRoles)
       })
   }
 
-  private def fillCaseTeam(records: Seq[CaseTeamMemberRecord]): CaseTeam = {
-    val members = records.filter(record => record.caseRole.isBlank)
-    val roles = records.filterNot(record => record.caseRole.isBlank)
+  private def getUserMembers(userRecords: Seq[CaseTeamUserRecord]): Seq[CaseTeamUser] = {
+    val users = userRecords.filter(record => record.caseRole.isBlank)
+    val roles = userRecords.filterNot(record => record.caseRole.isBlank)
+    users.map(user => CaseTeamUser.from(userId = user.userId, origin = Origin.getEnum(user.origin), isOwner = user.isOwner, caseRoles = roles.filter(role => role.userId == user.userId).map(_.caseRole).toSet))
+  }
 
-    CaseTeam(members.map(member => {
-      val key = MemberKey(member.memberId, member.isTenantUser match {
-        case true => "user"
-        case false => "role"
-      })
-      val memberRoles = roles.filter(role => role.memberId == member.memberId && role.isTenantUser == member.isTenantUser).map(role => role.caseRole)
-      new CaseTeamMember(key, memberRoles, Some(member.isOwner))
-    }))
+  private def getTenantRoleMembers(roleRecords: Seq[CaseTeamTenantRoleRecord]): Seq[CaseTeamTenantRole] = {
+    val records = roleRecords.filter(record => record.caseRole.isBlank)
+    val caseRoles = roleRecords.filterNot(record => record.caseRole.isBlank)
+    records.map(tRole => CaseTeamTenantRole(tenantRoleName = tRole.tenantRole, isOwner = tRole.isOwner, caseRoles = caseRoles.filter(role => role.tenantRole == tRole.tenantRole).map(_.caseRole).toSet))
+  }
+
+  private def fillCaseTeam(userRecords: Seq[CaseTeamUserRecord], tenantRoleRecords: Seq[CaseTeamTenantRoleRecord]): CaseTeam = {
+    val userMembers = getUserMembers(userRecords)
+    val tenantRoleMembers = getTenantRoleMembers(tenantRoleRecords)
+    CaseTeam(users = userMembers, tenantRoles = tenantRoleMembers)
   }
 
   override def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = {
@@ -209,7 +205,7 @@ class CaseQueriesImpl
       // Get the items in the case plan
       baseQuery <- planItemTableQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -223,7 +219,7 @@ class CaseQueriesImpl
       // Get the item
       baseQuery <- planItemTableQuery.filter(_.id === planItemId)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery
 
     db.run(query.result.headOption).map {
@@ -238,7 +234,7 @@ class CaseQueriesImpl
       baseQuery <- planItemTableQuery.filter(_.id === planItemId)
       definitionQuery <- caseDefinitionQuery.filter(_.caseInstanceId === baseQuery.caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield (baseQuery, definitionQuery)
 
     db.run(query.result.headOption).map {
@@ -260,7 +256,7 @@ class CaseQueriesImpl
       // Get the item's history
       baseQuery <- TableQuery[PlanItemHistoryTable].filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -281,7 +277,7 @@ class CaseQueriesImpl
       // Get the item's history
       baseQuery <- TableQuery[PlanItemHistoryTable].filter(_.planItemId === planItemId)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -372,7 +368,7 @@ class CaseQueriesImpl
           .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
 
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.id, baseQuery.tenant, filter.identifiers)
+      _ <- membershipQuery(user, baseQuery.id, filter.identifiers)
     } yield baseQuery
     db.run(query.distinct.only(area).order(sort).result).map(records => {
       //      println("Found " + records.length +" matching cases on filter " + identifiers)

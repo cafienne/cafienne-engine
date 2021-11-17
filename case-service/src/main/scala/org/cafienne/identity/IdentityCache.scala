@@ -1,7 +1,7 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
@@ -14,7 +14,9 @@ import scala.concurrent.{ExecutionContext, Future}
 trait IdentityProvider {
   def getPlatformUser(user: AuthenticatedUser, tlm: Option[String]): Future[PlatformUser] = ???
 
-  def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = ???
+  def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = ???
+
+  def getUserRegistration(userId: String): Future[PlatformUser] = ???
 
   def clear(userId: String): Unit = ???
 }
@@ -46,7 +48,7 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
   private def executeUserQuery(user: AuthenticatedUser): Future[PlatformUser] = {
     cache.get(user.userId) match {
       case user: PlatformUser => Future(user)
-      case null => userQueries.getPlatformUser(user).map(cacheUser)
+      case null => userQueries.getPlatformUser(user.userId).map(cacheUser)
     }
   }
 
@@ -55,7 +57,11 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
     cache.remove(userId)
   }
 
-  override def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = {
-    userQueries.getSelectedTenantUsers(tenant, userIds)
+  override def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = {
+    userQueries.getPlatformUsers(userIds)
+  }
+
+  override def getUserRegistration(userId: String): Future[PlatformUser] = {
+    userQueries.getPlatformUser(userId)
   }
 }

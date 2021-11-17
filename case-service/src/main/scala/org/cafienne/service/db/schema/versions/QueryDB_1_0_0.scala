@@ -8,7 +8,7 @@ import slick.lifted
 import slick.lifted.TableQuery
 import slick.migration.api.TableMigration
 
-trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables {
+trait CafienneTablesV1 extends QueryDBSchema with CaseTables with TenantTables with CafienneTablesV2 {
 
   import dbConfig.profile.api._
 

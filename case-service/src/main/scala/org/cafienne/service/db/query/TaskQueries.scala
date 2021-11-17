@@ -39,21 +39,20 @@ class TaskQueriesImpl extends TaskQueries
 
   override def getCaseMembership(taskId: String, user: PlatformUser): Future[CaseMembership] = {
     val tenantRoleBasedMembership =
-      TableQuery[CaseInstanceTeamMemberTable].filter(_.isTenantUser === false)
+      TableQuery[CaseInstanceTeamTenantRoleTable]
         .join(TableQuery[TaskTable].filter(_.id === taskId))
         .on(_.caseInstanceId === _.caseInstanceId)
         .joinRight(TableQuery[UserRoleTable].filter(_.userId === user.id))
-        .on((left, right) => left._1.memberId === right.role_name && left._1.tenant === right.tenant)
+        .on((left, right) => left._1.tenantRole === right.role_name && left._1.tenant === right.tenant)
         .map(record => {
-          (record._1.map(_._1.caseInstanceId), record._1.map(_._1.tenant), record._1.map(_._1.memberId))
+          (record._1.map(_._1.caseInstanceId), record._1.map(_._1.tenant), record._1.map(_._1.tenantRole))
         })
 
-    val userIdBasedMembership = TableQuery[CaseInstanceTeamMemberTable]
-      .filter(_.isTenantUser === true)
-      .filter(_.memberId === user.id)
+    val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.userId === user.id)
       .join(TableQuery[TaskTable].filter(_.id === taskId))
       .on(_.caseInstanceId === _.caseInstanceId)
-      .map(user => (user._1.caseInstanceId, user._1.tenant, user._1.memberId))
+      .map(user => (user._1.caseInstanceId, user._1.tenant, user._1.userId))
 
     val query = userIdBasedMembership
       .joinFull(tenantRoleBasedMembership)
@@ -82,7 +81,7 @@ class TaskQueriesImpl extends TaskQueries
       // Get the case
       baseQuery <- TableQuery[TaskTable].filter(_.id === taskId)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery
 
     db.run(query.result.headOption).map {
@@ -99,7 +98,7 @@ class TaskQueriesImpl extends TaskQueries
         .filter(_._2.caseName === caseName)
         .filterOpt(tenant)(_._1.tenant === _)
       // Access control query
-      _ <- membershipQuery(user, baseQuery._1.caseInstanceId, baseQuery._1.tenant, None)
+      _ <- membershipQuery(user, baseQuery._1.caseInstanceId)
     } yield baseQuery._1
 
     db.run(query.distinct.result)
@@ -110,7 +109,7 @@ class TaskQueriesImpl extends TaskQueries
       // Get the case
       baseQuery <- TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
@@ -119,38 +118,20 @@ class TaskQueriesImpl extends TaskQueries
     })
   }
 
-  override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]) = {
-    TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
-  }
-
-  override def getAllTasks(user: PlatformUser, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
-
+  override def getAllTasks(platformUser: PlatformUser, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
     // If there is no assignee given, then we need to query tasks that have a role that the user also has.
     //  Otherwise the query will not filter on roles
     val assignmentFilterQuery = filter.assignee match {
       case Some(assignee) => TableQuery[TaskTable].filter(_.assignee === assignee)
-      case None => for {
-        // Select all tasks
-        tasks <- TableQuery[TaskTable]
-        // In tenants where i am a user
-        tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.tenant === tasks.tenant)
-        // Where my case team roles map to the task role (or where i am a case owner)
-        tasksForMyCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
-          // Tasks for cases in which i belong to the case team ...
-          .filter(_.caseInstanceId === tasks.caseInstanceId)
-          // ... in an active membership
-          .filter(_.active === true) // Only search in active team members
-          // ... where any of my case roles matches the task's role - or where I am owner
-          // (Note: if role in task is left empty, then it it still found because team members have also an empty role)
-          .filter(member =>
-            (
-                (member.caseRole === tasks.role || member.isOwner === true)
-                  &&
-              // Now filter by either user id or tenant role (depending on the type of case team membership)
-              ((member.isTenantUser === true && member.memberId === user.id) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
-            )
-          )
-      } yield tasks
+      case None =>
+        // Select all tasks and filter for:
+        //  - consent groups that the user belongs to and that have the task.role equal to the users consent group roles
+        //  - tenant roles that the user has and that have a task role equals to the case role associated to that tenant role
+        //  - tasks that have a case role associated that the user has directly in the case team
+        TableQuery[TaskTable].filter(task =>
+          // Apply the filters: _1 is the case instance id, _2 is the case role
+          tenantRoleCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+            || userCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
     }
 
     val query = for {
@@ -168,7 +149,7 @@ class TaskQueriesImpl extends TaskQueries
         .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
 
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, filter.identifiers)
+      _ <- membershipQuery(platformUser, baseQuery.caseInstanceId, filter.identifiers)
 
     } yield baseQuery
 
@@ -190,8 +171,25 @@ class TaskQueriesImpl extends TaskQueries
     Option(LocalDateTime.parse(date + "T23:59:59.999999999").toInstant(getTimeZoneOffset(timeZone)))
   }
 
-  override def getCountForUser(user: PlatformUser, tenant: Option[String]): Future[TaskCount] = {
-    val claimedTasksQuery = TableQuery[TaskTable].filter(_.assignee === user.id)
+  // First define base queries that help find the cases that the user has access to with the specific case roles.
+  //  Resulting queries give a list of case instance id / case role pairs.
+  private def tenantRoleCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
+    TableQuery[UserRoleTable]
+      .filter(_.userId === platformUser.id)
+      .join(TableQuery[CaseInstanceTeamTenantRoleTable])
+      .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
+      .map(_._2)
+      .map(tenantRole => (tenantRole.caseInstanceId, tenantRole.caseRole))
+  }
+
+  private def userCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
+    TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.userId === platformUser.id)
+      .map(user => (user.caseInstanceId, user.caseRole))
+  }
+
+  override def getCountForUser(platformUser: PlatformUser, tenant: Option[String]): Future[TaskCount] = {
+    val claimedTasksQuery = TableQuery[TaskTable].filter(_.assignee === platformUser.id)
       .filterNot(_.taskState === "Completed")
       .filterNot(_.taskState === "Terminated")
       .filterOpt(tenant)(_.tenant === _)
@@ -201,24 +199,10 @@ class TaskQueriesImpl extends TaskQueries
       unclaimedTasks <- TableQuery[TaskTable].filter(_.assignee === "").filterOpt(tenant)(_.tenant === _)
         // And only active tasks, not completed or terminated
         .filterNot(_.taskState === "Completed").filterNot(_.taskState === "Terminated")
-      // In tenants where i am a user
-      tenantMembership <- TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.tenant === unclaimedTasks.tenant)
-      // Where my case team roles map to the task role
-      tasksForMyCaseRoles <- TableQuery[CaseInstanceTeamMemberTable]
-        // Tasks for cases in which i belong to the case team ...
-        .filter(_.caseInstanceId === unclaimedTasks.caseInstanceId)
-        // ... in an active membership
-        .filter(_.active === true) // Only search in active team members
-        // ... where any of my case roles matches the task's role - or where I am owner
-        // (Note: if role in task is left empty, then it it still found because team members have also an empty role)
-        .filter(member =>
-          (
-            (member.caseRole === unclaimedTasks.role || member.isOwner === true)
-              &&
-              // Now filter by either user id or tenant role (depending on the type of case team membership)
-              ((member.isTenantUser === true && member.memberId === user.id) || (member.isTenantUser === false && member.memberId === tenantMembership.role_name))
-            )
-        )
+        .filter(task =>
+          // Apply the filters: _1 is the case instance id, _2 is the case role
+          tenantRoleCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+            || userCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
     } yield unclaimedTasks
 
     val count = for {

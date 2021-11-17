@@ -2,9 +2,11 @@ package org.cafienne.service.db.materializer.slick
 
 import akka.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
+import org.cafienne.cmmn.instance.team.MemberType
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.service.db.materializer.RecordsPersistence
+import org.cafienne.service.db.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.service.db.record._
 import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
 
@@ -36,11 +38,11 @@ class SlickRecordsPersistence
         case value: CaseFileRecord => TableQuery[CaseFileTable].insertOrUpdate(value)
         case value: CaseBusinessIdentifierRecord => TableQuery[CaseBusinessIdentifierTable].insertOrUpdate(value)
         case value: CaseRoleRecord => TableQuery[CaseInstanceRoleTable].insertOrUpdate(value)
-        case value: CaseTeamMemberRecord => TableQuery[CaseInstanceTeamMemberTable].insertOrUpdate(value)
+        case value: CaseTeamUserRecord => TableQuery[CaseInstanceTeamUserTable].insertOrUpdate(value)
+        case value: CaseTeamTenantRoleRecord => TableQuery[CaseInstanceTeamTenantRoleTable].insertOrUpdate(value)
         case value: OffsetRecord => TableQuery[OffsetStoreTable].insertOrUpdate(value)
         case value: UserRoleRecord => TableQuery[UserRoleTable].insertOrUpdate(value)
         case value: TenantRecord => TableQuery[TenantTable].insertOrUpdate(value)
-        case value: TenantOwnerRecord => TableQuery[TenantOwnersTable].insertOrUpdate(value)
         case other => throw new IllegalArgumentException("Upsert not supported for objects of type " + other.getClass.getName)
       }
       addStatement(upsertStatement)
@@ -51,12 +53,20 @@ class SlickRecordsPersistence
     addStatement(TableQuery[TaskTable].filter(_.id === taskId).delete)
   }
 
+  override def deleteCaseTeamMember(key: CaseTeamMemberKey): Unit = {
+    key.memberType match {
+      case MemberType.User => addStatement(TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === key.caseInstanceId).filter(_.userId === key.memberId).delete)
+      case MemberType.TenantRole => addStatement(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === key.caseInstanceId).filter(_.tenantRole === key.memberId).delete)
+      case other => // Ignore for now
+    }
+  }
+
   override def deletePlanItemRecordAndHistory(planItemId: String): Unit = {
     addStatement(TableQuery[PlanItemTable].filter(_.id === planItemId).delete)
     addStatement(TableQuery[PlanItemHistoryTable].filter(_.id === planItemId).delete)
   }
 
-  override def delete(record: AnyRef) = {
+  override def delete(record: AnyRef): Unit = {
     if (record != null) {
       val upsertStatement = record match {
         case value: TaskRecord => TableQuery[TaskTable].filter(_.id === value.id).delete
@@ -67,9 +77,18 @@ class SlickRecordsPersistence
         case value: CaseFileRecord => TableQuery[CaseFileTable].filter(_.caseInstanceId === value.caseInstanceId).delete
         case value: CaseBusinessIdentifierRecord => TableQuery[CaseBusinessIdentifierTable].filter(_.caseInstanceId === value.caseInstanceId).filter(_.name === value.name).delete
         case value: CaseRoleRecord => TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === value.caseInstanceId).filter(_.roleName === value.roleName).delete
-        case value: CaseTeamMemberRecord => TableQuery[CaseInstanceTeamMemberTable].filter(r => r.caseInstanceId === value.caseInstanceId && r.caseRole === value.caseRole && r.memberId === value.memberId && r.isTenantUser === value.isTenantUser).delete
+        case value: CaseTeamUserRecord => TableQuery[CaseInstanceTeamUserTable]
+          .filter(_.caseInstanceId === value.caseInstanceId)
+          .filter(_.userId === value.userId)
+          .filter(_.caseRole === value.caseRole)
+          .delete
+        case value: CaseTeamTenantRoleRecord => TableQuery[CaseInstanceTeamTenantRoleTable]
+          .filter(_.caseInstanceId === value.caseInstanceId)
+          .filter(_.tenant === value.tenant)
+          .filter(_.tenantRole === value.tenantRole)
+          .filter(_.caseRole === value.caseRole)
+          .delete
         case value: UserRoleRecord => TableQuery[UserRoleTable].filter(r => r.userId === value.userId && r.tenant === value.tenant && r.role_name === value.role_name).delete
-        case value: TenantOwnerRecord => TableQuery[TenantOwnersTable].filter(_.tenant === value.tenant).filter(_.userId === value.userId).delete
         case other => throw new IllegalArgumentException("Delete not supported for objects of type " + other.getClass.getName)
       }
       addStatement(upsertStatement)
@@ -166,61 +185,11 @@ class SlickRecordsPersistence
     newUserIds.map(newUserId => (newUserId, info.filter(_.newUserId == newUserId).map(_.existingUserId).toSet))
   }
 
-  private def constructCaseTeamUserIdUpdates(caseId: String, info: Seq[NewUserInformation]): Future[Seq[DBIO[_]]] = {
-    val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
-    val hasNoDuplicates = !infoPerNewUserId.exists(update => update._2.size <= 1)
-
-    // If there are no duplicates (i.e., no situations where multiple old user id's map to the same new id)
-    //  then the update is simple.
-    // Otherwise we need to analyze the current database information (see below)
-    val simpleCaseTeamUpdate = info.map(user => {
-      // Update 'memberId' field in team table
-      val member = for {
-        member <- TableQuery[CaseInstanceTeamMemberTable].filter(r => r.caseInstanceId === caseId && r.isTenantUser && r.memberId === user.existingUserId)
-      } yield member.memberId
-      member.update(user.newUserId)
-    })
-
-    if (hasNoDuplicates) {
-      Future.successful(simpleCaseTeamUpdate)
-    } else {
-      // Run a query on the old user id's, in order to find out what their role in the case team is
-      //  - Subsequently delete all those old records, and replace them with a new set
-      val oldUserIds = info.map(_.existingUserId).toSet
-      val allOldMembers = TableQuery[CaseInstanceTeamMemberTable].filter(r => r.caseInstanceId === caseId && r.isTenantUser && r.memberId.inSet(oldUserIds))
-      val sql = db.run(allOldMembers.result).flatMap(records => {
-        if (records.nonEmpty) {
-          val tenant = records.head.tenant
-          val deleteOldMembers = allOldMembers.delete
-          val insertNewMembers = {
-            infoPerNewUserId.flatMap(member => {
-              val newMemberId = member._1
-              val updatableRecords = records.filter(record => member._2.contains(record.memberId))
-              val userRecords = updatableRecords.filter(_.caseRole.isBlank)
-              val roleRecords = updatableRecords.filterNot(_.caseRole.isBlank)
-
-              val distinctActiveRoles = roleRecords.filter(_.active).map(_.caseRole).toSet
-              val distinctInactiveRoles = roleRecords.filterNot(_.active).filterNot(m => distinctActiveRoles.contains(m.caseRole)).map(_.caseRole).toSet
-
-              // The new member becomes case owner if one or more of the old members is also case owner
-              val isCaseOwner = userRecords.filter(_.active).filter(_.isOwner).toSet.nonEmpty
-              val isActive = userRecords.filter(_.active).toSet.nonEmpty
-
-              val newMembers: Seq[CaseTeamMemberRecord] = {
-                Seq(CaseTeamMemberRecord(caseId, tenant, newMemberId, "", isTenantUser = true, isOwner = isCaseOwner, active = isActive)) ++
-                  distinctActiveRoles.map(roleName => CaseTeamMemberRecord(caseId, tenant, newMemberId, roleName, isTenantUser = true, isOwner = false, active = true)) ++
-                  distinctInactiveRoles.map(roleName => CaseTeamMemberRecord(caseId, tenant, newMemberId, roleName, isTenantUser = true, isOwner = false, active = false))
-              }
-              newMembers.map(newMember => TableQuery[CaseInstanceTeamMemberTable].insertOrUpdate(newMember))
-            })
-          }
-          Future.successful(Seq(deleteOldMembers) ++ insertNewMembers)
-        } else {
-          Future.successful(simpleCaseTeamUpdate)
-        }
-      })
-      sql
-    }
+  //  var nr = 0L
+  private def addOffsetRecord(offset: OffsetRecord): Seq[DBIO[_]] = {
+    //    println(s"$nr: Updating $offsetName to $offset")
+    //    nr += 1
+    Seq(TableQuery[OffsetStoreTable].insertOrUpdate(offset))
   }
 
   def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = {
@@ -274,11 +243,58 @@ class SlickRecordsPersistence
     })
   }
 
-  //  var nr = 0L
-  private def addOffsetRecord(offset: OffsetRecord): Seq[DBIO[_]] = {
-    //    println(s"$nr: Updating $offsetName to $offset")
-    //    nr += 1
-    Seq(TableQuery[OffsetStoreTable].insertOrUpdate(offset))
+  private def constructCaseTeamUserIdUpdates(caseId: String, info: Seq[NewUserInformation]): Future[Seq[DBIO[_]]] = {
+    val infoPerNewUserId: Set[(String, Set[String])] = convertUserUpdate(info)
+    val hasNoDuplicates = !infoPerNewUserId.exists(update => update._2.size <= 1)
+
+    // If there are no duplicates (i.e., no situations where multiple old user id's map to the same new id)
+    //  then the update is simple.
+    // Otherwise we need to analyze the current database information (see below)
+    val simpleCaseTeamUpdate = info.map(user => {
+      // Update 'memberId' field in team table
+      val member = for {
+        member <- TableQuery[CaseInstanceTeamUserTable].filter(r => r.caseInstanceId === caseId && r.userId === user.existingUserId)
+      } yield member.userId
+      member.update(user.newUserId)
+    })
+
+    if (hasNoDuplicates) {
+      Future.successful(simpleCaseTeamUpdate)
+    } else {
+      // Run a query on the old user id's, in order to find out what their role in the case team is
+      //  - Subsequently delete all those old records, and replace them with a new set
+      val oldUserIds = info.map(_.existingUserId).toSet
+      val allOldMembers = TableQuery[CaseInstanceTeamUserTable].filter(r => r.caseInstanceId === caseId && r.userId.inSet(oldUserIds))
+      val sql = db.run(allOldMembers.result).flatMap(records => {
+        if (records.nonEmpty) {
+          val tenant = records.head.tenant
+          val deleteOldMembers = allOldMembers.delete
+          val insertNewMembers = {
+            infoPerNewUserId.flatMap(member => {
+              val newUserId = member._1
+              val updatableRecords = records.filter(record => member._2.contains(record.userId))
+              val userRecords = updatableRecords.filter(_.caseRole.isBlank)
+              val roleRecords = updatableRecords.filterNot(_.caseRole.isBlank)
+
+              val distinctActiveRoles = roleRecords.map(_.caseRole).toSet
+
+              // The new member becomes case owner if one or more of the old members is also case owner
+              val isCaseOwner = userRecords.filter(_.isOwner).toSet.nonEmpty
+
+              val newMembers: Seq[CaseTeamUserRecord] = {
+                Seq(CaseTeamUserRecord(caseInstanceId = caseId, tenant = tenant, userId = newUserId, origin = "tenant", caseRole = "", isOwner = isCaseOwner)) ++
+                  distinctActiveRoles.map(caseRole => CaseTeamUserRecord(caseInstanceId = caseId, tenant = tenant, userId = newUserId, origin = "tenant", caseRole = caseRole, isOwner = isCaseOwner))
+              }
+              newMembers.map(newMember => TableQuery[CaseInstanceTeamUserTable].insertOrUpdate(newMember))
+            })
+          }
+          Future.successful(Seq(deleteOldMembers) ++ insertNewMembers)
+        } else {
+          Future.successful(simpleCaseTeamUpdate)
+        }
+      })
+      sql
+    }
   }
 
   override def getCaseInstance(id: String): Future[Option[CaseRecord]] = {
