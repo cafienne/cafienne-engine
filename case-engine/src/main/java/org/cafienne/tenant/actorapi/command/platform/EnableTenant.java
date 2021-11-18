@@ -1,7 +1,7 @@
 package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.PlatformUser;
+import org.cafienne.actormodel.identity.PlatformOwner;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @Manifest
 public class EnableTenant extends PlatformTenantCommand {
-    public EnableTenant(PlatformUser user, String tenantId) {
+    public EnableTenant(PlatformOwner user, String tenantId) {
         super(user, tenantId);
     }
 

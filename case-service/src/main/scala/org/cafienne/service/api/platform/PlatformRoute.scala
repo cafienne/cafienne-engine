@@ -43,7 +43,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
   @Consumes(Array("application/json"))
   def createTenant = post {
     pathEndOrSingleSlash {
-      validOwner { platformOwner =>
+      validPlatformOwner { platformOwner =>
         import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
         import spray.json.DefaultJsonProtocol._
 
@@ -71,7 +71,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     )
   )
   def disableTenant = put {
-    validOwner { platformOwner =>
+    validPlatformOwner { platformOwner =>
       path(Segment / "disable") { tenant =>
         askPlatform(new DisableTenant(platformOwner, tenant.name))
       }
@@ -93,7 +93,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     )
   )
   def enableTenant = put {
-    validOwner { platformOwner =>
+    validPlatformOwner { platformOwner =>
       path(Segment / "enable") { tenant =>
         askPlatform(new EnableTenant(platformOwner, tenant.name))
       }

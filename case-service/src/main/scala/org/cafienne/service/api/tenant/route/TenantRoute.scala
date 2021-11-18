@@ -9,7 +9,8 @@ package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.complete
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import akka.http.scaladsl.server.Route
+import org.cafienne.actormodel.identity.{PlatformOwner, PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.tenant.TenantReader
@@ -23,6 +24,15 @@ trait TenantRoute extends CommandRoute with QueryRoute {
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 
+  def validPlatformOwner(subRoute: PlatformOwner => Route): Route = {
+    validUser { platformUser =>
+      platformUser.isPlatformOwner match {
+        case true => subRoute(PlatformOwner(platformUser.id))
+        case false => complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
+      }
+    }
+  }
+
   def askPlatform(command: PlatformTenantCommand) = {
     askModelActor(command)
   }
@@ -35,7 +45,7 @@ trait TenantRoute extends CommandRoute with QueryRoute {
     def apply(tenantUser: TenantUser): TenantCommand
   }
 
-  def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenantFormat) = {
+  def invokeCreateTenant(platformOwner: PlatformOwner, newTenant: BackwardsCompatibleTenantFormat) = {
     import scala.jdk.CollectionConverters._
 
     val users = convertToTenant(newTenant).asJava

@@ -3,7 +3,6 @@ package org.cafienne.system.bootstrap
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.CaseSystem
@@ -110,7 +109,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
         throw new BootstrapFailure(msg)
       }
 
-      val aPlatformOwner = PlatformUser(Cafienne.config.platform.platformOwners.get(0), Seq())
+      val aPlatformOwner = Cafienne.config.platform.platformOwners.head
 
       new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
 

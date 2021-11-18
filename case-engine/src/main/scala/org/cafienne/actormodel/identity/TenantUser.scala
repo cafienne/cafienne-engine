@@ -1,8 +1,6 @@
 package org.cafienne.actormodel.identity
 
 import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.actormodel.exception.AuthorizationException
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{Value, ValueMap}
 
@@ -51,10 +49,5 @@ object TenantUser {
     val roles = json.readStringList(Fields.roles).toSet
 
     TenantUser(id, roles, tenant, isOwner, name, email)
-  }
-
-  final def fromPlatformOwner(user: PlatformUser, tenantId: String): TenantUser = {
-    if (!Cafienne.isPlatformOwner(user.id)) throw AuthorizationException("Only platform owners can execute this type of command")
-    TenantUser(user.id, Set(), tenantId, name = "")
   }
 }
