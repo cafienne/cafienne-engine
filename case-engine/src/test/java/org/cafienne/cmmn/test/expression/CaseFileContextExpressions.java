@@ -28,7 +28,8 @@ public class CaseFileContextExpressions {
 
         ValueMap caseInput = new ValueMap("Container", new ValueMap("Child", new ValueList(child1, child2)));
 
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, caseInput.cloneValueNode(), null), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, caseInput.cloneValueNode());
+        testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             testCase.getEventListener().awaitTaskInputFilled("TaskWithExpression", taskEvent -> {
                 ValueMap taskInput = taskEvent.getMappedInputParameters();

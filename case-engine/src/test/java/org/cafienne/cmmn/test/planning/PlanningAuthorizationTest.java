@@ -33,7 +33,8 @@ public class PlanningAuthorizationTest {
         TestScript testCase = new TestScript(testName);
         CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), planner);
 
-        testCase.addStep(new StartCase(anonymous, caseInstanceId, definitions, null, caseTeam), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(anonymous, caseInstanceId, definitions, caseTeam);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 
             final String discretionaryTaskName = "PlanMe";
@@ -63,7 +64,8 @@ public class PlanningAuthorizationTest {
         TestScript testCase = new TestScript(testName);
         CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), planner);
 
-        testCase.addStep(new StartCase(anonymous, caseInstanceId, definitions, null, caseTeam), casePlan -> casePlan.print());
+        StartCase startCase = testCase.createCaseCommand(anonymous, caseInstanceId, definitions, caseTeam);
+        testCase.addStep(startCase, casePlan -> casePlan.print());
 
         testCase.addStep(new GetDiscretionaryItems(anonymous, caseInstanceId), action -> {
 

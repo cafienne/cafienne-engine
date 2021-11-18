@@ -59,7 +59,7 @@ public class TestPaxAlert {
         checkin.plus("departuretime", "2015-03-21T12:12:00Z");
         
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, caseStarted -> {
             testCase.getEventListener().awaitPlanItemState("Execute background check", State.Completed);
             caseStarted.print();

@@ -26,7 +26,7 @@ public class SentryRef {
         String caseInstanceId = "SentryRefTest";
         TestScript testCase = new TestScript("sentryRef");
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
         MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, "Task_1", Transition.Complete);

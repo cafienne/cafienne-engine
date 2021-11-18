@@ -28,13 +28,13 @@ import org.junit.Test;
 public class CasePlanExitCriteria {
 
     private final TenantUser testUser = TestScript.getTestUser("Anonymous");
-    private final CaseDefinition caseDefinition = TestScript.getCaseDefinition("testdefinition/caseplanexitcriteria.xml");
+    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/caseplanexitcriteria.xml");
 
     @Test
     public void testCasePlanExitCompletion() {
         String caseInstanceId = "CasePlanExitCriteria-CompletionTest";
         TestScript testCase = new TestScript(caseInstanceId);
-        StartCase startCase = new StartCase(testUser, caseInstanceId, caseDefinition, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");
             reviewTask.assertState(State.Active);
@@ -65,7 +65,7 @@ public class CasePlanExitCriteria {
         String caseInstanceId = "CasePlanExitCriteria-TerminationTest";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, caseDefinition, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");

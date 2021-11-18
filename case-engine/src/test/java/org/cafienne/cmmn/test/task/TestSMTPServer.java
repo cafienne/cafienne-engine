@@ -45,7 +45,7 @@ public class TestSMTPServer {
         request.plus("attachment", attachmentContent);
         request.plus("filename", "abc.txt");
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 

@@ -28,7 +28,7 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
@@ -65,7 +65,7 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
@@ -93,7 +93,7 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         // Add child item together with parent

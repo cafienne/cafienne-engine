@@ -46,7 +46,8 @@ public class PathTest {
     @Test
     public void testUndefinedPath() {
         TestScript.debugMessage(rootValue.toString());
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, null, null));
+
+        testCase.addStep(testCase.createCaseCommand(testUser, caseInstanceId, definitions));
 
         assertInvalidCaseFilePath("/aaa/def/", "The path '/aaa/def/' is invalid, since the part 'def' is not defined in the case file");
         assertInvalidCaseFilePath("/aacb/", "The path '/aacb/' is invalid, since the part 'aacb' is not defined in the case file");

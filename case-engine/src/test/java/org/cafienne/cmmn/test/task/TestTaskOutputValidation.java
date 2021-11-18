@@ -66,7 +66,8 @@ public class TestTaskOutputValidation {
         );
 
         CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
-        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), cp -> {
+        StartCase startCase = testCase.createCaseCommand(pete, caseInstanceId, xml, inputs, team);
+        testCase.addStep(startCase, cp -> {
             // Depending on how fast the first (process) task starts, the "HumanTask" is either Active or still Available
             String taskId = cp.assertPlanItem("HumanTask").getId();
 

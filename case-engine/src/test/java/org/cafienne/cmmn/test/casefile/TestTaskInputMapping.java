@@ -28,7 +28,8 @@ public class TestTaskInputMapping {
         TestScript testCase = new TestScript(caseName);
         ValueMap caseInput = new ValueMap();
 
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, caseInput.cloneValueNode(), null), startPlan -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, caseInput.cloneValueNode());
+        testCase.addStep(startCase, startPlan -> {
             startPlan.print();
             String taskAddChild = startPlan.assertTask("Task.AddChild").assertState(State.Active).getId();
             startPlan.assertTask("TaskWithContainer").assertState(State.Available);

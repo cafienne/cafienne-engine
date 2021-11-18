@@ -38,21 +38,9 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
     private final String rootCaseId;
     private final String parentCaseId;
     private final ValueMap inputParameters;
-    private transient CaseDefinition definition;
+    private final CaseDefinition definition;
     private CaseTeam caseTeam;
     private final boolean debugMode;
-
-    /**
-     * Starts a new case with the specified case definition
-     *
-     * @param inputs              The case input parameters
-     * @param caseInstanceId      The instance identifier for the new case
-     * @param definition          The case definition (according to the CMMN xsd) that is being used to execute the model
-     * @param caseTeam            The CaseTeam for the case
-     */
-    public StartCase(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeam) {
-        this(tenantUser.tenant(), tenantUser, caseInstanceId, definition, inputs, caseTeam, Cafienne.config().actor().debugEnabled());
-    }
 
     /**
      * Starts a new case with the specified case definition
@@ -89,8 +77,8 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
         this.definition = definition;
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;
-        this.inputParameters = caseInputParameters == null ? new ValueMap() : caseInputParameters;
-        this.caseTeam = caseTeam == null ? CaseTeam.apply() : caseTeam;
+        this.inputParameters = caseInputParameters;
+        this.caseTeam = caseTeam;
         this.debugMode = debugMode;
     }
 

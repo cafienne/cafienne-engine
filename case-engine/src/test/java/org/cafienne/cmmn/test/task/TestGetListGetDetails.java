@@ -39,6 +39,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
  * However, no more than 3 times are the details fetched (although this is not yet checked in the test case)
  */
 public class TestGetListGetDetails {
+    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/getlist_getdetails.xml");
+    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
 
     private static final int PORT_NUMBER = 18087; // TODO: have wiremock pick the port number
 
@@ -54,14 +56,11 @@ public class TestGetListGetDetails {
     public void testGetListGetDetails() {
         String caseInstanceId = "GetListGetDetailsTest";
         TestScript testCase = new TestScript(caseInstanceId);
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/casefile/getlist_getdetails.xml");
-
-        TenantUser user = TestScript.getTestUser("anonymous");
 
         /**
          *  Start the case
          */
-        StartCase startCase = new StartCase(user, caseInstanceId, xml, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
 
         /**
          *  When the case` starts, GetCasesList & GetFirstCase tasks will be in available state
@@ -79,7 +78,7 @@ public class TestGetListGetDetails {
         // So GetList goes to Failed state & GetDetails remains in Available state
         ValueMap requestObject = new ValueMap();
         requestObject.plus("port", PORT_NUMBER);
-        CreateCaseFileItem createChild = new CreateCaseFileItem(user, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTPConfiguration"));
+        CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, requestObject.cloneValueNode(), new Path("HTTPConfiguration"));
         testCase.addStep(createChild, casePlan -> {
 //            casePlan.print();
 
@@ -92,7 +91,7 @@ public class TestGetListGetDetails {
         });
 
         // Reactivate the GetCasesList task; but since the backend is not yet up, it should again lead to failure of GetList
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "GetList", Transition.Reactivate), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "GetList", Transition.Reactivate), casePlan -> {
 //            casePlan.print();
 
             // Wait for the second failure event
@@ -111,7 +110,7 @@ public class TestGetListGetDetails {
 
         // Now reactive GetList, since stubs have started.
         // This should also lead to 3 times GetDetails task being activated and completed.
-        MakePlanItemTransition reactivateCase = new MakePlanItemTransition(user, caseInstanceId, "GetList", Transition.Reactivate);
+        MakePlanItemTransition reactivateCase = new MakePlanItemTransition(testUser, caseInstanceId, "GetList", Transition.Reactivate);
         testCase.addStep(reactivateCase, casePlan -> {
 //            casePlan.print();
 

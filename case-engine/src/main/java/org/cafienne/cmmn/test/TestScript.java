@@ -11,6 +11,7 @@ import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
@@ -21,6 +22,7 @@ import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.json.ValueMap;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +59,11 @@ public class TestScript {
 
     private boolean testCompleted;
 
-    private Deque<ModelTestCommand> commands = new ArrayDeque(); // We need to be able to add elements both at front and end; and execute always the front element
+    private final Deque<ModelTestCommand<?,?>> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
     private ModelTestCommand current; // current test step
     private int actionNumber = 0; // current action number
+
+    private static final String defaultTenant = "hard-coded-test-tenant";
 
     /**
      * Listener for CaseInstanceEvent that ought to be published by the Akka system
@@ -91,16 +95,6 @@ public class TestScript {
     }
 
     /**
-     * Returns the case definition with the specified identifier from the definitions file
-     *
-     * @param fileName
-     * @return
-     */
-    public static CaseDefinition getCaseDefinition(String fileName, String caseIdentifier) {
-        return getDefinitions(fileName).getCaseDefinition(caseIdentifier);
-    }
-
-    /**
      * Helper method to retrieve an invalid definitions document.
      * Throws an assertion if the Definition is missing instead of invalid.
      *
@@ -123,7 +117,7 @@ public class TestScript {
      * @return
      */
     public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSet(), "hard-coded-test-tenant", false, "", "", true);
+        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSet(), defaultTenant, false, "", "", true);
     }
 
     /**
@@ -182,6 +176,34 @@ public class TestScript {
         logger.info("Ready to receive responses from the case system for test '" + testName + "'");
     }
 
+    public StartCase createCaseCommand(TenantUser testUser, String caseInstanceId, CaseDefinition definitions) {
+        return createCaseCommand(testUser, caseInstanceId, definitions, new ValueMap());
+    }
+
+    public StartCase createCaseCommand(TenantUser testUser, String caseInstanceId, CaseDefinition definitions, ValueMap inputs) {
+        return createCaseCommand(testUser, caseInstanceId, definitions, inputs, getCaseTeam(getOwner(testUser)));
+    }
+
+    public StartCase createCaseCommand(TenantUser testUser, String caseInstanceId, CaseDefinition definitions, CaseTeam team) {
+        return createCaseCommand(testUser, caseInstanceId, definitions, new ValueMap(), team);
+    }
+
+    public StartCase createCaseCommand(TenantUser testUser, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
+        return createCaseCommand(defaultTenant, testUser, caseInstanceId, definitions, inputs, team);
+    }
+
+    public StartCase createCaseCommand(String tenant, TenantUser testUser, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
+        return new StartCase(tenant, testUser, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
+    }
+
+    public PingCommand createPingCommand(TenantUser tenantUser, String caseInstanceId, long waitTimeInMillis) {
+        return new PingCommand(defaultTenant, tenantUser, caseInstanceId, waitTimeInMillis);
+    }
+
+    public CaseDefinition getDefinition(String fileName) throws MissingDefinitionException {
+        return TestScript.getCaseDefinition(fileName);
+    }
+
     /**
      * Prints a log message to the debug logger
      *
@@ -230,7 +252,7 @@ public class TestScript {
      * @param command
      */
     public void assertStepFails(CaseCommand command) {
-        addTestStep(command, e -> new FailureAssertion(e));
+        addTestStep(command, FailureAssertion::new);
     }
 
     /**
@@ -259,7 +281,7 @@ public class TestScript {
      * @param command
      */
     public void addStep(CaseCommand command) {
-        addTestStep(command, e -> new CaseAssertion(e));
+        addTestStep(command, CaseAssertion::new);
     }
 
     public void insertStep(CaseCommand command, CaseValidator validator) {

@@ -78,7 +78,7 @@ public class BasicTypes {
         TestScript testCase = new TestScript(caseName);
 
         ValueMap inputs = getInputs();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(allPropertyTypesPath).assertValue(getContents(inputs)));
 
         testCase.runTest();
@@ -96,7 +96,7 @@ public class BasicTypes {
         Value<?> contents = inputs.getValue().remove(inputParameterName);
         inputs.put(wrongParameterName, contents);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.assertStepFails(startCase, action -> action.assertException(Exception.class, "An input parameter with name " + wrongParameterName + " is not defined in the case"));
 
         testCase.runTest();
@@ -136,7 +136,7 @@ public class BasicTypes {
 
         String caseInstanceId = "TestingWrongProperty" + propertyName + "_" + new Guid(); // Make a new CaseInstanceId to overcome framework
         // limitation.
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, wrongInputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, wrongInputs.cloneValueNode());
         testCase.assertStepFails(startCase, action -> action.assertException(CaseFileError.class, "Property '" + propertyName + "' has wrong type"));
     }
 
@@ -154,7 +154,7 @@ public class BasicTypes {
 
         contents.put("ChildItem", childItem);
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(childItem));
 
         testCase.runTest();
@@ -166,7 +166,7 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
@@ -209,7 +209,7 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(this.childItemPath).assertValue(Value.NULL));
 
         // Create a child item; child item contains an invalid value, so it should reject the operation, and child should still be null
@@ -265,7 +265,7 @@ public class BasicTypes {
         TestScript testCase = new TestScript(caseName);
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
@@ -312,7 +312,7 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input

@@ -40,7 +40,7 @@ public class TestPDFReport {
         request.plus("orderJrXml", subReportXml);
         request.plus("jsonData", customerData);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, action -> {
             String reportTaskId = testCase.getEventListener().awaitPlanItemState("Generate Report", State.Available).getPlanItemId();
 
@@ -50,7 +50,7 @@ public class TestPDFReport {
             testCase.getEventListener().awaitPlanItemState(reportTaskId, State.Completed);
 
             // TODO: perhaps this test should test the actual PDF report contents???
-            testCase.insertStep(new PingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem(new Path("Request/pdfReportData")).assertValueType(StringValue.class));
+            testCase.insertStep(testCase.createPingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem(new Path("Request/pdfReportData")).assertValueType(StringValue.class));
 
             // Assert that the ProcessActor has published events
             testCase.getEventListener().getEvents().assertEventType(ProcessStarted.class, 1).assertEventType(ProcessCompleted.class, 1);

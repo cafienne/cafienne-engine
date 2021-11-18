@@ -63,7 +63,7 @@ public class CaseFileTransitionTest {
         ValueMap inputs = new ValueMap();
         inputs.put(inputParameterName, content);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertCaseFileItem(requestPath).assertValue(content).assertCaseFileItem(new Path("/Customer")).assertState(State.Null);

@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.cmmn.actorapi.command.team
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 
@@ -36,8 +35,8 @@ object CaseTeam {
 
   def apply(member: CaseTeamMember) = new CaseTeam(Seq(member))
 
-  def deserialize(memberList: ValueList) = {
+  def deserialize(memberList: ValueList): CaseTeam = {
     val teamMembers = memberList.getValue.asScala.toSeq.asInstanceOf[Seq[ValueMap]].map(json => CaseTeamMember.deserialize(json))
-    team.CaseTeam(teamMembers)
+    CaseTeam(teamMembers)
   }
 }

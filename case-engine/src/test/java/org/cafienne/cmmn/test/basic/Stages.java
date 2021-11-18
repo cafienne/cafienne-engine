@@ -21,15 +21,14 @@ import org.junit.Test;
 public class Stages {
     @Test
     public void testStages() {
-        String caseName = "stages";
-        TestScript testCase = new TestScript(caseName);
+        String caseInstanceId = "stages";
+        TestScript testCase = new TestScript(caseInstanceId);
 
-        ValueMap inputs = null;
-        String caseInstanceId = caseName;
-        CaseDefinition definitionsDocument = TestScript.getCaseDefinition("testdefinition/stages.xml");
-        TenantUser user = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/stages.xml");
+        TenantUser testUser = TestScript.getTestUser("Anonymous");
 
-        testCase.addStep(new StartCase(user, caseInstanceId, definitionsDocument, inputs, null), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Available);
             StageAssertion item4 = casePlan.assertStage("Item4");
@@ -44,7 +43,7 @@ public class Stages {
             item4.assertHumanTask("Task1.1").assertState(State.Active);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Task1.1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Task1.1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
             StageAssertion item4 = casePlan.assertStage("Item4");

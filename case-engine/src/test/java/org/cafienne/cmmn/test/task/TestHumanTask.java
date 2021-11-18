@@ -37,8 +37,9 @@ public class TestHumanTask {
         TenantUser tom = TestScript.getTestUser("tom");
         TenantUser notInTeam = TestScript.getTestUser("not-in-team");
         CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
+        StartCase startCase = testCase.createCaseCommand(pete, caseInstanceId, xml, team);
 
-        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), caseStarted -> {
+        testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Available).getPlanItemId();
             TestScript.debugMessage("Task ID: " + taskId);

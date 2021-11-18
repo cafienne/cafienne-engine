@@ -26,7 +26,8 @@ public class StageCompletion {
         TestScript testCase = new TestScript(caseInstanceId);
 
         // Case contains a stage with a required Task1; completing the stage can only be done if Task1 is in semi-terminal state.
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, null, null), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertStage("Stage1").assertState(State.Available);
             casePlan.assertStage("Stage2").assertState(State.Available);
             casePlan.assertStage("Stage3").assertState(State.Available);
@@ -71,7 +72,8 @@ public class StageCompletion {
         final TestScript testCase = new TestScript(caseInstanceId);
 
         // Case contains a stage with a required Task1; completing the stage can only be done if Task1 is in semi-terminal state.
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, null, null), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertStage("Stage1").assertState(State.Available);
             casePlan.assertStage(mainStageName).assertState(State.Available);
             casePlan.assertStage("Stage3").assertState(State.Available);
@@ -108,7 +110,8 @@ public class StageCompletion {
         final TestScript testCase = new TestScript(caseInstanceId);
 
         // Case contains a stage with a required Task1; completing the stage can only be done if Task1 is in semi-terminal state.
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, null, null), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.assertStage("Stage1").assertState(State.Available);
             casePlan.assertStage("Stage2").assertState(State.Available);
             casePlan.assertStage(mainStageName).assertState(State.Available);

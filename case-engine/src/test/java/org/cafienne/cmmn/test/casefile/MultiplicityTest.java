@@ -33,7 +33,7 @@ public class MultiplicityTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(parentPath).assertValue(Value.NULL));
 
 
@@ -84,7 +84,7 @@ public class MultiplicityTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(parentPath).assertValue(Value.NULL));
 
 
@@ -118,7 +118,7 @@ public class MultiplicityTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(parentPath).assertValue(Value.NULL));
 
 

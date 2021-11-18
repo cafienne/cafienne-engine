@@ -35,7 +35,7 @@ public class CaseFileTest {
 
         TestScript.debugMessage(rootValue.toString());
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, rootValue.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, rootValue.cloneValueNode());
 
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
@@ -64,9 +64,9 @@ public class CaseFileTest {
 
         // This input leads to a crashing ifPart evaluation in the engine.
         //  That is actually incorrect behavior of the engine
-        
-        
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, rootValue.cloneValueNode(), null);
+
+
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, rootValue.cloneValueNode());
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertTask("FirstTask").assertLastTransition(Transition.Create, State.Available, State.Null);

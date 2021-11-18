@@ -21,14 +21,14 @@ public class MilestoneTesting {
     private final String caseInstanceId = testName;
     private final TenantUser anonymous = TestScript.getTestUser("user");
 
-    private final CaseDefinition definition = TestScript.getCaseDefinition("testdefinition/milestonetransitions.xml");
+    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/milestonetransitions.xml");
 
     @Test
     public void testDoubleMilestoneTransition() {
         TestScript testCase = new TestScript(testName);
         CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous));
-
-        testCase.addStep(new StartCase(anonymous, caseInstanceId, definition, null, caseTeam), casePlan -> {
+        StartCase startCase = testCase.createCaseCommand(anonymous, caseInstanceId, definitions, caseTeam);
+        testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.getEvents().printEventList();
             casePlan.assertPlanItems("HumanTask").assertSize(1).assertStates(State.Active);

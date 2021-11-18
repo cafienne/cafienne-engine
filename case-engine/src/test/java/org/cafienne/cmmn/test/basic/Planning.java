@@ -32,7 +32,7 @@ public class Planning {
         String caseInstanceId = "planning";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 

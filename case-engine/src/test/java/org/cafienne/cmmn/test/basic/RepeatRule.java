@@ -21,22 +21,21 @@ public class RepeatRule {
 
     @Test
     public void testRepeatRule() {
-        String caseName = "repeatrule";
-        TestScript testCase = new TestScript(caseName);
+        String caseInstanceId = "repeatrule";
+        TestScript testCase = new TestScript(caseInstanceId);
 
-        ValueMap inputs = null;
-        String caseInstanceId = caseName;
-        CaseDefinition definitionsDocument = TestScript.getCaseDefinition("testdefinition/repeatrule.xml");
-        TenantUser user = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repeatrule.xml");
+        TenantUser testUser = TestScript.getTestUser("Anonymous");
 
-        testCase.addStep(new StartCase(user, caseInstanceId, definitionsDocument, inputs, null), case1 -> {
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        testCase.addStep(startCase, case1 -> {
             case1.print();
             case1.assertPlanItem("Item1").assertState(State.Active);
             case1.assertPlanItems("Item2").filter(State.Available).assertSize(1);
         });
 
         // Now complete Item1. This should activate Item2 for the first time.
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item1", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(0);
@@ -44,63 +43,63 @@ public class RepeatRule {
         });
 
         // Now complete Item2 multiple times. It is not supposed to repeat more than 10 times, it says in the definition
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(1);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(2);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(3);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(4);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(5);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(6);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(7);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(8);
             casePlan.assertPlanItems("Item2").filter(State.Active).assertSize(1);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(9);
@@ -108,7 +107,7 @@ public class RepeatRule {
         });
 
         // It should stop repeating after the 10th item is put inside
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(10);
@@ -116,7 +115,7 @@ public class RepeatRule {
             casePlan.assertPlanItems("Item2").filter(State.Available).assertSize(0);
         });
 
-        testCase.addStep(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
+        testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete), casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Completed);
             casePlan.assertPlanItems("Item2").filter(State.Completed).assertSize(11);
@@ -125,7 +124,7 @@ public class RepeatRule {
         });
 
         // keeping completing should not lead to more items ;)
-        testCase.assertStepFails(new MakePlanItemTransition(user, caseInstanceId, "Item2", Transition.Complete));
+        testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, "Item2", Transition.Complete));
 
         testCase.runTest();
     }

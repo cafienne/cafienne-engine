@@ -35,9 +35,9 @@ public class PingCommand extends CaseCommand implements CafienneSerializable, Bo
 
     private final String tenant;
 
-    public PingCommand(TenantUser tenantUser, String caseInstanceId, long waitTimeInMillis) {
-        super(tenantUser, caseInstanceId);
-        this.tenant = tenantUser.tenant();
+    public PingCommand(String tenant, TenantUser user, String caseInstanceId, long waitTimeInMillis) {
+        super(user, caseInstanceId);
+        this.tenant = tenant;
         this.waitTime = waitTimeInMillis;
     }
 

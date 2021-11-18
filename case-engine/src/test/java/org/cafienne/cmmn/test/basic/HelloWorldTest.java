@@ -22,7 +22,7 @@ public class HelloWorldTest {
         TestScript testCase = new TestScript("hello-world");
         ValueMap greeting = new ValueMap("Greeting", new ValueMap("Message", "hello", "To", testUser.id(), "From", testUser.id()));
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, greeting, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, greeting);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             String taskId = casePlan.assertHumanTask("Receive Greeting and Send response").getId();
@@ -48,7 +48,7 @@ public class HelloWorldTest {
         TestScript testCase = new TestScript("hello-world");
         ValueMap greeting = new ValueMap("Greeting", new ValueMap("Message", "hello", "To", "", "From", testUser.id()));
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, greeting, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, greeting);
         testCase.addStep(startCase, action -> {
             TestScript.debugMessage("Events: " + action.getTestCommand());
             action.getEvents().filter(HumanTaskDueDateFilled.class).assertSize(1);

@@ -39,7 +39,7 @@ public class RepetitiveFileItems {
         // startCase
         String caseInstanceId = "CaseFileDefinitionTest";
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 
@@ -185,7 +185,7 @@ public class RepetitiveFileItems {
         // startCase
         String caseInstanceId = "CaseFileDefinitionTest23";
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             // There must be 1 review task in state available, and it must repeat because there are less than 2 item objects in the case file
             casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Available).assertRepeats();

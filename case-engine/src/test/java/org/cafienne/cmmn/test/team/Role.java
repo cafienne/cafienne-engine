@@ -12,6 +12,7 @@ import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
+import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.test.TestScript;
@@ -24,13 +25,15 @@ public class Role {
     private final TenantUser anonymous = TestScript.getTestUser("Anonymous");
     private final TenantUser admin = TestScript.getTestUser("Admin", "Admin");
     private final TenantUser employee = TestScript.getTestUser("Employee", "Employee");
+    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/team/roles.xml");
 
     @Test
     public void testRolesBasedAuthorization() {
         TestScript testCase = new TestScript(testName);
         CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), admin, employee);
+        StartCase startCase = testCase.createCaseCommand(anonymous, caseInstanceId, definitions, caseTeam);
 
-        testCase.addStep(new StartCase(anonymous, caseInstanceId, TestScript.getCaseDefinition("testdefinition/team/roles.xml"), null, caseTeam), casePlan -> casePlan.print());
+        testCase.addStep(startCase, casePlan -> casePlan.print());
 
         // With Role admin
         testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "UserEvent1", Transition.Occur), casePlan -> casePlan.print());
