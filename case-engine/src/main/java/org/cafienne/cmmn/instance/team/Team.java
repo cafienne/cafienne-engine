@@ -6,6 +6,9 @@ import org.cafienne.cmmn.actorapi.command.team.*;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.team.CaseTeamMemberRemoved;
 import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent;
+import org.cafienne.cmmn.actorapi.event.team.group.CaseTeamGroupAdded;
+import org.cafienne.cmmn.actorapi.event.team.group.CaseTeamGroupChanged;
+import org.cafienne.cmmn.actorapi.event.team.group.CaseTeamGroupRemoved;
 import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleAdded;
 import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleChanged;
 import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleRemoved;
@@ -30,6 +33,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
 
     private final Map<String, CaseTeamUser> users = new HashMap<>();
     private final Map<String, CaseTeamTenantRole> tenantRoles = new HashMap<>();
+    private final Map<String, CaseTeamGroup> groups = new HashMap<>();
 
     /**
      * Create a new, empty case team.
@@ -48,6 +52,9 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         users.keySet().stream().filter(newCaseTeam::notHasUser).collect(Collectors.toList()).forEach(this::removeUser);
         newCaseTeam.getUsers().forEach(this::setUser);
 
+        groups.keySet().stream().filter(newCaseTeam::notHasGroup).collect(Collectors.toList()).forEach(this::removeGroup);
+        newCaseTeam.getGroups().forEach(this::setGroup);
+
         tenantRoles.keySet().stream().filter(newCaseTeam::notHasTenantRole).collect(Collectors.toList()).forEach(this::removeTenantRole);
         newCaseTeam.getTenantRoles().forEach(this::setTenantRole);
     }
@@ -58,6 +65,10 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
 
     public CaseTeamTenantRole getTenantRole(String tenantRoleName) {
         return tenantRoles.get(tenantRoleName);
+    }
+
+    public CaseTeamGroup getGroup(String groupId) {
+        return groups.get(groupId);
     }
 
     public void upsert(UpsertMemberData memberData) {
@@ -74,6 +85,13 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         CaseTeamUser user = users.get(userId);
         if (user != null) {
             addEvent(new CaseTeamUserRemoved(this, user));
+        }
+    }
+
+    public void removeGroup(String groupId) {
+        CaseTeamGroup group = groups.get(groupId);
+        if (group != null) {
+            addEvent(new CaseTeamGroupRemoved(this, group));
         }
     }
 
@@ -106,6 +124,18 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         }
     }
 
+    public void setGroup(CaseTeamGroup newMemberInfo) {
+        CaseTeamGroup existingGroup = groups.get(newMemberInfo.groupId());
+        if (existingGroup == null) {
+            addEvent(new CaseTeamGroupAdded(this, newMemberInfo));
+        } else {
+            if (existingGroup.differsFrom(newMemberInfo)) {
+                Set<GroupRoleMapping> removedMappings = existingGroup.getRemovedMappings(newMemberInfo);
+                addEvent(new CaseTeamGroupChanged(this, newMemberInfo, removedMappings));
+            }
+        }
+    }
+
     public void setTenantRole(CaseTeamTenantRole newMemberInfo) {
         CaseTeamTenantRole existingTenantRole = tenantRoles.get(newMemberInfo.tenantRoleName());
         if (existingTenantRole == null) {
@@ -127,11 +157,16 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         Collection<CaseTeamMember> members = new ArrayList<>();
         members.addAll(users.values());
         members.addAll(tenantRoles.values());
+        members.addAll(groups.values());
         return members;
     }
 
     public Collection<CaseTeamUser> getUsers() {
         return users.values();
+    }
+
+    public Collection<CaseTeamGroup> getGroups() {
+        return groups.values();
     }
 
     public Collection<CaseTeamTenantRole> getTenantRoles() {
@@ -151,6 +186,10 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         users.put(user.userId(), user);
     }
 
+    public void updateState(CaseTeamGroup group) {
+        groups.put(group.groupId(), group);
+    }
+
     public void updateState(CaseTeamTenantRole tenantRole) {
         tenantRoles.put(tenantRole.tenantRoleName(), tenantRole);
     }
@@ -164,6 +203,9 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
                 break;
             case User:
                 users.remove(memberId);
+                break;
+            case Group:
+                groups.remove(memberId);
                 break;
         }
     }
@@ -190,6 +232,9 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
 //        Element tenantRolesElement = caseTeamXML.getOwnerDocument().createElement("tenant-roles");
 //        caseTeamXML.appendChild(tenantRolesElement);
 //        tenantRoles.values().forEach(tenantRole -> tenantRole.dumpMemoryStateToXML(tenantRolesElement));
+        // Element groupsElement = caseTeamXML.getOwnerDocument().createElement("groups");
+        // caseTeamXML.appendChild(groupsElement);
+//        groups.values().forEach(group -> group.dumpMemoryStateToXML(groupsElement));
     }
 
     /**
@@ -228,8 +273,8 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         }
     }
 
-    public CurrentMember getTeamMember(CaseUserIdentity currentTenantUser) {
-        return new CurrentMember(this, currentTenantUser);
+    public CurrentMember getTeamMember(CaseUserIdentity currentUser) {
+        return new CurrentMember(this, currentUser);
     }
 
     /**

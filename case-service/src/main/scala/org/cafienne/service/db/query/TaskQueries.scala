@@ -38,6 +38,13 @@ class TaskQueriesImpl extends TaskQueries
   val tasksQuery = TableQuery[TaskTable]
 
   override def getCaseMembership(taskId: String, user: PlatformUser): Future[CaseMembership] = {
+    val groupMembership = TableQuery[CaseInstanceTeamGroupTable]
+      .join(TableQuery[TaskTable].filter(_.id === taskId))
+      .on(_.caseInstanceId === _.caseInstanceId)
+      .filter(_._1.groupId.inSet(user.groups.map(_.groupId)))
+      .distinctOn(_._1.groupId)
+      .map(group => (group._1.caseInstanceId, group._1.tenant, group._1.groupId))
+
     val tenantRoleBasedMembership =
       TableQuery[CaseInstanceTeamTenantRoleTable]
         .join(TableQuery[TaskTable].filter(_.id === taskId))
@@ -56,23 +63,30 @@ class TaskQueriesImpl extends TaskQueries
 
     val query = userIdBasedMembership
       .joinFull(tenantRoleBasedMembership)
+      .joinFull(groupMembership)
 
     db.run(query.result).map(records => {
-      if (records.isEmpty) {
-        throw TaskSearchFailure(taskId)
-      }
+      // Records have this signature:
+      //      val _: Seq[]
+      //      _1: Option[]
+      //        _1._1 Option[(String, String, String)],
+      //        _1._2 Option[(Option[String], Option[String], Option[String])]
+      //      _2: Option[(String, String, String)])] = records
+      if (records.isEmpty) throw TaskSearchFailure(taskId)
 
-      val userRecords: Set[(String, String, String)] = records.map(_._1).filter(_.nonEmpty).map(_.get).toSet
+      val userRecords: Set[(String, String, String)] = records.map(_._1.map(_._1)).filter(_.nonEmpty).flatMap(_.get).toSet
       val tenantRoleRecords: Set[(String, String, String)] = {
         // Convert Seq[Option[(Option[String], Option[String], Option[String])])] to Set(String, String, String)
         //  can it be done more elegantly? Now we're assessing that if the first string is non empty, it means the record is filled, otherwise not.
         //  Note: first string is case instance id. Would be pretty weird if that is not filled.
-        val x: Seq[(Option[String], Option[String], Option[String])] = records.flatMap(_._2).filter(_._1.nonEmpty)
-        val z = x.map(role => (role._1.get, role._2.getOrElse(""), role._3.getOrElse(""))).toSet
+        val x: Seq[Option[(Option[String], Option[String], Option[String])]] = records.map(_._1.flatMap(_._2))
+        val y: Seq[(Option[String], Option[String], Option[String])] = x.filter(_.nonEmpty).map(_.get).filter(_._1.nonEmpty)
+        val z =  y.map(role => (role._1.get, role._2.getOrElse(""), role._3.getOrElse(""))).toSet
         z
       }
+      val groupRecords: Set[(String, String, String)] = records.map(_._2).filter(_.nonEmpty).map(_.get).toSet
 
-      createCaseUserIdentity(user, userRecords, tenantRoleRecords, TaskSearchFailure, taskId)
+      createCaseUserIdentity(user, userRecords, groupRecords, tenantRoleRecords, TaskSearchFailure, taskId)
     })
   }
 
@@ -130,7 +144,8 @@ class TaskQueriesImpl extends TaskQueries
         //  - tasks that have a case role associated that the user has directly in the case team
         TableQuery[TaskTable].filter(task =>
           // Apply the filters: _1 is the case instance id, _2 is the case role
-          tenantRoleCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+          consentGroupCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+            || tenantRoleCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
             || userCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
     }
 
@@ -171,23 +186,6 @@ class TaskQueriesImpl extends TaskQueries
     Option(LocalDateTime.parse(date + "T23:59:59.999999999").toInstant(getTimeZoneOffset(timeZone)))
   }
 
-  // First define base queries that help find the cases that the user has access to with the specific case roles.
-  //  Resulting queries give a list of case instance id / case role pairs.
-  private def tenantRoleCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
-    TableQuery[UserRoleTable]
-      .filter(_.userId === platformUser.id)
-      .join(TableQuery[CaseInstanceTeamTenantRoleTable])
-      .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
-      .map(_._2)
-      .map(tenantRole => (tenantRole.caseInstanceId, tenantRole.caseRole))
-  }
-
-  private def userCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
-    TableQuery[CaseInstanceTeamUserTable]
-      .filter(_.userId === platformUser.id)
-      .map(user => (user.caseInstanceId, user.caseRole))
-  }
-
   override def getCountForUser(platformUser: PlatformUser, tenant: Option[String]): Future[TaskCount] = {
     val claimedTasksQuery = TableQuery[TaskTable].filter(_.assignee === platformUser.id)
       .filterNot(_.taskState === "Completed")
@@ -201,7 +199,8 @@ class TaskQueriesImpl extends TaskQueries
         .filterNot(_.taskState === "Completed").filterNot(_.taskState === "Terminated")
         .filter(task =>
           // Apply the filters: _1 is the case instance id, _2 is the case role
-          tenantRoleCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+          consentGroupCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+            || tenantRoleCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
             || userCoupledCaseRoles(platformUser).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
     } yield unclaimedTasks
 
@@ -215,5 +214,28 @@ class TaskQueriesImpl extends TaskQueries
       //      println("Returning Count: : " + tc)
       tc
     })
+  }
+
+  // First define 3 base queries that help find the cases that the user has access to with the specific case roles.
+  //  Resulting queries give a list of case instance id / case role pairs.
+  private def consentGroupCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
+    TableQuery[ConsentGroupMemberTable].filter(_.userId === platformUser.id)
+      .join(TableQuery[CaseInstanceTeamGroupTable]).on(_.role === _.groupRole).map(_._2)
+      .map(group => (group.caseInstanceId, group.caseRole))
+  }
+
+  private def tenantRoleCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
+    TableQuery[UserRoleTable]
+      .filter(_.userId === platformUser.id)
+      .join(TableQuery[CaseInstanceTeamTenantRoleTable])
+      .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
+      .map(_._2)
+      .map(tenantRole => (tenantRole.caseInstanceId, tenantRole.caseRole))
+  }
+
+  private def userCoupledCaseRoles(platformUser: PlatformUser): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
+    TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.userId === platformUser.id)
+      .map(user => (user.caseInstanceId, user.caseRole))
   }
 }

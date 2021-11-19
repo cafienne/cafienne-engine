@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
-import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamTenantRole
+import org.cafienne.cmmn.actorapi.command.team.removemember._
+import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.Headers
@@ -31,7 +31,7 @@ import javax.ws.rs._
 @Path("/cases")
 class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
-  override def routes: Route = concat(getCaseTeam, setCaseTeam, setUser, deleteUser, setTenantRole, deleteTenantRole)
+  override def routes: Route = concat(getCaseTeam, setCaseTeam, setUser, deleteUser, setGroup, deleteGroup, setTenantRole, deleteTenantRole)
 
   @Path("/{caseInstanceId}/caseteam")
   @GET
@@ -140,6 +140,65 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("caseteam" / "users" / Segment) { userId =>
         askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, userId))
+      }
+    }
+  }
+
+  @Path("/{caseInstanceId}/caseteam/groups")
+  @POST
+  @Operation(
+    summary = "Add or replace a case team member of type consent group",
+    description = "Adds a new or replaces and existing consent group member of the case team. Changes to the team can only be done by case owners.",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Your request to update the case team has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+    )
+  )
+  @RequestBody(description = "Case Team Group", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamFormat.GroupFormat]))))
+  @Consumes(Array("application/json"))
+  def setGroup: Route = post {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+      path("caseteam" / "groups") {
+        entity(as[CaseTeamFormat.GroupFormat]) { input =>
+          askCase(platformUser, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, input.asGroup))
+        }
+      }
+    }
+    }
+  }
+
+  @Path("/{caseInstanceId}/caseteam/groups/{groupId}")
+  @DELETE
+  @Operation(
+    summary = "Remove a member from the case team",
+    description = "Remove a member from the case team. Can be a member of type user as well as role. Changes to the team can only be done by case owners.",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId",
+        description = "Unique id of the case instance",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+      new Parameter(name = "groupId",
+        description = "Id of the consent group to remove",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Your request to remove the consent group from the case team has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+    )
+  )
+  @Consumes(Array("application/json"))
+  def deleteGroup: Route = delete {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("caseteam" / "groups" / Segment) { groupId =>
+        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamGroup(tenantUser, caseInstanceId, groupId))
       }
     }
   }

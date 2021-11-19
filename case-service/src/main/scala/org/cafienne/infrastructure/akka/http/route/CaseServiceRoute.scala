@@ -58,14 +58,14 @@ trait CaseServiceRoute extends LazyLogging {
         case MalformedRequestContentRejection(errorMessage, e) =>
           extractRequest { request =>
             logger.debug(s"HTTP request ${request.method.value} ${request.uri} has malformed content (${e.getClass.getName} - '$errorMessage')")
-            complete(StatusCodes.BadRequest, "The request content was malformed:\n" + errorMessage)
+            val cause = if (e.getCause != null) e.getCause.getMessage else e.getMessage
+            complete(StatusCodes.BadRequest, "The request content was malformed: " + cause)
           }
-        case a: UnsupportedRequestContentTypeRejection => {
+        case a: UnsupportedRequestContentTypeRejection =>
           extractRequest { request =>
             logger.debug(s"HTTP request ${request.method.value} ${request.uri} comes with unsupported content type '${a.contentType.getOrElse("")}'; it needs one of ${a.supported}")
             complete(StatusCodes.BadRequest, s"The request content type ${a.contentType} is not supported, provide one of ${a.supported}")
           }
-        }
       }
       .result()
 

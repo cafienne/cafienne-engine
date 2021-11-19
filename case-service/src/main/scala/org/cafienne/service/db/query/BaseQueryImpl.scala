@@ -1,14 +1,15 @@
 package org.cafienne.service.db.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.identity.{ConsentGroupMembership, PlatformUser}
 import org.cafienne.service.db.record.{CaseBusinessIdentifierRecord, CaseRecord}
-import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
+import org.cafienne.service.db.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 trait BaseQueryImpl
   extends CaseTables
     with TaskTables
     with TenantTables
+    with ConsentGroupTables
     with LazyLogging {
 
   import dbConfig.profile.api._
@@ -21,10 +22,6 @@ trait BaseQueryImpl
   val caseIdentifiersQuery = TableQuery[CaseBusinessIdentifierTable]
 
   val planItemTableQuery = TableQuery[PlanItemTable]
-  val taskQuery = TableQuery[TaskTable]
-  val caseInstanceRoleQuery = TableQuery[CaseInstanceRoleTable]
-  val rolesQuery = TableQuery[UserRoleTable]
-
 
   /**
     * Query that validates that the user belongs to the team of the specified case, either by explicit
@@ -34,7 +31,17 @@ trait BaseQueryImpl
     * @param tenant
     * @return
     */
-  def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String]) = {
+  def membershipQuery(user: PlatformUser, caseInstanceId: Rep[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
+    val groupMembership = TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id)
+      .join(TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId))
+      .on((group, member) => {
+        // User belongs to the case team if the group belongs to the case team and either:
+        // - the user has a group role matching the case membership's group role
+        // - or the user is group owner
+        group.group === member.groupId && (group.role === member.groupRole || group.isOwner)
+      })
+      .map(_._2.caseInstanceId)
+
     val tenantRoleBasedMembership = TableQuery[UserRoleTable].filter(_.userId === user.id)
       .join(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId))
       // The tenant role must be in the case team, and also the user must have the role in the same tenant
@@ -49,7 +56,7 @@ trait BaseQueryImpl
     // Return a filter on the case that also matches membership existence somewhere
     caseInstanceQuery
       .filter(_.id === caseInstanceId)
-      .filter(_ => userIdBasedMembership.exists || tenantRoleBasedMembership.exists)
+      .filter(_ => userIdBasedMembership.exists || tenantRoleBasedMembership.exists || groupMembership.exists)
   }
 
   /**
@@ -68,32 +75,35 @@ trait BaseQueryImpl
     } yield teamMemberShip
   }
 
-  def createCaseUserIdentity(user: PlatformUser, userRecords: Set[(String, String, String)], tenantRoleRecords: Set[(String, String, String)], exception: String => Exception, msg: String): CaseMembership = {
-    if (userRecords.isEmpty && tenantRoleRecords.isEmpty) {
+  def createCaseUserIdentity(user: PlatformUser, userRecords: Set[(String, String, String)], groupRecords: Set[(String, String, String)], tenantRoleRecords: Set[(String, String, String)], exception: String => Exception, msg: String): CaseMembership = {
+    if (userRecords.isEmpty && groupRecords.isEmpty && tenantRoleRecords.isEmpty) {
       // All rows empty
       throw exception(msg)
     }
 
     val caseId = {
       if (userRecords.nonEmpty) userRecords.head._1
+      else if (groupRecords.nonEmpty) groupRecords.head._1
       else if (tenantRoleRecords.nonEmpty) tenantRoleRecords.head._1
       else throw exception(msg) // Pretty weird, as we just above checked that at least one of the Sets is nonEmpty
     }
 
     val tenantId: String = {
       if (userRecords.nonEmpty) userRecords.head._2
+      else if (groupRecords.nonEmpty) groupRecords.head._2
       else if (tenantRoleRecords.nonEmpty) tenantRoleRecords.head._2
       else throw exception(msg) // Pretty weird, as we just above checked that at least one of the Sets is nonEmpty
     }
 
     val userIdBasedMembership: Set[String] = userRecords.map(_._3)
+    val groupBasedMembership: Seq[ConsentGroupMembership] = groupRecords.map(_._3).map(user.group).toSeq.filter(_ != null)
     val tenantRoleBasedMembership: Set[String] = tenantRoleRecords.map(_._3)
     // Not all tenant roles of the case team may apply to this user, only those that the user actually has in the tenant ...
     val userTenantRoles: Set[String] = user.tenantRoles(tenantId).intersect(tenantRoleBasedMembership)
     // ... and, if those are non empty only then we have an actual access to this case
-    if (userIdBasedMembership.isEmpty && userTenantRoles.isEmpty) throw exception(msg)
+    if (userIdBasedMembership.isEmpty && groupBasedMembership.isEmpty && userTenantRoles.isEmpty) throw exception(msg)
 
-    new CaseMembership(id = user.id, origin = user.origin(tenantId), tenantRoles = userTenantRoles, caseInstanceId = caseId, tenant = tenantId)
+    new CaseMembership(id = user.id, origin = user.origin(tenantId), tenantRoles = userTenantRoles, groups = groupBasedMembership, caseInstanceId = caseId, tenant = tenantId)
   }
 
   class BusinessIdentifierFilterParser(string: Option[String]) {

@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{Origin, PlatformUser}
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamTenantRole, CaseTeamUser}
+import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
 import org.cafienne.service.db.query.exception.SearchFailure
 
 import scala.concurrent.Future
@@ -19,10 +19,11 @@ trait CaseTeamValidator extends AuthenticatedRoute with TenantValidator {
     val valid = for {
       validMembers <- validateCaseTeamUsers(team.users, tenant)
       validTenantRoles <- validateTenantRoles(team.tenantRoles)
-    } yield (validMembers, validTenantRoles)
+      validGroups <- validateConsentGroups(team.groups)
+    } yield (validMembers, validTenantRoles, validGroups)
 
     onComplete(valid) {
-      case Success(usersTenantsAndGroups) => command(team.copy(users = usersTenantsAndGroups._1, tenantRoles = usersTenantsAndGroups._2))
+      case Success(usersTenantsAndGroups) => command(team.copy(users = usersTenantsAndGroups._1, tenantRoles = usersTenantsAndGroups._2, groups = usersTenantsAndGroups._3))
       case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
     }
   }
@@ -47,5 +48,36 @@ trait CaseTeamValidator extends AuthenticatedRoute with TenantValidator {
     // As for now no real tenant role validation, but still a hook that could be implemented to validate that
     //  there is at least one user in the tenant with the specified tenant roles
     Future.successful(tenantRoles)
+  }
+
+  private def validateConsentGroups(groups: Seq[CaseTeamGroup]): Future[Seq[CaseTeamGroup]] = {
+    val groupIds = groups.map(_.groupId)
+    userCache.getConsentGroups(groupIds).map(consentGroups => {
+      if (consentGroups.size != groupIds.size) {
+        val unfoundGroups = groupIds.filterNot(id => consentGroups.exists(user => user.id == id))
+        val msg = {
+          if (unfoundGroups.size == 1) s"Cannot find a consent group with id '${unfoundGroups.head}'"
+          else s"Cannot find consent groups ${unfoundGroups.map(u => s"'$u'").mkString(", ")}"
+        }
+        throw new SearchFailure(msg)
+      } else {
+        // Now check that the case team groups have existing consent group roles (empty string is considered membership).
+        val invalidGroupRoles: Seq[String] = groups.map(group => {
+          val consentGroup = consentGroups.find(_.id == group.groupId).get
+          val missingRoles = group.mappings.map(_.groupRole).filterNot(_.isBlank).filterNot(consentGroup.groupRoles.contains)
+          if (missingRoles.isEmpty) {
+            ""
+          } else {
+            s"Group ${group.groupId} does not have role(s) '${missingRoles.mkString("', '")}'"
+          }
+        }).filterNot(_.isBlank)
+        if (invalidGroupRoles.nonEmpty) {
+          throw new SearchFailure(invalidGroupRoles.mkString(",\n"))
+        }
+      }
+      // If we reach this point, all consent groups have been validated, and we can return the groups.
+      //  Currently no need to add extra info (an example could be the tenant to which the group belongs, or perhaps the id's of the owners)
+      groups
+    })
   }
 }

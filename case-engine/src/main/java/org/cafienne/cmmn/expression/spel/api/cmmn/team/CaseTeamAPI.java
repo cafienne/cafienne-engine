@@ -4,15 +4,14 @@ import org.cafienne.cmmn.expression.spel.api.APIObject;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Team;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  */
 public class CaseTeamAPI extends BaseTeamAPI {
     private final Map<String, CaseRoleAPI> rolesByName = new HashMap<>();
+    private final List<MemberAPI> members = new ArrayList<>();
     private final RoleAPI roleAPI;
 
     public CaseTeamAPI(Team team) {
@@ -20,6 +19,7 @@ public class CaseTeamAPI extends BaseTeamAPI {
         this.roleAPI = new RoleAPI(getActor());
         addPropertyReader("members", this::getMembers);
         addPropertyReader("users", this::getUsers);
+        addPropertyReader("groups", this::getGroups);
         addPropertyReader("tenantRoles", this::getTenantRoles);
         addPropertyReader("owners", this::getOwners);
         addPropertyReader("roles", () -> getRolesByName().values());
@@ -42,6 +42,10 @@ public class CaseTeamAPI extends BaseTeamAPI {
 
     private Collection<MemberAPI> getUsers() {
         return team.getUsers().stream().map(this::wrap).collect(Collectors.toList());
+    }
+
+    private Collection<MemberAPI> getGroups() {
+        return team.getGroups().stream().map(this::wrap).collect(Collectors.toList());
     }
 
     private Collection<MemberAPI> getTenantRoles() {

@@ -275,4 +275,26 @@ trait CaseTables extends QueryDBSchema {
     lazy val indexCaseInstanceId = index(caseInstanceId)
     lazy val indexTenantRoles = index(ixName(tenantRole), (tenant, tenantRole))
   }
+
+  class CaseInstanceTeamGroupTable(tag: Tag) extends CafienneTenantTable[CaseTeamGroupRecord](tag, "case_instance_team_group") {
+
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
+
+    lazy val groupId = idColumn[String]("group_id")
+
+    lazy val groupRole = idColumn[String]("group_role")
+
+    lazy val caseRole = idColumn[String]("case_role")
+
+    lazy val isOwner = column[Boolean]("isOwner")
+
+    lazy val pk = primaryKey(pkName, (caseInstanceId, groupId, groupRole, caseRole))
+
+    lazy val * = (caseInstanceId, tenant, groupId, groupRole, caseRole, isOwner).mapTo[CaseTeamGroupRecord]
+
+    lazy val indexCaseInstanceId = index(caseInstanceId)
+    lazy val indexGroupId = index(groupId)
+    lazy val indexCaseGroups = index(s"ix_case_id_group_id__$tableName", (caseInstanceId, groupId))
+    lazy val indexGroupMemberRole = index(ixName(groupRole), (caseInstanceId, groupId, groupRole))
+  }
 }

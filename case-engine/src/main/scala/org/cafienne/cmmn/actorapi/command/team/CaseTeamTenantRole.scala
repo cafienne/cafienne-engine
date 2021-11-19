@@ -13,8 +13,9 @@ import scala.jdk.CollectionConverters.SetHasAsScala
 
 case class CaseTeamTenantRole(tenantRoleName: String, override val caseRoles: Set[String] = Set(), override val isOwner: Boolean = false) extends CaseTeamMember {
   override val isTenantRole: Boolean = true
-  override val memberId: String = tenantRoleName
   override val memberType: MemberType = MemberType.TenantRole
+
+  override def memberId: String = tenantRoleName
 
   override def currentMember(team: Team): CaseTeamMember = team.getTenantRole(tenantRoleName)
 

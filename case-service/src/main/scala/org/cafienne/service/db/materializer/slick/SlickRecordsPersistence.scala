@@ -41,6 +41,7 @@ class SlickRecordsPersistence
         case value: CaseRoleRecord => TableQuery[CaseInstanceRoleTable].insertOrUpdate(value)
         case value: CaseTeamUserRecord => TableQuery[CaseInstanceTeamUserTable].insertOrUpdate(value)
         case value: CaseTeamTenantRoleRecord => TableQuery[CaseInstanceTeamTenantRoleTable].insertOrUpdate(value)
+        case value: CaseTeamGroupRecord => TableQuery[CaseInstanceTeamGroupTable].insertOrUpdate(value)
         case value: OffsetRecord => TableQuery[OffsetStoreTable].insertOrUpdate(value)
         case value: UserRoleRecord => TableQuery[UserRoleTable].insertOrUpdate(value)
         case value: TenantRecord => TableQuery[TenantTable].insertOrUpdate(value)
@@ -59,8 +60,8 @@ class SlickRecordsPersistence
   override def deleteCaseTeamMember(key: CaseTeamMemberKey): Unit = {
     key.memberType match {
       case MemberType.User => addStatement(TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === key.caseInstanceId).filter(_.userId === key.memberId).delete)
+      case MemberType.Group => addStatement(TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === key.caseInstanceId).filter(_.groupId === key.memberId).delete)
       case MemberType.TenantRole => addStatement(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === key.caseInstanceId).filter(_.tenantRole === key.memberId).delete)
-      case other => // Ignore for now
     }
   }
 
@@ -89,6 +90,12 @@ class SlickRecordsPersistence
           .filter(_.caseInstanceId === value.caseInstanceId)
           .filter(_.tenant === value.tenant)
           .filter(_.tenantRole === value.tenantRole)
+          .filter(_.caseRole === value.caseRole)
+          .delete
+        case value: CaseTeamGroupRecord => TableQuery[CaseInstanceTeamGroupTable]
+          .filter(_.caseInstanceId === value.caseInstanceId)
+          .filter(_.groupId === value.groupId)
+          .filter(_.groupRole === value.groupRole)
           .filter(_.caseRole === value.caseRole)
           .delete
         case value: UserRoleRecord => TableQuery[UserRoleTable].filter(r => r.userId === value.userId && r.tenant === value.tenant && r.role_name === value.role_name).delete

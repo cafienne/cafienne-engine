@@ -20,6 +20,7 @@ object QueryDB_1_1_16 extends DbSchemaVersion with QueryDBSchema
       .&(fillCaseTeamTenantRoleTable)
       .&(fillCaseTeamUserTable)
       .&(dropCaseTeamMemberTable)
+      .&(createCaseTeamGroupTable)
 
   import dbConfig.profile.api._
 
@@ -77,4 +78,17 @@ object QueryDB_1_1_16 extends DbSchemaVersion with QueryDBSchema
   def dropCaseTeamMemberTable = {
     TableMigration(TableQuery[CaseInstanceTeamMemberTable]).drop
   }
+
+  def createCaseTeamGroupTable = TableMigration(TableQuery[CaseInstanceTeamGroupTable])
+    .create
+    .addColumns(
+      _.caseInstanceId,
+      _.tenant,
+      _.groupId,
+      _.groupRole,
+      _.caseRole,
+      _.isOwner
+    )
+    .addPrimaryKeys(_.pk)
+    .addIndexes(_.indexCaseInstanceId, _.indexCaseGroups, _.indexGroupMemberRole)
 }

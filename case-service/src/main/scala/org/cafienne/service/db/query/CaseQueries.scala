@@ -7,7 +7,7 @@ import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.cases._
 import org.cafienne.service.db.query.exception.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.db.query.filter.CaseFilter
-import org.cafienne.service.db.record.{CaseRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
+import org.cafienne.service.db.record.{CaseRecord, CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.concurrent.Future
 
@@ -50,39 +50,46 @@ class CaseQueriesImpl
   import dbConfig.profile.api._
 
   override def getCaseMembership(caseInstanceId: String, user: PlatformUser): Future[CaseMembership] = {
+    val groupMembership = TableQuery[CaseInstanceTeamGroupTable]
+      .filter(_.caseInstanceId === caseInstanceId)
+      .filter(_.groupId.inSet(user.groups.map(_.groupId)))
+      .map(group => (group.tenant, group.groupId, group.isOwner))
+      .distinct
+
     val tenantRoleBasedMembership = for {
       (role, _) <- TableQuery[UserRoleTable].filter(_.userId === user.id)
         .joinRight(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId))
         // The tenant role must be in the case team, and also the user must have the role in the same tenant
         .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
-    } yield (caseInstanceId, role.map(_.tenant), role.map(_.role_name))
+    } yield (role.map(_.tenant), role.map(_.role_name))
 
     val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
       .filter(_.userId === user.id)
       .filter(_.caseInstanceId === caseInstanceId)
-      .map(user => (caseInstanceId, user.tenant, user.userId)).distinct
+      .map(user => (user.tenant, user.userId)).distinct
 
     val query = userIdBasedMembership
       .joinFull(tenantRoleBasedMembership)
+      .joinFull(groupMembership)
 
     db.run(query.result).map(records => {
       // Records have this signature:
       //      val _: Seq[(Option[(Option[(String, String, String)], Option[(Option[String], Option[String], Option[String])])], Option[(String, String, String)])] = records
 
-      if (records.isEmpty) {
-        throw CaseSearchFailure(caseInstanceId)
-      }
+      if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
 
-      val userRecords: Set[(String, String, String)] = records.map(_._1).filter(_.nonEmpty).map(_.get).toSet
+      val userRecords: Set[(String, String, String)] = records.map(_._1.map(_._1)).filter(_.nonEmpty).flatMap(_.get).map(user => (caseInstanceId, user._1, user._2)).toSet
       val tenantRoleRecords: Set[(String, String, String)] = {
         // Convert Seq[Option[(Option[String], Option[String], Option[String])])] to Set(String, String, String)
-        //  can it be done more elegantly? Now we're assessing that if the second string (tenant) is non empty, it means the record is filled, otherwise not.
-        val x: Seq[(String, Option[String], Option[String])] = records.flatMap(_._2).filter(_._2.nonEmpty)
-        val z = x.map(role => (role._1, role._2.getOrElse(""), role._3.getOrElse(""))).toSet
+        //  can it be done more elegantly? Now we're assessing that if the first string is non empty, it means the record is filled, otherwise not.
+        val x: Seq[Option[(Option[String], Option[String])]] = records.map(_._1.flatMap(_._2))
+        val y: Seq[(Option[String], Option[String])] = x.filter(_.nonEmpty).map(_.get).filter(_._1.nonEmpty)
+        val z =  y.map(role => (role._1.get, role._2.getOrElse(""))).toSet
         z
-      }
+      }.map(role => (caseInstanceId, role._1, role._2))
+      val groupRecords: Set[(String, String, String)] = records.map(_._2).filter(_.nonEmpty).map(_.get).map(group => (caseInstanceId, group._1, group._2)).toSet
 
-      createCaseUserIdentity(user, userRecords, tenantRoleRecords, CaseSearchFailure, caseInstanceId)
+      createCaseUserIdentity(user, userRecords, groupRecords, tenantRoleRecords, CaseSearchFailure, caseInstanceId)
     })
   }
 
@@ -102,6 +109,78 @@ class CaseQueriesImpl
     result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4, identifiers = x._5)))
   }
 
+  override def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseRecord]] = {
+    //    println(s"Getting case $caseInstanceId for user ${user.id}")
+    val query = for {
+      // Get the case
+      baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
+      // Access control query
+      _ <- membershipQuery(user, caseInstanceId)
+    } yield baseQuery
+
+    db.run(query.result.headOption)
+  }
+
+  override def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeamResponse] = {
+    val usersQuery = for {
+      users <- TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === caseInstanceId)
+      _ <- membershipQuery(user, caseInstanceId)
+    } yield users
+    val tenantRolesQuery = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
+    val groupsQuery = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
+
+    (for {
+      userRecords <- db.run(usersQuery.result)
+      tenantRoleRecords <- db.run(tenantRolesQuery.result)
+      groupRecords <- db.run(groupsQuery.result)
+      roleRecords <- db.run(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).map(_.roleName).result)
+    } yield (userRecords, tenantRoleRecords, groupRecords, roleRecords))
+      .map(records => {
+        if (records._1.isEmpty) {
+          throw CaseSearchFailure(caseInstanceId)
+        }
+        val users = records._1
+        val tenantRoles = records._2
+        val groups = records._3
+        val caseRoleRecords: Seq[String] = records._4
+
+        val team = fillCaseTeam(users, tenantRoles, groups)
+        val caseRoles = caseRoleRecords.filterNot(_.isBlank)
+        val unassignedRoles = caseRoles.filter(caseRole => !users.exists(_.caseRole == caseRole) && !tenantRoles.exists(_.caseRole == caseRole) && !groups.exists(_.caseRole == caseRole))
+        CaseTeamResponse(team, caseRoles = caseRoles, unassignedRoles = unassignedRoles)
+      })
+  }
+
+  private def fillCaseTeam(userRecords: Seq[CaseTeamUserRecord], tenantRoleRecords: Seq[CaseTeamTenantRoleRecord], groupRecords: Seq[CaseTeamGroupRecord]): CaseTeam = {
+    val userMembers = getUserMembers(userRecords)
+    val tenantRoleMembers = getTenantRoleMembers(tenantRoleRecords)
+    val groupIds: Set[String] = groupRecords.map(_.groupId).toSet
+    val groups: Seq[CaseTeamGroup] =groupIds.map(groupId => {
+      val mappings = groupRecords.filter(_.groupId == groupId)
+      val groupRoles = mappings.map(_.groupRole).toSet
+      val groupRoleMappings = groupRoles.map(groupRole => {
+        val caseRoles = mappings.filter(_.groupRole == groupRole).map(_.caseRole).toSet
+        val isOwner = mappings.filter(_.groupRole == groupRole).exists(_.isOwner)
+        GroupRoleMapping(caseRoles, groupRole, isOwner)
+      })
+      CaseTeamGroup(groupId, groupRoleMappings.toSeq)
+    }).toSeq
+//    val groups: Seq[CaseTeamGroup] = groupIds.map(id => CaseTeamGroup(id, groupRecords.filter(_.groupId == id).map(m => GroupRoleMapping(m.caseRole, m.groupRole, m.isOwner)))).toSeq
+    CaseTeam(users = userMembers, tenantRoles = tenantRoleMembers, groups = groups)
+  }
+
+  private def getUserMembers(userRecords: Seq[CaseTeamUserRecord]): Seq[CaseTeamUser] = {
+    val users = userRecords.filter(record => record.caseRole.isBlank)
+    val roles = userRecords.filterNot(record => record.caseRole.isBlank)
+    users.map(user => CaseTeamUser.from(userId = user.userId, origin = Origin.getEnum(user.origin), isOwner = user.isOwner, caseRoles = roles.filter(role => role.userId == user.userId).map(_.caseRole).toSet))
+  }
+
+  private def getTenantRoleMembers(roleRecords: Seq[CaseTeamTenantRoleRecord]): Seq[CaseTeamTenantRole] = {
+    val records = roleRecords.filter(record => record.caseRole.isBlank)
+    val caseRoles = roleRecords.filterNot(record => record.caseRole.isBlank)
+    records.map(tRole => CaseTeamTenantRole(tenantRoleName = tRole.tenantRole, isOwner = tRole.isOwner, caseRoles = caseRoles.filter(role => role.tenantRole == tRole.tenantRole).map(_.caseRole).toSet))
+  }
+
   override def getCaseDefinition(caseInstanceId: String, user: PlatformUser): Future[CaseDefinitionDocument] = {
     val query = for {
       // Get the case file
@@ -114,17 +193,6 @@ class CaseQueriesImpl
       case Some(result) => CaseDefinitionDocument(result)
       case None => throw CaseSearchFailure(caseInstanceId)
     }
-  }
-
-  override def getCaseInstance(caseInstanceId: String, user: PlatformUser): Future[Option[CaseRecord]] = {
-    val query = for {
-      // Get the case
-      baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
-      // Access control query
-      _ <- membershipQuery(user, caseInstanceId)
-    } yield baseQuery
-
-    db.run(query.result.headOption)
   }
 
   override def getCaseFile(caseInstanceId: String, user: PlatformUser): Future[CaseFile] = {
@@ -153,51 +221,6 @@ class CaseQueriesImpl
       case Some(result) => CaseFileDocumentation(result)
       case None => throw CaseSearchFailure(caseInstanceId)
     }
-  }
-
-  override def getCaseTeam(caseInstanceId: String, user: PlatformUser): Future[CaseTeamResponse] = {
-    val usersQuery = for {
-      users <- TableQuery[CaseInstanceTeamUserTable].filter(_.caseInstanceId === caseInstanceId)
-      _ <- membershipQuery(user, caseInstanceId)
-    } yield users
-    val tenantRolesQuery = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
-
-    (for {
-      userRecords <- db.run(usersQuery.result)
-      tenantRoleRecords <- db.run(tenantRolesQuery.result)
-      roleRecords <- db.run(TableQuery[CaseInstanceRoleTable].filter(_.caseInstanceId === caseInstanceId).map(_.roleName).result)
-    } yield (userRecords, tenantRoleRecords, roleRecords))
-      .map(records => {
-        if (records._1.isEmpty) {
-          throw CaseSearchFailure(caseInstanceId)
-        }
-        val users = records._1
-        val tenantRoles = records._2
-        val caseRoleRecords: Seq[String] = records._3
-
-        val team = fillCaseTeam(users, tenantRoles)
-        val caseRoles = caseRoleRecords.filterNot(_.isBlank)
-        val unassignedRoles = caseRoles.filter(caseRole => !users.exists(_.caseRole == caseRole) && !tenantRoles.exists(_.caseRole == caseRole))
-        CaseTeamResponse(team, caseRoles = caseRoles, unassignedRoles = unassignedRoles)
-      })
-  }
-
-  private def getUserMembers(userRecords: Seq[CaseTeamUserRecord]): Seq[CaseTeamUser] = {
-    val users = userRecords.filter(record => record.caseRole.isBlank)
-    val roles = userRecords.filterNot(record => record.caseRole.isBlank)
-    users.map(user => CaseTeamUser.from(userId = user.userId, origin = Origin.getEnum(user.origin), isOwner = user.isOwner, caseRoles = roles.filter(role => role.userId == user.userId).map(_.caseRole).toSet))
-  }
-
-  private def getTenantRoleMembers(roleRecords: Seq[CaseTeamTenantRoleRecord]): Seq[CaseTeamTenantRole] = {
-    val records = roleRecords.filter(record => record.caseRole.isBlank)
-    val caseRoles = roleRecords.filterNot(record => record.caseRole.isBlank)
-    records.map(tRole => CaseTeamTenantRole(tenantRoleName = tRole.tenantRole, isOwner = tRole.isOwner, caseRoles = caseRoles.filter(role => role.tenantRole == tRole.tenantRole).map(_.caseRole).toSet))
-  }
-
-  private def fillCaseTeam(userRecords: Seq[CaseTeamUserRecord], tenantRoleRecords: Seq[CaseTeamTenantRoleRecord]): CaseTeam = {
-    val userMembers = getUserMembers(userRecords)
-    val tenantRoleMembers = getTenantRoleMembers(tenantRoleRecords)
-    CaseTeam(users = userMembers, tenantRoles = tenantRoleMembers)
   }
 
   override def getPlanItems(caseInstanceId: String, user: PlatformUser): Future[CasePlan] = {
@@ -364,8 +387,8 @@ class CaseQueriesImpl
   override def getCases(user: PlatformUser, filter: CaseFilter, area: Area, sort: Sort): Future[Seq[CaseRecord]] = {
     val query = for {
       baseQuery <- statusFilter(filter.status)
-          .filterOpt(filter.tenant)((t, value) => t.tenant === value)
-          .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
+        .filterOpt(filter.tenant)((t, value) => t.tenant === value)
+        .filterOpt(filter.caseName)((t, value) => t.caseName.toLowerCase like s"%${value.toLowerCase}%")
 
       // Validate team membership
       _ <- membershipQuery(user, baseQuery.id, filter.identifiers)

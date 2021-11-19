@@ -62,6 +62,8 @@ final case class CaseTeamUserRecord(caseInstanceId: String, tenant: String, user
 
 final case class CaseTeamTenantRoleRecord(caseInstanceId: String, tenant: String, tenantRole: String, caseRole: String, isOwner: Boolean)
 
+final case class CaseTeamGroupRecord(caseInstanceId: String, tenant: String, groupId: String, groupRole: String, caseRole: String, isOwner: Boolean)
+
 final case class PlanItemRecord(id: String,
                                 definitionId: String,
                                 stageId: String,

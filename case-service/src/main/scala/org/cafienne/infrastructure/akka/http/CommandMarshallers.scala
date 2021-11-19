@@ -42,6 +42,10 @@ object CommandMarshallers {
     JsonUtil.fromJson[CaseTeamFormat.CaseTeamUserFormat](data)
   })
 
+  implicit val CaseTeamGroupUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
+    JsonUtil.fromJson[CaseTeamFormat.GroupFormat](data)
+  })
+
   implicit val CaseTeamTenantRoleUnMarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => {
     JsonUtil.fromJson[CaseTeamFormat.TenantRoleFormat](data)
   })
