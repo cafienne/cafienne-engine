@@ -10,7 +10,7 @@ package org.cafienne.cmmn.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied;
@@ -20,7 +20,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.StringValue;
@@ -52,8 +51,8 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param debugMode           Indication whether case should run in debug mode or not
      *
      */
-    public StartCase(String tenant, TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeam, boolean debugMode) {
-        this(tenant, tenantUser, caseInstanceId, definition, inputs, caseTeam, debugMode, "", caseInstanceId);
+    public StartCase(String tenant, CaseUserIdentity user, String caseInstanceId, CaseDefinition definition, ValueMap inputs, CaseTeam caseTeam, boolean debugMode) {
+        this(tenant, user, caseInstanceId, definition, inputs, caseTeam, debugMode, "", caseInstanceId);
     }
 
     /**
@@ -67,8 +66,8 @@ public class StartCase extends CaseCommand implements BootstrapCommand {
      * @param parentCaseId        The id of the parent case, if it exists
      * @param rootCaseId          The root case id, if it exists.
      */
-    public StartCase(String tenant, TenantUser tenantUser, String caseInstanceId, CaseDefinition definition, ValueMap caseInputParameters, CaseTeam caseTeam, boolean debugMode, String parentCaseId, String rootCaseId) {
-        super(tenantUser, caseInstanceId);
+    public StartCase(String tenant, CaseUserIdentity user, String caseInstanceId, CaseDefinition definition, ValueMap caseInputParameters, CaseTeam caseTeam, boolean debugMode, String parentCaseId, String rootCaseId) {
+        super(user, caseInstanceId);
         // First validate the tenant information.
         this.tenant = tenant;
         if (tenant == null || tenant.isEmpty()) {

@@ -20,7 +20,7 @@ public abstract class ValidMessageHandler extends MessageHandler {
         super(actor, msg);
         this.user = msg.getUser();
         // NOTE: replace this with some kind of "start transaction"
-        this.actor.setCurrentUser((TenantUser) user); // For now always cast to TenantUser
+        this.actor.setCurrentUser(user);
     }
 
     protected void complete() {

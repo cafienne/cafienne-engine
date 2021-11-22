@@ -7,13 +7,13 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
@@ -28,7 +28,7 @@ public class Basic {
         // The test just starts the case and then validates the output, no specific actions are done (no transitions are made)
         String caseInstanceId = "Basic";
         TestScript testCase = new TestScript(caseInstanceId);
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/basic.xml");
 
         StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);

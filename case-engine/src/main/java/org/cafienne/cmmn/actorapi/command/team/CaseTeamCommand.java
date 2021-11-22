@@ -2,24 +2,20 @@ package org.cafienne.cmmn.actorapi.command.team;
 
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.definition.team.CaseTeamDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.json.ValueMap;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Generic abstraction for commands relating to CaseTeam.
  */
 public abstract class CaseTeamCommand extends CaseCommand {
-    protected CaseTeamCommand(TenantUser tenantUser, String caseInstanceId) {
-        super(tenantUser, caseInstanceId);
+    protected CaseTeamCommand(CaseUserIdentity user, String caseInstanceId) {
+        super(user, caseInstanceId);
     }
 
     protected CaseTeamCommand(ValueMap json) {

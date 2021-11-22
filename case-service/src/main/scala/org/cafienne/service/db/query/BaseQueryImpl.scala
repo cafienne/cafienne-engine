@@ -60,6 +60,34 @@ trait BaseQueryImpl
     query
   }
 
+  def createCaseUserIdentity(user: PlatformUser, userRecords: Set[(String, String, String)], tenantRoleRecords: Set[(String, String, String)], exception: String => Exception, msg: String): CaseMembership = {
+    if (userRecords.isEmpty && tenantRoleRecords.isEmpty) {
+      // All rows empty
+      throw exception(msg)
+    }
+
+    val caseId = {
+      if (userRecords.nonEmpty) userRecords.head._1
+      else if (tenantRoleRecords.nonEmpty) tenantRoleRecords.head._1
+      else throw exception(msg) // Pretty weird, as we just above checked that at least one of the Sets is nonEmpty
+    }
+
+    val tenantId: String = {
+      if (userRecords.nonEmpty) userRecords.head._2
+      else if (tenantRoleRecords.nonEmpty) tenantRoleRecords.head._2
+      else throw exception(msg) // Pretty weird, as we just above checked that at least one of the Sets is nonEmpty
+    }
+
+    val userIdBasedMembership: Set[String] = userRecords.map(_._3)
+    val tenantRoleBasedMembership: Set[String] = tenantRoleRecords.map(_._3)
+    // Not all tenant roles of the case team may apply to this user, only those that the user actually has in the tenant ...
+    val userTenantRoles: Set[String] = user.tenantRoles(tenantId).intersect(tenantRoleBasedMembership)
+    // ... and, if those are non empty only then we have an actual access to this case
+    if (userIdBasedMembership.isEmpty && userTenantRoles.isEmpty) throw exception(msg)
+
+    new CaseMembership(id = user.id, origin = user.origin(tenantId), tenantRoles = userTenantRoles, caseInstanceId = caseId, tenant = tenantId)
+  }
+
   /**
     * Membership query is extended with business identifier filters, if any.
     * If no identifiers are passed, then we need to have a base query applied (either on Case or on Task)
@@ -86,12 +114,12 @@ trait BaseQueryImpl
         }
         case 1 => {
           logger.whenDebugEnabled{logger.debug(s"Simple filter: [$string]")}
-          filters(0).toQuery(caseInstanceId)
+          filters.head.toQuery(caseInstanceId)
         }
         case moreThanOne => {
           logger.whenDebugEnabled{logger.debug(s"Composite filter on $moreThanOne fields: [$string]")}
           for {
-            topQuery <- filters(0).toQuery(caseInstanceId)
+            topQuery <- filters.head.toQuery(caseInstanceId)
             _ <- createCompositeQuery(1, topQuery.caseInstanceId)
           } yield topQuery
         }
@@ -188,15 +216,15 @@ trait BaseQueryImpl
 
   trait RawFilter {
     protected val rawFieldName: String // Raw field name should NOT be used, only the trimmed version should be used.
-    lazy val field = rawFieldName.trim() // Always trim field names.
+    lazy val field: String = rawFieldName.trim() // Always trim field names.
   }
 
   trait BasicValueFilter extends RawFilter {
     private lazy val splittedRawFilter = rawFilter.split(splitter)
     val splitter: String
     val rawFilter: String
-    val rawFieldName = getContent(0)
-    val value = getContent(1)
+    val rawFieldName: String = getContent(0)
+    val value: String = getContent(1)
 
     private def getContent(index: Int): String = {
       if (splittedRawFilter.length > index) splittedRawFilter(index)

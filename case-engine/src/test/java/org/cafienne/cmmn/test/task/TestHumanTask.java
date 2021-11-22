@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.test.task;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
 import org.cafienne.humantask.actorapi.command.*;
 import org.cafienne.humantask.instance.TaskState;
@@ -32,10 +32,10 @@ public class TestHumanTask {
         taskContent.plus("Subject", "Decide on this topic");
         taskContent.plus("Decision", "Yet to be decided");
 
-        TenantUser pete = TestScript.getTestUser("pete");
-        TenantUser gimy = TestScript.getTestUser("gimy");
-        TenantUser tom = TestScript.getTestUser("tom");
-        TenantUser notInTeam = TestScript.getTestUser("not-in-team");
+        TestUser pete = TestScript.getTestUser("pete");
+        TestUser gimy = TestScript.getTestUser("gimy");
+        TestUser tom = TestScript.getTestUser("tom");
+        TestUser notInTeam = TestScript.getTestUser("not-in-team");
         CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
         StartCase startCase = testCase.createCaseCommand(pete, caseInstanceId, xml, team);
 

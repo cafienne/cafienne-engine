@@ -7,14 +7,13 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.json.ValueMap;
+import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
 public class RepeatRule {
@@ -25,7 +24,7 @@ public class RepeatRule {
         TestScript testCase = new TestScript(caseInstanceId);
 
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repeatrule.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, case1 -> {

@@ -7,18 +7,18 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
 public class StageCompletion {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/stageCompletion.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testStage1Completion() {

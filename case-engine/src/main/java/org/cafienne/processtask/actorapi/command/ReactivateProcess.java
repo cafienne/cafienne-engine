@@ -1,7 +1,7 @@
 package org.cafienne.processtask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -14,8 +14,8 @@ import java.io.IOException;
 public class ReactivateProcess extends ProcessCommand {
     private final ValueMap inputParameters;
 
-    public ReactivateProcess(TenantUser tenantUser, String id, ValueMap inputParameters) {
-        super(tenantUser, id);
+    public ReactivateProcess(UserIdentity user, String id, ValueMap inputParameters) {
+        super(user, id);
         this.inputParameters = inputParameters;
     }
 

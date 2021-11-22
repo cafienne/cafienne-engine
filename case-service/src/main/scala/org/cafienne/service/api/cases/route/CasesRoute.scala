@@ -10,14 +10,14 @@ package org.cafienne.service.api.cases.route
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat}
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.service.db.query.exception.CaseSearchFailure
+import org.cafienne.service.db.query.{CaseMembership, CaseQueries}
 
 import scala.util.{Failure, Success}
 
@@ -67,20 +67,10 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def askCaseWithValidMembers(platformUser: PlatformUser, members: Seq[CaseTeamMember], caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
-    readLastModifiedHeader() { caseLastModified =>
-      onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
-        case Success(tenant) => {
-          askCaseWithValidTeam(tenant, members, createCaseCommand.apply(platformUser.getTenantUser(tenant)))
-        }
-        case Failure(error) => {
-          error match {
-            case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-            case _ => throw error
-          }
-        }
-      }
-    }
+  def askCaseWithValidMembers(platformUser: PlatformUser, members: Seq[CaseTeamMember], caseInstanceId: String, command: CaseMembership => CaseCommand): Route = {
+    authorizeCaseAccess(platformUser, caseInstanceId, caseMember => {
+      askCaseWithValidTeam(caseMember.tenant, members, command.apply(caseMember))
+    })
   }
 
   def askCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: CaseCommand): Route = {
@@ -91,7 +81,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
           val tenantUserIds = tenantUsers.map(t => t.id)
           val unfoundUsers = userIds.filterNot(userId => tenantUserIds.contains(userId))
           val msg = {
-            if (unfoundUsers.size == 1) s"Cannot find an active user '${unfoundUsers(0)}' in tenant '$tenant'"
+            if (unfoundUsers.size == 1) s"Cannot find an active user '${unfoundUsers.head}' in tenant '$tenant'"
             else s"The users ${unfoundUsers.map(u => s"'$u'").mkString(", ")} are not active in tenant $tenant"
           }
           complete(StatusCodes.NotFound, msg)
@@ -103,22 +93,21 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CreateCaseCommand): Route = {
+  def authorizeCaseAccess(platformUser: PlatformUser, caseInstanceId: String, subRoute: CaseMembership => Route): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      onComplete(handleSyncedQuery(() => caseQueries.authorizeCaseAccessAndReturnTenant(caseInstanceId, platformUser), caseLastModified)) {
-        case Success(tenant) => askModelActor(createCaseCommand.apply(platformUser.getTenantUser(tenant)))
-        case Failure(error) => {
+      onComplete(handleSyncedQuery(() => caseQueries.getCaseMembership(caseInstanceId, platformUser), caseLastModified)) {
+        case Success(membership) => subRoute(membership)
+        case Failure(error) =>
           error match {
             case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
             case _ => throw error
           }
-        }
       }
     }
   }
 
-  trait CreateCaseCommand {
-    def apply(user: TenantUser): CaseCommand
+  def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CaseMembership => CaseCommand): Route = {
+    authorizeCaseAccess(platformUser, caseInstanceId, caseMember => askModelActor(createCaseCommand.apply(caseMember)))
   }
 
   protected def teamConverter(caseTeam: BackwardCompatibleTeamFormat): CaseTeam = {

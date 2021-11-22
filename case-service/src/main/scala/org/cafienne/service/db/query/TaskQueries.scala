@@ -16,16 +16,13 @@ case class TaskCount(claimed: Long, unclaimed: Long) extends CafienneJson {
 
 trait TaskQueries {
 
-
-  // TODO: incorporate the casedefinition info, case parent id and case root id. For all queries. By joining.
+  def getCaseMembership(taskId: String, user: PlatformUser): Future[CaseMembership] = ???
 
   def getTask(taskId: String, user: PlatformUser): Future[TaskRecord] = ???
 
   def getTasksWithCaseName(caseName: String, tenant: Option[String], user: PlatformUser): Future[Seq[TaskRecord]] = ???
 
   def getCaseTasks(caseInstanceId: String, user: PlatformUser): Future[Seq[TaskRecord]] = ???
-
-  def authorizeTaskAccessAndReturnCaseAndTenantId(taskId: String, user: PlatformUser): Future[(String, String)] = ???
 
   def getAllTasks(user: PlatformUser, filter: TaskFilter = TaskFilter.Empty, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[TaskRecord]] = ???
 
@@ -39,6 +36,46 @@ class TaskQueriesImpl extends TaskQueries
   import dbConfig.profile.api._
 
   val tasksQuery = TableQuery[TaskTable]
+
+  override def getCaseMembership(taskId: String, user: PlatformUser): Future[CaseMembership] = {
+    val tenantRoleBasedMembership =
+      TableQuery[CaseInstanceTeamMemberTable].filter(_.isTenantUser === false)
+        .join(TableQuery[TaskTable].filter(_.id === taskId))
+        .on(_.caseInstanceId === _.caseInstanceId)
+        .joinRight(TableQuery[UserRoleTable].filter(_.userId === user.id))
+        .on((left, right) => left._1.memberId === right.role_name && left._1.tenant === right.tenant)
+        .map(record => {
+          (record._1.map(_._1.caseInstanceId), record._1.map(_._1.tenant), record._1.map(_._1.memberId))
+        })
+
+    val userIdBasedMembership = TableQuery[CaseInstanceTeamMemberTable]
+      .filter(_.isTenantUser === true)
+      .filter(_.memberId === user.id)
+      .join(TableQuery[TaskTable].filter(_.id === taskId))
+      .on(_.caseInstanceId === _.caseInstanceId)
+      .map(user => (user._1.caseInstanceId, user._1.tenant, user._1.memberId))
+
+    val query = userIdBasedMembership
+      .joinFull(tenantRoleBasedMembership)
+
+    db.run(query.result).map(records => {
+      if (records.isEmpty) {
+        throw TaskSearchFailure(taskId)
+      }
+
+      val userRecords: Set[(String, String, String)] = records.map(_._1).filter(_.nonEmpty).map(_.get).toSet
+      val tenantRoleRecords: Set[(String, String, String)] = {
+        // Convert Seq[Option[(Option[String], Option[String], Option[String])])] to Set(String, String, String)
+        //  can it be done more elegantly? Now we're assessing that if the first string is non empty, it means the record is filled, otherwise not.
+        //  Note: first string is case instance id. Would be pretty weird if that is not filled.
+        val x: Seq[(Option[String], Option[String], Option[String])] = records.flatMap(_._2).filter(_._1.nonEmpty)
+        val z = x.map(role => (role._1.get, role._2.getOrElse(""), role._3.getOrElse(""))).toSet
+        z
+      }
+
+      createCaseUserIdentity(user, userRecords, tenantRoleRecords, TaskSearchFailure, taskId)
+    })
+  }
 
   override def getTask(taskId: String, user: PlatformUser): Future[TaskRecord] = {
     val query = for {
@@ -84,21 +121,6 @@ class TaskQueriesImpl extends TaskQueries
 
   override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]) = {
     TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
-  }
-
-  override def authorizeTaskAccessAndReturnCaseAndTenantId(taskId: String, user: PlatformUser): Future[(String, String)] = {
-    val query = for {
-      // Get the case
-      baseQuery <- TableQuery[TaskTable].filter(_.id === taskId)
-      // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
-
-    } yield (baseQuery.caseInstanceId, baseQuery.tenant)
-
-    db.run(query.result.headOption).map {
-      case None => throw TaskSearchFailure(taskId)
-      case Some(result) => result
-    }
   }
 
   override def getAllTasks(user: PlatformUser, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {

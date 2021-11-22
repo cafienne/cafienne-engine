@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.actorapi.command.team
 
-import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.team.CaseTeamError
 import org.cafienne.infrastructure.serialization.Fields
@@ -52,7 +52,7 @@ object CaseTeamMember {
 
   def apply(key: MemberKey, caseRoles: Set[String], isOwner: Boolean) = new CaseTeamMember(key, caseRoles = caseRoles.toSeq, isOwner = Some(isOwner))
 
-  def createBootstrapMember(user: TenantUser) = new CaseTeamMember(MemberKey(user.id, "user"), isOwner = Some(true))
+  def createBootstrapMember(user: UserIdentity) = new CaseTeamMember(MemberKey(user.id, "user"), isOwner = Some(true))
 
   def deserialize(json: ValueMap) = {
     val memberId = json.readString(Fields.memberId)

@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team.member;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -33,8 +33,8 @@ import java.io.IOException;
 public class PutTeamMember extends CaseTeamMemberCommand {
     private final CaseTeamMember newMember;
 
-    public PutTeamMember(TenantUser tenantUser, String caseInstanceId, CaseTeamMember newMember) {
-        super(tenantUser, caseInstanceId, newMember.key());
+    public PutTeamMember(CaseUserIdentity user, String caseInstanceId, CaseTeamMember newMember) {
+        super(user, caseInstanceId, newMember.key());
         this.newMember = newMember;
     }
 

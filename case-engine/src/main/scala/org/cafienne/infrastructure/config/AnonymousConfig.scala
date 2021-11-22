@@ -1,7 +1,7 @@
 package org.cafienne.infrastructure.config
 
 import com.typesafe.config.{Config, ConfigObject}
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, PlatformUser, TenantUser}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamMember, MemberKey}
 import org.cafienne.infrastructure.Cafienne
@@ -46,7 +46,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
     fail(s"Tenant is missing in anonymous case definition on url '/request/case/$url' --> '$definition'; also default tenant is empty")
   }
   val anonymousPlatformUser = userConfig.asUser(tenant)
-  val anonymousTenantUser = anonymousPlatformUser.getTenantUser(tenant)
+
   val team: CaseTeam = {
     val members: Seq[CaseTeamMember] = getConfigReader("caseTeam").readConfigList("members").map(reader => {
       reader.requires("Case Team member for definition " + definition, "memberId", "memberType")
@@ -63,9 +63,14 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
     CaseTeam(members)
   }
 
+  val user: CaseUserIdentity = new CaseUserIdentity {
+    override val id: String = userConfig.userId
+    override val origin: Origin = Origin.Anonymous
+  }
+
   def createStartCaseCommand(newCaseId: String, inputParameters: ValueMap, debugMode: Boolean) = {
     val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(anonymousPlatformUser, tenant, definition)
-    val sc = new StartCase(tenant, anonymousTenantUser, newCaseId, definitionsDocument.getFirstCase, inputParameters, team, debugMode)
+    val sc = new StartCase(tenant, user, newCaseId, definitionsDocument.getFirstCase, inputParameters, team, debugMode)
     sc
   }
 

@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.actorapi.command.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
@@ -27,8 +27,8 @@ public class DeleteCaseFileItem extends CaseFileItemCommand {
      * @param caseInstanceId   The id of the case in which to perform this command.
      * @param path Path to the case file item to be created
      */
-    public DeleteCaseFileItem(TenantUser tenantUser, String caseInstanceId, Path path) {
-        super(tenantUser, caseInstanceId, Value.NULL, path, CaseFileItemTransition.Delete);
+    public DeleteCaseFileItem(CaseUserIdentity user, String caseInstanceId, Path path) {
+        super(user, caseInstanceId, Value.NULL, path, CaseFileItemTransition.Delete);
     }
 
     public DeleteCaseFileItem(ValueMap json) {

@@ -8,7 +8,8 @@
 package org.cafienne.humantask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
@@ -23,8 +24,8 @@ import java.io.IOException;
 public class DelegateTask extends WorkflowCommand {
     private final String assignee;
 
-    public DelegateTask(TenantUser tenantUser, String caseInstanceId, String taskId, TenantUser delegatee) {
-        super(tenantUser, caseInstanceId, taskId);
+    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, UserIdentity delegatee) {
+        super(user, caseInstanceId, taskId);
         this.assignee = delegatee.id();
     }
 

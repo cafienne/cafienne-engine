@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.test.task;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -8,6 +7,7 @@ import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import org.junit.Test;
 public class TestTaskOutputParameters {
 
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/requiredtaskparameters.xml");
-    private final TenantUser testUser = TestScript.getTestUser("user");
+    private final TestUser testUser = TestScript.getTestUser("user");
     private final ValueMap inputs = new ValueMap();
     private final ValueMap emptyTaskOutput = new ValueMap();
     private final ValueMap invalidTaskOutput = new ValueMap("Non-Result", "This is an invalid output parameter");

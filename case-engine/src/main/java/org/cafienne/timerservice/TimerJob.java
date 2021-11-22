@@ -40,7 +40,7 @@ public class TimerJob implements CafienneSerializable {
 
     @Override
     public String toString() {
-        return "Timer[" + timerId + "] in case ["+caseInstanceId+"] on behalf of user " + user.id();
+        return "Timer[" + timerId + "] in case [" + caseInstanceId + "] on behalf of user " + user.id();
     }
 
     @Override

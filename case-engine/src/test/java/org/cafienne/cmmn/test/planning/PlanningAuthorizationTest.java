@@ -8,7 +8,6 @@
 
 package org.cafienne.cmmn.test.planning;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
@@ -16,6 +15,7 @@ import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.junit.Test;
@@ -24,8 +24,8 @@ public class PlanningAuthorizationTest {
 
     private final String testName = "authorization-test";
     private final String caseInstanceId = testName;
-    private final TenantUser anonymous = TestScript.getTestUser("Anonymous");
-    private final TenantUser planner = TestScript.getTestUser("Planner", "planner");
+    private final TestUser anonymous = TestScript.getTestUser("Anonymous");
+    private final TestUser planner = TestScript.getTestUser("Planner", "planner");
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/planning/authorization.xml");
 
     @Test

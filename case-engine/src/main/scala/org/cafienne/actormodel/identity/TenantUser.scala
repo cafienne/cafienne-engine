@@ -8,6 +8,14 @@ final case class TenantUser(id: String, roles: Set[String], tenant: String, isOw
 
   import scala.jdk.CollectionConverters._
 
+  override def asCaseUserIdentity(): CaseUserIdentity = {
+    val user = this
+    new CaseUserIdentity {
+      override val id: String = user.id
+      override val origin: Origin = Origin.Tenant
+    }
+  }
+
   /**
     * Serializes the user information to JSON
     *

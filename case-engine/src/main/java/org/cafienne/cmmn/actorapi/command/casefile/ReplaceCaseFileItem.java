@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.actorapi.command.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
@@ -31,8 +31,8 @@ public class ReplaceCaseFileItem extends CaseFileItemCommand {
      * @param newContent         A value structure with contents of the new case file item
      * @param path Path to the case file item to be created
      */
-    public ReplaceCaseFileItem(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, Path path) {
-        super(tenantUser, caseInstanceId, newContent, path, CaseFileItemTransition.Replace);
+    public ReplaceCaseFileItem(CaseUserIdentity user, String caseInstanceId, Value<?> newContent, Path path) {
+        super(user, caseInstanceId, newContent, path, CaseFileItemTransition.Replace);
     }
 
     public ReplaceCaseFileItem(ValueMap json) {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.test.TestScript;
@@ -15,8 +14,6 @@ import org.cafienne.infrastructure.Cafienne;
 import org.junit.Test;
 
 public class InvalidCaseFileDefinition {
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
-
     // Simple test for casefile structure
     @Test
     public void testInvalidCaseDefinition() {

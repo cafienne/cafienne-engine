@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
@@ -8,6 +7,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.json.ValueList;
@@ -18,7 +18,7 @@ import org.junit.Test;
 public class TestTaskInputMapping {
     private final String caseName = "TaskInputMapping";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/taskinputmapping.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testContextSettingsFromTasks() {

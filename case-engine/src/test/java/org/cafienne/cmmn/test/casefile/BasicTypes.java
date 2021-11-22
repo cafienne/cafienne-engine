@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
@@ -17,6 +16,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
@@ -30,7 +30,7 @@ public class BasicTypes {
     private final String caseName = "CaseFileDefinitionTest";
     private final String inputParameterName = "inputCaseFile";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/basictypes.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path allPropertyTypesPath = new Path("AllPropertyTypes");
     private final Path childItemPath = new Path("AllPropertyTypes/ChildItem");
     private final Path childArrayPath = new Path("AllPropertyTypes/ArrayOfChildItem");

@@ -7,15 +7,14 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
-import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
 public class Stages {
@@ -25,7 +24,7 @@ public class Stages {
         TestScript testCase = new TestScript(caseInstanceId);
 
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/stages.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {

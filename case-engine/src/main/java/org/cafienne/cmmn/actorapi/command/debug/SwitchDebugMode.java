@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.command.debug;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -32,8 +32,8 @@ public class SwitchDebugMode extends CaseCommand {
      * @param caseInstanceId      The instance identifier of the case
      * @param debugMode           True if debug must be enabled, false if disabled.
      */
-    public SwitchDebugMode(TenantUser tenantUser, String caseInstanceId, boolean debugMode) {
-        super(tenantUser, caseInstanceId);
+    public SwitchDebugMode(CaseUserIdentity user, String caseInstanceId, boolean debugMode) {
+        super(user, caseInstanceId);
         this.debugMode = debugMode;
     }
 

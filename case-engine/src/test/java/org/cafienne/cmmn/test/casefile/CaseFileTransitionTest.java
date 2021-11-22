@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
@@ -19,6 +18,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
@@ -32,7 +32,7 @@ public class CaseFileTransitionTest {
     private static final String REVIEW_REQUEST = "ReviewRequest";
     private final String inputParameterName = "inputCaseFile";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repetitivefileitems.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path requestPath = new Path("Request");
     private final Path helperPath = new Path("Request/Helper");
     private final Path customerPath = new Path("Request/Customer");

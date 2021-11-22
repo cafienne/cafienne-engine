@@ -9,8 +9,7 @@ package org.cafienne.cmmn.actorapi.command;
 
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
@@ -23,14 +22,14 @@ import org.cafienne.json.ValueMap;
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
  * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */
-public abstract class CaseCommand extends ModelCommand<Case, TenantUser> {
+public abstract class CaseCommand extends ModelCommand<Case, CaseUserIdentity> {
     /**
      * Create a new command that can be sent to the case.
      *
      * @param user           The user that issues this command.
      * @param caseInstanceId The id of the case in which to perform this command.
      */
-    protected CaseCommand(TenantUser user, String caseInstanceId) {
+    protected CaseCommand(CaseUserIdentity user, String caseInstanceId) {
         super(user, caseInstanceId);
     }
 
@@ -39,8 +38,8 @@ public abstract class CaseCommand extends ModelCommand<Case, TenantUser> {
     }
 
     @Override
-    protected TenantUser readUser(ValueMap json) {
-        return TenantUser.deserialize(json);
+    protected CaseUserIdentity readUser(ValueMap json) {
+        return CaseUserIdentity.deserialize(json);
     }
 
     @Override

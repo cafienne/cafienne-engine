@@ -6,13 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.event.ProcessCompleted;
@@ -23,7 +22,7 @@ import java.io.*;
 
 public class TestPDFReport {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/pdfreport.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testReportGeneration() throws IOException {

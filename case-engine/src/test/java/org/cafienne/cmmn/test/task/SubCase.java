@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.task;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
@@ -19,8 +18,8 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
@@ -31,7 +30,7 @@ public class SubCase {
         TestScript testCase = new TestScript("SubCase");
 
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         /**
          * Start the MainCase
@@ -137,7 +136,7 @@ public class SubCase {
         TestScript testCase = new TestScript("SubCase");
 
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         /**
          * Start the MainCase
@@ -185,7 +184,7 @@ public class SubCase {
         TestScript testCase = new TestScript("SubCase");
 
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         /**
          * Start the MainCase

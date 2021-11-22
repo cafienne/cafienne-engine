@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.task.process;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
@@ -14,13 +14,14 @@ class ProcessTaskActorInformer extends ProcessInformer {
     @Override
     protected void startImplementation(ValueMap inputParameters) {
         final String taskId = task.getId();
-        final TenantUser user = getCaseInstance().getCurrentUser();
+        final CaseUserIdentity user = getCaseInstance().getCurrentUser();
+        final String tenant = getCaseInstance().getTenant();
         final String taskName = task.getName();
         final String rootActorId = task.getCaseInstance().getRootActorId();
         final String parentId = task.getCaseInstance().getId();
         final boolean debugMode = task.getCaseInstance().debugMode();
 
-        getCaseInstance().askProcess(new StartProcess(user, taskId, taskName, task.getDefinition().getImplementationDefinition(), inputParameters, parentId, rootActorId, debugMode),
+        getCaseInstance().askProcess(new StartProcess(user, tenant, taskId, taskName, task.getDefinition().getImplementationDefinition(), inputParameters, parentId, rootActorId, debugMode),
                 left -> task.goFault(new ValueMap("exception", left.toJson())),
                 right -> {
                     if (!task.getDefinition().isBlocking()) {

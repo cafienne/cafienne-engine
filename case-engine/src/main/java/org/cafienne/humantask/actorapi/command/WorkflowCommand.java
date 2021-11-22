@@ -3,7 +3,7 @@ package org.cafienne.humantask.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
@@ -25,8 +25,8 @@ public abstract class WorkflowCommand extends CaseCommand {
     private final String taskId;
     private HumanTask task;
 
-    protected WorkflowCommand(TenantUser tenantUser, String caseInstanceId, String taskId) {
-        super(tenantUser, caseInstanceId);
+    protected WorkflowCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
+        super(user, caseInstanceId);
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new NullPointerException("Task id should not be null or empty");
         }

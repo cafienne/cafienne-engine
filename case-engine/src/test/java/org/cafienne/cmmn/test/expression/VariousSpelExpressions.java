@@ -1,7 +1,6 @@
 package org.cafienne.cmmn.test.expression;
 
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
@@ -12,6 +11,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.event.TaskOutputAssertion;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.json.LongValue;
@@ -33,7 +33,7 @@ public class VariousSpelExpressions {
     private final ValueMap defaultTaskOutput = new ValueMap("Output", defaultOutput);
     private final ValueMap stopNowTaskOutput = new ValueMap("Output", stopNowOutput);
     private final ValueMap specialTaskOutput = new ValueMap("SpecialOutput", new ValueMap("Multi", new int[]{1, 2, 3, 4}));
-    private final TenantUser testUser = TestScript.getTestUser("user");
+    private final TestUser testUser = TestScript.getTestUser("user");
 
     @Test
     public void testHumanTaskExpressions() {

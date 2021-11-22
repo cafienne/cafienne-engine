@@ -176,7 +176,8 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
               val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-              askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              val caseStarter = platformUser.getTenantUser(tenant).asCaseUserIdentity()
+              askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, caseStarter, newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
             } catch {
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)

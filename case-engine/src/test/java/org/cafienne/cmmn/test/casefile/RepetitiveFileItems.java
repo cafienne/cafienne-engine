@@ -7,13 +7,13 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class RepetitiveFileItems {
     private final String caseName = "repetitiveFileItems";
     private final TestScript testCase = new TestScript(caseName);
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repeatcasefilecreation.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path topPath = new Path("TopCase");
     private final Path itemsPath = new Path("TopCase/items");
     private final Path item0 = new Path("TopCase/items[0]");

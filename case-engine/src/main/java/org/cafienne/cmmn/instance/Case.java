@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
@@ -91,6 +92,11 @@ public class Case extends ModelActor {
         this.sentryNetwork = new SentryNetwork(this);
 
         logger.info("Recovering/creating case " + this.getId() + " with path " + self().path());
+    }
+
+    @Override
+    public CaseUserIdentity getCurrentUser() {
+        return super.getCurrentUser().asCaseUserIdentity();
     }
 
     @Override

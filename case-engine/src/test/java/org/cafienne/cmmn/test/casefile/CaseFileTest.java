@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
@@ -14,7 +14,7 @@ public class CaseFileTest {
     private final String caseName = "CaseFileTest";
     private final String inputParameterName = "aaa";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/casefiletest.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testPropertyAccessingFromSentry() {

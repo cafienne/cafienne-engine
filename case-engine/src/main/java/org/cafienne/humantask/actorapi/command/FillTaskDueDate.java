@@ -8,7 +8,7 @@
 package org.cafienne.humantask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
@@ -23,8 +23,8 @@ import java.time.Instant;
 public class FillTaskDueDate extends WorkflowCommand {
 	private final Instant dueDate;
 
-	public FillTaskDueDate(TenantUser tenantUser, String caseInstanceId, String taskId, Instant dueDate) {
-		super(tenantUser, caseInstanceId, taskId);
+	public FillTaskDueDate(CaseUserIdentity user, String caseInstanceId, String taskId, Instant dueDate) {
+		super(user, caseInstanceId, taskId);
 		this.dueDate = dueDate;
 	}
 

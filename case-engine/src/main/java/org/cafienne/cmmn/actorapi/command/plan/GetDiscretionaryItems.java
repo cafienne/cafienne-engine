@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.actorapi.command.plan;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
@@ -16,7 +16,6 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 
@@ -33,8 +32,8 @@ public class GetDiscretionaryItems extends CaseCommand {
      * @param caseInstanceId
      *          The id of the case instance to get the discretionary items for
      */
-    public GetDiscretionaryItems(TenantUser tenantUser, String caseInstanceId) {
-        super(tenantUser, caseInstanceId);
+    public GetDiscretionaryItems(CaseUserIdentity user, String caseInstanceId) {
+        super(user, caseInstanceId);
     }
 
     public GetDiscretionaryItems(ValueMap json) {

@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
@@ -50,7 +50,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
     private void informParent(Transition transition) {
         String parentCaseTaskId = getCaseInstance().getId(); // Our Id within our parent
         String parentCaseId = getCaseInstance().getParentCaseId(); // Id of our parent
-        TenantUser user = getCaseInstance().getCurrentUser();
+        CaseUserIdentity user = getCaseInstance().getCurrentUser();
         informParent(() -> new MakePlanItemTransition(user, parentCaseId, parentCaseTaskId, transition));
     }
 

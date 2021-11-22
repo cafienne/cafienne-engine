@@ -8,7 +8,6 @@
 package org.cafienne.cmmn.test.task;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
@@ -18,6 +17,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.event.ProcessCompleted;
@@ -40,7 +40,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
  */
 public class TestGetListGetDetails {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/getlist_getdetails.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     private static final int PORT_NUMBER = 18087; // TODO: have wiremock pick the port number
 

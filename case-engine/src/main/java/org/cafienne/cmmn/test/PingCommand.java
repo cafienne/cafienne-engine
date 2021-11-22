@@ -9,7 +9,7 @@ package org.cafienne.cmmn.test;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapCommand;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -35,7 +35,7 @@ public class PingCommand extends CaseCommand implements CafienneSerializable, Bo
 
     private final String tenant;
 
-    public PingCommand(String tenant, TenantUser user, String caseInstanceId, long waitTimeInMillis) {
+    public PingCommand(String tenant, CaseUserIdentity user, String caseInstanceId, long waitTimeInMillis) {
         super(user, caseInstanceId);
         this.tenant = tenant;
         this.waitTime = waitTimeInMillis;

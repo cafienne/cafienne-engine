@@ -12,7 +12,7 @@ import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.handler.*;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
@@ -57,7 +57,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * User context of current message
      */
-    private TenantUser currentUser;
+    private UserIdentity currentUser;
     /**
      * Flag indicating whether the model actor runs in debug mode or not
      */
@@ -170,11 +170,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
      *
      * @return
      */
-    public TenantUser getCurrentUser() {
+    public UserIdentity getCurrentUser() {
         return currentUser;
     }
 
-    public final void setCurrentUser(TenantUser user) {
+    public final void setCurrentUser(UserIdentity user) {
         this.currentUser = user;
     }
 

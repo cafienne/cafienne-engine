@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.humantask.actorapi.event.HumanTaskAssigned;
 import org.cafienne.humantask.actorapi.event.HumanTaskDueDateFilled;
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class HelloWorldTest {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/helloworld.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testHelloWorld() {

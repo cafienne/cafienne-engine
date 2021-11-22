@@ -12,7 +12,7 @@ import org.cafienne.service.db.record.{CaseRecord, CaseTeamMemberRecord}
 import scala.concurrent.Future
 
 trait CaseQueries {
-  def authorizeCaseAccessAndReturnTenant(caseInstanceId: String, user: PlatformUser): Future[String] = ???
+  def getCaseMembership(caseInstanceId: String, user: PlatformUser): Future[CaseMembership] = ???
 
   def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = ???
 
@@ -49,19 +49,44 @@ class CaseQueriesImpl
 
   import dbConfig.profile.api._
 
-  override def authorizeCaseAccessAndReturnTenant(caseInstanceId: String, user: PlatformUser): Future[String] = {
-    val query = for {
-      // Get the case
-      baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
-      // Access control query
-      _ <- membershipQuery(user, caseInstanceId, baseQuery.tenant, None)
+  override def getCaseMembership(caseInstanceId: String, user: PlatformUser): Future[CaseMembership] = {
+    val tenantRoleBasedMembership = for {
+      (role, _) <- TableQuery[UserRoleTable].filter(_.userId === user.id)
+        .joinRight(TableQuery[CaseInstanceTeamMemberTable]
+          .filter(_.caseInstanceId === caseInstanceId)
+          .filter(_.isTenantUser === false))
+        // The tenant role must be in the case team, and also the user must have the role in the same tenant
+        .on((left, right) => left.role_name === right.memberId && left.tenant === right.tenant)
+    } yield (caseInstanceId, role.map(_.tenant), role.map(_.role_name))
 
-    } yield baseQuery.tenant
+    val userIdBasedMembership = TableQuery[CaseInstanceTeamMemberTable]
+      .filter(_.isTenantUser === true)
+      .filter(_.memberId === user.id)
+      .filter(_.caseInstanceId === caseInstanceId)
+      .map(user => (caseInstanceId, user.tenant, user.memberId)).distinct
 
-    db.run(query.result.headOption).map {
-      case None => throw CaseSearchFailure(caseInstanceId)
-      case Some(tenant) => tenant
-    }
+    val query = userIdBasedMembership
+      .joinFull(tenantRoleBasedMembership)
+
+    db.run(query.result).map(records => {
+      // Records have this signature:
+      //      val _: Seq[(Option[(Option[(String, String, String)], Option[(Option[String], Option[String], Option[String])])], Option[(String, String, String)])] = records
+
+      if (records.isEmpty) {
+        throw CaseSearchFailure(caseInstanceId)
+      }
+
+      val userRecords: Set[(String, String, String)] = records.map(_._1).filter(_.nonEmpty).map(_.get).toSet
+      val tenantRoleRecords: Set[(String, String, String)] = {
+        // Convert Seq[Option[(Option[String], Option[String], Option[String])])] to Set(String, String, String)
+        //  can it be done more elegantly? Now we're assessing that if the second string (tenant) is non empty, it means the record is filled, otherwise not.
+        val x: Seq[(String, Option[String], Option[String])] = records.flatMap(_._2).filter(_._2.nonEmpty)
+        val z = x.map(role => (role._1, role._2.getOrElse(""), role._3.getOrElse(""))).toSet
+        z
+      }
+
+      createCaseUserIdentity(user, userRecords, tenantRoleRecords, CaseSearchFailure, caseInstanceId)
+    })
   }
 
   override def getFullCaseInstance(caseInstanceId: String, user: PlatformUser): Future[FullCase] = {

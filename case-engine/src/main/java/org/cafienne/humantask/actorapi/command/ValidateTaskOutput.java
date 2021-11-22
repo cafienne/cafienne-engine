@@ -7,7 +7,7 @@
  */
 package org.cafienne.humantask.actorapi.command;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
@@ -21,8 +21,8 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class ValidateTaskOutput extends TaskOutputCommand {
-	public ValidateTaskOutput(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
-		super(tenantUser, caseInstanceId, taskId, taskOutput);
+	public ValidateTaskOutput(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
+		super(user, caseInstanceId, taskId, taskOutput);
 	}
 
 	public ValidateTaskOutput(ValueMap json) {

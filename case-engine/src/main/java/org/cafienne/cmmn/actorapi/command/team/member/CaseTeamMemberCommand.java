@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team.member;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamCommand;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -17,8 +17,8 @@ abstract class CaseTeamMemberCommand extends CaseTeamCommand {
     protected final String memberId;
     protected final String memberType;
 
-    protected CaseTeamMemberCommand(TenantUser tenantUser, String caseInstanceId, MemberKey key) {
-        super(tenantUser, caseInstanceId);
+    protected CaseTeamMemberCommand(CaseUserIdentity user, String caseInstanceId, MemberKey key) {
+        super(user, caseInstanceId);
         this.memberId = key.id();
         this.memberType = key.type();
     }

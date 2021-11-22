@@ -19,7 +19,7 @@ class Scheduled(val timerService: TimerService, val timer: Timer, val sink: Time
   logger.whenDebugEnabled(logger.debug(s"Scheduling to run timer request ${timer.timerId} in ${duration.length / 1000}.${duration.length % 1000} seconds from now (at ${timer.moment})"))
 
   def run(): Unit = {
-    logger.whenDebugEnabled(logger.debug(s"Raising timer in case ${timer.caseInstanceId} for timer ${timer.timerId} on behalf of user ${timer.user.id}"))
+    logger.whenDebugEnabled(logger.debug(s"Raising timer in case ${timer.caseInstanceId} for timer ${timer.timerId} on behalf of user ${timer.userId}"))
     sink.timerService.askCase(command,
       failure => sink.handleFailingCaseInvocation(this, failure),
       success => sink.handleCaseInvocation(this, success))

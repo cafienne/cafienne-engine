@@ -75,7 +75,7 @@ public class TimerService extends ModelActor {
             Collection<TimerJob> existingTimers = ((TimerStorage) snapshot).getTimers();
             if (!existingTimers.isEmpty()) {
                 logger.info("Found an existing snapshot with " + existingTimers.size() + " timers; migrating them to the new storage");
-                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user)).collect(Collectors.toList());
+                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user.id())).collect(Collectors.toList());
                 timerstream.migrateTimers(legacy);
                 logger.info("Successfully migrated timers to the new storage; clearing snapshot");
                 saveSnapshot(new TimerStorage());

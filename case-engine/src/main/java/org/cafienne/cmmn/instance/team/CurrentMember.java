@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.instance.team;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.w3c.dom.Element;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * akka event store, but still it is handy to work with such a user
  */
 public class CurrentMember extends Member {
-    private final TenantUser user;
+    private final CaseUserIdentity user;
 
     /**
      * Create a temporary member object for tenant user
@@ -23,7 +23,7 @@ public class CurrentMember extends Member {
      * @param team
      * @param user
      */
-    CurrentMember(Team team, TenantUser user) {
+    CurrentMember(Team team, CaseUserIdentity user) {
         super(team, new MemberKey(user.id(), "user"));
         this.user = user;
     }
@@ -45,7 +45,7 @@ public class CurrentMember extends Member {
     }
 
     private Stream<Member> getMatchingMembers() {
-        return getTeam().getMembers().stream().filter(member -> member.key.equals(this.key) || (!member.isUser() && user.roles().contains(member.key.id())));
+        return getTeam().getMembers().stream().filter(member -> member.key.equals(this.key) || (!member.isUser() && user.tenantRoles().contains(member.key.id())));
     }
 
     public void dumpMemoryStateToXML(Element parentElement) {

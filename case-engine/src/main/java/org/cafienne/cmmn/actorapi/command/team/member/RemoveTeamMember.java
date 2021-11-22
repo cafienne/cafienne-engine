@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.actorapi.command.team.member;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -14,8 +14,8 @@ import org.cafienne.json.ValueMap;
  */
 @Manifest
 public class RemoveTeamMember extends CaseTeamMemberCommand {
-    public RemoveTeamMember(TenantUser tenantUser, String caseInstanceId, MemberKey key) {
-        super(tenantUser, caseInstanceId, key);
+    public RemoveTeamMember(CaseUserIdentity user, String caseInstanceId, MemberKey key) {
+        super(user, caseInstanceId, key);
     }
 
     public RemoveTeamMember(ValueMap json) {

@@ -7,19 +7,19 @@
  */
 package org.cafienne.cmmn.test.sentry;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
 public class MilestoneTesting {
 
     private final String testName = "roles";
     private final String caseInstanceId = testName;
-    private final TenantUser anonymous = TestScript.getTestUser("user");
+    private final TestUser anonymous = TestScript.getTestUser("user");
 
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/milestonetransitions.xml");
 

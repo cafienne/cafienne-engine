@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.team;
 
 import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.command.team.MemberKey;
@@ -259,7 +259,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
      *
      * @param user
      */
-    public void validateMembership(TenantUser user) {
+    public void validateMembership(CaseUserIdentity user) {
         for (Member member : members) {
             if (member.isUser()) {
                 if (user.id().equals(member.key.id())) {
@@ -267,7 +267,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
                 }
             } else {
                 // Member is a tenant role, check whether the user has it
-                if (user.roles().contains(member.key.id())) {
+                if (user.tenantRoles().contains(member.key.id())) {
                     return;
                 }
             }
@@ -276,7 +276,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         throw new AuthorizationException("User " + user.id() + " is not part of the case team");
     }
 
-    public CurrentMember getTeamMember(TenantUser currentTenantUser) {
+    public CurrentMember getTeamMember(CaseUserIdentity currentTenantUser) {
         return new CurrentMember(this, currentTenantUser);
     }
 

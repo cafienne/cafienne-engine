@@ -1,10 +1,10 @@
 package org.cafienne.cmmn.test.expression;
 
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
@@ -14,7 +14,7 @@ import org.junit.Test;
 public class CaseFileContextExpressions {
     private final String caseName = "CaseFileContextExpressions";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/expression/casefilecontextexpressions.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testContextSettingsFromTasks() {

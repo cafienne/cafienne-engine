@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
@@ -41,9 +41,9 @@ public class SetCaseTeam extends CaseTeamCommand {
 
     private final CaseTeam caseTeam;
 
-    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam caseTeam) {
+    public SetCaseTeam(CaseUserIdentity user, String caseInstanceId, CaseTeam caseTeam) {
         // TODO: determine how to do authorization on this command.
-        super(tenantUser, caseInstanceId);
+        super(user, caseInstanceId);
         this.caseTeam = caseTeam;
     }
 

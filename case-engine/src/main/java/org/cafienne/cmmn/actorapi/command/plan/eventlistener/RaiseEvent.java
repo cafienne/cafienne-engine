@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.command.plan.eventlistener;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Transition;
@@ -29,7 +29,7 @@ public class RaiseEvent extends MakePlanItemTransition {
      *                       order. If the transition of such a plan item results in a new plan item in the case with the same name, then the command will _not_ be
      *                       invoked on the new plan item.
      */
-    public RaiseEvent(TenantUser user, String caseInstanceId, String identifier) {
+    public RaiseEvent(CaseUserIdentity user, String caseInstanceId, String identifier) {
         super(user, caseInstanceId, identifier, Transition.Occur);
     }
 
