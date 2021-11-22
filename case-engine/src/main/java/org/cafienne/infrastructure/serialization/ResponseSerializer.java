@@ -7,8 +7,6 @@ import org.cafienne.cmmn.actorapi.response.*;
 import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
-import org.cafienne.platform.actorapi.response.PlatformResponse;
-import org.cafienne.platform.actorapi.response.PlatformUpdateStatus;
 import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.tenant.actorapi.response.TenantOwnersResponse;
 import org.cafienne.tenant.actorapi.response.TenantResponse;
@@ -20,7 +18,6 @@ public class ResponseSerializer extends CafienneSerializer {
         addProcessResponses();
         addFailureResponses();
         addTenantResponses();
-        addPlatformResponses();
     }
 
     private static void addCaseResponses() {
@@ -50,10 +47,5 @@ public class ResponseSerializer extends CafienneSerializer {
     private static void addTenantResponses() {
         addManifestWrapper(TenantOwnersResponse.class, TenantOwnersResponse::new);
         addManifestWrapper(TenantResponse.class, TenantResponse::new);
-    }
-
-    private static void addPlatformResponses() {
-        addManifestWrapper(PlatformResponse.class, PlatformResponse::new);
-        addManifestWrapper(PlatformUpdateStatus.class, PlatformUpdateStatus::new);
     }
 }

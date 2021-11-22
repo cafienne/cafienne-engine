@@ -2,7 +2,6 @@ package org.cafienne.system.router
 
 import akka.actor.{ActorRef, Props, Terminated}
 import org.cafienne.actormodel.command.ModelCommand
-import org.cafienne.platform.actorapi.command.PlatformCommand
 import org.cafienne.system.CaseSystem
 
 /**
@@ -19,11 +18,7 @@ class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     * @param m
     */
   override def forwardMessage(m: ModelCommand[_]): Unit = {
-    val ref: ActorRef = m match {
-      case _: PlatformCommand => caseSystem.platformService
-      case _ => actors.getOrElseUpdate(m.actorId, createActorRef(m))
-    }
-    ref.forward(m)
+    actors.getOrElseUpdate(m.actorId, createActorRef(m)).forward(m)
   }
 
   override def terminateActor(actorId: String): Unit = {

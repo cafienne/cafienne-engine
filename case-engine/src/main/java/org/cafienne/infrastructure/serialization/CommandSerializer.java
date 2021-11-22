@@ -1,7 +1,6 @@
 package org.cafienne.infrastructure.serialization;
 
 import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
@@ -19,14 +18,11 @@ import org.cafienne.cmmn.actorapi.command.team.PutTeamMember;
 import org.cafienne.cmmn.actorapi.command.team.RemoveTeamMember;
 import org.cafienne.cmmn.actorapi.command.team.SetCaseTeam;
 import org.cafienne.humantask.actorapi.command.*;
-import org.cafienne.platform.actorapi.command.GetUpdateStatus;
-import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
 import org.cafienne.tenant.actorapi.command.platform.DisableTenant;
 import org.cafienne.tenant.actorapi.command.platform.EnableTenant;
-import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 
 public class CommandSerializer extends CafienneSerializer {
     public static void register() {
@@ -40,7 +36,6 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(StartCase.class, StartCase::new);
         addManifestWrapper(MigrateDefinition.class, MigrateDefinition::new);
         addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
-        addManifestWrapper(UpdateCaseWithPlatformInformation.class, UpdateCaseWithPlatformInformation::new);
         addCasePlanCommands();
         addCaseFileCommands();
         addCaseTeamCommands();
@@ -98,14 +93,11 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(GetTenantOwners.class, GetTenantOwners::new);
         addManifestWrapper(ReplaceTenant.class, ReplaceTenant::new);
         addManifestWrapper(UpdateTenant.class, UpdateTenant::new);
-        addManifestWrapper(UpdateTenantWithPlatformInformation.class, UpdateTenantWithPlatformInformation::new);
     }
 
     private static void addPlatformCommands() {
         addManifestWrapper(CreateTenant.class, CreateTenant::new);
         addManifestWrapper(DisableTenant.class, DisableTenant::new);
         addManifestWrapper(EnableTenant.class, EnableTenant::new);
-        addManifestWrapper(UpdatePlatformInformation.class, UpdatePlatformInformation::new);
-        addManifestWrapper(GetUpdateStatus.class, GetUpdateStatus::new);
     }
 }

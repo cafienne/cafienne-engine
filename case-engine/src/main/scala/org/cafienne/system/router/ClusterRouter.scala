@@ -5,7 +5,6 @@ import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardReg
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
-import org.cafienne.platform.actorapi.command.PlatformCommand
 import org.cafienne.processtask.actorapi.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.system.CaseSystem
@@ -36,7 +35,6 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
       case _: CaseCommand => caseShardRouter
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
-      case _: PlatformCommand => caseSystem.platformService
       case other => throw new Error(s"Cannot forward ModelCommands of type ${other.getClass.getName}")
     }
     shardRouter.forward(m)
