@@ -82,7 +82,9 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
       val ownerIds = {
         if (tenantConfig.hasPath("owners")) {
-          tenantConfig.getStringList("owners").asScala
+          val list = tenantConfig.getStringList("owners").asScala
+          logger.warn(s"""Bootstrap tenant '$tenantName' in file '${configFile.getName}' uses deprecated property 'owners = [${list.mkString("\"", "\", \"", "\"")}]'. Use 'isOwner = true' inside the designated users instead.""")
+          list
         } else {
           Seq()
         }
@@ -103,7 +105,9 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
       val undefinedOwners = ownerIds.filter(id => !users.map(u => u.id).contains(id))
       if (undefinedOwners.nonEmpty) {
-        throw new BootstrapFailure("All bootstrap tenant owners must be defined as user. Following users not found: " + undefinedOwners)
+        val msg = s"""Bootstrap tenant '$tenantName' in file ${configFile.getAbsolutePath} mentions owner(s) [${undefinedOwners.mkString("\"", "\", \"", "\"")}], but corresponding users are not defined in the file."""
+        logger.error("FATAL ERROR: " + msg)
+        throw new BootstrapFailure(msg)
       }
 
       val aPlatformOwner = PlatformUser(Cafienne.config.platform.platformOwners.get(0), Seq())
