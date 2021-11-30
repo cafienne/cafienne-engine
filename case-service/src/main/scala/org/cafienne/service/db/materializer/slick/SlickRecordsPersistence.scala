@@ -8,7 +8,7 @@ import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.service.db.record._
-import org.cafienne.service.db.schema.table.{CaseTables, TaskTables, TenantTables}
+import org.cafienne.service.db.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +18,7 @@ class SlickRecordsPersistence
     with CaseTables
     with TaskTables
     with TenantTables
+    with ConsentGroupTables
     with OffsetStoreTables {
 
   import dbConfig.profile.api._
@@ -43,6 +44,8 @@ class SlickRecordsPersistence
         case value: OffsetRecord => TableQuery[OffsetStoreTable].insertOrUpdate(value)
         case value: UserRoleRecord => TableQuery[UserRoleTable].insertOrUpdate(value)
         case value: TenantRecord => TableQuery[TenantTable].insertOrUpdate(value)
+        case value: ConsentGroupRecord => TableQuery[ConsentGroupTable].insertOrUpdate(value)
+        case value: ConsentGroupMemberRecord => TableQuery[ConsentGroupMemberTable].insertOrUpdate(value)
         case other => throw new IllegalArgumentException("Upsert not supported for objects of type " + other.getClass.getName)
       }
       addStatement(upsertStatement)
@@ -89,10 +92,16 @@ class SlickRecordsPersistence
           .filter(_.caseRole === value.caseRole)
           .delete
         case value: UserRoleRecord => TableQuery[UserRoleTable].filter(r => r.userId === value.userId && r.tenant === value.tenant && r.role_name === value.role_name).delete
+        case value: ConsentGroupRecord => TableQuery[ConsentGroupTable].filter(_.id === value.id).delete
+        case value: ConsentGroupMemberRecord => TableQuery[ConsentGroupMemberTable].filter(_.group === value.group).filter(_.userId === value.userId).filter(_.role === value.role).delete
         case other => throw new IllegalArgumentException("Delete not supported for objects of type " + other.getClass.getName)
       }
       addStatement(upsertStatement)
     }
+  }
+
+  override def deleteConsentGroupMember(groupId: String, userId: String): Unit = {
+    addStatement(TableQuery[ConsentGroupMemberTable].filter(_.group === groupId).filter(_.userId === userId).delete)
   }
 
   def addStatement(action: dbConfig.profile.api.DBIO[_]): Unit = {

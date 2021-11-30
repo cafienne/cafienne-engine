@@ -20,6 +20,9 @@ import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamTenant
 import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamUser;
 import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamTenantRole;
 import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser;
+import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup;
+import org.cafienne.consentgroup.actorapi.command.RemoveConsentGroupMember;
+import org.cafienne.consentgroup.actorapi.command.SetConsentGroupMember;
 import org.cafienne.humantask.actorapi.command.*;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.*;
@@ -32,6 +35,7 @@ public class CommandSerializer extends CafienneSerializer {
         addCaseCommands();
         addProcessActorCommands();
         addTenantCommands();
+        addConsentGroupCommands();
         addPlatformCommands();
     }
 
@@ -99,6 +103,12 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(GetTenantOwners.class, GetTenantOwners::new);
         addManifestWrapper(ReplaceTenant.class, ReplaceTenant::new);
         addManifestWrapper(UpdateTenant.class, UpdateTenant::new);
+    }
+
+    private static void addConsentGroupCommands() {
+        CafienneSerializer.addManifestWrapper(CreateConsentGroup.class, CreateConsentGroup::new);
+        CafienneSerializer.addManifestWrapper(SetConsentGroupMember.class, SetConsentGroupMember::new);
+        CafienneSerializer.addManifestWrapper(RemoveConsentGroupMember.class, RemoveConsentGroupMember::new);
     }
 
     private static void addPlatformCommands() {

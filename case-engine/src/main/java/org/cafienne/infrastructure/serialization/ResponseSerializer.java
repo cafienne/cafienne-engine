@@ -5,6 +5,8 @@ import org.cafienne.actormodel.response.EngineChokedFailure;
 import org.cafienne.actormodel.response.SecurityFailure;
 import org.cafienne.cmmn.actorapi.response.*;
 import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
+import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
+import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.processtask.actorapi.response.ProcessResponse;
@@ -18,6 +20,7 @@ public class ResponseSerializer extends CafienneSerializer {
         addProcessResponses();
         addFailureResponses();
         addTenantResponses();
+        addConsentGroupResponses();
     }
 
     private static void addCaseResponses() {
@@ -47,5 +50,10 @@ public class ResponseSerializer extends CafienneSerializer {
     private static void addTenantResponses() {
         addManifestWrapper(TenantOwnersResponse.class, TenantOwnersResponse::new);
         addManifestWrapper(TenantResponse.class, TenantResponse::new);
+    }
+
+    private static void addConsentGroupResponses() {
+        CafienneSerializer.addManifestWrapper(ConsentGroupCreatedResponse.class, ConsentGroupCreatedResponse::new);
+        CafienneSerializer.addManifestWrapper(ConsentGroupResponse.class, ConsentGroupResponse::new);
     }
 }

@@ -5,6 +5,8 @@ import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardReg
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.cmmn.instance.Case
+import org.cafienne.consentgroup.ConsentGroupActor
+import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.processtask.actorapi.command.ProcessCommand
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.system.CaseSystem
@@ -24,12 +26,14 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
   private lazy val caseShardRouter: ActorRef = ClusterSharding(context.system).shardRegion(caseShardTypeName)
   private lazy val processShardRouter: ActorRef = ClusterSharding(context.system).shardRegion(processShardTypeName)
   private lazy val tenantShardRouter: ActorRef = ClusterSharding(context.system).shardRegion(tenantShardTypeName)
+  private lazy val consentGroupShardRouter: ActorRef = ClusterSharding(context.system).shardRegion(consentGroupShardTypeName)
   val numberOfPartitions = 100
   val localSystemKey: Long = "localSystemKey".hashCode
   private val idExtractor: ShardRegion.ExtractEntityId = {
     case command: CaseCommand => (command.actorId, command)
     case command: ProcessCommand => (command.actorId, command)
     case command: TenantCommand => (command.actorId, command)
+    case command: ConsentGroupCommand => (command.actorId, command)
     case other => throw new Error(s"Cannot extract actor id for messages of type ${other.getClass.getName}")
   }
   private val shardResolver: ShardRegion.ExtractShardId = {
@@ -52,6 +56,7 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
       case _: CaseCommand => caseShardRouter
       case _: ProcessCommand => processShardRouter
       case _: TenantCommand => tenantShardRouter
+      case _: ConsentGroupCommand => consentGroupShardRouter
       case other => throw new Error(s"Cannot forward ModelCommands of type ${other.getClass.getName}")
     }
     shardRouter.forward(m)
@@ -75,6 +80,7 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     startShard(caseShardTypeName, classOf[Case])
     startShard(processShardTypeName, classOf[ProcessTaskActor])
     startShard(tenantShardTypeName, classOf[TenantActor])
+    startShard(consentGroupShardTypeName, classOf[ConsentGroupActor])
   }
 
   override def terminateActor(actorId: String): Unit = {

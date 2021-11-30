@@ -5,6 +5,7 @@ import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
+import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.db.query.UserQueries
@@ -20,6 +21,8 @@ trait IdentityProvider {
   def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = ???
 
   def getUserRegistration(userId: String): Future[PlatformUser] = ???
+
+  def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = ???
 
   def clear(userId: String): Unit = ???
 }
@@ -77,5 +80,9 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
 
   override def getUserRegistration(userId: String): Future[PlatformUser] = {
     userQueries.getPlatformUser(userId)
+  }
+
+  override def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = {
+    userQueries.getConsentGroups(groupIds)
   }
 }

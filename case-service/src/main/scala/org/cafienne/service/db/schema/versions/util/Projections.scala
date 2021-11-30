@@ -2,6 +2,7 @@ package org.cafienne.service.db.schema.versions.util
 
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.service.db.materializer.cases.CaseEventSink
+import org.cafienne.service.db.materializer.consentgroup.ConsentGroupEventSink
 import org.cafienne.service.db.materializer.tenant.TenantEventSink
 import org.cafienne.service.db.schema.QueryDBSchema
 
@@ -32,6 +33,10 @@ object Projections extends QueryDBSchema
 
   lazy val resetTenantEventOffset = {
     getResetterScript(TenantEventSink.offsetName)
+  }
+
+  lazy val resetConsentGroupEventOffset = {
+    getResetterScript(ConsentGroupEventSink.offsetName)
   }
 
   def getResetterScript(projectionName: String) = {

@@ -2,16 +2,19 @@ package org.cafienne.service.db.schema.versions
 
 import org.cafienne.infrastructure.jdbc.schema.DbSchemaVersion
 import org.cafienne.service.db.schema.QueryDBSchema
-import org.cafienne.service.db.schema.table.CaseTables
+import org.cafienne.service.db.schema.table.{CaseTables, ConsentGroupTables}
 import org.cafienne.service.db.schema.versions.util.Projections
 import slick.migration.api.TableMigration
 
 object QueryDB_1_1_16 extends DbSchemaVersion with QueryDBSchema
   with CafienneTablesV2
+  with ConsentGroupTables
   with CaseTables {
 
   val version = "1.1.16"
   val migrations = Projections.renameOffsets
+      .&(createConsentGroupTable)
+      .&(createConsentGroupMemberTable)
       .&(createCaseTeamUserTable)
       .&(createCaseTeamTenantRoleTable)
       .&(fillCaseTeamTenantRoleTable)
@@ -19,6 +22,22 @@ object QueryDB_1_1_16 extends DbSchemaVersion with QueryDBSchema
       .&(dropCaseTeamMemberTable)
 
   import dbConfig.profile.api._
+
+  def createConsentGroupTable = TableMigration(TableQuery[ConsentGroupTable])
+    .create
+    .addColumns(
+      _.id,
+      _.tenant
+    )
+
+  def createConsentGroupMemberTable = TableMigration(TableQuery[ConsentGroupMemberTable])
+    .create
+    .addColumns(
+      _.userId,
+      _.group,
+      _.role,
+      _.isOwner)
+    .addPrimaryKeys(_.pk)
 
   def createCaseTeamUserTable = TableMigration(TableQuery[CaseInstanceTeamUserTable])
     .create

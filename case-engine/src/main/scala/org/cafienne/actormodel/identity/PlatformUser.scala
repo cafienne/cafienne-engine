@@ -3,13 +3,13 @@ package org.cafienne.actormodel.identity
 import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserIdentity {
+final case class PlatformUser(id: String, users: Seq[TenantUser], groups: Seq[ConsentGroupMembership] = Seq()) extends UserIdentity {
   def tenants: Seq[String] = users.map(u => u.tenant)
 
   def origin(tenant: String): Origin = {
-    if (users.isEmpty) {
+    if (users.isEmpty && groups.isEmpty) {
       // No tenant users. Means trust level is IDP only.
       Origin.IDP
     } else if (isTenantMember(tenant)) {
@@ -25,6 +25,10 @@ final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserId
     if (isTenantMember(tenant)) getTenantUser(tenant).roles
     else Set()
   }
+
+  def isGroupMember(groupId: String): Boolean = groups.exists(_.groupId == groupId)
+
+  def group(groupId: String): ConsentGroupMembership = groups.find(_.groupId == groupId).orNull
 
   /**
     * If the user is registered in one tenant only, that tenant is returned.
@@ -63,7 +67,7 @@ final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserId
   }
 
   override def toValue: Value[_] = {
-    new ValueMap(Fields.userId, id, Fields.tenants, users)
+    new ValueMap(Fields.userId, id, Fields.tenants, users, Fields.groups, groups)
   }
 
   def shouldBelongTo(tenant: String): Unit = if (!isTenantMember(tenant)) throw AuthorizationException("Tenant '" + tenant + "' does not exist, or user '" + id + "' is not registered in it")
@@ -83,4 +87,21 @@ final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserId
 
 object PlatformUser {
   def from(user: UserIdentity) = new PlatformUser(user.id, Seq())
+}
+
+case class ConsentGroupMembership(groupId: String, roles: Set[String], isOwner: Boolean) extends CafienneJson {
+  override def toValue: Value[_] = {
+    val json = new ValueMap(Fields.groupId, groupId, Fields.isOwner, isOwner, Fields.roles, roles)
+    json
+  }
+}
+
+object ConsentGroupMembership {
+  def deserialize(json: ValueMap): ConsentGroupMembership = {
+    val groupId: String = json.readString(Fields.groupId)
+    val isOwner: Boolean = json.readBoolean(Fields.isOwner)
+    val roles = json.readStringList(Fields.roles).toSet
+
+    ConsentGroupMembership(groupId = groupId, roles = roles, isOwner = isOwner)
+  }
 }

@@ -2,19 +2,17 @@ package org.cafienne.service.db.materializer.tenant
 
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.record.{UserRoleKey, UserRoleRecord}
 import org.cafienne.tenant.actorapi.event._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserProjection(persistence: RecordsPersistence, userCache: IdentityProvider)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class UserProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val users = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
 
   def handleUserEvent(event: TenantUserEvent): Future[Done] = {
     //    println("Clearing user " + event.userId +" from user cache")
-    userCache.clear(event.userId)
     val key = UserRoleKey(event)
     getUserRoleRecord(key).map(user => {
       event match {
@@ -45,6 +43,8 @@ class UserProjection(persistence: RecordsPersistence, userCache: IdentityProvide
         }
     }
   }
+
+  def affectedUserIds: Set[String] = users.values.map(_.userId).toSet
 
   def prepareCommit(): Unit = {
     this.users.values.foreach(instance => persistence.upsert(instance))

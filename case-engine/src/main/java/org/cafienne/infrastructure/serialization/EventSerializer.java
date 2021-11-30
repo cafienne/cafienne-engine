@@ -25,6 +25,7 @@ import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleAdded;
 import org.cafienne.cmmn.actorapi.event.team.tenantrole.CaseTeamTenantRoleChanged;
 import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserAdded;
 import org.cafienne.cmmn.actorapi.event.team.user.CaseTeamUserChanged;
+import org.cafienne.consentgroup.actorapi.event.*;
 import org.cafienne.humantask.actorapi.event.*;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
@@ -41,6 +42,7 @@ public class EventSerializer extends CafienneSerializer {
         registerHumanTaskEvents();
         registerProcessEvents();
         registerTenantEvents();
+        registerConsentGroupEvents();
         registerPlatformEvents();
     }
 
@@ -160,6 +162,14 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(TenantOwnersRequested.class, TenantOwnersRequested::new);
         addManifestWrapper(TenantModified.class, TenantModified::new);
         addManifestWrapper(TenantAppliedPlatformUpdate.class, TenantAppliedPlatformUpdate::new);
+    }
+
+    private static void registerConsentGroupEvents() {
+        CafienneSerializer.addManifestWrapper(ConsentGroupMemberAdded.class, ConsentGroupMemberAdded::new);
+        CafienneSerializer.addManifestWrapper(ConsentGroupMemberChanged.class, ConsentGroupMemberChanged::new);
+        CafienneSerializer.addManifestWrapper(ConsentGroupMemberRemoved.class, ConsentGroupMemberRemoved::new);
+        CafienneSerializer.addManifestWrapper(ConsentGroupCreated.class, ConsentGroupCreated::new);
+        CafienneSerializer.addManifestWrapper(ConsentGroupModified.class, ConsentGroupModified::new);
     }
 
     private static void registerPlatformEvents() {

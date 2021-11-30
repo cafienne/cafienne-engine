@@ -39,4 +39,6 @@ trait RecordsPersistence {
   def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done]
 
   def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done]
+
+  def deleteConsentGroupMember(groupId: String, userId: String): Unit = ???
 }

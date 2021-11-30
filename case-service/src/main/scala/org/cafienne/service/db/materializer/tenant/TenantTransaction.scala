@@ -18,7 +18,7 @@ class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCac
                        (implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
 
   private val tenantProjection = new TenantProjection(persistence)
-  private val userProjection = new UserProjection(persistence, userCache)
+  private val userProjection = new UserProjection(persistence)
 
   override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
     logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " on tenant " + tenant)
@@ -47,7 +47,11 @@ class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCac
     // Update the offset of the last event handled in this projection
     persistence.upsert(offsetStorage.createOffsetRecord(envelope.offset))
     // Commit and then inform the last modified registration
-    persistence.commit().andThen(_ => TenantReader.lastModifiedRegistration.handle(tenantModified))
+    persistence.commit().andThen(_ => {
+      // Clear the user cache for those user ids that have been updated
+      userProjection.affectedUserIds.foreach(userCache.clear)
+      TenantReader.lastModifiedRegistration.handle(tenantModified)
+    })
   }
 
   private def updateUserIds(event: TenantAppliedPlatformUpdate, offset: Offset): Future[Done] = {

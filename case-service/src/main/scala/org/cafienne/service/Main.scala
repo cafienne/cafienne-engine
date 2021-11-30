@@ -18,6 +18,7 @@ import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.cqrs.QueryDBOffsetStorageProvider
 import org.cafienne.service.api.anonymous.AnonymousRequestRoutes
 import org.cafienne.service.api.cases.route.CasesRoutes
+import org.cafienne.service.api.consentgroup.route.ConsentGroupRoutes
 import org.cafienne.service.api.debug.DebugRoute
 import org.cafienne.service.api.identifiers.route.IdentifierRoutes
 import org.cafienne.service.api.platform.{CaseEngineHealthRoute, PlatformRoutes}
@@ -26,6 +27,7 @@ import org.cafienne.service.api.swagger.SwaggerHttpServiceRoute
 import org.cafienne.service.api.tasks.TaskRoutes
 import org.cafienne.service.api.tenant.route.TenantRoutes
 import org.cafienne.service.db.materializer.cases.CaseEventSink
+import org.cafienne.service.db.materializer.consentgroup.ConsentGroupEventSink
 import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
 import org.cafienne.service.db.materializer.tenant.TenantEventSink
 import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
@@ -71,10 +73,11 @@ object Main extends App {
     val updater = new SlickRecordsPersistence
     val offsetStorage = new QueryDBOffsetStorageProvider
 
-    implicit val userCache = new IdentityCache(userQueries)
+    implicit val userCache: IdentityCache = new IdentityCache(userQueries)
 
     new CaseEventSink(updater, offsetStorage).start()
     new TenantEventSink(updater, offsetStorage).start()
+    new ConsentGroupEventSink(updater, offsetStorage).start()
 
     // When running with H2, you can start a debug web server on port 8082.
     checkH2InDebugMode()
@@ -87,6 +90,7 @@ object Main extends App {
         new IdentifierRoutes(identifierQueries),
         new TaskRoutes(taskQueries),
         new TenantRoutes(userQueries),
+        new ConsentGroupRoutes(userQueries),
         new PlatformRoutes(),
         new RepositoryRoute(),
         new DebugRoute()

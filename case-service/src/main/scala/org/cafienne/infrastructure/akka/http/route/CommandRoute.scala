@@ -7,6 +7,7 @@ import akka.util.Timeout
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
+import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.Main
@@ -33,6 +34,8 @@ trait CommandRoute extends AuthenticatedRoute {
           case value: CaseResponse => completeWithLMH(StatusCodes.OK, value)
           case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
           case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
+          case value: ConsentGroupCreatedResponse => completeWithLMH(StatusCodes.OK, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
+          case value: ConsentGroupResponse => completeOnlyLMH(StatusCodes.Accepted, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
           case other => // Unknown new type of response that is not handled
             logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.OK)

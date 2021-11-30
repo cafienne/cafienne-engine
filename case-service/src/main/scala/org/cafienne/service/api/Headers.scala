@@ -7,4 +7,5 @@ object Headers {
 
   final val TENANT_LAST_MODIFIED = "Tenant-Last-Modified"
 
+  final val CONSENT_GROUP_LAST_MODIFIED = "Consent-Group-Last-Modified"
 }
