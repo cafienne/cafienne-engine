@@ -12,6 +12,7 @@ import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.authentication.AuthenticationDirectives
 import org.cafienne.service.api.Headers
+import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.health.HealthMonitor
 
 import java.net.URL
@@ -24,18 +25,19 @@ import scala.concurrent.ExecutionContext
 trait AuthenticatedRoute extends CaseServiceRoute {
 
   implicit val userCache: IdentityProvider
-  val uc = userCache
+  val uc: IdentityProvider = userCache
 
-  override def exceptionHandler = ExceptionHandler {
+  override def exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: CannotReachIDPException => handleIDPException(e)
     case s: AuthenticationException => handleAuthenticationException(s)
     case a: AuthorizationException => handleAuthorizationException(a)
     case i: InvalidCommandException => handleInvalidCommandException(i)
+    case s: SearchFailure => complete(StatusCodes.NotFound, s.getMessage)
     case s: SecurityException => handleAuthorizationException(s) // Pretty weird, as our code does not throw it; log it similar to Authorizaton issues
     case other => defaultExceptionHandler(other) // All other exceptions just handle the default way from CaseServiceRoute
   }
 
-  private def handleInvalidCommandException(i: InvalidCommandException) = {
+  private def handleInvalidCommandException(i: InvalidCommandException): Route = {
     if (logger.underlying.isDebugEnabled) {
       extractUri { uri =>
         extractMethod { method =>
@@ -48,7 +50,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
-  private def handleIDPException(e: CannotReachIDPException) = {
+  private def handleIDPException(e: CannotReachIDPException): Route = {
     logger.error("Service cannot validate security tokens, because IDP is not reachable")
     complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = e.getMessage)).andThen(g => {
       // TODO: this probably should be checked upon system startup in the first place
@@ -59,11 +61,11 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     })
   }
 
-  private def handleAuthenticationException(s: AuthenticationException) = {
+  private def handleAuthenticationException(s: AuthenticationException): Route = {
     complete(HttpResponse(StatusCodes.Unauthorized, entity = s.getMessage()))
   }
 
-  private def handleAuthorizationException(s: Exception) = {
+  private def handleAuthorizationException(s: Exception): Route = {
     extractMethod { method =>
       extractUri { uri =>
         if (logger.underlying.isInfoEnabled()) {
@@ -95,7 +97,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
-  def caseSystemMustBeHealthy() = {
+  def caseSystemMustBeHealthy(): Unit = {
     if (!HealthMonitor.ok()) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
     }
@@ -104,7 +106,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   object OIDCAuthentication extends Directives with AuthenticationDirectives {
     override protected val userCache: IdentityProvider = uc
     protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(Cafienne.config.OIDC.keysUrl))
-    protected val issuer = Cafienne.config.OIDC.issuer
+    protected val issuer: String = Cafienne.config.OIDC.issuer
     override protected implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
   }
 }

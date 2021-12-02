@@ -5,15 +5,15 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{Origin, PlatformUser}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamTenantRole, CaseTeamUser}
-import org.cafienne.identity.IdentityProvider
 import org.cafienne.service.db.query.exception.SearchFailure
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-trait CaseTeamValidator extends AuthenticatedRoute {
-  implicit val userCache: IdentityProvider
-  implicit val ec: ExecutionContext
+trait CaseTeamValidator extends AuthenticatedRoute with TenantValidator {
+  def validateTenantAndTeam(team: CaseTeam, tenant: String, command: CaseTeam => Route): Route = {
+    validateTenant(tenant, () => validateTeam(team, tenant, command))
+  }
 
   def validateTeam(team: CaseTeam, tenant: String, command: CaseTeam => Route): Route = {
     val valid = for {

@@ -26,6 +26,7 @@ import org.cafienne.infrastructure.akka.http.route.CaseTeamValidator
 import org.cafienne.infrastructure.config.AnonymousCaseDefinition
 import org.cafienne.json.ValueMap
 import org.cafienne.service.api.anonymous.CaseRequestRoute.AnonymousStartCaseFormat
+import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 
@@ -41,7 +42,7 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider, override implic
   val configuredCaseDefinitions: Map[String, AnonymousCaseDefinition] = Cafienne.config.api.anonymousConfig.definitions
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  override def routes = {
+  override def routes: Route = {
     createCase
   }
 
@@ -59,26 +60,27 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider, override implic
   @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[AnonymousStartCaseFormat]))))
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
-  def createCase = post {
+  def createCase: Route = post {
     readCaseType { caseType: String =>
       entity(as[AnonymousStartCaseFormat]) { payload =>
         try {
           configuredCaseDefinitions.get(caseType) match {
             case Some(definitionConfig) => {
               val newCaseId = payload.caseInstanceId.getOrElse(new Guid().toString)
-              validateTeam(definitionConfig.team, definitionConfig.tenant, team => {
-                val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-                val command = new StartCase(definitionConfig.tenant, definitionConfig.user, newCaseId, definitionConfig.definition, payload.inputs, team, debugMode)
-                sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
-                  writeLastModifiedHeader(response) {
-                    complete(StatusCodes.OK, s"""{\n  "caseInstanceId": "${response.getActorId}"\n}""")
-                  }
+                validateTenantAndTeam(definitionConfig.team, definitionConfig.tenant, team => {
+                  val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                  val command = new StartCase(definitionConfig.tenant, definitionConfig.user, newCaseId, definitionConfig.definition, payload.inputs, team, debugMode)
+                  sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
+                    writeLastModifiedHeader(response) {
+                      complete(StatusCodes.OK, s"""{\n  "caseInstanceId": "${response.getActorId}"\n}""")
+                    }
+                  })
                 })
-              })
             }
             case None => complete(StatusCodes.NotFound, s"Request of type '$caseType' is not found")
           }
         } catch {
+          case e: SearchFailure => fail(e)
           case e: MissingDefinitionException => fail(e.getMessage)
           case e: InvalidDefinitionException => fail(e.getMessage)
         }

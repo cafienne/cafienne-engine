@@ -2,13 +2,15 @@ package org.cafienne.service.db.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
-import org.cafienne.service.db.query.exception.UserSearchFailure
-import org.cafienne.service.db.record.UserRoleRecord
+import org.cafienne.service.db.query.exception.{TenantSearchFailure, UserSearchFailure}
+import org.cafienne.service.db.record.{TenantRecord, UserRoleRecord}
 import org.cafienne.service.db.schema.table.TenantTables
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserQueries {
+  def getTenant(tenantId: String): Future[TenantRecord] = ???
+
   def getPlatformUser(userId: String): Future[PlatformUser] = ???
 
   def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = ???
@@ -29,6 +31,13 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
   val rolesQuery = TableQuery[UserRoleTable]
+
+  override def getTenant(tenantId: String): Future[TenantRecord] = {
+    db.run(TableQuery[TenantTable].filter(_.name === tenantId).filter(_.enabled).result.headOption).map {
+      case None => throw TenantSearchFailure(tenantId)
+      case Some(record) => record
+    }
+  }
 
   override def getPlatformUser(userId: String): Future[PlatformUser] = getPlatformUsers(Seq(userId)).map(_.head)
 

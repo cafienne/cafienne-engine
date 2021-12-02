@@ -23,16 +23,18 @@ import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.infrastructure.akka.http.route.AuthenticatedRoute
+import org.cafienne.infrastructure.akka.http.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
 import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
 
 import javax.ws.rs._
+import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
-class RepositoryRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute {
+class RepositoryRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute with TenantValidator {
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
 
@@ -217,7 +219,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
     validUser { platformUser =>
       parameters("tenant".?) { optionalTenant =>
         val tenant = platformUser.resolveTenant(optionalTenant)
-        subRoute(platformUser, tenant)
+        validateTenant(tenant, () => subRoute(platformUser, tenant))
       }
     }
   }

@@ -38,7 +38,7 @@ final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserId
     } else {
       val configuredDefaultTenant = Cafienne.config.platform.defaultTenant
       if (configuredDefaultTenant.isEmpty) {
-        throw new MissingTenantException("Tenant property must have a value, because ")
+        throw new MissingTenantException("Tenant property must have a value")
       }
       if (!tenants.contains(configuredDefaultTenant)) {
         if (tenants.isEmpty) {
@@ -54,10 +54,10 @@ final case class PlatformUser(id: String, users: Seq[TenantUser]) extends UserId
   def resolveTenant(optionalTenant: Option[String]): String = {
     optionalTenant match {
       case None => defaultTenant // This will throw an IllegalArgumentException if the default tenant is not configured
-      case Some(string) => string.isBlank match {
-        case true => defaultTenant
-        //        case false => optionalTenant.get // Simply give the tenant requested, regardless whether the user is a member in it or not
-        case false => getTenantUser(optionalTenant.get).tenant // Simply give the tenant requested, regardless whether the user is a member in it or not
+      case Some(tenant) => if (tenant.isBlank) {
+        defaultTenant
+      } else {
+        tenant
       }
     }
   }
