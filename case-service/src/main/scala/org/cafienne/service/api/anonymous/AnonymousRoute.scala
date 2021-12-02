@@ -9,8 +9,8 @@ package org.cafienne.service.api.anonymous
 
 import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import akka.util.Timeout
 import org.cafienne.actormodel.exception.SerializedException
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
 import org.cafienne.cmmn.actorapi.command.StartCase
@@ -18,26 +18,28 @@ import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
 import org.cafienne.service.Main
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
 import scala.util.{Failure, Success}
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/request")
 class AnonymousRoute(override implicit val caseSystem: CaseSystem) extends CaseServiceRoute {
 
   val defaultErrorMessage = "Your request bumped into an internal configuration issue and cannot be handled"
 
   def sendCommand[T](command: StartCase, expectedResponseClass: Class[T], expectedResponseHandler: T => Route): Route = {
     import akka.pattern.ask
-    implicit val timeout = Main.caseSystemTimeout
+    implicit val timeout: Timeout = Main.caseSystemTimeout
     onComplete(caseSystem.router() ? command) {
       case Success(value) =>
-        value.getClass.isAssignableFrom(expectedResponseClass) match {
-          case true => expectedResponseHandler(value.asInstanceOf[T])
-          case false => failOnCaseSystemResponse(value)
+        if (value.getClass.isAssignableFrom(expectedResponseClass)) {
+          expectedResponseHandler(value.asInstanceOf[T])
+        } else {
+          failOnCaseSystemResponse(value)
         }
       case Failure(e) => fail(e)
     }
+  }
+
+  override def exceptionHandler: ExceptionHandler = ExceptionHandler {
+    case exception: Throwable => fail(exception)
   }
 
   def failOnCaseSystemResponse(response: Any): Route = {
@@ -48,22 +50,22 @@ class AnonymousRoute(override implicit val caseSystem: CaseSystem) extends CaseS
     }
   }
 
-  def fail(e: EngineChokedFailure) = {
+  def fail(e: EngineChokedFailure): Route = {
     extractUri { uri =>
       logger.warn(s"Route $uri bumped into a choked engine with failure of type ${e.exception().getClassName}: " + e.exception().getMessage)
       complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
     }
   }
 
-  def fail(t: SerializedException) = {
+  def fail(t: SerializedException): Route = {
     completeFailure(t.getMessage, " of type " + t.getClassName)
   }
 
-  def fail(msg: String) = {
+  def fail(msg: String): Route = {
     completeFailure(msg)
   }
 
-  def fail(t: Throwable) = {
+  def fail(t: Throwable): Route = {
     completeFailure(t.getMessage, " of type " + t.getClass.getName)
   }
 

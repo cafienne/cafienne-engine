@@ -23,15 +23,15 @@ trait CaseServiceRoute extends LazyLogging {
 
   import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
-  val corsSettings = CorsSettings.defaultSettings
+  private val corsSettings = CorsSettings.defaultSettings
     .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", Headers.CASE_LAST_MODIFIED, Headers.TENANT_LAST_MODIFIED, "accept", "origin"))
     .withAllowedMethods(Seq(GET, POST, HEAD, OPTIONS, PUT, DELETE))
     .withExposedHeaders(Seq(Headers.CASE_LAST_MODIFIED, Headers.TENANT_LAST_MODIFIED))
     .withMaxAge(Some(200L)
     )
 
-  val rejectionHandler = corsRejectionHandler withFallback requestServiceRejectionHandler
-  val handleErrors = handleRejections(rejectionHandler) & handleExceptions(exceptionHandler)
+  private val rejectionHandler = corsRejectionHandler withFallback requestServiceRejectionHandler
+  private val handleErrors = handleRejections(rejectionHandler) & handleExceptions(exceptionHandler)
 
   val route: Route = handleErrors {
     //extractExecutionContext { implicit executor =>
@@ -51,7 +51,7 @@ trait CaseServiceRoute extends LazyLogging {
 
   // Give more information back to client on various types of rejections
   //  Also do some server side logging when in debug mode
-  def requestServiceRejectionHandler =
+  def requestServiceRejectionHandler: RejectionHandler =
     RejectionHandler
       .newBuilder()
       .handle {
@@ -69,7 +69,7 @@ trait CaseServiceRoute extends LazyLogging {
       }
       .result()
 
-  def exceptionHandler = ExceptionHandler {
+  def exceptionHandler: ExceptionHandler = ExceptionHandler {
     case exception: Throwable => defaultExceptionHandler(exception)
   }
 
@@ -80,11 +80,11 @@ trait CaseServiceRoute extends LazyLogging {
         extractMethod { method =>
           // Depending on debug logging - either print full exception or only headline
           if (logger.underlying.isDebugEnabled()) {
-            logger.debug(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri", t)
+            logger.debug(s"Bumped into an exception in ${this.getClass.getSimpleName} on ${method.name} $uri", t)
           } else if (logger.underlying.isInfoEnabled()) {
-            logger.info(s"Bumped into an exception in ${this.getClass().getSimpleName} on ${method.name} $uri:\n" + t)
+            logger.info(s"Bumped into an exception in ${this.getClass.getSimpleName} on ${method.name} $uri:\n" + t)
           } else {
-            logger.warn(s"Bumped into ${t.getClass.getName} in ${this.getClass().getSimpleName} on ${method.name} $uri - enable debug logging for stack trace; msg: " + t.getMessage)
+            logger.warn(s"Bumped into ${t.getClass.getName} in ${this.getClass.getSimpleName} on ${method.name} $uri - enable debug logging for stack trace; msg: " + t.getMessage)
           }
           complete(HttpResponse(StatusCodes.InternalServerError))
         }
@@ -101,32 +101,31 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
 
-  def completeCafienneJSONSeq(seq: Seq[CafienneJson]) = {
+  def completeCafienneJSONSeq(seq: Seq[CafienneJson]): Route = {
     completeJsonValue(Value.convert(seq.map(element => element.toValue)))
   }
 
-  def completeJsonValue(v: Value[_]) = {
+  def completeJsonValue(v: Value[_]): Route = {
     complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, v.toString))
   }
 
-  private var concatenatedSubRoutes: Route = null
+  private var concatenatedSubRoutes: Option[Route] = None
 
   /**
     * Register a sub route; note: this requires an override of the prefix value as well,
     * and additionally the routes method should not be overridden
     * @param subRoute
     */
-  def addSubRoute(subRoute: CaseServiceRoute) = {
+  def addSubRoute(subRoute: CaseServiceRoute): Unit = {
     registerAPIRoute(subRoute)
-    if (concatenatedSubRoutes == null) concatenatedSubRoutes = subRoute.routes
-    else concatenatedSubRoutes = concat(concatenatedSubRoutes, subRoute.routes)
+    concatenatedSubRoutes = concatenatedSubRoutes.fold(Some(subRoute.routes))(route => Some(concat(route, subRoute.routes)))
   }
 
   val prefix: String = "/"
 
   def routes: Route = {
     pathPrefix(prefix) {
-      concatenatedSubRoutes
+      concatenatedSubRoutes.get
     }
   }
 
@@ -144,7 +143,7 @@ trait CaseServiceRoute extends LazyLogging {
     * @param route
     * @return
     */
-  def registerAPIRoute(route: CaseServiceRoute) = {
+  def registerAPIRoute(route: CaseServiceRoute): Unit = {
     if (route.addToSwaggerRoutes) {
       swaggerClasses += route.getClass
     }
