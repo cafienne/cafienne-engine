@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
@@ -177,7 +178,11 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
               val inputParameters = payload.inputs
               val caseTeam: CaseTeam = payload.caseTeam.asTeam
               val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-              val caseStarter = platformUser.getTenantUser(tenant).asCaseUserIdentity()
+              val caseStarter = new CaseUserIdentity {
+                override val id: String = platformUser.id
+                override val origin: Origin = platformUser.origin(tenant)
+                override val tenantRoles: Set[String] = platformUser.tenantRoles(tenant)
+              }
               validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, caseStarter, newCaseId, caseDefinition, inputParameters, team, debugMode)))
             } catch {
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
