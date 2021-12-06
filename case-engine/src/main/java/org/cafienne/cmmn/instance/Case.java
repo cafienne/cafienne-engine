@@ -25,6 +25,7 @@ import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
 import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.util.XMLHelper;
@@ -314,10 +315,11 @@ public class Case extends ModelActor {
         addDebugInfo(() -> "Retrieving discretionary items of " + this);
         Collection<DiscretionaryItem> items = new ArrayList<>();
         getCasePlan().retrieveDiscretionaryItems(items);
+        addDebugInfo(() -> "Discretionary items of " + this);
         addDebugInfo(() -> {
-            StringBuilder itemsString = new StringBuilder();
-            items.forEach(item -> itemsString.append("\n\t" + item.getDefinition() + " in " + item.getParentId()));
-            return "Discretionary items of " + this + itemsString;
+            ValueList list = new ValueList();
+            items.forEach(item -> list.add(item.asJson()));
+            return list;
         });
         return items;
     }

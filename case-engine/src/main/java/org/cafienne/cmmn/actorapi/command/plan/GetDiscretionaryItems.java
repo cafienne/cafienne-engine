@@ -19,8 +19,7 @@ import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  */
@@ -42,27 +41,14 @@ public class GetDiscretionaryItems extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        // Get the list of valid items
-        List<DiscretionaryItem> discretionaryItems = new ArrayList<>();
-        caseInstance.getDiscretionaryItems().stream().distinct().forEach(discretionaryItems::add);
-
         // Convert the response to JSON
         ValueMap node = new ValueMap();
         node.plus(Fields.caseInstanceId, getCaseInstanceId());
         node.plus(Fields.name, caseInstance.getDefinition().getName());
         ValueList items = node.withArray(Fields.discretionaryItems);
 
-        // discretionaryItems.stream().forEach(i -> items.put(new JSONObject().put("name", i.getDefinition().getName())));
-        discretionaryItems.forEach(i -> {
-            DiscretionaryItemDefinition definition = i.getDefinition();
-            String name = definition.getName();
-            String definitionId = definition.getId();
-            String type = i.getType();
-            String parentName = definition.getPlanItemDefinition().getParentElement().getName();
-            String parentType = definition.getPlanItemDefinition().getParentElement().getType();
-            String parentId = i.getParentId();
-
-            items.add(new ValueMap(Fields.name, name, Fields.definitionId, definitionId, Fields.type, type, Fields.parentName, parentName, Fields.parentType, parentType, Fields.parentId, parentId));
+        caseInstance.getDiscretionaryItems().forEach((DiscretionaryItem item) -> {
+            items.add(item.asJson());
         });
 
         return new GetDiscretionaryItemsResponse(this, node);

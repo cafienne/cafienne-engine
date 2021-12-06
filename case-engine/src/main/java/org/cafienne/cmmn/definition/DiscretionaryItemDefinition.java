@@ -45,18 +45,27 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
         }
     }
 
+    @Override
     public ItemControlDefinition getPlanItemControl() {
         return planItemControl;
     }
 
+    @Override
     public PlanItemDefinitionDefinition getPlanItemDefinition() {
         return definition;
     }
 
+    @Override
+    public String getType() {
+        return definition.getType();
+    }
+
+    @Override
     public Collection<EntryCriterionDefinition> getEntryCriteria() {
         return entryCriteria;
     }
 
+    @Override
     public Collection<ExitCriterionDefinition> getExitCriteria() {
         return exitCriteria;
     }

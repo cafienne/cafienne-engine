@@ -35,10 +35,12 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         return definition.getType() + "['" + getName() + "']";
     }
 
+    @Override
     public ItemControlDefinition getPlanItemControl() {
         return planItemControl;
     }
 
+    @Override
     public PlanItemDefinitionDefinition getPlanItemDefinition() {
         if (definition == null) {
             // Hmmm, apparently resolving is not yet done... (or it really cannot be found, in which case we again go search for it ;))
@@ -47,10 +49,12 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         return definition;
     }
 
+    @Override
     public Collection<EntryCriterionDefinition> getEntryCriteria() {
         return entryCriteria;
     }
 
+    @Override
     public Collection<ExitCriterionDefinition> getExitCriteria() {
         return exitCriteria;
     }
