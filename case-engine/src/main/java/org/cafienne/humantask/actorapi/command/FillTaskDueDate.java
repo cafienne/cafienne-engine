@@ -36,7 +36,7 @@ public class FillTaskDueDate extends WorkflowCommand {
 	@Override
 	public void validate(HumanTask task) {
 		// Only case owners can set the due date
-		super.validateCaseOwnership(task);
+		super.validateTaskOwnership(task);
 	}
 
 	@Override

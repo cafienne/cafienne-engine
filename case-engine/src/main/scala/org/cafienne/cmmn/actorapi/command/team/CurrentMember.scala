@@ -4,17 +4,17 @@ import org.cafienne.actormodel.identity.{CaseUserIdentity, ConsentGroupMembershi
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition
 import org.cafienne.cmmn.instance.team.Team
 
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, SetHasAsJava}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 class CurrentMember(team: Team, user: CaseUserIdentity) extends CaseTeamUser {
   lazy val isValid: Boolean = {
     userMembership.nonEmpty || tenantRoleMembership.nonEmpty || groupMembership.nonEmpty
   }
-  lazy val getRoles: java.util.Set[CaseRoleDefinition] = {
+  private lazy val getRoles: Set[CaseRoleDefinition] = {
     val userCaseRoles = userMembership.flatMap(_.caseRoles)
     val roleMembers = tenantRoleMembership.flatMap(_.caseRoles)
     val userGroupCaseRoles: Set[String] = groupMembership.flatMap(_.caseRoles)
-    (userCaseRoles ++ roleMembers ++ userGroupCaseRoles).map(team.getDefinition.getCaseRole).toSet.asJava
+    (userCaseRoles ++ roleMembers ++ userGroupCaseRoles).map(team.getDefinition.getCaseRole)
   }
   private lazy val userMembership: Set[CaseTeamUser] = {
     team.getUsers.asScala.filter(_.userId == userId).toSet
@@ -34,5 +34,27 @@ class CurrentMember(team: Team, user: CaseUserIdentity) extends CaseTeamUser {
   override val origin: Origin = user.origin
   override val isOwner: Boolean = {
     userMembership.exists(_.isOwner) || tenantRoleMembership.exists(_.isOwner) || groupMembership.exists(_.isOwner)
+  }
+
+  def hasRoles(caseRoles: java.util.Collection[CaseRoleDefinition]): Boolean = {
+    if (caseRoles.isEmpty) {
+      // Ouch. Anyone can take this task or discretionary item - no roles defined.
+      true
+    } else if (isOwner) {
+      // Case owners can do all things they want. But is that good?
+      true
+    } else {
+      caseRoles.asScala.exists(hasRole)
+    }
+  }
+
+  def hasRole(caseRole: CaseRoleDefinition): Boolean = {
+    if (caseRole == null) {
+      true
+    } else if (isOwner) {
+      true
+    } else {
+      getRoles.contains(caseRole)
+    }
   }
 }

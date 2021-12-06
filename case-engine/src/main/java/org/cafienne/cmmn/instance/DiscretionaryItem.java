@@ -50,22 +50,7 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
      * @return
      */
     public boolean isAuthorized() {
-        Collection<CaseRoleDefinition> authorizedRoles = getAuthorizedRoles();
-
-        // When no roles have been defined, it is allowed.
-        if (authorizedRoles.isEmpty()) {
-            return true;
-        }
-
-        // Otherwise the current user must have the role in the case team.
-        Set<CaseRoleDefinition> rolesOfCurrentUser = getCaseInstance().getCurrentTeamMember().getRoles();
-        for (CaseRoleDefinition role : authorizedRoles) {
-            if (rolesOfCurrentUser.contains(role)) {
-                return true; // You're free to go
-            }
-        }
-
-        return false;
+        return getCaseInstance().getCurrentTeamMember().hasRoles(getAuthorizedRoles());
     }
 
     /**

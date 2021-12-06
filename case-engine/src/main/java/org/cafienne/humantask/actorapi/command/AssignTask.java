@@ -10,6 +10,8 @@ package org.cafienne.humantask.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
+import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
@@ -22,7 +24,7 @@ import java.io.IOException;
 
 @Manifest
 public class AssignTask extends WorkflowCommand {
-    private final String assignee;
+    protected final String assignee;
 
     public AssignTask(CaseUserIdentity user, String caseInstanceId, String taskId, UserIdentity assignee) {
         super(user, caseInstanceId, taskId);
@@ -41,7 +43,28 @@ public class AssignTask extends WorkflowCommand {
         if (! currentTaskState.isActive()) {
             raiseException("Cannot be done because the task is in " + currentTaskState + " state, but must be in an active state (Unassigned or Assigned)");
         }
-        super.validateCaseTeamMembership(task, assignee);
+        validateCaseTeamMembership(task, assignee);
+    }
+
+    protected void validateCaseTeamMembership(HumanTask task, String assignee) {
+        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+            // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
+            return;
+        }
+        // Validate that the new assignee is part of the team
+        CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(assignee);
+        if (member == null) {
+            raiseException("There is no case team member with id '" + assignee + "'");
+        } else {
+            // Validate that - if the task needs a role - the new assignee has that role
+            CaseRoleDefinition role = task.getPerformer();
+            if (role != null) {
+                // Members need to have the role, Owners don't need to
+                if (!member.isOwner() && !member.getCaseRoles().contains(role.getName())) {
+                    raiseAuthorizationException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
+                }
+            }
+        }
     }
 
     @Override

@@ -7,31 +7,23 @@
  */
 package org.cafienne.humantask.actorapi.command;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
-import java.io.IOException;
-
 @Manifest
-public class DelegateTask extends WorkflowCommand {
-    private final String assignee;
-
+public class DelegateTask extends AssignTask {
     public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, UserIdentity delegatee) {
-        super(user, caseInstanceId, taskId);
-        this.assignee = delegatee.id();
+        super(user, caseInstanceId, taskId, delegatee);
     }
 
     public DelegateTask(ValueMap json) {
         super(json);
-        this.assignee = json.readString(Fields.assignee);
     }
 
     @Override
@@ -45,11 +37,5 @@ public class DelegateTask extends WorkflowCommand {
     public HumanTaskResponse process(WorkflowTask workflowTask) {
         workflowTask.delegate(assignee);
         return new HumanTaskResponse(this);
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.assignee, assignee);
     }
 }

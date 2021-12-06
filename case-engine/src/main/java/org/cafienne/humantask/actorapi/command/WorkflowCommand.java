@@ -90,8 +90,8 @@ public abstract class WorkflowCommand extends CaseCommand {
      */
     protected void validateState(HumanTask task, TaskState... expectedStates) {
         TaskState currentTaskState = task.getImplementation().getCurrentState();
-        for (int i = 0; i < expectedStates.length; i++) {
-            if (expectedStates[i].equals(currentTaskState)) {
+        for (TaskState expectedState : expectedStates) {
+            if (expectedState.equals(currentTaskState)) {
                 return;
             }
         }
@@ -154,25 +154,5 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     protected void raiseException(String msg) {
         throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
-    }
-
-    protected void validateCaseTeamMembership(HumanTask task, String assignee) {
-        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
-            // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
-            return;
-        }
-        // Validate that the new assignee is part of the team
-        CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(assignee);
-        if (member == null) {
-            raiseException("There is no case team member with id '" + assignee + "'");
-        }
-        // Validate that - if the task needs a role - the new assignee has that role
-        CaseRoleDefinition role = task.getPerformer();
-        if (role != null) {
-            // Members need to have the role, Owners don't need to
-            if (!member.isOwner() && !member.getCaseRoles().contains(role.getName())) {
-                raiseAuthorizationException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
-            }
-        }
     }
 }
