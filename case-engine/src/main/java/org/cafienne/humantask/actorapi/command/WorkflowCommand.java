@@ -112,7 +112,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      * @param task
      */
     protected void validateCaseOwnership(HumanTask task) {
-        if (! task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+        if (! task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
             raiseAuthorizationException("You must be case owner to perform this operation");
         }
     }
@@ -132,7 +132,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      * @param task
      */
     protected void validateTaskOwnership(HumanTask task) {
-        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+        if (task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
             // case owners have the privilege to do this too....
             return;
         }
