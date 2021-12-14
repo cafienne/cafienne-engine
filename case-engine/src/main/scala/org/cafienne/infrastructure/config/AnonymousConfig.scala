@@ -93,5 +93,5 @@ class AnonymousUserConfig(val config: Config) extends ConfigReader {
   val name: String = readString("name")
   val email: String = readString("email")
 
-  def asUser(tenant: String): PlatformUser = PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, isOwner = false, name, email)))
+  def asUser(tenant: String): PlatformUser = PlatformUser(userId, Seq(TenantUser(id = userId, tenant = tenant, roles = roles, name = name, email = email)))
 }

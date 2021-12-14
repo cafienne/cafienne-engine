@@ -5,12 +5,12 @@ import org.cafienne.service.db.record.{CaseTeamUserRecord, UserRoleRecord}
 
 object TestIdentityFactory {
 
-  def createTenantUser(id: String, tenant: String = "", name: String = "", roles: Set[String] = Set(), email: String = "") : TenantUser = {
-    TenantUser(id, roles, tenant, name = id, email = email, enabled = true)
+  def createTenantUser(id: String) : TenantUser = {
+    TenantUser(id = id, tenant = "")
   }
 
   def createPlatformUser(userId: String, tenant: String, roles: Set[String]) : PlatformUser = {
-    PlatformUser(userId, Seq(TenantUser(userId, roles, tenant, name = "", email = "")))
+    PlatformUser(userId, Seq(TenantUser(id = userId, tenant = tenant, roles = roles)))
   }
 
   def createTeamMember(caseId: String, tenant: String, user: PlatformUser, caseRole: String): CaseTeamUserRecord = {

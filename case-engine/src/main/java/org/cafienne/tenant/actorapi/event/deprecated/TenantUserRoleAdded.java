@@ -1,9 +1,8 @@
-package org.cafienne.tenant.actorapi.event;
+package org.cafienne.tenant.actorapi.event.deprecated;
 
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.User;
 
 @Manifest
 public class TenantUserRoleAdded extends TenantUserRoleEvent {
@@ -18,10 +17,5 @@ public class TenantUserRoleAdded extends TenantUserRoleEvent {
     @Override
     public String getDescription() {
         return super.getDescription() +" - added role " + role;
-    }
-
-    @Override
-    protected void updateUserState(User user) {
-        user.updateState(this);
     }
 }

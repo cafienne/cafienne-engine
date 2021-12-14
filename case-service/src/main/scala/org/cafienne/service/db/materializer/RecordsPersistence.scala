@@ -1,6 +1,7 @@
 package org.cafienne.service.db.materializer
 
 import akka.Done
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.service.db.materializer.cases.team.CaseTeamMemberKey
@@ -17,6 +18,8 @@ trait RecordsPersistence {
   def delete(record: AnyRef): Unit
 
   def deleteTaskRecord(taskId: String): Unit = ???
+
+  def deleteTenantUser(user: TenantUser): Unit = ???
 
   def deleteCaseTeamMember(key: CaseTeamMemberKey): Unit = ???
 

@@ -12,34 +12,35 @@ import org.cafienne.tenant.actorapi.response.TenantResponse;
 import java.io.IOException;
 
 @Manifest
-public class UpsertTenantUser extends TenantCommand {
-    private final TenantUserInformation newUser;
+public class RemoveTenantUser extends TenantCommand {
+    public final String userId;
 
-    public UpsertTenantUser(TenantUser tenantOwner, String tenant, TenantUserInformation newUser) {
+    public RemoveTenantUser(TenantUser tenantOwner, String tenant, String userId) {
         super(tenantOwner, tenant);
-        this.newUser = newUser;
+        this.userId = userId;
     }
 
-    public UpsertTenantUser(ValueMap json) {
+    public RemoveTenantUser(ValueMap json) {
         super(json);
-        this.newUser = TenantUserInformation.from(json.with(Fields.newTenantUser));
+        this.userId = json.readString(Fields.userId);
     }
 
     @Override
     public void validate(TenantActor tenant) throws InvalidCommandException {
         super.validate(tenant);
-        validateNotLastOwner(tenant, newUser);
+        validateNotLastOwner(tenant, userId);
     }
+
 
     @Override
     public TenantResponse process(TenantActor tenant) {
-        tenant.upsertUser(newUser);
+        tenant.removeUser(userId);
         return new TenantResponse(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.newTenantUser, newUser.toValue());
+        writeField(generator, Fields.userId, userId);
     }
 }

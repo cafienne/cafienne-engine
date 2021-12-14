@@ -1,6 +1,7 @@
 package org.cafienne.service.db.materializer.slick
 
 import akka.Done
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.cmmn.instance.team.MemberType
 import org.cafienne.infrastructure.cqrs.OffsetRecord
@@ -55,6 +56,10 @@ class SlickRecordsPersistence
 
   override def deleteTaskRecord(taskId: String): Unit = {
     addStatement(TableQuery[TaskTable].filter(_.id === taskId).delete)
+  }
+
+  override def deleteTenantUser(user: TenantUser): Unit = {
+    addStatement(TableQuery[UserRoleTable].filter(userRoleRecord => userRoleRecord.userId === user.id && userRoleRecord.tenant === user.tenant).delete)
   }
 
   override def deleteCaseTeamMember(key: CaseTeamMemberKey): Unit = {

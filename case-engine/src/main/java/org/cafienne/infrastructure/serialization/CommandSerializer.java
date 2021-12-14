@@ -99,14 +99,10 @@ public class CommandSerializer extends CafienneSerializer {
     }
 
     private static void addTenantCommands() {
-        addManifestWrapper(UpsertTenantUser.class, UpsertTenantUser::new);
-        addManifestWrapper(UpdateTenantUser.class, UpdateTenantUser::new);
-        addManifestWrapper(ReplaceTenantUser.class, ReplaceTenantUser::new);
-        addManifestWrapper(AddTenantUserRole.class, AddTenantUserRole::new);
-        addManifestWrapper(RemoveTenantUserRole.class, RemoveTenantUserRole::new);
+        addManifestWrapper(SetTenantUser.class, SetTenantUser::new);
+        addManifestWrapper(RemoveTenantUser.class, RemoveTenantUser::new);
         addManifestWrapper(GetTenantOwners.class, GetTenantOwners::new);
         addManifestWrapper(ReplaceTenant.class, ReplaceTenant::new);
-        addManifestWrapper(UpdateTenant.class, UpdateTenant::new);
     }
 
     private static void addConsentGroupCommands() {

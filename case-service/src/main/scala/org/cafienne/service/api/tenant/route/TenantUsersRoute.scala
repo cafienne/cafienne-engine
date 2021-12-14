@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
@@ -9,6 +10,7 @@ package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -16,7 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.model._
+import org.cafienne.service.api.tenant.model.TenantAPI.TenantUserFormat
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.db.query.exception.UserSearchFailure
 import org.cafienne.system.CaseSystem
@@ -29,7 +31,7 @@ import scala.util.{Failure, Success}
 @Path("/tenant")
 class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
 
-  override def routes = concat(getTenantUsers, getTenantUser)
+  override def routes: Route = concat(getTenantUsers, getTenantUser)
 
   @Path("/{tenant}/users")
   @GET
@@ -41,12 +43,12 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
+      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantUserFormat]))))),
       new ApiResponse(responseCode = "404", description = "Tenant not found"),
     )
   )
   @Produces(Array("application/json"))
-  def getTenantUsers = get {
+  def getTenantUsers: Route = get {
     validUser { platformUser =>
       path(Segment / "users") {
         tenant => runListQuery(userQueries.getTenantUsers(platformUser, tenant))
@@ -65,12 +67,12 @@ class TenantUsersRoute(userQueries: UserQueries)(override implicit val userCache
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantAPI.TenantUserFormat]))))),
+      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantUserFormat]))))),
       new ApiResponse(responseCode = "404", description = "User (or tenant) not found"),
     )
   )
   @Produces(Array("application/json"))
-  def getTenantUser = get {
+  def getTenantUser: Route = get {
     validUser { platformUser =>
       path(Segment / "users" / Segment) { (tenant, userId) =>
         onComplete(userQueries.getTenantUser(platformUser, tenant, userId)) {

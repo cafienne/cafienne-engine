@@ -36,7 +36,7 @@ public class TenantAppliedPlatformUpdate extends TenantBaseEvent implements Comm
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
+        super.writeTenantEvent(generator);
         writeField(generator, Fields.users, newUserInformation.toValue());
     }
 }

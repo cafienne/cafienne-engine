@@ -1,12 +1,11 @@
-package org.cafienne.tenant.actorapi.event;
+package org.cafienne.tenant.actorapi.event.deprecated;
 
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.User;
 
 @Manifest
-public class TenantUserDisabled extends TenantUserEvent {
+public class TenantUserDisabled extends DeprecatedTenantUserEvent {
 
     public TenantUserDisabled(TenantActor tenant, String userId) {
         super(tenant, userId);
@@ -14,10 +13,5 @@ public class TenantUserDisabled extends TenantUserEvent {
 
     public TenantUserDisabled(ValueMap json) {
         super(json);
-    }
-
-    @Override
-    protected void updateUserState(User user) {
-        user.updateState(this);
     }
 }

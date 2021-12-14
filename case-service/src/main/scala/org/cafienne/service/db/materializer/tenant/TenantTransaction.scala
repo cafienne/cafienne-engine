@@ -10,7 +10,9 @@ import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.slick.SlickTransaction
 import org.cafienne.tenant.actorapi.event._
+import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
 import org.cafienne.tenant.actorapi.event.platform.PlatformEvent
+import org.cafienne.tenant.actorapi.event.user.TenantMemberEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,14 +20,15 @@ class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCac
                        (implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
 
   private val tenantProjection = new TenantProjection(persistence)
-  private val userProjection = new UserProjection(persistence)
+  private val userProjection = new TenantUserProjection(persistence)
 
   override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
     logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " on tenant " + tenant)
 
     envelope.event match {
       case p: PlatformEvent => tenantProjection.handlePlatformEvent(p)
-      case t: TenantUserEvent => userProjection.handleUserEvent(t)
+      case m: TenantMemberEvent => userProjection.handleUserEvent(m);
+      case t: DeprecatedTenantUserEvent => userProjection.handleDeprecatedUserEvent(t)
       case _ => Future.successful(Done) // Ignore other events
     }
   }

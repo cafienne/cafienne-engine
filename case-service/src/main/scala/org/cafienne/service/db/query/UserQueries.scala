@@ -110,7 +110,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   }
 
   private def createTenantUser(user: UserRoleRecord, roles: Set[String]): TenantUser = {
-    TenantUser(user.userId, roles, user.tenant, isOwner = user.isOwner, user.name, user.email, enabled = user.enabled)
+    TenantUser(user.userId, tenant = user.tenant, roles = roles, isOwner = user.isOwner, name = user.name, email = user.email, enabled = user.enabled)
   }
 
   override def getDisabledTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {

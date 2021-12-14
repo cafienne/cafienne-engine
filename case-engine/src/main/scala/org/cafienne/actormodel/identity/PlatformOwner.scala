@@ -4,7 +4,7 @@ import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 
 case class PlatformOwner(id: String) extends UserIdentity {
-  def asTenantUser(tenant: String): TenantUser = TenantUser(id = id, roles = Set(), tenant = tenant, name = "")
+  def asTenantUser(tenant: String): TenantUser = TenantUser(id = id, tenant = tenant)
 
   override def asCaseUserIdentity(): CaseUserIdentity = {
     val owner = this

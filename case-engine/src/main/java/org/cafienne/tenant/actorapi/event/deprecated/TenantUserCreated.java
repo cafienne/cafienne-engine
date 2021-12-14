@@ -1,34 +1,28 @@
-package org.cafienne.tenant.actorapi.event;
+package org.cafienne.tenant.actorapi.event.deprecated;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.User;
 
 import java.io.IOException;
 
 @Manifest
-public class TenantUserUpdated extends TenantUserEvent {
+public class TenantUserCreated extends DeprecatedTenantUserEvent {
     public final String name;
     public final String email;
 
-    public TenantUserUpdated(TenantActor tenant, String userId, String name, String email) {
+    public TenantUserCreated(TenantActor tenant, String userId, String name, String email) {
         super(tenant, userId);
         this.name = name;
         this.email = email;
     }
 
-    public TenantUserUpdated(ValueMap json) {
+    public TenantUserCreated(ValueMap json) {
         super(json);
         this.name = json.readString(Fields.name);
         this.email = json.readString(Fields.email);
-    }
-
-    @Override
-    protected void updateUserState(User user) {
-        user.updateState(this);
     }
 
     @Override

@@ -17,6 +17,10 @@ import org.cafienne.tenant.actorapi.event.TenantModified;
 import org.cafienne.tenant.actorapi.exception.TenantException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Base class for sending commands to a TenantActor
@@ -63,18 +67,23 @@ public abstract class TenantCommand extends ModelCommand<TenantActor, TenantUser
         }
     }
 
-    protected void validateNotLastOwner(TenantActor tenant, TenantUserInformation newUser) {
-        // If either
-        // 1. ownership is defined and revoked in the new information (needs to be checked like this, because isOwner() defaults to false)
-        // 2. or if the account is no longer enabled (isEnabled defaults to true, so if false it must have been set to change)
-        // Then
+    protected void validateUserList(List<TenantUser> users) {
+        Set<String> duplicates = users.stream().map(TenantUser::id).collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toSet());
+        if (duplicates.size() > 0) {
+            throw new TenantException("Cannot set tenant with user duplicates. Found multiple entries for users " + duplicates);
+        }
+        // Check whether the new tenant users contains an owner.
+        if (users.stream().noneMatch(potentialOwner -> potentialOwner.isOwner() && potentialOwner.enabled())) {
+            throw new TenantException("Cannot set tenant without active tenant owners");
+        }
+    }
+
+    protected void validateNotLastOwner(TenantActor tenant, String userId) {
         //  check whether this user is the last man standing in the list of owners. If so, the command cannot be executed.
-        if ((newUser.owner().nonEmpty() && !newUser.isOwner()) || !newUser.isEnabled()) {
-            List<String> currentOwners = tenant.getOwnerList();
-            // If only 1 owner, and newUser has the same id, then throw the exception
-            if (currentOwners.size() == 1 && currentOwners.contains(newUser.id())) {
-                throw new TenantException("Cannot remove tenant ownership or disable the account. There must be at least one tenant owner.");
-            }
+        List<String> currentOwners = tenant.getOwnerList();
+        // If only 1 owner, and newUser has the same id, then throw the exception
+        if (currentOwners.size() == 1 && currentOwners.contains(userId)) {
+            throw new TenantException("Cannot remove tenant ownership or disable the account. There must be at least one tenant owner.");
         }
     }
 

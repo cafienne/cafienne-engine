@@ -19,5 +19,4 @@ class TenantRoutes(userQueries: UserQueries)(override implicit val userCache: Id
 
   addSubRoute(new TenantOwnersRoute(userQueries)(userCache, caseSystem))
   addSubRoute(new TenantUsersRoute(userQueries)(userCache, caseSystem))
-  addSubRoute(new DeprecatedTenantOwnersRoute(userQueries)(userCache, caseSystem))
 }

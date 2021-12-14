@@ -34,9 +34,13 @@ import org.cafienne.humantask.actorapi.event.migration.HumanTaskDropped;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
 import org.cafienne.processtask.actorapi.event.*;
 import org.cafienne.tenant.actorapi.event.*;
+import org.cafienne.tenant.actorapi.event.deprecated.*;
 import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
 import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
 import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
+import org.cafienne.tenant.actorapi.event.user.TenantUserAdded;
+import org.cafienne.tenant.actorapi.event.user.TenantUserChanged;
+import org.cafienne.tenant.actorapi.event.user.TenantUserRemoved;
 
 public class EventSerializer extends CafienneSerializer {
     public static void register() {
@@ -157,6 +161,16 @@ public class EventSerializer extends CafienneSerializer {
     }
 
     private static void registerTenantEvents() {
+        addManifestWrapper(TenantOwnersRequested.class, TenantOwnersRequested::new);
+        addManifestWrapper(TenantModified.class, TenantModified::new);
+        addManifestWrapper(TenantAppliedPlatformUpdate.class, TenantAppliedPlatformUpdate::new);
+        addManifestWrapper(TenantUserAdded.class, TenantUserAdded::new);
+        addManifestWrapper(TenantUserChanged.class, TenantUserChanged::new);
+        addManifestWrapper(TenantUserRemoved.class, TenantUserRemoved::new);
+        registerDeprecatedTenantEvents();
+    }
+
+    private static void registerDeprecatedTenantEvents() {
         addManifestWrapper(TenantUserCreated.class, TenantUserCreated::new);
         addManifestWrapper(TenantUserUpdated.class, TenantUserUpdated::new);
         addManifestWrapper(TenantUserRoleAdded.class, TenantUserRoleAdded::new);
@@ -165,9 +179,6 @@ public class EventSerializer extends CafienneSerializer {
         addManifestWrapper(TenantUserDisabled.class, TenantUserDisabled::new);
         addManifestWrapper(OwnerAdded.class, OwnerAdded::new);
         addManifestWrapper(OwnerRemoved.class, OwnerRemoved::new);
-        addManifestWrapper(TenantOwnersRequested.class, TenantOwnersRequested::new);
-        addManifestWrapper(TenantModified.class, TenantModified::new);
-        addManifestWrapper(TenantAppliedPlatformUpdate.class, TenantAppliedPlatformUpdate::new);
     }
 
     private static void registerConsentGroupEvents() {

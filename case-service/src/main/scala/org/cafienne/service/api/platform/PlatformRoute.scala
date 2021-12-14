@@ -8,6 +8,7 @@
 package org.cafienne.service.api.platform
 
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -15,10 +16,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.service.api.tenant.model.TenantAPI
+import org.cafienne.service.api.tenant.model.TenantAPI._
 import org.cafienne.service.api.tenant.route.TenantRoute
 import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.platform.{DisableTenant, EnableTenant}
+import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant}
 
 import javax.ws.rs._
 
@@ -26,31 +27,29 @@ import javax.ws.rs._
 @Path("/platform")
 class PlatformRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
 
-  override def routes = concat(createTenant, disableTenant, enableTenant, getUserInformation)
+  override def routes: Route = concat(createTenant, disableTenant, enableTenant, getUserInformation)
 
   @Path("/")
   @POST
   @Operation(
     summary = "Register a new tenant",
-    description = "Register a new tenant with it's owners",
+    description = "Register a new tenant with one or more users and at least one owner",
     tags = Array("platform"),
     responses = Array(
       new ApiResponse(description = "Tenant registered successfully", responseCode = "204"),
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
     )
   )
-  @RequestBody(description = "Tenant", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.TenantFormat]))))
+  @RequestBody(description = "Tenant", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantFormat]))))
   @Consumes(Array("application/json"))
-  def createTenant = post {
+  def createTenant: Route = post {
     pathEndOrSingleSlash {
       validPlatformOwner { platformOwner =>
-        import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-        import spray.json.DefaultJsonProtocol._
-
-        implicit val userFormat = jsonFormat6(TenantAPI.UserFormat)
-        implicit val tenantFormat = jsonFormat3(TenantAPI.BackwardsCompatibleTenantFormat)
-        entity(as[TenantAPI.BackwardsCompatibleTenantFormat]) { newTenant =>
-          invokeCreateTenant(platformOwner, newTenant)
+        entity(as[TenantFormat]) { newTenant =>
+          import scala.jdk.CollectionConverters._
+          val newTenantName = newTenant.name
+          val users = newTenant.getTenantUsers.asJava
+          askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, users))
         }
       }
     }
@@ -70,7 +69,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
     )
   )
-  def disableTenant = put {
+  def disableTenant: Route = put {
     validPlatformOwner { platformOwner =>
       path(Segment / "disable") { tenant =>
         askPlatform(new DisableTenant(platformOwner, tenant.name))
@@ -92,7 +91,7 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
       new ApiResponse(description = "Tenant information is invalid", responseCode = "400"),
     )
   )
-  def enableTenant = put {
+  def enableTenant: Route = put {
     validPlatformOwner { platformOwner =>
       path(Segment / "enable") { tenant =>
         askPlatform(new EnableTenant(platformOwner, tenant.name))
@@ -107,12 +106,12 @@ class PlatformRoute()(override implicit val userCache: IdentityProvider, overrid
     description = "Retrieves the user information of current user",
     tags = Array("platform"),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[TenantAPI.PlatformUserFormat])))),
+      new ApiResponse(responseCode = "200", description = "All user information known within the platform", content = Array(new Content(schema = new Schema(implementation = classOf[PlatformUserFormat])))),
       new ApiResponse(responseCode = "401", description = "User is not registered in the case system"),
     )
   )
   @Produces(Array("application/json"))
-  def getUserInformation = get {
+  def getUserInformation: Route = get {
     pathPrefix("user") {
       pathEndOrSingleSlash {
         validUser { platformUser =>

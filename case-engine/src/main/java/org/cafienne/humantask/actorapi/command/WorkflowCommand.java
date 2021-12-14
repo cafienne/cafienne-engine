@@ -6,8 +6,6 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
@@ -16,7 +14,6 @@ import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
-import org.cafienne.tenant.User;
 
 import java.io.IOException;
 import java.util.Arrays;
