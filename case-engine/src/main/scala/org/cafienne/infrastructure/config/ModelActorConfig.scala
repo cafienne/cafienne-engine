@@ -1,9 +1,19 @@
 package org.cafienne.infrastructure.config
 
+import akka.util.Timeout
 import org.cafienne.infrastructure.config.util.ChildConfigReader
+
+import scala.concurrent.duration.SECONDS
 
 class ModelActorConfig(val parent: CafienneConfig) extends ChildConfigReader {
   val path = "actor"
+
+  lazy val askTimout: Timeout = {
+    val default = 60
+    val period = readLong("ask-timeout", default)
+    logger.info("CommandRoutes wait a maximum of " + period + " seconds for a response upon their requests")
+    Timeout(period, SECONDS)
+  }
 
   lazy val idlePeriod: Long = {
     val default = 60 * 10

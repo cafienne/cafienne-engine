@@ -2,10 +2,10 @@ package org.cafienne.system.router
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.util.Timeout
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 
 class CafienneGateway(caseSystem: CaseSystem) {
   private val system: ActorSystem = caseSystem.system
@@ -13,7 +13,7 @@ class CafienneGateway(caseSystem: CaseSystem) {
 
   def request(message: Any): Future[Any] = {
     import akka.pattern.ask
-    implicit val timeout: Timeout = Timeout(10.seconds)
+    implicit val timeout: Timeout = Cafienne.config.actor.askTimout
 
     messageRouterService.ask(message)
   }
