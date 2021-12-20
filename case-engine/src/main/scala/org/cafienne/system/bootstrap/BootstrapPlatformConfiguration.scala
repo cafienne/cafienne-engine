@@ -141,7 +141,7 @@ object BootstrapPlatformConfiguration extends LazyLogging {
   }
 
   private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant): Future[Unit] = {
-    implicit val ec: ExecutionContext = ExecutionContext.global
+    implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
     caseSystem.gateway.request(bootstrapTenant).map {
       case e: CommandFailure =>

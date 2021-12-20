@@ -1,8 +1,10 @@
 package org.cafienne.infrastructure.akka.http.route
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, onComplete}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.headers.RawHeader
+import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHeader, respondWithHeaders}
+import akka.http.scaladsl.server.{Directive0, Route}
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
@@ -10,12 +12,20 @@ import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse,
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.infrastructure.akka.http.ResponseMarshallers._
 import org.cafienne.service.api.Headers
+import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
+import scala.collection.immutable.Seq
 import scala.util.{Failure, Success}
 
 trait CommandRoute extends AuthenticatedRoute {
   def askModelActor(command: ModelCommand): Route = {
+    CommandRouteExecutor.askModelActor(caseSystem, command)
+  }
+}
+
+object CommandRouteExecutor extends LazyLogging {
+  def askModelActor(caseSystem: CaseSystem, command: ModelCommand): Route = {
     onComplete(caseSystem.gateway.request(command)) {
       case Success(value) =>
         value match {
@@ -40,7 +50,7 @@ trait CommandRoute extends AuthenticatedRoute {
   /**
     * Complete by marshalling the response as JSON and with writing last modified header
     */
-  private def completeWithLMH[R <: ModelResponse](statusCode: StatusCodes.Success, response: R, header: String = Headers.CASE_LAST_MODIFIED) = {
+  private def completeWithLMH[R <: ModelResponse](statusCode: StatusCodes.Success, response: R, header: String = Headers.CASE_LAST_MODIFIED): Route = {
     writeLastModifiedHeader(response, header) {
       complete(statusCode, response)
     }
@@ -49,9 +59,18 @@ trait CommandRoute extends AuthenticatedRoute {
   /**
     * Complete without a response but still with writing last modified header
     */
-  private def completeOnlyLMH[R <: ModelResponse](statusCode: StatusCodes.Success, response: R, header: String) = {
+  private def completeOnlyLMH[R <: ModelResponse](statusCode: StatusCodes.Success, response: R, header: String): Route = {
     writeLastModifiedHeader(response, header) {
       complete(statusCode)
+    }
+  }
+
+  def writeLastModifiedHeader(response: ModelResponse, headerName: String = Headers.CASE_LAST_MODIFIED): Directive0 = {
+    val lm = response.lastModifiedContent().toString
+    if (lm != null) {
+      respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
+    } else {
+      respondWithHeaders(Seq())
     }
   }
 }

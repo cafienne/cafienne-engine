@@ -107,6 +107,6 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     override protected val userCache: IdentityProvider = uc
     protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(Cafienne.config.OIDC.keysUrl))
     protected val issuer: String = Cafienne.config.OIDC.issuer
-    override protected implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+    override protected implicit val ec: ExecutionContext = caseSystem.system.dispatcher
   }
 }
