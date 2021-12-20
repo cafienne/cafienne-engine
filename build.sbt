@@ -171,9 +171,7 @@ lazy val service = project("case-service")
     Deps.compile(
       Deps.akkaHttpCore,
       Deps.akkaHtppJackson,
-      Deps.hikariCP,
       Deps.jacksonScala,
-      Deps.javaxws,
       Deps.sw4jj,
     ) ++
       Deps.test(
