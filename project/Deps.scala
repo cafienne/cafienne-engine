@@ -42,7 +42,7 @@ object Deps {
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
-  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.7"
+  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.9"
   val config                = "com.typesafe"            %  "config"                               % "1.4.1"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.4"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
