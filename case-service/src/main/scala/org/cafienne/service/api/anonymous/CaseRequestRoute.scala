@@ -21,17 +21,14 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.akka.http.route.CaseTeamValidator
 import org.cafienne.infrastructure.config.AnonymousCaseDefinition
-import org.cafienne.json.ValueMap
-import org.cafienne.service.api.anonymous.CaseRequestRoute.AnonymousStartCaseFormat
+import org.cafienne.service.api.anonymous.model.AnonymousAPI._
 import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 
 import javax.ws.rs._
-import scala.annotation.meta.field
 import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -94,24 +91,3 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider, override implic
       path("case" / Remaining) { rawPath => subRoute(rawPath) })
   }
 }
-
-
-object CaseRequestRoute {
-
-  @Schema(description = "Input parameters example json")
-  case class InputParametersFormat(input1: String, input2: Object, input3: List[String])
-
-  @Schema(description = "Start the execution of a new case")
-  case class AnonymousStartCaseFormat(
-                                       @(Schema@field)(
-                                         description = "Input parameters that will be passed to the started case",
-                                         required = false,
-                                         implementation = classOf[InputParametersFormat])
-                                       inputs: ValueMap,
-                                       @(Schema@field)(description = "Unique identifier to be used for this case. When there is no identifier given, a UUID will be generated", required = false, example = "Will be generated if omitted or empty")
-                                       caseInstanceId: Option[String],
-                                       @(Schema@field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
-                                       debug: Option[Boolean])
-
-}
-

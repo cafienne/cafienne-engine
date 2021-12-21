@@ -1,4 +1,4 @@
-package org.cafienne.service.api.model
+package org.cafienne.service.api
 
 object ApiValidator {
 

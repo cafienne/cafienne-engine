@@ -1,18 +1,17 @@
 package org.cafienne.service.api.tenant.model
 
-import akka.http.scaladsl.model.ContentTypes
-import akka.http.scaladsl.unmarshalling.Unmarshaller
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.infrastructure.akka.http.JsonUtil
-import org.cafienne.service.api.model.ApiValidator
+import org.cafienne.infrastructure.akka.http.EntityReader.{EntityReader, entityReader}
+import org.cafienne.service.api.ApiValidator
 
 import scala.annotation.meta.field
 
 object TenantAPI {
-  implicit val UserFormatParser = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => JsonUtil.fromJson[UserFormat](data))
-  implicit val TenantFormatParser = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => JsonUtil.fromJson[TenantFormat](data))
-  implicit val ReplaceTenantFormatParser = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => JsonUtil.fromJson[ReplaceTenantFormat](data))
+
+  implicit val userReader: EntityReader[UserFormat] = entityReader[UserFormat]
+  implicit val tenantReader: EntityReader[TenantFormat] = entityReader[TenantFormat]
+  implicit val replaceTenantReader: EntityReader[ReplaceTenantFormat] = entityReader[ReplaceTenantFormat]
 
   case class UserFormat(
                          @(Schema @field)(implementation = classOf[String], example = "User id (matched with token when user logs on)") userId: String,

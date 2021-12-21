@@ -86,7 +86,6 @@ lazy val engine = project("case-engine")
       Deps.akkaContrib,
       Deps.akkaHttp,
       Deps.akkaHttpCors,
-      Deps.akkaHttpSprayJson,
       Deps.akkaHttpXml,
       Deps.akkaInMemoryTestDB,
       Deps.cassandraPersistence,

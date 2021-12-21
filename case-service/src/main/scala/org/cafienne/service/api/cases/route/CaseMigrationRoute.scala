@@ -8,6 +8,7 @@
 package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -16,9 +17,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.Headers
-import org.cafienne.service.api.model.MigrationDefinitionFormat
+import org.cafienne.service.api.cases.model.CaseMigrationAPI._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
@@ -28,7 +28,7 @@ import javax.ws.rs._
 @Path("/cases")
 class CaseMigrationRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
-  override def routes = {
+  override def routes: Route = {
       startMigration
     }
 
@@ -48,7 +48,7 @@ class CaseMigrationRoute(val caseQueries: CaseQueries)(override implicit val use
     )
   )
   @Produces(Array("application/json"))
-  def startMigration = post {
+  def startMigration: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("migrate-definition") {
         entity(as[MigrationDefinitionFormat]) { migrateDefinition =>

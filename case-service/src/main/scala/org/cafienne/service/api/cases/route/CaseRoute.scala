@@ -24,11 +24,10 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.model.StartCaseFormat
+import org.cafienne.service.api.cases.model.CaseAPI._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.service.db.query.filter.CaseFilter
 import org.cafienne.system.CaseSystem

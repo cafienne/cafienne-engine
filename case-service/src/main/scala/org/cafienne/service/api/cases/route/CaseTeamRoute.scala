@@ -19,9 +19,8 @@ import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.removemember._
 import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole}
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.Headers
-import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, CaseTeamFormat, Examples}
+import org.cafienne.service.api.cases.model.CaseTeamAPI._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
@@ -71,12 +70,12 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamFormat.TeamFormat]))))
+  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TeamFormat]))))
   @Consumes(Array("application/json"))
   def setCaseTeam: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
       path("caseteam") {
-        entity(as[BackwardCompatibleTeamFormat]) { input =>
+        entity(as[Compatible.TeamFormat]) { input =>
           val teamInput = input.asTeam
           authorizeCaseAccess(platformUser, caseInstanceId, member => validateTeam(teamInput, member.tenant, team => askModelActor(new SetCaseTeam(member, caseInstanceId, team))))
         }
@@ -99,12 +98,12 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Case Team User", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamFormat.CaseTeamUserFormat]))))
+  @RequestBody(description = "Case Team User", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamUserFormat]))))
   @Consumes(Array("application/json"))
   def setUser: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
       path("caseteam" / "users") {
-        entity(as[CaseTeamFormat.CaseTeamUserFormat]) { input =>
+        entity(as[CaseTeamUserFormat]) { input =>
           putCaseTeamUser(platformUser, caseInstanceId, input.asCaseTeamUser)
         }
       }
@@ -158,12 +157,12 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Case Team Group", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamFormat.GroupFormat]))))
+  @RequestBody(description = "Case Team Group", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[GroupFormat]))))
   @Consumes(Array("application/json"))
   def setGroup: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
       path("caseteam" / "groups") {
-        entity(as[CaseTeamFormat.GroupFormat]) { input =>
+        entity(as[GroupFormat]) { input =>
           askCase(platformUser, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, input.asGroup))
         }
       }
@@ -217,12 +216,12 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Tenant Role", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamFormat.TenantRoleFormat]))))
+  @RequestBody(description = "Tenant Role", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantRoleFormat]))))
   @Consumes(Array("application/json"))
   def setTenantRole: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
       path("caseteam" / "tenant-roles") {
-        entity(as[CaseTeamFormat.TenantRoleFormat]) { input =>
+        entity(as[TenantRoleFormat]) { input =>
           askCase(platformUser, caseInstanceId, user => new SetCaseTeamTenantRole(user, caseInstanceId, input.asTenantRole))
         }
       }

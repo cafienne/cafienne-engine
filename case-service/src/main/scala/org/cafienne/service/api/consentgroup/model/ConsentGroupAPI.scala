@@ -1,18 +1,17 @@
 package org.cafienne.service.api.consentgroup.model
 
-import akka.http.scaladsl.model.ContentTypes
-import akka.http.scaladsl.unmarshalling.Unmarshaller
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
-import org.cafienne.infrastructure.akka.http.JsonUtil
-import org.cafienne.service.api.model.ApiValidator
+import org.cafienne.infrastructure.akka.http.EntityReader.{EntityReader, entityReader}
+import org.cafienne.service.api.ApiValidator
 import org.cafienne.util.Guid
 
 import scala.annotation.meta.field
 
 object ConsentGroupAPI {
-  implicit val ConsentGroupFormatParser = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => JsonUtil.fromJson[ConsentGroupFormat](data))
-  implicit val ConsentGroupUserFormatParser = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(data => JsonUtil.fromJson[ConsentGroupUserFormat](data))
+
+  implicit val consentGroupReader: EntityReader[ConsentGroupFormat] = entityReader[ConsentGroupFormat]
+  implicit val consentGroupUserReader: EntityReader[ConsentGroupUserFormat] = entityReader[ConsentGroupUserFormat]
 
   case class ConsentGroupFormat(
                    @(Schema @field)(implementation = classOf[String], example = "Unique identifier of the group (optionally generated in the engine)")
