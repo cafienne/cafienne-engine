@@ -8,7 +8,7 @@
 package org.cafienne.humantask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -23,14 +23,14 @@ import java.io.IOException;
 public abstract class TaskOutputCommand extends WorkflowCommand {
 	protected final ValueMap taskOutput;
 
-	protected TaskOutputCommand(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
-		super(tenantUser, caseInstanceId, taskId);
+	protected TaskOutputCommand(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
+		super(user, caseInstanceId, taskId);
 		this.taskOutput = taskOutput;
 	}
 
 	protected TaskOutputCommand(ValueMap json) {
 		super(json);
-		this.taskOutput = readMap(json, Fields.taskOutput);
+		this.taskOutput = json.readMap(Fields.taskOutput);
 	}
 
 	public ValueMap getOutput() {

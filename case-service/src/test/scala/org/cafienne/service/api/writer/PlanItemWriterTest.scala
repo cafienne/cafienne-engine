@@ -5,7 +5,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
+import org.cafienne.service.db.materializer.cases.CaseEventSink
 import org.cafienne.service.db.record.{CaseRecord, PlanItemRecord}
 import org.cafienne.service.db.schema.QueryDB
 import org.scalatest.BeforeAndAfterAll
@@ -45,7 +45,7 @@ class PlanItemWriterTest
 
   val persistence = new TestPersistence()
 
-  val cpw = new CaseProjectionsWriter(persistence, NoOffsetStorage)
+  val cpw = new CaseEventSink(persistence, NoOffsetStorage)
   cpw.start()
 
 

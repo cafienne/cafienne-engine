@@ -1,7 +1,6 @@
 package org.cafienne.infrastructure.serialization;
 
 import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.UpdateCaseWithPlatformInformation;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
@@ -15,24 +14,30 @@ import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
-import org.cafienne.cmmn.actorapi.command.team.PutTeamMember;
-import org.cafienne.cmmn.actorapi.command.team.RemoveTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert;
 import org.cafienne.cmmn.actorapi.command.team.SetCaseTeam;
+import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamGroup;
+import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamTenantRole;
+import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamUser;
+import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamGroup;
+import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamTenantRole;
+import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser;
+import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup;
+import org.cafienne.consentgroup.actorapi.command.RemoveConsentGroupMember;
+import org.cafienne.consentgroup.actorapi.command.SetConsentGroupMember;
 import org.cafienne.humantask.actorapi.command.*;
-import org.cafienne.platform.actorapi.command.GetUpdateStatus;
-import org.cafienne.platform.actorapi.command.UpdatePlatformInformation;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.*;
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
 import org.cafienne.tenant.actorapi.command.platform.DisableTenant;
 import org.cafienne.tenant.actorapi.command.platform.EnableTenant;
-import org.cafienne.tenant.actorapi.command.platform.UpdateTenantWithPlatformInformation;
 
 public class CommandSerializer extends CafienneSerializer {
     public static void register() {
         addCaseCommands();
         addProcessActorCommands();
         addTenantCommands();
+        addConsentGroupCommands();
         addPlatformCommands();
     }
 
@@ -40,7 +45,6 @@ public class CommandSerializer extends CafienneSerializer {
         addManifestWrapper(StartCase.class, StartCase::new);
         addManifestWrapper(MigrateDefinition.class, MigrateDefinition::new);
         addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
-        addManifestWrapper(UpdateCaseWithPlatformInformation.class, UpdateCaseWithPlatformInformation::new);
         addCasePlanCommands();
         addCaseFileCommands();
         addCaseTeamCommands();
@@ -65,8 +69,13 @@ public class CommandSerializer extends CafienneSerializer {
     }
 
     private static void addCaseTeamCommands() {
-        addManifestWrapper(PutTeamMember.class, PutTeamMember::new);
-        addManifestWrapper(RemoveTeamMember.class, RemoveTeamMember::new);
+        addManifestWrapper(DeprecatedUpsert.class, DeprecatedUpsert::new);
+        addManifestWrapper(SetCaseTeamUser.class, SetCaseTeamUser::new);
+        addManifestWrapper(SetCaseTeamTenantRole.class, SetCaseTeamTenantRole::new);
+        addManifestWrapper(SetCaseTeamGroup.class, SetCaseTeamGroup::new);
+        addManifestWrapper(RemoveCaseTeamUser.class, RemoveCaseTeamUser::new);
+        addManifestWrapper(RemoveCaseTeamGroup.class, RemoveCaseTeamGroup::new);
+        addManifestWrapper(RemoveCaseTeamTenantRole.class, RemoveCaseTeamTenantRole::new);
         addManifestWrapper(SetCaseTeam.class, SetCaseTeam::new);
     }
 
@@ -90,22 +99,21 @@ public class CommandSerializer extends CafienneSerializer {
     }
 
     private static void addTenantCommands() {
-        addManifestWrapper(UpsertTenantUser.class, UpsertTenantUser::new);
-        addManifestWrapper(UpdateTenantUser.class, UpdateTenantUser::new);
-        addManifestWrapper(ReplaceTenantUser.class, ReplaceTenantUser::new);
-        addManifestWrapper(AddTenantUserRole.class, AddTenantUserRole::new);
-        addManifestWrapper(RemoveTenantUserRole.class, RemoveTenantUserRole::new);
+        addManifestWrapper(SetTenantUser.class, SetTenantUser::new);
+        addManifestWrapper(RemoveTenantUser.class, RemoveTenantUser::new);
         addManifestWrapper(GetTenantOwners.class, GetTenantOwners::new);
         addManifestWrapper(ReplaceTenant.class, ReplaceTenant::new);
-        addManifestWrapper(UpdateTenant.class, UpdateTenant::new);
-        addManifestWrapper(UpdateTenantWithPlatformInformation.class, UpdateTenantWithPlatformInformation::new);
+    }
+
+    private static void addConsentGroupCommands() {
+        CafienneSerializer.addManifestWrapper(CreateConsentGroup.class, CreateConsentGroup::new);
+        CafienneSerializer.addManifestWrapper(SetConsentGroupMember.class, SetConsentGroupMember::new);
+        CafienneSerializer.addManifestWrapper(RemoveConsentGroupMember.class, RemoveConsentGroupMember::new);
     }
 
     private static void addPlatformCommands() {
         addManifestWrapper(CreateTenant.class, CreateTenant::new);
         addManifestWrapper(DisableTenant.class, DisableTenant::new);
         addManifestWrapper(EnableTenant.class, EnableTenant::new);
-        addManifestWrapper(UpdatePlatformInformation.class, UpdatePlatformInformation::new);
-        addManifestWrapper(GetUpdateStatus.class, GetUpdateStatus::new);
     }
 }

@@ -25,9 +25,9 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val case33 = "33"
   val case44 = "44"
 
-  val testUser = TestIdentityFactory.createPlatformUser("test", tenant, List("A", "B"))
-  val userWithAandB = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, List("A", "B"))
-  val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, List("B", "C"))
+  val testUser = TestIdentityFactory.createPlatformUser("test", tenant, Set("A", "B"))
+  val userWithAandB = TestIdentityFactory.createPlatformUser("userWithAplusB", tenant, Set("A", "B"))
+  val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
 
   override def beforeAll() = {
     QueryDB.verifyConnectivity()
@@ -75,14 +75,17 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     res.caseInstanceId must be(case33)
   }
 
-  it should "retrieve a caseinstanceId by taskId" in {
-    val res = Await.result(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId("1", testUser), 1.second)
+  it should "retrieve a caseInstanceId and tenant by taskId" in {
+    val res = Await.result({
+      implicit val ec = scala.concurrent.ExecutionContext.global
+      taskQueries.getCaseMembership("1", testUser).map(m => (m.caseInstanceId, m.tenant))
+    }, 1.second)
     res must be((case33, tenant))
   }
 
   it should "retrieve nothing by unknown taskId" in {
     assertThrows[TaskSearchFailure] {
-      Await.result(taskQueries.authorizeTaskAccessAndReturnCaseAndTenantId("10", testUser), 1.second)
+      Await.result(taskQueries.getCaseMembership("10", testUser), 1.second)
     }
   }
 

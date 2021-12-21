@@ -3,16 +3,13 @@ package org.cafienne.humantask.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.team.Member;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -25,8 +22,8 @@ public abstract class WorkflowCommand extends CaseCommand {
     private final String taskId;
     private HumanTask task;
 
-    protected WorkflowCommand(TenantUser tenantUser, String caseInstanceId, String taskId) {
-        super(tenantUser, caseInstanceId);
+    protected WorkflowCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
+        super(user, caseInstanceId);
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new NullPointerException("Task id should not be null or empty");
         }
@@ -36,7 +33,7 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     protected WorkflowCommand(ValueMap json) {
         super(json);
-        this.taskId = readField(json, Fields.taskId);
+        this.taskId = json.readString(Fields.taskId);
     }
 
     protected String getTaskId() {
@@ -90,8 +87,8 @@ public abstract class WorkflowCommand extends CaseCommand {
      */
     protected void validateState(HumanTask task, TaskState... expectedStates) {
         TaskState currentTaskState = task.getImplementation().getCurrentState();
-        for (int i = 0; i < expectedStates.length; i++) {
-            if (expectedStates[i].equals(currentTaskState)) {
+        for (TaskState expectedState : expectedStates) {
+            if (expectedState.equals(currentTaskState)) {
                 return;
             }
         }
@@ -112,7 +109,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      * @param task
      */
     protected void validateCaseOwnership(HumanTask task) {
-        if (! task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+        if (! task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
             raiseAuthorizationException("You must be case owner to perform this operation");
         }
     }
@@ -132,7 +129,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      * @param task
      */
     protected void validateTaskOwnership(HumanTask task) {
-        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+        if (task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
             // case owners have the privilege to do this too....
             return;
         }
@@ -154,25 +151,5 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     protected void raiseException(String msg) {
         throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
-    }
-
-    protected void validateCaseTeamMembership(HumanTask task, String assignee) {
-        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
-            // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
-            return;
-        }
-        // Validate that the new assignee is part of the team
-        Member member = task.getCaseInstance().getCaseTeam().getMember(new MemberKey(assignee, "user"));
-        if (member == null) {
-            raiseException("There is no case team member with id '" + assignee + "'");
-        }
-        // Validate that - if the task needs a role - the new assignee has that role
-        CaseRoleDefinition role = task.getPerformer();
-        if (role != null) {
-            // Members need to have the role, Owners don't need to
-            if (!member.isOwner() && !member.getRoles().contains(role)) {
-                raiseAuthorizationException("The case team member with id '" + assignee + "' does not have the case role " + role.getName());
-            }
-        }
     }
 }

@@ -35,7 +35,7 @@ public class CaseFileItemChildRemoved extends CaseFileItemTransitioned {
 
     public CaseFileItemChildRemoved(ValueMap json) {
         super(json);
-        this.childPath = readPath(json, Fields.childPath);
+        this.childPath = json.readPath(Fields.childPath);
     }
 
     public Path getChildPath() {

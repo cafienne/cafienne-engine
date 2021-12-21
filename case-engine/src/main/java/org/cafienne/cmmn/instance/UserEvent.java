@@ -8,15 +8,13 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.cmmn.actorapi.command.team.CurrentMember;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.UserEventDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
-import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
-import java.util.Set;
 
 public class UserEvent extends EventListener<UserEventDefinition> {
     public UserEvent(String id, int index, ItemDefinition itemDefinition, UserEventDefinition definition, Stage<?> stage) {
@@ -34,22 +32,11 @@ public class UserEvent extends EventListener<UserEventDefinition> {
             return;
         }
 
-        Collection<CaseRoleDefinition> authorizedRoles = getAuthorizedRoles();
-        if (authorizedRoles.isEmpty()) { // No roles defined, so it is allowed.
-            return;
-        }
-
         CurrentMember currentUser = getCaseInstance().getCurrentTeamMember();
-        // Now fetch roles of current user within this case and see if there is one that matches one of the authorized roles
-        Set<CaseRoleDefinition> rolesOfCurrentUser = currentUser.getRoles();
-        for (CaseRoleDefinition role : authorizedRoles) {
-            if (rolesOfCurrentUser.contains(role)) {
-                return; // You're free to go
-            }
+        if (!currentUser.hasRoles(getAuthorizedRoles())) {
+            // Apparently no matching role was found.
+            throw new AuthorizationException("User '" + currentUser.userId() + "' does not have the permission to raise the event " + getName());
         }
-
-        // Apparently no matching role was found.
-        throw new AuthorizationException("User '"+currentUser.getMemberId()+"' does not have the permission to raise the event " + getName());
     }
 
     @Override

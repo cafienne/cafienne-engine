@@ -39,8 +39,8 @@ public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent
 
     protected CasePlanEvent(ValueMap json) {
         super(json);
-        this.planItemId = readField(json, Fields.planItemId);
-        this.type = readField(json, Fields.type);
+        this.planItemId = json.readString(Fields.planItemId);
+        this.type = json.readString(Fields.type);
         this.planItem = null;
     }
 

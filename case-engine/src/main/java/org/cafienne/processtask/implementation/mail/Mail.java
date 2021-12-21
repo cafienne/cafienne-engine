@@ -164,7 +164,7 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
                         invite.put("required", input.get("to"));
                         invite.put("optional", input.get("cc"));
                     }
-                    if (!invite.has("meetingName")) invite.putRaw("meetingName", subject);
+                    if (!invite.has("meetingName")) invite.plus("meetingName", subject);
                     String content = new CalendarInvite(invite).invite;
                     String fileName = "invite.ics";
                     String mimeType = "text/calendar";

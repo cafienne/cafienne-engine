@@ -36,9 +36,9 @@ public abstract class PlanItemEvent extends CasePlanEvent<PlanItem<?>> {
 
     protected PlanItemEvent(ValueMap json) {
         super(json);
-        ValueMap planItemJson = readMap(json, Fields.planitem);
+        ValueMap planItemJson = json.readMap(Fields.planitem);
         this.seqNo = ((Long) planItemJson.raw(Fields.seqNo)).intValue();
-        this.index = ((Long)readField(planItemJson, Fields.index)).intValue();
+        this.index = ((Long) planItemJson.raw(Fields.index)).intValue();
     }
 
     public void writePlanItemEvent(JsonGenerator generator) throws IOException {

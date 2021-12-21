@@ -59,8 +59,9 @@ class PlatformQueriesImpl extends PlatformQueries with LazyLogging
     } yield (tasks.caseInstanceId, tasks.tenant, tasks.createdBy, tasks.modifiedBy, tasks.assignee, tasks.owner)
 
     val teamQuery = for {
-      teams <- TableQuery[CaseInstanceTeamMemberTable].filter(record => record.isTenantUser && record.memberId.inSet(userIds)).inTenants(tenants)
-    } yield (teams.caseInstanceId, teams.tenant, teams.memberId)
+      teams <- TableQuery[CaseInstanceTeamUserTable].filter(record => record.userId.inSet(userIds)) //.inTenants(tenants)
+      tenants <- TableQuery[CaseInstanceTable].filter(_.id === teams.caseInstanceId).map(_.tenant)
+    } yield (teams.caseInstanceId, tenants, teams.userId)
 
     val result = for {
       // Register case.id+tenant, case.createdBy and case.modifiedBy

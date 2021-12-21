@@ -28,8 +28,8 @@ public class TaskInputFilled extends TaskEvent<Task<?>> {
 
     public TaskInputFilled(ValueMap json) {
         super(json);
-        this.taskParameters = readMap(json, Fields.taskParameters);
-        this.mappedInputParameters = readMap(json, Fields.mappedInputParameters);
+        this.taskParameters = json.readMap(Fields.taskParameters);
+        this.mappedInputParameters = json.readMap(Fields.mappedInputParameters);
     }
 
     @Override

@@ -1,23 +1,19 @@
 package org.cafienne.cmmn.expression.spel.api;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.identity.UserIdentity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 /**
- * Wrapper around TenantUser, so that user can be accessed from spel expressions
+ * Wrapper to access user information from spel expressions
  */
-public class UserContext {
-    public final String id;
-    public final String name;
-    public final Set<String> roles;
-    public final String email;
-
-    public UserContext(TenantUser user) {
-        this.id = user.id();
-        this.name = user.name();
-        this.roles = new HashSet<>(scala.jdk.CollectionConverters.SeqHasAsJava(user.roles()).asJava());
-        this.email = user.email();
+public class UserContext extends APIObject<ModelActor> {
+    public UserContext(ModelActor actor, UserIdentity user) {
+        super(actor);
+        addPropertyReader("id", user::id);
+        addDeprecatedReader("roles", ArrayList<String>::new);
+        addDeprecatedReader("name", () -> "");
+        addDeprecatedReader("email", () -> "");
     }
 }

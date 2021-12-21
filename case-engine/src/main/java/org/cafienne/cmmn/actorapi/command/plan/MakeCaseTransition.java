@@ -9,7 +9,7 @@ package org.cafienne.cmmn.actorapi.command.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -31,14 +31,14 @@ public class MakeCaseTransition extends CaseCommand {
      * @param caseInstanceId The id of the case in which to perform this command.
      * @param transition     The transition to be executed on the case
      */
-    public MakeCaseTransition(TenantUser tenantUser, String caseInstanceId, Transition transition) {
-        super(tenantUser, caseInstanceId);
+    public MakeCaseTransition(CaseUserIdentity user, String caseInstanceId, Transition transition) {
+        super(user, caseInstanceId);
         this.transition = transition;
     }
 
     public MakeCaseTransition(ValueMap json) {
         super(json);
-        this.transition = readEnum(json, Fields.transition, Transition.class);
+        this.transition = json.readEnum(Fields.transition, Transition.class);
     }
 
     public Transition getTransition() {

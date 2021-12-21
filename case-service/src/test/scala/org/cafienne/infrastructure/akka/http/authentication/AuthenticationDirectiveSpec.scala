@@ -1,6 +1,5 @@
 package org.cafienne.infrastructure.akka.http.authentication
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
@@ -22,7 +21,7 @@ import java.util.Date
 import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters._
 
-class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with SprayJsonSupport with ScalatestRouteTest {
+class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with ScalatestRouteTest {
   //TODO add a test with a non UUID subject
   final val tokenWithRole    = generateTokenAndSource("subject1", List("USER", "ADMIN"))
   final val tokenWithoutRole = generateTokenAndSource("subject2", List.empty[String])

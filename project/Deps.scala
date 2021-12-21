@@ -16,7 +16,6 @@ object Deps {
 
   object V {
     val scala       = "2.13.6"
-    val spray       = "1.3.6"
     val akkaHttp    = "10.2.7"
     val akka        = "2.6.17"
     val jackson     = "2.13.0"
@@ -50,7 +49,6 @@ object Deps {
 
   val akkaHttp              = "com.typesafe.akka"       %% "akka-http"                            % V.akkaHttp
   val akkaHttpXml           = "com.typesafe.akka"       %% "akka-http-xml"                        % V.akkaHttp
-  val akkaHttpSprayJson     = "com.typesafe.akka"       %% "akka-http-spray-json"                 % V.akkaHttp
   val akkaHttpCore          = "com.typesafe.akka"       %% "akka-http-core"                       % V.akkaHttp
   val akkaHttpTestkit       = "com.typesafe.akka"       %% "akka-http-testkit"                    % V.akkaHttp
   val akkaHtppJackson       = "com.typesafe.akka"       %% "akka-http-jackson"                    % V.akkaHttp

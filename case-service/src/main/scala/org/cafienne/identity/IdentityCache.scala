@@ -1,20 +1,29 @@
 package org.cafienne.identity
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.exception.AuthorizationException
+import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.actormodel.response.ActorLastModified
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
+import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.api.tenant.TenantReader
 import org.cafienne.service.db.query.UserQueries
+import org.cafienne.service.db.record.TenantRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentityProvider {
+  def getTenant(tenant: String): Future[TenantRecord] = ???
+
   def getPlatformUser(user: AuthenticatedUser, tlm: Option[String]): Future[PlatformUser] = ???
-  def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = ???
+
+  def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = ???
+
+  def getUserRegistration(userId: String): Future[PlatformUser] = ???
+
+  def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = ???
+
   def clear(userId: String): Unit = ???
 }
 
@@ -23,6 +32,7 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.
   private val cache = new SimpleLRUCache[String, PlatformUser](Cafienne.config.api.security.identityCacheSize)
+  private val tenantCache = new SimpleLRUCache[String, TenantRecord](Cafienne.config.api.security.identityCacheSize)
 
   override def getPlatformUser(user: AuthenticatedUser, tlm: Option[String]): Future[PlatformUser] = {
     tlm match {
@@ -37,28 +47,42 @@ class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext)
     }
   }
 
+  private def cacheUser(user: PlatformUser) = {
+    cache.put(user.id, user)
+    user
+  }
+
   private def executeUserQuery(user: AuthenticatedUser): Future[PlatformUser] = {
     cache.get(user.userId) match {
       case user: PlatformUser => Future(user)
-      case null => {
-        userQueries.getPlatformUser(user).map(u => {
-          if (u.users.isEmpty && !u.isPlatformOwner) {
-            logger.info(s"User ${user.userId} has a valid token, but is not registered in the case system")
-            throw AuthorizationException(s"User ${user.userId} is not registered in the case system")
-          }
-          cache.put(user.userId, u)
-          u
-        })
-      }
+      case null => userQueries.getPlatformUser(user.userId).map(cacheUser)
     }
   }
 
-  override def clear(userId: String) = {
+  override def getTenant(tenantId: String): Future[TenantRecord] = {
+    tenantCache.get(tenantId) match {
+      case tenant: TenantRecord => Future(tenant)
+      case null => userQueries.getTenant(tenantId).map(tenant => {
+        tenantCache.put(tenantId, tenant)
+        tenant
+      })
+    }
+  }
+
+  override def clear(userId: String): Unit = {
     // NOTE: We can also extend this to update the cache information, instead of removing keys.
     cache.remove(userId)
   }
 
-  override def getUsers(userIds: Seq[String], tenant: String): Future[Seq[TenantUser]] = {
-    userQueries.getSelectedTenantUsers(tenant, userIds)
+  override def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = {
+    userQueries.getPlatformUsers(userIds)
+  }
+
+  override def getUserRegistration(userId: String): Future[PlatformUser] = {
+    userQueries.getPlatformUser(userId)
+  }
+
+  override def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = {
+    userQueries.getConsentGroups(groupIds)
   }
 }

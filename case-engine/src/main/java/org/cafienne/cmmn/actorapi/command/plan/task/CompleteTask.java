@@ -43,16 +43,16 @@ public class CompleteTask extends CaseCommand {
      * @param taskOutput       An optional map with named output parameters for the task. These will be set on the task before the task is reported as complete. This
      *                         means that the parameters will also be bound to the case file, which may cause sentries to activate before the task completes.
      */
-    public CompleteTask(ModelActor<?,?> child, ValueMap taskOutput) {
-        super(child.getCurrentUser(), child.getParentActorId());
+    public CompleteTask(ModelActor child, ValueMap taskOutput) {
+        super(child.getCurrentUser().asCaseUserIdentity(), child.getParentActorId());
         this.taskId = child.getId();
         this.taskOutput = taskOutput;
     }
 
     public CompleteTask(ValueMap json) {
         super(json);
-        this.taskId = readField(json, Fields.taskId);
-        this.taskOutput = readMap(json, Fields.taskOutput);
+        this.taskId = json.readString(Fields.taskId);
+        this.taskOutput = json.readMap(Fields.taskOutput);
     }
 
     @Override

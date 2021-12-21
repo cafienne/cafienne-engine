@@ -9,9 +9,12 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> {
     private final PlanItem<?> containingPlanItem;
@@ -47,22 +50,7 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
      * @return
      */
     public boolean isAuthorized() {
-        Collection<CaseRoleDefinition> authorizedRoles = getAuthorizedRoles();
-
-        // When no roles have been defined, it is allowed.
-        if (authorizedRoles.isEmpty()) {
-            return true;
-        }
-
-        // Otherwise the current user must have the role in the case team.
-        Set<CaseRoleDefinition> rolesOfCurrentUser = getCaseInstance().getCurrentTeamMember().getRoles();
-        for (CaseRoleDefinition role : authorizedRoles) {
-            if (rolesOfCurrentUser.contains(role)) {
-                return true; // You're free to go
-            }
-        }
-
-        return false;
+        return getCaseInstance().getCurrentTeamMember().hasRoles(getAuthorizedRoles());
     }
 
     /**
@@ -74,20 +62,14 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
         containingStage.planChild(this, planItemId);
     }
 
-    /**
-     * Returns the type of the runtime plan item, e.g. CaseTask, Stage, UserEvent, etc.
-     *
-     * @return
-     */
-    public String getType() {
-        return getDefinition().getPlanItemDefinition().getType();
-    }
-
-    /**
-     * Returns the id of the plan item that provides the context for planning this discretionary item.
-     * @return
-     */
-    public String getParentId() {
-        return containingPlanItem.getId();
+    public ValueMap asJson() {
+        DiscretionaryItemDefinition definition = getDefinition();
+        String name = definition.getName();
+        String definitionId = definition.getId();
+        String type = definition.getType();
+        String parentName = containingPlanItem.getName();
+        String parentType = containingPlanItem.getType();
+        String parentId = containingPlanItem.getId();
+        return new ValueMap(Fields.name, name, Fields.definitionId, definitionId, Fields.type, type, Fields.parentName, parentName, Fields.parentType, parentType, Fields.parentId, parentId);
     }
 }

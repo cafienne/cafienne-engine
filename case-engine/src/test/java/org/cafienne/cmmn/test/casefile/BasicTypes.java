@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
@@ -17,6 +16,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
@@ -30,7 +30,7 @@ public class BasicTypes {
     private final String caseName = "CaseFileDefinitionTest";
     private final String inputParameterName = "inputCaseFile";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/basictypes.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path allPropertyTypesPath = new Path("AllPropertyTypes");
     private final Path childItemPath = new Path("AllPropertyTypes/ChildItem");
     private final Path childArrayPath = new Path("AllPropertyTypes/ArrayOfChildItem");
@@ -49,19 +49,19 @@ public class BasicTypes {
         }
         ValueMap contents = new ValueMap();
         // Put some contents in the input parameter
-        contents.putRaw("aString", "My favorite first string");
-        contents.putRaw("aBoolean", true);
-        contents.putRaw("aDate", "2001-10-26");
-        contents.putRaw("aDateTime", "2001-10-26T21:32:52");
-        contents.putRaw("aDuration", "PT2S");
-        contents.putRaw("aGDay", "---03");
-        contents.putRaw("aGMonthDay", "--05-01");
-        contents.putRaw("aGMonth", "--05");
-        contents.putRaw("aGYear", "-2003");
-        contents.putRaw("aGYearMonth", "2001-10");
-        contents.putRaw("anInteger", 10);
-        contents.putRaw("aDouble", 2.0);
-        contents.putRaw("aDecimal", 0.1);
+        contents.plus("aString", "My favorite first string");
+        contents.plus("aBoolean", true);
+        contents.plus("aDate", "2001-10-26");
+        contents.plus("aDateTime", "2001-10-26T21:32:52");
+        contents.plus("aDuration", "PT2S");
+        contents.plus("aGDay", "---03");
+        contents.plus("aGMonthDay", "--05-01");
+        contents.plus("aGMonth", "--05");
+        contents.plus("aGYear", "-2003");
+        contents.plus("aGYearMonth", "2001-10");
+        contents.plus("anInteger", 10);
+        contents.plus("aDouble", 2.0);
+        contents.plus("aDecimal", 0.1);
         return contents;
     }
 
@@ -78,7 +78,7 @@ public class BasicTypes {
         TestScript testCase = new TestScript(caseName);
 
         ValueMap inputs = getInputs();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(allPropertyTypesPath).assertValue(getContents(inputs)));
 
         testCase.runTest();
@@ -96,7 +96,7 @@ public class BasicTypes {
         Value<?> contents = inputs.getValue().remove(inputParameterName);
         inputs.put(wrongParameterName, contents);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.assertStepFails(startCase, action -> action.assertException(Exception.class, "An input parameter with name " + wrongParameterName + " is not defined in the case"));
 
         testCase.runTest();
@@ -129,14 +129,14 @@ public class BasicTypes {
         ValueMap contents = getContents(inputs);
         // Make a clone of contents and enter the wrong property
         ValueMap wrongContents = contents.cloneValueNode();
-        wrongContents.putRaw(propertyName, propertyValue);
+        wrongContents.plus(propertyName, propertyValue);
         // And now clone the inputs and put the wrong parameter in it
         ValueMap wrongInputs = inputs.cloneValueNode();
         wrongInputs.put(inputParameterName, wrongContents);
 
         String caseInstanceId = "TestingWrongProperty" + propertyName + "_" + new Guid(); // Make a new CaseInstanceId to overcome framework
         // limitation.
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, wrongInputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, wrongInputs.cloneValueNode());
         testCase.assertStepFails(startCase, action -> action.assertException(CaseFileError.class, "Property '" + propertyName + "' has wrong type"));
     }
 
@@ -149,12 +149,12 @@ public class BasicTypes {
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("aChildString", "child-string");
-        childItem.putRaw("aSecondChildString", "child-string-2");
+        childItem.plus("aChildString", "child-string");
+        childItem.plus("aSecondChildString", "child-string-2");
 
         contents.put("ChildItem", childItem);
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(childItem));
 
         testCase.runTest();
@@ -166,13 +166,13 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("aChildString", "child-string");
-        childItem.putRaw("aSecondChildString", "child-string-2");
+        childItem.plus("aChildString", "child-string");
+        childItem.plus("aSecondChildString", "child-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childItemPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(childItem));
 
@@ -180,8 +180,8 @@ public class BasicTypes {
         // inserted
         // Effectively this should merge old and new content.
         ValueMap updatedContent = new ValueMap();
-        updatedContent.putRaw("aChildString", "aNewChildString");
-        updatedContent.putRaw("aChildInteger", 9);
+        updatedContent.plus("aChildString", "aNewChildString");
+        updatedContent.plus("aChildInteger", 9);
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
@@ -192,7 +192,7 @@ public class BasicTypes {
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
-        replacedChildItem.putRaw("aChildInteger", 3);
+        replacedChildItem.plus("aChildInteger", 3);
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), childItemPath);
         testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(replacedChildItem));
 
@@ -209,27 +209,27 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(this.childItemPath).assertValue(Value.NULL));
 
         // Create a child item; child item contains an invalid value, so it should reject the operation, and child should still be null
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("aChildString", "child-string");
-        childItem.putRaw("aChildInteger", "I should be an integer");
+        childItem.plus("aChildString", "child-string");
+        childItem.plus("aChildInteger", "I should be an integer");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childItemPath);
         testCase.assertStepFails(createChild);
 
         // Update the child item; Should fail because child is still not created
         ValueMap updatedContent = new ValueMap();
-        updatedContent.putRaw("aChildString", "aNewChildString");
-        updatedContent.putRaw("aChildInteger", "I should be an integer");
+        updatedContent.plus("aChildString", "aNewChildString");
+        updatedContent.plus("aChildInteger", "I should be an integer");
         
         UpdateCaseFileItem updateChild = new UpdateCaseFileItem(testUser, caseInstanceId, updatedContent.cloneValueNode(), childItemPath);
         testCase.assertStepFails(updateChild);
 
         // Replace the child item; Should fail because child is still not created
         ValueMap replacedChildItem = new ValueMap();
-        replacedChildItem.putRaw("aChildInteger", "I should be an integer");
+        replacedChildItem.plus("aChildInteger", "I should be an integer");
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), childItemPath);
         testCase.assertStepFails(replaceChild);
 
@@ -240,8 +240,8 @@ public class BasicTypes {
         // Now create a proper child and then we should fail in updating and replacing it
 
         // Create a child item; child item contains an invalid value, so it should reject the operation, and child should still be null
-        childItem.putRaw("aChildString", "child-string");
-        childItem.putRaw("aChildInteger", 9);
+        childItem.plus("aChildString", "child-string");
+        childItem.plus("aChildInteger", 9);
         createChild = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), childItemPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(this.childItemPath).assertValue(childItem));
 
@@ -265,13 +265,13 @@ public class BasicTypes {
         TestScript testCase = new TestScript(caseName);
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("aChildString", "child-string");
-        childItem.putRaw("aSecondChildString", "child-string-2");
+        childItem.plus("aChildString", "child-string");
+        childItem.plus("aSecondChildString", "child-string-2");
 
         ValueList arrayOfChildItem = new ValueList();
         arrayOfChildItem.add(childItem.cloneValueNode());
@@ -283,8 +283,8 @@ public class BasicTypes {
         // inserted
         // Effectively this should merge old and new content.
         ValueMap updatedContent = new ValueMap();
-        updatedContent.putRaw("aChildString", "aNewChildString");
-        updatedContent.putRaw("aChildInteger", 9);
+        updatedContent.plus("aChildString", "aNewChildString");
+        updatedContent.plus("aChildInteger", 9);
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
@@ -295,7 +295,7 @@ public class BasicTypes {
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
-        replacedChildItem.putRaw("aChildInteger", 3);
+        replacedChildItem.plus("aChildInteger", 3);
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), child0);
         testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(replacedChildItem));
 
@@ -312,13 +312,13 @@ public class BasicTypes {
 
         ValueMap inputs = getInputs();
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(childItemPath).assertValue(Value.NULL));
 
         // Now start a case with a child being set within the JSON input
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("aChildString", "child-string");
-        childItem.putRaw("aSecondChildString", "child-string-2");
+        childItem.plus("aChildString", "child-string");
+        childItem.plus("aSecondChildString", "child-string-2");
 
         ValueList arrayOfChildItem = new ValueList();
         arrayOfChildItem.add(childItem.cloneValueNode());
@@ -343,8 +343,8 @@ public class BasicTypes {
         // inserted
         // Effectively this should merge old and new content.
         ValueMap updatedContent = new ValueMap();
-        updatedContent.putRaw("aChildString", "aNewChildString");
-        updatedContent.putRaw("aChildInteger", 9);
+        updatedContent.plus("aChildString", "aNewChildString");
+        updatedContent.plus("aChildInteger", 9);
 
         // Create a clone an merge old and new content to create a new object that is expected to be the result of the UpdateCaseFileItem operation
         ValueMap childItemClone = childItem.cloneValueNode();
@@ -355,7 +355,7 @@ public class BasicTypes {
 
         // Now replace the child item.
         ValueMap replacedChildItem = new ValueMap();
-        replacedChildItem.putRaw("aChildInteger", 3);
+        replacedChildItem.plus("aChildInteger", 3);
         ReplaceCaseFileItem replaceChild = new ReplaceCaseFileItem(testUser, caseInstanceId, replacedChildItem.cloneValueNode(), child0);
         testCase.addStep(replaceChild, caseFile -> caseFile.assertCaseFileItem(child0).assertValue(replacedChildItem));
 

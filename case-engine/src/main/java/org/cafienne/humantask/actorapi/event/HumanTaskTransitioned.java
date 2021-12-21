@@ -35,9 +35,9 @@ public abstract class HumanTaskTransitioned extends HumanTaskEvent {
 
     protected HumanTaskTransitioned(ValueMap json) {
         super(json);
-        this.currentState = json.getEnum(Fields.currentState, TaskState.class);
-        this.historyState = json.getEnum(Fields.historyState, TaskState.class);
-        this.transition = json.getEnum(Fields.transition, TaskAction.class);
+        this.currentState = json.readEnum(Fields.currentState, TaskState.class);
+        this.historyState = json.readEnum(Fields.historyState, TaskState.class);
+        this.transition = json.readEnum(Fields.transition, TaskAction.class);
     }
 
     public void writeTransitionEvent(JsonGenerator generator) throws IOException {

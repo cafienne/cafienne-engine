@@ -53,7 +53,7 @@ public class StageDefinition extends PlanFragmentDefinition {
         DiscretionaryItemDefinition diDefinition = null;
         if (planningTable != null) {
             // Let's first check our stage-level planning table
-            return diDefinition = planningTable.getDiscretionaryItem(identifier);
+            diDefinition = planningTable.getDiscretionaryItem(identifier);
         }
         if (diDefinition == null) {
             // Perhaps it is in one of our HumanTasks

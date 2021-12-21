@@ -2,20 +2,20 @@ package org.cafienne.actormodel.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 import java.time.Instant;
 
-public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements ModelEvent<M> {
+public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent<M> {
     private final ValueMap json;
 
     // Serializable fields
     private final String actorId;
     public final String tenant;
-    private final TenantUser tenantUser;
+    private final UserIdentity user;
     private final Instant timestamp;
 
     /**
@@ -26,20 +26,20 @@ public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements Model
 
     protected BaseModelEvent(M actor) {
         this.json = new ValueMap();
+        this.actor = actor;
         this.actorId = actor.getId();
         this.tenant = actor.getTenant();
-        this.tenantUser = actor.getCurrentUser();
-        this.actor = actor;
+        this.user = actor.getCurrentUser();
         this.timestamp = actor.getTransactionTimestamp();
     }
 
     protected BaseModelEvent(ValueMap json) {
         this.json = json;
         ValueMap modelEventJson = json.with(Fields.modelEvent);
-        this.actorId = readField(modelEventJson, Fields.actorId);
-        this.tenant = readField(modelEventJson, Fields.tenant);
-        this.timestamp = readInstant(modelEventJson, Fields.timestamp);
-        this.tenantUser = TenantUser.from(modelEventJson.with(Fields.user));
+        this.actorId = modelEventJson.readString(Fields.actorId);
+        this.tenant = modelEventJson.readString(Fields.tenant);
+        this.timestamp = modelEventJson.readInstant(Fields.timestamp);
+        this.user = modelEventJson.readObject(Fields.user, UserIdentity::deserialize);
     }
 
     @Override
@@ -72,8 +72,8 @@ public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements Model
      *
      * @return
      */
-    public final TenantUser getUser() {
-        return tenantUser;
+    public final UserIdentity getUser() {
+        return user;
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class BaseModelEvent<M extends ModelActor<?,?>> implements Model
         writeField(generator, Fields.actorId, this.getActorId());
         writeField(generator, Fields.tenant, this.tenant);
         writeField(generator, Fields.timestamp, this.timestamp);
-        writeField(generator, Fields.user, tenantUser);
+        writeField(generator, Fields.user, user);
         generator.writeEndObject();
     }
 

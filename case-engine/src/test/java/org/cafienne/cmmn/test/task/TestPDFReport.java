@@ -6,13 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.event.ProcessCompleted;
@@ -23,7 +22,7 @@ import java.io.*;
 
 public class TestPDFReport {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/pdfreport.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testReportGeneration() throws IOException {
@@ -36,11 +35,11 @@ public class TestPDFReport {
 
         ValueMap inputs = new ValueMap();
         ValueMap request = inputs.with("Request");
-        request.putRaw("customerJrXml", reportXml);
-        request.putRaw("orderJrXml", subReportXml);
-        request.putRaw("jsonData", customerData);
+        request.plus("customerJrXml", reportXml);
+        request.plus("orderJrXml", subReportXml);
+        request.plus("jsonData", customerData);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, action -> {
             String reportTaskId = testCase.getEventListener().awaitPlanItemState("Generate Report", State.Available).getPlanItemId();
 
@@ -50,7 +49,7 @@ public class TestPDFReport {
             testCase.getEventListener().awaitPlanItemState(reportTaskId, State.Completed);
 
             // TODO: perhaps this test should test the actual PDF report contents???
-            testCase.insertStep(new PingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem(new Path("Request/pdfReportData")).assertValueType(StringValue.class));
+            testCase.insertStep(testCase.createPingCommand(testUser, caseInstanceId, 0), result -> result.assertCaseFileItem(new Path("Request/pdfReportData")).assertValueType(StringValue.class));
 
             // Assert that the ProcessActor has published events
             testCase.getEventListener().getEvents().assertEventType(ProcessStarted.class, 1).assertEventType(ProcessCompleted.class, 1);

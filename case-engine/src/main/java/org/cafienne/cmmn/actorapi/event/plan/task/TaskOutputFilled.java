@@ -28,8 +28,8 @@ public class TaskOutputFilled extends TaskEvent<Task<?>> {
 
     public TaskOutputFilled(ValueMap json) {
         super(json);
-        this.parameters = readMap(json, Fields.parameters);
-        this.rawOutputParameters = readMap(json, Fields.rawOutputParameters);
+        this.parameters = json.readMap(Fields.parameters);
+        this.rawOutputParameters = json.readMap(Fields.rawOutputParameters);
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.json.ValueMap
-import org.cafienne.service.db.materializer.cases.CaseProjectionsWriter
+import org.cafienne.service.db.materializer.cases.CaseEventSink
 import org.cafienne.service.db.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
@@ -43,11 +43,11 @@ class CaseInstanceWriterTest
 
   val persistence = new TestPersistence()
 
-  val cpw = new CaseProjectionsWriter(persistence, NoOffsetStorage)
+  val cpw = new CaseEventSink(persistence, NoOffsetStorage)
   cpw.start()
 
   val caseInstanceId = "9fc49257_7d33_41cb_b28a_75e665ee3b2c"
-  val user = TestIdentityFactory.createPlatformUser("test", "", List())
+  val user = TestIdentityFactory.createPlatformUser("test", "", Set())
   val caseDefinition = TestScript.getCaseDefinition("helloworld.xml")
 
   val eventFactory = new EventFactory(caseInstanceId, caseDefinition, user.getTenantUser(""))

@@ -6,7 +6,7 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.actorapi.command.TenantCommand;
 
 @Manifest
-public class TenantResponse extends ModelResponse {
+public class  TenantResponse extends ModelResponse {
     public TenantResponse(TenantCommand command) {
         super(command);
     }

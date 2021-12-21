@@ -8,18 +8,18 @@
 package org.cafienne.service.api.tasks
 
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.cmmn.actorapi.command.CaseCommandModels
 import org.cafienne.humantask.actorapi.command._
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
 import org.cafienne.json.ValueMap
-import org.cafienne.service.api.model.Examples
+import org.cafienne.service.api.tasks.model.TaskAPI._
 import org.cafienne.service.db.query.{TaskCount, TaskQueries}
 import org.cafienne.system.CaseSystem
 
@@ -29,7 +29,7 @@ import javax.ws.rs._
 @Path("/tasks")
 class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TaskRoute {
 
-  override def routes = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)
+  override def routes: Route = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)
 
   @Path("/user/count")
   @GET
@@ -45,7 +45,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     )
   )
   @Produces(Array("application/json"))
-  def getTaskCount = get {
+  def getTaskCount: Route = get {
     validUser { platformUser =>
       parameters("tenant".?) { tenant =>
         path("user" / "count") {
@@ -70,9 +70,9 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
+  @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.TaskOutputFormat]))))
   @Produces(Array("application/json"))
-  def validateTaskOutput = post {
+  def validateTaskOutput: Route = post {
     validUser { platformUser =>
       path(Segment) { taskId =>
         entity(as[ValueMap]) {
@@ -96,9 +96,9 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
+  @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.TaskOutputFormat]))))
   @Produces(Array("application/json"))
-  def saveTaskOutput = put {
+  def saveTaskOutput: Route = put {
     validUser { platformUser =>
       path(Segment) { taskId =>
         entity(as[ValueMap]) { outputParams =>
@@ -123,7 +123,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     )
   )
   @Produces(Array("application/json"))
-  def claimTaskRoute =
+  def claimTaskRoute: Route =
     put {
       validUser { platformUser =>
         path(Segment / "claim") {
@@ -147,7 +147,7 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
     )
   )
   @Produces(Array("application/json"))
-  def revokeTaskRoute =
+  def revokeTaskRoute: Route =
     put {
       validUser { platformUser =>
         path(Segment / "revoke") {
@@ -170,20 +170,16 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Id of the user to which the task must be assigned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseCommandModels.Assignee]))))
+  @RequestBody(description = "Id of the user to which the task must be assigned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Assignee]))))
   @Produces(Array("application/json"))
-  def assignTaskRoute =
+  def assignTaskRoute: Route =
     put {
       validUser { platformUser =>
         path(Segment / "assign") {
           taskId =>
             requestEntityPresent {
-              import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-              import spray.json.DefaultJsonProtocol._
-              implicit val format = jsonFormat1(CaseCommandModels.Assignee)
-
-              entity(as[CaseCommandModels.Assignee]) { data =>
-                askTaskWithMember(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
+              entity(as[Assignee]) { data =>
+                askTaskWithAssignee(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }
@@ -204,20 +200,16 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Task not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Id of the user to which the task must be assigned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseCommandModels.Assignee]))))
+  @RequestBody(description = "Id of the user to which the task must be assigned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Assignee]))))
   @Produces(Array("application/json"))
-  def delegateTaskRoute =
+  def delegateTaskRoute: Route =
     put {
       validUser { platformUser =>
         path(Segment / "delegate") {
           taskId =>
             requestEntityPresent {
-              import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-              import spray.json.DefaultJsonProtocol._
-              implicit val format = jsonFormat1(CaseCommandModels.Assignee)
-
-              entity(as[CaseCommandModels.Assignee]) { data =>
-                askTaskWithMember(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
+              entity(as[Assignee]) { data =>
+                askTaskWithAssignee(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }
@@ -239,9 +231,9 @@ class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userC
       new ApiResponse(description = "Unable to complete the task because the task output is invalid", responseCode = "400"),
     )
   )
-  @RequestBody(description = "Output (optional) to complete the task with", required = false, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.OutputParametersFormat]))))
+  @RequestBody(description = "Output (optional) to complete the task with", required = false, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.TaskOutputFormat]))))
   @Produces(Array("application/json"))
-  def completeTaskRoute =
+  def completeTaskRoute: Route =
     post {
       validUser { platformUser =>
         path(Segment / "complete") {

@@ -10,13 +10,12 @@ package org.cafienne.cmmn.actorapi.command.plan;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseNotModifiedResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -44,7 +43,7 @@ public class MakePlanItemTransition extends CaseCommand {
      *                       invoked on the new plan item.
      * @param transition     The transition to make on the plan item(s)
      */
-    public MakePlanItemTransition(TenantUser user, String caseInstanceId, String identifier, Transition transition) {
+    public MakePlanItemTransition(CaseUserIdentity user, String caseInstanceId, String identifier, Transition transition) {
         super(user, caseInstanceId);
         this.identifier = identifier;
         this.transition = transition;
@@ -52,8 +51,8 @@ public class MakePlanItemTransition extends CaseCommand {
 
     public MakePlanItemTransition(ValueMap json) {
         super(json);
-        this.identifier = readField(json, Fields.identifier);
-        this.transition = readEnum(json, Fields.transition, Transition.class);
+        this.identifier = json.readString(Fields.identifier);
+        this.transition = json.readEnum(Fields.transition, Transition.class);
     }
 
     public String getIdentifier() {

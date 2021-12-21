@@ -23,7 +23,7 @@ public class TerminateModelActor implements CafienneSerializable {
     }
 
     public TerminateModelActor(ValueMap json) {
-        this.actorId = json.raw(Fields.actorId);
+        this.actorId = json.readString(Fields.actorId);
     }
 
     @Override

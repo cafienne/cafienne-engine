@@ -3,11 +3,10 @@ package org.cafienne.system.bootstrap
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.TenantUserInformation
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant
 import org.cafienne.tenant.actorapi.response.TenantResponse
 
@@ -82,31 +81,35 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
       val ownerIds = {
         if (tenantConfig.hasPath("owners")) {
-          tenantConfig.getStringList("owners").asScala
+          val list = tenantConfig.getStringList("owners").asScala
+          logger.warn(s"""Bootstrap tenant '$tenantName' in file '${configFile.getName}' uses deprecated property 'owners = [${list.mkString("\"", "\", \"", "\"")}]'. Use 'isOwner = true' inside the designated users instead.""")
+          list
         } else {
           Seq()
         }
       } // Owners MUST exist
 
-      val users: Seq[TenantUserInformation] = tenantConfig.getConfigList("users").asScala.toSeq.map(user => {
+      val users: Seq[TenantUser] = tenantConfig.getConfigList("users").asScala.toSeq.map(user => {
         val userId = user.getString("id")
-        val roles = readStringList(user, "roles")
+        val roles = readStringList(user, "roles").toSet
         val name = readStringOr(user, "name", "")
         val email = readStringOr(user, "email", "")
         val isOwner = readBooleanOr(user, "isOwner", ownerIds.contains(userId))
-        TenantUserInformation(userId, roles = Some(roles), name = Some(name), email = Some(email), owner = Some(isOwner), enabled = Some(true))
+        TenantUser(id = userId, tenant = tenantName, roles = roles, name = name, email = email, isOwner = isOwner)
       })
 
-      if (!users.exists(_.isOwner())) {
+      if (!users.exists(_.isOwner)) {
         throw new BootstrapFailure(s"Bootstrap tenant '$tenantName' misses a mandatory tenant owner. File ${configFile.getAbsolutePath}")
       }
 
       val undefinedOwners = ownerIds.filter(id => !users.map(u => u.id).contains(id))
       if (undefinedOwners.nonEmpty) {
-        throw new BootstrapFailure("All bootstrap tenant owners must be defined as user. Following users not found: " + undefinedOwners)
+        val msg = s"""Bootstrap tenant '$tenantName' in file ${configFile.getAbsolutePath} mentions owner(s) [${undefinedOwners.mkString("\"", "\", \"", "\"")}], but corresponding users are not defined in the file."""
+        logger.error("FATAL ERROR: " + msg)
+        throw new BootstrapFailure(msg)
       }
 
-      val aPlatformOwner = PlatformUser(Cafienne.config.platform.platformOwners.get(0), Seq())
+      val aPlatformOwner = Cafienne.config.platform.platformOwners.head
 
       new CreateTenant(aPlatformOwner, tenantName, tenantName, users.asJava)
 

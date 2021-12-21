@@ -32,15 +32,15 @@ public class TimerJob implements CafienneSerializable {
     }
 
     public TimerJob(ValueMap json) {
-        this.caseInstanceId = readField(json, Fields.caseInstanceId);
-        this.moment = readInstant(json, Fields.moment);
-        this.timerId = readField(json, Fields.timerId);
-        this.user = TenantUser.from(json.with(Fields.user));
+        this.caseInstanceId = json.readString(Fields.caseInstanceId);
+        this.moment = json.readInstant(Fields.moment);
+        this.timerId = json.readString(Fields.timerId);
+        this.user = json.readObject(Fields.user, TenantUser::deserialize);
     }
 
     @Override
     public String toString() {
-        return "Timer[" + timerId + "] in case ["+caseInstanceId+"] on behalf of user " + user.id();
+        return "Timer[" + timerId + "] in case [" + caseInstanceId + "] on behalf of user " + user.id();
     }
 
     @Override

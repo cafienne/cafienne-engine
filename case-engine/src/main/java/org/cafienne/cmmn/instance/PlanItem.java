@@ -9,9 +9,12 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
-import org.cafienne.cmmn.actorapi.event.plan.*;
+import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
@@ -509,6 +512,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Returns true if the plan item's parent is in active state.
      * Returns always true for the case plan.
+     *
      * @return
      */
     public boolean hasActiveParent() {
@@ -519,11 +523,12 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Method that can be used by MakePlanItemTransition command to determine whether this plan item
      * can go through the suggested transition.
      * Checks whether the parent stage is in Active state.
+     *
      * @param transition
      */
     public void validateTransition(Transition transition) {
-        if (! hasActiveParent()) {
-            throw new InvalidCommandException("Cannot perform action '"+transition +"' on '" + getName()+"', since the surrounding stage is not active");
+        if (!hasActiveParent()) {
+            throw new InvalidCommandException("Cannot perform action '" + transition + "' on '" + getName() + "', since the surrounding stage is not active");
         }
     }
 
@@ -597,7 +602,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition) {
-        MigDevConsole("\n==================== Giving " + this.getClass().getSimpleName() + " " + getName() + " a new item definition:\n");
+        addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
         super.migrateDefinition(newDefinition);
         setItemDefinition(newItemDefinition);
         if (getState() != State.Null) {
@@ -614,6 +619,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         }
         getEntryCriteria().migrateCriteria(newItemDefinition);
         getExitCriteria().migrateCriteria(newItemDefinition);
+        addDebugInfo(() -> "=== Completed migration of " + this + "\n");
     }
 
     private boolean hasNewNameOrId() {

@@ -1,11 +1,8 @@
 package org.cafienne.actormodel;
 
-import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
@@ -20,51 +17,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generic MessageHandler for incoming messages in ModelActors.
+ * Generic MessageHandler for incoming messages in ModelActors
+ * An incoming message may lead to state changes in the ModelActor, and these can be added as ModelEvents.
+ * In that sense, the MessageHandler can be considered like a sort of a transaction, but the handler
+ * is itself responsible for persisting events
  * Message handlers must support 2 phases of handling a message:
  * <ul>
  * <li>{@link MessageHandler#process()}</li>
  * <li>{@link MessageHandler#complete()}</li>
  * </ul>
- * There are 3 types of message handler. Using a generic M to abstract the differences.
  *
- * @param <M>
  */
-public abstract class MessageHandler<M, C extends ModelCommand<A>, E extends ModelEvent<A>, A extends ModelActor<C, E>> {
+public abstract class MessageHandler {
     /**
      * The ModelActor to which the message was sent
      */
-    protected final A actor;
+    protected final ModelActor actor;
     /**
      * The message that was sent to the actor that is being handled by this handler.
      */
-    protected final M msg;
-
-    protected final TenantUser user;
+    protected final Object msg;
 
     private final static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     private final static int avgNumEvents = 30;
 
-    protected final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
+    protected final List<ModelEvent<?>> events = new ArrayList<>(avgNumEvents);
 
     private DebugEvent debugEvent;
 
-    protected MessageHandler(A actor, M msg, TenantUser user) {
+    protected MessageHandler(ModelActor actor, Object msg) {
         this.actor = actor;
-        this.actor.setCurrentUser(user);
         this.msg = msg;
-        this.user = user;
-    }
-
-    /**
-     * Lifecycle method
-     * Returns null if there are no security issues, or an exception if some are found
-     *
-     * @return
-     */
-    protected AuthorizationException runSecurityChecks() {
-        return null;
     }
 
     protected void checkEngineVersion() {
@@ -92,15 +76,11 @@ public abstract class MessageHandler<M, C extends ModelCommand<A>, E extends Mod
      *
      * @param event
      */
-    public <EV extends E> EV addEvent(EV event) {
-        return addModelEvent(event);
-    }
-
-    protected <ME extends ModelEvent> ME addModelEvent(ME event) {
+    public ModelEvent<?> addEvent(ModelEvent<?> event) {
         return addModelEvent(events.size(), event);
     }
 
-    protected <ME extends ModelEvent> ME addModelEvent(int index, ME event) {
+    protected ModelEvent<?> addModelEvent(int index, ModelEvent event) {
         events.add(index, event);
         addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);
         event.updateState(actor);
@@ -187,7 +167,7 @@ public abstract class MessageHandler<M, C extends ModelCommand<A>, E extends Mod
      * @return
      */
     protected boolean hasOnlyDebugEvents() {
-        boolean hasOnlyDebugEvents = ! events.stream().anyMatch(e -> ! (e instanceof DebugEvent));
+        boolean hasOnlyDebugEvents = events.stream().allMatch(e -> e instanceof DebugEvent);
         return hasOnlyDebugEvents;
     }
 }

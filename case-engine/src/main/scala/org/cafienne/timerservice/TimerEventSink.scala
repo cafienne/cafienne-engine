@@ -39,7 +39,7 @@ class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: Ca
 
   def setTimer(event: TimerSet, offset: Offset): Future[Done] = {
     logger.debug(s"${event.getClass.getSimpleName} on timer ${event.getTimerId} in case ${event.getActorId} (triggering at ${event.getTargetMoment})")
-    val job: Timer = Timer(event.getCaseInstanceId, event.getTimerId, event.getTargetMoment, event.getUser)
+    val job: Timer = Timer(event.getCaseInstanceId, event.getTimerId, event.getTargetMoment, event.getUser.id)
     scheduleTimer(job)
     storage.storeTimer(job, Some(offset))
   }

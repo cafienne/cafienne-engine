@@ -15,7 +15,6 @@ import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import scala.collection.Seq;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -189,8 +188,13 @@ public abstract class Value<T> implements Serializable {
             return (Value<?>) object;
         } else if (object instanceof String) {
             return new StringValue((String) object);
-        } else if (object instanceof Seq) {
-            Seq<?> list = (Seq<?>) object;
+        } else if (object instanceof scala.collection.Map) {
+            scala.collection.Map<?, ?> map = (scala.collection.Map<?, ?>) object;
+            ValueMap valueMap = new ValueMap();
+            map.foreach(entry -> valueMap.put(String.valueOf(entry._1()), convert(entry._2())));
+            return valueMap;
+        } else if (object instanceof scala.collection.Iterable) {
+            scala.collection.Iterable<?> list = (scala.collection.Iterable<?>) object;
             ValueList valueList = new ValueList();
             list.foreach(item -> valueList.add(convert(item)));
             return valueList;
@@ -224,19 +228,12 @@ public abstract class Value<T> implements Serializable {
         } else if (object instanceof Instant) {
             return new InstantValue((Instant) object);
         } else if (object instanceof Map) {
-            try {
-                // TODO: Isn't there a cleaner way of checking that the Map is of type Map<String, ?>
-                // Because we catch the exception it is not really unchecked...
-                @SuppressWarnings("unchecked")
-                Map<String, ?> map = (Map<String, ?>) object;
-                ValueMap valueMap = new ValueMap();
-                for (Entry<String, ?> entry : map.entrySet()) {
-                    valueMap.put(entry.getKey(), convert(entry.getValue()));
-                }
-                return valueMap;
-            } catch (ClassCastException cce) {
-                return new SerializableValue(object);
+            Map<?, ?> map = (Map<?, ?>) object;
+            ValueMap valueMap = new ValueMap();
+            for (Entry<?, ?> entry : map.entrySet()) {
+                valueMap.put(String.valueOf(entry.getKey()), convert(entry.getValue()));
             }
+            return valueMap;
         } else if (object instanceof Set) {
             Set<?> list = (Set<?>) object;
             ValueList valueList = new ValueList();

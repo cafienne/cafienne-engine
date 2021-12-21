@@ -26,7 +26,7 @@ public class RequiredRuleEvaluated extends PlanItemEvent {
 
     public RequiredRuleEvaluated(ValueMap json) {
         super(json);
-        this.isRequired = readField(json, Fields.isRequired);
+        this.isRequired = json.readBoolean(Fields.isRequired);
     }
 
     public boolean isRequired() {

@@ -8,7 +8,8 @@ import slick.migration.api.TableMigration
 object QueryDB_1_1_11 extends DbSchemaVersion with QueryDBSchema
   with CaseTables
   with TaskTables
-  with TenantTables {
+  with TenantTables
+  with CafienneTablesV2 {
 
   val version = "1.1.11"
   val migrations = (

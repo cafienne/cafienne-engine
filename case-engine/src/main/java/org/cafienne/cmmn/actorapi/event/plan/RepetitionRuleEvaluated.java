@@ -26,7 +26,7 @@ public class RepetitionRuleEvaluated extends PlanItemEvent {
 
     public RepetitionRuleEvaluated(ValueMap json) {
         super(json);
-        this.isRepeating = readField(json, Fields.isRepeating);
+        this.isRepeating = json.readBoolean(Fields.isRepeating);
     }
 
     public boolean isRepeating() {

@@ -9,56 +9,38 @@ package org.cafienne.service.api.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.complete
-import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
+import akka.http.scaladsl.server.Route
+import org.cafienne.actormodel.identity.{PlatformOwner, PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.tenant.TenantReader
-import org.cafienne.service.api.tenant.model.TenantAPI.{BackwardsCompatibleTenantFormat, UserFormat}
-import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, PlatformTenantCommand}
-import org.cafienne.tenant.actorapi.command.{TenantCommand, TenantUserInformation}
+import org.cafienne.service.db.materializer.LastModifiedRegistration
+import org.cafienne.tenant.actorapi.command.TenantCommand
+import org.cafienne.tenant.actorapi.command.platform.PlatformTenantCommand
 
 trait TenantRoute extends CommandRoute with QueryRoute {
 
-  override val lastModifiedRegistration = TenantReader.lastModifiedRegistration
+  override val lastModifiedRegistration: LastModifiedRegistration = TenantReader.lastModifiedRegistration
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 
-  def askPlatform(command: PlatformTenantCommand) = {
+  def validPlatformOwner(subRoute: PlatformOwner => Route): Route = {
+    validUser { platformUser =>
+      if (platformUser.isPlatformOwner) {
+        subRoute(PlatformOwner(platformUser.id))
+      } else {
+        complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
+      }
+    }
+  }
+
+  def askPlatform(command: PlatformTenantCommand): Route = {
     askModelActor(command)
   }
 
-  def askTenant(platformUser: PlatformUser, tenant: String, createTenantCommand: CreateTenantCommand) = {
+  def askTenant(platformUser: PlatformUser, tenant: String, createTenantCommand: TenantUser => TenantCommand): Route = {
     askModelActor(createTenantCommand.apply(platformUser.getTenantUser(tenant)))
   }
 
-  trait CreateTenantCommand {
-    def apply(tenantUser: TenantUser): TenantCommand
-  }
-
-  def invokeCreateTenant(platformOwner: PlatformUser, newTenant: BackwardsCompatibleTenantFormat) = {
-    import scala.jdk.CollectionConverters._
-
-    val users = convertToTenant(newTenant).asJava
-    if (users.isEmpty) {
-      complete(StatusCodes.BadRequest, "Creation of tenant cannot be done without users and at least one owner")
-    } else {
-      val newTenantName = newTenant.name
-      askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, users))
-    }
-  }
-
-  def convertToTenant(tenant: BackwardsCompatibleTenantFormat): Seq[TenantUserInformation] = {
-    val users = tenant.users.getOrElse(tenant.owners.getOrElse(Seq()))
-    val defaultOwnership: Option[Boolean] = {
-      if (tenant.users.isEmpty && tenant.owners.nonEmpty) Some(true) // Owners is the old format, then all users become owner.
-      else None // In the new format every owner must be explicitly defined
-    }
-    users.map(user => asTenantUser(user, tenant.name, defaultOwnership))
-  }
-
-  def asTenantUser(user: UserFormat, tenant: String, defaultOwnership: Option[Boolean] = None): TenantUserInformation = {
-    val ownerShip = defaultOwnership.fold(user.isOwner)(Some(_))
-    TenantUserInformation(user.userId, roles = user.roles, name = user.name, email = user.email, owner = ownerShip, enabled = user.enabled)
-  }
 }
 

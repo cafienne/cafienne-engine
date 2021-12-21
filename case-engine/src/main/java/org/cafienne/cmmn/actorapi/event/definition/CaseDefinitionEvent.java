@@ -29,8 +29,8 @@ public abstract class CaseDefinitionEvent extends CaseBaseEvent {
 
     protected CaseDefinitionEvent(ValueMap json) {
         super(json);
-        this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
-        this.caseName = readField(json, Fields.caseName);
+        this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
+        this.caseName = json.readString(Fields.caseName);
     }
 
     /**

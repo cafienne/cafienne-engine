@@ -6,34 +6,47 @@ import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.tenant.actorapi.command.TenantCommand;
-import org.cafienne.tenant.actorapi.command.TenantUserInformation;
 import org.cafienne.tenant.actorapi.event.TenantAppliedPlatformUpdate;
 import org.cafienne.tenant.actorapi.event.TenantEvent;
 import org.cafienne.tenant.actorapi.event.TenantModified;
-import org.cafienne.tenant.actorapi.event.TenantUserCreated;
+import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent;
 import org.cafienne.tenant.actorapi.event.platform.TenantCreated;
 import org.cafienne.tenant.actorapi.event.platform.TenantDisabled;
 import org.cafienne.tenant.actorapi.event.platform.TenantEnabled;
+import org.cafienne.tenant.actorapi.event.user.TenantUserAdded;
+import org.cafienne.tenant.actorapi.event.user.TenantUserChanged;
+import org.cafienne.tenant.actorapi.event.user.TenantUserRemoved;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * TenantActor manages users and their roles inside a tenant.
  */
-public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
+public class TenantActor extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(TenantActor.class);
 
     private TenantCreated creationEvent;
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, TenantUser> users = new HashMap<>();
     private boolean disabled = false; // TODO: we can add some behavior behind this...
 
     public TenantActor(CaseSystem caseSystem) {
-        super(TenantCommand.class, TenantEvent.class, caseSystem);
+        super(caseSystem);
+    }
+
+    @Override
+    protected boolean supportsCommand(Object msg) {
+        return msg instanceof TenantCommand;
+    }
+
+    @Override
+    protected boolean supportsEvent(Object msg) {
+        return msg instanceof TenantEvent;
     }
 
     @Override
@@ -50,30 +63,43 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         return this.creationEvent != null;
     }
 
-    public void createInstance(List<TenantUserInformation> newUsers) {
+    public void createInstance(List<TenantUser> newUsers) {
         addEvent(new TenantCreated(this));
-        updateInstance(newUsers);
+        replaceInstance(newUsers);
     }
 
-    public void replaceInstance(List<TenantUserInformation> newUsers) {
-        new HashMap<>(users).keySet().forEach(userId -> {
-            if (newUsers.stream().noneMatch(user -> user.id().equals(userId))) {
-                users.get(userId).disable();
+    public void replaceInstance(List<TenantUser> newUsers) {
+        // Remove users that no longer exist
+        users.keySet().stream().filter(userId -> newUsers.stream().noneMatch(newUser -> newUser.id().equals(userId))).collect(Collectors.toList()).forEach(this::removeUser);
+        // Update existing and add new users
+        newUsers.forEach(this::setUser);
+    }
+
+    public void removeUser(String userId) {
+        TenantUser user = users.get(userId);
+        if (user != null) {
+            addEvent(new TenantUserRemoved(this, user));
+        }
+    }
+
+    public void setUser(TenantUser newUserInfo) {
+        TenantUser existingUser = users.get(newUserInfo.id());
+        if (existingUser == null) {
+            addEvent(new TenantUserAdded(this, newUserInfo));
+        } else {
+            if (existingUser.differs(newUserInfo)) {
+                Set<String> removedRoles = existingUser.getRoles().stream().filter(role -> !newUserInfo.roles().contains(role)).collect(Collectors.toSet());
+                addEvent(new TenantUserChanged(this, newUserInfo, removedRoles));
             }
-        });
-        newUsers.forEach(newUser -> getOrCreate(newUser).replaceWith(newUser));
-    }
-
-    public void updateInstance(List<TenantUserInformation> usersToUpdate) {
-        usersToUpdate.forEach(this::upsertUser);
+        }
     }
 
     public void updateState(TenantAppliedPlatformUpdate event) {
         Map<String, NewUserInformation> updatedUsers = new HashMap<>();
         event.newUserInformation.info().foreach(userInfo -> {
-            User user = users.remove(userInfo.existingUserId());
+            TenantUser user = users.remove(userInfo.existingUserId());
             if (user != null) {
-                users.put(userInfo.newUserId(), user.copy(userInfo.newUserId()));
+                users.put(userInfo.newUserId(), userInfo.copyTo(user));
                 updatedUsers.put(userInfo.existingUserId(), userInfo);
             } else {
                 // Ouch. How can that be? Well ... if same user id is updated multiple times within this event.
@@ -94,18 +120,16 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         this.creationEvent = tenantCreated;
     }
 
-    private User getOrCreate(TenantUserInformation userInfo) {
-        User existingUser = users.get(userInfo.id());
-        if (existingUser == null) {
-            addEvent(new TenantUserCreated(this, userInfo.id(), userInfo.getName(), userInfo.getEmail()));
-            return getUser(userInfo.id());
-        } else {
-            return existingUser;
-        }
+    public void updateState(TenantUserAdded event) {
+        users.put(event.memberId, event.member);
     }
 
-    public void upsertUser(TenantUserInformation newInfo) {
-        getOrCreate(newInfo).upsertWith(newInfo);
+    public void updateState(TenantUserChanged event) {
+        users.put(event.memberId, event.member);
+    }
+
+    public void updateState(TenantUserRemoved event) {
+        users.remove(event.memberId);
     }
 
     public void disable() {
@@ -128,12 +152,12 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
         this.disabled = false;
     }
 
-    public User getUser(String userId) {
+    public TenantUser getUser(String userId) {
         return users.get(userId);
     }
 
     public boolean isOwner(String userId) {
-        User user = getUser(userId);
+        TenantUser user = getUser(userId);
         return user != null && user.isOwner();
     }
 
@@ -142,11 +166,11 @@ public class TenantActor extends ModelActor<TenantCommand, TenantEvent> {
     }
 
     public List<String> getOwnerList() {
-        return users.values().stream().filter(user -> user.isOwner()).map(owner -> owner.userId).collect(Collectors.toList());
+        return users.values().stream().filter(TenantUser::isOwner).filter(TenantUser::enabled).map(TenantUser::id).collect(Collectors.toList());
     }
 
-    public void updateState(TenantUserCreated event) {
-        users.put(event.userId, new User(this, event.userId, event.name, event.email));
+    public void updateState(DeprecatedTenantUserEvent event) {
+        TenantUser.handleDeprecatedEvent(users, event);
     }
 
     public void updateState(TenantModified event) {

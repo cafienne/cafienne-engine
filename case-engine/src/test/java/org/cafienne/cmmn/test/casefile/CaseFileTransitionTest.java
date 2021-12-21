@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
@@ -19,6 +18,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
@@ -32,7 +32,7 @@ public class CaseFileTransitionTest {
     private static final String REVIEW_REQUEST = "ReviewRequest";
     private final String inputParameterName = "inputCaseFile";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repetitivefileitems.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path requestPath = new Path("Request");
     private final Path helperPath = new Path("Request/Helper");
     private final Path customerPath = new Path("Request/Customer");
@@ -59,11 +59,11 @@ public class CaseFileTransitionTest {
 
         ValueMap content = new ValueMap();
         content.put("Customer", getCustomers("Joost", "Piet", "Joop"));
-        content.putRaw("Description", "Help me out");
+        content.plus("Description", "Help me out");
         ValueMap inputs = new ValueMap();
         inputs.put(inputParameterName, content);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, inputs.cloneValueNode(), null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertCaseFileItem(requestPath).assertValue(content).assertCaseFileItem(new Path("/Customer")).assertState(State.Null);
@@ -71,8 +71,8 @@ public class CaseFileTransitionTest {
 
         // Create the CaseFileItem Request/Helper
         ValueMap helper = new ValueMap();
-        helper.putRaw("Name", "Piet");
-        helper.putRaw("Description", "Piet is a nice guy");
+        helper.plus("Name", "Piet");
+        helper.plus("Description", "Piet is a nice guy");
 
         testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, helper, helperPath), casePlan -> {
             casePlan.print();

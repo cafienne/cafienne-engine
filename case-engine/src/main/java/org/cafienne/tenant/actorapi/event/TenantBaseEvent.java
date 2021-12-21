@@ -26,8 +26,7 @@ public abstract class TenantBaseEvent extends BaseModelEvent<TenantActor> implem
         super(json);
     }
 
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
+    protected void writeTenantEvent(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
     }
 }

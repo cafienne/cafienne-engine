@@ -1,11 +1,11 @@
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.humantask.actorapi.event.HumanTaskAssigned;
 import org.cafienne.humantask.actorapi.event.HumanTaskDueDateFilled;
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class HelloWorldTest {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/helloworld.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testHelloWorld() {
@@ -22,7 +22,7 @@ public class HelloWorldTest {
         TestScript testCase = new TestScript("hello-world");
         ValueMap greeting = new ValueMap("Greeting", new ValueMap("Message", "hello", "To", testUser.id(), "From", testUser.id()));
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, greeting, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, greeting);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             String taskId = casePlan.assertHumanTask("Receive Greeting and Send response").getId();
@@ -48,7 +48,7 @@ public class HelloWorldTest {
         TestScript testCase = new TestScript("hello-world");
         ValueMap greeting = new ValueMap("Greeting", new ValueMap("Message", "hello", "To", "", "From", testUser.id()));
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, greeting, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, greeting);
         testCase.addStep(startCase, action -> {
             TestScript.debugMessage("Events: " + action.getTestCommand());
             action.getEvents().filter(HumanTaskDueDateFilled.class).assertSize(1);

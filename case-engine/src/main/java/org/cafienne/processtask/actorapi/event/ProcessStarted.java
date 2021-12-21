@@ -35,13 +35,13 @@ public class ProcessStarted extends BaseProcessEvent {
 
     public ProcessStarted(ValueMap json) {
         super(json);
-        this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
-        this.name = json.raw(Fields.name);
-        this.parentActorId = json.raw(Fields.parentActorId);
-        this.rootActorId = json.raw(Fields.rootActorId);
-        this.inputParameters = readMap(json, Fields.input);
-        this.definition = readDefinition(json, Fields.processDefinition, ProcessDefinition.class);
-        this.debugMode = json.raw(Fields.debugMode);
+        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.name = json.readString(Fields.name);
+        this.parentActorId = json.readString(Fields.parentActorId);
+        this.rootActorId = json.readString(Fields.rootActorId);
+        this.inputParameters = json.readMap(Fields.input);
+        this.definition = json.readDefinition(Fields.processDefinition, ProcessDefinition.class);
+        this.debugMode = json.readBoolean(Fields.debugMode);
     }
 
     @Override

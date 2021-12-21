@@ -7,13 +7,13 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
@@ -28,11 +28,10 @@ public class Basic {
         // The test just starts the case and then validates the output, no specific actions are done (no transitions are made)
         String caseInstanceId = "Basic";
         TestScript testCase = new TestScript(caseInstanceId);
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
-
-
+        TestUser testUser = TestScript.getTestUser("Anonymous");
         CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/basic.xml");
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 
@@ -62,11 +61,10 @@ public class Basic {
 
             PublishedEventsAssertion startCaseEvents = casePlan.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 53;
+            int expectedNumberOfEvents = 52;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nCaseDefinitionApplied: 1\n" +
-                        "TeamRoleFilled: 1\n" +
-                        "CaseOwnerAdded: 1\n" +
+                        "CaseTeamUserAdded: 1\n" +
                         "PlanItemCreated: 9\n" +
                         "PlanItemTransitioned: 14\n" +
                         "RepetitionRuleEvaluated: 7\n" +

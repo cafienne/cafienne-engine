@@ -2,10 +2,10 @@ package org.cafienne.timerservice;
 
 import akka.persistence.SnapshotOffer;
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.system.CaseSystem;
+import org.cafienne.tenant.actorapi.event.platform.PlatformEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,15 +16,25 @@ import java.util.stream.Collectors;
 /**
  * TenantActor manages users and their roles inside a tenant.
  */
-public class TimerService extends ModelActor<ModelCommand, ModelEvent> {
+public class TimerService extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(TimerService.class);
     public static final String CAFIENNE_TIMER_SERVICE = "cafienne-timer-service";
     private final TimerEventSink timerstream;
 
     public TimerService(CaseSystem caseSystem) {
-        super(ModelCommand.class, ModelEvent.class, caseSystem);
+        super(caseSystem);
         this.timerstream = new TimerEventSink(this, caseSystem, caseSystem.system());
         setEngineVersion(Cafienne.version());
+    }
+
+    @Override
+    protected boolean supportsCommand(Object msg) {
+        return false;
+    }
+
+    @Override
+    protected boolean supportsEvent(Object msg) {
+        return false;
     }
 
     @Override
@@ -65,7 +75,7 @@ public class TimerService extends ModelActor<ModelCommand, ModelEvent> {
             Collection<TimerJob> existingTimers = ((TimerStorage) snapshot).getTimers();
             if (!existingTimers.isEmpty()) {
                 logger.info("Found an existing snapshot with " + existingTimers.size() + " timers; migrating them to the new storage");
-                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user)).collect(Collectors.toList());
+                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user.id())).collect(Collectors.toList());
                 timerstream.migrateTimers(legacy);
                 logger.info("Successfully migrated timers to the new storage; clearing snapshot");
                 saveSnapshot(new TimerStorage());

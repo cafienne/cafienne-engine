@@ -2,7 +2,7 @@ package org.cafienne.processtask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapCommand;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -22,10 +22,10 @@ public class StartProcess extends ProcessCommand implements BootstrapCommand {
     private transient ProcessDefinition definition;
     private final boolean debugMode;
 
-    public StartProcess(TenantUser tenantUser, String id, String name, ProcessDefinition definition, ValueMap inputParameters, String parentActorId, String rootActorId, boolean debugMode) {
-        super(tenantUser, id);
+    public StartProcess(UserIdentity user, String tenant, String id, String name, ProcessDefinition definition, ValueMap inputParameters, String parentActorId, String rootActorId, boolean debugMode) {
+        super(user, id);
         this.name = name;
-        this.tenant = tenantUser.tenant();
+        this.tenant = tenant;
         this.parentActorId = parentActorId;
         this.rootActorId = rootActorId;
         this.inputParameters = inputParameters;
@@ -35,13 +35,13 @@ public class StartProcess extends ProcessCommand implements BootstrapCommand {
 
     public StartProcess(ValueMap json) {
         super(json);
-        this.name = json.raw(Fields.name);
-        this.tenant = readField(json, Fields.tenant);
-        this.parentActorId = json.raw(Fields.parentActorId);
-        this.rootActorId = json.raw(Fields.rootActorId);
-        this.inputParameters = readMap(json, Fields.inputParameters);
-        this.definition = readDefinition(json, Fields.processDefinition, ProcessDefinition.class);
-        this.debugMode = json.raw(Fields.debugMode);
+        this.name = json.readString(Fields.name);
+        this.tenant = json.readString(Fields.tenant);
+        this.parentActorId = json.readString(Fields.parentActorId);
+        this.rootActorId = json.readString(Fields.rootActorId);
+        this.inputParameters = json.readMap(Fields.inputParameters);
+        this.definition = json.readDefinition(Fields.processDefinition, ProcessDefinition.class);
+        this.debugMode = json.readBoolean(Fields.debugMode);
     }
 
     @Override

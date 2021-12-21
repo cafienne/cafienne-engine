@@ -7,20 +7,19 @@
  */
 package org.cafienne.cmmn.actorapi.command.plan;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  */
@@ -32,8 +31,8 @@ public class GetDiscretionaryItems extends CaseCommand {
      * @param caseInstanceId
      *          The id of the case instance to get the discretionary items for
      */
-    public GetDiscretionaryItems(TenantUser tenantUser, String caseInstanceId) {
-        super(tenantUser, caseInstanceId);
+    public GetDiscretionaryItems(CaseUserIdentity user, String caseInstanceId) {
+        super(user, caseInstanceId);
     }
 
     public GetDiscretionaryItems(ValueMap json) {
@@ -42,39 +41,14 @@ public class GetDiscretionaryItems extends CaseCommand {
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        // Get the list of valid items
-        List<DiscretionaryItem> discretionaryItems = new ArrayList<>();
-        caseInstance.getDiscretionaryItems().stream().distinct().forEach(d -> discretionaryItems.add(d));
-
         // Convert the response to JSON
         ValueMap node = new ValueMap();
-        node.put("caseInstanceId", new StringValue(getCaseInstanceId()));
-        node.put("name", new StringValue(caseInstance.getDefinition().getName()));
-        ValueList items = node.withArray("discretionaryItems");
+        node.plus(Fields.caseInstanceId, getCaseInstanceId());
+        node.plus(Fields.name, caseInstance.getDefinition().getName());
+        ValueList items = node.withArray(Fields.discretionaryItems);
 
-        // discretionaryItems.stream().forEach(i -> items.put(new JSONObject().put("name", i.getDefinition().getName())));
-        discretionaryItems.stream().forEach(i -> {
-            DiscretionaryItemDefinition definition = i.getDefinition();
-            String name = definition.getName();
-            String definitionId = definition.getId();
-            String type = i.getType();
-            String parentName = definition.getPlanItemDefinition().getParentElement().getName();
-            String parentType = definition.getPlanItemDefinition().getParentElement().getType();
-            String parentId = i.getParentId();
-
-            items.add(new ValueMap("name", name, "definitionId", definitionId, "type", type, "parentName", parentName, "parentType", parentType, "parentId", parentId));
-//
-//            ValueMap di = new ValueMap();
-//
-//
-//            di.put("name", new StringValue(definition.getName()));
-//            di.put("definitionId", new StringValue(definition.getId()));
-//            di.put("id", new StringValue(definition.getId()));
-//            di.put("type", new StringValue(i.getType()));
-//            di.put("parentName", new StringValue(definition.getPlanItemDefinition().getParentElement().getName()));
-//            di.put("parentType", new StringValue(definition.getPlanItemDefinition().getParentElement().getType()));
-//            di.put("parentId", new StringValue(i.getParentId()));
-//            items.add(di);
+        caseInstance.getDiscretionaryItems().forEach((DiscretionaryItem item) -> {
+            items.add(item.asJson());
         });
 
         return new GetDiscretionaryItemsResponse(this, node);

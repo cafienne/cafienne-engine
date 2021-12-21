@@ -65,7 +65,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         return evaluateJSON(processTaskActor, value);
     }
 
-    private Value<?> evaluateJSON(ModelActor<?,?> caseInstance, Value<?> value) {
+    private Value<?> evaluateJSON(ModelActor caseInstance, Value<?> value) {
         // First check if there is something at all to evaluate on. If not, return immediately.
         if (value == null || value.equals(Value.NULL)) {
             // Just can't read from null

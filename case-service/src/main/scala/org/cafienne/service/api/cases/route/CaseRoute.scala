@@ -9,12 +9,14 @@ package org.cafienne.service.api.cases.route
 
 import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
@@ -22,11 +24,10 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases._
-import org.cafienne.service.api.model.StartCaseFormat
+import org.cafienne.service.api.cases.model.CaseAPI._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.service.db.query.filter.CaseFilter
 import org.cafienne.system.CaseSystem
@@ -38,7 +39,7 @@ import javax.ws.rs._
 @Path("/cases")
 class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
-  override def routes = concat(getCases, stats, getCase, getCaseDefinition, startCase, debugCase)
+  override def routes: Route = concat(getCases, stats, getCase, getCaseDefinition, startCase, debugCase)
 
   @GET
   @Operation(
@@ -61,7 +62,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     )
   )
   @Produces(Array("application/json"))
-  def getCases = get {
+  def getCases: Route = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
         parameters("tenant".?,"identifiers".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?, "sortBy".?, "sortOrder".?) {
@@ -93,7 +94,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     )
   )
   @Produces(Array("application/json"))
-  def stats = get {
+  def stats: Route = get {
     path("stats") {
       validUser { platformUser =>
         parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
@@ -121,7 +122,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     )
   )
   @Produces(Array("application/json"))
-  def getCase = get {
+  def getCase: Route = get {
     validUser { platformUser =>
       path(Segment) {
         caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, platformUser))
@@ -145,7 +146,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     )
   )
   @Produces(Array("application/json"))
-  def getCaseDefinition = get {
+  def getCaseDefinition: Route = get {
     caseInstanceSubRoute("definition", (platformUser, caseInstanceId) => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, platformUser)))
   }
 
@@ -162,7 +163,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
   @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[StartCaseFormat]))))
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
-  def startCase = post {
+  def startCase: Route = post {
     pathEndOrSingleSlash {
       validUser { platformUser =>
         post {
@@ -174,9 +175,14 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
               val inputParameters = payload.inputs
-              val caseTeam: CaseTeam = payload.caseTeam.fold(CaseTeam())(c => teamConverter(c))
+              val caseTeam: CaseTeam = payload.caseTeam.asTeam
               val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-              askCaseWithValidTeam(tenant, caseTeam.members, new StartCase(tenant, platformUser.getTenantUser(tenant), newCaseId, caseDefinition, inputParameters, caseTeam, debugMode))
+              val caseStarter = new CaseUserIdentity {
+                override val id: String = platformUser.id
+                override val origin: Origin = platformUser.origin(tenant)
+                override val tenantRoles: Set[String] = platformUser.tenantRoles(tenant)
+              }
+              validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, caseStarter, newCaseId, caseDefinition, inputParameters, team, debugMode)))
             } catch {
               case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
               case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
@@ -203,7 +209,7 @@ class CaseRoute(val caseQueries: CaseQueries)(override implicit val userCache: I
     )
   )
   @Produces(Array("application/json"))
-  def debugCase = put {
+  def debugCase: Route = put {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("debug" / Segment) { debugMode =>
         askCase(platformUser, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))

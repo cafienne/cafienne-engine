@@ -3,6 +3,7 @@ package org.cafienne.infrastructure.config.util
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 
+import java.lang.reflect.InvocationTargetException
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 import scala.jdk.CollectionConverters._
@@ -15,10 +16,6 @@ trait ConfigReader extends LazyLogging {
 
   def warn(msg: String) = {
     logger.warn(msg)
-  }
-
-  def fail(msg: String) = {
-    throw ConfigurationException(msg)
   }
 
   def readNumber(path: String, default: Number): Number = {
@@ -53,6 +50,25 @@ trait ConfigReader extends LazyLogging {
     }
   }
 
+  def readEnum[T <: AnyRef](path: String, enumClass: Class[T], default: T = null): T = {
+    if (config != null && config.hasPath(path)) {
+      val string = config.getString(path)
+      if (string == null) { // No value found, just return the default;
+        return default
+      }
+      // Try to find valueOf method and use that to instantiate the enum.
+      try {
+        val m = enumClass.getMethod("valueOf", classOf[String])
+        m.invoke(enumClass, string).asInstanceOf[T]
+      } catch {
+        case e@(_: IllegalAccessException | _: IllegalArgumentException | _: InvocationTargetException | _: NoSuchMethodException | _: SecurityException) =>
+          throw new IllegalArgumentException(e.fillInStackTrace)
+      }
+    } else {
+      default
+    }
+  }
+
   def readBoolean(path: String, default: Boolean): Boolean = {
     if (config != null && config.hasPath(path)) {
       config.getBoolean(path)
@@ -77,16 +93,16 @@ trait ConfigReader extends LazyLogging {
     }
   }
 
+  def getConfigReader(path: String, defaultValue: Config = ConfigFactory.empty()): ConfigReader = {
+    ConfigReader(readConfig(path, defaultValue))
+  }
+
   def readConfig(path: String, defaultValue: Config = ConfigFactory.empty()): Config = {
     if (config.hasPath(path)) {
       config.getConfig(path)
     } else {
       defaultValue
     }
-  }
-
-  def getConfigReader(path: String, defaultValue: Config = ConfigFactory.empty()): ConfigReader = {
-    ConfigReader(readConfig(path, defaultValue))
   }
 
   def readConfigList(path: String, defaultValue: Seq[Config] = Seq()): Seq[ConfigReader] = {
@@ -99,8 +115,12 @@ trait ConfigReader extends LazyLogging {
   }
 
   def requires(errorPrefixMessage: String, paths: String*) = {
-    val missingPaths = paths.filter(path => ! config.hasPath(path)).map(p => s"'$p'")
-    if (missingPaths.nonEmpty) fail(errorPrefixMessage +" misses config properties " + missingPaths.mkString(", "))
+    val missingPaths = paths.filter(path => !config.hasPath(path)).map(p => s"'$p'")
+    if (missingPaths.nonEmpty) fail(errorPrefixMessage + " misses config properties " + missingPaths.mkString(", "))
+  }
+
+  def fail(msg: String) = {
+    throw ConfigurationException(msg)
   }
 }
 

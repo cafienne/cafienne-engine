@@ -3,39 +3,34 @@ package org.cafienne.tenant.actorapi.command.platform;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.PlatformUser;
+import org.cafienne.actormodel.identity.PlatformOwner;
+import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.TenantUserInformation;
 import org.cafienne.tenant.actorapi.exception.TenantException;
 import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Manifest
 public class CreateTenant extends PlatformTenantCommand implements BootstrapCommand {
     public final String name;
-    private final List<TenantUserInformation> users;
+    private final List<TenantUser> users;
 
-    public CreateTenant(PlatformUser user, String tenantId, String name, List<TenantUserInformation> users) {
+    public CreateTenant(PlatformOwner user, String tenantId, String name, List<TenantUser> users) {
         super(user, tenantId);
         this.name = name;
         this.users = users;
-        // Check whether after the filtering there are still owners left. Tenant must have owners.
-        if (this.users.stream().filter(u -> u.isOwner() && u.isEnabled()).count() == 0) {
-            throw new TenantException("Cannot create a tenant without providing tenant owners");
-        }
+        super.validateUserList(users);
     }
 
     public CreateTenant(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
-        this.users = new ArrayList<>();
-        json.withArray(Fields.users).forEach(user -> this.users.add(TenantUserInformation.from(user.asMap())));
+        this.name = json.readString(Fields.name);
+        this.users = json.readObjects(Fields.users, TenantUser::deserialize);
     }
 
     @Override

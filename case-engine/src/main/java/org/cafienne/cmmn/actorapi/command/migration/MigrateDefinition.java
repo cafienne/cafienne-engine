@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.command.migration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
@@ -29,14 +29,14 @@ public class MigrateDefinition extends CaseCommand {
      *  @param caseInstanceId      The instance identifier of the case
      * @param definition          The case definition (according to the CMMN xsd) to be updated to
      */
-    public MigrateDefinition(TenantUser tenantUser, String caseInstanceId, CaseDefinition definition) {
-        super(tenantUser, caseInstanceId);
+    public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition definition) {
+        super(user, caseInstanceId);
         this.definition = definition;
     }
 
     public MigrateDefinition(ValueMap json) {
         super(json);
-        this.definition = readDefinition(json, Fields.definition, CaseDefinition.class);
+        this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
     }
 
     @Override

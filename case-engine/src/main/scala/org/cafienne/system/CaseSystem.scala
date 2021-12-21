@@ -10,7 +10,6 @@ package org.cafienne.system
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.platform.PlatformService
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.{ClusterRouter, LocalRouter}
 import org.cafienne.timerservice.TimerService
@@ -37,7 +36,6 @@ class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging 
   }
 
   // Create singleton actors
-  val platformService: ActorRef = system.actorOf(Props.create(classOf[PlatformService], this), PlatformService.CAFIENNE_PLATFORM_SERVICE);
   val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
 
   val messageRouterService: ActorRef = system.actorOf(Props.create(routerClazz, this))

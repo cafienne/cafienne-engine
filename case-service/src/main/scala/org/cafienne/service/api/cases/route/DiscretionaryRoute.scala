@@ -14,11 +14,10 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.cmmn.actorapi.command.CaseCommandModels
 import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
 import org.cafienne.cmmn.actorapi.response.CaseResponseModels
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
+import org.cafienne.service.api.cases.model.CasePlanAPI._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
@@ -73,7 +72,7 @@ class DiscretionaryRoute(val caseQueries: CaseQueries)(override implicit val use
   def planDiscretionaryItem = post {
     validUser { platformUser =>
       path(Segment / "discretionaryitems" / "plan") { caseInstanceId =>
-        entity(as[CaseCommandModels.PlanDiscretionaryItem]) { payload =>
+        entity(as[PlanDiscretionaryItem]) { payload =>
           askCase(platformUser, caseInstanceId, tenantUser => new AddDiscretionaryItem(tenantUser, caseInstanceId, payload.name, payload.definitionId, payload.parentId, payload.planItemId.orNull))
         }
       }

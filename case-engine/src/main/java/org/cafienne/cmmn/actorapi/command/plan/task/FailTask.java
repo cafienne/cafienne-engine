@@ -8,7 +8,7 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class FailTask extends CompleteTask {
-    public FailTask(ModelActor<?,?> child, ValueMap taskOutput) {
+    public FailTask(ModelActor child, ValueMap taskOutput) {
         super(child, taskOutput);
     }
 

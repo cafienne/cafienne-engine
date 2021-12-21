@@ -6,8 +6,9 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.{JdbcProfile, SQLServerProfile}
 import slick.lifted.{ColumnOrdered, Index}
 import slick.migration.api.org.cafienne.infrastructure.jdbc.sqlserver.SQLServerDialect
-import slick.migration.api.{Dialect, GenericDialect}
+import slick.migration.api.{Dialect, GenericDialect, MigrationSeq, SqlMigration}
 import slick.relational.RelationalProfile.ColumnOption.Length
+import slick.sql.SqlAction
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
 /**
@@ -67,12 +68,38 @@ trait CafienneJDBCConfig {
       * @param column
       * @return
       */
-    def index(column: Rep[String]): Index = {
-      index(generateIndexName(column), column)
+    def oldStyleIndex(column: Rep[String]): Index = {
+      index(oldStyleIxName(column), column)
     }
 
-    def generateIndexName(column: Rep[_]): String = {
+    /**
+      * Generate an index name for the specified column
+      *
+      */
+    def oldStyleIxName(column: Rep[_]): String = {
       s"ix_${tableName}__$column"
+    }
+
+    def index(column: Rep[String]): Index = {
+      index(ixName(column), column)
+    }
+
+    /**
+      * Generate an index name for the specified column
+      */
+    def ixName(column: Rep[_]): String = {
+      val columnName = s"$column".replace(s"$tableName.", "")
+      val name = s"ix_${tableName}__$columnName"
+//      println("Creating index name " + name +"\n\tfor column: '" + column.toString() +"'\n\ton table '"+ tableName +s"'\n\tnode type: '${column.toNode.nodeType}' with node string '${column.toNode.toString()}'\n")
+      name
+    }
+
+    /**
+      * Generate a primary key name based on the table name (to make it unique across the database)
+      * @return
+      */
+    def pkName: String = {
+      s"pk_$tableName"
     }
 
     /**
@@ -213,5 +240,25 @@ trait CafienneJDBCConfig {
       case _: SQLServerProfile => new SQLServerDialect
       case _ => GenericDialect(dbConfig.profile)
     }
+  }
+
+  /**
+    * Helper to create SqlMigration object from a 'regular' Slick SqlAction
+    * @param action
+    * @return
+    */
+  def asSqlMigration(action: SqlAction[_,_,_]): MigrationSeq = {
+    asSqlMigration(action.statements.toSeq:_*)
+  }
+
+  /**
+    * Helper to create SqlMigration from one or more strings
+    * @param action
+    * @return
+    */
+  def asSqlMigration(sql: String*): MigrationSeq = {
+//    val statements = sql.mkString(";\n")
+//    println(s"SQL:\n\t$statements\n")
+    MigrationSeq(sql.map(statement => SqlMigration(statement)):_*)
   }
 }

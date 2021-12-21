@@ -40,11 +40,13 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
         }
     }
 
-    private void checkAccess(TenantUser user) {
+    private void checkAccess(PlatformUser user, String tenant) {
         if (authorizedTenantRoles.isEmpty()) return;
 
+        // Extend retrieving tenant user to only if we have configured role based authorization
+        TenantUser tenantUser = user.getTenantUser(tenant);
         for (String role: authorizedTenantRoles) {
-            if (user.roles().contains(role)) {
+            if (tenantUser.roles().contains(role)) {
                 return;
             }
         }
@@ -53,7 +55,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
 
     @Override
     public DefinitionsDocument read(PlatformUser user, String tenant, String contents) throws InvalidDefinitionException {
-        checkAccess(user.getTenantUser(tenant));
+        checkAccess(user, tenant);
         try {
             // Now check to see if the file is already in our cache, and, if so, check whether it has the same last modified; if not, put the new one in the cache instead
             DefinitionsDocument cacheEntry = cache.get(contents);

@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.command.casefile;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
@@ -38,8 +38,8 @@ abstract class CaseFileItemCommand extends CaseCommand {
      * @param path   Path to the case file item to be created
      * @param intendedTransition
      */
-    protected CaseFileItemCommand(TenantUser tenantUser, String caseInstanceId, Value<?> newContent, Path path, CaseFileItemTransition intendedTransition) {
-        super(tenantUser, caseInstanceId);
+    protected CaseFileItemCommand(CaseUserIdentity user, String caseInstanceId, Value<?> newContent, Path path, CaseFileItemTransition intendedTransition) {
+        super(user, caseInstanceId);
         this.path = path;
         this.content = newContent;
         this.intendedTransition = intendedTransition;
@@ -47,8 +47,8 @@ abstract class CaseFileItemCommand extends CaseCommand {
 
     protected CaseFileItemCommand(ValueMap json, CaseFileItemTransition intendedTransition) {
         super(json);
-        this.path = readPath(json, Fields.path);
-        this.content = json.get(Fields.content.toString());
+        this.path = json.readPath(Fields.path);
+        this.content = json.get(Fields.content);
         this.intendedTransition = intendedTransition;
     }
 

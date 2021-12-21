@@ -563,8 +563,10 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     @Override
     public void migrateDefinition(CaseFileItemDefinition newDefinition) {
+        addDebugInfo(() -> "=== Migrating CaseFileItem[" + getPath() + "] to a new definition");
         super.migrateDefinition(newDefinition);
         migrateIdentifiers(newDefinition);
+        addDebugInfo(() -> "=== Completed migration of CaseFileItem[" + getPath() + "]\n");
     }
 
     private void migrateIdentifiers(CaseFileItemDefinition newDefinition) {

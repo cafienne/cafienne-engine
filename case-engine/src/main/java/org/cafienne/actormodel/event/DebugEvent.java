@@ -21,21 +21,23 @@ import java.io.IOException;
  * DebugEvent
  */
 @Manifest
-public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
+public class DebugEvent extends BaseModelEvent<ModelActor> {
     private final ValueMap messages;
 
-    public DebugEvent(ModelActor<?,?> modelActor) {
+    public DebugEvent(ModelActor modelActor) {
         super(modelActor);
         this.messages = new ValueMap();
     }
 
     public DebugEvent(ValueMap json) {
         super(json);
-        this.messages = readMap(json, Fields.messages);
+        this.messages = json.readMap(Fields.messages);
     }
 
     public void addMessage(String msg) {
-        add(new StringValue(msg));
+        for (String s : msg.split("\n")) {
+            add(new StringValue(s));
+        }
     }
 
     public void addMessage(Value<?> json) {
@@ -56,7 +58,7 @@ public class DebugEvent extends BaseModelEvent<ModelActor<?,?>> {
     }
 
     @Override
-    public void updateState(ModelActor<?,?> actor) {
+    public void updateState(ModelActor actor) {
         // nothing to update
     }
 

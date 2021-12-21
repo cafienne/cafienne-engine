@@ -1,20 +1,19 @@
 package org.cafienne.cmmn.test.expression;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
 public class TestTimerExpression {
 
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/timerexpression.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testTimerExpression() {
@@ -24,7 +23,7 @@ public class TestTimerExpression {
         ValueMap timerInput = new ValueMap("timer", new ValueMap("period", period));
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, timerInput, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, timerInput);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
@@ -41,13 +40,13 @@ public class TestTimerExpression {
         testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, "simplehumantask", Transition.Complete));
 
         // Waiting 1 second should not have changed anything; timer is still running
-        testCase.addStep(new PingCommand(testUser, caseInstanceId, 1000), casePlan -> {
+        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 1000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Resume, State.Available, State.Suspended);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
 
         // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addStep(new PingCommand(testUser, caseInstanceId, 5000), casePlan -> {
+        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 5000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });
@@ -63,7 +62,7 @@ public class TestTimerExpression {
         ValueMap timerInput = new ValueMap("timer", new ValueMap("period", period));
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, timerInput, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, timerInput);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Create, State.Available, State.Null);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
@@ -78,7 +77,7 @@ public class TestTimerExpression {
                 casePlan -> casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Suspend, State.Suspended, State.Available));
 
         // Waiting 1 second should not have changed anything; timer is still running
-        testCase.addStep(new PingCommand(testUser, caseInstanceId, 1000), casePlan -> {
+        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 1000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Suspend, State.Suspended, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
@@ -93,7 +92,7 @@ public class TestTimerExpression {
         });
 
         // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addStep(new PingCommand(testUser, caseInstanceId, 5000), casePlan -> {
+        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 5000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });

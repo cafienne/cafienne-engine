@@ -22,7 +22,7 @@ import java.time.Instant;
 
 @Manifest
 public class CaseDefinitionApplied extends CaseDefinitionEvent {
-    private final CafienneVersion engineVersion;
+    public final CafienneVersion engineVersion;
     private final String parentCaseId;
     private final String rootCaseId;
     public final Instant createdOn;
@@ -43,11 +43,11 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent {
 
     public CaseDefinitionApplied(ValueMap json) {
         super(json);
-        this.createdOn = readInstant(json, Fields.createdOn);
-        this.createdBy = readField(json, Fields.createdBy);
-        this.rootCaseId = readField(json, Fields.rootActorId);
-        this.parentCaseId = readField(json, Fields.parentActorId);
-        this.engineVersion = new CafienneVersion(readMap(json, Fields.engineVersion));
+        this.createdOn = json.readInstant(Fields.createdOn);
+        this.createdBy = json.readString(Fields.createdBy);
+        this.rootCaseId = json.readString(Fields.rootActorId);
+        this.parentCaseId = json.readString(Fields.parentActorId);
+        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
     }
 
     /**
@@ -86,8 +86,7 @@ public class CaseDefinitionApplied extends CaseDefinitionEvent {
     }
 
     public void updateState(Case caseInstance) {
-        caseInstance.setEngineVersion(engineVersion);
-        caseInstance.applyCaseDefinition(this.definition, getParentCaseId(), getRootCaseId());
+        caseInstance.updateState(this);
     }
 
     @Override

@@ -79,20 +79,4 @@ public class CMMNElement<T extends DefinitionElement> {
     protected <T extends CaseEvent> T addEvent(T event) {
         return getCaseInstance().addEvent(event);
     }
-
-    /**
-     * Temp method to keep track of all system.out.println statements
-     * @param msg
-     */
-    public void MigDevConsole(String msg) {
-        MigDevConsoleStatic(getClass().getSimpleName() +": " + msg);
-    }
-
-    /**
-     * Temp method to keep track of all system.out.println statements
-     * @param msg
-     */
-    public static void MigDevConsoleStatic(String msg) {
-        System.out.println(msg);
-    }
 }

@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueList;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class PlanningTableAssertion extends ModelTestCommandAssertion {
     public PlanningTableAssertion(CaseAssertion response) {
         super(response.getTestCommand());
         this.response = response.getTestCommand().getActualResponse();
-        this.response.toJson().withArray("discretionaryItems").forEach(value -> discretionaries.add(new DiscretionaryItemAssertion(response.getTestCommand(), value.asMap())));
+        this.response.toJson().withArray(Fields.discretionaryItems).forEach(value -> discretionaries.add(new DiscretionaryItemAssertion(response.getTestCommand(), value.asMap())));
     }
 
     @Override

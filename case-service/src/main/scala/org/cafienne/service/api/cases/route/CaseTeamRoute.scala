@@ -8,6 +8,7 @@
 package org.cafienne.service.api.cases.route
 
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -15,10 +16,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.team._
+import org.cafienne.cmmn.actorapi.command.team.removemember._
+import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole}
 import org.cafienne.identity.IdentityProvider
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
 import org.cafienne.service.api.Headers
-import org.cafienne.service.api.model.{BackwardCompatibleTeamFormat, BackwardCompatibleTeamMemberFormat, Examples}
+import org.cafienne.service.api.cases.model.CaseTeamAPI._
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
@@ -28,7 +30,7 @@ import javax.ws.rs._
 @Path("/cases")
 class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
 
-  override def routes = concat(getCaseTeam, setCaseTeam, putCaseTeamMember, deleteCaseTeamMember)
+  override def routes: Route = concat(getCaseTeam, setCaseTeam, setUser, deleteUser, setGroup, deleteGroup, setTenantRole, deleteTenantRole)
 
   @Path("/{caseInstanceId}/caseteam")
   @GET
@@ -46,7 +48,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Produces(Array("application/json"))
-  def getCaseTeam = get {
+  def getCaseTeam: Route = get {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("caseteam") {
         runQuery(caseQueries.getCaseTeam(caseInstanceId, platformUser))
@@ -58,7 +60,7 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
   @POST
   @Operation(
     summary = "Replace the case team",
-    description = "Removes existing cae team, and replaces it with the new team. The new team must have an owner. Changes to the team can only be done by case owners.",
+    description = "Removes the existing case team, and replaces it with the new team. The new team must have an owner. Changes to the team can only be done by case owners.",
     tags = Array("case team"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
@@ -68,49 +70,107 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.StartCaseTeamFormat]))))
+  @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TeamFormat]))))
   @Consumes(Array("application/json"))
-  def setCaseTeam = post {
+  def setCaseTeam: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
       path("caseteam") {
-        entity(as[BackwardCompatibleTeamFormat]) { oldFormat =>
-          val caseTeam = teamConverter(oldFormat)
-          askCaseWithValidMembers(platformUser, caseTeam.members, caseInstanceId, tenantUser => new SetCaseTeam(tenantUser, caseInstanceId, caseTeam))
+        entity(as[Compatible.TeamFormat]) { input =>
+          val teamInput = input.asTeam
+          authorizeCaseAccess(platformUser, caseInstanceId, member => validateTeam(teamInput, member.tenant, team => askModelActor(new SetCaseTeam(member, caseInstanceId, team))))
         }
       }
     }
     }
   }
 
-  @Path("/{caseInstanceId}/caseteam")
-  @PUT
+  @Path("/{caseInstanceId}/caseteam/users")
+  @POST
   @Operation(
-    summary = "Add or update a case team member",
-    description = "Add a new member to the case team or change roles or ownership rights of an existing member. Changes to the team can only be done by case owners.",
+    summary = "Add or replace a case team user",
+    description = "Add a new or replace an existing user in the case team. Changes to the team can only be done by case owners.",
     tags = Array("case team"),
     parameters = Array(
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Your request to update a case team has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Your request to update the case team has been accepted", responseCode = "202"),
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Case Team Member", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.PutCaseTeamMemberFormat]))))
+  @RequestBody(description = "Case Team User", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamUserFormat]))))
   @Consumes(Array("application/json"))
-  def putCaseTeamMember = put {
+  def setUser: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) => {
-      path("caseteam") {
-        entity(as[BackwardCompatibleTeamMemberFormat]) { oldFormat =>
-          val caseTeamMember = memberConverter(oldFormat)
-          askCaseWithValidMembers(platformUser, Seq(caseTeamMember), caseInstanceId, tenantUser => new PutTeamMember(tenantUser, caseInstanceId, caseTeamMember))
+      path("caseteam" / "users") {
+        entity(as[CaseTeamUserFormat]) { input =>
+          putCaseTeamUser(platformUser, caseInstanceId, input.asCaseTeamUser)
         }
       }
     }
     }
   }
 
-  @Path("/{caseInstanceId}/caseteam/{memberId}?type={memberType}")
+  @Path("/{caseInstanceId}/caseteam/users/{userId}")
+  @DELETE
+  @Operation(
+    summary = "Remove a user from the case team",
+    description = "Remove a user from the case team. Changes to the team can only be done by case owners.",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId",
+        description = "Unique id of the case instance",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+      new Parameter(name = "userId",
+        description = "Id of the user to remove from the case team",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Your request to remove a case team user has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+    )
+  )
+  @Consumes(Array("application/json"))
+  def deleteUser: Route = delete {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("caseteam" / "users" / Segment) { userId =>
+        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, userId))
+      }
+    }
+  }
+
+  @Path("/{caseInstanceId}/caseteam/groups")
+  @POST
+  @Operation(
+    summary = "Add or replace a case team member of type consent group",
+    description = "Adds a new or replaces and existing consent group member of the case team. Changes to the team can only be done by case owners.",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Your request to update the case team has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+    )
+  )
+  @RequestBody(description = "Case Team Group", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[GroupFormat]))))
+  @Consumes(Array("application/json"))
+  def setGroup: Route = post {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+      path("caseteam" / "groups") {
+        entity(as[GroupFormat]) { input =>
+          askCase(platformUser, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, input.asGroup))
+        }
+      }
+    }
+    }
+  }
+
+  @Path("/{caseInstanceId}/caseteam/groups/{groupId}")
   @DELETE
   @Operation(
     summary = "Remove a member from the case team",
@@ -122,15 +182,69 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
         in = ParameterIn.PATH,
         schema = new Schema(implementation = classOf[String]),
         required = true),
-      new Parameter(name = "memberId",
-        description = "Id of the case team member to remove",
+      new Parameter(name = "groupId",
+        description = "Id of the consent group to remove",
         in = ParameterIn.PATH,
         schema = new Schema(implementation = classOf[String]),
         required = true),
-      new Parameter(name = "type",
-        description = "Type of member (either 'user' or 'role'). If omitted both 'user' is taken",
-        in = ParameterIn.QUERY,
-        schema = new Schema(implementation = classOf[String], allowableValues = Array("user", "role")),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Your request to remove the consent group from the case team has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+    )
+  )
+  @Consumes(Array("application/json"))
+  def deleteGroup: Route = delete {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+      path("caseteam" / "groups" / Segment) { groupId =>
+        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamGroup(tenantUser, caseInstanceId, groupId))
+      }
+    }
+  }
+
+  @Path("/{caseInstanceId}/caseteam/tenant-roles")
+  @POST
+  @Operation(
+    summary = "Add or replace a tenant role in the case team",
+    description = "Add a new or replace an existing tenant role in the case team. Changes to the team can only be done by case owners.",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Your request to update the case team has been accepted", responseCode = "202"),
+      new ApiResponse(description = "Case not found", responseCode = "404"),
+    )
+  )
+  @RequestBody(description = "Tenant Role", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantRoleFormat]))))
+  @Consumes(Array("application/json"))
+  def setTenantRole: Route = post {
+    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+      path("caseteam" / "tenant-roles") {
+        entity(as[TenantRoleFormat]) { input =>
+          askCase(platformUser, caseInstanceId, user => new SetCaseTeamTenantRole(user, caseInstanceId, input.asTenantRole))
+        }
+      }
+    }
+    }
+  }
+
+  @Path("/{caseInstanceId}/caseteam/tenant-roles/{tenantRoleName}")
+  @DELETE
+  @Operation(
+    summary = "Remove a tenant role from the case team",
+    description = "Remove a tenant role from the case team. Changes to the team can only be done by case owners.",
+    tags = Array("case team"),
+    parameters = Array(
+      new Parameter(name = "caseInstanceId",
+        description = "Unique id of the case instance",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
+        required = true),
+      new Parameter(name = "tenantRoleName",
+        description = "Name of the tenant role that must be removed from the case team",
+        in = ParameterIn.PATH,
+        schema = new Schema(implementation = classOf[String]),
         required = true),
     ),
     responses = Array(
@@ -139,12 +253,10 @@ class CaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Consumes(Array("application/json"))
-  def deleteCaseTeamMember = delete {
+  def deleteTenantRole: Route = delete {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
-      path("caseteam" / Segment) { memberId =>
-        parameters("type".?) { memberType =>
-          askCase(platformUser, caseInstanceId, tenantUser => new RemoveTeamMember(tenantUser, caseInstanceId, MemberKey(memberId, memberType.getOrElse("user"))))
-        }
+      path("caseteam" / "tenant-roles" / Segment) { tenantRoleName =>
+        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, tenantRoleName))
       }
     }
   }

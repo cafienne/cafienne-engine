@@ -1,19 +1,18 @@
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.InvalidPathException;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
 public class PathTest {
     private final String caseName = "CaseFileTest";
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final String caseInstanceId = new Guid().toString();
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/casefiletest.xml");
     private final TestScript testCase = new TestScript(caseName);
@@ -46,7 +45,8 @@ public class PathTest {
     @Test
     public void testUndefinedPath() {
         TestScript.debugMessage(rootValue.toString());
-        testCase.addStep(new StartCase(testUser, caseInstanceId, definitions, null, null));
+
+        testCase.addStep(testCase.createCaseCommand(testUser, caseInstanceId, definitions));
 
         assertInvalidCaseFilePath("/aaa/def/", "The path '/aaa/def/' is invalid, since the part 'def' is not defined in the case file");
         assertInvalidCaseFilePath("/aacb/", "The path '/aacb/' is invalid, since the part 'aacb' is not defined in the case file");

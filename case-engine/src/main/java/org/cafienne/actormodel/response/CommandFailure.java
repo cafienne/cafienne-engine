@@ -32,7 +32,7 @@ public class CommandFailure extends ModelResponse {
      * @param command
      * @param failure The reason why the command failed
      */
-    public CommandFailure(ModelCommand<?> command, Throwable failure) {
+    public CommandFailure(ModelCommand<?, ?> command, Throwable failure) {
         super(command);
         this.exception = failure;
         this.exceptionAsJSON = Value.convertThrowable(failure);
@@ -42,7 +42,7 @@ public class CommandFailure extends ModelResponse {
     public CommandFailure(ValueMap json) {
         super(json);
         this.exception = null;
-        this.exceptionAsJSON = readMap(json, Fields.exception);
+        this.exceptionAsJSON = json.readMap(Fields.exception);
         this.serializedException = new SerializedException(exceptionAsJSON);
     }
 

@@ -1,47 +1,48 @@
 package org.cafienne.cmmn.actorapi.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamMemberDeserializer;
+import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Basic event allowing listeners that are interested only in case team member events to do initial filtering.
  */
-public abstract class CaseTeamMemberEvent extends CaseTeamEvent {
-    public final String memberId;
-    public final boolean isTenantUser;
-    public final transient MemberKey key;
+public abstract class CaseTeamMemberEvent<Member extends CaseTeamMember> extends CaseTeamEvent {
+    public final Member member;
 
-    protected CaseTeamMemberEvent(Case caseInstance, MemberKey key) {
-        super(caseInstance);
-        this.key = key;
-        this.memberId = key.id();
-        this.isTenantUser = key.type().equals("user");
+    protected CaseTeamMemberEvent(Team team, Member newInfo) {
+        super(team);
+        this.member = newInfo;
     }
 
-    protected CaseTeamMemberEvent(ValueMap json) {
+    protected CaseTeamMemberEvent(ValueMap json, CaseTeamMemberDeserializer<Member> reader) {
         super(json);
-        this.memberId = json.raw(Fields.memberId);
-        this.isTenantUser = json.raw(Fields.isTenantUser);
-        this.key = new MemberKey(memberId, isTenantUser ? "user" : "role");
+        this.member = reader.readMember(json.with(Fields.member));
     }
 
-    public String roleName() {
-        return "";
+    public Set<String> getCaseRoles() {
+        return member.getCaseRoles();
     }
 
-    protected String getMemberDescription() {
-        return "Tenant " + key;
+    public Set<String> getRolesRemoved() {
+        return new HashSet<>();
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
+        writeCaseTeamMemberEvent(generator);
+    }
+
+    protected void writeCaseTeamMemberEvent(JsonGenerator generator) throws IOException {
         super.writeCaseTeamEvent(generator);
-        writeField(generator, Fields.memberId, memberId);
-        writeField(generator, Fields.isTenantUser, isTenantUser);
+        writeField(generator, Fields.member, member);
     }
 }
+

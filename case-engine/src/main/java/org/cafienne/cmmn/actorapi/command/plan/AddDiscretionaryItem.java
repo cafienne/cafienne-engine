@@ -9,7 +9,7 @@ package org.cafienne.cmmn.actorapi.command.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.AddDiscretionaryItemResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
@@ -45,8 +45,8 @@ public class AddDiscretionaryItem extends CaseCommand {
      * @param definitionId The id of the discretionary item; can be used instead of the name.
      * @param parentId The id of the plan item that contains this discretionary item (i.e., the stage or human task in which it is being planned).
      */
-    public AddDiscretionaryItem(TenantUser tenantUser, String caseInstanceId, String name, String definitionId, String parentId, String newPlanItemId) {
-        super(tenantUser, caseInstanceId);
+    public AddDiscretionaryItem(CaseUserIdentity user, String caseInstanceId, String name, String definitionId, String parentId, String newPlanItemId) {
+        super(user, caseInstanceId);
         this.name = name;
         this.planItemId = (newPlanItemId == null || newPlanItemId.isEmpty()) ? new Guid().toString() : newPlanItemId;
         this.definitionId = definitionId;
@@ -55,10 +55,10 @@ public class AddDiscretionaryItem extends CaseCommand {
 
     public AddDiscretionaryItem(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
-        this.planItemId = readField(json, Fields.planItemId);
-        this.definitionId = readField(json, Fields.definitionId);
-        this.parentId = readField(json, Fields.parentId);
+        this.name = json.readString(Fields.name);
+        this.planItemId = json.readString(Fields.planItemId);
+        this.definitionId = json.readString(Fields.definitionId);
+        this.parentId = json.readString(Fields.parentId);
     }
 
     @Override

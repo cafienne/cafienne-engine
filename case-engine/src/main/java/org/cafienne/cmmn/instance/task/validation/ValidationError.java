@@ -14,8 +14,7 @@ public class ValidationError extends ValidationResponse {
     }
 
     public ValidationError(ValueMap msg, Exception e) {
-        super(msg);
-        msg.putRaw("error", e);
+        super(msg.plus("error", e));
         this.exception = e;
     }
 

@@ -27,7 +27,7 @@ public class TimerSet extends TimerBaseEvent {
 
     public TimerSet(ValueMap json) {
         super(json);
-        this.targetMoment = Instant.parse(json.raw(Fields.targetMoment));
+        this.targetMoment = json.readInstant(Fields.targetMoment);
     }
 
     public Instant getTargetMoment() {

@@ -20,7 +20,7 @@ public class HumanTaskResponse extends CaseResponse {
 
     public HumanTaskResponse(ValueMap json) {
         super(json);
-        this.taskId = readField(json, Fields.taskId);
+        this.taskId = json.readString(Fields.taskId);
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.cafienne.timerservice.persistence.jdbc
 
 import akka.Done
 import akka.persistence.query.Offset
-import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
@@ -24,12 +23,12 @@ class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBC
 
   override def getTimers(): Future[Seq[Timer]] = {
     val query = TableQuery[TimerServiceTable]
-    db.run(query.distinct.result).map(records => records.map(record => new Timer(record.caseInstanceId, record.timerId, record.moment, new TenantUser(record.user, roles = Seq(), tenant = record.tenant, isOwner = false, name = ""))))
+    db.run(query.distinct.result).map(records => records.map(record => Timer(record.caseInstanceId, record.timerId, record.moment, record.user)))
   }
 
   override def storeTimer(job: Timer, offset: Option[Offset]): Future[Done] = {
     logger.debug("Storing JDBC timer " + job.timerId + " for timestamp " + job.moment)
-    val record = TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, moment = job.moment, tenant = job.user.tenant, user = job.user.id)
+    val record = TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, moment = job.moment, tenant = "", user = job.userId)
     commit(offset, TableQuery[TimerServiceTable].insertOrUpdate(record))
   }
 
@@ -46,7 +45,7 @@ class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBC
 
   override def importTimers(list: Seq[Timer]): Unit = {
     val tx = list
-      .map(job => TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, moment = job.moment, tenant = job.user.tenant, user = job.user.id))
+      .map(job => TimerServiceRecord(timerId = job.timerId, caseInstanceId = job.caseInstanceId, moment = job.moment, tenant = "", user = job.userId))
       .map(record => TableQuery[TimerServiceTable].insertOrUpdate(record))
     Await.result(db.run(DBIO.sequence(tx).transactionally), 30.seconds)
   }

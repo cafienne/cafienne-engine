@@ -22,7 +22,7 @@ class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabasePro
 //        case _: HsqldbProfile => "hsql" // not yet supported
         case _ => throw new IllegalArgumentException(s"Cannot start EventDatabase provider for unsupported JDBC profile of type ${profile.getClass.getName}")
       }
-    }
+    } 
 
     val flyway = Flyway
       .configure()

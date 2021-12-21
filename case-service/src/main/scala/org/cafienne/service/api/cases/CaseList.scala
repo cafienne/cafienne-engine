@@ -14,17 +14,17 @@ final case class CaseList(caseName: String = "",
 
   override def toValue: Value[_] = {
     val v = new ValueMap
-    v.putRaw("caseName", caseName)
-    v.putRaw("totalInstances", totalInstances)
+    v.plus("caseName", caseName)
+    v.plus("totalInstances", totalInstances)
 
-    v.putRaw("numActive", numActive)
-    v.putRaw("numCompleted", numCompleted)
-    v.putRaw("numTerminated", numTerminated)
+    v.plus("numActive", numActive)
+    v.plus("numCompleted", numCompleted)
+    v.plus("numTerminated", numTerminated)
 
-    v.putRaw("numSuspended", numSuspended)
-    v.putRaw("numFailed", numFailed)
-    v.putRaw("numClosed", numClosed)
-    v.putRaw("numWithFailures", numWithFailures)
+    v.plus("numSuspended", numSuspended)
+    v.plus("numFailed", numFailed)
+    v.plus("numClosed", numClosed)
+    v.plus("numWithFailures", numWithFailures)
     v
   }
 }

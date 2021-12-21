@@ -8,8 +8,10 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
+import org.cafienne.cmmn.actorapi.command.team.CurrentMember;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
@@ -22,8 +24,8 @@ import org.cafienne.cmmn.instance.casefile.CaseFile;
 import org.cafienne.cmmn.instance.parameter.CaseInputParameter;
 import org.cafienne.cmmn.instance.parameter.CaseOutputParameter;
 import org.cafienne.cmmn.instance.sentry.SentryNetwork;
-import org.cafienne.cmmn.instance.team.CurrentMember;
 import org.cafienne.cmmn.instance.team.Team;
+import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.util.XMLHelper;
@@ -38,7 +40,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Case extends ModelActor<CaseCommand, CaseEvent> {
+public class Case extends ModelActor {
 
     private final static Logger logger = LoggerFactory.getLogger(Case.class);
 
@@ -83,11 +85,26 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
     private Team caseTeam;
 
     public Case(CaseSystem caseSystem) {
-        super(CaseCommand.class, CaseEvent.class, caseSystem);
+        super(caseSystem);
         this.createdOn = getTransactionTimestamp();
         this.sentryNetwork = new SentryNetwork(this);
 
         logger.info("Recovering/creating case " + this.getId() + " with path " + self().path());
+    }
+
+    @Override
+    public CaseUserIdentity getCurrentUser() {
+        return super.getCurrentUser().asCaseUserIdentity();
+    }
+
+    @Override
+    protected boolean supportsCommand(Object msg) {
+        return msg instanceof CaseCommand;
+    }
+
+    @Override
+    protected boolean supportsEvent(Object msg) {
+        return msg instanceof CaseEvent;
     }
 
     @Override
@@ -298,10 +315,11 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         addDebugInfo(() -> "Retrieving discretionary items of " + this);
         Collection<DiscretionaryItem> items = new ArrayList<>();
         getCasePlan().retrieveDiscretionaryItems(items);
+        addDebugInfo(() -> "Discretionary items of " + this);
         addDebugInfo(() -> {
-            StringBuilder itemsString = new StringBuilder();
-            items.forEach(item -> itemsString.append("\n\t" + item.getDefinition() + " in " + item.getParentId()));
-            return "Discretionary items of " + this + itemsString;
+            ValueList list = new ValueList();
+            items.forEach(item -> list.add(item.asJson()));
+            return list;
         });
         return items;
     }
@@ -411,16 +429,22 @@ public class Case extends ModelActor<CaseCommand, CaseEvent> {
         addEvent(new CaseDefinitionMigrated(this, definition));
     }
 
-    public void migrateCaseDefinition(CaseDefinition definition) {
-        CMMNElement.MigDevConsoleStatic("\n\nMigrating case " + getDefinition().getName() + " with id " + getId());
-        setDefinition(definition);
-        getCaseTeam().migrateDefinition(definition.getCaseTeamModel());
-        getCaseFile().migrateDefinition(definition.getCaseFileModel());
-        getCasePlan().migrateDefinition(definition.getCasePlanModel());
+    public void migrateCaseDefinition(CaseDefinition newDefinition) {
+        addDebugInfo(() -> "====== Migrating Case["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + newDefinition.getName() +"\n");
+        setDefinition(newDefinition);
+        getCaseTeam().migrateDefinition(newDefinition.getCaseTeamModel());
+        getCaseFile().migrateDefinition(newDefinition.getCaseFileModel());
+        getCasePlan().migrateDefinition(newDefinition.getCasePlanModel());
     }
 
     public void removeDroppedPlanItem(PlanItem<?> item) {
         getSentryNetwork().disconnect(item);
         planItems.remove(item);
+    }
+
+    public void updateState(CaseDefinitionApplied event) {
+        this.createdOn = event.createdOn;
+        setEngineVersion(event.engineVersion);
+        applyCaseDefinition(event.getDefinition(), event.getParentCaseId(), event.getRootCaseId());
     }
 }

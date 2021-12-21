@@ -20,10 +20,6 @@ class IdentifierQueriesImpl
 
   import dbConfig.profile.api._
 
-  override def blankIdentifierFilterQuery(caseInstanceId: Rep[String]): Query[_, _, Seq] = {
-    caseIdentifiersQuery.filter(_.caseInstanceId === caseInstanceId)
-  }
-
   override def getIdentifiers(user: PlatformUser, filter: IdentifierFilter, area: Area, sort: Sort): Future[IdentifierSet] = {
     val query = for {
       baseQuery <- caseIdentifiersQuery
@@ -31,7 +27,7 @@ class IdentifierQueriesImpl
         .filterOpt(filter.tenant)((identifier, tenant) => identifier.tenant === tenant)
         .filterOpt(filter.name)((identifier, name) => identifier.name === name)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery
     db.run(query.distinct.only(area).order(sort).result).map(records => {
       //      println("Found " + records.length +" matching cases on filter " + identifiers)
@@ -45,7 +41,7 @@ class IdentifierQueriesImpl
         .filter(_.active === true)
         .filterOpt(tenant)((identifier, tenant) => identifier.tenant === tenant)
       // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId, baseQuery.tenant, None)
+      _ <- membershipQuery(user, baseQuery.caseInstanceId)
     } yield baseQuery.name
     db.run(query.distinct.result).map(records => {
       //      println("Found " + records.length +" matching cases on filter " + identifiers)

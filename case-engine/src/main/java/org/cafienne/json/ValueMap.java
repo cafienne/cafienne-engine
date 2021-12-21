@@ -10,8 +10,10 @@ package org.cafienne.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
+import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;
@@ -20,10 +22,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Name based {@link Map} of {@link Value} objects. Typically corresponds to a json object structure, and it is
@@ -51,15 +52,31 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      */
     public ValueMap(Object... rawInputs) {
         this();
+        plus(rawInputs);
+    }
+
+    /**
+     * Add a number of properties to the map.
+     * Note, the properties must come as name/value pairs.
+     *
+     * @param rawInputs
+     * @return
+     */
+    public ValueMap plus(Object... rawInputs) {
         if (rawInputs.length % 2 != 0) {
             throw new IllegalArgumentException("Must provide sufficient input data to the ValueMap construction, of pattern String, Object, String, Object ...");
         }
         for (int i = 0; i < rawInputs.length; i += 2) {
-            if (!(rawInputs[i] instanceof String || rawInputs[i] instanceof Fields)) {
-                throw new IllegalArgumentException("Field name of parameter " + (i % 2) + " is not of type String or Fields, but it must be; found type " + (rawInputs[i] == null ? "null" : rawInputs[i].getClass().getName()));
+            if (rawInputs[i] == null) {
+                throw new IllegalArgumentException("Field name cannot be null (argument nr " + i + ")");
             }
-            putRaw(String.valueOf(rawInputs[i]), rawInputs[i + 1]);
+            String fieldName = String.valueOf(rawInputs[i]);
+            if ((fieldName.length() > 50 && !(rawInputs[i] instanceof String || rawInputs[i] instanceof Fields))) {
+                throw new IllegalArgumentException("Field name at argument nr " + i + " is type " + rawInputs[i].getClass().getName() + " generates a field name with too many characters (" + fieldName.length() + "). Probably wrong argument order? Otherwise use put() method instead for this field.");
+            }
+            put(fieldName, Value.convert(rawInputs[i + 1]));
         }
+        return this;
     }
 
     /**
@@ -82,22 +99,10 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return put(fieldName.toString(), fieldValue);
     }
 
-    /**
-     * Puts a raw value into the object, by first converting the raw value into a {@link Value} object.
-     *
-     * @param fieldName
-     * @param rawValue
-     */
-    public void putRaw(String fieldName, Object rawValue) {
-        put(fieldName, Value.convert(rawValue));
-    }
-
     @Override
     public void print(JsonGenerator generator) throws IOException {
         generator.writeStartObject();
-        Iterator<Entry<String, Value<?>>> fields = value.entrySet().iterator();
-        while (fields.hasNext()) {
-            Entry<String, Value<?>> next = fields.next();
+        for (Entry<String, Value<?>> next : value.entrySet()) {
             printField(generator, next.getKey(), next.getValue());
         }
         generator.writeEndObject();
@@ -114,7 +119,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
             return false;
         }
         Map<String, Value<?>> thisMap = this.value;
-        Map<String, Value<?>> otherMap = (Map<String, Value<?>>) other.value;
+        Map<String, Value<?>> otherMap = other.asMap().value;
         // If the other map has more keys than we, we surely do not contain it.
         if (otherMap.size() > thisMap.size()) {
             return false;
@@ -284,7 +289,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return this.rawInstant(fieldName.toString());
     }
 
-    public <T extends Enum<?>> T getEnum(Fields fieldName, Class<T> tClass) {
+    private <T extends Enum<?>> T getEnum(Fields fieldName, Class<T> tClass) {
         return getEnum(fieldName.toString(), tClass);
     }
 
@@ -296,12 +301,13 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> T getEnum(String fieldName, Class<T> tClass) {
+    private <T extends Enum<?>> T getEnum(String fieldName, Class<T> tClass) {
         Value<?> v = get(fieldName);
         if (v == null || v == Value.NULL) {
             return null;
         }
-        String string = raw(fieldName);
+
+        String string = String.valueOf(v.value);
         if (string == null) {
             // No value found, just return null;
             return null;
@@ -354,5 +360,66 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
             this.value.put(fieldName, fromFieldValue);
         });
         return (V) this;
+    }
+
+    @SafeVarargs
+    public final <T> T readField(Fields fieldName, T... value) {
+        if (has(fieldName)) {
+            return raw(fieldName);
+        } else if (value.length > 0) {
+            return value[0];
+        } else {
+            return null;
+        }
+    }
+
+    public <T extends Enum<?>> T readEnum(Fields fieldName, Class<T> enumClass) {
+        return getEnum(fieldName, enumClass);
+    }
+
+    public String readString(Fields fieldName, String... value) {
+        return readField(fieldName, value);
+    }
+
+    public Boolean readBoolean(Fields fieldName, Boolean... value) {
+        if (value.length > 0) {
+            return readField(fieldName, value);
+        } else {
+            return readField(fieldName, false);
+        }
+    }
+
+    public Instant readInstant(Fields fieldName) {
+        return rawInstant(fieldName);
+    }
+
+    public String[] readStringList(Fields fieldName) {
+        List<String> list = withArray(fieldName).rawList();
+        return list.toArray(new String[0]);
+    }
+
+    public ValueMap readMap(Fields fieldName) {
+        return with(fieldName);
+    }
+
+    public <T> Set<T> readSet(Fields fieldName) {
+        return new HashSet<>(withArray(fieldName).rawList());
+    }
+
+    public <T extends CMMNElementDefinition> T readDefinition(Fields fieldName, Class<T> tClass) {
+        return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(fieldName), tClass);
+    }
+
+    public Path readPath(Fields fieldName) {
+        return new Path(readString(fieldName));
+    }
+
+    public <T> T readObject(Fields fieldName, ValueMapParser<T> parser) {
+        ValueMap json = with(fieldName);
+        return parser.convert(json);
+    }
+
+    public <T> List<T> readObjects(Fields fieldName, ValueMapParser<T> parser) {
+        return withArray(fieldName).stream().map(json -> parser.convert(json.asMap())).collect(Collectors.toList());
     }
 }

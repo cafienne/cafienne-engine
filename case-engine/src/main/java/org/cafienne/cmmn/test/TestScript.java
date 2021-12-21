@@ -7,13 +7,12 @@
  */
 package org.cafienne.cmmn.test;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
-import org.cafienne.cmmn.actorapi.command.team.MemberKey;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -21,6 +20,7 @@ import org.cafienne.cmmn.repository.MissingDefinitionException;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.cafienne.cmmn.test.assertions.FailureAssertion;
 import org.cafienne.infrastructure.Cafienne;
+import org.cafienne.json.ValueMap;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 /**
  * This class enables building test scripts for cases.
@@ -57,9 +60,11 @@ public class TestScript {
 
     private boolean testCompleted;
 
-    private Deque<ModelTestCommand> commands = new ArrayDeque(); // We need to be able to add elements both at front and end; and execute always the front element
+    private final Deque<ModelTestCommand<?, ?>> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
     private ModelTestCommand current; // current test step
     private int actionNumber = 0; // current action number
+
+    private static final String defaultTenant = "hard-coded-test-tenant";
 
     /**
      * Listener for CaseInstanceEvent that ought to be published by the Akka system
@@ -91,16 +96,6 @@ public class TestScript {
     }
 
     /**
-     * Returns the case definition with the specified identifier from the definitions file
-     *
-     * @param fileName
-     * @return
-     */
-    public static CaseDefinition getCaseDefinition(String fileName, String caseIdentifier) {
-        return getDefinitions(fileName).getCaseDefinition(caseIdentifier);
-    }
-
-    /**
      * Helper method to retrieve an invalid definitions document.
      * Throws an assertion if the Definition is missing instead of invalid.
      *
@@ -122,8 +117,8 @@ public class TestScript {
      * @param roles
      * @return
      */
-    public static TenantUser getTestUser(final String user, final String... roles) {
-        return new TenantUser(user, scala.jdk.CollectionConverters.ListHasAsScala(Arrays.asList(roles)).asScala().toSeq(), "hard-coded-test-tenant", false, "", "", true);
+    public static TestUser getTestUser(final String user, final String... roles) {
+        return new TestUser(user, roles);
     }
 
     /**
@@ -134,17 +129,17 @@ public class TestScript {
      * @return
      */
     public static CaseTeam getCaseTeam(Object... users) {
-        List<CaseTeamMember> members = new ArrayList<>();
+        List<CaseTeamUser> members = new ArrayList<>();
         for (Object user : users) {
-            if (user instanceof TenantUser) {
-                members.add(getMember((TenantUser) user));
-            } else if (user instanceof CaseTeamMember) {
-                members.add((CaseTeamMember) user);
+            if (user instanceof TestUser) {
+                members.add(getMember((TestUser) user));
+            } else if (user instanceof CaseTeamUser) {
+                members.add((CaseTeamUser) user);
             } else {
                 throw new IllegalArgumentException("Cannot accept users of type " + user.getClass().getName());
             }
         }
-        return CaseTeam.apply(members);
+        return CaseTeam.create(members);
     }
 
     /**
@@ -153,8 +148,8 @@ public class TestScript {
      * @param user
      * @return
      */
-    public static CaseTeamMember getOwner(TenantUser user) {
-        return CaseTeamMember.apply(new MemberKey(user.id(), "user"), user.roles(), true);
+    public static CaseTeamUser getOwner(TestUser user) {
+        return user.asCaseOwner();
     }
 
     /**
@@ -163,8 +158,8 @@ public class TestScript {
      * @param user
      * @return
      */
-    public static CaseTeamMember getMember(TenantUser user) {
-        return CaseTeamMember.apply(new MemberKey(user.id(), "user"), user.roles(), false);
+    public static CaseTeamUser getMember(TestUser user) {
+        return user.asCaseMember();
     }
 
     /**
@@ -180,6 +175,34 @@ public class TestScript {
         // Start listening to the events coming out of the case persistence mechanism
         this.eventListener = new CaseEventListener(this);
         logger.info("Ready to receive responses from the case system for test '" + testName + "'");
+    }
+
+    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions) {
+        return createCaseCommand(user, caseInstanceId, definitions, new ValueMap());
+    }
+
+    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs) {
+        return createCaseCommand(user, caseInstanceId, definitions, inputs, getCaseTeam(getOwner(user)));
+    }
+
+    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, CaseTeam team) {
+        return createCaseCommand(user, caseInstanceId, definitions, new ValueMap(), team);
+    }
+
+    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
+        return createCaseCommand(defaultTenant, user, caseInstanceId, definitions, inputs, team);
+    }
+
+    public StartCase createCaseCommand(String tenant, TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
+        return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
+    }
+
+    public PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {
+        return new PingCommand(defaultTenant, user, caseInstanceId, waitTimeInMillis);
+    }
+
+    public CaseDefinition getDefinition(String fileName) throws MissingDefinitionException {
+        return TestScript.getCaseDefinition(fileName);
     }
 
     /**
@@ -230,7 +253,7 @@ public class TestScript {
      * @param command
      */
     public void assertStepFails(CaseCommand command) {
-        addTestStep(command, e -> new FailureAssertion(e));
+        addTestStep(command, FailureAssertion::new);
     }
 
     /**
@@ -259,7 +282,7 @@ public class TestScript {
      * @param command
      */
     public void addStep(CaseCommand command) {
-        addTestStep(command, e -> new CaseAssertion(e));
+        addTestStep(command, CaseAssertion::new);
     }
 
     public void insertStep(CaseCommand command, CaseValidator validator) {

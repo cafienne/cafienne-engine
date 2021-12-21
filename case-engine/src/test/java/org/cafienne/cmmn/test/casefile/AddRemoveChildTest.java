@@ -1,6 +1,5 @@
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
@@ -8,6 +7,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
@@ -19,7 +19,7 @@ public class AddRemoveChildTest {
 
     private final String caseName = "addChildTest";
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/addChildTest.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path testPath = new Path("test");
     private final Path testChildPath = new Path("test/testChild");
 
@@ -28,12 +28,12 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
-        item.putRaw("effe", "root-string");
-        item.putRaw("effe2", "root-string-2");
+        item.plus("effe", "root-string");
+        item.plus("effe2", "root-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, item.cloneValueNode(), testPath);
         testCase.addStep(createChild, caseFile -> {
             caseFile.assertCaseFileItem(testPath).assertValue(item);
@@ -43,7 +43,7 @@ public class AddRemoveChildTest {
 
         // Add child item
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("world", "child-string");
+        childItem.plus("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         testCase.addStep(createChild2, caseFile -> {
             caseFile.assertCaseFileItem(testChildPath).assertValue(childItem);
@@ -65,19 +65,19 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
-        item.putRaw("effe", "root-string");
-        item.putRaw("effe2", "root-string-2");
+        item.plus("effe", "root-string");
+        item.plus("effe2", "root-string-2");
         CreateCaseFileItem createChild = new CreateCaseFileItem(testUser, caseInstanceId, item.cloneValueNode(), testPath);
         testCase.addStep(createChild, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(item));
 
 
         // Add child item
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("world", "child-string");
+        childItem.plus("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         testCase.addStep(createChild2, caseFile -> caseFile.assertCaseFileItem(testChildPath).assertValue(childItem));
 
@@ -93,12 +93,12 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         // Add child item together with parent
         ValueMap childItem = new ValueMap();
-        childItem.putRaw("world", "child-string");
+        childItem.plus("world", "child-string");
         CreateCaseFileItem createChild2 = new CreateCaseFileItem(testUser, caseInstanceId, childItem.cloneValueNode(), testChildPath);
         // In case the parent does not have state == Active, CaseFileItemChildAdded should not be triggered
         testCase.assertStepFails(createChild2);

@@ -7,7 +7,7 @@
  */
 package org.cafienne.humantask.actorapi.command;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
@@ -31,8 +31,8 @@ public class CompleteHumanTask extends TaskOutputCommand {
      * @param taskOutput An optional map with named output parameters for the task. These will be set on the task before the task is reported as complete. This
      *                   means that the parameters will also be bound to the case file, which may cause sentries to activate before the task completes.
      */
-    public CompleteHumanTask(TenantUser tenantUser, String caseInstanceId, String taskId, ValueMap taskOutput) {
-        super(tenantUser, caseInstanceId, taskId, taskOutput);
+    public CompleteHumanTask(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
+        super(user, caseInstanceId, taskId, taskOutput);
     }
 
     public CompleteHumanTask(ValueMap json) {

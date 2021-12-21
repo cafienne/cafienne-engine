@@ -7,13 +7,13 @@
  */
 package org.cafienne.cmmn.test.casefile;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class RepetitiveFileItems {
     private final String caseName = "repetitiveFileItems";
     private final TestScript testCase = new TestScript(caseName);
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repeatcasefilecreation.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
     private final Path topPath = new Path("TopCase");
     private final Path itemsPath = new Path("TopCase/items");
     private final Path item0 = new Path("TopCase/items[0]");
@@ -39,7 +39,7 @@ public class RepetitiveFileItems {
         // startCase
         String caseInstanceId = "CaseFileDefinitionTest";
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 
@@ -73,8 +73,8 @@ public class RepetitiveFileItems {
 
         // And add a first item to 'items'
         ValueMap itemObject = new ValueMap();
-        itemObject.putRaw("item", "Help, doe geen review");
-        itemObject.putRaw("role", "expert");
+        itemObject.plus("item", "Help, doe geen review");
+        itemObject.plus("role", "expert");
         itemArray.add(itemObject); // Also add it to the test object
 
         // We're adding a clone of the item object into the case, so that we properly compare arrays. There must be 1 Review task.
@@ -185,7 +185,7 @@ public class RepetitiveFileItems {
         // startCase
         String caseInstanceId = "CaseFileDefinitionTest23";
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             // There must be 1 review task in state available, and it must repeat because there are less than 2 item objects in the case file
             casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Available).assertRepeats();
@@ -196,8 +196,8 @@ public class RepetitiveFileItems {
         ValueList itemArray = new ValueList();
         topCaseObject.put("items", itemArray);
         ValueMap itemObject = new ValueMap();
-        itemObject.putRaw("item", "Help, doe geen review");
-        itemObject.putRaw("role", "expert");
+        itemObject.plus("item", "Help, doe geen review");
+        itemObject.plus("role", "expert");
         itemArray.add(itemObject.cloneValueNode()); // [0]
         itemArray.add(itemObject.cloneValueNode()); // [1]
 

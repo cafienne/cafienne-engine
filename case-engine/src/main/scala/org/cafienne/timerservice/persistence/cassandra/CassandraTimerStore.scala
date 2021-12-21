@@ -7,7 +7,6 @@ import akka.util.Timeout
 import com.datastax.driver.core.querybuilder.{Insert, QueryBuilder}
 import com.datastax.driver.core.schemabuilder.SchemaBuilder
 import com.datastax.driver.core.{BatchStatement, DataType}
-import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
@@ -71,7 +70,7 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
           logger.error(s"Cassandra database table contains an invalid record ($timerId, $caseInstanceId, $tenant, $userId, $moment). Record will be ignored")
           null
         } else {
-          Timer(caseInstanceId, timerId, moment.toInstant, new TenantUser(userId, Seq(), tenant, false, ""))
+          Timer(caseInstanceId, timerId, moment.toInstant, userId)
         }
       }).filter(timer => timer != null) // Filter out the records that have missing column information
     })
@@ -92,8 +91,8 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
     QueryBuilder.insertInto(keyspace, "cafienne_timer")
       .value("timerid", job.timerId)
       .value("caseinstanceid", job.caseInstanceId)
-      .value("tenant", job.user.tenant)
-      .value("user", job.user.id)
+      .value("tenant", "")
+      .value("user", job.userId)
       .value("moment", job.moment)
   }
 

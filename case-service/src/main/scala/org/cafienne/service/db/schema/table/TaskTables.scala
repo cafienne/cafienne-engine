@@ -25,46 +25,46 @@ trait TaskTables extends QueryDBSchema {
       case _ => lastModified
     }
 
-    def id = idColumn[String]("id", O.PrimaryKey)
+    lazy val id = idColumn[String]("id", O.PrimaryKey)
 
-    def caseInstanceId = idColumn[String]("case_instance_id")
+    lazy val caseInstanceId = idColumn[String]("case_instance_id")
 
-    def role = column[String]("role", O.Default(""))
+    lazy val role = column[String]("role", O.Default(""))
 
-    def taskName = column[String]("task_name", O.Default(""))
+    lazy val taskName = column[String]("task_name", O.Default(""))
 
-    def taskState = stateColumn[String]("task_state", O.Default(""))
+    lazy val taskState = stateColumn[String]("task_state", O.Default(""))
 
-    def assignee = userColumn[String]("assignee", O.Default(""))
+    lazy val assignee = userColumn[String]("assignee", O.Default(""))
 
-    def owner = userColumn[String]("owner", O.Default(""))
+    lazy val owner = userColumn[String]("owner", O.Default(""))
 
-    def dueDate = column[Option[Instant]]("due_date")
+    lazy val dueDate = column[Option[Instant]]("due_date")
 
-    def createdOn = column[Instant]("created_on")
+    lazy val createdOn = column[Instant]("created_on")
 
-    def createdBy = userColumn[String]("created_by", O.Default(""))
+    lazy val createdBy = userColumn[String]("created_by", O.Default(""))
 
-    def lastModified = column[Instant]("last_modified")
+    lazy val lastModified = column[Instant]("last_modified")
 
-    def modifiedBy = userColumn[String]("modified_by", O.Default(""))
+    lazy val modifiedBy = userColumn[String]("modified_by", O.Default(""))
 
-    def input = jsonColumn[String]("task_input", O.Default(""))
+    lazy val input = jsonColumn[String]("task_input", O.Default(""))
 
-    def output = jsonColumn[String]("task_output", O.Default(""))
+    lazy val output = jsonColumn[String]("task_output", O.Default(""))
 
-    def taskModel = jsonColumn[String]("task_model", O.Default(""))
+    lazy val taskModel = jsonColumn[String]("task_model", O.Default(""))
 
     // Various indices for optimizing getAllTasks queries
-    def indexCaseInstanceId = index(caseInstanceId)
-    def indexTaskState = index(taskState)
-    def indexAssignee = index(assignee)
-    def indexOwner = index(owner)
-    def indexCreatedBy = index(createdBy)
-    def indexModifiedBy = index(modifiedBy)
-    def indexTenant = index(tenant)
-    def indexDueDate = index(generateIndexName(dueDate), dueDate)
+    lazy val indexCaseInstanceId = oldStyleIndex(caseInstanceId)
+    lazy val indexTaskState = oldStyleIndex(taskState)
+    lazy val indexAssignee = oldStyleIndex(assignee)
+    lazy val indexOwner = oldStyleIndex(owner)
+    lazy val indexCreatedBy = oldStyleIndex(createdBy)
+    lazy val indexModifiedBy = oldStyleIndex(modifiedBy)
+    lazy val indexTenant = oldStyleIndex(tenant)
+    lazy val indexDueDate = index(oldStyleIxName(dueDate), dueDate)
 
-    def * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[TaskRecord]
+    lazy val * = (id, caseInstanceId, tenant, taskName, taskState, role, assignee, owner, dueDate, createdOn, createdBy, lastModified, modifiedBy, input, output, taskModel).mapTo[TaskRecord]
   }
 }

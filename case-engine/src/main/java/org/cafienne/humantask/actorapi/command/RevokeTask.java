@@ -7,7 +7,7 @@
  */
 package org.cafienne.humantask.actorapi.command;
 
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
@@ -17,8 +17,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class RevokeTask extends WorkflowCommand {
-    public RevokeTask(TenantUser tenantUser, String caseInstanceId, String taskId) {
-        super(tenantUser, caseInstanceId, taskId);
+    public RevokeTask(CaseUserIdentity user, String caseInstanceId, String taskId) {
+        super(user, caseInstanceId, taskId);
     }
 
     public RevokeTask(ValueMap json) {

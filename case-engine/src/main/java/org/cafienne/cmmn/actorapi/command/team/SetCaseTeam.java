@@ -1,9 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -14,68 +12,40 @@ import java.io.IOException;
 
 /**
  * Command to set the case team
- * CaseTeam must be a json structure
- * <pre>
- * {
- *   "members" : [
- *      {
- *        "user"  : "user1 identifier",
- *        "roles" : [ "rolename1", 
- *                    "rolename2", 
- *                     ... ]
- *      }, 
- *      {
- *        "user"  : "user2 identifier",
- *        "roles" : [ "rolename1", 
- *                    "rolename3", 
- *                     ... ]
- *      }]
- * }
- * </pre>
- *
- * The roles are matched to roles as defined in the case definition.
- * Furthermore validation on the roles is done.
- *
  */
 @Manifest
 public class SetCaseTeam extends CaseTeamCommand {
 
-    private final CaseTeam newCaseTeam;
+    private final CaseTeam caseTeam;
 
-    public SetCaseTeam(TenantUser tenantUser, String caseInstanceId, CaseTeam newCaseTeam) {
-        // TODO: determine how to do authorization on this command.
-        super(tenantUser, caseInstanceId);
-        this.newCaseTeam = newCaseTeam;
+    public SetCaseTeam(CaseUserIdentity user, String caseInstanceId, CaseTeam caseTeam) {
+        super(user, caseInstanceId);
+        this.caseTeam = caseTeam;
     }
 
     public SetCaseTeam(ValueMap json) {
         super(json);
-        this.newCaseTeam = CaseTeam.deserialize(json.withArray(Fields.team));
+        this.caseTeam = CaseTeam.deserialize(json.with(Fields.team));
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeListField(generator, Fields.team, newCaseTeam.getMembers());
+        writeField(generator, Fields.team, caseTeam);
     }
 
     @Override
-    public void validate(Case caseInstance) {
-        super.validate(caseInstance);
+    public void validate(Team team) {
         // New team cannot be empty
-        if (newCaseTeam.members().isEmpty()) throw new CaseTeamError("The new case team cannot be empty");
+        if (caseTeam.isEmpty()) throw new CaseTeamError("The new case team cannot be empty");
         // New team also must have owners
-        if (newCaseTeam.owners().isEmpty()) throw new CaseTeamError("The new case team must have owners");
+        if (caseTeam.owners().isEmpty()) throw new CaseTeamError("The new case team must have owners");
         // New team roles must match the case definition
-        newCaseTeam.validate(caseInstance.getDefinition());
+        caseTeam.validate(team.getDefinition());
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
-        Team caseTeam = caseInstance.getCaseTeam();
-        caseTeam.clear();
-        caseTeam.fillFrom(newCaseTeam);
-        return new CaseResponse(this);
+    protected void process(Team team) {
+        team.replace(this.caseTeam);
     }
-
 }

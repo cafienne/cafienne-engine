@@ -8,11 +8,11 @@
 package org.cafienne.actormodel.event;
 
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.TenantUserMessage;
+import org.cafienne.actormodel.UserMessage;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.cafienne.json.ValueMap;
 
-public interface ModelEvent<M extends ModelActor<?,?>> extends CafienneSerializable, TenantUserMessage {
+public interface ModelEvent<M extends ModelActor> extends CafienneSerializable, UserMessage {
     String TAG = "cafienne";
 
     void updateState(M actor);

@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.basic;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
@@ -15,13 +14,14 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.junit.Test;
 
 public class EventListener {
     private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/eventlistener.xml");
-    private final TenantUser testUser = TestScript.getTestUser("Anonymous");
+    private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
     public void testEventListener() {
@@ -29,7 +29,7 @@ public class EventListener {
         String caseInstanceId = "EventListener";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = new StartCase(testUser, caseInstanceId, definitions, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 

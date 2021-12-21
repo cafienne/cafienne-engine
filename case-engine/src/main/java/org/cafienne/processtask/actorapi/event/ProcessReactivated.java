@@ -20,7 +20,7 @@ public class ProcessReactivated extends BaseProcessEvent {
 
     public ProcessReactivated(ValueMap json) {
         super(json);
-        this.inputParameters = readMap(json, Fields.input);
+        this.inputParameters = json.readMap(Fields.input);
     }
 
     @Override

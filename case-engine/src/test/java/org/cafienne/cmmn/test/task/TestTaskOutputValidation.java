@@ -4,12 +4,12 @@ import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
 import org.cafienne.humantask.actorapi.command.ClaimTask;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
@@ -36,9 +36,9 @@ public class TestTaskOutputValidation {
     private final ValueMap invalidDecisionResponse = new ValueMap("Status", "NOK", "details", "Field 'decision' has an improper value");
 
 
-    private final TenantUser pete = TestScript.getTestUser("pete");
-    private final TenantUser gimy = TestScript.getTestUser("gimy");
-    private final TenantUser tom = TestScript.getTestUser("tom");
+    private final TestUser pete = TestScript.getTestUser("pete");
+    private final TestUser gimy = TestScript.getTestUser("gimy");
+    private final TestUser tom = TestScript.getTestUser("tom");
 
 
     private final int port = 17382;
@@ -66,7 +66,8 @@ public class TestTaskOutputValidation {
         );
 
         CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
-        testCase.addStep(new StartCase(pete, caseInstanceId, xml, inputs, team), cp -> {
+        StartCase startCase = testCase.createCaseCommand(pete, caseInstanceId, xml, inputs, team);
+        testCase.addStep(startCase, cp -> {
             // Depending on how fast the first (process) task starts, the "HumanTask" is either Active or still Available
             String taskId = cp.assertPlanItem("HumanTask").getId();
 

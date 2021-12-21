@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.test.task;
 
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
@@ -19,8 +18,8 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
-import org.cafienne.cmmn.test.PingCommand;
 import org.cafienne.cmmn.test.TestScript;
+import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
@@ -30,13 +29,13 @@ public class SubCase {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");
 
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         /**
          * Start the MainCase
          */
-        StartCase startCase = new StartCase(testUser, caseInstanceId, xml, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
         /**
@@ -92,7 +91,7 @@ public class SubCase {
              */
             testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "NonBlockingSubCaseTask", Transition.Suspend), suspendedMainCase -> {
                 TestScript.debugMessage("resulting main case: " + suspendedMainCase);
-                testCase.insertStep(new PingCommand(testUser, nonBlockingSubCaseId, 100), nonBlockingSubCasePlan -> {
+                testCase.insertStep(testCase.createPingCommand(testUser, nonBlockingSubCaseId, 100), nonBlockingSubCasePlan -> {
                     TestScript.debugMessage("resulting non-blocking sub case: " + nonBlockingSubCasePlan);
                     nonBlockingSubCasePlan.assertPlanItem("Item1").assertLastTransition(Transition.Start, State.Active, State.Available);
                 });
@@ -136,13 +135,13 @@ public class SubCase {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");
 
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         /**
          * Start the MainCase
          */
-        StartCase startCase = new StartCase(testUser, caseInstanceId, xml, null, null);
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
         /**
@@ -184,20 +183,21 @@ public class SubCase {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");
 
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TenantUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
+        TestUser testUser = TestScript.getTestUser("Anonymous");
 
         /**
          * Start the MainCase
          */
-        testCase.addStep(new StartCase(testUser, caseInstanceId, xml, null, null), mainCasePlan -> mainCasePlan.print());
+        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        testCase.addStep(startCase, mainCasePlan -> mainCasePlan.print());
 
 
         // Now set some invalid data in the main case. It is acceptable data for the main case, but when passed as input parameter
         //  to the subcase, the subcase should choke in it.
         // Next, we expect the main case's task to go to Fault state.
         ValueMap invalidMainRequest = new ValueMap();
-        invalidMainRequest.putRaw("aBoolean", "I ought to be boolean but i am a string");
+        invalidMainRequest.plus("aBoolean", "I ought to be boolean but i am a string");
         testCase.addStep(new CreateCaseFileItem(testUser, caseInstanceId, invalidMainRequest, new Path("InvalidMainRequest")), action -> action.print());
 
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "TriggerFailingBlockingSubCaseTask", Transition.Complete), mainCasePlan -> {
@@ -208,7 +208,7 @@ public class SubCase {
 
             // Now ping the sub case. It must still be "empty", that is to say, it ought to exist (because it is a PersistentActor),
             // but without a definition, because that has failed
-            testCase.addStep(new PingCommand(testUser, subCaseId, 0), casePlan -> {
+            testCase.addStep(testCase.createPingCommand(testUser, subCaseId, 0), casePlan -> {
                 if (!testCase.getEventListener().getEvents().filter(subCaseId).filter(CaseDefinitionApplied.class).getEvents().isEmpty()) {
                     throw new AssertionError("Case has a definition, but it is not expected to have one");
                 }
@@ -216,7 +216,7 @@ public class SubCase {
             });
 
             ValueMap validMainRequest = new ValueMap();
-            validMainRequest.putRaw("aBoolean", false);
+            validMainRequest.plus("aBoolean", false);
             testCase.addStep(new UpdateCaseFileItem(testUser, caseInstanceId, validMainRequest, new Path("InvalidMainRequest")), r -> r.print()); // print the updated case file
 
             testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "FailingBlockingSubCaseTask", Transition.Reactivate), r -> {

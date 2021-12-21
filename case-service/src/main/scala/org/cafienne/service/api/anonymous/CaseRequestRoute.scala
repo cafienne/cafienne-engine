@@ -16,30 +16,30 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember
 import org.cafienne.cmmn.actorapi.response.CaseStartedResponse
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.CommandMarshallers._
-import org.cafienne.json.ValueMap
-import org.cafienne.service.api.anonymous.CaseRequestRoute.AnonymousStartCaseFormat
+import org.cafienne.infrastructure.akka.http.route.CaseTeamValidator
+import org.cafienne.infrastructure.config.AnonymousCaseDefinition
+import org.cafienne.service.api.anonymous.model.AnonymousAPI._
+import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 
 import javax.ws.rs._
-import scala.annotation.meta.field
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class CaseRequestRoute(implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AnonymousRoute {
+class CaseRequestRoute(implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator {
 
   // Reading the definitions executes certain validations immediately
-  val configuredCaseDefinitions = Cafienne.config.api.anonymousConfig.definitions
+  val configuredCaseDefinitions: Map[String, AnonymousCaseDefinition] = Cafienne.config.api.anonymousConfig.definitions
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  override def routes = {
+  override def routes: Route = {
     createCase
   }
 
@@ -57,20 +57,27 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider, override implic
   @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[AnonymousStartCaseFormat]))))
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
-  def createCase = post {
+  def createCase: Route = post {
     readCaseType { caseType: String =>
       entity(as[AnonymousStartCaseFormat]) { payload =>
         try {
           configuredCaseDefinitions.get(caseType) match {
             case Some(definitionConfig) => {
               val newCaseId = payload.caseInstanceId.getOrElse(new Guid().toString)
-              val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-              val startCaseCommand = definitionConfig.createStartCaseCommand(newCaseId, payload.inputs, debugMode)
-              createCaseWithValidTeam(definitionConfig.tenant, definitionConfig.team.members, startCaseCommand)
+                validateTenantAndTeam(definitionConfig.team, definitionConfig.tenant, team => {
+                  val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                  val command = new StartCase(definitionConfig.tenant, definitionConfig.user, newCaseId, definitionConfig.definition, payload.inputs, team, debugMode)
+                  sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
+                    writeLastModifiedHeader(response) {
+                      complete(StatusCodes.OK, s"""{\n  "caseInstanceId": "${response.getActorId}"\n}""")
+                    }
+                  })
+                })
             }
             case None => complete(StatusCodes.NotFound, s"Request of type '$caseType' is not found")
           }
         } catch {
+          case e: SearchFailure => fail(e)
           case e: MissingDefinitionException => fail(e.getMessage)
           case e: InvalidDefinitionException => fail(e.getMessage)
         }
@@ -81,51 +88,6 @@ class CaseRequestRoute(implicit val userCache: IdentityProvider, override implic
   private def readCaseType(subRoute: String => Route): Route = {
     // Either we have a '/request/case' or '/request/case/' or '/request/case/{case-type}'
     concat(path("case") { pathEndOrSingleSlash { subRoute("") } },
-    path("case" / Remaining) { rawPath => subRoute(rawPath) })
-  }
-
-  def createCaseWithValidTeam(tenant: String, members: Seq[CaseTeamMember], command: StartCase): Route = {
-    val userIds = members.filter(member => member.isTenantUser()).map(member => member.key.id)
-    onComplete(userCache.getUsers(userIds, tenant)) {
-      case Success(tenantUsers) => {
-        if (tenantUsers.size != userIds.size) {
-          val tenantUserIds = tenantUsers.map(t => t.id)
-          val unfoundUsers = userIds.filterNot(userId => tenantUserIds.contains(userId))
-          val msg = {
-            if (unfoundUsers.size == 1) s"Cannot find an active user '${unfoundUsers(0)}' in tenant '$tenant'"
-            else s"The users ${unfoundUsers.map(u => s"'$u'").mkString(", ")} are not active in tenant $tenant"
-          }
-          fail(msg)
-        } else {
-          sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
-            writeLastModifiedHeader(response) {
-              complete(StatusCodes.OK, s"""{\n  "caseInstanceId": "${response.getActorId}"\n}""")
-            }
-          })
-        }
-      }
-      case Failure(t: Throwable) => fail(t)
-    }
+      path("case" / Remaining) { rawPath => subRoute(rawPath) })
   }
 }
-
-
-final object CaseRequestRoute {
-
-  @Schema(description = "Input parameters example json")
-  case class InputParametersFormat(input1: String, input2: Object, input3: List[String])
-
-  @Schema(description = "Start the execution of a new case")
-  case class AnonymousStartCaseFormat(
-                                       @(Schema@field)(
-                                         description = "Input parameters that will be passed to the started case",
-                                         required = false,
-                                         implementation = classOf[InputParametersFormat])
-                                       inputs: ValueMap,
-                                       @(Schema@field)(description = "Unique identifier to be used for this case. When there is no identifier given, a UUID will be generated", required = false, example = "Will be generated if omitted or empty")
-                                       caseInstanceId: Option[String],
-                                       @(Schema@field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
-                                       debug: Option[Boolean])
-
-}
-

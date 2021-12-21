@@ -31,7 +31,7 @@ public class CaseModified extends ActorModified<Case> implements CaseEvent {
     public CaseModified(ValueMap json) {
         super(json);
         this.numFailures = json.rawInt(Fields.numFailures);
-        this.state = readEnum(json, Fields.state, State.class);
+        this.state = json.readEnum(Fields.state, State.class);
     }
 
     /**

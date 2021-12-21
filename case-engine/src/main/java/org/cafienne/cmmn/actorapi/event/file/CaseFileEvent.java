@@ -39,7 +39,7 @@ public abstract class CaseFileEvent extends CaseBaseEvent {
 
     protected CaseFileEvent(ValueMap json) {
         super(json);
-        this.path = readPath(json, Fields.path);
+        this.path = json.readPath(Fields.path);
     }
 
     @Override

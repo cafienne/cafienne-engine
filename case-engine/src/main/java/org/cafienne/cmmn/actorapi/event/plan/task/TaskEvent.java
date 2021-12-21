@@ -20,12 +20,12 @@ public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent<T> {
 
     protected TaskEvent(ValueMap json) {
         super(json);
-        this.taskName = readField(json, Fields.taskName);
+        this.taskName = json.readString(Fields.taskName);
         // Not all old style task event carry task id, some have plan item id,
         //  so taking that as default value if task id is missing.
         //  Note: plan item id is parsed from json in the super constructor,
         //  and available through the super getter (which is overridden below, so make sure to call super itself).
-        this.taskId = readField(json, Fields.taskId, super.getPlanItemId());
+        this.taskId = json.readString(Fields.taskId, super.getPlanItemId());
     }
 
     /**

@@ -1,6 +1,6 @@
 package org.cafienne.infrastructure
 
-import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.infrastructure.config.CafienneConfig
 
 /**
@@ -20,7 +20,7 @@ object Cafienne {
     */
   lazy val version = new CafienneVersion
 
-  def isPlatformOwner(user: TenantUser): Boolean = isPlatformOwner(user.id)
+  def isPlatformOwner(user: UserIdentity): Boolean = isPlatformOwner(user.id)
 
   def isPlatformOwner(userId: String): Boolean = {
     config.platform.isPlatformOwner(userId)

@@ -25,8 +25,7 @@ public class StringTemplateTest {
 
     @Test
     public void testURL() throws MalformedURLException {
-        ValueMap parameters = new ValueMap();
-        parameters.putRaw("caseInstanceId", "12");
+        ValueMap parameters = new ValueMap("caseInstanceId", "12");
 
         StringTemplate stringTemplate = new StringTemplate("http://localhost/cases/${caseInstanceId}");
         URL actualURL = stringTemplate.resolveParameters(parameters).toURL();
@@ -36,8 +35,7 @@ public class StringTemplateTest {
 
     @Test
     public void test() throws MalformedURLException {
-        ValueMap parameters = new ValueMap();
-        parameters.putRaw("httpMethod", "POST");
+        ValueMap parameters = new ValueMap("httpMethod", "POST");
 
         StringTemplate stringTemplate = new StringTemplate("-${httpMethod}-");
         String result = stringTemplate.resolveParameters(parameters).toString();

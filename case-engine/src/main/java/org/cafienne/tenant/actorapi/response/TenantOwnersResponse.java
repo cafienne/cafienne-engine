@@ -23,7 +23,7 @@ public class TenantOwnersResponse extends TenantResponse {
 
     public TenantOwnersResponse(ValueMap json) {
         super(json);
-        this.name = readField(json, Fields.name);
+        this.name = json.readString(Fields.name);
         this.owners = json.withArray(Fields.owners).rawList();
     }
 

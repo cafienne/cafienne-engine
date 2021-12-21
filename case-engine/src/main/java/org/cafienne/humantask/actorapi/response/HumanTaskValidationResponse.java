@@ -19,7 +19,7 @@ public class HumanTaskValidationResponse extends HumanTaskResponse {
 
     public HumanTaskValidationResponse(ValueMap json) {
         super(json);
-        this.value = readMap(json, Fields.value);
+        this.value = json.readMap(Fields.value);
     }
 
     @Override
