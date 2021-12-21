@@ -21,7 +21,7 @@ object Deps {
     val akka        = "2.6.17"
     val jackson     = "2.13.0"
     val enumeratum  = "1.7.0"
-    val swagger     = "2.1.10"
+    val swagger     = "2.1.11"
     val slick       = "3.3.3"
     val jasper      = "6.18.1"
   }
@@ -42,7 +42,7 @@ object Deps {
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
-  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.7"
+  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.9"
   val config                = "com.typesafe"            %  "config"                               % "1.4.1"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.4"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
@@ -58,7 +58,7 @@ object Deps {
   // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
   // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
   val javaxws               = "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
-  val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.6.0"
+  val swaggerAkkaHttp       = "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.5.2"
   val swaggerCore           = "io.swagger.core.v3"      % "swagger-core"                          % V.swagger
   val swaggerAnnotations    = "io.swagger.core.v3"      % "swagger-annotations"                   % V.swagger
   val swaggerModels         = "io.swagger.core.v3"      % "swagger-models"                        % V.swagger
@@ -97,7 +97,7 @@ object Deps {
   val slickMigration        = "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
   val flywaySlickBindings   = "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
 
-  val javaXmlJDK9Compat     = "javax.xml.bind"          % "jaxb-api"                              % "2.4.0-b180830.0359"
+  val javaXmlJDK9Compat     = "javax.xml.bind"          % "jaxb-api"                              % "2.3.1" // Used in StringValue xsd date conversions
 
   object gatling {
     private val v   = "3.4.0-M1"
