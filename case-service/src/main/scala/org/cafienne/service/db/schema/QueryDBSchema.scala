@@ -2,6 +2,7 @@ package org.cafienne.service.db.schema
 
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import org.cafienne.service.db.schema.QueryDBSchema._db
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
@@ -25,5 +26,10 @@ import slick.jdbc.JdbcProfile
   */
 
 trait QueryDBSchema extends CafienneJDBCConfig {
-  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.queryDB.config)
+
+  override lazy val dbConfig: DatabaseConfig[JdbcProfile] = _db
+}
+
+object QueryDBSchema extends QueryDBSchema {
+   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.queryDB.config)
 }

@@ -12,6 +12,7 @@ import java.util.logging.Logger
 import javax.sql.DataSource
 
 class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabaseProvider(system) {
+  private var _db: Option[SlickDatabase] = None
 
   private def createOrMigrate(db: JdbcBackend.Database, profile: JdbcProfile) = {
     val dbScriptsLocation = {
@@ -32,11 +33,12 @@ class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabasePro
     flyway.migrate()
   }
 
-  override def database(config: Config): SlickDatabase = {
+  override def database(config: Config): SlickDatabase = _db.fold({
     val db = super.database(config)
     createOrMigrate(db.database, db.profile)
+    _db = Some(db)
     db
-  }
+  })(db => db)
 }
 
 private class DatabaseDataSource(db: JdbcBackend.Database) extends DataSource {
