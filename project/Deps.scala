@@ -35,7 +35,7 @@ object Deps {
   val cassandraExtras =     "com.datastax.cassandra"     % "cassandra-driver-extras"              % "3.11.0"
 
   val akkaInMemoryTestDB    = "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2" excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  val akkaPersistenceJDBC   = "com.lightbend.akka"      %% "akka-persistence-jdbc"                % "4.0.0"
+  val akkaPersistenceJDBC   = "com.lightbend.akka"      %% "akka-persistence-jdbc"                % "5.0.4"
   val akkaTestKit           = "com.typesafe.akka"       %% "akka-testkit"                         % V.akka
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
