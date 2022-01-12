@@ -17,7 +17,7 @@ object Deps {
   object V {
     val scala       = "2.13.6"
     val akkaHttp    = "10.2.7"
-    val akka        = "2.6.17"
+    val akka        = "2.6.18"
     val jackson     = "2.13.0"
     val enumeratum  = "1.7.0"
     val swagger     = "2.1.11"
@@ -41,7 +41,7 @@ object Deps {
   val akkaMultiNodeTestKit  = "com.typesafe.akka"       %% "akka-multi-node-testkit"              % V.akka
   val akkaSlf4j             = "com.typesafe.akka"       %% "akka-slf4j"                           % V.akka
   val bcrypt                = "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
-  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.9"
+  val logback               = "ch.qos.logback"          %  "logback-classic"                      % "1.2.10"
   val config                = "com.typesafe"            %  "config"                               % "1.4.1"
   val scalaLogging          = "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.4"
   val enumeratum            = "com.beachape"            %% "enumeratum"                           % V.enumeratum
@@ -63,7 +63,7 @@ object Deps {
   val swaggerjaxrs2         = "io.swagger.core.v3"      % "swagger-jaxrs2"                        % V.swagger
 
   // The test scope will be added in the build so we don't need to declare it in here
-  val scalaMock             = "org.scalamock"           %% "scalamock"                            % "5.1.0"
+  val scalaMock             = "org.scalamock"           %% "scalamock"                            % "5.2.0"
   val scalaTest             = "org.scalatest"           %% "scalatest"                            % "3.2.9"
   val junit                 = "org.junit.jupiter"       % "junit-jupiter-api"                     % "5.8.2"
   val sbtJUnitInterface     = "com.novocode"            % "junit-interface"                       % "0.11"
@@ -74,7 +74,7 @@ object Deps {
   val jacksonDatabind       = "com.fasterxml.jackson.core"   % "jackson-databind"			            % V.jackson
   val jacksonScala          = "com.fasterxml.jackson.module" %% "jackson-module-scala"            % V.jackson
 
-  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.3.13"
+  val spel                  = "org.springframework"     %  "spring-expression"                    % "5.3.14"
   val jsonPath              = "com.jayway.jsonpath"  	  % "json-path"                             % "2.6.0"
 
   val javaMail              = "com.sun.mail"            % "javax.mail"                            % "1.6.2"
