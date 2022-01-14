@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.engine
 
 import org.cafienne.infrastructure.config.util.ChildConfigReader
 

@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
 trait ConfigReader extends LazyLogging {
   val config: Config
 
-  def warn(msg: String) = {
+  def warn(msg: String): Unit = {
     logger.warn(msg)
   }
 
@@ -114,18 +114,18 @@ trait ConfigReader extends LazyLogging {
     list.map(c => ConfigReader(c)).toSeq
   }
 
-  def requires(errorPrefixMessage: String, paths: String*) = {
+  def requires(errorPrefixMessage: String, paths: String*): Unit = {
     val missingPaths = paths.filter(path => !config.hasPath(path)).map(p => s"'$p'")
     if (missingPaths.nonEmpty) fail(errorPrefixMessage + " misses config properties " + missingPaths.mkString(", "))
   }
 
-  def fail(msg: String) = {
+  def fail(msg: String): Nothing = {
     throw ConfigurationException(msg)
   }
 }
 
 object ConfigReader {
-  def apply(baseConfig: Config) = new ConfigReader {
+  def apply(baseConfig: Config): ConfigReader = new ConfigReader {
     override val config: Config = baseConfig
   }
 }

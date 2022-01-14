@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.api
 
 import org.cafienne.infrastructure.config.util.MandatoryConfig
 
@@ -8,7 +8,7 @@ class SecurityConfig(val parent: ApiConfig) extends MandatoryConfig {
   lazy val oidc: OIDCConfig = new OIDCConfig(this)
 
 
-  lazy val identityCacheSize = {
+  lazy val identityCacheSize: Int = {
     val key = "identity.cache.size"
     val size = readInt(key, 1000)
     if (size == 0) {
@@ -18,5 +18,4 @@ class SecurityConfig(val parent: ApiConfig) extends MandatoryConfig {
     }
     size
   }
-
 }

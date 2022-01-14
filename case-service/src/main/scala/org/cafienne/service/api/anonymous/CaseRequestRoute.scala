@@ -22,7 +22,7 @@ import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.route.CaseTeamValidator
-import org.cafienne.infrastructure.config.AnonymousCaseDefinition
+import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
 import org.cafienne.service.api.anonymous.model.AnonymousAPI._
 import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.CaseSystem

@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.api
 
 import com.typesafe.config.{Config, ConfigObject}
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, PlatformUser, TenantUser}

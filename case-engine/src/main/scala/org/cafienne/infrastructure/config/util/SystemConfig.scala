@@ -51,7 +51,7 @@ object SystemConfig extends LazyLogging {
     * Print a big warning message, hopefully drawing attention :)
     * @param msg
     */
-  def printWarning(msg: String) = {
+  def printWarning(msg: String): Unit = {
     val extendedMessage = s"\tWARNING - $msg\t"
     val longestLine = extendedMessage.split("\n").map(_.length).max + 8 // Plus 8 for 2 tabs
     val manyHashes = List.fill(longestLine)('#').mkString
