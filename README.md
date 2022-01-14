@@ -31,7 +31,7 @@ We assume you know how to install Java, Scala and sbt, etc.
 ### 1.1.2 Case Service
 
 #### 1.1.2.1 Installation
-After you succesfully installed Cassandra and Postgres you are ready for the Case Service installation.
+After you successfully installed Cassandra and Postgres you are ready for the Case Service installation.
 
 #### 1.1.2.2 Run the Case Service from IntelliJ
 1. If you want to run Case Service from IntelliJ you have to checkout the sources directly from IntelliJ and create a new project based on these sources:
@@ -88,90 +88,7 @@ $ ./case-service (or case-service.bat on Windows)
 
 #### 1.1.2.4 Run as a Docker image
 
-__!! This is still experimental and needs some work !!__
-
-- This assumes you already have a running docker setup, including docker-compose
-- This config will pull the images _java:latest (based on openjdk)
-- The exposed ports to the host OS are changed to prevent conflicts with the Case Service and ES running
-locally on the host. Add 10000 to the default ports
-    - Case Service API: 28082
-    - JMX: 19999
-
-1. To build the Case Service docker image run
-``` sh
-$ cd ./cafienne
-$ sbt docker:publishLocal
-```
-
-##### Use the docker hub version to run cafienne. 
-
-By default the docker hub version is pre-packed with a configuration that makes use of a number of environment 
-variables in order to specify the projections database, the event database and the OpenID connect IDP used. 
-
-At this moment Postgres is supported as database out of the box. By overriding the configuration, its possible to
-have different setups as supported by slick and the akka-persistence drivers.
-
-###### Run the container with environment settings
- 
-PROJECTION_DB_URL
-
- * "jdbc:postgresql://localhost:5432/cafienne-query?reWriteBatchedInserts=true"
- 
- 
-PROJECTION_DB_USER
-
-PROJECTION_DB_PASSWORD
-
-EVENT_DB_URL
-
- * "jdbc:postgresql://localhost:5432/cafienne-eventstore?reWriteBatchedInserts=true"
- 
- 
-EVENT_DB_USER
-
-EVENT_DB_PASSWORD
-
-
-CLUSTER_SEED_NODES
-
-This is a list and is specified like CLUSTER_SEED_NODES.0=akka://ClusterSystem@192.168.1.55:25520 
-
-CAFIENNE_PLATFORM_OWNERS
-
-This is a list and is specified like CAFIENNE_PLATFORM_OWNERS.0=admin
-
-CAFIENNE_PLATFORM_DEFAULT_TENANT
- 
-CAFIENNE_OIDC_CONNECT_URL
-
-CAFIENNE_OIDC_TOKEN_URL
-
-CAFIENNE_OIDC_KEY_URL
-
-CAFIENNE_OIDC_AUTHORIZATION_URL
-
-CAFIENNE_OIDC_ISSUER
-
-CAFIENNE_CMMN_DEFINITIONS_PATH
-
-CAFIENNE_DEBUG_EVENTS
-
-###### Use of a custom configuration
-
-1. Create data folders for the external data
-``` sh
-$ mkdir ~/docker-data/cafienne
-$ mkdir ~/docker-data/cafienne/conf
-$ mkdir ~/docker-data/cafienne/definitions
-$ mkdir ~/docker-data/cafienne/definitions/logs
-```
-
-2. Copy the  `cafienne.conf.docker` file to the `~/docker-data/cafienne/conf` folder
-``` sh
-$ cp ./cafienne/run/case-service/cafienne.conf.docker ~/docker-data/cafienne/conf/local.conf
-```
-
-4. Press `ctrl-C` to shutdown the containers
+Checkout the [Getting Started](https://github.com/cafienne/getting-started) repository.
 
 ## 1.2 FAQ
 

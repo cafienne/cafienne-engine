@@ -11,7 +11,7 @@ import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
-import org.cafienne.system.router.{ClusterRouter, LocalRouter}
+import org.cafienne.system.router.CafienneGateway
 import org.cafienne.timerservice.TimerService
 
 /**
@@ -30,22 +30,16 @@ class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging 
     */
   val system: ActorSystem = ActorSystem(name, Cafienne.config.systemConfig) // Create an Akka system
 
-  private val routerClazz = system.hasExtension(akka.cluster.Cluster) match {
-    case true => classOf[ClusterRouter]
-    case false => classOf[LocalRouter]
-  }
-
   // Create singleton actors
   val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
 
-  val messageRouterService: ActorRef = system.actorOf(Props.create(routerClazz, this))
+  private val cafienneGateway = new CafienneGateway(this)
+
 
   /**
     * Retrieve a router for case messages. This will forward the messages to the correct case instance
     */
-  def router(): ActorRef = {
-    messageRouterService
-  }
+  lazy val gateway: CafienneGateway = cafienneGateway
 
   // First, start platform bootstrap configuration
   BootstrapPlatformConfiguration.run(this)

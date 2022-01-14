@@ -413,7 +413,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         synchronized (responseListeners) {
             responseListeners.put(command.getMessageId(), new Responder(left, right));
         }
-        caseSystem.router().tell(command, self());
+        caseSystem.gateway().inform(command, self());
     }
 
     /**
