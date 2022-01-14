@@ -9,11 +9,9 @@ package org.cafienne.actormodel.response;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -34,7 +32,7 @@ public abstract class BaseModelResponse implements ModelResponse {
     private final UserIdentity user;
     private final String commandType;
 
-    protected BaseModelResponse(ModelCommand<?, ?> command) {
+    protected BaseModelResponse(ModelCommand command) {
         // Make sure that we capture the recipient during creation.
         //  This is required since sending the response is done after events are persisted,
         //  and that in itself may or may not happen asynchronously, and if it is happening
@@ -42,7 +40,7 @@ public abstract class BaseModelResponse implements ModelResponse {
         //  of the next message handled by the actor already.
         this.recipient = command.getActor().sender();
         this.messageId = command.getMessageId();
-        this.actorId = command.actorId;
+        this.actorId = command.actorId();
         // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
         //  the actor will not be available. Checking that here. Required for CommandFailure.
         this.lastModified = command.getActor() != null ? command.getActor().getLastModified() : null;

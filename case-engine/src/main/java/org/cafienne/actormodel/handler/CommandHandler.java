@@ -15,14 +15,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-public class CommandHandler<C extends ModelCommand<A, ?>, A extends ModelActor> extends IncomingMessageHandler {
+public class CommandHandler extends IncomingMessageHandler {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
-    protected final C command;
+    protected final ModelCommand command;
 
-    protected final A actor;
+    protected final ModelActor actor;
 
-    public CommandHandler(A actor, C msg) {
+    public CommandHandler(ModelActor actor, ModelCommand msg) {
         super(actor, msg);
         this.actor = actor;
         this.command = msg;
@@ -39,7 +39,7 @@ public class CommandHandler<C extends ModelCommand<A, ?>, A extends ModelActor> 
 
         // First, simple, validation
         try {
-            command.validate(actor);
+            command.validateCommand(actor);
         } catch (AuthorizationException e) {
             addDebugInfo(() -> e, logger);
             setNextResponse(new SecurityFailure(getCommand(), e));
@@ -59,7 +59,7 @@ public class CommandHandler<C extends ModelCommand<A, ?>, A extends ModelActor> 
 
         try {
             // Leave the actual work of processing to the command itself.
-            setNextResponse(command.process(actor));
+            setNextResponse(command.processCommand(actor));
             logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
         } catch (AuthorizationException e) {
             addDebugInfo(() -> e, logger);
@@ -115,7 +115,7 @@ public class CommandHandler<C extends ModelCommand<A, ?>, A extends ModelActor> 
         return response != null && response instanceof CommandFailure;
     }
 
-    public C getCommand() {
+    public ModelCommand getCommand() {
         return command;
     }
 }

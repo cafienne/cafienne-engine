@@ -278,9 +278,9 @@ public abstract class ModelActor extends AbstractPersistentActor {
                     return new NotConfiguredHandler(this, msg);
                 }
             }
-            ModelCommand<?, ?> command = (ModelCommand<?, ?>) msg;
+            ModelCommand command = (ModelCommand) msg;
             command.setActor(this);
-            CommandHandler<?, ?> c = createCommandHandler(command);
+            CommandHandler c = createCommandHandler(command);
             return c;
         } else if (msg instanceof ModelResponse) {
             if (inNeedOfTenantInformation()) {
@@ -320,7 +320,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      *
      * @param command
      */
-    protected CommandHandler<?, ?> createCommandHandler(ModelCommand<?, ?> command) {
+    protected CommandHandler createCommandHandler(ModelCommand command) {
         return new CommandHandler(this, command);
     }
 

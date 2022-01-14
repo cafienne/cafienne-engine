@@ -37,7 +37,7 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     case other => throw new Error(s"Cannot extract actor id for messages of type ${other.getClass.getName}")
   }
   private val shardResolver: ShardRegion.ExtractShardId = {
-    case m: ModelCommand[_, _] => {
+    case m: ModelCommand => {
       val pidHashKey: Long = m.actorId.hashCode()
       val shard = ((localSystemKey + pidHashKey) % numberOfPartitions).toString
       shard
@@ -50,7 +50,7 @@ class ClusterRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     }
   }
 
-  override def forwardMessage(m: ModelCommand[_, _]) = {
+  override def forwardMessage(m: ModelCommand) = {
     // Forward message into the right shardregion
     val shardRouter: ActorRef = m match {
       case _: CaseCommand => caseShardRouter

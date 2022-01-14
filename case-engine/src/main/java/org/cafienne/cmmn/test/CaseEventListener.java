@@ -49,7 +49,7 @@ public class CaseEventListener {
         this.readJournal = new CaseEventPublisher(this, system);
     }
 
-    void sendCommand(ModelCommand<?, ?> command) {
+    void sendCommand(ModelCommand command) {
         newEvents = new ArrayList<>();
         caseMessageRouter.tell(command, responseHandlingActor);
     }

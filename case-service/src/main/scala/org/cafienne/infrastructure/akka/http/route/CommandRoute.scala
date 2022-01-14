@@ -22,7 +22,7 @@ trait CommandRoute extends AuthenticatedRoute {
 
   implicit val timeout: Timeout = Main.caseSystemTimeout
 
-  def askModelActor(command: ModelCommand[_, _]): Route = {
+  def askModelActor(command: ModelCommand): Route = {
     onComplete(caseSystem.router() ? command) {
       case Success(value) =>
         value match {

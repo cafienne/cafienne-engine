@@ -1,13 +1,13 @@
 package org.cafienne.processtask.actorapi.command;
 
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.event.ProcessModified;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
-public abstract class ProcessCommand extends ModelCommand<ProcessTaskActor, UserIdentity> {
+public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> {
     protected ProcessCommand(UserIdentity user, String id) {
         super(user, id);
     }

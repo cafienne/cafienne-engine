@@ -27,7 +27,7 @@ public class InvalidMessageHandler extends MessageHandler {
     protected void complete() {
         if (msg instanceof ModelCommand) {
             // Sent to the wrong type of actor
-            ModelCommand<?, ?> invalidCommand = (ModelCommand<?, ?>) msg;
+            ModelCommand invalidCommand = (ModelCommand) msg;
             // Still set the actor, so that it can create a proper failure response.
             invalidCommand.setActor(this.actor);
             Exception wrongCommandType = new Exception(errorMsg());

@@ -19,7 +19,7 @@ public abstract class ActorModified extends BaseModelEvent<ModelActor> implement
     public final String source;
     public final Instant lastModified;
 
-    protected ActorModified(ModelCommand<?,?> command) {
+    protected ActorModified(ModelCommand command) {
         super(command.getActor());
         this.source = command.getClass().getName();
         this.lastModified = command.getActor().getTransactionTimestamp();

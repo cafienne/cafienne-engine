@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.actorapi.command;
 
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
@@ -19,10 +19,10 @@ import org.cafienne.json.ValueMap;
 
 /**
  * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
- * Each CaseCommand must implement it's own logic within the case, through the optional {@link ModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
+ * Each CaseCommand must implement it's own logic within the case, through the optional {@link BaseModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
  * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */
-public abstract class CaseCommand extends ModelCommand<Case, CaseUserIdentity> {
+public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentity> {
     /**
      * Create a new command that can be sent to the case.
      *

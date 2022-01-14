@@ -1,159 +1,55 @@
 package org.cafienne.actormodel.command;
 
-import akka.actor.ActorPath;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
 import org.cafienne.json.Value;
-import org.cafienne.json.ValueMap;
-import org.cafienne.util.Guid;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-public abstract class ModelCommand<T extends ModelActor, U extends UserIdentity> implements IncomingActorMessage {
-    protected final String msgId;
-    public final String actorId;
-    protected transient T actor;
-
-    /**
-     * Store the user that issued the Command.
-     */
-    private final U user;
-
-    protected ModelCommand(U user, String actorId) {
-        // First, validate actor id to be akka compliant
-        if (actorId == null) {
-            throw new InvalidCommandException("Actor id cannot be null");
-        }
-        try {
-            ActorPath.validatePathElement(actorId);
-        } catch (Throwable t) {
-            throw new InvalidCommandException("Invalid actor path " + actorId, t);
-        }
-        if (user == null || user.id() == null || user.id().trim().isEmpty()) {
-            throw new InvalidCommandException("Tenant user cannot be null");
-        }
-        this.msgId = new Guid().toString();
-        this.user = user;
-        this.actorId = actorId;
-    }
-
-    protected ModelCommand(ValueMap json) {
-        this.msgId = json.readString(Fields.messageId);
-        this.actorId = json.readString(Fields.actorId);
-        this.user = readUser(json.with(Fields.user));
-    }
-
-    protected abstract U readUser(ValueMap json);
-
+public interface ModelCommand extends IncomingActorMessage {
     /**
      * Explicit method to be implemented returning the type of the ModelActor handling this message.
      * This is required for the message routing within the CaseSystem
      * @return
      */
-    public abstract Class<T> actorClass();
-
-    /**
-     * Through this method, the command is made aware of the actor that is handling it.
-     * @param actor
-     */
-    public final void setActor(ModelActor actor) {
-        this.actor = (T) actor;
-    }
-
-    /**
-     * Note: this method will only return a sensible value when it is invoked from within the command handling context.
-     * It is intended for command handlers to have more metadata when creating a ModelResponse.
-     * @return
-     */
-    public T getActor() {
-        return actor;
-    }
+    Class<?> actorClass();
 
     /**
      * Returns the user context for this command.
      *
      * @return
      */
-    public final U getUser() {
-        return user;
-    }
+    UserIdentity getUser();
 
     /**
      * Returns a string with the identifier of the actor towards this command must be sent.
      * @return
      */
-    public final String getActorId() {
-        return actorId;
+    String getActorId();
+
+    default String actorId() {
+        return getActorId();
     }
 
     /**
-     * Returns the correlation id of this command, that can be used to relate a {@link CaseResponse} back to this
-     * original command.
-     *
-     * @return
+     * Return the actor handling this command. May return null if setActor() is not yet invoked.
      */
-    public String getMessageId() {
-        return msgId;
-    }
+    ModelActor getActor();
 
     /**
-     * Before the Model Actor starts processing the command, it will first ask to validate the command.
-     * Implementations may override this method to implement their own validation logic.
-     * Implementations may throw the {@link InvalidCommandException} if they encounter a validation error
-     *
-     * @param modelActor
-     * @throws InvalidCommandException If the command is invalid
+     * Through this method, the command is made aware of the actor that is handling it.
      */
-    public abstract void validate(T modelActor) throws InvalidCommandException;
+    void setActor(ModelActor actor);
+
+    void validateCommand(ModelActor actor);
+
+    ModelResponse processCommand(ModelActor actor);
+
+    String getCommandDescription();
 
     /**
-     * Method to be implemented to handle the command.
-     * @param modelActor
-     * @return
+     * Return a ValueMap serialization of the command
      */
-    public abstract ModelResponse process(T modelActor);
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        writeModelCommand(generator);
-    }
-
-    protected void writeModelCommand(JsonGenerator generator) throws IOException {
-        writeField(generator, Fields.messageId, this.getMessageId());
-        writeField(generator, Fields.actorId, this.getActorId());
-        writeField(generator, Fields.user, user);
-    }
-
-    public String getCommandDescription() {
-        return getClass().getSimpleName();
-    }
-
-    public String toString() {
-        return "Command [" + getCommandDescription() + "]" + super.toString();
-    }
-
-    public Value<?> toJson() {
-        JsonFactory factory = new JsonFactory();
-        StringWriter sw = new StringWriter();
-        try {
-            JsonGenerator generator = factory.createGenerator(sw);
-            generator.setPrettyPrinter(new DefaultPrettyPrinter());
-            writeThisObject(generator);
-            generator.close();
-            return JSONReader.parse(sw.toString());
-        } catch (IOException | JSONParseFailure e) {
-            return new ValueMap("message", "Could not make JSON out of command "+getClass().getName(), "exception", Value.convertThrowable(e));
-        }
-    }
+    Value<?> toJson();
 }

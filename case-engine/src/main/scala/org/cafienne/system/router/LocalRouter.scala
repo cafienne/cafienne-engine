@@ -18,7 +18,7 @@ class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     *
     * @param m
     */
-  override def forwardMessage(m: ModelCommand[_, _]): Unit = {
+  override def forwardMessage(m: ModelCommand): Unit = {
     actors.getOrElseUpdate(m.actorId, createActorRef(m)).forward(m)
   }
 
@@ -28,7 +28,7 @@ class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
     * @param m
     * @return
     */
-  private def createActorRef(m: ModelCommand[_, _]): ActorRef = {
+  private def createActorRef(m: ModelCommand): ActorRef = {
     // Note: we create the ModelActor as a child to our context
     val ref = context.actorOf(Props.create(m.actorClass, caseSystem), m.actorId)
     // Also start watching the lifecycle of the model actor
