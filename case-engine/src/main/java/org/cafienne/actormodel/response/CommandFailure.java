@@ -21,7 +21,7 @@ import java.io.IOException;
  * Can be used to return an exception to the sender of the command.
  */
 @Manifest
-public class CommandFailure extends ModelResponse {
+public class CommandFailure extends BaseModelResponse {
     private final Throwable exception;
     private final SerializedException serializedException;
     private ValueMap exceptionAsJSON;

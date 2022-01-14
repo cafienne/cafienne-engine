@@ -21,5 +21,5 @@ public interface IncomingActorMessage extends CafienneSerializable, UserMessage 
      *
      * @return
      */
-    void done();
+    default void done(){}
 }
