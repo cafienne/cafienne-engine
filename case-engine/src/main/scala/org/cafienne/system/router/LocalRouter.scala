@@ -8,10 +8,8 @@ import org.cafienne.system.CaseSystem
   * In-memory router for akka messages sent in the CaseSystem.
   * Facilitates actor management in a non-clustered actor system.
   */
-class LocalRouter(val caseSystem: CaseSystem) extends CaseMessageRouter {
+class LocalRouter(caseSystem: CaseSystem, actors: collection.concurrent.TrieMap[String, ActorRef]) extends CaseMessageRouter {
   logger.info("Starting case system in local mode")
-
-  val actors = collection.mutable.Map[String, ActorRef]()
 
   /**
     * Forward a command to the appropriate ModelActor. Actor will be created if it does not yet exist.
