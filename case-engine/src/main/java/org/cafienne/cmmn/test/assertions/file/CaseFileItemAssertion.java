@@ -12,7 +12,7 @@ import org.cafienne.json.ValueList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CaseFileItemAssertion extends ModelTestCommandAssertion<CaseTestCommand> {
+public class CaseFileItemAssertion extends ModelTestCommandAssertion {
     private final Path path;
     private final PublishedEventsAssertion<CaseFileItemTransitioned> events = new PublishedEventsAssertion(new ArrayList<>());
     private final CaseFileAssertion caseFileAssertion;

@@ -3,6 +3,7 @@ package org.cafienne.cmmn.test;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
@@ -28,8 +29,8 @@ import java.util.List;
 public class CaseEventListener {
     private final static Logger logger = LoggerFactory.getLogger(CaseEventListener.class);
 
-    private List<ModelEvent> publishedEvents = new ArrayList<>();
-    private List<ModelEvent> newEvents = new ArrayList<>();
+    private final List<ModelEvent<?>> publishedEvents = new ArrayList<>();
+    private List<ModelEvent<?>> newEvents = new ArrayList<>();
     private CaseModified lastCaseModifiedEvent;
     private final ActorRef caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
@@ -48,7 +49,7 @@ public class CaseEventListener {
         this.readJournal = new CaseEventPublisher(this, system);
     }
 
-    void sendCommand(Object command) {
+    void sendCommand(ModelCommand<?, ?> command) {
         newEvents = new ArrayList<>();
         caseMessageRouter.tell(command, responseHandlingActor);
     }
@@ -58,13 +59,13 @@ public class CaseEventListener {
             if (object instanceof CaseModified) {
                 lastCaseModifiedEvent = (CaseModified) object;
             }
-            handle((ModelEvent) object);
+            handle((ModelEvent<?>) object);
         } else {
             logger.warn("Received unexpected event " + object);
         }
     }
 
-    private void handle(ModelEvent event) {
+    private void handle(ModelEvent<?> event) {
         logger.debug("Received "+event.getClass().getSimpleName()+" event " + event);
         publishedEvents.add(event);
         newEvents.add(event);
@@ -78,8 +79,8 @@ public class CaseEventListener {
      *
      * @return
      */
-    public PublishedEventsAssertion getNewEvents() {
-        return new PublishedEventsAssertion(new ArrayList<>(newEvents));
+    public PublishedEventsAssertion<?> getNewEvents() {
+        return new PublishedEventsAssertion<ModelEvent<?>>(new ArrayList<>(newEvents));
     }
 
     /**

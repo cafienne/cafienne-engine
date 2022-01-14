@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class CaseFileAssertion extends ModelTestCommandAssertion<CaseTestCommand> {
+public class CaseFileAssertion extends ModelTestCommandAssertion {
     private final static Logger logger = LoggerFactory.getLogger(CaseFileAssertion.class);
     private final Map<Path, CaseFileItemAssertion> assertions = new HashMap<>();
 
