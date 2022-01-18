@@ -18,7 +18,7 @@ import java.io.IOException;
  *
  */
 @Manifest
-public class CaseModified extends ActorModified<Case> implements CaseEvent {
+public class CaseModified extends ActorModified implements CaseEvent {
     private final int numFailures;
     private final State state;
 

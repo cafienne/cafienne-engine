@@ -42,7 +42,7 @@ public abstract class MessageHandler {
 
     private final static int avgNumEvents = 30;
 
-    protected final List<ModelEvent<?>> events = new ArrayList<>(avgNumEvents);
+    protected final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
 
     private DebugEvent debugEvent;
 
@@ -76,14 +76,14 @@ public abstract class MessageHandler {
      *
      * @param event
      */
-    public ModelEvent<?> addEvent(ModelEvent<?> event) {
+    public <T extends ModelEvent> T addEvent(T event) {
         return addModelEvent(events.size(), event);
     }
 
-    protected ModelEvent<?> addModelEvent(int index, ModelEvent event) {
+    protected <T extends ModelEvent> T addModelEvent(int index, T event) {
         events.add(index, event);
         addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);
-        event.updateState(actor);
+        event.updateActorState(actor);
         return event;
     }
 

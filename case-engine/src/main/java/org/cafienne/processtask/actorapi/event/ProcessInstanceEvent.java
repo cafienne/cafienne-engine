@@ -1,8 +1,7 @@
 package org.cafienne.processtask.actorapi.event;
 
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.processtask.instance.ProcessTaskActor;
 
-public interface ProcessInstanceEvent extends ModelEvent<ProcessTaskActor> {
+public interface ProcessInstanceEvent extends ModelEvent {
     String TAG = "cafienne:process";
 }

@@ -32,7 +32,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   /**
     * This method must be implemented by the consumer to handle the wrapped ModelEvent
     *
-    * @param envelope Wrapper around Akka EventEnvelop with a typed event (typed as ModelEvent[_])
+    * @param envelope Wrapper around Akka EventEnvelop with a typed event (typed as ModelEvent)
     * @return
     */
   def consumeModelEvent(envelope: ModelEventEnvelope): Future[Done]
@@ -78,7 +78,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
     // The fact that we receive an event here is an indication that the readJournal is healthy
     HealthMonitor.readJournal.isOK()
     element match {
-      case EventEnvelope(_, _, _, _: ModelEvent[_]) => true
+      case EventEnvelope(_, _, _, _: ModelEvent) => true
       case _ =>
         val offset = element.offset
         val persistenceId = element.persistenceId

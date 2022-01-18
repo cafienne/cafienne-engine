@@ -206,10 +206,10 @@ public abstract class ModelActor extends AbstractPersistentActor {
         // Step 2
         if (supportsEvent(event) || event instanceof EngineVersionChanged) {
             if (tenant == null && event instanceof ModelEvent) {
-                tenant = ((ModelEvent<?>) event).getTenant();
+                tenant = ((ModelEvent) event).getTenant();
             }
             // Step 2a.
-            runHandler(createRecoveryHandler((ModelEvent<?>) event));
+            runHandler(createRecoveryHandler((ModelEvent) event));
         } else if (event instanceof DebugEvent) {
             // Step 2b.
             // No recovery from debug events ...
@@ -360,7 +360,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
      *
      * @param event
      */
-    protected RecoveryEventHandler<?, ?> createRecoveryHandler(ModelEvent<?> event) {
+    protected RecoveryEventHandler createRecoveryHandler(ModelEvent event) {
         return new RecoveryEventHandler(this, event);
     }
 
@@ -371,9 +371,8 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * @param <EV>
      * @return
      */
-    public <EV extends ModelEvent<?>> EV addEvent(EV event) {
-        currentMessageHandler.addEvent(event);
-        return event;
+    public <EV extends ModelEvent> EV addEvent(EV event) {
+        return currentMessageHandler.addEvent(event);
     }
 
     public Responder getResponseListener(String msgId) {

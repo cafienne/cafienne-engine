@@ -12,12 +12,12 @@ import org.cafienne.actormodel.UserMessage;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.cafienne.json.ValueMap;
 
-public interface ModelEvent<M extends ModelActor> extends CafienneSerializable, UserMessage {
+public interface ModelEvent extends CafienneSerializable, UserMessage {
     String TAG = "cafienne";
 
-    void updateState(M actor);
+    void updateActorState(ModelActor actor);
 
-    void recover(M actor);
+    void recover(ModelActor actor);
 
     String getTenant();
 

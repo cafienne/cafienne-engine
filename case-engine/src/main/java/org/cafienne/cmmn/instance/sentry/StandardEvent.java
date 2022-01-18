@@ -1,9 +1,8 @@
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.actorapi.event.CaseEvent;
 
-public interface StandardEvent<T extends Enum<?>, C extends TransitionGenerator<?>> extends ModelEvent<Case> {
+public interface StandardEvent<T extends Enum<?>, C extends TransitionGenerator<?>> extends CaseEvent {
     T getTransition();
 
     C getSource();
