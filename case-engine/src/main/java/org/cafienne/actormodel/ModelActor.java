@@ -426,16 +426,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
     }
 
     /**
-     * Method for a MessageHandler to persist it's events
-     *
-     * @param events
-     * @param <T>
-     */
-    public <T> void persistEvents(List<T> events) {
-        persistEventsAndThenReply(events, null);
-    }
-
-    /**
      * Model actor can send a reply to a command with this method
      *
      * @param response
@@ -457,44 +447,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
         response.getRecipient().tell(response, self());
     }
 
-    public <T> void replyAndThenPersistEvents(List<T> events, ModelResponse response) {
-        reply(response);
-        persistEvents(events);
-    }
-
-    /**
-     * Method for a MessageHandler to persist it's events, and after that send the (optional) reply.
-     * If there are no events, the reply will be sent immediately.
-     *
-     * @param events
-     * @param response
-     * @param <T>
-     */
-    public <T> void persistEventsAndThenReply(List<T> events, ModelResponse response) {
-        if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
-            StringBuilder msg = new StringBuilder("\n------------------------ PERSISTING " + events.size() + " EVENTS IN " + this);
-            events.forEach(e -> msg.append("\n\t" + e));
-            getLogger().debug(msg + "\n");
-            EngineDeveloperConsole.debugIndentedConsoleLogging(msg + "\n");
-        }
-        resetTransactionTimestamp();
-        if (events.isEmpty()) {
-            reply(response);
-            return;
-        } else {
-            T lastEvent = events.get(events.size() - 1);
-            persistAll(events, e -> {
-                HealthMonitor.writeJournal().isOK();
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(this.getDescription() + " - persisted event [" + lastSequenceNr() + "] of type " + e.getClass().getName());
-                }
-                if (e == lastEvent) {
-                    reply(response);
-                }
-            });
-        }
-    }
-
     /**
      * If the command handler has changed ModelActor state, but then ran into an unhandled exception,
      * the actor will remove itself from memory and start again.
@@ -502,14 +454,17 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * @param handler
      * @param exception
      */
-    public void failedWithInvalidState(MessageHandler handler, Throwable exception) {
-        this.getScheduler().clearSchedules(); // Remove all schedules.
+    public void failedWithInvalidState(Object msg, Throwable exception) {
+        // Remove all schedules.
+        this.getScheduler().clearSchedules();
+        // Print errors
         if (exception instanceof CommandException) {
-            getLogger().error("Restarting " + this + ". Handling msg of type " + handler.msg.getClass().getName() + " resulted in invalid state.");
+            getLogger().error("Restarting " + this + ". Handling msg of type " + msg.getClass().getName() + " resulted in invalid state.");
             getLogger().error("  Cause: " + exception.getClass().getSimpleName() + " - " + exception.getMessage());
         } else {
-            getLogger().error("Encountered failure in handling msg of type " + handler.msg.getClass().getName() + "; restarting " + this, exception);
+            getLogger().error("Encountered failure in handling msg of type " + msg.getClass().getName() + "; restarting " + this, exception);
         }
+        // Tell our supervisor to restart us in order to clear any invalid state
         this.supervisorStrategy().restartChild(self(), exception, true);
     }
 
@@ -518,12 +473,14 @@ public abstract class ModelActor extends AbstractPersistentActor {
         //  Can also happen when a serialization of an event to JSON fails. In that case, recovery of the case seems not to work,
         //  whereas if we break e.g. Cassandra connection, it properly recovers after having invoked context().stop(self()).
         //  Not sure right now what the reason is for this.
-        HealthMonitor.writeJournal().hasFailed(cause);
+
+        // First log a message
         getLogger().error("Failure in " + getClass().getSimpleName() + " " + getId() + " during persistence of event " + seqNr + " of type " + event.getClass().getName() + ". Stopping instance.", cause);
-        if (currentMessageHandler instanceof CommandHandler) {
-            ModelCommand command = ((CommandHandler) currentMessageHandler).getCommand();
-            reply(new CommandFailure(command, new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
-        }
+        // Inform the HealthMonitor
+        HealthMonitor.writeJournal().hasFailed(cause);
+        // Optionally send a reply (in the CommandHandler). If persistence fails, also sending a reply may fail, hence first logging the issue.
+        currentMessageHandler.handlePersistFailure(cause, event, seqNr);
+        // Stop the actor
         context().stop(self());
     }
 

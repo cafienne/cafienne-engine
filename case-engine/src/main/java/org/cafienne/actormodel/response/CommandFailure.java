@@ -24,7 +24,7 @@ import java.io.IOException;
 public class CommandFailure extends BaseModelResponse {
     private final Throwable exception;
     private final SerializedException serializedException;
-    private ValueMap exceptionAsJSON;
+    private final ValueMap exceptionAsJSON;
 
     /**
      * Create a failure response for the command.

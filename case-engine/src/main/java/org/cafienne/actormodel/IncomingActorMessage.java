@@ -13,13 +13,4 @@ public interface IncomingActorMessage extends CafienneSerializable, UserMessage 
      * @return
      */
     String getMessageId();
-
-    /**
-     * This method is invoked when handling of the message completed and
-     * resulting state changes are to be persisted in the event journal.
-     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.CommitEvent} event.
-     *
-     * @return
-     */
-    default void done(){}
 }

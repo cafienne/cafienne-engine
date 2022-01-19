@@ -2,18 +2,14 @@ package org.cafienne.actormodel.handler;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.EngineChokedFailure;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.actormodel.response.SecurityFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 public class CommandHandler extends IncomingMessageHandler {
     private final static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
@@ -26,10 +22,10 @@ public class CommandHandler extends IncomingMessageHandler {
         super(actor, msg);
         this.actor = actor;
         this.command = msg;
-        addDebugInfo(() -> "\n\n\txxxxxxxxxxxxxxxxxxxx new command " + command.getCommandDescription() +" xxxxxxxxxxxxxxx\n\n", logger);
+        addDebugInfo(() -> "\n\n\txxxxxxxxxxxxxxxxxxxx new command " + command.getCommandDescription() +" xxxxxxxxxxxxxxx\n\n", getLogger());
     }
 
-    protected Logger getLogger() {
+    private Logger getLogger() {
         return logger;
     }
 
@@ -41,81 +37,50 @@ public class CommandHandler extends IncomingMessageHandler {
         try {
             command.validateCommand(actor);
         } catch (AuthorizationException e) {
-            addDebugInfo(() -> e, logger);
-            setNextResponse(new SecurityFailure(getCommand(), e));
-            logger.debug("===== Command was not authorized ======");
+            addDebugInfo(() -> e, getLogger());
+            setResponse(new SecurityFailure(getCommand(), e));
             return;
         } catch (InvalidCommandException e) {
-            addDebugInfo(() -> e, logger);
-            setNextResponse(new CommandFailure(getCommand(), e));
-            logger.debug("===== Command was invalid ======");
+            addDebugInfo(() -> e, getLogger());
+            setResponse(new CommandFailure(getCommand(), e));
+            addDebugInfo(() -> "===== Command was invalid ======", getLogger());
             return;
         } catch (Throwable e) {
-            addDebugInfo(() -> e, logger);
-            setNextResponse(new EngineChokedFailure(getCommand(), e));
-            addDebugInfo(() -> "---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception", logger);
+            addDebugInfo(() -> e, getLogger());
+            setResponse(new EngineChokedFailure(getCommand(), e));
+            addDebugInfo(() -> "---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception", getLogger());
             return;
         }
 
         try {
             // Leave the actual work of processing to the command itself.
-            setNextResponse(command.processCommand(actor));
-            logger.info("---------- User " + command.getUser().id() + " in " + this.actor + " completed command " + command);
+            setResponse(command.processCommand(actor));
         } catch (AuthorizationException e) {
-            addDebugInfo(() -> e, logger);
-            setNextResponse(new SecurityFailure(getCommand(), e));
-            logger.debug("===== Command was not authorized ======");
+            addDebugInfo(() -> e, getLogger());
+            setResponse(new SecurityFailure(getCommand(), e));
         } catch (CommandException e) {
-            setNextResponse(new CommandFailure(getCommand(), e));
-            addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception", logger);
-            addDebugInfo(() -> e, logger);
+            setResponse(new CommandFailure(getCommand(), e));
+            addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + this.actor + " failed to complete command " + command + "\nwith exception", getLogger());
+            addDebugInfo(() -> e, getLogger());
         } catch (Throwable e) {
-            setNextResponse(new EngineChokedFailure(getCommand(), e));
-            addDebugInfo(() -> "---------- Engine choked during processing of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception", logger);
-            addDebugInfo(() -> e, logger);
+            setResponse(new EngineChokedFailure(getCommand(), e));
+            addDebugInfo(() -> "---------- Engine choked during processing of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception", getLogger());
+            addDebugInfo(() -> e, getLogger());
         }
     }
 
-    @Override
-    protected final void complete() {
-        // Handling the incoming message can result in 3 different scenarios that are dealt with below:
-        // 1. The message resulted in an exception that needs to be returned to the client; Possibly the case must be restarted.
-        // 2. The message did not result in state changes (e.g., when fetching discretionary items), and the response can be sent straight away
-        // 3. The message resulted in state changes, so the new events need to be persisted, and after persistence the response is sent back to the client.
-
-        if (hasFailures()) { // Means there is a response AND it is of type CommandFailure
-            // Inform the sender about the failure
-            // In case of failure we still want to store the debug events. Actually, mostly we need this in case of failure (what else are we debugging for)
-            Object[] debugEvents = events.stream().filter(e -> e instanceof DebugEvent).toArray();
-            actor.replyAndThenPersistEvents(Arrays.asList(debugEvents), response);
-
-
-            // If we have created events (other than debug events) from the failure, then we are in inconsistent state and need to restart the actor.
-            if (events.size() > debugEvents.length) {
-                Throwable exception = ((CommandFailure) response).internalException();
-                addDebugInfo(() -> {
-                    StringBuilder msg = new StringBuilder("\n------------------------ SKIPPING PERSISTENCE OF " + events.size() + " EVENTS IN " + this);
-                    events.forEach(e -> msg.append("\n\t"+e.getDescription()));
-                    return msg + "\n";
-                }, logger);
-                addDebugInfo(() -> exception, logger);
-                actor.failedWithInvalidState(this, exception);
-            }
-        } else {
-            // Follow regular procedure
-            super.complete();
+    protected void beforeCommit() {
+        if (events.containStateChanges()) {
+            command.done();
         }
-    }
-
-    protected void setNextResponse(ModelResponse response) {
-        this.response = response;
-    }
-
-    protected boolean hasFailures() {
-        return response != null && response instanceof CommandFailure;
     }
 
     public ModelCommand getCommand() {
         return command;
+    }
+
+    @Override
+    protected void handlePersistFailure(Throwable cause, Object event, long seqNr) {
+        actor.reply(new CommandFailure(command, new Exception("Handling the request resulted in a system failure. Check the server logs for more information.")));
     }
 }

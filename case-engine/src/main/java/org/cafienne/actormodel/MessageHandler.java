@@ -3,6 +3,8 @@ package org.cafienne.actormodel;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
 import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
 import org.cafienne.cmmn.instance.debug.DebugStringAppender;
@@ -12,9 +14,6 @@ import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
 import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Generic MessageHandler for incoming messages in ModelActors
@@ -40,15 +39,18 @@ public abstract class MessageHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
-    private final static int avgNumEvents = 30;
+    protected final EventBatch events;
 
-    protected final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
-
-    private DebugEvent debugEvent;
+    protected ModelResponse response = null;
 
     protected MessageHandler(ModelActor actor, Object msg) {
         this.actor = actor;
         this.msg = msg;
+        this.events = new EventBatch(actor, this);
+    }
+
+    protected void setResponse(ModelResponse response) {
+        this.response = response;
     }
 
     protected void checkEngineVersion() {
@@ -57,19 +59,56 @@ public abstract class MessageHandler {
         CafienneVersion actorVersion = actor.getEngineVersion();
         if (actorVersion != null && currentEngineVersion.differs(actor.getEngineVersion())) {
             logger.info(this + " changed engine version from\n" + actor.getEngineVersion()+ " to\n" + currentEngineVersion);
-            addModelEvent(0, new EngineVersionChanged(actor, currentEngineVersion));
+            addEvent(new EngineVersionChanged(actor, currentEngineVersion));
         }
+    }
+
+    /**
+     * Flag indicating whether events generated while handling the message should be persisted.
+     * In case of invalid messages or recovery or akka system messages it should not.
+     * In case of commands or responses to commands it should.
+     * @return
+     */
+    protected boolean hasPersistence() {
+        return false;
+    }
+
+    protected void handlePersistFailure(Throwable cause, Object event, long seqNr) {}
+
+    /**
+     * Lifecycle method
+     */
+    protected void process() {
     }
 
     /**
      * Lifecycle method
      */
-    abstract protected void process();
+    protected void beforeCommit() {
+    }
 
     /**
      * Lifecycle method
      */
-    abstract protected void complete();
+    protected void complete() {
+        // Handling the incoming message can result in 3 different scenarios that are dealt with below:
+        // 1. The message resulted in an exception that needs to be returned to the client; Possibly the case must be restarted.
+        // 2. The message did not result in state changes (e.g., when fetching discretionary items), and the response can be sent straight away
+        // 3. The message resulted in state changes, so the new events need to be persisted, and after persistence the response is sent back to the client.
+        if (hasFailures()) { // Means there is a response AND it is of type CommandFailure
+            events.abortWith(msg, response);
+        } else {
+            // Follow regular procedure
+            beforeCommit();
+            events.commit(response);
+        }
+    }
+
+    protected boolean hasFailures() {
+        return response != null && response instanceof CommandFailure;
+    }
+
+//    abstract protected void complete();
 
     /**
      * Adds an event generated while handling the incoming message
@@ -77,11 +116,7 @@ public abstract class MessageHandler {
      * @param event
      */
     public <T extends ModelEvent> T addEvent(T event) {
-        return addModelEvent(events.size(), event);
-    }
-
-    protected <T extends ModelEvent> T addModelEvent(int index, T event) {
-        events.add(index, event);
+        events.addEvent(event);
         addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), logger);
         event.updateActorState(actor);
         return event;
@@ -93,13 +128,7 @@ public abstract class MessageHandler {
      * @return
      */
     private DebugEvent getDebugEvent() {
-        if (debugEvent == null) {
-            debugEvent = new DebugEvent(this.actor);
-            if (actor.debugMode() && !actor.recoveryRunning()) {
-                events.add(debugEvent);
-            }
-        }
-        return debugEvent;
+        return events.getDebugEvent();
     }
 
     protected void addDebugInfo(DebugStringAppender appender, Value<?> json, Logger logger) {
@@ -158,16 +187,5 @@ public abstract class MessageHandler {
      */
     private boolean logDebugMessages() {
         return EngineDeveloperConsole.enabled() || actor.debugMode() || logger.isDebugEnabled();
-    }
-
-    /**
-     * Returns true if the list of events generated has only debug events.
-     * This is used in e.g. command handlers to determine whether or not the state of the actor has
-     * actually changed during handling of the message. (DebugEvents are not supposed to change state...)
-     * @return
-     */
-    protected boolean hasOnlyDebugEvents() {
-        boolean hasOnlyDebugEvents = events.stream().allMatch(e -> e instanceof DebugEvent);
-        return hasOnlyDebugEvents;
     }
 }

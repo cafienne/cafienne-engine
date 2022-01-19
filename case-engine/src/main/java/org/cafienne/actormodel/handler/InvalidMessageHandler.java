@@ -17,14 +17,11 @@ public class InvalidMessageHandler extends MessageHandler {
         super(actor, msg);
     }
 
-    protected void process() {
-    }
-
     protected String errorMsg() {
         return this.actor + " does not support commands of type " + msg.getClass().getName();
     }
 
-    protected void complete() {
+    protected void process() {
         if (msg instanceof ModelCommand) {
             // Sent to the wrong type of actor
             ModelCommand invalidCommand = (ModelCommand) msg;
@@ -32,12 +29,9 @@ public class InvalidMessageHandler extends MessageHandler {
             invalidCommand.setActor(this.actor);
             Exception wrongCommandType = new Exception(errorMsg());
             addDebugInfo(wrongCommandType::getMessage, logger);
-            CommandFailure response = new CommandFailure(invalidCommand, wrongCommandType);
-            actor.reply(response);
+            setResponse(new CommandFailure(invalidCommand, wrongCommandType));
         } else {
             logger.warn(actor + " received a message it cannot handle, of type " + msg.getClass().getName());
         }
-
-        actor.persistEvents(events);
     }
 }

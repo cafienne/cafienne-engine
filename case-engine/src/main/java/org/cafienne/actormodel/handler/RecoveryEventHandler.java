@@ -22,6 +22,7 @@ public class RecoveryEventHandler extends ValidMessageHandler {
     }
 
     protected void process() {
+//        System.out.println("Recovering " + actor +" with " + msg.getClass().getSimpleName());
         msg.recover(actor);
     }
 
@@ -34,8 +35,5 @@ public class RecoveryEventHandler extends ValidMessageHandler {
 
         logger.debug("Not storing internally generated event because recovery is running. Event is of type " + event.getClass().getSimpleName());
         return event;
-    }
-
-    protected void complete() {
     }
 }

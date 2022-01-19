@@ -38,7 +38,8 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      */
     public PublishedEventsAssertion assertSize(int expectedNumberOfEvents) {
         if (events.size() != expectedNumberOfEvents) {
-            throw new AssertionError("Expecting " + expectedNumberOfEvents + ", but found " + events.size() + " events");
+            String types = events.stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.toSet()).toString();
+            throw new AssertionError("Expecting " + expectedNumberOfEvents + ", but found " + events.size() + " events: " + types);
         }
         return this;
     }
