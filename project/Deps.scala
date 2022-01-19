@@ -27,7 +27,6 @@ object Deps {
 
   val akkaActor             = "com.typesafe.akka"       %% "akka-actor"                           % V.akka
   val akkaStream            = "com.typesafe.akka"       %% "akka-stream"                          % V.akka
-  val akkaContrib           = "com.typesafe.akka"       %% "akka-contrib"                         % "2.5.32"
   val akkaClusterTools      = "com.typesafe.akka"       %% "akka-cluster-tools"                   % V.akka
   val akkaPersistence       = "com.typesafe.akka"       %% "akka-persistence"                     % V.akka    // exclude("org.iq80.leveldb","leveldb")
   val akkaQuery             = "com.typesafe.akka"       %% "akka-persistence-query"               % V.akka

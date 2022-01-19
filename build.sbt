@@ -83,7 +83,6 @@ lazy val engine = project("case-engine")
       Deps.akkaActor,
       Deps.akkaClusterTools,
       Deps.akkaClusterSharding,
-      Deps.akkaContrib,
       Deps.akkaHttp,
       Deps.akkaHttpCors,
       Deps.akkaHttpXml,
