@@ -10,28 +10,15 @@ public abstract class IncomingMessageHandler extends ValidMessageHandler {
      */
     protected final IncomingActorMessage msg;
 
-    /**
-     * Valid Messages may lead to a response to the sender.
-     */
-    protected ModelResponse response = null;
-
     protected IncomingMessageHandler(ModelActor actor, IncomingActorMessage msg) {
         super(actor, msg);
         this.msg = msg;
+        // First check the engine version, potentially leading to an extra event.
+        checkEngineVersion();
     }
 
-    protected void complete() {
-        // First check the engine version.
-        checkEngineVersion();
-
-        // If there are only debug events, first respond and then persist the events (for performance).
-        // Otherwise, only send a response upon successful persisting the events.
-        if (hasOnlyDebugEvents()) {
-            actor.replyAndThenPersistEvents(events, response);
-        } else {
-            // Inform the message that we're done handling it. Can typically be used to add a transaction event
-            msg.done();
-            actor.persistEventsAndThenReply(events, response);
-        }
+    @Override
+    protected boolean hasPersistence() {
+        return true;
     }
 }

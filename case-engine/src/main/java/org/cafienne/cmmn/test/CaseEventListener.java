@@ -3,6 +3,7 @@ package org.cafienne.cmmn.test;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
@@ -15,6 +16,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.filter.EventFilter;
+import org.cafienne.system.router.CafienneGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +30,10 @@ import java.util.List;
 public class CaseEventListener {
     private final static Logger logger = LoggerFactory.getLogger(CaseEventListener.class);
 
-    private List<ModelEvent> publishedEvents = new ArrayList<>();
+    private final List<ModelEvent> publishedEvents = new ArrayList<>();
     private List<ModelEvent> newEvents = new ArrayList<>();
     private CaseModified lastCaseModifiedEvent;
-    private final ActorRef caseMessageRouter; // proxy to the case system
+    private final CafienneGateway caseMessageRouter; // proxy to the case system
     private final ActorRef responseHandlingActor; // The actor we use to communicate with the case system
     private final TestScript testScript;
     private final CaseEventPublisher readJournal;
@@ -39,7 +41,7 @@ public class CaseEventListener {
     CaseEventListener(TestScript testScript) {
         this.testScript = testScript;
         // Case message router is used to send messages into the case system
-        this.caseMessageRouter = testScript.getCaseSystem().router();
+        this.caseMessageRouter = testScript.getCaseSystem().gateway();
 
         final ActorSystem system = testScript.getCaseSystem().system();
         // Now create the callback mechanism for the case system
@@ -48,9 +50,9 @@ public class CaseEventListener {
         this.readJournal = new CaseEventPublisher(this, system);
     }
 
-    void sendCommand(Object command) {
+    void sendCommand(ModelCommand command) {
         newEvents = new ArrayList<>();
-        caseMessageRouter.tell(command, responseHandlingActor);
+        caseMessageRouter.inform(command, responseHandlingActor);
     }
 
     void handle(Object object) {
@@ -78,8 +80,8 @@ public class CaseEventListener {
      *
      * @return
      */
-    public PublishedEventsAssertion getNewEvents() {
-        return new PublishedEventsAssertion(new ArrayList<>(newEvents));
+    public PublishedEventsAssertion<?> getNewEvents() {
+        return new PublishedEventsAssertion<ModelEvent>(new ArrayList<>(newEvents));
     }
 
     /**

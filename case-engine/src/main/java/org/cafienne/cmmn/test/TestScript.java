@@ -13,6 +13,7 @@ import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
+import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
@@ -60,8 +61,8 @@ public class TestScript {
 
     private boolean testCompleted;
 
-    private final Deque<ModelTestCommand<?, ?>> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
-    private ModelTestCommand current; // current test step
+    private final Deque<CaseTestCommand> commands = new ArrayDeque<>(); // We need to be able to add elements both at front and end; and execute always the front element
+    private CaseTestCommand current; // current test step
     private int actionNumber = 0; // current action number
 
     private static final String defaultTenant = "hard-coded-test-tenant";
@@ -475,7 +476,7 @@ public class TestScript {
             if (response instanceof CommandFailure) {
                 current.handleFailure((CommandFailure) response);
             } else {
-                current.handleResponse((ModelResponse) response);
+                current.handleResponse((CaseResponse) response);
             }
         } catch (Throwable t) {
             // One of the validators raised an exception, so finish the script here and now with that exception

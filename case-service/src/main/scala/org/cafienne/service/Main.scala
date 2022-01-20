@@ -10,7 +10,6 @@ package org.cafienne.service
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
-import akka.util.Timeout
 import org.cafienne.BuildInfo
 import org.cafienne.identity.IdentityCache
 import org.cafienne.infrastructure.Cafienne
@@ -50,9 +49,6 @@ object Main extends App {
     t.printStackTrace()
     System.exit(-1)
   }
-
-  def httpRoutesTimeout = Timeout(15.seconds) // This is the timeout that the http engine uses to wait for futures
-  def caseSystemTimeout = Timeout(10.seconds) // This is the timeout that the routes use to interact with the case engine
 
   def startup(): Unit = {
     // Take some implicits from the case system

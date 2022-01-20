@@ -34,7 +34,7 @@ import scala.concurrent.ExecutionContext
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
 class RepositoryRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute with TenantValidator {
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
 

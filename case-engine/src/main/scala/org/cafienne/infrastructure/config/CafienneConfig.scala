@@ -1,17 +1,20 @@
 package org.cafienne.infrastructure.config
 
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.infrastructure.config.api.{ApiConfig, OIDCConfig}
+import org.cafienne.infrastructure.config.engine.EngineConfig
 import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
 
 /**
   * Configuration settings of this Cafienne Case System Platform
   * @param systemConfig
   */
-class CafienneConfig() extends ConfigReader with LazyLogging {
-  val systemConfig = SystemConfig.load()
+class CafienneConfig extends ConfigReader with LazyLogging {
+  val systemConfig: Config = SystemConfig.load()
 
   val path = "cafienne"
-  override lazy val config = {
+  override lazy val config: Config = {
     if (systemConfig.hasPath(path)) {
       systemConfig.getConfig(path)
     } else {
@@ -27,7 +30,7 @@ class CafienneConfig() extends ConfigReader with LazyLogging {
   /**
     * Returns configuration options for the QueryDB
     */
-  lazy val readJournal = {
+  lazy val readJournal: String = {
     if (config.hasPath("read-journal")) {
       readString("read-journal")
     } else {
@@ -70,7 +73,7 @@ class CafienneConfig() extends ConfigReader with LazyLogging {
     */
   val developerRouteOpen: Boolean = {
     val debugRouteOpenOption = "api.security.debug.events.open"
-    val open = readBoolean(debugRouteOpenOption, false)
+    val open = readBoolean(debugRouteOpenOption, default = false)
     if (open) {
       SystemConfig.printWarning("Case Service runs in developer mode (the debug route to get all events is open for anyone!)")
     }

@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Some basic assertions for plan items
  */
-public class PlanItemAssertion extends ModelTestCommandAssertion<CaseTestCommand> {
+public class PlanItemAssertion extends ModelTestCommandAssertion {
     protected final String caseId;
 
     private final String id;

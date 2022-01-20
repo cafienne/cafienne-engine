@@ -1,15 +1,16 @@
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.api
 
 import org.cafienne.infrastructure.config.util.MandatoryConfig
+import org.cafienne.infrastructure.config.CafienneConfig
 
 class ApiConfig(val parent: CafienneConfig) extends MandatoryConfig {
   val path = "api"
 
-  lazy val bindHost = {
+  lazy val bindHost: String = {
     config.getString("bindhost")
   }
 
-  lazy val bindPort = {
+  lazy val bindPort: Int = {
     config.getInt("bindport")
   }
 

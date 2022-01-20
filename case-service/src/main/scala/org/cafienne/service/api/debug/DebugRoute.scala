@@ -87,11 +87,11 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
   @Produces(Array("application/json"))
   def forceRecovery = patch {
     path("force-recovery" / Segment) { modelId =>
-      validUser { _ =>
+      validUser { user =>
         if (! Cafienne.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          caseSystem.router() ! new TerminateModelActor(modelId)
+          caseSystem.gateway.inform(new TerminateModelActor(user, modelId))
           complete(StatusCodes.OK, s"Forced recovery of $modelId")
         }
       }

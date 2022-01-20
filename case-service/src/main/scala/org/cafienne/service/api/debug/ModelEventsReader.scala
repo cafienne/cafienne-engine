@@ -19,7 +19,7 @@ class ModelEventsReader()(implicit override val system: ActorSystem) extends Laz
     val eventList = new ValueList
     val source: Source[EventEnvelope, akka.NotUsed] = journal().currentEventsByPersistenceId(actorId, from, to)
     source.runForeach {
-      case EventEnvelope(offset, _, sequenceNr: Long, event: ModelEvent[_]) =>
+      case EventEnvelope(offset, _, sequenceNr: Long, event: ModelEvent) =>
         if (user == null || user.tenants.contains(event.tenant) || user.isPlatformOwner) {
           val eventNr = sequenceNr.asInstanceOf[java.lang.Long]
           val eventType = event.getClass.getSimpleName

@@ -21,7 +21,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
       logger.info(s"Received termination request for actor ${kill.actorId}")
       terminateActor(kill.actorId)
     }
-    case m: ModelCommand[_, _] => forwardMessage(m)
+    case m: ModelCommand => forwardMessage(m)
     case t: Terminated => removeActorRef(t)
     case other => handleUnknownMessage(other);
   }
@@ -41,7 +41,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
     *
     * @param m
     */
-  def verifyCommand(m: ModelCommand[_, _]): Unit = {
+  def verifyCommand(m: ModelCommand): Unit = {
     try {
       // Try and validate the actor path. May result in an exception, and then we do not forward the message into the cluster system
       ActorPath.validatePathElement(m.actorId)
@@ -65,7 +65,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
     }
   }
 
-  def forwardMessage(m: ModelCommand[_, _]): Unit
+  def forwardMessage(m: ModelCommand): Unit
 
   def terminateActor(str: String): Unit
 }

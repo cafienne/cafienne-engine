@@ -7,7 +7,7 @@
  */
 package org.cafienne.tenant.actorapi.command;
 
-import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * Base class for sending commands to a TenantActor
  */
-public abstract class TenantCommand extends ModelCommand<TenantActor, TenantUser> {
+public abstract class TenantCommand extends BaseModelCommand<TenantActor, TenantUser> {
     /**
      * Create a new command that can be sent to the tenant.
      *

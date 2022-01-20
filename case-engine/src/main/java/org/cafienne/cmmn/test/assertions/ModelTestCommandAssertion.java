@@ -1,15 +1,15 @@
 package org.cafienne.cmmn.test.assertions;
 
-import org.cafienne.cmmn.test.ModelTestCommand;
+import org.cafienne.cmmn.test.CaseTestCommand;
 
-public class ModelTestCommandAssertion<T extends ModelTestCommand> {
-    protected final T testCommand;
+public class ModelTestCommandAssertion {
+    protected final CaseTestCommand testCommand;
 
-    protected ModelTestCommandAssertion(T testCommand) {
+    protected ModelTestCommandAssertion(CaseTestCommand testCommand) {
         this(testCommand, false);
     }
 
-    protected ModelTestCommandAssertion(T testCommand, boolean expectCommandFailure) {
+    protected ModelTestCommandAssertion(CaseTestCommand testCommand, boolean expectCommandFailure) {
         this.testCommand = testCommand;
         if (expectCommandFailure) {
             expectCommandFailure();
@@ -18,7 +18,7 @@ public class ModelTestCommandAssertion<T extends ModelTestCommand> {
         }
     }
 
-    public T getTestCommand() {
+    public CaseTestCommand getTestCommand() {
         return testCommand;
     }
 

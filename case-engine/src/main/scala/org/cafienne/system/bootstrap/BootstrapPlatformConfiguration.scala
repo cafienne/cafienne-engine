@@ -1,6 +1,5 @@
 package org.cafienne.system.bootstrap
 
-import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
@@ -12,7 +11,6 @@ import org.cafienne.tenant.actorapi.response.TenantResponse
 
 import java.io.File
 import scala.concurrent._
-import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 
 /**
@@ -142,19 +140,16 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     }
   }
 
-  private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant) = {
-    import akka.pattern.ask
-    implicit val timeout: Timeout = Timeout(10.seconds)
-    implicit val ec: ExecutionContextExecutor = ExecutionContext.global
+  private def sendCommand(caseSystem: CaseSystem, bootstrapTenant: CreateTenant): Future[Unit] = {
+    implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-    caseSystem.router().ask(bootstrapTenant).map {
-      case e: CommandFailure => {
+    caseSystem.gateway.request(bootstrapTenant).map {
+      case e: CommandFailure =>
         if (e.exception().getMessage.toLowerCase().contains("already exists")) {
           logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
         } else {
           logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
         }
-      }
       case _: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
       case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
       case t: Throwable => throw t

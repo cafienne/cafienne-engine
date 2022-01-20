@@ -9,24 +9,17 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 import java.time.Instant;
 
-public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent<M> {
+public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent {
     private final ValueMap json;
-
+    
     // Serializable fields
     private final String actorId;
     public final String tenant;
     private final UserIdentity user;
     private final Instant timestamp;
 
-    /**
-     * During recovery, Actor is set in call to {@link ModelEvent#recover(ModelActor)}
-     * So during {@link ModelEvent#updateState(ModelActor)} it can be used.
-     */
-    protected transient M actor;
-
     protected BaseModelEvent(M actor) {
         this.json = new ValueMap();
-        this.actor = actor;
         this.actorId = actor.getId();
         this.tenant = actor.getTenant();
         this.user = actor.getCurrentUser();
@@ -91,17 +84,22 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
      */
     public abstract void updateState(M actor);
 
+    @Override
+    public final void updateActorState(ModelActor actor) {
+        // A very hard cast indeed. But it would be weird if it doesn't work...
+        updateState((M) actor);
+    }
+
     /**
      * Internal framework method
      *
      * @param actor
      */
-    public final void recover(M actor) {
-        this.actor = actor;
+    public final void recover(ModelActor actor) {
         if (logger.isDebugEnabled()) {
             logger.debug("Recovery in " + actor.getDescription() + "[" + actor.lastSequenceNr() + "]: " + timestamp + " - " + this.getDescription());
         }
-        this.updateState(actor);
+        this.updateActorState(actor);
     }
 
     protected void writeModelEvent(JsonGenerator generator) throws IOException {

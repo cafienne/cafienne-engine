@@ -12,7 +12,7 @@ import org.cafienne.tenant.actorapi.command.TenantCommand;
  *
  */
 @Manifest
-public class TenantModified extends ActorModified<TenantActor> implements TenantEvent {
+public class TenantModified extends ActorModified implements TenantEvent {
     public TenantModified(TenantCommand command) {
         super(command);
     }

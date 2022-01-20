@@ -10,12 +10,10 @@ package org.cafienne.service.api.anonymous
 import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
-import akka.util.Timeout
 import org.cafienne.actormodel.exception.SerializedException
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
-import org.cafienne.service.Main
 import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
@@ -25,9 +23,7 @@ class AnonymousRoute(override implicit val caseSystem: CaseSystem) extends CaseS
   val defaultErrorMessage = "Your request bumped into an internal configuration issue and cannot be handled"
 
   def sendCommand[T](command: StartCase, expectedResponseClass: Class[T], expectedResponseHandler: T => Route): Route = {
-    import akka.pattern.ask
-    implicit val timeout: Timeout = Main.caseSystemTimeout
-    onComplete(caseSystem.router() ? command) {
+    onComplete(caseSystem.gateway.request(command)) {
       case Success(value) =>
         if (value.getClass.isAssignableFrom(expectedResponseClass)) {
           expectedResponseHandler(value.asInstanceOf[T])

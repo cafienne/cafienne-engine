@@ -53,5 +53,4 @@ public class GetDiscretionaryItems extends CaseCommand {
 
         return new GetDiscretionaryItemsResponse(this, node);
     }
-
 }

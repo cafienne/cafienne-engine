@@ -1,6 +1,7 @@
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.engine
 
 import org.cafienne.infrastructure.config.util.ChildConfigReader
+import org.cafienne.infrastructure.config.CafienneConfig
 
 class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
   val path = "engine"

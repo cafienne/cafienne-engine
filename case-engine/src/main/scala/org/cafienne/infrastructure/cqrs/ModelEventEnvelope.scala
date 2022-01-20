@@ -7,6 +7,6 @@ case class ModelEventEnvelope(envelope: EventEnvelope) {
   lazy val offset: Offset = envelope.offset
   lazy val persistenceId: String = envelope.persistenceId
   lazy val sequenceNr: Long = envelope.sequenceNr
-  lazy val event: ModelEvent[_] = envelope.event.asInstanceOf[ModelEvent[_]]
+  lazy val event: ModelEvent = envelope.event.asInstanceOf[ModelEvent]
 }
 

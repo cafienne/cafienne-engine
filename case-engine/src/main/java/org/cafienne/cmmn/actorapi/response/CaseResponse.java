@@ -7,6 +7,7 @@
  */
 package org.cafienne.cmmn.actorapi.response;
 
+import org.cafienne.actormodel.response.BaseModelResponse;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
@@ -24,7 +25,7 @@ import org.cafienne.json.ValueMap;
  * </ul>
  */
 @Manifest
-public class CaseResponse extends ModelResponse {
+public class CaseResponse extends BaseModelResponse {
     public CaseResponse(CaseCommand command) {
         super(command);
     }

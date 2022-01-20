@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 
 trait QueryRoute extends AuthenticatedRoute {
 
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  implicit val ec: ExecutionContext = caseSystem.system.dispatcher
   implicit val lastModifiedRegistration: LastModifiedRegistration
 
   val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED

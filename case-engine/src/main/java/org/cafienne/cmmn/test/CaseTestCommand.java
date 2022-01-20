@@ -13,6 +13,7 @@ import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * single JVM executing the case instance, as it holds a direct reference to the case instance that can be used for assertions.
  */
 @Manifest
-public class CaseTestCommand extends CaseCommand implements ModelTestCommand<CaseCommand, CaseResponse>, BootstrapCommand {
+public class CaseTestCommand extends CaseCommand implements BootstrapCommand {
     private final static Logger logger = LoggerFactory.getLogger(CaseTestCommand.class);
 
     private transient final TestScript testScript;
@@ -61,7 +62,6 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
      * Returns the actual command that was (or is to be) executed by the case instance
      * @return
      */
-    @Override
     public CaseCommand getActualCommand() {
         return actualCommand;
     }
@@ -95,7 +95,6 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
      * Returns the response given by the case for the command; can only be accessed after the response has been received.
      * @return
      */
-    @Override
     public <R extends CaseResponse> R getActualResponse() {
         return (R) actualResponse;
     }
@@ -126,10 +125,17 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
     }
 
     /**
+     * Returns the list of events published for this test command, as published since by the actor id
+     * @return
+     */
+    public PublishedEventsAssertion<?> getEvents() {
+        return getEventListener().getNewEvents().filter(getActorId());
+    }
+
+    /**
      * Handles the response to this command by validating the result.
      * @param response The response to this CaseTestCommand
      */
-    @Override
     public void handleResponse(CaseResponse response) {
         // Store the actual response.
         this.actualResponse = response;
@@ -144,7 +150,6 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
         }
     }
 
-    @Override
     public void handleFailure(CommandFailure failure) {
         // Store the actual response.
         this.actualFailure = failure;
@@ -169,12 +174,10 @@ public class CaseTestCommand extends CaseCommand implements ModelTestCommand<Cas
         getEventListener().awaitCaseModifiedEvent(response.getLastModified());
     }
 
-    @Override
     public String caseInstanceString() {
         return this.caseSnapshotString;
     }
 
-    @Override
     public String tenant() {
         if (actualCommand instanceof BootstrapCommand) {
             return ((BootstrapCommand) actualCommand).tenant();

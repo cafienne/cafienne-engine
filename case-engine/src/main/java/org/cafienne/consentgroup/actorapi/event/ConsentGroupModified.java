@@ -12,7 +12,7 @@ import org.cafienne.json.ValueMap;
  *
  */
 @Manifest
-public class ConsentGroupModified extends ActorModified<ConsentGroupActor> implements ConsentGroupEvent  {
+public class ConsentGroupModified extends ActorModified implements ConsentGroupEvent  {
     public ConsentGroupModified(ConsentGroupCommand command) {
         super(command);
     }

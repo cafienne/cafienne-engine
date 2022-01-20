@@ -11,14 +11,15 @@ trait ChildConfigReader extends ConfigReader with LazyLogging {
   val path: String
   val exception: ConfigurationException = null
   lazy val config: Config = {
-    parent.config.hasPath(path) match {
-      case true => parent.config.getConfig(path)
-      case false => ConfigFactory.empty()
+    if (parent.config.hasPath(path)) {
+      parent.config.getConfig(path)
+    } else {
+      ConfigFactory.empty()
     }
   }
 
-  lazy val fullPath: String = parent.isInstanceOf[ChildConfigReader] match {
-    case true => parent.asInstanceOf[ChildConfigReader].path + "." + path
-    case false => path
+  lazy val fullPath: String = parent match {
+    case reader: ChildConfigReader => reader.path + "." + path
+    case _ => path
   }
 }

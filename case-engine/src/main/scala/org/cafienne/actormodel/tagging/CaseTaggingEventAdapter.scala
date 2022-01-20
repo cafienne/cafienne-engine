@@ -30,7 +30,7 @@ class CaseTaggingEventAdapter extends WriteEventAdapter {
     case event: ProcessInstanceEvent => Tagged(event, Set(ProcessInstanceEvent.TAG, ModelEvent.TAG))
     case event: TenantEvent => Tagged(event, Set(TenantEvent.TAG, ModelEvent.TAG))
     case event: ConsentGroupEvent => Tagged(event, Set(ConsentGroupEvent.TAG, ModelEvent.TAG))
-    case event: ModelEvent[_] => Tagged(event, Set(ModelEvent.TAG))
+    case event: ModelEvent => Tagged(event, Set(ModelEvent.TAG))
     case other => other
   }
 }

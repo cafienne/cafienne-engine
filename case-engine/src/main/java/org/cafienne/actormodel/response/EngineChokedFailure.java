@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,6 +20,7 @@ public class EngineChokedFailure extends CommandFailure {
     /**
      * Create a failure response for the command.
      * The message id of the command will be pasted into the message id of the response.
+     *
      * @param command
      * @param failure The reason why the command failed
      */

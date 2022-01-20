@@ -8,10 +8,4 @@ public class AkkaSystemMessageHandler extends MessageHandler {
     public AkkaSystemMessageHandler(ModelActor actor, Object msg) {
         super(actor, msg);
     }
-
-    protected void process() {
-    }
-
-    protected void complete() {
-    }
 }

@@ -2,7 +2,7 @@ package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.actormodel.exception.SerializedException;
 import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.cmmn.test.ModelTestCommand;
+import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.TestScript;
 
 /**
@@ -10,7 +10,7 @@ import org.cafienne.cmmn.test.TestScript;
  *
  */
 public class FailureAssertion extends ModelTestCommandAssertion {
-    public FailureAssertion(ModelTestCommand testCommand) {
+    public FailureAssertion(CaseTestCommand testCommand) {
         super(testCommand, true);
         if (testCommand.getActualFailure() == null) {
             throw new AssertionError("Test script expected a failure from the engine in step " + testCommand.getActionNumber() + " [" + testCommand.getActualCommand().getClass().getSimpleName() + "]");
