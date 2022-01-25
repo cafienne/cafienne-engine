@@ -1,0 +1,94 @@
+version: '3.1'
+services:
+  cassandra:
+    image: cassandra:3.11
+    labels:
+      component: event-store
+    network_mode: host
+    expose:
+      - 9042
+    container_name: cassandra
+    healthcheck:
+      test: [ "CMD", "cqlsh", "--execute", "show version;quit" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  postgres-for-cassandra:
+    image: postgres:12.1-alpine
+    network_mode: host
+    expose:
+      - 9432
+    hostname: postgres
+    container_name: postgres-for-cassandra
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-query
+    command: postgres --port=9432
+
+  empty-sql-server:
+    image: batav/circle-ci:sqlserver
+    network_mode: host
+    expose:
+      - 1433
+    hostname: sql-server
+    container_name: empty-sql-server
+    environment:
+      SA_PASSWORD: Abc_123456
+      ACCEPT_EULA: Y
+      QUERY_DB: cafienneQuery
+      EVENT_DB: cafienneEventstore
+
+  postgres-empty-event-db:
+    image: postgres:12.1-alpine
+    network_mode: host
+    expose:
+      - 5431
+    hostname: cafienne-event-db
+    container_name: postgres-empty-event-db
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-eventstore
+    command: postgres --port=5431
+
+  postgres-empty-query-db:
+    image: postgres:12.1-alpine
+    network_mode: host
+    expose:
+      - 5430
+    hostname: postgres-empty-query-db
+    container_name: postgres-empty-query-db
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-query
+    command: postgres --port=5430
+
+  postgres-with-events:
+    image: batav/circle-ci:postgres-event-data
+    network_mode: host
+    expose:
+      - 6431
+    hostname: postgres-with-events
+    container_name: postgres-with-events
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-eventstore
+      PGDATA: event-data
+    command: postgres --port=6431
+
+  postgres-query-db-for-events:
+    image: postgres:12.1-alpine
+    network_mode: host
+    expose:
+      - 6430
+    hostname: postgres
+    container_name: postgres-query-db-for-events
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: mysecret
+      POSTGRES_DB: cafienne-query
+    command: postgres --port=6430
