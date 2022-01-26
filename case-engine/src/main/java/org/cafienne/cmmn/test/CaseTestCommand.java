@@ -7,7 +7,7 @@
  */
 package org.cafienne.cmmn.test;
 
-import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * single JVM executing the case instance, as it holds a direct reference to the case instance that can be used for assertions.
  */
 @Manifest
-public class CaseTestCommand extends CaseCommand implements BootstrapCommand {
+public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
     private final static Logger logger = LoggerFactory.getLogger(CaseTestCommand.class);
 
     private transient final TestScript testScript;
@@ -47,6 +47,11 @@ public class CaseTestCommand extends CaseCommand implements BootstrapCommand {
         this.validator = null;
         // OOPS: this should actually be done properly...
         this.actualCommand = null;
+    }
+
+    @Override
+    public boolean isBootstrapMessage() {
+        return actualCommand.isBootstrapMessage();
     }
 
     /**
@@ -179,8 +184,8 @@ public class CaseTestCommand extends CaseCommand implements BootstrapCommand {
     }
 
     public String tenant() {
-        if (actualCommand instanceof BootstrapCommand) {
-            return ((BootstrapCommand) actualCommand).tenant();
+        if (actualCommand.isBootstrapMessage()) {
+            return actualCommand.asBootstrapMessage().tenant();
         }
         throw new RuntimeException("This is not a BootstrapCommand");
     }

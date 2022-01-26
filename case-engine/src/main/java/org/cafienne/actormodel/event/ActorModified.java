@@ -3,6 +3,7 @@ package org.cafienne.actormodel.event;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
@@ -19,10 +20,10 @@ public abstract class ActorModified extends BaseModelEvent<ModelActor> implement
     public final String source;
     public final Instant lastModified;
 
-    protected ActorModified(ModelCommand command) {
-        super(command.getActor());
-        this.source = command.getClass().getName();
-        this.lastModified = command.getActor().getTransactionTimestamp();
+    protected ActorModified(ModelActor actor, IncomingActorMessage message) {
+        super(actor);
+        this.source = message.getClass().getName();
+        this.lastModified = actor.getTransactionTimestamp();
     }
 
     protected ActorModified(ValueMap json) {

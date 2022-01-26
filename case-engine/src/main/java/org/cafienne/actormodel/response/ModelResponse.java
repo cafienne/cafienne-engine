@@ -7,9 +7,8 @@
  */
 package org.cafienne.actormodel.response;
 
-import akka.actor.ActorRef;
-import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
@@ -25,11 +24,6 @@ public interface ModelResponse extends IncomingActorMessage {
     void setLastModified(Instant lastModified);
 
     /**
-     * Returns the actor ref to whom the response message must be sent.
-     */
-    ActorRef getRecipient();
-
-    /**
      * Return the last modified timestamp of the ModelActor, along with the actor id.
      */
     ActorLastModified lastModifiedContent();
@@ -40,5 +34,15 @@ public interface ModelResponse extends IncomingActorMessage {
      */
     default Value<?> toJson() {
         return new ValueMap();
+    }
+
+    @Override
+    default boolean isResponse() {
+        return true;
+    }
+
+    @Override
+    default ModelResponse asResponse() {
+        return this;
     }
 }

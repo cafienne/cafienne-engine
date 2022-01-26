@@ -36,7 +36,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     }
 
     @Override
-    public String getTenant() {
+    public String tenant() {
         return tenant;
     }
 
@@ -88,18 +88,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     public final void updateActorState(ModelActor actor) {
         // A very hard cast indeed. But it would be weird if it doesn't work...
         updateState((M) actor);
-    }
-
-    /**
-     * Internal framework method
-     *
-     * @param actor
-     */
-    public final void recover(ModelActor actor) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Recovery in " + actor.getDescription() + "[" + actor.lastSequenceNr() + "]: " + timestamp + " - " + this.getDescription());
-        }
-        this.updateActorState(actor);
     }
 
     protected void writeModelEvent(JsonGenerator generator) throws IOException {

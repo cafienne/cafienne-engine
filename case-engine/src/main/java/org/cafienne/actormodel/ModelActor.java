@@ -1,18 +1,15 @@
 package org.cafienne.actormodel;
 
-import akka.actor.Cancellable;
 import akka.actor.PoisonPill;
 import akka.persistence.AbstractPersistentActor;
-import akka.persistence.RecoveryCompleted;
-import akka.persistence.SnapshotMetadata;
-import org.cafienne.actormodel.command.BootstrapCommand;
+import akka.persistence.SnapshotOffer;
+import akka.persistence.SnapshotProtocol;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.command.ModelCommand;
-import org.cafienne.actormodel.event.DebugEvent;
-import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
-import org.cafienne.actormodel.handler.*;
 import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
@@ -23,21 +20,16 @@ import org.cafienne.cmmn.instance.debug.DebugStringAppender;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.infrastructure.serialization.DeserializationFailure;
 import org.cafienne.json.Value;
 import org.cafienne.processtask.actorapi.command.ProcessCommand;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.system.health.HealthMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public abstract class ModelActor extends AbstractPersistentActor {
 
@@ -51,9 +43,13 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     private final String id;
     /**
-     * Reference to handler for the current message being processed by the ModelActor.
+     * Front door knows ModelActor state, and determines whether visitors can pass.
      */
-    private MessageHandler currentMessageHandler;
+    private final Reception reception = new Reception(this);
+    /**
+     * Storage area for the ModelActor, keeps track of state changes
+     */
+    private final Warehouse warehouse = reception.warehouse;
     /**
      * User context of current message
      */
@@ -81,7 +77,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     private Instant transactionTimestamp;
 
-
     /**
      * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
      * If a ModelActor is recovered by Akka, then the version will be overwritten in {@link ModelActor#setEngineVersion(CafienneVersion)}.
@@ -101,7 +96,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     abstract protected boolean supportsCommand(Object msg);
 
-    abstract protected boolean supportsEvent(Object msg);
+    abstract protected boolean supportsEvent(ModelEvent msg);
+
+    protected boolean hasAutoShutdown() {
+        return true;
+    }
 
     public CafienneVersion getEngineVersion() {
         return this.engineVersion;
@@ -191,188 +190,49 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     @Override
     public Receive createReceiveRecover() {
-        return receiveBuilder().match(Object.class, this::handleRecovery).build();
+        return receiveBuilder().match(Object.class, reception::handleRecovery).build();
     }
 
-    protected void handleRecovery(Object event) {
-        // Steps:
-        // 1. Set tenant if not yet available
-        // 2. Check whether this is a valid type of ModelEvent for this type of ModelActor
-        //    a. If so, run the recovery handler for it
-        //    b. Ignore DebugEvents and RecoveryCompleted message
-        //    c. In all other cases print warn statements, with a special check for other ModelEvents
+    @Override
+    public final Receive createReceive() {
+        return receiveBuilder().match(Object.class, reception::handleMessage).build();
+    }
 
-        // Step 1
-        // Step 2
-        if (supportsEvent(event) || event instanceof EngineVersionChanged) {
-            if (tenant == null && event instanceof ModelEvent) {
-                tenant = ((ModelEvent) event).getTenant();
-            }
-            // Step 2a.
-            runHandler(createRecoveryHandler((ModelEvent) event));
-        } else if (event instanceof DebugEvent) {
-            // Step 2b.
-            // No recovery from debug events ...
-        } else if (event instanceof RecoveryCompleted) {
-            // Step 2b.
-            recoveryCompleted();
-        } else if (event instanceof ModelEvent) {
-            // Step 2c. Weird: ModelEvents in recovery of other models??
-            getLogger().warn("Received unexpected recovery event of type " + event.getClass().getName() + " in actor of type " + getClass().getName());
-        } else if (event instanceof DeserializationFailure) {
-            // Step 2c. Weird: ModelEvents in recovery of other models??
-            getLogger().error("Event Deserialization Failure: " + event);
-        } else {
-            // Step 2c.
-            getLogger().warn("Received unknown event of type " + event.getClass().getName() + " during recovery: " + event);
-        }
+    /**
+     * Hook for handling snapshots.
+     *
+     * @param snapshot
+     */
+    protected void handleSnapshot(SnapshotOffer snapshot) {
+    }
+
+    protected void handleSnapshotProtocolMessage(SnapshotProtocol.Response message) {
     }
 
     protected void recoveryCompleted() {
         getLogger().info("Recovery of " + getClass().getSimpleName() + " " + getId() + " completed");
     }
 
-    @Override
-    public final Receive createReceive() {
-        return receiveBuilder().match(Object.class, msg -> {
-
-//            System.out.println(this.getClass().getSimpleName() + ": Received a msg of type " + msg.getClass().getSimpleName());
-
-            // Steps:
-            // 1. Remove self cleaner
-            // 2. Handle message
-            // 3. Set a new self cleaner (basically resets the timer)
-            clearSelfCleaner();
-            runHandler(createMessageHandler(msg));
-            enableSelfCleaner();
-        }).build();
-    }
-
-    /**
-     * SelfCleaner provides a mechanism to have the ModelActor remove itself from memory after a specific idle period.
-     */
-    private Cancellable selfCleaner = null;
-
-    protected void clearSelfCleaner() {
-        // Receiving message should reset the self-cleaning timer
-        if (selfCleaner != null) selfCleaner.cancel();
-    }
-
-    protected void enableSelfCleaner() {
-        // Now set the new selfCleaner
-        long idlePeriod = Cafienne.config().actor().idlePeriod();
-        FiniteDuration duration = Duration.create(idlePeriod, TimeUnit.MILLISECONDS);
-        selfCleaner = getScheduler().schedule(duration, () -> {
-            getLogger().debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
+    void takeABreak() {
+        getLogger().debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (Cafienne.config().actor().idlePeriod() / 1000) + " seconds");
 //            System.out.println("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
-            self().tell(PoisonPill.getInstance(), self());
-        });
+        self().tell(PoisonPill.getInstance(), self());
     }
 
-    private MessageHandler createMessageHandler(Object msg) {
-        if (supportsCommand(msg)) {
-            if (inNeedOfTenantInformation()) {
-                if (msg instanceof BootstrapCommand) {
-                    this.tenant = ((BootstrapCommand) msg).tenant();
-                } else {
-                    return new NotConfiguredHandler(this, msg);
-                }
-            }
-            ModelCommand command = (ModelCommand) msg;
-            command.setActor(this);
-            CommandHandler c = createCommandHandler(command);
-            return c;
-        } else if (msg instanceof ModelResponse) {
-            if (inNeedOfTenantInformation()) {
-                // We cannot handle responses if we have not been properly initialized.
-                return new NotConfiguredHandler(this, msg);
-            }
-            return createResponseHandler((ModelResponse) msg);
-        } else if (msg.getClass().getPackage().equals(SnapshotMetadata.class.getPackage())) {
-            return createAkkaSystemMessageHandler(msg);
-        } else {
-            return createInvalidMessageHandler(msg);
-        }
-    }
-
-    protected boolean inNeedOfTenantInformation() {
-        return tenant == null;
+    protected void handleBootstrapMessage(BootstrapMessage message) {
+        this.tenant = message.tenant();
     }
 
     /**
-     * Execute the lifecycle in handling the incoming message:
-     * - run security checks
-     * - if no issues from there, invoke process method
-     * - and finally invoke complete method.
-     *
-     * @param handler
-     */
-    private void runHandler(MessageHandler handler) {
-        this.currentMessageHandler = handler;
-        // First process, then complete
-        this.currentMessageHandler.process();
-        this.currentMessageHandler.complete();
-    }
-
-    /**
-     * Basic handler for commands received in this ModelActor.
-     * Be careful in overriding it.
-     *
-     * @param command
-     */
-    protected CommandHandler createCommandHandler(ModelCommand command) {
-        return new CommandHandler(this, command);
-    }
-
-    /**
-     * Basic handler for response messages received from other ModelActors in this ModelActor.
-     * Be careful in overriding it.
-     *
-     * @param response
-     */
-    protected ResponseHandler createResponseHandler(ModelResponse response) {
-        return new ResponseHandler(this, response);
-    }
-
-    /**
-     * Basic handler for wrongly typed messages received in this ModelActor.
-     * Be careful in overriding it.
-     *
-     * @param message
-     */
-    protected InvalidMessageHandler createInvalidMessageHandler(Object message) {
-        return new InvalidMessageHandler(this, message);
-    }
-
-    /**
-     * Handler for akka system messages (e.g. SnapshotOffer, SnapshotSaveSuccess, RecoveryCompleted, etc)
-     *
-     * @param message
-     * @return
-     */
-    protected AkkaSystemMessageHandler createAkkaSystemMessageHandler(Object message) {
-        return new AkkaSystemMessageHandler(this, message);
-    }
-
-    /**
-     * Basic handler of events upon recovery of this ModelActor.
-     * Be careful in overriding it.
+     * Adds an event to the current message handling context
      *
      * @param event
-     */
-    protected RecoveryEventHandler createRecoveryHandler(ModelEvent event) {
-        return new RecoveryEventHandler(this, event);
-    }
-
-    /**
-     * Adds an event to the current message handler
-     *
-     * @param event
-     * @param <EV>
+     * @param <E>
      * @return
      */
-    public <EV extends ModelEvent> EV addEvent(EV event) {
-        return currentMessageHandler.addEvent(event);
+    public <E extends ModelEvent> E addEvent(E event) {
+        warehouse.storeEvent(event);
+        return event;
     }
 
     public Responder getResponseListener(String msgId) {
@@ -438,21 +298,26 @@ public abstract class ModelActor extends AbstractPersistentActor {
             return;
         }
 
+        if (!(response instanceof CommandFailure)) {
+            // Having handled a ModelCommand and properly stored the events we can unlock the reception.
+            reception.unlock();
+        }
         if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
+            if (response instanceof CommandFailure) {
+                msg += ": " + response;
+            }
+
             getLogger().debug(msg);
             EngineDeveloperConsole.debugIndentedConsoleLogging(msg);
         }
         response.setLastModified(getLastModified());
-        response.getRecipient().tell(response, self());
+        sender().tell(response, self());
     }
 
     /**
      * If the command handler has changed ModelActor state, but then ran into an unhandled exception,
      * the actor will remove itself from memory and start again.
-     *
-     * @param handler
-     * @param exception
      */
     public void failedWithInvalidState(Object msg, Throwable exception) {
         // Remove all schedules.
@@ -479,7 +344,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
         // Inform the HealthMonitor
         HealthMonitor.writeJournal().hasFailed(cause);
         // Optionally send a reply (in the CommandHandler). If persistence fails, also sending a reply may fail, hence first logging the issue.
-        currentMessageHandler.handlePersistFailure(cause, event, seqNr);
+        warehouse.handlePersistFailure(cause, event, seqNr);
         // Stop the actor
         context().stop(self());
     }
@@ -502,19 +367,19 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * @param appender
      */
     public void addDebugInfo(DebugStringAppender appender) {
-        currentMessageHandler.addDebugInfo(appender, getLogger());
+        warehouse.addDebugInfo(appender, getLogger());
     }
 
     public void addDebugInfo(DebugStringAppender appender, Value<?> json) {
-        currentMessageHandler.addDebugInfo(appender, json, getLogger());
+        warehouse.addDebugInfo(appender, json, getLogger());
     }
 
     public void addDebugInfo(DebugJsonAppender appender) {
-        currentMessageHandler.addDebugInfo(appender, getLogger());
+        warehouse.addDebugInfo(appender, getLogger());
     }
 
-    public void addDebugInfo(DebugStringAppender appender, Exception exception) {
-        currentMessageHandler.addDebugInfo(appender, exception, getLogger());
+    public void addDebugInfo(DebugStringAppender appender, Throwable exception) {
+        warehouse.addDebugInfo(appender, exception, getLogger());
     }
 
     /**
@@ -557,12 +422,16 @@ public abstract class ModelActor extends AbstractPersistentActor {
         return logger;
     }
 
-    public String getDescription() {
-        return this.getClass().getSimpleName() + "[" + getId() + "]";
-    }
-
     @Override
     public String toString() {
-        return this.getDescription();
+        return this.getClass().getSimpleName() + "[" + self().path().name() + "]";
+    }
+
+    /**
+     * This method is invoked when handling of the source message completed and
+     * resulting state changes are to be persisted in the event journal.
+     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
+     */
+    protected void completeTransaction(IncomingActorMessage source) {
     }
 }

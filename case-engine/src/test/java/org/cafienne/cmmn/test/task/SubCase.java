@@ -11,7 +11,6 @@ import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -205,15 +204,6 @@ public class SubCase {
             String subCaseId = testCase.getEventListener().awaitPlanItemState("FailingBlockingSubCaseTask", State.Active).getPlanItemId();
             testCase.getEventListener().awaitPlanItemState("FailingBlockingSubCaseTask", Transition.Fault, State.Failed, State.Active);
             mainCasePlan.print();
-
-            // Now ping the sub case. It must still be "empty", that is to say, it ought to exist (because it is a PersistentActor),
-            // but without a definition, because that has failed
-            testCase.addStep(testCase.createPingCommand(testUser, subCaseId, 0), casePlan -> {
-                if (!testCase.getEventListener().getEvents().filter(subCaseId).filter(CaseDefinitionApplied.class).getEvents().isEmpty()) {
-                    throw new AssertionError("Case has a definition, but it is not expected to have one");
-                }
-                TestScript.debugMessage("Ping responded; case is " + casePlan);
-            });
 
             ValueMap validMainRequest = new ValueMap();
             validMainRequest.plus("aBoolean", false);

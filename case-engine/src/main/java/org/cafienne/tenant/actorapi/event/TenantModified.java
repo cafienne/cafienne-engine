@@ -1,10 +1,10 @@
 package org.cafienne.tenant.actorapi.event;
 
 import org.cafienne.actormodel.event.ActorModified;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.command.TenantCommand;
 
 /**
  * Event that is published after an {@link org.cafienne.tenant.actorapi.command.TenantCommand} has been fully handled by a {@link TenantActor} instance.
@@ -13,8 +13,8 @@ import org.cafienne.tenant.actorapi.command.TenantCommand;
  */
 @Manifest
 public class TenantModified extends ActorModified implements TenantEvent {
-    public TenantModified(TenantCommand command) {
-        super(command);
+    public TenantModified(TenantActor actor, IncomingActorMessage source) {
+        super(actor, source);
     }
 
     public TenantModified(ValueMap json) {

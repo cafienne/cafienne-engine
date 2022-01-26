@@ -13,7 +13,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.event.TenantModified;
+import org.cafienne.tenant.actorapi.TenantMessage;
 import org.cafienne.tenant.actorapi.exception.TenantException;
 
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * Base class for sending commands to a TenantActor
  */
-public abstract class TenantCommand extends BaseModelCommand<TenantActor, TenantUser> {
+public abstract class TenantCommand extends BaseModelCommand<TenantActor, TenantUser> implements TenantMessage {
     /**
      * Create a new command that can be sent to the tenant.
      *
@@ -43,11 +43,6 @@ public abstract class TenantCommand extends BaseModelCommand<TenantActor, Tenant
     @Override
     protected TenantUser readUser(ValueMap json) {
         return TenantUser.deserialize(json);
-    }
-
-    @Override
-    public final Class<TenantActor> actorClass() {
-        return TenantActor.class;
     }
 
     /**
@@ -85,10 +80,5 @@ public abstract class TenantCommand extends BaseModelCommand<TenantActor, Tenant
         if (currentOwners.size() == 1 && currentOwners.contains(userId)) {
             throw new TenantException("Cannot remove tenant ownership or disable the account. There must be at least one tenant owner.");
         }
-    }
-
-    @Override
-    public void done() {
-        actor.addEvent(new TenantModified(this));
     }
 }

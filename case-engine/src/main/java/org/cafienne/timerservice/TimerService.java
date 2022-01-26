@@ -5,7 +5,6 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.system.CaseSystem;
-import org.cafienne.tenant.actorapi.event.platform.PlatformEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,12 @@ public class TimerService extends ModelActor {
     }
 
     @Override
-    protected boolean supportsEvent(Object msg) {
+    protected boolean supportsEvent(ModelEvent msg) {
+        return false;
+    }
+
+    @Override
+    protected boolean hasAutoShutdown() {
         return false;
     }
 
@@ -43,30 +47,15 @@ public class TimerService extends ModelActor {
     }
 
     @Override
-    protected void enableSelfCleaner() {
-        // Make sure TimerService remains in memory and is not removed each and every time
-    }
-
-    @Override
-    protected boolean inNeedOfTenantInformation() {
-        // No need of tenant information, as this is a singleton actor in this JVM that is tenant-agnostic
-        return false;
-    }
-
-    @Override
     protected void recoveryCompleted() {
         logger.info("Starting Timer Service");
         timerstream.open();
     }
 
     @Override
-    protected void handleRecovery(Object object) {
+    protected void handleSnapshot(SnapshotOffer snapshot) {
         // Handle migration of old style of timer persistence
-        if (object instanceof SnapshotOffer) {
-            migrateSnapshot((SnapshotOffer) object);
-        } else {
-            super.handleRecovery(object);
-        }
+        migrateSnapshot(snapshot);
     }
 
     private void migrateSnapshot(SnapshotOffer offer) {

@@ -1,7 +1,7 @@
 package org.cafienne.tenant.actorapi.command.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.PlatformOwner;
 import org.cafienne.actormodel.identity.TenantUser;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Manifest
-public class CreateTenant extends PlatformTenantCommand implements BootstrapCommand {
+public class CreateTenant extends PlatformTenantCommand implements BootstrapMessage {
     public final String name;
     private final List<TenantUser> users;
 

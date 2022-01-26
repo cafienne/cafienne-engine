@@ -33,6 +33,10 @@ public enum State {
         return this == Closed || this == Completed || this == Disabled || this == Failed || this == Terminated;
     }
 
+    public boolean isFailed() {
+        return this == Failed;
+    }
+
     public boolean isActive() {
         return this == Active;
     }

@@ -44,9 +44,9 @@ class LocalRouter(caseSystem: CaseSystem, actors: collection.concurrent.TrieMap[
     * @param t
     * @return
     */
-  override def removeActorRef(t: Terminated) = {
+  override def removeActorRef(t: Terminated): Unit = {
     val actorId = t.actor.path.name
-    logger.debug("ModelActor[" + actorId + "] has been terminated. Removing routing reference")
+    logger.whenDebugEnabled(logger.debug("ModelActor[" + actorId + "] has been terminated. Removing routing reference"))
     if (actors.remove(actorId).isEmpty) {
       logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the LocalRoutingService. Termination message is ignored")
     }

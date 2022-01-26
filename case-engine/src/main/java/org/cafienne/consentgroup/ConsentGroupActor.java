@@ -1,7 +1,9 @@
 package org.cafienne.consentgroup;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand;
 import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup;
@@ -25,7 +27,7 @@ public class ConsentGroupActor extends ModelActor {
     }
 
     @Override
-    protected boolean supportsEvent(Object msg) {
+    protected boolean supportsEvent(ModelEvent msg) {
         return msg instanceof ConsentGroupEvent;
     }
 
@@ -92,5 +94,10 @@ public class ConsentGroupActor extends ModelActor {
     public void create(CreateConsentGroup command) {
         addEvent(new ConsentGroupCreated(this, command.tenant()));
         command.getMembers().foreach(this::setMember);
+    }
+
+    @Override
+    protected void completeTransaction(IncomingActorMessage source) {
+        addEvent(new ConsentGroupModified(this, source));
     }
 }

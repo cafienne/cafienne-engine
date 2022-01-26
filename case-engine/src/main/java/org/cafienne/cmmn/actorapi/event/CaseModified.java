@@ -2,6 +2,7 @@ package org.cafienne.cmmn.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.event.ActorModified;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.State;
@@ -22,8 +23,8 @@ public class CaseModified extends ActorModified implements CaseEvent {
     private final int numFailures;
     private final State state;
 
-    public CaseModified(CaseCommand command, Case caseInstance, int numFailures) {
-        super(command);
+    public CaseModified(Case caseInstance, IncomingActorMessage source, int numFailures) {
+        super(caseInstance, source);
         this.numFailures = numFailures;
         this.state = caseInstance.getCasePlan().getState();
     }
