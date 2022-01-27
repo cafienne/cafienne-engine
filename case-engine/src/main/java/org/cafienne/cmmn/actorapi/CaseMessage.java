@@ -5,19 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.actorapi.event;
+package org.cafienne.cmmn.actorapi;
 
-import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.cmmn.actorapi.CaseMessage;
+import org.cafienne.actormodel.message.UserMessage;
 import org.cafienne.cmmn.instance.Case;
 
-public interface CaseEvent extends ModelEvent, CaseMessage {
-    String TAG = "cafienne:case";
-
-    default String getCaseInstanceId() {
-        return this.getActorId();
-    }
-
+public interface CaseMessage extends UserMessage {
     @Override
     default Class<Case> actorClass() {
         return Case.class;

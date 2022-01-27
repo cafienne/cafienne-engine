@@ -1,7 +1,7 @@
 package org.cafienne.processtask.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -13,7 +13,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import java.io.IOException;
 
 @Manifest
-public class StartProcess extends ProcessCommand implements BootstrapCommand {
+public class StartProcess extends ProcessCommand implements BootstrapMessage {
     private final String parentActorId;
     private final String rootActorId;
     private final String tenant;

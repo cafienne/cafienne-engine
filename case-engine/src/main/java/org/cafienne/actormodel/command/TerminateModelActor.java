@@ -38,13 +38,7 @@ public class TerminateModelActor extends BaseModelCommand<ModelActor, UserIdenti
     }
 
     @Override
-    public Class<ModelActor> actorClass() {
-        return ModelActor.class;
-    }
-
-    @Override
     public void validate(ModelActor modelActor) throws InvalidCommandException {
-
     }
 
     @Override

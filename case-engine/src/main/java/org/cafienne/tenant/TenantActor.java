@@ -1,7 +1,9 @@
 package org.cafienne.tenant;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.system.CaseSystem;
@@ -45,13 +47,8 @@ public class TenantActor extends ModelActor {
     }
 
     @Override
-    protected boolean supportsEvent(Object msg) {
+    protected boolean supportsEvent(ModelEvent msg) {
         return msg instanceof TenantEvent;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Tenant[" + getId() + "]";
     }
 
     @Override
@@ -179,5 +176,10 @@ public class TenantActor extends ModelActor {
 
     public void updatePlatformInformation(PlatformUpdate newUserInformation) {
         addEvent(new TenantAppliedPlatformUpdate(this, newUserInformation));
+    }
+
+    @Override
+    protected void completeTransaction(IncomingActorMessage source) {
+        addEvent(new TenantModified(this, source));
     }
 }

@@ -9,7 +9,7 @@ package org.cafienne.cmmn.actorapi.response;
 
 import org.cafienne.actormodel.response.BaseModelResponse;
 import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.ModelResponse;
+import org.cafienne.cmmn.actorapi.CaseMessage;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -25,7 +25,7 @@ import org.cafienne.json.ValueMap;
  * </ul>
  */
 @Manifest
-public class CaseResponse extends BaseModelResponse {
+public class CaseResponse extends BaseModelResponse implements CaseMessage {
     public CaseResponse(CaseCommand command) {
         super(command);
     }

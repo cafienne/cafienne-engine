@@ -22,7 +22,7 @@ public class DeserializationFailure implements Serializable {
         this.manifest = manifest;
         this.exception = e;
         this.blob = blob;
-        this.msg = "Unrecognized manifest " + manifest + " gives failure of type " + exception.getClass().getName() + "\nMessage: " + exception.getMessage() + "\nEvent blob: " + new String(blob);
+        this.msg = "Fatal error in deserializing manifest " + manifest + "\n" + exception + "\nEvent blob: " + new String(blob);
     }
 
     @Override

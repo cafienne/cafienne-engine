@@ -7,7 +7,6 @@
  */
 package org.cafienne.actormodel.response;
 
-import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.identity.UserIdentity;
@@ -21,11 +20,6 @@ import java.time.Instant;
  * Basic implementation for ModelResponse to reply to a {@link ModelCommand}
  */
 public abstract class BaseModelResponse implements ModelResponse {
-    /**
-     * Recipient is assigned during construction of the response message.
-     * It is the current value of sender() in the actor.
-     */
-    private final transient ActorRef recipient;
     private final String messageId;
     private final String actorId;
     private Instant lastModified;
@@ -33,12 +27,6 @@ public abstract class BaseModelResponse implements ModelResponse {
     private final String commandType;
 
     protected BaseModelResponse(ModelCommand command) {
-        // Make sure that we capture the recipient during creation.
-        //  This is required since sending the response is done after events are persisted,
-        //  and that in itself may or may not happen asynchronously, and if it is happening
-        //  asynchronously, then the sender() value of the Actor may have been overwritten with the sender
-        //  of the next message handled by the actor already.
-        this.recipient = command.getActor().sender();
         this.messageId = command.getMessageId();
         this.actorId = command.actorId();
         // If a Command never reached the actor (e.g., if CaseSystem routing service ran into an error),
@@ -49,17 +37,11 @@ public abstract class BaseModelResponse implements ModelResponse {
     }
 
     protected BaseModelResponse(ValueMap json) {
-        this.recipient = null;
         this.messageId = json.readString(Fields.messageId);
         this.actorId = json.readString(Fields.actorId);
         this.lastModified = json.readInstant(Fields.lastModified);
         this.user = json.readObject(Fields.user, UserIdentity::deserialize);
         this.commandType = json.readString(Fields.commandType);
-    }
-
-    @Override
-    public ActorRef getRecipient() {
-        return recipient;
     }
 
     @Override

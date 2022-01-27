@@ -15,19 +15,19 @@ import scala.concurrent.Future
 class CafienneGateway(caseSystem: CaseSystem) {
   private val system: ActorSystem = caseSystem.system
   private val actors = collection.concurrent.TrieMap[String, ActorRef]()
-  private val messageRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "LocalRouter")
-  private val caseRouterService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "CaseRouter")
-  private val processRouterService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "ProcessTaskRouter")
-  private val tenantRouterService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "TenantRouter")
-  private val consentGroupRouterService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "ConsentGroupRouter")
+  private val caseService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "cases")
+  private val processTaskService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "process-tasks")
+  private val tenantService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "tenants")
+  private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "consent-groups")
+  private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "default-router")
 
   private def getRouter(message: Any): ActorRef = {
     message match {
-      case _: CaseCommand =>  caseRouterService
-      case _: ProcessCommand => processRouterService
-      case _: TenantCommand => tenantRouterService
-      case _: ConsentGroupCommand => consentGroupRouterService
-      case _ => messageRouterService
+      case _: CaseCommand =>  caseService
+      case _: ProcessCommand => processTaskService
+      case _: TenantCommand => tenantService
+      case _: ConsentGroupCommand => consentGroupService
+      case _ => defaultRouterService
     }
   }
 

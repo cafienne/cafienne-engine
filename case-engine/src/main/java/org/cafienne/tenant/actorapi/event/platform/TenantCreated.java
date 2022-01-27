@@ -1,6 +1,7 @@
 package org.cafienne.tenant.actorapi.event.platform;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -11,7 +12,7 @@ import org.cafienne.tenant.TenantActor;
 import java.io.IOException;
 
 @Manifest
-public class TenantCreated extends PlatformBaseEvent {
+public class TenantCreated extends PlatformBaseEvent implements BootstrapMessage {
     public final CafienneVersion engineVersion;
 
     public TenantCreated(TenantActor tenant) {

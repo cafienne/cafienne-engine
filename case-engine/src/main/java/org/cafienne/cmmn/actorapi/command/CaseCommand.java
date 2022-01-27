@@ -10,9 +10,9 @@ package org.cafienne.cmmn.actorapi.command;
 import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.cmmn.actorapi.CaseMessage;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
@@ -22,7 +22,7 @@ import org.cafienne.json.ValueMap;
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link BaseModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
  * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */
-public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentity> {
+public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentity> implements CaseMessage {
     /**
      * Create a new command that can be sent to the case.
      *
@@ -40,11 +40,6 @@ public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentit
     @Override
     protected CaseUserIdentity readUser(ValueMap json) {
         return CaseUserIdentity.deserialize(json);
-    }
-
-    @Override
-    public final Class<Case> actorClass() {
-        return Case.class;
     }
 
     /**
@@ -77,11 +72,5 @@ public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentit
      */
     protected void validateCaseTeamMembership(Case caseInstance) {
         caseInstance.getCaseTeam().validateMembership(getUser());
-    }
-
-    @Override
-    public void done() {
-        int numFailedPlanItems = Long.valueOf(actor.getPlanItems().stream().filter(p -> p.getState() == org.cafienne.cmmn.instance.State.Failed).count()).intValue();
-        actor.addEvent(new CaseModified(this, actor, numFailedPlanItems));
     }
 }

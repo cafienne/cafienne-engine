@@ -2,6 +2,7 @@ package org.cafienne.processtask.instance;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.cafienne.json.ValueMap;
@@ -11,7 +12,6 @@ import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.system.CaseSystem;
-import org.cafienne.tenant.actorapi.event.platform.PlatformEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     @Override
-    protected boolean supportsEvent(Object msg) {
+    protected boolean supportsEvent(ModelEvent msg) {
         return msg instanceof ProcessInstanceEvent;
     }
 
@@ -90,11 +90,6 @@ public class ProcessTaskActor extends ModelActor {
     @Override
     protected Logger getLogger() {
         return logger;
-    }
-
-    @Override
-    public String getDescription() {
-        return "ProcessTask[" + getId() + "]";
     }
 
     public void completed(ValueMap processOutputParameters) {
@@ -152,5 +147,10 @@ public class ProcessTaskActor extends ModelActor {
         addDebugInfo(() -> "Terminating process " + getName());
         taskImplementation.terminate();
         return new ProcessResponse(command);
+    }
+
+    @Override
+    protected void completeTransaction(IncomingActorMessage source) {
+        addEvent(new ProcessModified(this, source));
     }
 }

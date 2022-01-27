@@ -1,20 +1,12 @@
 package org.cafienne.actormodel.command;
 
-import org.cafienne.actormodel.IncomingActorMessage;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.json.Value;
 
 public interface ModelCommand extends IncomingActorMessage {
-    /**
-     * Explicit method to be implemented returning the type of the ModelActor handling this message.
-     * This is required for the message routing within the CaseSystem
-     * @return
-     */
-    Class<?> actorClass();
-
     /**
      * Returns the user context for this command.
      *
@@ -46,19 +38,20 @@ public interface ModelCommand extends IncomingActorMessage {
 
     ModelResponse processCommand(ModelActor actor);
 
-    /**
-     * This method is invoked when handling of the command completed and
-     * resulting state changes are to be persisted in the event journal.
-     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.CommitEvent} event.
-     *
-     * @return
-     */
-    default void done(){}
-
     String getCommandDescription();
 
     /**
      * Return a ValueMap serialization of the command
      */
     Value<?> toJson();
+
+    @Override
+    default boolean isCommand() {
+        return true;
+    }
+
+    @Override
+    default ModelCommand asCommand() {
+        return this;
+    }
 }

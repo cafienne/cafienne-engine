@@ -4,10 +4,10 @@ import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.event.ProcessModified;
+import org.cafienne.processtask.actorapi.ProcessActorMessage;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
-public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> {
+public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, UserIdentity> implements ProcessActorMessage {
     protected ProcessCommand(UserIdentity user, String id) {
         super(user, id);
     }
@@ -22,17 +22,7 @@ public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, 
     }
 
     @Override
-    public final Class<ProcessTaskActor> actorClass() {
-        return ProcessTaskActor.class;
-    }
-
-    @Override
     public void validate(ProcessTaskActor modelActor) throws InvalidCommandException {
         // Nothing to validate
-    }
-
-    @Override
-    public void done() {
-        actor.addEvent(new ProcessModified(this, actor, actor.getTransactionTimestamp()));
     }
 }

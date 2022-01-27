@@ -1,6 +1,7 @@
 package org.cafienne.consentgroup.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
@@ -11,7 +12,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class ConsentGroupCreated extends ConsentGroupBaseEvent {
+public class ConsentGroupCreated extends ConsentGroupBaseEvent implements BootstrapMessage {
     public final CafienneVersion engineVersion;
     public final String tenant;
 

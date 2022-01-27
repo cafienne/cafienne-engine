@@ -8,7 +8,9 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
 import org.cafienne.cmmn.actorapi.command.team.CurrentMember;
@@ -103,7 +105,7 @@ public class Case extends ModelActor {
     }
 
     @Override
-    protected boolean supportsEvent(Object msg) {
+    protected boolean supportsEvent(ModelEvent msg) {
         return msg instanceof CaseEvent;
     }
 
@@ -446,5 +448,11 @@ public class Case extends ModelActor {
         this.createdOn = event.createdOn;
         setEngineVersion(event.engineVersion);
         applyCaseDefinition(event.getDefinition(), event.getParentCaseId(), event.getRootCaseId());
+    }
+
+    @Override
+    protected void completeTransaction(IncomingActorMessage source) {
+        int numFailedPlanItems = Long.valueOf(getPlanItems().stream().filter(p -> p.getState().isFailed()).count()).intValue();
+        this.addEvent(new CaseModified(this, source, numFailedPlanItems));
     }
 }

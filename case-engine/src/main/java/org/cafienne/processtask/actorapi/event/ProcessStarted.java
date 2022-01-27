@@ -1,6 +1,7 @@
 package org.cafienne.processtask.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -13,7 +14,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import java.io.IOException;
 
 @Manifest
-public class ProcessStarted extends BaseProcessEvent {
+public class ProcessStarted extends BaseProcessEvent implements BootstrapMessage {
     public final String parentActorId;
     public final String rootActorId;
     public final String name;

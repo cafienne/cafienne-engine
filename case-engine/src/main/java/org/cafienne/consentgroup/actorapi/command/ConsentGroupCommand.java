@@ -12,14 +12,14 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupModified;
+import org.cafienne.consentgroup.actorapi.ConsentGroupMessage;
 import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
 import org.cafienne.json.ValueMap;
 
 /**
  * Consent Groups can be used to invite users from other tenants to join a case tam
  */
-public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupActor, TenantUser> {
+public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupActor, TenantUser> implements ConsentGroupMessage {
     /**
      * Create a new command that can be sent to the group.
      *
@@ -37,11 +37,6 @@ public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupA
     @Override
     protected TenantUser readUser(ValueMap json) {
         return TenantUser.deserialize(json);
-    }
-
-    @Override
-    public final Class<ConsentGroupActor> actorClass() {
-        return ConsentGroupActor.class;
     }
 
     /**
@@ -74,10 +69,5 @@ public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupA
         if (group.getOwners().size() == 1 && group.getOwners().contains(userId)) {
             throw new ConsentGroupException("Cannot remove group ownership of user " + userId + ". There must be at least one group owner.");
         }
-    }
-
-    @Override
-    public void done() {
-        actor.addEvent(new ConsentGroupModified(this));
     }
 }

@@ -8,24 +8,25 @@
 package org.cafienne.actormodel.event;
 
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.UserMessage;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import org.cafienne.actormodel.message.UserMessage;
 import org.cafienne.json.ValueMap;
 
-public interface ModelEvent extends CafienneSerializable, UserMessage {
+import java.time.Instant;
+
+public interface ModelEvent extends UserMessage {
     String TAG = "cafienne";
 
     void updateActorState(ModelActor actor);
 
-    void recover(ModelActor actor);
-
-    String getTenant();
-
-    default String tenant() {
-        return getTenant();
+    default String getTenant() {
+        return tenant();
     }
 
+    String tenant();
+
     String getActorId();
+
+    Instant getTimestamp();
 
     String getDescription();
 

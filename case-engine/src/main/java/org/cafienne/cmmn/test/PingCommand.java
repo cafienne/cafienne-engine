@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.test;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
@@ -28,7 +28,7 @@ import java.io.IOException;
  * need to wait a certain time before continuing, in order to wait for the "after-timer" actions.
  */
 @Manifest
-public class PingCommand extends CaseCommand implements CafienneSerializable, BootstrapCommand {
+public class PingCommand extends CaseCommand {
     private final static Logger logger = LoggerFactory.getLogger(PingCommand.class);
 
     private final long waitTime;
@@ -45,11 +45,6 @@ public class PingCommand extends CaseCommand implements CafienneSerializable, Bo
         super(json);
         this.waitTime = Long.parseLong(json.raw(Fields.waitTime));
         this.tenant = json.readString(Fields.tenant);
-    }
-
-    @Override
-    public String tenant() {
-        return tenant;
     }
 
     @Override

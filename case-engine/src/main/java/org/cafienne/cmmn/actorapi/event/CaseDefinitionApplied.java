@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.actorapi.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -21,7 +22,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class CaseDefinitionApplied extends CaseDefinitionEvent {
+public class CaseDefinitionApplied extends CaseDefinitionEvent implements BootstrapMessage {
     public final CafienneVersion engineVersion;
     private final String parentCaseId;
     private final String rootCaseId;

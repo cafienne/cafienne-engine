@@ -198,6 +198,10 @@ public class TestScript {
         return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
     }
 
+    public PingCommand pingExistingCase(TestUser user, String caseInstanceId, long waitTimeInMillis) {
+        return new PingCommand(defaultTenant, user, caseInstanceId, waitTimeInMillis);
+    }
+
     public PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {
         return new PingCommand(defaultTenant, user, caseInstanceId, waitTimeInMillis);
     }

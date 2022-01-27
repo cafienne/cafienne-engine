@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapCommand;
+import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
@@ -27,7 +27,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class StartCase extends CaseCommand implements BootstrapCommand {
+public class StartCase extends CaseCommand implements BootstrapMessage {
     private final String tenant;
     private final String rootCaseId;
     private final String parentCaseId;
