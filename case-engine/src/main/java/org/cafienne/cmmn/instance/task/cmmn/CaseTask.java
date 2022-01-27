@@ -33,7 +33,11 @@ public class CaseTask extends Task<CaseTaskDefinition> {
 
     @Override
     protected void terminateInstance() {
-        tell(Transition.Terminate);
+        if (getHistoryState() == State.Available) {
+            addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
+        } else {
+            tell(Transition.Terminate);
+        }
     }
 
     @Override
