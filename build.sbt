@@ -13,13 +13,13 @@ lazy val basicSettings = {
       "-encoding", "UTF-8",
       "-unchecked",
       "-deprecation",
-      "-Xlint","deprecation",
-      "-Xlint","unchecked",
+      "-Xlint", "deprecation",
+      "-Xlint", "unchecked",
       "-Xlog-reflective-calls"
     ),
     Compile / parallelExecution := true,
     Compile / doc / sources := List(),
-    Test / parallelExecution  := false,
+    Test / parallelExecution := false,
     Test / fork := true,
     homepage := Some(url("https://cafienne.org")),
     scmInfo := Some(ScmInfo(url("https://github.com/cafienne/cafienne-engine.git"), "git@github.com:cafienne/cafienne-engine.git")),
@@ -30,9 +30,9 @@ lazy val basicSettings = {
       "tpetter@cafienne.io",
       url("https://github.com/tpetter")),
       Developer("olger",
-      "Olger Warnier",
-      "olger@spectare.nl",
-      url("https://github.com/olger"))
+        "Olger Warnier",
+        "olger@spectare.nl",
+        url("https://github.com/olger"))
     ),
     publishMavenStyle := true,
 
@@ -126,6 +126,10 @@ lazy val engine = project("case-engine")
       Deps.swaggerCore,
       Deps.swaggerjaxrs2,
       Deps.swaggerModels,
+      Deps.akkaHttpCore,
+      Deps.akkaHtppJackson,
+      Deps.jacksonScala,
+      Deps.sw4jj,
     ) ++
       Deps.test(
         Deps.akkaMultiNodeTestKit,
@@ -150,6 +154,7 @@ lazy val engine = project("case-engine")
     git.gitUncommittedChanges := git.gitCurrentTags.value.isEmpty,
     git.gitTagToVersionNumber := { tag: String =>
       val splittedTag = tag.split("-")
+      println("Tag: " + tag)
       splittedTag.length match {
         case 0 => Some(tag)
         case 1 => Some(tag)
@@ -166,26 +171,20 @@ lazy val engine = project("case-engine")
 lazy val service = project("case-service")
   .dependsOn(engine)
   .settings(libraryDependencies ++=
-    Deps.compile(
-      Deps.akkaHttpCore,
-      Deps.akkaHtppJackson,
-      Deps.jacksonScala,
-      Deps.sw4jj,
-    ) ++
-      Deps.test(
-        Deps.akkaTestKit,
-        Deps.akkaHttpTestkit,
-        Deps.akkaMultiNodeTestKit,
-        Deps.junit,
-        Deps.wireMock,
-      )
+    Deps.test(
+      Deps.akkaTestKit,
+      Deps.akkaHttpTestkit,
+      Deps.akkaMultiNodeTestKit,
+      Deps.junit,
+      Deps.wireMock,
+    )
   )
   .settings(
     Docker / packageName := "cafienne/engine",
     Docker / version := "latest",
     Docker / maintainer := """Cafienne <info@cafienne.io>""",
     Docker / defaultLinuxInstallLocation := "/opt/cafienne",
-    bashScriptDefines / scriptClasspath := Seq("../lib_ext/*","*"),
+    bashScriptDefines / scriptClasspath := Seq("../lib_ext/*", "*"),
     bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml"""",
     bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf"""",
     dockerExposedPorts := Seq(2027, 9999),
