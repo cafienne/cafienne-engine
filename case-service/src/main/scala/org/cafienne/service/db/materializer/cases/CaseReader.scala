@@ -1,4 +1,4 @@
-package org.cafienne.service.api.cases
+package org.cafienne.service.db.materializer.cases
 
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 

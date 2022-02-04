@@ -1,4 +1,4 @@
-package org.cafienne.service.api.consentgroup
+package org.cafienne.service.db.materializer.consentgroup
 
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.service.db.materializer.LastModifiedRegistration

@@ -15,8 +15,8 @@ import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser
 import org.cafienne.infrastructure.akka.http.route.{CaseTeamValidator, CommandRoute, QueryRoute}
-import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.db.materializer.LastModifiedRegistration
+import org.cafienne.service.db.materializer.cases.CaseReader
 import org.cafienne.service.db.query.{CaseMembership, CaseQueries}
 import org.cafienne.service.db.query.exception.CaseSearchFailure
 

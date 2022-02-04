@@ -7,7 +7,7 @@ import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.api.tenant.TenantReader
+import org.cafienne.service.db.materializer.tenant.TenantReader
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.db.record.TenantRecord
 

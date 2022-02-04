@@ -8,6 +8,7 @@
 package org.cafienne.service.api.identifiers.route
 
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -16,8 +17,9 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.api.cases._
 import org.cafienne.service.api.identifiers.model.BusinessIdentifierFormat
+import org.cafienne.service.db.materializer.LastModifiedRegistration
+import org.cafienne.service.db.materializer.cases.CaseReader
 import org.cafienne.service.db.query.IdentifierQueries
 import org.cafienne.service.db.query.filter.IdentifierFilter
 import org.cafienne.system.CaseSystem
@@ -28,9 +30,9 @@ import javax.ws.rs._
 @Path("/identifiers")
 class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem
 ) extends QueryRoute {
-  override val lastModifiedRegistration = CaseReader.lastModifiedRegistration
+  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
 
-  override def routes = concat(getIdentifiers, getIdentifierNames)
+  override def routes: Route = concat(getIdentifiers, getIdentifierNames)
 
   @GET
   @Operation(
@@ -50,7 +52,7 @@ class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implic
     )
   )
   @Produces(Array("application/json"))
-  def getIdentifiers = get {
+  def getIdentifiers: Route = get {
     pathEndOrSingleSlash {
       validUser { platformUser =>
         parameters("tenant".?, "name".?, "offset".?(0), "numberOfResults".?(100), "sortBy".?, "sortOrder".?) {
@@ -76,7 +78,7 @@ class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implic
     )
   )
   @Produces(Array("application/json"))
-  def getIdentifierNames = get {
+  def getIdentifierNames: Route = get {
     path("names") {
       pathEndOrSingleSlash {
         validUser { platformUser =>

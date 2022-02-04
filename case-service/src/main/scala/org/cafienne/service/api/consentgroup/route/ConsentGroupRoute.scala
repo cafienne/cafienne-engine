@@ -14,8 +14,8 @@ import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
 import org.cafienne.service.api.Headers
-import org.cafienne.service.api.consentgroup.ConsentGroupReader
 import org.cafienne.service.db.materializer.LastModifiedRegistration
+import org.cafienne.service.db.materializer.consentgroup.ConsentGroupReader
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.db.query.exception.ConsentGroupSearchFailure
 

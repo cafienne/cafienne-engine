@@ -6,7 +6,6 @@ import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.consentgroup.actorapi.event.{ConsentGroupCreated, ConsentGroupMemberEvent, ConsentGroupModified}
 import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
-import org.cafienne.service.api.consentgroup.ConsentGroupReader
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.slick.SlickTransaction
 

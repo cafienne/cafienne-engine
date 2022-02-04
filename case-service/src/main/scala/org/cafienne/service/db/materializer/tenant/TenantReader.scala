@@ -1,4 +1,4 @@
-package org.cafienne.service.api.tenant
+package org.cafienne.service.db.materializer.tenant
 
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 

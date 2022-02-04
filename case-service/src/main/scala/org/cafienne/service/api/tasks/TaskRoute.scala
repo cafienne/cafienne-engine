@@ -13,8 +13,8 @@ import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
 import org.cafienne.humantask.actorapi.command.WorkflowCommand
 import org.cafienne.infrastructure.akka.http.route.{CommandRoute, QueryRoute}
-import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.db.materializer.LastModifiedRegistration
+import org.cafienne.service.db.materializer.cases.CaseReader
 import org.cafienne.service.db.query.{CaseMembership, TaskQueries}
 import org.cafienne.service.db.query.exception.TaskSearchFailure
 

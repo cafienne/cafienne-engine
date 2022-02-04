@@ -8,7 +8,6 @@ import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
-import org.cafienne.service.api.cases.CaseReader
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.cases.file.CaseFileProjection
 import org.cafienne.service.db.materializer.cases.plan.CasePlanProjection
