@@ -17,7 +17,6 @@ lazy val basicSettings = {
       "-Xlint", "unchecked",
       "-Xlog-reflective-calls"
     ),
-    Compile / parallelExecution := true,
     Compile / doc / sources := List(),
     Test / parallelExecution := false,
     Test / fork := true,
@@ -172,15 +171,6 @@ lazy val engine = project("case-engine")
 
 lazy val service = project("case-service")
   .dependsOn(engine)
-  .settings(libraryDependencies ++=
-    Deps.test(
-      Deps.akkaTestKit,
-      Deps.akkaHttpTestkit,
-      Deps.akkaMultiNodeTestKit,
-      Deps.junit,
-      Deps.wireMock,
-    )
-  )
   .settings(
     Docker / packageName := "cafienne/engine",
     Docker / version := "latest",
