@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http
+package org.cafienne.infrastructure.akkahttp
 
 import org.cafienne.json.ValueMap
 

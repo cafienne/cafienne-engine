@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http
+package org.cafienne.infrastructure.akkahttp
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._

@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
+import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 

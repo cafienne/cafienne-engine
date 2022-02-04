@@ -1,7 +1,7 @@
 package org.cafienne.service.api.tasks.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.infrastructure.akka.http.EntityReader.{EntityReader, entityReader}
+import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 
 import scala.annotation.meta.field
 

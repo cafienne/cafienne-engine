@@ -8,7 +8,7 @@
 package org.cafienne.service.api.cases.route.deprecated
 
 import akka.http.scaladsl.server.Directives._
-import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.service.api.cases.route.CasesRoute
 import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem

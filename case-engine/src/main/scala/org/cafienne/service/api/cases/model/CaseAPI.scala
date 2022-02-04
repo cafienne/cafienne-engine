@@ -1,7 +1,7 @@
 package org.cafienne.service.api.cases.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.cafienne.infrastructure.akka.http.EntityReader._
+import org.cafienne.infrastructure.akkahttp.EntityReader._
 import org.cafienne.json.ValueMap
 
 import scala.annotation.meta.field

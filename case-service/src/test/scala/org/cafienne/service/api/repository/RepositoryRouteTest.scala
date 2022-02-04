@@ -4,8 +4,8 @@ import akka.event.Logging
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
-import org.cafienne.infrastructure.akka.http.ValueMarshallers
-import org.cafienne.infrastructure.akka.http.authentication.IdentityCache
+import org.cafienne.infrastructure.akkahttp.ValueMarshallers
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
 import org.cafienne.service.db.query.TenantQueriesImpl
 import org.cafienne.system.CaseSystem
 import org.scalatest.flatspec.AnyFlatSpec

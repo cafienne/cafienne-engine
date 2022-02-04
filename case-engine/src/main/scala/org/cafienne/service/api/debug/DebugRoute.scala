@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
-import org.cafienne.infrastructure.akka.http.route.CommandRoute
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.infrastructure.akkahttp.route.CommandRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.{GET, PATCH, Path, Produces}

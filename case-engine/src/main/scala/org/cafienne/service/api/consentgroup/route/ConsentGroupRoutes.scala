@@ -7,7 +7,7 @@
  */
 package org.cafienne.service.api.consentgroup.route
 
-import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.system.CaseSystem
 

@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.authentication
+package org.cafienne.infrastructure.akkahttp.authentication
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.PlatformUser

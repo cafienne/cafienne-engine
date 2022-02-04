@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.authentication
+package org.cafienne.infrastructure.akkahttp.authentication
 
 import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.{Directive1, Directives}

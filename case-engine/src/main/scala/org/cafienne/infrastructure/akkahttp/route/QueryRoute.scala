@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.route
+package org.cafienne.infrastructure.akkahttp.route
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName}

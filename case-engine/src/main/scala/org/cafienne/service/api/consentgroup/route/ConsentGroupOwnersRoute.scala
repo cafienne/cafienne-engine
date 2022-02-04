@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.consentgroup.actorapi.command._
-import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.service.api.consentgroup.model.ConsentGroupAPI._
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.system.CaseSystem

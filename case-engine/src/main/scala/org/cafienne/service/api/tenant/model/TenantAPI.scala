@@ -2,7 +2,7 @@ package org.cafienne.service.api.tenant.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.infrastructure.akka.http.EntityReader.{EntityReader, entityReader}
+import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.service.api.ApiValidator
 
 import scala.annotation.meta.field

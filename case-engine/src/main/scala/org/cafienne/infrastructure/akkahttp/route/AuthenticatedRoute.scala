@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.route
+package org.cafienne.infrastructure.akkahttp.route
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, extractUri, _}
@@ -9,7 +9,7 @@ import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommand
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.{AuthenticationException, CannotReachIDPException}
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.authentication.{AuthenticationDirectives, IdentityProvider}
+import org.cafienne.infrastructure.akkahttp.authentication.{AuthenticationDirectives, IdentityProvider}
 import org.cafienne.service.api.Headers
 import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.health.HealthMonitor

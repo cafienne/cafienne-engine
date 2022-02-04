@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.akka.http.authentication
+package org.cafienne.infrastructure.akkahttp.authentication
 
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.AuthenticatedUser

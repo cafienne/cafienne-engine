@@ -2,7 +2,7 @@ package org.cafienne.service.api.consentgroup.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
-import org.cafienne.infrastructure.akka.http.EntityReader.{EntityReader, entityReader}
+import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.service.api.ApiValidator
 import org.cafienne.util.Guid
 

@@ -21,9 +21,9 @@ import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.ValueMarshallers._
-import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
-import org.cafienne.infrastructure.akka.http.route.{AuthenticatedRoute, TenantValidator}
+import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.infrastructure.akkahttp.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
 import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document

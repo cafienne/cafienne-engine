@@ -13,7 +13,7 @@ import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.SerializedException
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
 import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
+import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}

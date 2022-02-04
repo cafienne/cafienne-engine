@@ -3,7 +3,7 @@ package org.cafienne.service.api.cases.model
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Schema}
 import org.cafienne.actormodel.identity.Origin
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser, GroupRoleMapping, UpsertMemberData}
-import org.cafienne.infrastructure.akka.http.EntityReader.{EntityReader, entityReader}
+import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.service.api.ApiValidator
 
 import scala.annotation.meta.field

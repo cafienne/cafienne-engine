@@ -12,8 +12,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import org.cafienne.BuildInfo
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akka.http.authentication.IdentityCache
-import org.cafienne.infrastructure.akka.http.route.CaseServiceRoute
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
+import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.cqrs.QueryDBOffsetStorageProvider
 import org.cafienne.service.api.anonymous.AnonymousRequestRoutes
 import org.cafienne.service.api.cases.route.CasesRoutes
