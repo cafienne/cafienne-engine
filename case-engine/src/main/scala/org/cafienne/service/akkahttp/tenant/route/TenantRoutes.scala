@@ -8,7 +8,7 @@
 package org.cafienne.service.akkahttp.tenant.route
 
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.service.db.query.UserQueries
+import org.cafienne.querydb.query.UserQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

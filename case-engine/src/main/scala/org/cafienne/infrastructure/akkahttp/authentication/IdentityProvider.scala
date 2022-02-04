@@ -3,7 +3,7 @@ package org.cafienne.infrastructure.akkahttp.authentication
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.consentgroup.actorapi.ConsentGroup
-import org.cafienne.service.db.record.TenantRecord
+import org.cafienne.querydb.record.TenantRecord
 
 import scala.concurrent.Future
 

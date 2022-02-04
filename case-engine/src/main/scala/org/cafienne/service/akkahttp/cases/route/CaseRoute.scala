@@ -25,11 +25,11 @@ import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases._
 import org.cafienne.service.akkahttp.cases.model.CaseAPI._
-import org.cafienne.service.db.query.CaseQueries
-import org.cafienne.service.db.query.filter.CaseFilter
 import org.cafienne.system.CaseSystem
 
 import java.util.UUID

@@ -13,11 +13,11 @@ import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{PlatformUser, TenantUser}
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
+import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.materializer.consentgroup.ConsentGroupReader
+import org.cafienne.querydb.query.UserQueries
+import org.cafienne.querydb.query.exception.ConsentGroupSearchFailure
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.db.materializer.LastModifiedRegistration
-import org.cafienne.service.db.materializer.consentgroup.ConsentGroupReader
-import org.cafienne.service.db.query.UserQueries
-import org.cafienne.service.db.query.exception.ConsentGroupSearchFailure
 
 import scala.util.{Failure, Success}
 

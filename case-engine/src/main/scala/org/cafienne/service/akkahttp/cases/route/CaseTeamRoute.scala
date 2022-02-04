@@ -19,9 +19,9 @@ import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.removemember._
 import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole}
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.CaseQueries
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.model.CaseTeamAPI._
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

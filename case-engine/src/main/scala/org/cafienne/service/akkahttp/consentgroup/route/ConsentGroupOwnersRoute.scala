@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.consentgroup.actorapi.command._
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.UserQueries
 import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI._
-import org.cafienne.service.db.query.UserQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

@@ -4,7 +4,7 @@ import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.service.db.record._
+import org.cafienne.querydb.record._
 
 final case class FullCase(caseInstance: CaseRecord, file: CaseFile, team: CaseTeamResponse, planitems: CasePlan, identifiers: CaseIdentifiers) extends CafienneJson {
   override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team, "file", file.toValue, "planitems", planitems.toValue, "identifiers", identifiers.toValue))

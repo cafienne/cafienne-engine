@@ -15,10 +15,10 @@ import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser
 import org.cafienne.infrastructure.akkahttp.route.{CaseTeamValidator, CommandRoute, QueryRoute}
-import org.cafienne.service.db.materializer.LastModifiedRegistration
-import org.cafienne.service.db.materializer.cases.CaseReader
-import org.cafienne.service.db.query.{CaseMembership, CaseQueries}
-import org.cafienne.service.db.query.exception.CaseSearchFailure
+import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.materializer.cases.CaseReader
+import org.cafienne.querydb.query.{CaseMembership, CaseQueries}
+import org.cafienne.querydb.query.exception.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 

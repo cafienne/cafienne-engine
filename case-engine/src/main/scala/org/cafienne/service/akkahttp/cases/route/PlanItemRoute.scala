@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.CaseQueries
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

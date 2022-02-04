@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
+import org.cafienne.querydb.materializer.slick.SlickRecordsPersistence
+import org.cafienne.querydb.query.CaseQueriesImpl
+import org.cafienne.querydb.query.filter.CaseFilter
+import org.cafienne.querydb.record.{CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
 import org.cafienne.service.akkahttp.writer.TestConfig
-import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
-import org.cafienne.service.db.query.CaseQueriesImpl
-import org.cafienne.service.db.query.filter.CaseFilter
-import org.cafienne.service.db.record.{CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
-import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers

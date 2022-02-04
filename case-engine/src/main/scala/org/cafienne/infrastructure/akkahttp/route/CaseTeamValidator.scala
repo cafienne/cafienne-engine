@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{Origin, PlatformUser}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
-import org.cafienne.service.db.query.exception.SearchFailure
+import org.cafienne.querydb.query.exception.SearchFailure
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

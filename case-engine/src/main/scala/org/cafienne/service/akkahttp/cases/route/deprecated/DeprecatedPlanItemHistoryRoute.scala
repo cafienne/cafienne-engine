@@ -9,8 +9,8 @@ package org.cafienne.service.akkahttp.cases.route.deprecated
 
 import akka.http.scaladsl.server.Directives._
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.CaseQueries
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
 class DeprecatedPlanItemHistoryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {

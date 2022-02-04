@@ -9,7 +9,7 @@ package org.cafienne.service.akkahttp.tasks
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.service.db.query.TaskQueries
+import org.cafienne.querydb.query.TaskQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.Path

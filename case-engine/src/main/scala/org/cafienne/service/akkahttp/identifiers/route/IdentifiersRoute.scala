@@ -17,11 +17,11 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.materializer.cases.CaseReader
+import org.cafienne.querydb.query.IdentifierQueries
+import org.cafienne.querydb.query.filter.IdentifierFilter
 import org.cafienne.service.akkahttp.identifiers.model.BusinessIdentifierFormat
-import org.cafienne.service.db.materializer.LastModifiedRegistration
-import org.cafienne.service.db.materializer.cases.CaseReader
-import org.cafienne.service.db.query.IdentifierQueries
-import org.cafienne.service.db.query.filter.IdentifierFilter
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

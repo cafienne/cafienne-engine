@@ -19,8 +19,8 @@ import org.cafienne.humantask.actorapi.command._
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.json.ValueMap
+import org.cafienne.querydb.query.{TaskCount, TaskQueries}
 import org.cafienne.service.akkahttp.tasks.model.TaskAPI._
-import org.cafienne.service.db.query.{TaskCount, TaskQueries}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

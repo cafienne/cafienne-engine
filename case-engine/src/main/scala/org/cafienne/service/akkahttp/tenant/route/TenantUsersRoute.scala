@@ -18,9 +18,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.UserQueries
+import org.cafienne.querydb.query.exception.UserSearchFailure
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI.TenantUserFormat
-import org.cafienne.service.db.query.UserQueries
-import org.cafienne.service.db.query.exception.UserSearchFailure
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

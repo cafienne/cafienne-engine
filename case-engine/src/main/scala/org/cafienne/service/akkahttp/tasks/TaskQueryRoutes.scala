@@ -15,9 +15,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
+import org.cafienne.querydb.query.{TaskCount, TaskQueries}
+import org.cafienne.querydb.query.filter.TaskFilter
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.db.query.filter.TaskFilter
-import org.cafienne.service.db.query.{TaskCount, TaskQueries}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

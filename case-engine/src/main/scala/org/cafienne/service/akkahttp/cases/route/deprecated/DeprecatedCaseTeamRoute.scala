@@ -12,9 +12,9 @@ import akka.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
 import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.CaseQueries
 import org.cafienne.service.akkahttp.cases.model.CaseTeamAPI.Compatible._
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
 class DeprecatedCaseTeamRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {

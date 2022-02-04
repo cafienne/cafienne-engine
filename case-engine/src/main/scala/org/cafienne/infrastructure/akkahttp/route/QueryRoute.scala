@@ -6,10 +6,10 @@ import akka.http.scaladsl.server.{Directive1, Route}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.json.{CafienneJson, Value}
+import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.query.exception.SearchFailure
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.CaseDefinitionDocument
-import org.cafienne.service.db.materializer.LastModifiedRegistration
-import org.cafienne.service.db.query.exception.SearchFailure
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

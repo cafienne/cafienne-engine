@@ -20,8 +20,8 @@ import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCa
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.json.Value
+import org.cafienne.querydb.query.CaseQueries
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

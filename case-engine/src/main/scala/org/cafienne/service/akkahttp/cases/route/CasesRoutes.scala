@@ -9,8 +9,8 @@ package org.cafienne.service.akkahttp.cases.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.querydb.query.CaseQueries
 import org.cafienne.service.akkahttp.cases.route.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
-import org.cafienne.service.db.query.CaseQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

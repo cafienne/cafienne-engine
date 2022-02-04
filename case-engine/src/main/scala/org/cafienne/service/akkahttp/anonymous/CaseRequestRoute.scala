@@ -23,8 +23,8 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
+import org.cafienne.querydb.query.exception.SearchFailure
 import org.cafienne.service.akkahttp.anonymous.model.AnonymousAPI._
-import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 

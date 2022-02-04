@@ -11,11 +11,11 @@
 <!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
 
     <!-- Show logging for offset of projections -->
-    <!--    <logger name="org.cafienne.service.db.materializer.cases.CaseProjectionsWriter" level="DEBUG" />-->
-    <!--    <logger name="org.cafienne.service.db.materializer.tenant.TenantProjectionsWriter"    level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.querydb.materializer.cases.CaseProjectionsWriter" level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.querydb.materializer.tenant.TenantProjectionsWriter"    level="DEBUG" />-->
 
     <!-- Show all projections logging, including info on event being handled -->
-    <!--    <logger name="org.cafienne.service.db.materializer" level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.querydb.materializer" level="DEBUG" />-->
 
     <!-- Show logging for engine -->
     <!--        <logger name="org.cafienne.cmmn"    level="DEBUG" />-->

@@ -3,8 +3,8 @@ package org.cafienne.service.akkahttp.writer
 import akka.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
-import org.cafienne.service.db.materializer.RecordsPersistence
-import org.cafienne.service.db.record._
+import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.record._
 
 import java.time.Instant
 import scala.concurrent.Future

@@ -15,6 +15,12 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.cqrs.QueryDBOffsetStorageProvider
+import org.cafienne.querydb.materializer.cases.CaseEventSink
+import org.cafienne.querydb.materializer.consentgroup.ConsentGroupEventSink
+import org.cafienne.querydb.materializer.slick.SlickRecordsPersistence
+import org.cafienne.querydb.materializer.tenant.TenantEventSink
+import org.cafienne.querydb.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
+import org.cafienne.querydb.schema.QueryDB
 import org.cafienne.service.akkahttp.anonymous.AnonymousRequestRoutes
 import org.cafienne.service.akkahttp.cases.route.CasesRoutes
 import org.cafienne.service.akkahttp.consentgroup.route.ConsentGroupRoutes
@@ -25,12 +31,6 @@ import org.cafienne.service.akkahttp.repository.RepositoryRoute
 import org.cafienne.service.akkahttp.swagger.SwaggerHttpServiceRoute
 import org.cafienne.service.akkahttp.tasks.TaskRoutes
 import org.cafienne.service.akkahttp.tenant.route.TenantRoutes
-import org.cafienne.service.db.materializer.cases.CaseEventSink
-import org.cafienne.service.db.materializer.consentgroup.ConsentGroupEventSink
-import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
-import org.cafienne.service.db.materializer.tenant.TenantEventSink
-import org.cafienne.service.db.query.{CaseQueriesImpl, IdentifierQueriesImpl, TaskQueriesImpl, TenantQueriesImpl}
-import org.cafienne.service.db.schema.QueryDB
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.duration._

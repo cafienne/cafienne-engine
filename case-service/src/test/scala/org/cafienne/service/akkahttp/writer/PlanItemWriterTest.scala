@@ -5,9 +5,9 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.service.db.materializer.cases.CaseEventSink
-import org.cafienne.service.db.record.{CaseRecord, PlanItemRecord}
-import org.cafienne.service.db.schema.QueryDB
+import org.cafienne.querydb.materializer.cases.CaseEventSink
+import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
+import org.cafienne.querydb.schema.QueryDB
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers

@@ -10,8 +10,8 @@ import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.{AuthenticationException, CannotReachIDPException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.{AuthenticationDirectives, IdentityProvider}
+import org.cafienne.querydb.query.exception.SearchFailure
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.db.query.exception.SearchFailure
 import org.cafienne.system.health.HealthMonitor
 
 import java.net.URL

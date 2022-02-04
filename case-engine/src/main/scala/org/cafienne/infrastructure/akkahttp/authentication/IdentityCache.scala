@@ -7,9 +7,9 @@ import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.service.db.materializer.tenant.TenantReader
-import org.cafienne.service.db.query.UserQueries
-import org.cafienne.service.db.record.TenantRecord
+import org.cafienne.querydb.materializer.tenant.TenantReader
+import org.cafienne.querydb.query.UserQueries
+import org.cafienne.querydb.record.TenantRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 

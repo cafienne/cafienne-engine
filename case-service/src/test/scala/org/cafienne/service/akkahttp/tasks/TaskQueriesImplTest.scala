@@ -3,11 +3,11 @@ package org.cafienne.service.akkahttp.tasks
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence
-import org.cafienne.service.db.query.TaskQueriesImpl
-import org.cafienne.service.db.query.exception.TaskSearchFailure
-import org.cafienne.service.db.record.{CaseRecord, TaskRecord}
-import org.cafienne.service.db.schema.{QueryDB, QueryDBSchema}
+import org.cafienne.querydb.materializer.slick.SlickRecordsPersistence
+import org.cafienne.querydb.query.TaskQueriesImpl
+import org.cafienne.querydb.query.exception.TaskSearchFailure
+import org.cafienne.querydb.record.{CaseRecord, TaskRecord}
+import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers

@@ -12,9 +12,9 @@ import akka.http.scaladsl.server.Directives.complete
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{PlatformOwner, PlatformUser, TenantUser}
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
+import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.db.materializer.LastModifiedRegistration
-import org.cafienne.service.db.materializer.tenant.TenantReader
 import org.cafienne.tenant.actorapi.command.TenantCommand
 import org.cafienne.tenant.actorapi.command.platform.PlatformTenantCommand
 
