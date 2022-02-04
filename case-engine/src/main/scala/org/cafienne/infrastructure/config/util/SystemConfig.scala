@@ -12,7 +12,7 @@ object SystemConfig extends LazyLogging {
   def load(): Config = {
     val fallback = ConfigFactory.defaultReference()
     val currentConfig = ConfigFactory.load().withFallback(fallback)
-    val newConfig = migrateTagging(migrateSerializer(currentConfig))
+    val newConfig = migrateEventDatabaseProvider(migrateTagging(migrateSerializer(currentConfig)))
     newConfig
   }
 
@@ -47,6 +47,15 @@ object SystemConfig extends LazyLogging {
     migrateConfigurationProperty(newConfig, bindingPath, oldKey, newKey)
   }
 
+  def migrateEventDatabaseProvider(config: Config): Config = {
+    // Tagging is configured in the akka persistence journal.
+    //  This journal has different configuration keys per type of persistence.
+    //  Find the right path based on the config of the journal plugin.
+    val deprecatedValue = "org.cafienne.service.db.events.EventDatabaseProvider"
+    val newValue = "org.cafienne.journal.jdbc.EventDatabaseProvider"
+    migrateConfigurationValue(config, "akka-persistence-jdbc", "database-provider-fqcn", deprecatedValue, newValue, false)
+  }
+
   /**
     * Print a big warning message, hopefully drawing attention :)
     * @param msg
@@ -71,7 +80,7 @@ object SystemConfig extends LazyLogging {
     s"${origin.url()}, line ${origin.lineNumber()}"
   }
 
-  def migrateConfigurationValue(config: Config, path: String, key: String, oldValue: AnyRef, newValue: AnyRef): Config = {
+  def migrateConfigurationValue(config: Config, path: String, key: String, oldValue: AnyRef, newValue: AnyRef, showWarningOnDifferentValue: Boolean = true): Config = {
     val keyPath = s"""$path.$key"""
     if (config.hasPath(keyPath)) {
       val configValue = config.getValue(keyPath)
@@ -81,7 +90,7 @@ object SystemConfig extends LazyLogging {
         if (value == oldValue) {
           printWarning(s"""$location\n\tPlease change deprecated configuration property '$keyPath' to\n\n\t\t$key = "$newValue" """)
           return config.withValue(keyPath, ConfigValueFactory.fromAnyRef(newValue))
-        } else {
+        } else if (showWarningOnDifferentValue) {
           printWarning(s"""$location\n\tConfiguration property '$keyPath' may have the wrong value; consider changing it to \n\n\t\t$key = "$newValue" """)
         }
       }

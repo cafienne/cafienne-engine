@@ -1,4 +1,4 @@
-package org.cafienne.service.db.events
+package org.cafienne.journal.jdbc
 
 import akka.actor.ActorSystem
 import akka.persistence.jdbc.db.{DefaultSlickDatabaseProvider, SlickDatabase}
