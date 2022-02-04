@@ -3,11 +3,12 @@ package org.cafienne.service.akkahttp.writer
 import akka.actor.{ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
 import akka.testkit.{TestKit, TestProbe}
+import org.cafienne.cmmn.instance.{State, Transition}
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
+import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.querydb.materializer.cases.CaseEventSink
-import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
-import org.cafienne.querydb.schema.QueryDB
+import org.cafienne.querydb.record._
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
@@ -17,15 +18,12 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import java.time.Instant
 import scala.concurrent.duration._
 
-class PlanItemWriterTest
+class CaseTaskWriterTest
   extends TestKit(ActorSystem("testsystem", TestConfig.config))
     with AnyWordSpecLike
     with Matchers
     with BeforeAndAfterAll
     with Eventually {
-
-  //Ensure the database is setup completely (including the offset store)
-  QueryDB.verifyConnectivity()
 
   private val storeEventsActor = system.actorOf(Props(classOf[CreateEventsInStoreActor]), "storeevents-actor")
   private val tp = TestProbe()
@@ -37,7 +35,7 @@ class PlanItemWriterTest
     interval = scaled(Span(5, Millis)))
 
   private def sendEvent(evt: Any) = {
-    within(5.seconds) {
+    within(10.seconds) {
       tp.send(storeEventsActor, evt)
       tp.expectMsg(evt)
     }
@@ -49,29 +47,34 @@ class PlanItemWriterTest
   cpw.start()
 
 
-  val caseInstanceId = "c140aae8_dd10_4ece_8fb1_5f7a199e49e7"
+  val caseInstanceId = "9fc49257_7d33_41cb_b28a_75e665ee3b2c"
   val user = TestIdentityFactory.createTenantUser("test")
-  val caseDefinition = TestScript.getCaseDefinition("helloworld.xml")
+  val caseDefinition = TestScript.getCaseDefinition("testdefinition/helloworld.xml")
 
   val eventFactory = new EventFactory(caseInstanceId, caseDefinition, user)
   val ivm = Instant.now
 
   val caseDefinitionApplied = eventFactory.createCaseDefinitionApplied()
   val caseModifiedEvent = eventFactory.createCaseModified(ivm)
-  val planItemCreated = eventFactory.createPlanItemCreated("1", "CasePlan", "HelloWorld", "", ivm)
+  val planItemTransitioned = eventFactory.createPlanItemTransitioned("1", "HumanTask", State.Terminated, State.Active, Transition.Terminate, ivm)
 
   "CaseProjectionsWriter" must {
-    "add and update plan items" in {
+    "add and update tasks" in {
 
       sendEvent(caseDefinitionApplied)
-      sendEvent(planItemCreated)
+      sendEvent(planItemTransitioned)
       sendEvent(caseModifiedEvent)
 
-      Thread.sleep(1000)
+      Thread.sleep(2000)
       eventually {
-        persistence.records.length shouldBe 8
-        assert(persistence.records.exists(x => x.isInstanceOf[CaseRecord]))
-        assert(persistence.records.exists(x => x.isInstanceOf[PlanItemRecord]))
+        println(s"Found ${persistence.records.length} records, of types ${persistence.records.map(_.getClass.getSimpleName).toSet.mkString(",")}")
+        persistence.records.length shouldBe 7
+        persistence.records.count(_.isInstanceOf[CaseDefinitionRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[CaseRoleRecord]) shouldBe 2
+        persistence.records.count(_.isInstanceOf[CaseRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[CaseFileRecord]) shouldBe 1
+        persistence.records.count(_.isInstanceOf[PlanItemHistoryRecord]) shouldBe 1  // so ... then why is this called CaseTaskWriterTest???
+        persistence.records.count(_.isInstanceOf[OffsetRecord]) shouldBe 1
       }
     }
   }

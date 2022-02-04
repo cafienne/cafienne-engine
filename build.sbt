@@ -132,6 +132,8 @@ lazy val engine = project("case-engine")
       Deps.sw4jj,
     ) ++
       Deps.test(
+        Deps.akkaTestKit,
+        Deps.akkaHttpTestkit,
         Deps.akkaMultiNodeTestKit,
         Deps.akkaInMemoryTestDB,
         Deps.junit,

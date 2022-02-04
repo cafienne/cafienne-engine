@@ -21,9 +21,9 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
   val repositoryRoute = new RepositoryRoute() {
   }
 
-  testValidationRoute("fail when an invalid definition is given", "invaliddefinition.xml", "[ \"helloworld.case: Plan item Receive Greeting and Send response refers to a definition named pid_cm_csVQy_167, but that definition is not found\" ]", StatusCodes.BadRequest)
-  testValidationRoute("fail when no definition is given", "nodefinition.xml", "[ \"The definitions document does not contain any definitions\" ]", StatusCodes.BadRequest)
-  testValidationRoute("succeed when a valid definition is given ", "helloworld.xml", "OK", StatusCodes.OK)
+  testValidationRoute("fail when an invalid definition is given", "testdefinition/invaliddefinition.xml", "[ \"helloworld.case: Plan item Receive Greeting and Send response refers to a definition named pid_cm_csVQy_167, but that definition is not found\" ]", StatusCodes.BadRequest)
+  testValidationRoute("fail when no definition is given", "testdefinition/nodefinition.xml", "[ \"The definitions document does not contain any definitions\" ]", StatusCodes.BadRequest)
+  testValidationRoute("succeed when a valid definition is given ", "testdefinition/helloworld.xml", "OK", StatusCodes.OK)
 
   /**
     * Test method for the /validation sub-route of the /repository route
