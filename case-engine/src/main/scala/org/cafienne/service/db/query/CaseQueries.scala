@@ -4,7 +4,7 @@ import org.cafienne.actormodel.identity.{Origin, PlatformUser}
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.service.api.cases._
+import org.cafienne.service.akkahttp.cases._
 import org.cafienne.service.db.query.exception.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
 import org.cafienne.service.db.query.filter.CaseFilter
 import org.cafienne.service.db.record.{CaseRecord, CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}

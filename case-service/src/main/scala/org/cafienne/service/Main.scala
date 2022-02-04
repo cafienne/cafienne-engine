@@ -15,16 +15,16 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.infrastructure.jdbc.cqrs.QueryDBOffsetStorageProvider
-import org.cafienne.service.api.anonymous.AnonymousRequestRoutes
-import org.cafienne.service.api.cases.route.CasesRoutes
-import org.cafienne.service.api.consentgroup.route.ConsentGroupRoutes
-import org.cafienne.service.api.debug.DebugRoute
-import org.cafienne.service.api.identifiers.route.IdentifierRoutes
-import org.cafienne.service.api.platform.{CaseEngineHealthRoute, PlatformRoutes}
-import org.cafienne.service.api.repository.RepositoryRoute
-import org.cafienne.service.api.swagger.SwaggerHttpServiceRoute
-import org.cafienne.service.api.tasks.TaskRoutes
-import org.cafienne.service.api.tenant.route.TenantRoutes
+import org.cafienne.service.akkahttp.anonymous.AnonymousRequestRoutes
+import org.cafienne.service.akkahttp.cases.route.CasesRoutes
+import org.cafienne.service.akkahttp.consentgroup.route.ConsentGroupRoutes
+import org.cafienne.service.akkahttp.debug.DebugRoute
+import org.cafienne.service.akkahttp.identifiers.route.IdentifierRoutes
+import org.cafienne.service.akkahttp.platform.{CaseEngineHealthRoute, PlatformRoutes}
+import org.cafienne.service.akkahttp.repository.RepositoryRoute
+import org.cafienne.service.akkahttp.swagger.SwaggerHttpServiceRoute
+import org.cafienne.service.akkahttp.tasks.TaskRoutes
+import org.cafienne.service.akkahttp.tenant.route.TenantRoutes
 import org.cafienne.service.db.materializer.cases.CaseEventSink
 import org.cafienne.service.db.materializer.consentgroup.ConsentGroupEventSink
 import org.cafienne.service.db.materializer.slick.SlickRecordsPersistence

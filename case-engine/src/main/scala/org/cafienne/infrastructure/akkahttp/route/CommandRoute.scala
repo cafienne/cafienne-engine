@@ -11,7 +11,7 @@ import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseRespons
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
 import org.cafienne.infrastructure.akkahttp.ResponseMarshallers._
-import org.cafienne.service.api.Headers
+import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 

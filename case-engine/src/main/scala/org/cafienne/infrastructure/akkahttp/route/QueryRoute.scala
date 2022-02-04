@@ -6,8 +6,8 @@ import akka.http.scaladsl.server.{Directive1, Route}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.json.{CafienneJson, Value}
-import org.cafienne.service.api.Headers
-import org.cafienne.service.api.cases.CaseDefinitionDocument
+import org.cafienne.service.akkahttp.Headers
+import org.cafienne.service.akkahttp.cases.CaseDefinitionDocument
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 import org.cafienne.service.db.query.exception.SearchFailure
 

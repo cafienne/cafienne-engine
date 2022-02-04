@@ -8,7 +8,7 @@
     <logger name="org.cafienne" level="WARN" />
 
     <!-- Show HTTP traffic logging -->
-    <!--    <logger name="org.cafienne.service.api" level="DEBUG" />-->
+<!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
 
     <!-- Show logging for offset of projections -->
     <!--    <logger name="org.cafienne.service.db.materializer.cases.CaseProjectionsWriter" level="DEBUG" />-->
