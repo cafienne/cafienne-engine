@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
-import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.json.Value
 import org.cafienne.service.api.Headers
 import org.cafienne.service.db.query.CaseQueries

@@ -2,7 +2,7 @@ package org.cafienne.infrastructure.akka.http.route
 
 import akka.http.scaladsl.server.Directives.onComplete
 import akka.http.scaladsl.server.Route
-import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}

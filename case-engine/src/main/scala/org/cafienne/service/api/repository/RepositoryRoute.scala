@@ -20,9 +20,9 @@ import org.cafienne.actormodel.exception.{AuthorizationException, MissingTenantE
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
-import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akka.http.ValueMarshallers._
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
 import org.cafienne.system.CaseSystem

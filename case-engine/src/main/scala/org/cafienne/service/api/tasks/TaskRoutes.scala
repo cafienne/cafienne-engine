@@ -8,7 +8,7 @@
 package org.cafienne.service.api.tasks
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.service.db.query.TaskQueries
 import org.cafienne.system.CaseSystem
 

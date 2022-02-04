@@ -8,7 +8,7 @@
 package org.cafienne.service.api.identifiers.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.QueryRoute
 import org.cafienne.service.db.materializer.LastModifiedRegistration
 import org.cafienne.service.db.materializer.cases.CaseReader

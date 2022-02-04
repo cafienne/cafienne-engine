@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
-import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.service.api.Headers
 import org.cafienne.service.api.cases.model.CaseMigrationAPI._
 import org.cafienne.service.db.query.CaseQueries

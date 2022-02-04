@@ -1,4 +1,4 @@
-package org.cafienne.identity
+package org.cafienne.infrastructure.akka.http.authentication
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.PlatformUser
@@ -12,20 +12,6 @@ import org.cafienne.service.db.query.UserQueries
 import org.cafienne.service.db.record.TenantRecord
 
 import scala.concurrent.{ExecutionContext, Future}
-
-trait IdentityProvider {
-  def getTenant(tenant: String): Future[TenantRecord] = ???
-
-  def getPlatformUser(user: AuthenticatedUser, tlm: Option[String]): Future[PlatformUser] = ???
-
-  def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = ???
-
-  def getUserRegistration(userId: String): Future[PlatformUser] = ???
-
-  def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = ???
-
-  def clear(userId: String): Unit = ???
-}
 
 class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext) extends IdentityProvider with LazyLogging {
 

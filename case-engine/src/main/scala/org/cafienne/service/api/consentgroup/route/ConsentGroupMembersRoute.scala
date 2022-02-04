@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.service.api.consentgroup.model.ConsentGroupAPI.ConsentGroupUserFormat
 import org.cafienne.service.db.query.UserQueries
 import org.cafienne.system.CaseSystem

@@ -19,8 +19,8 @@ import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.response.CaseStartedResponse
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
-import org.cafienne.identity.IdentityProvider
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.infrastructure.akka.http.route.CaseTeamValidator
 import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
 import org.cafienne.service.api.anonymous.model.AnonymousAPI._

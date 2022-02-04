@@ -10,7 +10,6 @@ import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
-import org.cafienne.identity.IdentityProvider
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike

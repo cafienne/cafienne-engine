@@ -3,7 +3,7 @@ package org.cafienne.service.db.materializer.tenant
 import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.identity.IdentityProvider
+import org.cafienne.infrastructure.akka.http.authentication.IdentityProvider
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage, OffsetStorageProvider}
 import org.cafienne.service.db.materializer.RecordsPersistence
 import org.cafienne.service.db.materializer.slick.SlickEventMaterializer
