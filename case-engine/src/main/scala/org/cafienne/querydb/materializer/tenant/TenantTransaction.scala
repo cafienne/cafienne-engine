@@ -5,7 +5,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetRecord}
 import org.cafienne.querydb.materializer.RecordsPersistence
 import org.cafienne.querydb.materializer.slick.SlickTransaction
 import org.cafienne.tenant.actorapi.event._
@@ -13,13 +13,16 @@ import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
 import org.cafienne.tenant.actorapi.event.platform.PlatformEvent
 import org.cafienne.tenant.actorapi.event.user.TenantMemberEvent
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCache: IdentityProvider, offsetStorage: OffsetStorage)
-                       (implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
+class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCache: IdentityProvider) extends SlickTransaction with LazyLogging {
+
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   private val tenantProjection = new TenantProjection(persistence)
   private val userProjection = new TenantUserProjection(persistence)
+
+  def createOffsetRecord(offset: Offset): OffsetRecord = OffsetRecord(TenantEventSink.offsetName, offset)
 
   override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
     logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " on tenant " + tenant)
@@ -47,7 +50,7 @@ class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCac
     tenantProjection.prepareCommit()
     userProjection.prepareCommit()
     // Update the offset of the last event handled in this projection
-    persistence.upsert(offsetStorage.createOffsetRecord(envelope.offset))
+    persistence.upsert(createOffsetRecord(envelope.offset))
     // Commit and then inform the last modified registration
     persistence.commit().andThen(_ => {
       // Clear the user cache for those user ids that have been updated
@@ -57,6 +60,6 @@ class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCac
   }
 
   private def updateUserIds(event: TenantAppliedPlatformUpdate, offset: Offset): Future[Done] = {
-    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, offsetStorage.createOffsetRecord(offset))
+    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, createOffsetRecord(offset))
   }
 }

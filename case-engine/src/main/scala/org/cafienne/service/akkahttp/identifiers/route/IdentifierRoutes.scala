@@ -8,20 +8,18 @@
 package org.cafienne.service.akkahttp.identifiers.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.QueryRoute
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.cases.CaseReader
-import org.cafienne.querydb.query.IdentifierQueries
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/identifiers")
-class IdentifierRoutes(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends QueryRoute {
+class IdentifierRoutes(override val caseSystem: CaseSystem) extends QueryRoute {
   override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
   override val prefix = "identifiers"
 
-  addSubRoute(new IdentifiersRoute(identifierQueries)(userCache, caseSystem))
+  addSubRoute(new IdentifiersRoute(caseSystem))
 }

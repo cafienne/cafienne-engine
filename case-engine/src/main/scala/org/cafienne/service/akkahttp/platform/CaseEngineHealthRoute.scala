@@ -20,7 +20,7 @@ import org.cafienne.system.health.HealthMonitor
 import javax.ws.rs._
 
 @Path("/")
-class CaseEngineHealthRoute(override implicit val caseSystem: CaseSystem) extends CaseServiceRoute {
+class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseServiceRoute {
 
 
   // For now, directly in the main, and not as child of PlatformRoutes;

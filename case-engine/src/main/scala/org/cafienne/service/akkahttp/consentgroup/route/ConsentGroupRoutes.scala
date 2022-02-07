@@ -7,16 +7,15 @@
  */
 package org.cafienne.service.akkahttp.consentgroup.route
 
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.UserQueries
+import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
 @Path("consent-group")
-class ConsentGroupRoutes(val userQueries: UserQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends ConsentGroupRoute {
+class ConsentGroupRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
   override val prefix: String = "consent-group"
 
-  addSubRoute(new ConsentGroupOwnersRoute(userQueries)(userCache, caseSystem))
-  addSubRoute(new ConsentGroupMembersRoute(userQueries)(userCache, caseSystem))
+  addSubRoute(new ConsentGroupOwnersRoute(caseSystem))
+  addSubRoute(new ConsentGroupMembersRoute(caseSystem))
 }

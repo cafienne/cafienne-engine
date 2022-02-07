@@ -9,6 +9,7 @@ package org.cafienne.service.akkahttp.cases.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -16,8 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -25,9 +25,10 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
+class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+  val caseQueries: CaseQueries = new CaseQueriesImpl
 
-  override def routes = concat(getPlanItems, getPlanItem, makePlanItemTransition)
+  override def routes: Route = concat(getPlanItems, getPlanItem, makePlanItemTransition)
 
   @Path("/{caseInstanceId}/planitems")
   @GET
@@ -45,7 +46,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Produces(Array("application/json"))
-  def getPlanItems = get {
+  def getPlanItems: Route = get {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("planitems") {
         runQuery(caseQueries.getPlanItems(caseInstanceId, platformUser))
@@ -70,7 +71,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Produces(Array("application/json"))
-  def getPlanItem = get {
+  def getPlanItem: Route = get {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("planitems" / Segment) {
         planItemId => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
@@ -97,7 +98,7 @@ class PlanItemRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Produces(Array("application/json"))
-  def makePlanItemTransition = post {
+  def makePlanItemTransition: Route = post {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("planitems" / Segment / Segment) { (planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)

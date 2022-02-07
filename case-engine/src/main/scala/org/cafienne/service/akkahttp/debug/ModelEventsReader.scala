@@ -8,10 +8,12 @@ import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.infrastructure.cqrs.{OffsetRecord, ReadJournalProvider}
 import org.cafienne.json.{ValueList, ValueMap}
+import org.cafienne.system.CaseSystem
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ModelEventsReader()(implicit override val system: ActorSystem) extends LazyLogging with ReadJournalProvider {
+class ModelEventsReader(caseSystem: CaseSystem) extends LazyLogging with ReadJournalProvider {
+  override implicit val system: ActorSystem = caseSystem.system
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 

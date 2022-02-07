@@ -8,8 +8,7 @@
 package org.cafienne.service.akkahttp.cases.route
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.service.akkahttp.cases.route.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
 import org.cafienne.system.CaseSystem
 
@@ -17,17 +16,17 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CasesRoutes(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
+class CasesRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
   override val prefix = "cases"
 
-  addSubRoute(new CaseRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new CaseFileRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new CaseTeamRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new PlanItemRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new DiscretionaryRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new CaseDocumentationRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new CaseHistoryRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new CaseMigrationRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseQueries)(userCache, caseSystem))
-  addSubRoute(new DeprecatedCaseTeamRoute(caseQueries)(userCache, caseSystem))
+  addSubRoute(new CaseRoute(caseSystem))
+  addSubRoute(new CaseFileRoute(caseSystem))
+  addSubRoute(new CaseTeamRoute(caseSystem))
+  addSubRoute(new PlanItemRoute(caseSystem))
+  addSubRoute(new DiscretionaryRoute(caseSystem))
+  addSubRoute(new CaseDocumentationRoute(caseSystem))
+  addSubRoute(new CaseHistoryRoute(caseSystem))
+  addSubRoute(new CaseMigrationRoute(caseSystem))
+  addSubRoute(new DeprecatedPlanItemHistoryRoute(caseSystem))
+  addSubRoute(new DeprecatedCaseTeamRoute(caseSystem))
 }

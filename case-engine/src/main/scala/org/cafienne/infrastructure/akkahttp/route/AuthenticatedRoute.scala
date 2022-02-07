@@ -23,7 +23,7 @@ import scala.concurrent.ExecutionContext
   */
 trait AuthenticatedRoute extends CaseServiceRoute {
 
-  implicit val userCache: IdentityProvider
+  val userCache: IdentityProvider = caseSystem.userCache
   val uc: IdentityProvider = userCache
 
   override def exceptionHandler: ExceptionHandler = ExceptionHandler {

@@ -8,17 +8,15 @@
 package org.cafienne.service.akkahttp.tasks
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.TaskQueries
+import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.Path
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TaskRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TaskRoute {
+class TaskRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
   override val prefix = "tasks"
-
-  addSubRoute(new TaskQueryRoutes(taskQueries))
-  addSubRoute(new TaskActionRoutes(taskQueries))
+  addSubRoute(new TaskQueryRoutes(caseSystem))
+  addSubRoute(new TaskActionRoutes(caseSystem))
 }

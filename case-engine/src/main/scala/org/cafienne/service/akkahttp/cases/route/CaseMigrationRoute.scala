@@ -16,8 +16,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.model.CaseMigrationAPI._
 import org.cafienne.system.CaseSystem
@@ -26,7 +25,8 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseMigrationRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
+class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+  val caseQueries: CaseQueries = new CaseQueriesImpl
 
   override def routes: Route = {
       startMigration

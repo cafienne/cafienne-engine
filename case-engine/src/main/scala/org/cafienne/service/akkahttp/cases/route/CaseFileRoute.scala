@@ -18,9 +18,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.json.Value
-import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -28,9 +27,10 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
+class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+  val caseQueries: CaseQueries = new CaseQueriesImpl
 
-  override def routes = concat(getCaseFile, createCaseFileItem, replaceCaseFileItem, updateCaseFileItem, deleteCaseFileItem)
+  override def routes: Route = concat(getCaseFile, createCaseFileItem, replaceCaseFileItem, updateCaseFileItem, deleteCaseFileItem)
 
   @Path("/{caseInstanceId}/casefile")
   @GET
@@ -48,7 +48,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Produces(Array("application/json"))
-  def getCaseFile = get {
+  def getCaseFile: Route = get {
     validUser { platformUser =>
       path(Segment / "casefile") {
         caseInstanceId => runQuery(caseQueries.getCaseFile(caseInstanceId, platformUser))
@@ -73,7 +73,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
-  def createCaseFileItem = post {
+  def createCaseFileItem: Route = post {
     casefileContentRoute("create", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
@@ -94,7 +94,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
   )
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
-  def replaceCaseFileItem = put {
+  def replaceCaseFileItem: Route = put {
     casefileContentRoute("replace", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
@@ -114,7 +114,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
-  def updateCaseFileItem = put {
+  def updateCaseFileItem: Route = put {
     casefileContentRoute("update", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
@@ -134,7 +134,7 @@ class CaseFileRoute(val caseQueries: CaseQueries)(override implicit val userCach
     )
   )
   @Consumes(Array("application/json"))
-  def deleteCaseFileItem = delete {
+  def deleteCaseFileItem: Route = delete {
     casefileRoute("delete", (platformUser, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path)))
   }
 

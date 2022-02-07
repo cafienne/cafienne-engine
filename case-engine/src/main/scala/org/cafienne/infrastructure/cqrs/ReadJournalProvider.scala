@@ -10,17 +10,17 @@ import org.cafienne.infrastructure.Cafienne
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)
   */
 trait ReadJournalProvider extends LazyLogging {
-  val configuredJournal = system.settings.config.getString("akka.persistence.journal.plugin")
-  val readJournalSetting = findReadJournalSetting()
-
   implicit def system: ActorSystem
+
+  lazy val configuredJournal: String = system.settings.config.getString("akka.persistence.journal.plugin")
+  lazy val readJournalSetting: String = findReadJournalSetting()
 
   /**
     * Provides the requested journal
     *
     * @return
     */
-  def journal() = {
+  def journal(): ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery = {
     PersistenceQuery(system).readJournalFor[ReadJournal with CurrentPersistenceIdsQuery with EventsByTagQuery with CurrentEventsByTagQuery with EventsByPersistenceIdQuery with CurrentEventsByPersistenceIdQuery](readJournalSetting)
   }
 

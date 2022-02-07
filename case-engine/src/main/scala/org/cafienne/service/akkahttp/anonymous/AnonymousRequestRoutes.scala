@@ -8,16 +8,16 @@
 package org.cafienne.service.akkahttp.anonymous
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
+import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class AnonymousRequestRoutes(implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AnonymousRoute {
+class AnonymousRequestRoutes(override val caseSystem: CaseSystem) extends CaseServiceRoute {
 
   override val prefix: String = "request"
 
-  addSubRoute(new CaseRequestRoute())
+  addSubRoute(new CaseRequestRoute(caseSystem))
 }

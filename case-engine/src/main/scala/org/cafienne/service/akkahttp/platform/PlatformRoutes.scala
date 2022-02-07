@@ -8,16 +8,15 @@
 package org.cafienne.service.akkahttp.platform
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.infrastructure.akkahttp.route.CommandRoute
+import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoutes()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CommandRoute {
+class PlatformRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
   override val prefix: String = "platform"
 
-  addSubRoute(new PlatformRoute())
+  addSubRoute(new PlatformRoute(caseSystem))
 }

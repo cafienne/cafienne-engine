@@ -9,6 +9,7 @@ import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.querydb.materializer.cases.CaseEventSink
 import org.cafienne.querydb.record._
+import org.cafienne.system.CaseSystem
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
@@ -43,7 +44,7 @@ class CaseTaskWriterTest
 
   val persistence = new TestPersistence()
 
-  val cpw = new CaseEventSink(persistence, NoOffsetStorage)
+  val cpw = new CaseEventSink(new CaseSystem)
   cpw.start()
 
 

@@ -4,24 +4,22 @@ import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage, OffsetStorageProvider}
-import org.cafienne.querydb.materializer.RecordsPersistence
-import org.cafienne.querydb.materializer.slick.SlickEventMaterializer
+import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
+import org.cafienne.querydb.materializer.slick.{SlickEventMaterializer, SlickRecordsPersistence}
+import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
-class CaseEventSink
-  (persistence: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)
-  (implicit override val system: ActorSystem) extends SlickEventMaterializer with LazyLogging {
+class CaseEventSink(caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
+  val persistence = new SlickRecordsPersistence
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+  override def system: ActorSystem = caseSystem.system
 
-  lazy val offsetStorage: OffsetStorage = offsetStorageProvider.storage(CaseEventSink.offsetName)
   override val tag: String = CaseEvent.TAG
 
-  override def getOffset(): Future[Offset] = offsetStorage.getOffset()
+  override def getOffset(): Future[Offset] = persistence.storage(CaseEventSink.offsetName).getOffset
 
-  override def createTransaction(envelope: ModelEventEnvelope) = new CaseTransaction(envelope.persistenceId, envelope.event.tenant, persistence, offsetStorage)
+  override def createTransaction(envelope: ModelEventEnvelope) = new CaseTransaction(envelope.persistenceId, envelope.event.tenant, persistence)
 }
 
 object CaseEventSink {

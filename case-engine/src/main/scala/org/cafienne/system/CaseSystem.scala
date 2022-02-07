@@ -10,9 +10,13 @@ package org.cafienne.system
 import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
+import org.cafienne.querydb.schema.QueryDB
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.CafienneGateway
 import org.cafienne.timerservice.TimerService
+
+import scala.concurrent.ExecutionContextExecutor
 
 /**
   *
@@ -23,6 +27,8 @@ import org.cafienne.timerservice.TimerService
   * a simple in-memory router.
   */
 class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging {
+  QueryDB.verifyConnectivity()
+
   /**
     * Start the Case System. This will spin up an akka system according to the specifications
     *
@@ -30,10 +36,14 @@ class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging 
     */
   val system: ActorSystem = ActorSystem(name, Cafienne.config.systemConfig) // Create an Akka system
 
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
+
   // Create singleton actors
   val timerService: ActorRef = system.actorOf(Props.create(classOf[TimerService], this), TimerService.CAFIENNE_TIMER_SERVICE);
 
   private val cafienneGateway = new CafienneGateway(this)
+
+  lazy val userCache: IdentityCache = new IdentityCache()
 
 
   /**
@@ -43,5 +53,8 @@ class CaseSystem(val name: String = "Cafienne-Case-System") extends LazyLogging 
 
   // First, start platform bootstrap configuration
   BootstrapPlatformConfiguration.run(this)
+
+  // Start running the Event Sinks
+  QueryDB.open(this)
 }
 

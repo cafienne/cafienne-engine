@@ -8,9 +8,9 @@
 
 package org.cafienne.service.akkahttp.debug
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.CommandRoute
 import org.cafienne.system.CaseSystem
 
@@ -27,13 +26,13 @@ import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/debug")
-class DebugRoute()(override implicit val userCache: IdentityProvider, implicit val system: ActorSystem, override implicit val caseSystem: CaseSystem) extends CommandRoute {
+class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 
-  val modelEventsReader = new ModelEventsReader()
+  val modelEventsReader = new ModelEventsReader(caseSystem)
 
   // NOTE: although documented with Swagger, this route is not exposed in the public Swagger documentation!
   //  Reason: avoid too easily using this route in development of applications, as that introduces a potential security issue.
-  override def routes =
+  override def routes: Route =
     pathPrefix("debug") {
       concat(getEvents, forceRecovery)
     }
@@ -55,7 +54,7 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
     )
   )
   @Produces(Array("application/json"))
-  def getEvents = get {
+  def getEvents: Route = get {
     path(Segment) { modelId =>
       optionalUser { platformUser =>
         parameters("from".?(0L), "to".?(Long.MaxValue)) { (from: Long, to: Long) => {
@@ -85,7 +84,7 @@ class DebugRoute()(override implicit val userCache: IdentityProvider, implicit v
     )
   )
   @Produces(Array("application/json"))
-  def forceRecovery = patch {
+  def forceRecovery: Route = patch {
     path("force-recovery" / Segment) { modelId =>
       validUser { user =>
         if (! Cafienne.config.developerRouteOpen) {

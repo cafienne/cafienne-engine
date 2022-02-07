@@ -22,7 +22,6 @@ import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionExcep
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
 import org.cafienne.system.CaseSystem
@@ -33,7 +32,7 @@ import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/repository")
-class RepositoryRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AuthenticatedRoute with TenantValidator {
+class RepositoryRoute(override val caseSystem: CaseSystem) extends AuthenticatedRoute with TenantValidator {
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
   override def routes: Route = pathPrefix("repository") { concat(loadModel, listModels, validateModel, deployModel) }
@@ -93,7 +92,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
   )
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
-  def listModels = get {
+  def listModels: Route = get {
     path("list") {
       userWithTenant { (platformUser, tenant) => {
         import scala.jdk.CollectionConverters._
@@ -104,7 +103,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
           var description = "Description"
           try {
             val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, file)
-            description = definitionsDocument.getFirstCase().documentation.text
+            description = definitionsDocument.getFirstCase.documentation.text
           } catch {
             case i: InvalidDefinitionException => description = i.toString
             case t: Throwable => description = "Could not read definition: " + t.getMessage
@@ -132,7 +131,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
   @RequestBody(description = "Definitions file", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/xml"))
   @Produces(Array("application/json"))
-  def validateModel = post {
+  def validateModel: Route = post {
     path("validate") { // NOTE: This API is open, you do not need to have user credentials for it.
       entity(as[Document]) { payload =>
         try {
@@ -166,7 +165,7 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
   )
   @RequestBody(description = "Definitions XML file", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/xml"))
-  def deployModel = post {
+  def deployModel: Route = post {
     path("deploy" / Remaining ) { modelName =>
       // For deploying files through the network, authorization is mandatory
       userWithTenant { (platformUser, tenant) => {
@@ -177,12 +176,11 @@ class RepositoryRoute()(override implicit val userCache: IdentityProvider, overr
             val definitions = new DefinitionsDocument(xmlDocument)
 
             val tenantUser = platformUser.getTenantUser(tenant)
-            tenantUser.isOwner match {
-              case false => complete(StatusCodes.Unauthorized, "User '" + platformUser.id + "' does not have the privileges to deploy a definition")
-              case true => {
-                Cafienne.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
-                complete(StatusCodes.NoContent)
-              }
+            if (tenantUser.isOwner) {
+              Cafienne.config.repository.DefinitionProvider.write(platformUser, tenant, modelName, definitions)
+              complete(StatusCodes.NoContent)
+            } else {
+              complete(StatusCodes.Unauthorized, "User '" + platformUser.id + "' does not have the privileges to deploy a definition")
             }
           } catch {
             case idd: InvalidDefinitionException => {

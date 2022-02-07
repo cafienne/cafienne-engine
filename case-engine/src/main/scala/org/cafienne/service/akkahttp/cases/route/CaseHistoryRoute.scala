@@ -8,13 +8,13 @@
 package org.cafienne.service.akkahttp.cases.route
 
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -22,9 +22,10 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseHistoryRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
+class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+  val caseQueries: CaseQueries = new CaseQueriesImpl
 
-  override def routes = concat(getPlanHistory, getPlanItemHistory)
+  override def routes: Route = concat(getPlanHistory, getPlanItemHistory)
 
   @Path("/{caseInstanceId}/history/planitems")
   @GET
@@ -42,7 +43,7 @@ class CaseHistoryRoute(val caseQueries: CaseQueries)(override implicit val userC
     )
   )
   @Produces(Array("application/json"))
-  def getPlanHistory = get {
+  def getPlanHistory: Route = get {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("history" / "planitems") {
          runListQuery(caseQueries.getCasePlanHistory(caseInstanceId, platformUser))
@@ -66,7 +67,7 @@ class CaseHistoryRoute(val caseQueries: CaseQueries)(override implicit val userC
     )
   )
   @Produces(Array("application/json"))
-  def getPlanItemHistory = get {
+  def getPlanItemHistory: Route = get {
     caseInstanceSubRoute { (platformUser, caseInstanceId) =>
       path("history" / "planitems" / Segment) { planItemId =>
         runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))

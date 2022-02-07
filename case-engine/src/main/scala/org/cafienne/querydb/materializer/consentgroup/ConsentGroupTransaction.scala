@@ -5,14 +5,14 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.consentgroup.actorapi.event.{ConsentGroupCreated, ConsentGroupMemberEvent, ConsentGroupModified}
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetRecord}
 import org.cafienne.querydb.materializer.RecordsPersistence
 import org.cafienne.querydb.materializer.slick.SlickTransaction
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class ConsentGroupTransaction(groupId: String, persistence: RecordsPersistence, userCache: IdentityProvider, offsetStorage: OffsetStorage)
-                         (implicit val executionContext: ExecutionContext) extends SlickTransaction with LazyLogging {
+class ConsentGroupTransaction(groupId: String, persistence: RecordsPersistence, userCache: IdentityProvider) extends SlickTransaction with LazyLogging {
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   private val groupProjection = new GroupProjection(persistence)
   private val memberProjection = new GroupMemberProjection(groupId, persistence)
@@ -39,7 +39,7 @@ class ConsentGroupTransaction(groupId: String, persistence: RecordsPersistence, 
     groupProjection.prepareCommit()
     memberProjection.prepareCommit()
     // Update the offset of the last event handled in this projection
-    persistence.upsert(offsetStorage.createOffsetRecord(envelope.offset))
+    persistence.upsert(OffsetRecord(ConsentGroupEventSink.offsetName, envelope.offset))
     // Commit and then inform the last modified registration
     persistence.commit().andThen(_ => {
       memberProjection.affectedUserIds.foreach(userCache.clear)

@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.system.CaseSystem
@@ -25,7 +24,7 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute()(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TenantRoute {
+class PlatformRoute(override val caseSystem: CaseSystem) extends TenantRoute {
 
   override def routes: Route = concat(createTenant, disableTenant, enableTenant, getUserInformation)
 

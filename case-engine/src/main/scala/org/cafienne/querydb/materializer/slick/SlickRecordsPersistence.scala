@@ -4,18 +4,22 @@ import akka.Done
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.cmmn.instance.team.MemberType
-import org.cafienne.infrastructure.cqrs.OffsetRecord
-import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
+import org.cafienne.infrastructure.cqrs.{OffsetRecord, OffsetStorage, OffsetStorageProvider}
+import org.cafienne.infrastructure.jdbc.cqrs.{JDBCOffsetStorage, OffsetStoreTables}
 import org.cafienne.querydb.materializer.RecordsPersistence
 import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.querydb.record._
+import org.cafienne.querydb.schema.QueryDBSchema
 import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 class SlickRecordsPersistence
   extends RecordsPersistence
+    with QueryDBSchema
+    with OffsetStorageProvider
     with CaseTables
     with TaskTables
     with TenantTables
@@ -26,10 +30,17 @@ class SlickRecordsPersistence
 
   implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
-  val dbStatements = ListBuffer[DBIO[_]]()
+  val dbStatements: mutable.ListBuffer[DBIO[_]] = ListBuffer[DBIO[_]]()
 
-  //
-  override def upsert(record: AnyRef) = {
+  private lazy val meMyselfAndI_or_BasicallyThisOnly = this
+
+  override def storage(name: String): OffsetStorage = new JDBCOffsetStorage {
+    override val storageName: String = name
+    override implicit val ec: ExecutionContext = db.ioExecutionContext
+    override lazy val dbConfig = meMyselfAndI_or_BasicallyThisOnly.dbConfig
+  }
+
+  override def upsert(record: AnyRef): Unit = {
     if (record != null) {
       val upsertStatement = record match {
         case value: TaskRecord => TableQuery[TaskTable].insertOrUpdate(value)

@@ -8,12 +8,13 @@ import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.materializer.tenant.TenantReader
-import org.cafienne.querydb.query.UserQueries
+import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.querydb.record.TenantRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdentityCache(userQueries: UserQueries)(implicit val ec: ExecutionContext) extends IdentityProvider with LazyLogging {
+class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider with LazyLogging {
+  val userQueries: UserQueries = new TenantQueriesImpl
 
   // TODO: this should be a most recently used cache
   // TODO: check for multithreading issues now that event materializer can clear.

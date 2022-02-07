@@ -4,25 +4,22 @@ import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage, OffsetStorageProvider}
-import org.cafienne.querydb.materializer.RecordsPersistence
-import org.cafienne.querydb.materializer.slick.SlickEventMaterializer
+import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
+import org.cafienne.querydb.materializer.slick.{SlickEventMaterializer, SlickRecordsPersistence}
+import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
-class ConsentGroupEventSink
-  (updater: RecordsPersistence, offsetStorageProvider: OffsetStorageProvider)
-  (implicit val system: ActorSystem, implicit val userCache: IdentityProvider) extends SlickEventMaterializer with LazyLogging {
+class ConsentGroupEventSink(caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
+  val persistence = new SlickRecordsPersistence
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  lazy val offsetStorage: OffsetStorage = offsetStorageProvider.storage(ConsentGroupEventSink.offsetName)
+  lazy val offsetStorage: OffsetStorage = persistence.storage(ConsentGroupEventSink.offsetName)
   override val tag: String = ConsentGroupEvent.TAG
+  override def system: ActorSystem = caseSystem.system
 
-  override def getOffset(): Future[Offset] = offsetStorage.getOffset()
+  override def getOffset(): Future[Offset] = offsetStorage.getOffset
 
-  override def createTransaction(envelope: ModelEventEnvelope): ConsentGroupTransaction = new ConsentGroupTransaction(envelope.persistenceId, updater, userCache, offsetStorage)
+  override def createTransaction(envelope: ModelEventEnvelope): ConsentGroupTransaction = new ConsentGroupTransaction(envelope.persistenceId, persistence, caseSystem.userCache)
 }
 
 object ConsentGroupEventSink {

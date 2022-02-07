@@ -14,6 +14,3 @@ trait OffsetStorageProvider extends LazyLogging {
     */
   def storage(name: String): OffsetStorage
 }
-
-
-

@@ -17,9 +17,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.humantask.actorapi.command._
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.json.ValueMap
-import org.cafienne.querydb.query.{TaskCount, TaskQueries}
+import org.cafienne.querydb.query.{TaskCount, TaskQueries, TaskQueriesImpl}
 import org.cafienne.service.akkahttp.tasks.model.TaskAPI._
 import org.cafienne.system.CaseSystem
 
@@ -27,7 +26,8 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TaskActionRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TaskRoute {
+class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
+  val taskQueries: TaskQueries = new TaskQueriesImpl
 
   override def routes: Route = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)
 

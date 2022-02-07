@@ -19,7 +19,7 @@ import scala.collection.immutable.Seq
   * Base class for Case Service APIs. All cors enabled
   */
 trait CaseServiceRoute extends LazyLogging {
-  implicit val caseSystem: CaseSystem
+  val caseSystem: CaseSystem
 
   import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 

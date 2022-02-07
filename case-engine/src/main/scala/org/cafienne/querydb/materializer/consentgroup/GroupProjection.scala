@@ -6,9 +6,9 @@ import org.cafienne.consentgroup.actorapi.event.ConsentGroupCreated
 import org.cafienne.querydb.materializer.RecordsPersistence
 import org.cafienne.querydb.record.ConsentGroupRecord
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class GroupProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class GroupProjection(persistence: RecordsPersistence) extends LazyLogging {
   def handleGroupEvent(event: ConsentGroupCreated): Future[Done] = {
     val groupRecord = ConsentGroupRecord(id = event.getActorId, tenant = event.tenant)
     persistence.upsert(groupRecord)

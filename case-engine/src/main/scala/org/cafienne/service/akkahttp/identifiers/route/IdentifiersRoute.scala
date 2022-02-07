@@ -14,12 +14,11 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.QueryRoute
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.cases.CaseReader
-import org.cafienne.querydb.query.IdentifierQueries
+import org.cafienne.querydb.query.IdentifierQueriesImpl
 import org.cafienne.querydb.query.filter.IdentifierFilter
 import org.cafienne.service.akkahttp.identifiers.model.BusinessIdentifierFormat
 import org.cafienne.system.CaseSystem
@@ -28,8 +27,9 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/identifiers")
-class IdentifiersRoute(val identifierQueries: IdentifierQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem
-) extends QueryRoute {
+class IdentifiersRoute(override val caseSystem: CaseSystem) extends QueryRoute {
+  val identifierQueries = new IdentifierQueriesImpl
+
   override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
 
   override def routes: Route = concat(getIdentifiers, getIdentifierNames)

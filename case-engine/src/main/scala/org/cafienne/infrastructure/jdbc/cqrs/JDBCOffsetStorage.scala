@@ -3,8 +3,6 @@ package org.cafienne.infrastructure.jdbc.cqrs
 import akka.persistence.query.Offset
 import org.cafienne.infrastructure.cqrs.{OffsetRecord, OffsetStorage}
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
-import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,11 +10,10 @@ trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with Cafien
 
   val storageName: String
 
-  val dbConfig: DatabaseConfig[JdbcProfile]
+  implicit val ec: ExecutionContext
 
   import dbConfig.profile.api._
 
-  implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
   val offsetQuery = TableQuery[OffsetStoreTable]
 
   /**
@@ -24,14 +21,13 @@ trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with Cafien
     *
     * @return
     */
-  override def getOffset(): Future[Offset] = {
+  override def getOffset: Future[Offset] = {
     val query = offsetQuery.filter(_.name === storageName)
     db.run(query.result.headOption).map {
       case Some(value) => value.asOffset()
-      case None => {
+      case None =>
         logger.debug("An offset for " + storageName + " has not been found. Starting with default 'no offset'")
         Offset.noOffset
-      }
     }
   }
 }

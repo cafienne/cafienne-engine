@@ -14,11 +14,10 @@ import org.cafienne.actormodel.exception.SerializedException
 import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
-import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}
 
-class AnonymousRoute(override implicit val caseSystem: CaseSystem) extends CaseServiceRoute {
+trait AnonymousRoute extends CaseServiceRoute {
 
   val defaultErrorMessage = "Your request bumped into an internal configuration issue and cannot be handled"
 

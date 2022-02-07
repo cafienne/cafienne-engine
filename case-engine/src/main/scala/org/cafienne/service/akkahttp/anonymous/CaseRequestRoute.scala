@@ -20,7 +20,6 @@ import org.cafienne.cmmn.actorapi.response.CaseStartedResponse
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
 import org.cafienne.querydb.query.exception.SearchFailure
@@ -33,7 +32,7 @@ import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class CaseRequestRoute(implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator {
+class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator {
 
   // Reading the definitions executes certain validations immediately
   val configuredCaseDefinitions: Map[String, AnonymousCaseDefinition] = Cafienne.config.api.anonymousConfig.definitions

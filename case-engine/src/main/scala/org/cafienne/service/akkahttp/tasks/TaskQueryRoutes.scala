@@ -13,10 +13,9 @@ import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.{TaskCount, TaskQueries}
 import org.cafienne.querydb.query.filter.TaskFilter
+import org.cafienne.querydb.query.{TaskCount, TaskQueries, TaskQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -24,7 +23,8 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
-class TaskQueryRoutes(val taskQueries: TaskQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends TaskRoute {
+class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
+  val taskQueries: TaskQueries = new TaskQueriesImpl
 
   override def routes = concat(getAllTasks, getCaseTasks, getTaskCount, getTask)
 

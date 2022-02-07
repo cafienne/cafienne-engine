@@ -10,6 +10,7 @@ import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.json.ValueMap
 import org.cafienne.querydb.materializer.cases.CaseEventSink
 import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
+import org.cafienne.system.CaseSystem
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
@@ -44,7 +45,7 @@ class CaseFileWriterTest
 
   val persistence = new TestPersistence()
 
-  val cpw = new CaseEventSink(persistence, NoOffsetStorage)
+  val cpw = new CaseEventSink(new CaseSystem)
   cpw.start()
 
   val caseInstanceId = "9fc49257_7d33_41cb_b28a_75e665ee3b2c"

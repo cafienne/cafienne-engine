@@ -8,13 +8,13 @@
 package org.cafienne.service.akkahttp.cases.route
 
 import akka.http.scaladsl.server.Directives.{path, _}
+import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
-import org.cafienne.querydb.query.CaseQueries
+import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -22,9 +22,10 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseDocumentationRoute(val caseQueries: CaseQueries)(override implicit val userCache: IdentityProvider, override implicit val caseSystem: CaseSystem) extends CasesRoute {
+class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+  val caseQueries: CaseQueries = new CaseQueriesImpl
 
-  override def routes = concat(getPlanItemDocumentation, getCaseFileDocumentation)
+  override def routes: Route = concat(getPlanItemDocumentation, getCaseFileDocumentation)
 
   @Path("/{caseInstanceId}/documentation/planitems/{planItemId}")
   @GET
@@ -43,7 +44,7 @@ class CaseDocumentationRoute(val caseQueries: CaseQueries)(override implicit val
     )
   )
   @Produces(Array("application/json"))
-  def getPlanItemDocumentation = get {
+  def getPlanItemDocumentation: Route = get {
     validUser { platformUser =>
       path(Segment / "documentation" / "planitems" / Segment) {
         (_, planItemId) => runQuery(caseQueries.getPlanItemDocumentation(planItemId, platformUser))
@@ -67,7 +68,7 @@ class CaseDocumentationRoute(val caseQueries: CaseQueries)(override implicit val
     )
   )
   @Produces(Array("application/json"))
-  def getCaseFileDocumentation = get {
+  def getCaseFileDocumentation: Route = get {
     validUser { platformUser =>
       path(Segment / "documentation" / "casefile") {
         caseInstanceId => runQuery(caseQueries.getCaseFileDocumentation(caseInstanceId, platformUser))
