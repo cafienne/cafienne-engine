@@ -47,7 +47,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
     }
 
     public boolean isEmpty() {
-        return criteria.isEmpty();
+        return definitions.isEmpty();
     }
 
     private Criterion<?> earlyBird = null;
@@ -77,7 +77,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
             //  initiate that with the entry transition
             item.addDebugInfo(() -> criterion + " is satisfied and will repeat " + item);
             release();
-            item.repeat();
+            item.repeat("an entry criterion was satisfied");
         }
     }
 
