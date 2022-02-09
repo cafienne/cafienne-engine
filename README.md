@@ -25,7 +25,7 @@ We assume you know how to install Java, Scala and sbt, etc.
 1. OpenJDK 11
 2. Apache Cassandra 3.x
 3. Postgres 12.x
-4. Scala 2.12 (http://www.scala-lang.org/download/)
+4. Scala 2.13 (http://www.scala-lang.org/download/)
 5. SBT build tool >= 1.3
 
 ### 1.1.2 Case Service
