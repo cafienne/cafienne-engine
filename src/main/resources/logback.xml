@@ -1,0 +1,37 @@
+<configuration scan="true">
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date|%-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.cafienne" level="WARN" />
+
+    <!-- Show HTTP traffic logging -->
+<!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
+
+    <!-- Show logging for offset of projections -->
+    <!--    <logger name="org.cafienne.querydb.materializer.cases.CaseProjectionsWriter" level="DEBUG" />-->
+    <!--    <logger name="org.cafienne.querydb.materializer.tenant.TenantProjectionsWriter"    level="DEBUG" />-->
+
+    <!-- Show all projections logging, including info on event being handled -->
+    <!--    <logger name="org.cafienne.querydb.materializer" level="DEBUG" />-->
+
+    <!-- Show logging for engine -->
+    <!--        <logger name="org.cafienne.cmmn"    level="DEBUG" />-->
+
+    <logger name="com.datastax" level="WARN"/>
+    <logger name="com.wordnik" level="ERROR"/>
+    <logger name="com.gettyimages" level="ERROR"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+
+    <logger name="slick" level="INFO"/>
+<!--    <logger name="slick.basic.BasicBackend.action" level="DEBUG"/>-->
+<!--    <logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG"/>-->
+    <!--<logger name="slick.jdbc.JdbcBackend.statementAndParameter" level="DEBUG"/>-->
+    <!--<logger name="slick.jdbc.JdbcBackend.parameter" level="DEBUG"/>-->
+<!--    <logger name="org.flywaydb" level="INFO"/>-->
+    <root level="INFO">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>
