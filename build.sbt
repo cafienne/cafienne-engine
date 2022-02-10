@@ -38,6 +38,8 @@ developers := List(Developer(
     url("https://github.com/olger"))
 )
 publishMavenStyle := true
+Test / publishArtifact := false
+pomIncludeRepository := { _ => false }
 
 // disable publishw ith scala version, otherwise artifact name will include scala version
 // e.g cassper_2.11
@@ -177,7 +179,7 @@ dockerExposedPorts := Seq(2027, 9999)
 dockerBaseImage := "cafienne/base:openjdk-11-buster"
 Universal / name := "cafienne"
 Universal / packageName := "cafienne"
-publish / skip := true
+Docker / publish / skip := true
 
 enablePlugins(JavaAppPackaging)
 enablePlugins(UniversalPlugin)
