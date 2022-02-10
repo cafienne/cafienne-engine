@@ -133,8 +133,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Repeats the plan item upon it's Completion or Termination, and only if there are no entry criteria.
      * Additionally checks that the containing stage is still active.
      */
-    void repeat() {
-        addDebugInfo(() -> this + ": initiating repeat logic for next item. First releasing entry criteria");
+    void repeat(String msg) {
+        addDebugInfo(() -> this + ": initiating repeat logic because " + msg);
         // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
         if (getStage().getState() != State.Active) {
             // The stage that contains us is no longer active. So we will not prepare any repeat item.
@@ -149,15 +149,24 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         if (repeats()) {
             if (getItemDefinition().isDiscretionary()) {
                 // Means we are discretionary, and adding to the plan must be done manually
+                addDebugInfo(() -> this + ": not repeating because item is discretionary and needs to be planned explicitly");
                 return;
             }
             // Generate an id for the repeat item
             String repeatItemId = new Guid().toString();
+            // Make sure we have a proper next index, by counting the number of existing plan items in this stage with the same definition
+            //  An alternative was to do (this.index + 1) but actually it can happen that multiple items are active simultaneously
+            //  and in that case, when completing an earlier one of those it may lead to a duplicate index if we apply only +1
+            long nextIndex = stage.getPlanItems().stream().map(PlanItem::getItemDefinition).filter(sibling -> sibling.equals(this.getItemDefinition())).count();
             // Create a new plan item
-            addDebugInfo(() -> this + ": creating repeat item " + (index + 1) + " with id " + repeatItemId);
-            PlanItem<?> repeatedItem = stage.addChild(getItemDefinition(), repeatItemId, index + 1);
+            addDebugInfo(() -> this + ": creating repeat item with index " + nextIndex + " and id " + repeatItemId);
+            PlanItem<?> repeatedItem = stage.addChild(getItemDefinition(), repeatItemId, (int) nextIndex);
             // Also let it Start immediately (or Occur, or Enable)
-            repeatedItem.makeTransition(getEntryTransition());
+            Transition transition = getEntryTransition();
+            addDebugInfo(() -> this + ": triggering transition " + repeatedItem + "." + transition + " within repeat (because " + msg + ")");
+            repeatedItem.makeTransition(transition);
+        } else {
+            addDebugInfo(() -> this + ": not or no longer repeating");
         }
     }
 
@@ -299,6 +308,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         boolean newRuleOutcome = getItemDefinition().getPlanItemControl().getRepetitionRule().evaluate(this);
         if (firstEvaluation || newRuleOutcome != this.repetitionRuleOutcome) {
             addEvent(new RepetitionRuleEvaluated(this, newRuleOutcome));
+        } else {
+            addDebugInfo(() -> "New evaluation of repetition rule still gives " + newRuleOutcome);
         }
     }
 

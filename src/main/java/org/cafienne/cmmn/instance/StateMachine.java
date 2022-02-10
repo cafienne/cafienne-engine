@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.instance;
 
-import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 
 import java.util.HashMap;
@@ -194,13 +193,13 @@ class StateMachine {
         TaskStage.setAction(State.Completed, (PlanItem<?> p, Transition t) -> {
             p.completeInstance();
             if (p.getEntryCriteria().isEmpty()) {
-                p.repeat();
+                p.repeat("the item completed");
             }
         });
         TaskStage.setAction(State.Terminated, (PlanItem<?> p, Transition t) -> {
             p.terminateInstance();
             if (p.getEntryCriteria().isEmpty()) {
-                p.repeat();
+                p.repeat("the item terminated");
             }
         });
         TaskStage.setAction(State.Failed, (PlanItem<?> p, Transition t) -> p.failInstance());
