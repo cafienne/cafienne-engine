@@ -6,7 +6,6 @@ resolvers ++= Seq(
   Resolver.DefaultMavenRepository,
   Resolver.sonatypeRepo("releases"),
   "typesafe releases" at "https://repo.typesafe.com/typesafe/releases",
-  "typesafe snapshots" at "https://repo.typesafe.com/typesafe/snapshots",
 )
 
 /**
