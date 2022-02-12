@@ -1,9 +1,9 @@
 package org.cafienne.infrastructure
 
 import org.cafienne.BuildInfo
-import org.cafienne.json.{JSONReader, ValueMap}
+import org.cafienne.json.{Value, ValueMap}
 
-class CafienneVersion(val json: ValueMap = JSONReader.parse(BuildInfo.toJson).asInstanceOf[ValueMap]) {
+class CafienneVersion(val json: ValueMap = Value.convert(BuildInfo.toMap).asMap) {
   val description: String = {
     var headCommit = json.get("gitHeadCommit").toString
     if (headCommit.startsWith("Some(")) {
