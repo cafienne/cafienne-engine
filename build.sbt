@@ -81,6 +81,7 @@ developers := List(Developer(
     "olger@spectare.nl",
     url("https://github.com/olger"))
 )
+versionScheme := Some("semver-spec")
 publishMavenStyle := true
 pomIncludeRepository := { _ => false }
 
