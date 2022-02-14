@@ -7,14 +7,12 @@ import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.testkit.TestKit
 import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.definition.CaseDefinition
-import org.cafienne.cmmn.instance.Transition
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.cmmn.test.TestScript.{loadCaseDefinition, testUser}
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask
 import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.infrastructure.cqrs.batch.public_events.{CaseCompleted, CaseStarted, HumanTaskStarted, PublicCaseEventBatch}
+import org.cafienne.infrastructure.cqrs.batch.public_events.{CaseCompleted, HumanTaskStarted, PublicCaseEventBatch}
 import org.cafienne.json.ValueMap
 import org.cafienne.util.Guid
 import org.scalatest.BeforeAndAfterAll

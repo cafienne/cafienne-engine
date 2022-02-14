@@ -141,6 +141,10 @@ public enum Fields {
     moment,
     timers,
 
+    metadata,
+    archive,
+    events,
+
     className,
     message,
     cause,
