@@ -77,7 +77,9 @@ jobs:
             npm run prod PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for In-memory testing
       - run:
@@ -98,7 +100,9 @@ jobs:
             npm run prod
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for MS SQL Server testing
       - run:
@@ -123,6 +127,7 @@ jobs:
       - run:
           name: Stop and remove the Cafienne container, and also MS SQL Server container
           command: |
+            docker logs cafienne
             docker rm -f cafienne empty-sql-server
             sleep 3
             docker-compose -f .circleci/docker-config/databases-compatibility.yml up -d sql-server-with-events
@@ -155,7 +160,9 @@ jobs:
             npm run prod
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for Cassandra testing
       - run:
@@ -185,7 +192,9 @@ jobs:
             npm run prod
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for backwards compatibility MS SQL Server testing against latest engine
       - run:
@@ -205,6 +214,11 @@ jobs:
             cd ..
             cd ./cmmn-test-framework
             npm run prod
+      - run:
+          name: Stop and remove the Cafienne container
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for backwards compatibility PostgreSQL testing against latest engine
       - run:
@@ -318,7 +332,9 @@ jobs:
             npm run prod PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for In-memory testing
       - run:
@@ -427,7 +443,9 @@ jobs:
             npm run prod PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for In-memory testing
       - run:
@@ -448,7 +466,9 @@ jobs:
             npm run prod
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for MS SQL Server testing
       - run:
@@ -472,6 +492,7 @@ jobs:
       - run:
           name: Stop and remove the Cafienne container, and also MS SQL Server container
           command: |
+            docker logs cafienne
             docker rm -f cafienne empty-sql-server
             sleep 3
             docker-compose -f .circleci/docker-config/databases-compatibility.yml up -d sql-server-with-events
@@ -504,7 +525,9 @@ jobs:
             npm run prod
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for Cassandra testing
       - run:
@@ -534,7 +557,9 @@ jobs:
             npm run prod
       - run:
           name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for backwards compatibility MS SQL Server testing against latest engine
       - run:
@@ -554,6 +579,11 @@ jobs:
             cd ..
             cd ./cmmn-test-framework
             npm run prod
+      - run:
+          name: Stop and remove the Cafienne container
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
 
       # Starting docker environment for backwards compatibility PostgreSQL testing against latest engine
       - run:
