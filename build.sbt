@@ -35,7 +35,7 @@ bashScriptDefines / scriptClasspath := Seq("../lib_ext/*", "*")
 bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
 bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf""""
 dockerExposedPorts := Seq(2027, 9999)
-dockerBaseImage := "cafienne/base:openjdk-11-buster"
+dockerBaseImage := "openjdk:19-slim"
 Universal / name := "cafienne"
 Universal / packageName := "cafienne"
 // Do not publish to docker
