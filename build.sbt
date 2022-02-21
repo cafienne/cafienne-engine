@@ -1,3 +1,5 @@
+import com.typesafe.sbt.packager.docker._
+
 /**
   * Resolver repositories
   */
@@ -36,6 +38,11 @@ bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/
 bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf""""
 dockerExposedPorts := Seq(2027, 9999)
 dockerBaseImage := "openjdk:19-slim"
+//Adding dependencies required for the PDF generation Process Task
+dockerCommands := dockerCommands.value.flatMap {
+  case c@Cmd("USER", "root") => Seq(c, Cmd("RUN",  "apt-get update && apt-get -y install fontconfig libfreetype6 && apt-get clean"))
+  case other => Seq(other)
+}
 Universal / name := "cafienne"
 Universal / packageName := "cafienne"
 // Do not publish to docker
