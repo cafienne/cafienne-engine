@@ -49,11 +49,11 @@ Compile / doc / sources := List()
 Compile / mainClass := Some("org.cafienne.service.Main")
 // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
 packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("org.cafienne.service.Main")
-scalacOptions += "-target:jvm-11"
 javacOptions ++= Seq("-source", "11", "-target", "11")
 scalacOptions := Seq(
   "-encoding", "UTF-8",
   "-unchecked",
+  "-target:jvm-11",
   "-deprecation",
   "-Xlint", "deprecation",
   "-Xlint", "unchecked",
