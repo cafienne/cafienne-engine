@@ -22,7 +22,7 @@ public class TimerService extends ModelActor {
 
     public TimerService(CaseSystem caseSystem) {
         super(caseSystem);
-        this.timerstream = new TimerEventSink(this, caseSystem, caseSystem.system());
+        this.timerstream = new TimerEventSink(this, caseSystem);
         setEngineVersion(Cafienne.version());
     }
 

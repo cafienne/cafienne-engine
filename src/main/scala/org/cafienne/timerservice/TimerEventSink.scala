@@ -1,7 +1,6 @@
 package org.cafienne.timerservice
 
 import akka.Done
-import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
@@ -13,9 +12,8 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TimerEventSink(val timerService: TimerService)(implicit val caseSystem: CaseSystem, implicit val system: ActorSystem) extends TaggedEventConsumer {
-
-  val storage: TimerStore = new TimerStoreProvider()(system).store
+class TimerEventSink(val timerService: TimerService, val caseSystem: CaseSystem) extends TaggedEventConsumer {
+  val storage: TimerStore = new TimerStoreProvider(caseSystem).store
 
   override def getOffset(): Future[Offset] = storage.getOffset()
   override val tag: String = TimerBaseEvent.TAG

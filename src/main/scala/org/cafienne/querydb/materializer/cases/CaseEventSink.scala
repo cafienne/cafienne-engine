@@ -1,6 +1,5 @@
 package org.cafienne.querydb.materializer.cases
 
-import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseEvent
@@ -10,10 +9,8 @@ import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
-class CaseEventSink(caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
+class CaseEventSink(val caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
   val persistence = new SlickRecordsPersistence
-
-  override def system: ActorSystem = caseSystem.system
 
   override val tag: String = CaseEvent.TAG
 

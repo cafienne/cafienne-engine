@@ -1,6 +1,5 @@
 package org.cafienne.querydb.materializer.tenant
 
-import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
@@ -10,13 +9,11 @@ import org.cafienne.tenant.actorapi.event.TenantEvent
 
 import scala.concurrent.Future
 
-class TenantEventSink(caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
+class TenantEventSink(val caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
   override val tag: String = TenantEvent.TAG
 
   val persistence = new SlickRecordsPersistence
   def offsetStorage: OffsetStorage = persistence.storage(TenantEventSink.offsetName)
-
-  override def system: ActorSystem = caseSystem.system
 
   override def getOffset(): Future[Offset] = offsetStorage.getOffset
 

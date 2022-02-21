@@ -1,6 +1,5 @@
 package org.cafienne.service.akkahttp.debug
 
-import akka.actor.ActorSystem
 import akka.persistence.query.EventEnvelope
 import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
@@ -12,9 +11,7 @@ import org.cafienne.system.CaseSystem
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ModelEventsReader(caseSystem: CaseSystem) extends LazyLogging with ReadJournalProvider {
-  override implicit val system: ActorSystem = caseSystem.system
-
+class ModelEventsReader(val caseSystem: CaseSystem) extends LazyLogging with ReadJournalProvider {
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   def getEvents(user: PlatformUser, actorId: String, from: Long, to: Long): Future[ValueList] = {

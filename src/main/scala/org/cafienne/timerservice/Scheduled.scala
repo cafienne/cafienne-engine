@@ -3,13 +3,12 @@ package org.cafienne.timerservice
 import akka.actor.Cancellable
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
-import org.cafienne.system.CaseSystem
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
-class Scheduled(val timerService: TimerService, val timer: Timer, val sink: TimerEventSink = null)(implicit val caseSystem: CaseSystem) extends Runnable with LazyLogging {
+class Scheduled(val timerService: TimerService, val timer: Timer, val sink: TimerEventSink = null) extends Runnable with LazyLogging {
 
   val command = new RaiseEvent(timer.user, timer.caseInstanceId, timer.timerId)
   val millis: Long = timer.moment.toEpochMilli
@@ -25,7 +24,7 @@ class Scheduled(val timerService: TimerService, val timer: Timer, val sink: Time
       success => sink.handleCaseInvocation(this, success))
   }
 
-  val schedule: Cancellable = caseSystem.system.scheduler.scheduleOnce(duration, this)
+  val schedule: Cancellable = timerService.caseSystem.system.scheduler.scheduleOnce(duration, this)
 
   def cancel(): Boolean = {
     schedule.cancel()
