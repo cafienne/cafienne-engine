@@ -17,7 +17,7 @@ class TimerEventSink(val timerService: TimerService, val caseSystem: CaseSystem)
 
   override def getOffset(): Future[Offset] = storage.getOffset()
   override val tag: String = TimerBaseEvent.TAG
-  private val schedule: mutable.Map[String, Scheduled] = mutable.Map()
+  private val schedule: mutable.Map[String, TimerJob] = mutable.Map()
 
   def open(): Future[Unit] = {
     storage.getTimers().map(timers => {
@@ -32,7 +32,7 @@ class TimerEventSink(val timerService: TimerService, val caseSystem: CaseSystem)
   }
 
   private def scheduleTimer(job: Timer): Unit = {
-    schedule.put(job.timerId, new Scheduled(timerService, job, this))
+    schedule.put(job.timerId, new TimerJob(timerService, job, this))
   }
 
   def setTimer(event: TimerSet, offset: Offset): Future[Done] = {
@@ -56,21 +56,14 @@ class TimerEventSink(val timerService: TimerService, val caseSystem: CaseSystem)
     storage.removeTimer(timerId, offset)
   }
 
-  def handleFailingCaseInvocation(job: Scheduled, failure: CommandFailure): Unit = {
+  def handleFailingCaseInvocation(job: TimerJob, failure: CommandFailure): Unit = {
     // TODO: we can also update the timer state in the storage???
     logger.warn(s"Could not trigger timer ${job.timer.timerId} in case ${job.timer.caseInstanceId}:" + failure.toJson)
   }
 
-  def handleCaseInvocation(job: Scheduled, response: ModelResponse): Unit = {
+  def handleCaseInvocation(job: TimerJob, response: ModelResponse): Unit = {
     // TODO: we can also delete the timer here, or update a state for that timer in the store
     logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer ${job.timer.timerId} in case ${job.timer.caseInstanceId}"))
-  }
-
-  def migrateTimers(timers: java.util.List[Timer]): Unit = {
-    import scala.jdk.CollectionConverters._
-    // Note: Migration MUST be done synchronously, otherwise the flow of starting and opening up to listen to the stream
-    //  may fail if timers are added async and already read when opening the stream.
-    storage.importTimers(timers.asScala.toSeq)
   }
 
   /**

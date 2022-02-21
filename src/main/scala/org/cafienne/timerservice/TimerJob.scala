@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
-class Scheduled(val timerService: TimerService, val timer: Timer, val sink: TimerEventSink = null) extends Runnable with LazyLogging {
+class TimerJob(val timerService: TimerService, val timer: Timer, val sink: TimerEventSink = null) extends Runnable with LazyLogging {
 
   val command = new RaiseEvent(timer.user, timer.caseInstanceId, timer.timerId)
   val millis: Long = timer.moment.toEpochMilli

@@ -8,10 +8,6 @@ import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * TenantActor manages users and their roles inside a tenant.
  */
@@ -54,21 +50,6 @@ public class TimerService extends ModelActor {
 
     @Override
     protected void handleSnapshot(SnapshotOffer snapshot) {
-        // Handle migration of old style of timer persistence
-        migrateSnapshot(snapshot);
-    }
-
-    private void migrateSnapshot(SnapshotOffer offer) {
-        Object snapshot = offer.snapshot();
-        if (snapshot instanceof TimerStorage) {
-            Collection<TimerJob> existingTimers = ((TimerStorage) snapshot).getTimers();
-            if (!existingTimers.isEmpty()) {
-                logger.info("Found an existing snapshot with " + existingTimers.size() + " timers; migrating them to the new storage");
-                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user.id())).collect(Collectors.toList());
-                timerstream.migrateTimers(legacy);
-                logger.info("Successfully migrated timers to the new storage; clearing snapshot");
-                saveSnapshot(new TimerStorage());
-            }
-        }
+        logger.error("Timer Service no longer supports snapshot offers. This functionality was deprecated in Cafienne Engine version 1.1.13 and is completely removed in version 1.1.18");
     }
 }
