@@ -5,6 +5,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.timerservice.Timer
 
+import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -19,7 +20,7 @@ trait TimerStore extends LazyLogging {
 
   def importTimers(list: Seq[Timer]): Unit
 
-  def getTimers(): Future[Seq[Timer]]
+  def getTimers(window: Instant): Future[Seq[Timer]]
 
   def storeTimer(job: Timer, offset: Option[Offset]): Future[Done]
 

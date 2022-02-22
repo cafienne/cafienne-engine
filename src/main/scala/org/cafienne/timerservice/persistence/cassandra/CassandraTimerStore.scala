@@ -11,6 +11,7 @@ import org.cafienne.infrastructure.cqrs.OffsetRecord
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
 
+import java.time.Instant
 import java.util.UUID
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -33,6 +34,7 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
       .addColumn("tenant", DataType.text())
       .addColumn("user", DataType.text())
       .addColumn("moment", DataType.timestamp())
+    val indexOnMoment = SchemaBuilder.createIndex("moment_indexed").onTable(keyspace, offsetTable).andColumn("moment")
     val offsetDDL = SchemaBuilder.createTable(keyspace, offsetTable).ifNotExists()
       .addPartitionKey("name", DataType.text())
       .addColumn("offset_type", DataType.text())
@@ -41,6 +43,8 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
 
     logger.info(s"Creating table $timerTable: " + timerDDL)
     readJournal.session.executeDDL(timerDDL.toString)
+    logger.info(s"Adding index to column 'moment' in table $timerTable: " + indexOnMoment)
+    readJournal.session.executeDDL(indexOnMoment.toString)
     logger.info(s"Creating table $offsetTable: " + offsetDDL)
     readJournal.session.executeDDL(offsetDDL.toString)
 
@@ -55,9 +59,9 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
     }))
   }
 
-  override def getTimers(): Future[Seq[Timer]] = {
-    logger.whenDebugEnabled(logger.debug("Reading existing timers from Cassandra database"))
-    val select = QueryBuilder.select().from(keyspace, timerTable)
+  override def getTimers(window: Instant): Future[Seq[Timer]] = {
+    logger.whenDebugEnabled(logger.debug(s"Reading existing timers from Cassandra database for window $window"))
+    val select = QueryBuilder.select().from(keyspace, timerTable).where(QueryBuilder.lte("moment", window)).allowFiltering()
     readJournal.session.selectAll(select).map(rows => {
       logger.whenDebugEnabled(logger.debug("Found " + rows.length + " timers"))
       rows.map(row => {
@@ -72,7 +76,7 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
         } else {
           Timer(caseInstanceId, timerId, moment.toInstant, userId)
         }
-      }).filter(timer => timer != null) // Filter out the records that have missing column information
+      }).filter(_ != null) // Filter out the records that have missing column information
     })
   }
 

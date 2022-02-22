@@ -20,7 +20,10 @@ class TimerStorageReader(schedule: TimerMonitor) extends Runnable with LazyLoggi
     val nextWindow = Instant.now().plusMillis(window.toMillis)
     activeWindow = nextWindow.toEpochMilli
     logger.whenDebugEnabled(logger.debug(s"Reading timers from TimerStore for next $window (setting active window to $nextWindow)"))
-    storage.getTimers().map(_.filter(fitsActiveWindow).foreach(schedule.scheduleTimer))
+    storage.getTimers(nextWindow).map(timers => {
+      logger.whenDebugEnabled(logger.debug(s"Storage returned ${timers.length} timers to plan in window $nextWindow"))
+      timers.foreach(schedule.scheduleTimer)
+    })
   }
 
   def fitsActiveWindow(timer: Timer): Boolean = {

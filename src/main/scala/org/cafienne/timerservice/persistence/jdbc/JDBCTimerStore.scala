@@ -11,18 +11,19 @@ import org.cafienne.timerservice.persistence.TimerStore
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
+import java.time.Instant
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBCConfig with TimerServiceTables {
   override lazy val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig(Cafienne.config.engine.timerService.store)
 
   import dbConfig.profile.api._
 
-  override implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
+  override implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
-  override def getTimers(): Future[Seq[Timer]] = {
-    val query = TableQuery[TimerServiceTable]
+  override def getTimers(window: Instant): Future[Seq[Timer]] = {
+    val query = TableQuery[TimerServiceTable].filter(_.moment <= window)
     db.run(query.distinct.result).map(records => records.map(record => Timer(record.caseInstanceId, record.timerId, record.moment, record.user)))
   }
 
