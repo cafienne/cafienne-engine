@@ -5,6 +5,8 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.system.CaseSystem;
+import org.cafienne.timerservice.persistence.TimerStore;
+import org.cafienne.timerservice.persistence.TimerStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +16,15 @@ import org.slf4j.LoggerFactory;
 public class TimerService extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(TimerService.class);
     public static final String CAFIENNE_TIMER_SERVICE = "cafienne-timer-service";
-    private final TimerEventSink timerstream;
+    final TimerStore storage;
+    final TimerEventSink eventSink;
+    final TimerMonitor monitor;
 
     public TimerService(CaseSystem caseSystem) {
         super(caseSystem);
-        this.timerstream = new TimerEventSink(this, caseSystem);
+        this.storage = new TimerStoreProvider(caseSystem).store();
+        this.monitor = new TimerMonitor(this);
+        this.eventSink = new TimerEventSink(this);
         setEngineVersion(Cafienne.version());
     }
 
@@ -45,7 +51,8 @@ public class TimerService extends ModelActor {
     @Override
     protected void recoveryCompleted() {
         logger.info("Starting Timer Service");
-        timerstream.open();
+        monitor.start();
+        eventSink.start();
     }
 
     @Override
