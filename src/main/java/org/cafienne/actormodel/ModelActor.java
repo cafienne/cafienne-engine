@@ -86,7 +86,10 @@ public abstract class ModelActor extends AbstractPersistentActor {
      */
     private CafienneVersion engineVersion;
 
-    protected final CaseSystem caseSystem;
+    /**
+     * The CaseSystem in which this ModelActor runs
+     */
+    public final CaseSystem caseSystem;
 
     protected ModelActor(CaseSystem caseSystem) {
         this.caseSystem = caseSystem;
