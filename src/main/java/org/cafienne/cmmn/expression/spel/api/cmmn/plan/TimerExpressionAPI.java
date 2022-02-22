@@ -10,6 +10,7 @@ import org.cafienne.cmmn.instance.TimerEvent;
 public class TimerExpressionAPI extends CaseRootObject {
     public TimerExpressionAPI(TimerEvent timer) {
         super(timer.getCaseInstance());
+        registerPlanItem(timer);
     }
 
     @Override
