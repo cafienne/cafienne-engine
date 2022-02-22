@@ -61,7 +61,7 @@ object GitInfoAnalyzer {
     GitInfoAnalyzer.isSnapshot = additionalCommits > 0 || localChanges;
 
     println(s"--- Analyzing Git Information")
-    println(s" - git described version: $currentGitTag")
+    println(s" - git tag given:         $currentGitTag")
     println(s" - base version:          $baseline")
     println(s" - branch:                $gitBranch")
     println(s" - commits in branch:     $additionalCommits")

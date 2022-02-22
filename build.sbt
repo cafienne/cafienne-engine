@@ -1,3 +1,5 @@
+import com.typesafe.sbt.packager.docker._
+
 /**
   * Resolver repositories
   */
@@ -35,7 +37,12 @@ bashScriptDefines / scriptClasspath := Seq("../lib_ext/*", "*")
 bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
 bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf""""
 dockerExposedPorts := Seq(2027, 9999)
-dockerBaseImage := "cafienne/base:openjdk-11-buster"
+dockerBaseImage := "openjdk:19-slim"
+//Adding dependencies required for the PDF generation Process Task
+dockerCommands := dockerCommands.value.flatMap {
+  case c@Cmd("USER", "root") => Seq(c, Cmd("RUN",  "apt-get update && apt-get -y install fontconfig libfreetype6 && apt-get clean"))
+  case other => Seq(other)
+}
 Universal / name := "cafienne"
 Universal / packageName := "cafienne"
 // Do not publish to docker
@@ -44,16 +51,16 @@ Docker / publish / skip := true
 /**
   * Compiler settings
   */
-scalaVersion := "2.13.6"
+scalaVersion := "2.13.8"
 Compile / doc / sources := List()
 Compile / mainClass := Some("org.cafienne.service.Main")
 // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
 packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("org.cafienne.service.Main")
-scalacOptions += "-target:jvm-11"
 javacOptions ++= Seq("-source", "11", "-target", "11")
 scalacOptions := Seq(
   "-encoding", "UTF-8",
   "-unchecked",
+  "-target:jvm-11",
   "-deprecation",
   "-Xlint", "deprecation",
   "-Xlint", "unchecked",
