@@ -11,5 +11,7 @@ case class Timer(caseInstanceId: String, timerId: String, moment: Instant, userI
       override val origin: Origin = Origin.TimerService
     }
   }
+
+  override def toString: String = s"[$timerId - $moment]"
 }
 

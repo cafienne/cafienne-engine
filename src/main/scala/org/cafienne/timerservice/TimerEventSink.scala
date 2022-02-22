@@ -18,7 +18,7 @@ class TimerEventSink(val timerService: TimerService) extends TaggedEventConsumer
     envelope.event match {
       case event: TimerSet =>
         logger.debug(s"${event.getClass.getSimpleName} on timer ${event.getTimerId} in case ${event.getActorId} (triggering at ${event.getTargetMoment})")
-        timerService.monitor.setTimer(event, envelope.offset)
+        timerService.monitor.addTimer(event, envelope.offset)
       case event: TimerCleared =>
         logger.debug(s"${event.getClass.getSimpleName} on timer ${event.getTimerId} in case ${event.getActorId}")
         timerService.monitor.removeTimer(event.getTimerId, Some(envelope.offset))

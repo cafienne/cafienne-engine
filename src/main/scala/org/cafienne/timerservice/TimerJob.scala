@@ -10,7 +10,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
 class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: Scheduler) extends Runnable with LazyLogging {
-
   val command = new RaiseEvent(timer.user, timer.caseInstanceId, timer.timerId)
   val millis: Long = timer.moment.toEpochMilli
   val delay: Long = millis - System.currentTimeMillis
@@ -30,10 +29,11 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
 
   def handleFailingCaseInvocation(failure: CommandFailure): Unit = {
     // TODO: we can also update the timer state in the storage???
-    logger.warn(s"Could not trigger timer ${timer.timerId} in case ${timer.caseInstanceId}:" + failure.toJson)
+    logger.warn(s"Could not trigger timer $timer in case ${timer.caseInstanceId}:" + failure.toJson)
   }
 
   def handleCaseInvocation(response: ModelResponse): Unit = {
     // TODO: we can also delete the timer here, or update a state for that timer in the store
-    logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer ${timer.timerId} in case ${timer.caseInstanceId}"))
-  }}
+    logger.whenDebugEnabled(logger.debug(s"Successfully invoked timer $timer in case ${timer.caseInstanceId}"))
+  }
+}

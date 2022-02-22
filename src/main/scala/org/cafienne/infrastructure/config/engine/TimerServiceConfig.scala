@@ -2,6 +2,9 @@ package org.cafienne.infrastructure.config.engine
 
 import org.cafienne.infrastructure.config.util.ChildConfigReader
 
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.FiniteDuration
+
 class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
   val path = "timer-service"
 
@@ -16,5 +19,24 @@ class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
       logger.warn("Event store configuration is missing, assuming default value " + defaultValue)
       defaultValue
     }
+  }
+
+  /**
+    * Returns the duration of the window ahead to set timers in the in-memory scheduler
+    */
+  val window: FiniteDuration = {
+    readDuration("window", FiniteDuration(8, TimeUnit.SECONDS))
+  }
+
+  /**
+    * Returns the cycle time to refresh the timers loaded into the in-memory scheduler.
+    * Cannot be longer than the duration given for the 'window'
+    */
+  val interval: FiniteDuration = {
+    val interval = readDuration("interval", FiniteDuration(4, TimeUnit.SECONDS))
+    if (interval >= window) {
+      fail(s"Timer service refresh interval (configured to $interval) must be shorter than the window ahead (which is configured to $window)")
+    }
+    interval
   }
 }
