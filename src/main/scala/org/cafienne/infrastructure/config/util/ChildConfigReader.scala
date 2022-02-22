@@ -18,6 +18,8 @@ trait ChildConfigReader extends ConfigReader with LazyLogging {
     }
   }
 
+  override def toString: String = s"cafienne.$fullPath"
+
   lazy val fullPath: String = parent match {
     case reader: ChildConfigReader => reader.path + "." + path
     case _ => path

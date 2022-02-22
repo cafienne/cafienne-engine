@@ -50,7 +50,7 @@ public class TimerService extends ModelActor {
 
     @Override
     protected void recoveryCompleted() {
-        logger.info("Starting Timer Service - loading timers every " + Cafienne.config().engine().timerService().interval() + " for a window of " + Cafienne.config().engine().timerService().window() + " ahead");
+        logger.warn("Starting Timer Service - loading timers every " + Cafienne.config().engine().timerService().interval() + " for a window of " + Cafienne.config().engine().timerService().window() + " ahead");
         monitor.start();
         eventSink.start();
     }

@@ -79,7 +79,11 @@ trait ConfigReader extends LazyLogging {
 
   def readDuration(name: String, default: FiniteDuration): FiniteDuration = {
     if (config != null && config.hasPath(name)) {
-      FiniteDuration(config.getDuration(name).toSeconds, TimeUnit.SECONDS)
+      val duration = FiniteDuration(config.getDuration(name).toSeconds, TimeUnit.SECONDS).toCoarsest
+      if (duration.toMillis < 0) {
+        fail(s"Duration cannot be negative (found $this.$name = ${config.getValue(name).unwrapped()})")
+      }
+      duration
     } else {
       default
     }

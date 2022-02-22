@@ -25,7 +25,7 @@ class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
     * Returns the duration of the window ahead to set timers in the in-memory scheduler
     */
   val window: FiniteDuration = {
-    readDuration("window", FiniteDuration(8, TimeUnit.SECONDS))
+    readDuration("window", FiniteDuration(65, TimeUnit.MINUTES))
   }
 
   /**
@@ -33,7 +33,7 @@ class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
     * Cannot be longer than the duration given for the 'window'
     */
   val interval: FiniteDuration = {
-    val interval = readDuration("interval", FiniteDuration(4, TimeUnit.SECONDS))
+    val interval = readDuration("interval", FiniteDuration(1, TimeUnit.HOURS))
     if (interval >= window) {
       fail(s"Timer service refresh interval (configured to $interval) must be shorter than the window ahead (which is configured to $window)")
     }
