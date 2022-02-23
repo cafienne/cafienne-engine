@@ -9,7 +9,7 @@ class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
   /**
     * Returns configuration options for the Timer Service
     */
-  lazy val timerService = new TimerServiceConfig(this)
+  val timerService = new TimerServiceConfig(this)
 
   /**
     * Config property for settings of the mail service to use

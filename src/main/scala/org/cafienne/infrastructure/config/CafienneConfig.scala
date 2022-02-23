@@ -66,7 +66,7 @@ class CafienneConfig extends ConfigReader with LazyLogging {
   /**
     * Returns configuration options for the engine and it's internal services
     */
-  lazy val engine: EngineConfig = new EngineConfig(this)
+  val engine: EngineConfig = new EngineConfig(this)
 
   /**
     * Returns true of the debug route is open (for developers using IDE to do debugging)

@@ -23,12 +23,6 @@ class Reception {
     private final BackOffice backoffice;
     final Warehouse warehouse;
 
-    private enum Mode {
-        Operational,
-        Bootstrapped,
-        Broken,
-    }
-
     Reception(ModelActor actor) {
         this.actor = actor;
         this.recoveryRoom = new RecoveryRoom(actor, this);
@@ -48,7 +42,8 @@ class Reception {
     void handleMessage(Object message) {
         if (message instanceof IncomingActorMessage) {
             IncomingActorMessage visitor = (IncomingActorMessage) message;
-            if (canPass(visitor)) {
+            // Responses are always allowed, as they come only when we have requested something
+            if (visitor.isResponse() || canPass(visitor.asCommand())) {
                 backoffice.handleVisitor(visitor);
             }
         } else if (message instanceof SnapshotProtocol.Response) {
@@ -59,11 +54,9 @@ class Reception {
         }
     }
 
-    private boolean canPass(IncomingActorMessage visitor) {
-        // Note: incoming visitors of type model command need the actor for processing and responding.
-        if (visitor.isCommand()) {
-            visitor.asCommand().setActor(actor);
-        }
+    private boolean canPass(ModelCommand visitor) {
+        // Incoming visitors of type model command need the actor for processing and responding.
+        visitor.setActor(actor);
 
         if (isBroken()) {
             return informAboutRecoveryFailure(visitor);
@@ -86,7 +79,7 @@ class Reception {
             }
         }
 
-        if (visitor.isCommand() && !actor.supportsCommand(visitor)) {
+        if (!actor.supportsCommand(visitor)) {
             fail(visitor, actor + " does not support commands of type " + visitor.getClass().getSimpleName());
             return false;
         }

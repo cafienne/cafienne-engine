@@ -8,7 +8,7 @@
     <logger name="org.cafienne" level="WARN" />
 
     <!-- Show HTTP traffic logging -->
-<!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
+    <!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
 
     <!-- Show logging for offset of projections -->
     <!--    <logger name="org.cafienne.querydb.materializer.cases.CaseProjectionsWriter" level="DEBUG" />-->
@@ -17,8 +17,11 @@
     <!-- Show all projections logging, including info on event being handled -->
     <!--    <logger name="org.cafienne.querydb.materializer" level="DEBUG" />-->
 
-    <!-- Show logging for engine -->
-    <!--        <logger name="org.cafienne.cmmn"    level="DEBUG" />-->
+    <!-- Show logging for cases in the engine -->
+    <!--    <logger name="org.cafienne.cmmn" level="DEBUG" />-->
+
+    <!-- Show timer service logging -->
+    <!--    <logger name="org.cafienne.timerservice" level="DEBUG" />-->
 
     <logger name="com.datastax" level="WARN"/>
     <logger name="com.wordnik" level="ERROR"/>

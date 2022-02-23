@@ -5,12 +5,10 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.system.CaseSystem;
+import org.cafienne.timerservice.persistence.TimerStore;
+import org.cafienne.timerservice.persistence.TimerStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * TenantActor manages users and their roles inside a tenant.
@@ -18,11 +16,15 @@ import java.util.stream.Collectors;
 public class TimerService extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(TimerService.class);
     public static final String CAFIENNE_TIMER_SERVICE = "cafienne-timer-service";
-    private final TimerEventSink timerstream;
+    final TimerStore storage;
+    final TimerEventSink eventSink;
+    final TimerMonitor monitor;
 
     public TimerService(CaseSystem caseSystem) {
         super(caseSystem);
-        this.timerstream = new TimerEventSink(this, caseSystem, caseSystem.system());
+        this.storage = new TimerStoreProvider(caseSystem).store();
+        this.monitor = new TimerMonitor(this);
+        this.eventSink = new TimerEventSink(this);
         setEngineVersion(Cafienne.version());
     }
 
@@ -48,27 +50,13 @@ public class TimerService extends ModelActor {
 
     @Override
     protected void recoveryCompleted() {
-        logger.info("Starting Timer Service");
-        timerstream.open();
+        logger.warn("Starting Timer Service - loading timers every " + Cafienne.config().engine().timerService().interval() + " for a window of " + Cafienne.config().engine().timerService().window() + " ahead");
+        monitor.start();
+        eventSink.start();
     }
 
     @Override
     protected void handleSnapshot(SnapshotOffer snapshot) {
-        // Handle migration of old style of timer persistence
-        migrateSnapshot(snapshot);
-    }
-
-    private void migrateSnapshot(SnapshotOffer offer) {
-        Object snapshot = offer.snapshot();
-        if (snapshot instanceof TimerStorage) {
-            Collection<TimerJob> existingTimers = ((TimerStorage) snapshot).getTimers();
-            if (!existingTimers.isEmpty()) {
-                logger.info("Found an existing snapshot with " + existingTimers.size() + " timers; migrating them to the new storage");
-                List<Timer> legacy = existingTimers.stream().map(job -> new Timer(job.caseInstanceId, job.timerId, job.moment, job.user.id())).collect(Collectors.toList());
-                timerstream.migrateTimers(legacy);
-                logger.info("Successfully migrated timers to the new storage; clearing snapshot");
-                saveSnapshot(new TimerStorage());
-            }
-        }
+        logger.error("Timer Service no longer supports snapshot offers. This functionality was deprecated in Cafienne Engine version 1.1.13 and is completely removed in version 1.1.18");
     }
 }

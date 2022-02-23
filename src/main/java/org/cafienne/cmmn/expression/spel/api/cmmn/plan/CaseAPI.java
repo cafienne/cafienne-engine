@@ -15,7 +15,7 @@ public class CaseAPI extends APIObject<Case> {
     private final CaseTeamAPI caseTeam;
     private final CaseFileAPI caseFile;
 
-    private final Map<String, PlanItemAPI> planItems = new HashMap<>();
+    private final Map<String, PlanItemAPI<?>> planItems = new HashMap<>();
 
     public CaseAPI(Case actor) {
         super(actor);
