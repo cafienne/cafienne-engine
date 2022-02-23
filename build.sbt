@@ -19,12 +19,14 @@ enablePlugins(GitVersioning, GitBranchPrompt)
 enablePlugins(JavaAppPackaging)
 enablePlugins(UniversalPlugin)
 enablePlugins(DockerPlugin)
+enablePlugins(ClasspathJarPlugin)
 
 /**
   * Global settings
   */
 organization := "org.cafienne"
-description := "Case Engine"
+name := "Cafienne Engine"
+packageName := "cafienne-engine"
 
 /**
   * Docker packaging
@@ -33,18 +35,16 @@ Docker / packageName := "cafienne/engine"
 Docker / version := "latest"
 Docker / maintainer := """Cafienne <info@cafienne.io>"""
 Docker / defaultLinuxInstallLocation := "/opt/cafienne"
-bashScriptDefines / scriptClasspath := Seq("../lib_ext/*", "*")
-bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
-bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf""""
 dockerExposedPorts := Seq(2027, 9999)
-dockerBaseImage := "openjdk:19-slim"
+dockerBaseImage := "openjdk:17-slim"
 //Adding dependencies required for the PDF generation Process Task
 dockerCommands := dockerCommands.value.flatMap {
   case c@Cmd("USER", "root") => Seq(c, Cmd("RUN",  "apt-get update && apt-get -y install fontconfig libfreetype6 && apt-get clean"))
   case other => Seq(other)
 }
-Universal / name := "cafienne"
-Universal / packageName := "cafienne"
+bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value
+bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
+bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf""""
 // Do not publish to docker
 Docker / publish / skip := true
 
