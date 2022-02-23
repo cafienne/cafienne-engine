@@ -1,6 +1,5 @@
-import sbtbuildinfo._
-
 object GitInfoAnalyzer {
+  private val SPLITTER: String = "---"
 
   case class Version(baseVersion: Seq[Int], isSnapshot: Boolean) {
     val major: Int = baseVersion.head
@@ -14,51 +13,58 @@ object GitInfoAnalyzer {
         s"$major.$minor.$patch"
       }
     }
+  }
 
-    val next: String = {
-      if (isSnapshot) {
-        s"$major.$minor.${patch + 1}"
+  def version(sbtVersion: String, gitDescribedVersion: Option[String]): String = {
+    if (gitDescribedVersion.isEmpty) {
+      println("Missing gitDescribedVersion; return 0.0.0")
+      sbtVersion
+    } else {
+      val versionAndDescriptionSplitted = gitDescribedVersion.get.split(SPLITTER)
+      if (versionAndDescriptionSplitted.length < 2) {
+        // That's weird.
+        println(s"Git described version '${gitDescribedVersion.get}' does not contain the expected SPLITTER $SPLITTER, returning default version")
+        sbtVersion
       } else {
-        s"$major.$minor.$patch"
+        versionAndDescriptionSplitted(0)
       }
     }
   }
-
-  private var analyzedDescription: String  = ""
-  private var baseline: String = ""
-  private var branch: String = ""
-  private var gitCommit: String = ""
-  private var additionalCommits: Int = 0
-  private var isSnapshot: Boolean = true
-  private var version: Version = null
-
-  /**
-    * Returns the next version number, i.e. patch level increased with 1,
-    * or baseline patch version if nothing has changed since the baseline tag
-    * @return
-    */
-  def nextVersion: String = version.next
 
   /**
     * Return BuildInfoKey with the description
     * @return
     */
-  def description: BuildInfoKey = BuildInfoKey("description" -> analyzedDescription)
+  def description(sbtDescription: String, gitDescribedVersion: Option[String]): String = {
+    println("SBT Description: " + sbtDescription)
+    if (gitDescribedVersion.isEmpty) {
+      println("Missing gitDescribedVersion; return 0.0.0")
+      sbtDescription
+    } else {
+      val versionAndDescriptionSplitted = gitDescribedVersion.get.split(SPLITTER)
+      if (versionAndDescriptionSplitted.length < 2) {
+        // That's weird.
+        println(s"Git described version '${gitDescribedVersion.get}' does not contain the expected SPLITTER $SPLITTER, returning default version")
+        sbtDescription
+      } else {
+        versionAndDescriptionSplitted(1)
+      }
+    }
+  }
 
   /**
     * Analyze the given information on git source code status
     */
-  def load(currentGitTag: String, gitBranch: String, gitHeadCommit: Option[String], localChanges: Boolean): Unit = {
+  def getVersionPlusDescription(currentGitTag: String, gitBranch: String, gitHeadCommit: Option[String], localChanges: Boolean): Option[String] = {
     val dashedVersions = currentGitTag.split("-")
 
-    GitInfoAnalyzer.baseline = dashedVersions(0)
-    GitInfoAnalyzer.branch = gitBranch
-    GitInfoAnalyzer.gitCommit = gitHeadCommit.getOrElse("")
-    GitInfoAnalyzer.additionalCommits = {
+    val baseline = dashedVersions(0)
+    val gitCommit = gitHeadCommit.getOrElse("")
+    val additionalCommits = {
       if (dashedVersions.length > 1) dashedVersions(1).toInt
       else 0
     }
-    GitInfoAnalyzer.isSnapshot = additionalCommits > 0 || localChanges;
+    val isSnapshot = additionalCommits > 0 || localChanges;
 
     println(s"--- Analyzing Git Information")
     println(s" - git tag given:         $currentGitTag")
@@ -69,9 +75,9 @@ object GitInfoAnalyzer {
     println(s" - found local changes:   $localChanges")
     println(s" - is snapshot:           $isSnapshot\n")
 
-    GitInfoAnalyzer.version = Version(dashedVersions(0).split("[.]").map(_.toInt), isSnapshot)
+    val version = Version(dashedVersions(0).split("[.]").map(_.toInt), isSnapshot)
 
-    GitInfoAnalyzer.analyzedDescription = {
+    val description = {
       if (additionalCommits > 0) {
         if (localChanges) {
           s"This engine is built on commit [$gitCommit] in branch [$gitBranch] having $additionalCommits additional commits on top of version [$baseline]. The build also contains some local changes that have not been committed."
@@ -88,8 +94,10 @@ object GitInfoAnalyzer {
     }
 
     println("--- Resulting Description and Version")
-    println(" -  description: " + GitInfoAnalyzer.analyzedDescription)
-    println(" -  version:     " + GitInfoAnalyzer.version)
+    println(" -  description: " + description)
+    println(" -  version:     " + version)
     println("")
+
+    Some(version + SPLITTER + description)
   }
 }

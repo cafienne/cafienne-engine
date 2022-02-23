@@ -109,14 +109,18 @@ publishTo := Some(
   */
 git.useGitDescribe := true // Not sure if this is required, it seems to also work when it is not set
 git.gitTagToVersionNumber := { tag =>
-  // Generation of version key is done by analysing the git tag.
-  //  This analysis is also used later on for the generation of the 'description' key
-  GitInfoAnalyzer.load(tag, git.gitCurrentBranch.value, git.gitHeadCommit.value, git.gitUncommittedChanges.value)
-  // Return the analyzed next version
-  Some(GitInfoAnalyzer.nextVersion)
+  // This code sets the gitDescribedVersion from the current git tag.
+  //  We do not actually return a version, but the version + the description.
+  //  Next task is to pull them apart from each other again.
+  //  This is done because somehow it is not possible to keep state inside the GitInfoAnalyzer object :(
+  GitInfoAnalyzer.getVersionPlusDescription(tag, git.gitCurrentBranch.value, git.gitHeadCommit.value, git.gitUncommittedChanges.value)
 }
+// Now convert the generated gitDescribedVersion into a proper 'version' and 'description'
+version := GitInfoAnalyzer.version(version.value, git.gitDescribedVersion.value)
+description := GitInfoAnalyzer.description(description.value, git.gitDescribedVersion.value)
+
 // Generate 'name', 'organization', 'version', 'description', 'gitHeadCommit', 'gitCurrentBranch', 'gitUncommittedChanges'
-sbtbuildinfo.BuildInfoKeys.buildInfoKeys := Seq[BuildInfoKey](name, organization, version, GitInfoAnalyzer.description, git.gitHeadCommit, git.gitCurrentBranch, git.gitUncommittedChanges)
+sbtbuildinfo.BuildInfoKeys.buildInfoKeys := Seq[BuildInfoKey](name, organization, version, description, git.gitHeadCommit, git.gitCurrentBranch, git.gitUncommittedChanges)
 sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.BuildTime
 sbtbuildinfo.BuildInfoKeys.buildInfoOptions += BuildInfoOption.ToMap
 sbtbuildinfo.BuildInfoKeys.buildInfoPackage := "org.cafienne"
