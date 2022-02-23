@@ -3,7 +3,8 @@ package org.cafienne.service.akkahttp
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.concat
-import org.cafienne.BuildInfo
+import akka.http.scaladsl.server.Route
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.service.akkahttp.anonymous.AnonymousRequestRoutes
@@ -19,56 +20,51 @@ import org.cafienne.service.akkahttp.tenant.route.TenantRoutes
 import org.cafienne.system.CaseSystem
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.ExecutionContextExecutor
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
 
-class CafienneHttpServer(val caseSystem: CaseSystem) {
-  implicit val system: ActorSystem = caseSystem.system
-  implicit val ec: ExecutionContextExecutor = system.dispatcher
-//  val userCache: IdentityCache = new IdentityCache()
-  private val routes = new ListBuffer[CaseServiceRoute]()
+class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
 
-  def addRoute(caseServiceRoute: CaseServiceRoute): Unit = {
-    routes += caseServiceRoute
+  val defaultRoutes: Seq[CaseServiceRoute] = {
+    val routes = Seq(new CaseEngineHealthRoute(caseSystem),
+      new CasesRoutes(caseSystem),
+      new IdentifierRoutes(caseSystem),
+      new TaskRoutes(caseSystem),
+      new TenantRoutes(caseSystem),
+      new ConsentGroupRoutes(caseSystem),
+      new PlatformRoutes(caseSystem),
+      new RepositoryRoute(caseSystem),
+      new DebugRoute(caseSystem),
+    )
+    // Optionally add the anonymous route
+    if (Cafienne.config.api.anonymousConfig.enabled) {
+      routes ++ Seq(new AnonymousRequestRoutes(caseSystem))
+    } else {
+      routes
+    }
   }
+  val routes: ListBuffer[CaseServiceRoute] = new ListBuffer[CaseServiceRoute]().addAll(defaultRoutes)
 
-  addRoute(new CaseEngineHealthRoute(caseSystem))
-  addRoute(new CasesRoutes(caseSystem))
-  addRoute(new IdentifierRoutes(caseSystem))
-  addRoute(new TaskRoutes(caseSystem))
-  addRoute(new TenantRoutes(caseSystem))
-  addRoute(new ConsentGroupRoutes(caseSystem))
-  addRoute(new PlatformRoutes(caseSystem))
-  addRoute(new RepositoryRoute(caseSystem))
-  addRoute(new DebugRoute(caseSystem))
-  // Optionally add the anonymous route
-  if (Cafienne.config.api.anonymousConfig.enabled) {
-    addRoute(new AnonymousRequestRoutes(caseSystem))
-  }
+  def addRoute(caseServiceRoute: CaseServiceRoute): Unit = routes += caseServiceRoute
 
-  def start(): Unit = {
-    // Find the API classes of the routes and pass them to Swagger
-    val apiClasses = routes.flatMap(route => route.apiClasses())
+  def start(): Future[Http.ServerBinding] = {
+    logger.info("Starting Cafienne HTTP Server - loading swagger documentation of the routes")
 
     // Create the route tree
     val apiRoutes = {
+      // Find the API classes of the routes and pass them to Swagger
+      val apiClasses = routes.flatMap(route => route.apiClasses())
       var mainRoute = new SwaggerHttpServiceRoute(apiClasses.toSet).route
-      routes.map(c => c.route).foreach(route => mainRoute = concat(mainRoute, route))
+      def routeAppender(route: Route) = mainRoute = concat(mainRoute, route)
+      routes.map(_.route).foreach(routeAppender)
       mainRoute
     }
 
     val apiHost = Cafienne.config.api.bindHost
     val apiPort = Cafienne.config.api.bindPort
-    val httpServer = Http().newServerAt(apiHost, apiPort).bindFlow(apiRoutes)
-    httpServer onComplete {
-      case Success(answer) => {
-        system.log.info(s"service is done: $answer")
-        system.log.info(s"Running [$BuildInfo]")
-      }
-      case Failure(msg) => {
-        system.log.error(s"service failed: $msg")
-        System.exit(-1) // Also exit the JVM; what use do we have to keep running when there is no http available...
-      }
-    }
+    logger.info(s"Starting Cafienne HTTP Server - starting akka http on $apiHost:$apiPort")
+    implicit val system: ActorSystem = caseSystem.system
+
+    val akkaHttp = Http().newServerAt(apiHost, apiPort)
+    akkaHttp.bindFlow(apiRoutes)
   }
 }

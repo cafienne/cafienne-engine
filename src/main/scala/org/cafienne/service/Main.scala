@@ -7,18 +7,33 @@
  */
 package org.cafienne.service
 
+import akka.actor.ActorSystem
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.akkahttp.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
-object Main extends App {
+object Main extends App with LazyLogging {
   try {
     // Create the Case System
     val caseSystem: CaseSystem = new CaseSystem
+    implicit val system: ActorSystem = caseSystem.system
+    implicit val ec: ExecutionContextExecutor = system.dispatcher
+
     // Create and start the http server
-    new CafienneHttpServer(caseSystem).start()
+    new CafienneHttpServer(caseSystem).start().onComplete {
+      case Success(answer) =>
+        logger.warn(s"Running Cafienne version: ${Cafienne.version}")
+        logger.warn(s"Akka HTTP Server available at $answer")
+      case Failure(msg) =>
+        logger.error(s"Starting Akka HTTP Server failed: $msg")
+        System.exit(-1) // Also exit the JVM; what use do we have to keep running when there is no http available...
+    }
+
 
     // Inform akka when we're going down.
     sys addShutdownHook {

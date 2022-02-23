@@ -7,7 +7,6 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
 import org.cafienne.infrastructure.Cafienne
 
-import java.util.concurrent.TimeUnit
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
