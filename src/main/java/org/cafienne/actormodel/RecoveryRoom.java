@@ -59,7 +59,7 @@ class RecoveryRoom {
             reception.open();
         } else {
             // Step 4.
-            actor.getLogger().warn("Received unknown message of type " + msg.getClass().getName() + " during recovery: " + msg);
+            actor.getLogger().warn(actor + " received unknown message of type " + msg.getClass().getName() + " during recovery: " + msg);
         }
     }
 
