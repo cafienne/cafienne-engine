@@ -29,6 +29,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
      * Set of accessible property names. Case sensitive, and does not contain deprecated properties
      */
     private final Set<String> propertyNames = new HashSet<>();
+    private final Set<String> deprecatedNames = new HashSet<>();
     private final Map<String, ExpressionObjectPropertyReader> readers = new HashMap<>();
     protected final T actor;
 
@@ -67,6 +68,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     }
 
     protected void addDeprecatedReader(String deprecatedName, String newPropertyName, ExpressionObjectPropertyReader reader) {
+        deprecatedNames.add(deprecatedName);
         addReader(deprecatedName, () -> {
             warnDeprecation(deprecatedName, newPropertyName);
             return reader.get();
@@ -74,6 +76,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     }
 
     protected void addDeprecatedReader(String deprecatedName, ExpressionObjectPropertyReader reader) {
+        deprecatedNames.add(deprecatedName);
         addReader(deprecatedName, () -> {
             String msg = "Expression contains unsupported property '" + deprecatedName + "'. An empty value is given.";
             logger.warn(msg);
@@ -85,7 +88,9 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     @Override
     public boolean canRead(String propertyName) {
         if (!readers.containsKey(propertyName.toLowerCase())) {
-            getActor().addDebugInfo(() -> "Reading property '" + propertyName + "' has no value in " + getClass().getSimpleName() + ". Values exist for: " + propertyNames);
+            Set<String> availableProperties = new HashSet<>(propertyNames);
+            availableProperties.removeAll(deprecatedNames);
+            getActor().addDebugInfo(() -> "Reading property '" + propertyName + "' has no value in " + getClass().getSimpleName() + ". Values exist for: " + availableProperties);
         }
         return true;
     }
