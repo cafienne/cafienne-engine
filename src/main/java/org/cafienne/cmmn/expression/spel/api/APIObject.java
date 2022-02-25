@@ -2,6 +2,7 @@ package org.cafienne.cmmn.expression.spel.api;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
+import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,16 +84,17 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
 
     @Override
     public boolean canRead(String propertyName) {
-        boolean found = readers.containsKey(propertyName.toLowerCase());
-        if (!found) {
-            getActor().addDebugInfo(() -> "Property " + propertyName + " is not available on the " + getClass().getSimpleName() + "; available properties: " + propertyNames);
+        if (!readers.containsKey(propertyName.toLowerCase())) {
+            getActor().addDebugInfo(() -> "Reading property '" + propertyName + "' has no value in " + getClass().getSimpleName() + ". Values exist for: " + propertyNames);
         }
-        return found;
+        return true;
     }
 
     @Override
     public Object read(String propertyName) {
-        return readers.getOrDefault(propertyName.toLowerCase(), () -> null).get();
+        // Returning Value.NULL makes it possible to read further into the non-existing property,
+        //  avoiding spel expressions to crash or not to have to use "safe?" expressions.
+        return readers.getOrDefault(propertyName.toLowerCase(), () -> Value.NULL).get();
     }
 
     @Override
