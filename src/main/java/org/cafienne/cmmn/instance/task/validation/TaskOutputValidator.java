@@ -157,7 +157,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                 try {
                     ValueMap responseJSON = JSONReader.parse(httpConnection.getInputStream());
                     output.put(HTTPCallDefinition.RESPONSE_PAYLOAD_PARAMETER, responseJSON);
-                    addDebugInfo(() -> "Response to validation of task " + task.getId() + ":", responseJSON);
+                    addDebugInfo(() -> "Response to validation of task " + task.getId() + ": ", responseJSON);
                     return new ValidationResponse(responseJSON);
                 } catch (IOException | JSONParseFailure e) {
                     return new ValidationError("Technical failure while reading http response although http code was " + responseCode, e);

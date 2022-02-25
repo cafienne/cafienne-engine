@@ -32,4 +32,9 @@ public class CafienneSerializableValue extends PrimitiveValue<CafienneSerializab
     public void print(JsonGenerator generator) throws IOException {
         value.writeThisObject(generator);
     }
+
+    @Override
+    public boolean isPrimitive() {
+        return false;
+    }
 }

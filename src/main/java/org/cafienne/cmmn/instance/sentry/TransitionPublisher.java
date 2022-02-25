@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
 
     public void informEntryCriteria(E transition) {
         if (! connectedEntryCriteria.isEmpty()) {
-            addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() +" entry criteria that listen to item " + item);
+            addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() +" entry criteria that listen to item " + item.getDescription());
         }
         // Then inform the activating sentries
         new ArrayList<>(connectedEntryCriteria).forEach(onPart -> onPart.inform(item, transition));
@@ -94,7 +94,7 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
 
     public void informExitCriteria(E transition) {
         if (! connectedExitCriteria.isEmpty()) {
-            addDebugInfo(() -> "Informing " + connectedExitCriteria.size() +" exit criteria that listen to item " + item);
+            addDebugInfo(() -> "Informing " + connectedExitCriteria.size() +" exit criteria that listen to item " + item.getDescription());
         }
         // Then inform the activating sentries
         new ArrayList<>(connectedExitCriteria).forEach(onPart -> onPart.inform(item, transition));
@@ -108,7 +108,7 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
         }
     }
 
-    protected void addDebugInfo(DebugStringAppender appender) {
+    protected void addDebugInfo(DebugInfoAppender appender) {
         item.getCaseInstance().addDebugInfo(appender);
     }
 }

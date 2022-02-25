@@ -2,10 +2,8 @@ package org.cafienne.actormodel;
 
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
-import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.json.Value;
 import org.slf4j.Logger;
 
 /**
@@ -48,27 +46,20 @@ class Warehouse {
         }
     }
 
-    void addDebugInfo(DebugStringAppender appender, Value<?> json, Logger logger) {
+    /**
+     * Add debug info to the ModelActor if debug is enabled.
+     * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
+     * then the appender's debugInfo method will be invoked to store a string in the log.
+     *
+     * @param logger The slf4j logger instance to check whether debug logging is enabled
+     * @param appender A functional interface returning "an" object, holding the main info to be logged.
+     *                 Note: the interface is only invoked if logging is enabled. This appender typically
+     *                 returns a String that is only created upon demand (in order to speed up a bit)
+     * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
+     */
+    void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
         if (isOpen) {
-            staging.addDebugInfo(appender, json, logger);
-        }
-    }
-
-    void addDebugInfo(DebugStringAppender appender, Logger logger) {
-        if (isOpen) {
-            staging.addDebugInfo(appender, logger);
-        }
-    }
-
-    void addDebugInfo(DebugStringAppender appender, Throwable exception, Logger logger) {
-        if (isOpen) {
-            staging.addDebugInfo(appender, exception, logger);
-        }
-    }
-
-    void addDebugInfo(DebugJsonAppender appender, Logger logger) {
-        if (isOpen) {
-            staging.addDebugInfo(appender, logger);
+            staging.addDebugInfo(logger, appender, additionalInfo);
         }
     }
 }

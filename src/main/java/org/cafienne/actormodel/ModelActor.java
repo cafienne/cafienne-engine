@@ -15,12 +15,10 @@ import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
-import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.json.Value;
 import org.cafienne.processtask.actorapi.command.ProcessCommand;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.system.health.HealthMonitor;
@@ -367,22 +365,26 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * If the case runs in debug mode (or if Log4J has debug enabled for this logger),
      * then the appender's debugInfo method will be invoked to store a string in the log.
      *
-     * @param appender
+     * @param appender Producer of the log info
+     * @param additionalInfo Additional parameters such as Throwable or json Value will be printed in a special manner
      */
-    public void addDebugInfo(DebugStringAppender appender) {
-        warehouse.addDebugInfo(appender, getLogger());
+    public void addDebugInfo(DebugInfoAppender appender, Object... additionalInfo) {
+        addDebugInfo(getLogger(), appender, additionalInfo);
     }
 
-    public void addDebugInfo(DebugStringAppender appender, Value<?> json) {
-        warehouse.addDebugInfo(appender, json, getLogger());
-    }
-
-    public void addDebugInfo(DebugJsonAppender appender) {
-        warehouse.addDebugInfo(appender, getLogger());
-    }
-
-    public void addDebugInfo(DebugStringAppender appender, Throwable exception) {
-        warehouse.addDebugInfo(appender, exception, getLogger());
+    /**
+     * Add debug info to the ModelActor if debug is enabled.
+     * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
+     * then the appender's debugInfo method will be invoked to store a string in the log.
+     *
+     * @param logger The slf4j logger instance to check whether debug logging is enabled
+     * @param appender A functional interface returning "an" object, holding the main info to be logged.
+     *                 Note: the interface is only invoked if logging is enabled. This appender typically
+     *                 returns a String that is only created upon demand (in order to speed up a bit)
+     * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
+     */
+    public void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
+        warehouse.addDebugInfo(logger, appender, additionalInfo);
     }
 
     /**

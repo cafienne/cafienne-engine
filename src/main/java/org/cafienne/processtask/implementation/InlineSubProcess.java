@@ -9,7 +9,7 @@ package org.cafienne.processtask.implementation;
 
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
-import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
@@ -81,7 +81,7 @@ public abstract class InlineSubProcess<T extends InlineSubProcessDefinition> {
         processOutputParameters.getValue().clear();
     }
 
-    protected void addDebugInfo(DebugStringAppender appender) {
+    protected void addDebugInfo(DebugInfoAppender appender) {
         task.getCaseInstance().addDebugInfo(appender);
     }
 

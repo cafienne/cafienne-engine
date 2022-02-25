@@ -145,7 +145,7 @@ public class StartCase extends CaseCommand implements BootstrapMessage {
         caseInstance.getCaseTeam().create(caseTeam);
 
         // Apply input parameters. This may also fill the CaseFile
-        caseInstance.addDebugInfo(() -> "Input parameters for new case of type "+ definition.getName(), inputParameters);
+        caseInstance.addDebugInfo(() -> "Input parameters for new case of type " + definition.getName(), inputParameters);
         caseInstance.setInputParameters(inputParameters);
 
         // Now trigger the Create transition on the case plan, to make the case actually go running

@@ -9,7 +9,6 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
-import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.*;
@@ -82,12 +81,10 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
      *  These may have been created due to case definition migration while stage was in Fault state
      */
     private void createNullItems() {
-        addDebugInfo(() -> "Instantiating life cycle for null items. Total plan items in Stage[" + getName()+ " is " + planItems.size());
-        addDebugInfo(() -> {
-            StringBuilder sb = new StringBuilder("Items:\n");
-            planItems.forEach(item -> sb.append("Item["+item.getName()+"."+item.getIndex() +"] in state "+ item.getState()));
-            return sb.toString();
-        });
+        if (planItems.size() > 0) {
+            addDebugInfo(() -> "Stage[" + getName() + "]: instantiating " + planItems.size() + " children having Null state. These are probably discretionary items that have been planned before the stage became active");
+            planItems.forEach(item -> addDebugInfo(() -> "Item["+item.getName()+"."+item.getIndex() +"] in state "+ item.getState()));
+        }
         planItems.stream().filter(item -> item.getState().isNull()).forEach(item -> item.makeTransition(Transition.Create));
     }
 
