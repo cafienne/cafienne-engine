@@ -21,7 +21,7 @@ public abstract class PrimitiveValue<T> extends Value<T> implements SpelProperty
     }
 
     @Override
-    public final boolean isPrimitive() {
+    public boolean isPrimitive() {
         return true;
     }
 

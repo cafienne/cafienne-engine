@@ -9,9 +9,7 @@ package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
 import org.cafienne.cmmn.definition.DefinitionElement;
-import org.cafienne.cmmn.instance.debug.DebugStringAppender;
-import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.json.Value;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 
 public class CMMNElement<T extends DefinitionElement> {
     private final Case caseInstance;
@@ -34,20 +32,8 @@ public class CMMNElement<T extends DefinitionElement> {
         this.definition = definition;
     }
 
-    protected void addDebugInfo(DebugStringAppender appender, Criterion<?> criterion) {
-        addDebugInfo(appender, criterion.toJson());
-    }
-
-    protected void addDebugInfo(DebugStringAppender appender, Exception e) {
-        getCaseInstance().addDebugInfo(appender, e);
-    }
-
-    protected void addDebugInfo(DebugStringAppender appender, Value<?> v) {
-        getCaseInstance().addDebugInfo(appender, v);
-    }
-
-    protected void addDebugInfo(DebugStringAppender appender) {
-        getCaseInstance().addDebugInfo(appender);
+    protected void addDebugInfo(DebugInfoAppender appender, Object... additionalInfo) {
+        getCaseInstance().addDebugInfo(appender, additionalInfo);
     }
 
     public T getDefinition() {

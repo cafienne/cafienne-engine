@@ -2,6 +2,7 @@ package org.cafienne.cmmn.expression.spel.api;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
+import org.cafienne.json.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
      * Set of accessible property names. Case sensitive, and does not contain deprecated properties
      */
     private final Set<String> propertyNames = new HashSet<>();
+    private final Set<String> deprecatedNames = new HashSet<>();
     private final Map<String, ExpressionObjectPropertyReader> readers = new HashMap<>();
     protected final T actor;
 
@@ -66,6 +68,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     }
 
     protected void addDeprecatedReader(String deprecatedName, String newPropertyName, ExpressionObjectPropertyReader reader) {
+        deprecatedNames.add(deprecatedName);
         addReader(deprecatedName, () -> {
             warnDeprecation(deprecatedName, newPropertyName);
             return reader.get();
@@ -73,6 +76,7 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
     }
 
     protected void addDeprecatedReader(String deprecatedName, ExpressionObjectPropertyReader reader) {
+        deprecatedNames.add(deprecatedName);
         addReader(deprecatedName, () -> {
             String msg = "Expression contains unsupported property '" + deprecatedName + "'. An empty value is given.";
             logger.warn(msg);
@@ -83,16 +87,19 @@ public abstract class APIObject<T extends ModelActor> implements SpelReadable {
 
     @Override
     public boolean canRead(String propertyName) {
-        boolean found = readers.containsKey(propertyName.toLowerCase());
-        if (!found) {
-            getActor().addDebugInfo(() -> "Property " + propertyName + " is not available on the " + getClass().getSimpleName() + "; available properties: " + propertyNames);
+        if (!readers.containsKey(propertyName.toLowerCase())) {
+            Set<String> availableProperties = new HashSet<>(propertyNames);
+            availableProperties.removeAll(deprecatedNames);
+            getActor().addDebugInfo(() -> "Reading property '" + propertyName + "' has no value in " + getClass().getSimpleName() + ". Values exist for: " + availableProperties);
         }
-        return found;
+        return true;
     }
 
     @Override
     public Object read(String propertyName) {
-        return readers.getOrDefault(propertyName.toLowerCase(), () -> null).get();
+        // Returning Value.NULL makes it possible to read further into the non-existing property,
+        //  avoiding spel expressions to crash or not to have to use "safe?" expressions.
+        return readers.getOrDefault(propertyName.toLowerCase(), () -> Value.NULL).get();
     }
 
     @Override

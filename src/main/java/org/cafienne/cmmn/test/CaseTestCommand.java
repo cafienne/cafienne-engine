@@ -67,8 +67,12 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
      * Returns the actual command that was (or is to be) executed by the case instance
      * @return
      */
-    public CaseCommand getActualCommand() {
-        return actualCommand;
+    public <T extends CaseCommand> T getActualCommand() {
+        return (T) actualCommand;
+    }
+
+    boolean isTestScriptCommand() {
+        return actualCommand instanceof TestScriptCommand;
     }
 
     @Deprecated // CaseSnapShotString is taken to show the "old" XML. To be replaced with some json based snapshotting
@@ -148,10 +152,17 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
         // Wait for the CaseModified event to be published
         awaitCaseModifiedEvent(response);
 
-        logger.debug("Validating response for test command " + getActionNumber() + ": " + this.getActualCommand());
+        // Run the validators.
+        runValidation();
+    }
+
+    void runValidation() {
         // Run the validators. Validators raise an exception for the test script to stop. Typically an assertion error.
         if (validator != null) {
+            logger.debug("Validating response for test command " + getActionNumber() + ": " + this.getActualCommand());
             validator.validate(this);
+        } else {
+            logger.debug("Did not find validations for test command " + getActionNumber() + ": " + this.getActualCommand());
         }
     }
 
@@ -159,11 +170,8 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
         // Store the actual response.
         this.actualFailure = failure;
 
-        logger.debug("Validating response for test command " + getActionNumber() + ": " + this.getActualCommand());
-        // Run the validators. Validators raise an exception for the test script to stop. Typically an assertion error.
-        if (validator != null) {
-            validator.validate(this);
-        }
+        // Run the validators.
+        runValidation();
     }
 
     private void awaitCaseModifiedEvent(CaseResponse response) {

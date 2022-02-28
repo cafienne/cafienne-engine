@@ -106,7 +106,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
                 if (relatedExitCriterion.isActive()) {
                     criterion.activate(this);
                 } else {
-                    addDebugInfo(() -> criterion + ": onPart '" + getSourceName() + "=>" + event.getTransition() + "' is not activated, because related exit criterion is not active", this.criterion);
+                    addDebugInfo(() -> criterion + ": onPart '" + getSourceName() + "=>" + event.getTransition() + "' is not activated, because related exit criterion is not active", this.criterion.toJson());
                 }
             } else {
                 // Bingo, we have a hit

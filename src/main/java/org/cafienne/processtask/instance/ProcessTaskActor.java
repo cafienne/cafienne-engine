@@ -74,7 +74,7 @@ public class ProcessTaskActor extends ModelActor {
 
     public ProcessResponse start(StartProcess command) {
         addEvent(new ProcessStarted(this, command));
-        addDebugInfo(() -> "Starting process task " + name + " with input parameters", inputParameters);
+        addDebugInfo(() -> "Starting process task " + name + " with input: ", inputParameters);
         taskImplementation.start();
         return new ProcessResponse(command);
     }
@@ -93,7 +93,7 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     public void completed(ValueMap processOutputParameters) {
-        addDebugInfo(() -> "Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);
+        addDebugInfo(() -> "Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + " with output:", processOutputParameters);
 
         addEvent(new ProcessCompleted(this, processOutputParameters));
 
@@ -108,7 +108,8 @@ public class ProcessTaskActor extends ModelActor {
     public void failed(String errorDescription, ValueMap processOutputParameters) {
         addEvent(new ProcessFailed(this, processOutputParameters));
         addDebugInfo(() -> "Encountered failure in process task '" + name + "' of process type " + taskImplementation.getClass().getName());
-        addDebugInfo(() -> "Error: " + errorDescription, processOutputParameters);
+        addDebugInfo(() -> "Error: " + errorDescription);
+        addDebugInfo(() -> "Output: ", processOutputParameters);
 
         askCase(new FailTask(this, processOutputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
@@ -119,7 +120,7 @@ public class ProcessTaskActor extends ModelActor {
 
     public void failed(ValueMap processOutputParameters) {
         addEvent(new ProcessFailed(this, processOutputParameters));
-        addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + "\nOutput:", processOutputParameters);
+        addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + " with output: ", processOutputParameters);
 
         askCase(new FailTask(this, processOutputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);

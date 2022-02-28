@@ -45,15 +45,14 @@ public class SpelReadableRecognizer implements PropertyAccessor {
             if (value instanceof SpelPropertyValueProvider) {
                 value = ((SpelPropertyValueProvider) value).getValue();
             }
-            final Object valueLog = value; // Must be final for logging.
-            model.addDebugInfo(() -> "Reading property '" + propertyName + "' results in value: " + valueLog);
+            model.addDebugInfo(() -> "Reading property '" + propertyName + "' results in value: ", value);
             return new TypedValue(value);
         } else {
             // It is actually weird if we end up in this code. Since it means that on 'canRead' we have returned true...
             if (object == null) {
                 model.addDebugInfo(() -> "Cannot read property " + propertyName + " from null object");
             } else {
-                model.addDebugInfo(() -> "Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName() + ": with value " + object);
+                model.addDebugInfo(() -> "Cannot read property " + propertyName + " from strange context of type " + object.getClass().getName() + ": with value ", object);
             }
             return null;
         }

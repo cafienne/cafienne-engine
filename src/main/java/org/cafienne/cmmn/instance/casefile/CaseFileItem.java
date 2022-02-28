@@ -195,7 +195,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     public void informConnectedExitCriteria(CaseFileItemTransitioned event) {
         // Finally iterate the terminating sentries and inform them
         getPublisher().informExitCriteria(event);
-        addDebugInfo(() -> "CaseFile[" + getName() + "]: Completed behavior for transition " + event.getTransition());
+        addDebugInfo(() -> getDescription() + ": Completed behavior for transition " + event.getTransition());
     }
 
     @Override
@@ -370,7 +370,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      * @param newValue
      */
     protected void setValue(Value<?> newValue) {
-        addDebugInfo(() -> "Setting case file item [" + getPath() + "] value", newValue);
+        addDebugInfo(() -> "Setting case file item [" + getPath() + "] value to: ", newValue);
         // Remove ownership from former value, set our value, and also tell the value that we now own it.
         this.value.clearOwner();
         this.value = newValue;
@@ -476,7 +476,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     public String getDescription() {
-        return "CaseFileItem["+getPath()+"]";
+        return getClass().getSimpleName() + "[" + getPath() + "]";
     }
 
     @Override
@@ -486,7 +486,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
     @Override
     public String toString() {
-        return getName() + " : " + value;
+        return getDescription();
     }
 
     /**

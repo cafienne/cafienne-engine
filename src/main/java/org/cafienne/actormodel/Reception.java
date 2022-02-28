@@ -50,7 +50,7 @@ class Reception {
             // Weirdly enough snapshotting takes a different route than event persistence...
             actor.handleSnapshotProtocolMessage((SnapshotProtocol.Response) message);
         } else {
-            actor.getLogger().warn(this + " received a message it cannot handle, of type " + message.getClass().getName());
+            actor.getLogger().warn(actor + " received a message it cannot handle, of type " + message.getClass().getName());
         }
     }
 

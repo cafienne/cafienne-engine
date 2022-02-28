@@ -10,7 +10,7 @@ public class BootstrapCaseFileTransitionPublisher extends CaseFileTransitionPubl
 
     BootstrapCaseFileTransitionPublisher(CaseFileItem item) {
         super(item);
-        addDebugInfo(() -> "Creating delayed publisher for item " + item);
+        addDebugInfo(() -> "Creating delayed publisher for " + item);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class BootstrapCaseFileTransitionPublisher extends CaseFileTransitionPubl
 
     @Override
     public void releaseBootstrapEvents() {
-        addDebugInfo(() -> "Releasing " + bootstrapEvents.size() + " events from case file publisher of item " + item);
+        addDebugInfo(() -> "BootstrapPublisher["+item+"]: releasing " + bootstrapEvents.size() + " events generated from case input parameters");
         bootstrapEvents.forEach(super::informSentryNetwork);
     }
 }

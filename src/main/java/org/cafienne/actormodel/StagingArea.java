@@ -8,9 +8,7 @@ import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.EngineChokedFailure;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.instance.debug.DebugExceptionAppender;
-import org.cafienne.cmmn.instance.debug.DebugJsonAppender;
-import org.cafienne.cmmn.instance.debug.DebugStringAppender;
+import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
@@ -56,7 +54,7 @@ class StagingArea {
      */
     void addEvent(ModelEvent event) {
         events.add(event);
-        addDebugInfo(() -> "Updating actor state for new event "+ event.getDescription(), actor.getLogger());
+        addDebugInfo(actor.getLogger(), () -> "Updating actor state for new event "+ event.getDescription());
         event.updateActorState(actor);
     }
 
@@ -145,8 +143,7 @@ class StagingArea {
      * Stateful events are not stored, DebugEvent would still get stored.
      */
     void reportFailure(Throwable exception, CommandFailure failure, String msg) {
-        actor.addDebugInfo(() -> "", exception);
-        actor.addDebugInfo(() -> msg);
+        actor.addDebugInfo(() -> "", exception, msg);
         this.response = failure;
     }
 
@@ -201,52 +198,75 @@ class StagingArea {
         return events.size() > 0;
     }
 
-    void addDebugInfo(DebugStringAppender appender, Value<?> json, Logger logger) {
-        addDebugInfo(appender, logger);
-        addDebugInfo(json::cloneValueNode, logger);
-    }
-
-    void addDebugInfo(DebugStringAppender appender, Throwable exception, Logger logger) {
-        addDebugInfo(appender, logger);
-        addDebugInfo(() -> exception, logger);
-    }
-
     /**
-     * Add debug info to the case if debug is enabled.
-     * If the case runs in debug mode (or if Log4J has debug enabled for this logger),
+     * Add debug info to the ModelActor if debug is enabled.
+     * If the actor runs in debug mode (or if slf4j has debug enabled for this logger),
      * then the appender's debugInfo method will be invoked to store a string in the log.
      *
-     * @param appender
+     * @param logger The slf4j logger instance to check whether debug logging is enabled
+     * @param appender A functional interface returning "an" object, holding the main info to be logged.
+     *                 Note: the interface is only invoked if logging is enabled. This appender typically
+     *                 returns a String that is only created upon demand (in order to speed up a bit)
+     * @param additionalInfo Additional objects to be logged. Typically, pointers to existing objects.
      */
-    void addDebugInfo(DebugStringAppender appender, Logger logger) {
-        // First check whether at all we should add some message.
+    void addDebugInfo(Logger logger, DebugInfoAppender appender, Object... additionalInfo) {
         if (logDebugMessages(logger)) {
             // Ensure log message is only generated once.
-            String logMessage = appender.debugInfo();
-            if (! logMessage.isBlank()) { // Ignore blank messages
-                logger.debug(logMessage); // plain log4j
-                EngineDeveloperConsole.debugIndentedConsoleLogging(logMessage); // special dev indentation in console
-                getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
+            Object info = appender.info();
+
+            // Check whether the first additional parameter can be appended to the main info or deserves a separate
+            //  logging entry. Typically, this is done for exceptions and json objects and arrays.
+            if (additionalInfo.length == 0 || needsSeparateLine(additionalInfo[0])) {
+                logObject(logger, info);
+                logObjects(logger, additionalInfo);
+            } else {
+                additionalInfo[0] = String.valueOf(info) + additionalInfo[0];
+                logObjects(logger, additionalInfo);
             }
         }
     }
 
-    void addDebugInfo(DebugJsonAppender appender, Logger logger) {
-        if (logDebugMessages(logger)) {
-            Value<?> json = appender.info();
-            logger.debug(json.toString());
-            EngineDeveloperConsole.debugIndentedConsoleLogging(json);
-            getDebugEvent().addMessage(json);
+    private boolean needsSeparateLine(Object additionalObject) {
+        return additionalObject instanceof Throwable ||
+                additionalObject instanceof Value && !((Value<?>) additionalObject).isPrimitive();
+    }
+
+    private void logObjects(Logger logger, Object... any) {
+        for (Object o : any) {
+            logObject(logger, o);
         }
     }
 
-    void addDebugInfo(DebugExceptionAppender appender, Logger logger) {
-        if (logDebugMessages(logger)) {
-            Throwable t = appender.exceptionInfo();
-            logger.debug(t.getMessage(), t);
-            EngineDeveloperConsole.debugIndentedConsoleLogging(t);
-            getDebugEvent().addMessage(t);
+    private void logObject(Logger logger, Object o) {
+        if (o instanceof Throwable) {
+            logException(logger, (Throwable) o);
+        } else if (o instanceof Value) {
+            logJSON(logger, (Value<?>) o);
+        } else {
+            // Value of will also convert a null object to "null", so no need to check on null.
+            logString(logger, String.valueOf(o));
         }
+    }
+
+    private void logString(Logger logger, String logMessage) {
+        if (logMessage.isBlank()) {
+            return;
+        }
+        logger.debug(logMessage); // plain slf4j
+        EngineDeveloperConsole.debugIndentedConsoleLogging(logMessage); // special dev indentation in console
+        getDebugEvent().addMessage(logMessage); // when actor runs in debug mode also publish events
+    }
+
+    private void logJSON(Logger logger, Value<?> json) {
+        logger.debug(json.toString());
+        EngineDeveloperConsole.debugIndentedConsoleLogging(json);
+        getDebugEvent().addMessage(json);
+    }
+
+    private void logException(Logger logger, Throwable t) {
+        logger.debug(t.getMessage(), t);
+        EngineDeveloperConsole.debugIndentedConsoleLogging(t);
+        getDebugEvent().addMessage(t);
     }
 
     /**
