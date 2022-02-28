@@ -7,6 +7,8 @@
  */
 package org.cafienne.cmmn.test;
 
+import akka.actor.ActorRef;
+import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
@@ -198,12 +200,16 @@ public class TestScript {
         return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
     }
 
-    public PingCommand pingExistingCase(TestUser user, String caseInstanceId, long waitTimeInMillis) {
+    public PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {
         return new PingCommand(defaultTenant, user, caseInstanceId, waitTimeInMillis);
     }
 
-    public PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {
-        return new PingCommand(defaultTenant, user, caseInstanceId, waitTimeInMillis);
+    public ForceRecoveryCommand createRecoveryCommand(TestUser user, String caseInstanceId) {
+        return new ForceRecoveryCommand(defaultTenant, user, caseInstanceId);
+    }
+
+    public ForceTermination createTerminationCommand(TestUser user, String caseInstanceId) {
+        return new ForceTermination(defaultTenant, user, caseInstanceId);
     }
 
     public CaseDefinition getDefinition(String fileName) throws MissingDefinitionException {
@@ -311,18 +317,26 @@ public class TestScript {
         current = commands.removeFirst();
         actionNumber++;
 
-        // A bit of a hack right here. PingCommand is a special command that can be used to have the
-        // test system wait for some time, in order to have the case instance give some room
-        // for handling internal timer events.
-        if (current.getActualCommand() instanceof PingCommand) {
-            PingCommand waitCommand = (PingCommand) current.getActualCommand();
-            waitCommand.awaitCompletion();
+        // Some commands are not actual case commands, but have other functionality specific to testing.
+        //  E.g. PingCommand waits a certain time before sending a message to the case
+        //  and ForceRecoveryCommand actually terminates the case and the recovers it.
+        if (current.isTestScriptCommand()) {
+            TestScriptCommand command = current.getActualCommand();
+            command.beforeSendCommand(this);
+            if (command.isLocal()) {
+                new Thread(() -> {
+                    System.out.println(" OH YEAH " + Thread.currentThread().getName());
+                    current.runValidation();
+                    continueTest();
+                }).start();
+            } else {
+                logger.debug("Sending test command " + current.getActionNumber() + ": [" + current + "] to case " + current.getActorId());
+                eventListener.sendCommand(current);
+            }
+        } else {
+            logger.debug("Sending test command " + current.getActionNumber() + ": [" + current + "] to case " + current.getActorId());
+            eventListener.sendCommand(current);
         }
-
-        logger.debug("Sending test command " + current.getActionNumber() + ": [" + current + "] to case " + current.getActorId());
-
-        eventListener.sendCommand(current);
-
     }
 
     /**
@@ -369,7 +383,7 @@ public class TestScript {
                     final long SECOND = 1000;
                     wait(SECOND);
                     maximumDuration -= SECOND;
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
 
                 }
                 if (!testCompleted && maximumDuration < 10000) // Only print if 10 seconds left

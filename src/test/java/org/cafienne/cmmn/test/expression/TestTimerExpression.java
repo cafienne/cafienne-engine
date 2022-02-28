@@ -16,10 +16,10 @@ public class TestTimerExpression {
     private final TestUser testUser = TestScript.getTestUser("Anonymous");
 
     @Test
-    public void testTimerExpression() {
+    public void testTimerExpressionSuspendResumeWithTermination() {
         String caseInstanceId = "Timer";
         TestScript testCase = new TestScript(caseInstanceId);
-        String period = "PT3S";
+        String period = "PT2S";
         ValueMap timerInput = new ValueMap("timer", new ValueMap("period", period));
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
@@ -36,17 +36,11 @@ public class TestTimerExpression {
 
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "AfterPeriod", Transition.Resume));
 
-        // second test step should lead to recovery
-        testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, "simplehumantask", Transition.Complete));
+        // Now force the case to be removed from memory. This should lead to recovery when the timer goes off.
+        testCase.addStep(testCase.createTerminationCommand(testUser, caseInstanceId));
 
-        // Waiting 1 second should not have changed anything; timer is still running
-        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 1000), casePlan -> {
-            casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Resume, State.Available, State.Suspended);
-            casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
-        });
-
-        // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 5000), casePlan -> {
+        // Waiting 3 seconds should have triggered the timer and the task should now be active
+        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 3000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });
@@ -55,10 +49,10 @@ public class TestTimerExpression {
     }
 
     @Test
-    public void testTimerExpressionSuspendAndCrashAndResume() {
+    public void testTimerExpressionSuspendResumeWithRecovery() {
         String caseInstanceId = "Timer";
         TestScript testCase = new TestScript(caseInstanceId);
-        String period = "PT3S";
+        String period = "PT2S";
         ValueMap timerInput = new ValueMap("timer", new ValueMap("period", period));
 
         // Case contains a timer that runs after 3 seconds; it then starts a task.
@@ -82,17 +76,21 @@ public class TestTimerExpression {
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Create, State.Available, State.Null);
         });
 
-
-        // This step leads to failure and recovery. It should suspend the schedule
-        testCase.assertStepFails(new MakePlanItemTransition(testUser, caseInstanceId, "simplehumantask", Transition.Complete));
-
+        // Resume the timer, then force recovery on the case should
         testCase.addStep(new MakePlanItemTransition(testUser, caseInstanceId, "AfterPeriod", Transition.Resume), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Resume, State.Available, State.Suspended);
             TestScript.debugMessage("CasePLan after resume: \n\n" + casePlan + "\n\n\n");
         });
 
+        // Now force the case to be removed from memory and then recovered.
+        //  The timer should still be pending.
+        testCase.addStep(testCase.createRecoveryCommand(testUser, caseInstanceId), casePlan -> {
+            TestScript.debugMessage("Recovered case instance: " + casePlan);
+            casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Resume, State.Available, State.Suspended);
+        });
+
         // Waiting 5 seconds should have triggered the timer and the task should now be active
-        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 5000), casePlan -> {
+        testCase.addStep(testCase.createPingCommand(testUser, caseInstanceId, 2000), casePlan -> {
             casePlan.assertPlanItem("AfterPeriod").assertLastTransition(Transition.Occur, State.Completed, State.Available);
             casePlan.assertPlanItem("Task1").assertLastTransition(Transition.Start, State.Active, State.Available);
         });
