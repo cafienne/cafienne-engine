@@ -34,13 +34,9 @@ jobs:
       - run:
           name: Pull DB, Mailcatcher and IDP docker images
           command: |
-            docker pull cassandra:3.11
-            docker pull postgres:12.1-alpine
-            docker pull batav/circle-ci:postgres-event-data
-            docker pull batav/circle-ci:sqlserver
-            docker pull batav/circle-ci:sqlserver-event-data
-            docker pull schickling/mailcatcher:latest
-            docker pull spectare/oidc-token-test-service:latest
+            docker-compose -f .circleci/docker-config/base-infra.yml pull
+            docker-compose -f .circleci/docker-config/databases.yml pull
+            docker-compose -f .circleci/docker-config/databases-compatibility.yml pull
 
       # Start the basic container infrastructure
       - run:
@@ -299,8 +295,7 @@ jobs:
       - run:
           name: Pull Mailcatcher and IDP docker images
           command: |
-            docker pull schickling/mailcatcher:latest
-            docker pull spectare/oidc-token-test-service:latest
+            docker-compose -f .circleci/docker-config/base-infra.yml pull
 
       # Only launch the mailcatcher and idp token service, not the databases in the infra
       - run:
@@ -400,13 +395,9 @@ jobs:
       - run:
           name: Pull DB, Mailcatcher and IDP docker images
           command: |
-            docker pull cassandra:3.11
-            docker pull postgres:12.1-alpine
-            docker pull batav/circle-ci:postgres-event-data
-            docker pull batav/circle-ci:sqlserver
-            docker pull batav/circle-ci:sqlserver-event-data
-            docker pull schickling/mailcatcher:latest
-            docker pull spectare/oidc-token-test-service:latest
+            docker-compose -f .circleci/docker-config/base-infra.yml pull
+            docker-compose -f .circleci/docker-config/databases.yml pull
+            docker-compose -f .circleci/docker-config/databases-compatibility.yml pull
 
       # Start the basic container infrastructure
       - run:
