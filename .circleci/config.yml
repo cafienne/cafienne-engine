@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  master-build:
+  main-build:
     working_directory: ~/cafienne-engine
     machine:
       image: ubuntu-2004:202107-02
@@ -620,19 +620,19 @@ workflows:
   version: 2
   ci:
     jobs:
-      - master-build:
+      - main-build:
           context: automation-context
           filters:
             branches:
               only:
-                - master
+                - main
                 - dependency-updates
       - branch-build:
           context: automation-context
           filters:
             branches:
               ignore:
-                - master
+                - main
                 - dependency-updates
       - release-build:
           context: automation-context
