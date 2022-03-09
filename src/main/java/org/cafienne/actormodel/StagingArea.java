@@ -1,5 +1,6 @@
 package org.cafienne.actormodel;
 
+import akka.persistence.journal.Tagged;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * StagingArea captures all state changing events upon handling
@@ -101,8 +103,12 @@ class StagingArea {
         actor.reply(response);
         // In case of failure we still want to store the debug event. Actually, mostly we need this in case of failure (what else are we debugging for)
         if (hasDebugEvent()) {
-            actor.persistAsync(debugEvent, e -> {});
+            actor.persistAsync(tag(debugEvent), e -> {});
         }
+    }
+
+    private Object tag(ModelEvent event) {
+        return new Tagged(event, event.tags());
     }
 
     private void persistEventsAndThenReply(ModelResponse response) {
@@ -116,13 +122,23 @@ class StagingArea {
         if (hasDebugEvent()) {
             events.add(0, debugEvent);
         }
-        final Object lastEvent = events.get(events.size() - 1);
-        actor.persistAll(events, e -> {
+
+        // Apply tagging to the events
+        final List<Object> persistables = events.stream().map(this::tag).collect(Collectors.toList());
+        // When the last event is persisted, we can send a reply. Keep track of that last event here, so that we need not go through the list each time.
+        final Object lastPersistable = persistables.get(persistables.size() - 1);
+
+        actor.persistAll(persistables, persistedEvent -> {
             HealthMonitor.writeJournal().isOK();
             if (getLogger().isDebugEnabled()) {
-                getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + e.getClass().getName());
+                if (persistedEvent instanceof Tagged) {
+                    Object e = ((Tagged) persistedEvent).payload();
+                    getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + e.getClass().getName());
+                } else {
+                    getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + persistedEvent.getClass().getName());
+                }
             }
-            if (e == lastEvent) {
+            if (persistedEvent == lastPersistable) {
                 actor.reply(response);
             }
         });

@@ -11,14 +11,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 public abstract class HumanTaskEvent extends TaskEvent<HumanTask> {
-    public static final String TAG = "cafienne:task";
-
     /**
      * Constructor used by HumanTaskCreated event, since at that moment the task name is not yet known
      * inside the task actor.

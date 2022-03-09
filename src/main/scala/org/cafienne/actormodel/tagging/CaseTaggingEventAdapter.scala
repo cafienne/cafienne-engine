@@ -8,29 +8,18 @@
 package org.cafienne.actormodel.tagging
 
 import akka.persistence.journal.{Tagged, WriteEventAdapter}
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerBaseEvent
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent
-import org.cafienne.cmmn.actorapi.event.{CaseEvent, CaseModified}
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.humantask.actorapi.event.HumanTaskEvent
-import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
-import org.cafienne.tenant.actorapi.event.TenantEvent
 
-class CaseTaggingEventAdapter extends WriteEventAdapter {
+class CaseTaggingEventAdapter extends WriteEventAdapter with LazyLogging {
+  logger.warn("You can safely remove the CaseTaggingEventAdapter properties in the read journal configuration")
+
   override def manifest(event: Any): String = ""
 
   override def toJournal(event: Any): Any = event match {
-    // Also CaseModified needs HumanTask tag, such that human task projections get a transaction scope too.
-    case event: CaseModified => Tagged(event, Set(HumanTaskEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
-    case event: TimerBaseEvent => Tagged(event, Set(TimerBaseEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
-    case event: HumanTaskEvent => Tagged(event, Set(HumanTaskEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
-    case event: CaseTeamEvent => Tagged(event, Set(HumanTaskEvent.TAG, CaseEvent.TAG, ModelEvent.TAG))
-    case event: CaseEvent => Tagged(event, Set(CaseEvent.TAG, ModelEvent.TAG))
-    case event: ProcessInstanceEvent => Tagged(event, Set(ProcessInstanceEvent.TAG, ModelEvent.TAG))
-    case event: TenantEvent => Tagged(event, Set(TenantEvent.TAG, ModelEvent.TAG))
-    case event: ConsentGroupEvent => Tagged(event, Set(ConsentGroupEvent.TAG, ModelEvent.TAG))
-    case event: ModelEvent => Tagged(event, Set(ModelEvent.TAG))
-    case other => other
+    case event: ModelEvent =>
+      import scala.jdk.CollectionConverters.SetHasAsScala
+      Tagged(event, event.tags().asScala.toSet)
+    case _ => event
   }
 }

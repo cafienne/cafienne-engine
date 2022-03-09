@@ -11,8 +11,17 @@ import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.CaseMessage;
 import org.cafienne.cmmn.instance.Case;
 
+import java.util.Set;
+
 public interface CaseEvent extends ModelEvent, CaseMessage {
     String TAG = "cafienne:case";
+
+    Set<String> tags = Set.of(ModelEvent.TAG, CaseEvent.TAG);
+
+    @Override
+    default Set<String> tags() {
+        return tags;
+    }
 
     default String getCaseInstanceId() {
         return this.getActorId();
