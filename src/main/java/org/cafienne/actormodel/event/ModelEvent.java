@@ -12,9 +12,16 @@ import org.cafienne.actormodel.message.UserMessage;
 import org.cafienne.json.ValueMap;
 
 import java.time.Instant;
+import java.util.Set;
 
 public interface ModelEvent extends UserMessage {
     String TAG = "cafienne";
+
+    Set<String> tags = Set.of(ModelEvent.TAG);
+
+    default Set<String> tags() {
+        return tags;
+    }
 
     void updateActorState(ModelActor actor);
 

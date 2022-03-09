@@ -43,12 +43,6 @@ object TestConfig {
       |    }
       |
       |    inmemory-journal {
-      |      event-adapters {
-      |         tagging = "org.cafienne.actormodel.tagging.CaseTaggingEventAdapter"
-      |      }
-      |      event-adapter-bindings {
-      |        "org.cafienne.actormodel.event.ModelEvent" = tagging
-      |      }
       |    }
     """.stripMargin
   )
