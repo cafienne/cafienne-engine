@@ -9,7 +9,6 @@ package org.cafienne.cmmn.actorapi.event;
 
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.CaseMessage;
-import org.cafienne.cmmn.instance.Case;
 
 import java.util.Set;
 
@@ -25,10 +24,5 @@ public interface CaseEvent extends ModelEvent, CaseMessage {
 
     default String getCaseInstanceId() {
         return this.getActorId();
-    }
-
-    @Override
-    default Class<Case> actorClass() {
-        return Case.class;
     }
 }
