@@ -13,4 +13,9 @@ public class ProcessSuspended extends BaseProcessEvent {
     public ProcessSuspended(ValueMap json) {
         super(json);
     }
+
+    @Override
+    public void updateState(ProcessTaskActor actor) {
+        actor.updateState(this);
+    }
 }

@@ -13,4 +13,9 @@ public class ProcessResumed extends BaseProcessEvent {
     public ProcessResumed(ValueMap json) {
         super(json);
     }
+
+    @Override
+    public void updateState(ProcessTaskActor actor) {
+        actor.updateState(this);
+    }
 }

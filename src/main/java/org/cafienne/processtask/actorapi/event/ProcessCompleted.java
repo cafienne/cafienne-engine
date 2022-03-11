@@ -13,4 +13,9 @@ public class ProcessCompleted extends ProcessEnded {
     public ProcessCompleted(ValueMap json) {
         super(json);
     }
+
+    @Override
+    public void updateState(ProcessTaskActor actor) {
+        actor.updateState(this);
+    }
 }

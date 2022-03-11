@@ -15,9 +15,4 @@ public interface ProcessInstanceEvent extends ModelEvent, ProcessActorMessage {
     default Set<String> tags() {
         return tags;
     }
-
-    @Override
-    default Class<ProcessTaskActor> actorClass() {
-        return ProcessTaskActor.class;
-    }
 }

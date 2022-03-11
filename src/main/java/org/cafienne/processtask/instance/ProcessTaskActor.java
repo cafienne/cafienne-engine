@@ -24,6 +24,7 @@ public class ProcessTaskActor extends ModelActor {
     private String rootActorId;
     private SubProcess<?> taskImplementation;
     private ValueMap inputParameters;
+    private ValueMap outputParameters;
 
     public ProcessTaskActor(CaseSystem caseSystem) {
         super(caseSystem);
@@ -57,6 +58,14 @@ public class ProcessTaskActor extends ModelActor {
         return name;
     }
 
+    public <S extends SubProcess<?>> S getImplementation() {
+        return (S) taskImplementation;
+    }
+
+    public void updateState(ProcessInstanceEvent event) {
+
+    }
+
     public void updateState(ProcessStarted event) {
         this.setEngineVersion(event.engineVersion);
         this.setDebugMode(event.debugMode);
@@ -66,25 +75,62 @@ public class ProcessTaskActor extends ModelActor {
         this.parentActorId = event.parentActorId;
         this.rootActorId = event.rootActorId;
         this.inputParameters = event.inputParameters;
+        if (! recoveryRunning()) {
+            addDebugInfo(() -> "Starting process task " + name + " with input: ", inputParameters);
+            getImplementation().start();
+        }
     }
 
     public void updateState(ProcessReactivated event) {
         this.inputParameters = event.inputParameters;
+        if (! recoveryRunning()) {
+            addDebugInfo(() -> "Reactivating process " + getName());
+            getImplementation().resetOutput();
+            getImplementation().reactivate();
+        }
     }
 
-    public ProcessResponse start(StartProcess command) {
-        addEvent(new ProcessStarted(this, command));
-        addDebugInfo(() -> "Starting process task " + name + " with input: ", inputParameters);
-        taskImplementation.start();
-        return new ProcessResponse(command);
+    public void updateState(ProcessSuspended event) {
+        if (! recoveryRunning()) {
+            addDebugInfo(() -> "Suspending process " + getName());
+            getImplementation().suspend();
+        }
     }
 
-    public ProcessResponse reactivate(ReactivateProcess command) {
-        addEvent(new ProcessReactivated(this, command));
-        addDebugInfo(() -> "Reactivating process " + getName());
-        taskImplementation.resetOutput();
-        taskImplementation.reactivate();
-        return new ProcessResponse(command);
+    public void updateState(ProcessResumed event) {
+        if (! recoveryRunning()) {
+            addDebugInfo(() -> "Resuming process " + getName());
+            getImplementation().resume();
+        }
+    }
+
+    public void updateState(ProcessTerminated event) {
+        if (! recoveryRunning()) {
+            addDebugInfo(() -> "Terminating process " + getName());
+            getImplementation().terminate();
+        }
+    }
+
+    public void updateState(ProcessCompleted event) {
+        this.outputParameters = event.output;
+        addDebugInfo(() -> "Completing process task " + name + " of process type " + getImplementation().getClass().getName() + " with output:", outputParameters);
+        if (recoveryFinished()) {
+            askCase(new CompleteTask(this, outputParameters),
+                    failure -> {
+                        addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
+                        logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
+                    },
+                    success -> addDebugInfo(() -> "Completed process task " + getId() + " '" + name + "' in parent " + parentActorId));
+        }
+    }
+
+    public void updateState(ProcessFailed event) {
+        outputParameters = event.output;
+        askCase(new FailTask(this, outputParameters), failure -> {
+            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
+        }, success -> {
+            addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
+        });
     }
 
     @Override
@@ -93,61 +139,19 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     public void completed(ValueMap processOutputParameters) {
-        addDebugInfo(() -> "Completing process task " + name + " of process type " + taskImplementation.getClass().getName() + " with output:", processOutputParameters);
-
         addEvent(new ProcessCompleted(this, processOutputParameters));
-
-        askCase(new CompleteTask(this, processOutputParameters),
-            failure -> {
-                addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
-                logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
-            },
-            success -> addDebugInfo(() -> "Completed process task " + getId() + " '" + name + "' in parent " + parentActorId));
     }
 
     public void failed(String errorDescription, ValueMap processOutputParameters) {
-        addEvent(new ProcessFailed(this, processOutputParameters));
-        addDebugInfo(() -> "Encountered failure in process task '" + name + "' of process type " + taskImplementation.getClass().getName());
+        addDebugInfo(() -> "Encountered failure in process task '" + name + "' of process type " + getImplementation().getClass().getName());
         addDebugInfo(() -> "Error: " + errorDescription);
         addDebugInfo(() -> "Output: ", processOutputParameters);
-
-        askCase(new FailTask(this, processOutputParameters), failure -> {
-            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
-        }, success -> {
-            addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
-        });
+        addEvent(new ProcessFailed(this, processOutputParameters));
     }
 
     public void failed(ValueMap processOutputParameters) {
+        addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + getImplementation().getClass().getName() + " with output: ", processOutputParameters);
         addEvent(new ProcessFailed(this, processOutputParameters));
-        addDebugInfo(() -> "Reporting failure in process task " + name + " of process type " + taskImplementation.getClass().getName() + " with output: ", processOutputParameters);
-
-        askCase(new FailTask(this, processOutputParameters), failure -> {
-            logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
-        }, success -> {
-            addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
-        });
-    }
-
-    public ProcessResponse suspend(SuspendProcess command) {
-        addEvent(new ProcessSuspended(this));
-        addDebugInfo(() -> "Suspending process " + getName());
-        taskImplementation.suspend();
-        return new ProcessResponse(command);
-    }
-
-    public ProcessResponse resume(ResumeProcess command) {
-        addEvent(new ProcessResumed(this));
-        addDebugInfo(() -> "Resuming process " + getName());
-        taskImplementation.resume();
-        return new ProcessResponse(command);
-    }
-
-    public ProcessResponse terminate(TerminateProcess command) {
-        addEvent(new ProcessTerminated(this));
-        addDebugInfo(() -> "Terminating process " + getName());
-        taskImplementation.terminate();
-        return new ProcessResponse(command);
     }
 
     @Override

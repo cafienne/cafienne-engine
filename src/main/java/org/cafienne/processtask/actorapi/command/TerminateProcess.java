@@ -10,7 +10,9 @@ package org.cafienne.processtask.actorapi.command;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
+import org.cafienne.processtask.actorapi.event.ProcessTerminated;
 import org.cafienne.processtask.actorapi.response.ProcessResponse;
+import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
 @Manifest
@@ -24,7 +26,7 @@ public class TerminateProcess extends ProcessCommand {
     }
 
     @Override
-    public ProcessResponse process(ProcessTaskActor process) {
-        return process.terminate(this);
+    protected void process(ProcessTaskActor processTaskActor, SubProcess<?> implementation) {
+        processTaskActor.addEvent(new ProcessTerminated(processTaskActor));
     }
 }

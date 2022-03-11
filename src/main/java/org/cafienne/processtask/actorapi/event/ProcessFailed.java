@@ -13,4 +13,9 @@ public class ProcessFailed extends ProcessEnded {
     public ProcessFailed(ValueMap json) {
         super(json);
     }
+
+    @Override
+    public void updateState(ProcessTaskActor actor) {
+        actor.updateState(this);
+    }
 }
