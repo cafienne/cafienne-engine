@@ -7,6 +7,7 @@
  */
 package org.cafienne.service.akkahttp.platform
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -15,10 +16,12 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.actormodel.identity.PlatformOwner
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.system.CaseSystem
-import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant}
+import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
 
 import javax.ws.rs._
 
@@ -43,12 +46,12 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends TenantRoute {
   @Consumes(Array("application/json"))
   def createTenant: Route = post {
     pathEndOrSingleSlash {
-      validPlatformOwner { platformOwner =>
+      platformOwner { owner =>
         entity(as[TenantFormat]) { newTenant =>
           import scala.jdk.CollectionConverters._
           val newTenantName = newTenant.name
           val users = newTenant.getTenantUsers.asJava
-          askPlatform(new CreateTenant(platformOwner, newTenantName, newTenantName, users))
+          askPlatform(new CreateTenant(owner, newTenantName, newTenantName, users))
         }
       }
     }
@@ -69,9 +72,9 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends TenantRoute {
     )
   )
   def disableTenant: Route = put {
-    validPlatformOwner { platformOwner =>
+    platformOwner { owner =>
       path(Segment / "disable") { tenant =>
-        askPlatform(new DisableTenant(platformOwner, tenant.name))
+        askPlatform(new DisableTenant(owner, tenant.name))
       }
     }
   }
@@ -91,9 +94,9 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends TenantRoute {
     )
   )
   def enableTenant: Route = put {
-    validPlatformOwner { platformOwner =>
+    platformOwner { owner =>
       path(Segment / "enable") { tenant =>
-        askPlatform(new EnableTenant(platformOwner, tenant.name))
+        askPlatform(new EnableTenant(owner, tenant.name))
       }
     }
   }
@@ -118,5 +121,19 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends TenantRoute {
         }
       }
     }
+  }
+
+  def platformOwner(subRoute: PlatformOwner => Route): Route = {
+    authenticatedUser { user =>
+      if (Cafienne.isPlatformOwner(user.id)) {
+        subRoute(PlatformOwner(user.id))
+      } else {
+        complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
+      }
+    }
+  }
+
+  def askPlatform(command: PlatformTenantCommand): Route = {
+    askModelActor(command)
   }
 }

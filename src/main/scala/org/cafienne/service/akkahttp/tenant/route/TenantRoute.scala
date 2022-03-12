@@ -7,16 +7,14 @@
  */
 package org.cafienne.service.akkahttp.tenant.route
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.complete
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{PlatformOwner, PlatformUser, TenantUser}
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.tenant.actorapi.command.TenantCommand
-import org.cafienne.tenant.actorapi.command.platform.PlatformTenantCommand
 
 trait TenantRoute extends CommandRoute with QueryRoute {
 
@@ -24,23 +22,8 @@ trait TenantRoute extends CommandRoute with QueryRoute {
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 
-  def validPlatformOwner(subRoute: PlatformOwner => Route): Route = {
-    validUser { platformUser =>
-      if (platformUser.isPlatformOwner) {
-        subRoute(PlatformOwner(platformUser.id))
-      } else {
-        complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
-      }
-    }
-  }
-
-  def askPlatform(command: PlatformTenantCommand): Route = {
-    askModelActor(command)
-  }
-
   def askTenant(platformUser: PlatformUser, tenant: String, createTenantCommand: TenantUser => TenantCommand): Route = {
     askModelActor(createTenantCommand.apply(platformUser.getTenantUser(tenant)))
   }
-
 }
 
