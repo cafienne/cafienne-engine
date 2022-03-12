@@ -90,8 +90,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   }
 
   def authenticatedUser(subRoute: AuthenticatedUser => Route): Route = {
-    OIDCAuthentication.authenticatedUser() {
-      user => {
+    OIDCAuthentication.authenticatedUser() { user => {
         caseSystemMustBeHealthy()
         optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) {
           case Some(s) =>
@@ -108,7 +107,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
 
   def validUser(subRoute: PlatformUser => Route): Route = {
     optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { tlm =>
-      OIDCAuthentication.user(tlm) { platformUser =>
+      OIDCAuthentication.platformUser(tlm) { platformUser =>
         caseSystemMustBeHealthy()
         subRoute(platformUser)
       }

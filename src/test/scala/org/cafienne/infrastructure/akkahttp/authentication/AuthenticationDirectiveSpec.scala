@@ -44,7 +44,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import IncludeAuthDirectives._
     val route = get {
       path("secured") {
-        user(None) { userContext =>
+        platformUser(None) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
@@ -63,7 +63,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import AuthDirectivesWithoutRoles._
     val route = get {
       path("secured") {
-        user(None) { userContext =>
+        platformUser(None) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
@@ -82,7 +82,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import AuthDirectivesNoUUID._
     val route = get {
       path("secured") {
-        user(None) { userContext =>
+        platformUser(None) { userContext =>
           complete(s"The user context is $userContext")
         }
       }

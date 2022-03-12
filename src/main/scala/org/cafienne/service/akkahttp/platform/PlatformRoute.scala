@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.PlatformOwner
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.akkahttp.route.CommandRoute
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
-import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenant, EnableTenant, PlatformTenantCommand}
 
@@ -27,7 +27,7 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/platform")
-class PlatformRoute(override val caseSystem: CaseSystem) extends TenantRoute {
+class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 
   override def routes: Route = concat(createTenant, disableTenant, enableTenant, getUserInformation)
 

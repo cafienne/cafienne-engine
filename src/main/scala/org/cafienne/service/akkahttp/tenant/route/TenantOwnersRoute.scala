@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.ConsentGroupFormat
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
 import org.cafienne.system.CaseSystem
@@ -30,7 +29,6 @@ import scala.jdk.CollectionConverters._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute {
-  val userQueries: UserQueries = new TenantQueriesImpl
 
   override def routes: Route = concat(getTenantOwners, setUser, putUser, removeUser, createConsentGroup, setTenant, putTenant, getDisabledUserAccounts)
 
@@ -50,9 +48,9 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
   )
   @Produces(Array("application/json"))
   def getTenantOwners: Route = get {
-    validUser { tenantOwner =>
-      path(Segment / "owners") { tenant =>
-        askTenant(tenantOwner, tenant, tenantUser => new GetTenantOwners(tenantUser, tenant))
+    tenantUser { tenantOwner =>
+      path("owners") {
+        askTenant(new GetTenantOwners(tenantOwner, tenantOwner.tenant))
       }
     }
   }
@@ -82,18 +80,17 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
   }
 
   private def replaceTenant: Route = {
-    validUser { platformUser =>
-      path(Segment) { tenant =>
-        entity(as[ReplaceTenantFormat]) { newTenantInformation =>
-          // Map users from external format to TenantUser case class and convert to java List
-          val users = newTenantInformation.users.map(user => user.asTenantUser(tenant))
-          askTenant(platformUser, tenant, tenantOwner => new ReplaceTenant(tenantOwner, tenant, users.asJava))
-        }
+    tenantUser { tenantOwner =>
+      entity(as[ReplaceTenantFormat]) { newTenantInformation =>
+        // Map users from external format to TenantUser case class and convert to java List
+        val users = newTenantInformation.users.map(user => user.asTenantUser(tenantOwner.tenant))
+        askTenant(new ReplaceTenant(tenantOwner, tenantOwner.tenant, users.asJava))
       }
     }
   }
 
-  @Path("/{tenant}/users")
+
+@Path("/{tenant}/users")
   @POST
   @Operation(
     summary = "Add or replace a tenant user",
@@ -114,10 +111,10 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
   def putUser: Route = put { replaceUser }
 
   def replaceUser: Route = {
-    validUser { platformUser =>
-      path(Segment / "users") { tenant =>
+    tenantUser { tenantOwner =>
+      path("users") {
         entity(as[UserFormat]) { newUser =>
-          askTenant(platformUser, tenant, tenantOwner => new SetTenantUser(tenantOwner, tenant, newUser.asTenantUser(tenant)))
+          askTenant(new SetTenantUser(tenantOwner, tenantOwner.tenant, newUser.asTenantUser(tenantOwner.tenant)))
         }
       }
     }
@@ -139,9 +136,9 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
     )
   )
   def removeUser: Route = delete {
-    validUser { platformUser =>
-      path(Segment / "users" / Segment) { (tenant, userId) =>
-        askTenant(platformUser, tenant, tenantOwner => new RemoveTenantUser(tenantOwner, tenant, userId))
+    tenantUser { tenantOwner =>
+      path("users" / Segment) { userId =>
+        askTenant(new RemoveTenantUser(tenantOwner, tenantOwner.tenant, userId))
       }
     }
   }
@@ -193,9 +190,9 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
   )
   @Produces(Array("application/json"))
   def getDisabledUserAccounts: Route = get {
-    validUser { tenantOwner =>
-      path(Segment / "disabled-accounts") {
-        tenant => runListQuery(userQueries.getDisabledTenantUsers(tenantOwner, tenant))
+    tenantUser { tenantOwner =>
+      path("disabled-accounts") {
+        runListQuery(userQueries.getDisabledTenantUserAccounts(tenantOwner))
       }
     }
   }
