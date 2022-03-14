@@ -345,4 +345,13 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         });
         addDebugInfo(() -> "Completed Case Team migration\n");
     }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "users=" + users +
+                ", tenantRoles=" + tenantRoles +
+                ", groups=" + groups +
+                '}';
+    }
 }

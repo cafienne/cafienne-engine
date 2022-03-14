@@ -1,6 +1,6 @@
 package org.cafienne.querydb.query
 
-import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.json.{CafienneJson, StringValue, Value}
 import org.cafienne.querydb.query.filter.IdentifierFilter
@@ -9,9 +9,9 @@ import org.cafienne.service.akkahttp.identifiers.route.IdentifierSet
 import scala.concurrent.Future
 
 trait IdentifierQueries {
-  def getIdentifiers(user: PlatformUser, filter: IdentifierFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[IdentifierSet] = ???
+  def getIdentifiers(user: UserIdentity, filter: IdentifierFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[IdentifierSet] = ???
 
-  def getIdentifierNames(user: PlatformUser, tenant: Option[String]): Future[Seq[IdentifierName]] = ???
+  def getIdentifierNames(user: UserIdentity, tenant: Option[String]): Future[Seq[IdentifierName]] = ???
 }
 
 class IdentifierQueriesImpl
@@ -20,7 +20,7 @@ class IdentifierQueriesImpl
 
   import dbConfig.profile.api._
 
-  override def getIdentifiers(user: PlatformUser, filter: IdentifierFilter, area: Area, sort: Sort): Future[IdentifierSet] = {
+  override def getIdentifiers(user: UserIdentity, filter: IdentifierFilter, area: Area, sort: Sort): Future[IdentifierSet] = {
     val query = for {
       baseQuery <- caseIdentifiersQuery
         .filter(_.active === true)
@@ -35,7 +35,7 @@ class IdentifierQueriesImpl
     })
   }
 
-  override def getIdentifierNames(user: PlatformUser, tenant: Option[String]): Future[Seq[IdentifierName]] = {
+  override def getIdentifierNames(user: UserIdentity, tenant: Option[String]): Future[Seq[IdentifierName]] = {
     val query = for {
       baseQuery <- caseIdentifiersQuery
         .filter(_.active === true)
