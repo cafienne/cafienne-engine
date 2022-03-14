@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.repository;
 
-import org.cafienne.actormodel.identity.PlatformUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 
@@ -16,7 +16,7 @@ public interface DefinitionProvider {
      * @param user
      * @param tenant
      */
-    List<String> list(PlatformUser user, String tenant);
+    List<String> list(UserIdentity user, String tenant);
 
     /**
      * Reads the DefinitionsDocument if the user has access to it
@@ -27,7 +27,7 @@ public interface DefinitionProvider {
      * @throws MissingDefinitionException
      * @throws InvalidDefinitionException
      */
-    DefinitionsDocument read(PlatformUser user, String tenant, String name) throws MissingDefinitionException, InvalidDefinitionException;
+    DefinitionsDocument read(UserIdentity user, String tenant, String name) throws MissingDefinitionException, InvalidDefinitionException;
 
     /**
      * Writes a DefinitionsDocument into the DefinitionProvider in the context of the user
@@ -37,5 +37,5 @@ public interface DefinitionProvider {
      * @param definitionsDocument
      * @throws MissingDefinitionException
      */
-    void write(PlatformUser user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException;
+    void write(UserIdentity user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException;
 }

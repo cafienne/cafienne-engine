@@ -1,6 +1,6 @@
 package org.cafienne.cmmn.repository.file;
 
-import org.cafienne.actormodel.identity.PlatformUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.DefinitionProvider;
@@ -24,7 +24,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     private final String EXTENSION = ".xml";
 
     @Override
-    public List<String> list(PlatformUser user, String tenant) {
+    public List<String> list(UserIdentity user, String tenant) {
         return listDefinitions();
     }
 
@@ -44,7 +44,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
      * @throws InvalidDefinitionException
      */
     @Override
-    public DefinitionsDocument read(PlatformUser user, String tenant, String name) throws MissingDefinitionException, InvalidDefinitionException {
+    public DefinitionsDocument read(UserIdentity user, String tenant, String name) throws MissingDefinitionException, InvalidDefinitionException {
         if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
         try {
             long lastModified = -1; // Note, -1 is the default value for reading files from class path (resourceAsStream)
@@ -77,7 +77,7 @@ public class FileBasedDefinitionProvider implements DefinitionProvider {
     }
 
     @Override
-    public void write(PlatformUser user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
+    public void write(UserIdentity user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
         if (! name.endsWith(EXTENSION)) name = name + EXTENSION;
 
         String prefix = getDeployDirectory() + File.separator;

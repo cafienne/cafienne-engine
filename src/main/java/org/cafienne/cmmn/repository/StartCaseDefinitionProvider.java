@@ -2,8 +2,7 @@ package org.cafienne.cmmn.repository;
 
 import com.typesafe.config.Config;
 import org.cafienne.actormodel.exception.AuthorizationException;
-import org.cafienne.actormodel.identity.PlatformUser;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.cmmn.definition.DefinitionsDocument;
 import org.cafienne.cmmn.definition.InvalidDefinitionException;
 import org.cafienne.cmmn.repository.file.SimpleLRUCache;
@@ -23,7 +22,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     private final List<String> authorizedTenantRoles;
 
     @Override
-    public List<String> list(PlatformUser user, String tenant) {
+    public List<String> list(UserIdentity user, String tenant) {
         return new ArrayList<>();
     }
 
@@ -40,21 +39,24 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
         }
     }
 
-    private void checkAccess(PlatformUser user, String tenant) {
+    private void checkAccess(UserIdentity user, String tenant) {
         if (authorizedTenantRoles.isEmpty()) return;
 
         // Extend retrieving tenant user to only if we have configured role based authorization
-        TenantUser tenantUser = user.getTenantUser(tenant);
-        for (String role: authorizedTenantRoles) {
-            if (tenantUser.roles().contains(role)) {
-                return;
-            }
-        }
+
+        // NOTE This logic is temporarily unavailable;
+
+//        TenantUser tenantUser = user.getTenantUser(tenant);
+//        for (String role: authorizedTenantRoles) {
+//            if (tenantUser.roles().contains(role)) {
+//                return;
+//            }
+//        }
         throw new AuthorizationException("User " + user.id() + " is not allowed to perform this operation");
     }
 
     @Override
-    public DefinitionsDocument read(PlatformUser user, String tenant, String contents) throws InvalidDefinitionException {
+    public DefinitionsDocument read(UserIdentity user, String tenant, String contents) throws InvalidDefinitionException {
         checkAccess(user, tenant);
         try {
             // Now check to see if the file is already in our cache, and, if so, check whether it has the same last modified; if not, put the new one in the cache instead
@@ -70,7 +72,7 @@ public class StartCaseDefinitionProvider implements DefinitionProvider {
     }
 
     @Override
-    public void write(PlatformUser user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
+    public void write(UserIdentity user, String tenant, String name, DefinitionsDocument definitionsDocument) throws WriteDefinitionException {
         throw new WriteDefinitionException("This operation is not supported");
     }
 }
