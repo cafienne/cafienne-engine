@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.actormodel.identity.{ConsentGroupUser, TenantUser}
 import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup
 import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.ConsentGroupFormat
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
@@ -160,14 +160,15 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
   @RequestBody(description = "Group to create", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupFormat]))))
   @Consumes(Array("application/json"))
   def createConsentGroup: Route = post {
-    validUser { platformUser =>
-      path(Segment / "consent-groups") { tenant =>
+    tenantUser { tenantOwner =>
+      path("consent-groups") {
         entity(as[ConsentGroupFormat]) { newGroup =>
-          val tenantOwner = platformUser.getTenantUser(tenant)
           if (!tenantOwner.isOwner) {
             complete(StatusCodes.Unauthorized, "Only tenant owners can create consent groups")
           } else {
-            askModelActor(new CreateConsentGroup(tenantOwner, newGroup.asGroup(tenant)))
+            val group = newGroup.asGroup(tenantOwner.tenant)
+            val groupOwner = new ConsentGroupUser(id = tenantOwner.id, tenant = tenantOwner.tenant, groupId = group.id)
+            askModelActor(new CreateConsentGroup(groupOwner, group))
           }
         }
       }

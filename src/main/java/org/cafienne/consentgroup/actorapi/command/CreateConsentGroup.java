@@ -2,7 +2,7 @@ package org.cafienne.consentgroup.actorapi.command;
 
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroup;
 import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
@@ -13,8 +13,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class CreateConsentGroup extends CollectiveCommand implements BootstrapMessage {
-    public CreateConsentGroup(TenantUser tenantOwner, ConsentGroup newGroupInfo) {
-        super(tenantOwner, newGroupInfo);
+    public CreateConsentGroup(ConsentGroupUser user, ConsentGroup newGroupInfo) {
+        super(user, newGroupInfo);
     }
 
     public CreateConsentGroup(ValueMap json) {

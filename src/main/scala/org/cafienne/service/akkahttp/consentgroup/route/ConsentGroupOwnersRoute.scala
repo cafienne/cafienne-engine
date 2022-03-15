@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.akkahttp.consentgroup.route
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -30,18 +29,26 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
 
   override def routes: Route = concat(replaceGroup, setGroupMember, removeGroupMember)
 
-  def replaceGroup: Route = post {
-    validUser { platformUser =>
-      path(Segment) { tenant =>
+  @Path("/{groupId}")
+  @POST
+  @Operation(
+    summary = "Replace the consent group",
+    description = "Overwrite the member information of the existing group",
+    tags = Array("consent-group"),
+    parameters = Array(
+      new Parameter(name = "groupId", description = "The group to be replaced", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Consent group updated successfully", responseCode = "204"),
+      new ApiResponse(responseCode = "404", description = "Consent group not found"),
+    )
+  )
+  @RequestBody(description = "Group to replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupFormat]))))
+  @Consumes(Array("application/json"))  def replaceGroup: Route = post {
+    consentGroupUser { groupOwner =>
         entity(as[ConsentGroupFormat]) { newGroup =>
-          val tenantOwner = platformUser.getTenantUser(tenant)
-          if (!tenantOwner.isOwner) {
-            complete(StatusCodes.Unauthorized, "Only tenant owners can create consent groups")
-          } else {
-            askModelActor(new ReplaceConsentGroup(tenantOwner, newGroup.asGroup(tenant)))
-          }
+          askModelActor(new ReplaceConsentGroup(groupOwner, newGroup.asGroup("")))
         }
-      }
     }
   }
 
@@ -62,10 +69,10 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
   @RequestBody(description = "Member information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupUserFormat]))))
   @Consumes(Array("application/json"))
   def setGroupMember: Route = post {
-    validUser { platformUser =>
-      path(Segment / "members") { group =>
+    consentGroupUser { groupOwner =>
+      path("members") {
         entity(as[ConsentGroupUserFormat]) { newMember =>
-          askConsentGroup(platformUser, group, tenantOwner => new SetConsentGroupMember(tenantOwner, group, newMember.asMember))
+          askConsentGroup(new SetConsentGroupMember(groupOwner, newMember.asMember))
         }
       }
     }
@@ -89,9 +96,9 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
   )
   @Consumes(Array("application/json"))
   def removeGroupMember: Route = delete {
-    validUser { platformUser =>
-      path(Segment / "members" / Segment) { (group, userId) =>
-        askConsentGroup(platformUser, group, tenantOwner => new RemoveConsentGroupMember(tenantOwner, group, userId))
+    consentGroupUser { groupOwner =>
+      path("members" / Segment) { userId =>
+        askConsentGroup(new RemoveConsentGroupMember(groupOwner, userId))
       }
     }
   }

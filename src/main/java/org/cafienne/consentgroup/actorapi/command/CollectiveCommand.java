@@ -3,6 +3,7 @@ package org.cafienne.consentgroup.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroup;
@@ -20,8 +21,8 @@ import java.io.IOException;
 abstract class CollectiveCommand extends ConsentGroupCommand {
     protected final ConsentGroup newGroupInfo;
 
-    protected CollectiveCommand(TenantUser tenantOwner, ConsentGroup newGroupInfo) {
-        super(tenantOwner, newGroupInfo.id());
+    protected CollectiveCommand(ConsentGroupUser user, ConsentGroup newGroupInfo) {
+        super(user, newGroupInfo.id());
         this.newGroupInfo = newGroupInfo;
         validateMemberList();
     }

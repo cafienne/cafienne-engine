@@ -1,5 +1,6 @@
 package org.cafienne.consentgroup.actorapi.command;
 
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroup;
@@ -9,8 +10,8 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class ReplaceConsentGroup extends CollectiveCommand {
-    public ReplaceConsentGroup(TenantUser tenantOwner, ConsentGroup newGroupInfo) {
-        super(tenantOwner, newGroupInfo);
+    public ReplaceConsentGroup(ConsentGroupUser user, ConsentGroup newGroupInfo) {
+        super(user, newGroupInfo);
     }
 
     public ReplaceConsentGroup(ValueMap json) {

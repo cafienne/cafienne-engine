@@ -10,6 +10,7 @@ package org.cafienne.consentgroup.actorapi.command;
 import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
@@ -21,14 +22,14 @@ import scala.collection.Seq;
 /**
  * Consent Groups can be used to invite users from other tenants to join a case tam
  */
-public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupActor, TenantUser> implements ConsentGroupMessage {
+public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupActor, ConsentGroupUser> implements ConsentGroupMessage {
     /**
      * Create a new command that can be sent to the group.
      *
      * @param groupOwner The user that issues this command.
      * @param groupId    The id of the consent group
      */
-    protected ConsentGroupCommand(TenantUser groupOwner, String groupId) {
+    protected ConsentGroupCommand(ConsentGroupUser groupOwner, String groupId) {
         super(groupOwner, groupId);
     }
 
@@ -37,8 +38,8 @@ public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupA
     }
 
     @Override
-    protected TenantUser readUser(ValueMap json) {
-        return TenantUser.deserialize(json);
+    protected ConsentGroupUser readUser(ValueMap json) {
+        return ConsentGroupUser.deserialize(json);
     }
 
     /**

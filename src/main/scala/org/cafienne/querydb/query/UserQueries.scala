@@ -1,7 +1,7 @@
 package org.cafienne.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.{ConsentGroupMembership, PlatformUser, TenantUser, UserIdentity}
+import org.cafienne.actormodel.identity._
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
 import org.cafienne.querydb.query.exception.{ConsentGroupMemberSearchFailure, ConsentGroupSearchFailure, TenantSearchFailure, TenantUserSearchFailure, UserSearchFailure}
 import org.cafienne.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
@@ -30,7 +30,7 @@ trait UserQueries {
 
   def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String): Future[ConsentGroupMember] = ???
 
-  def authorizeConsentGroupMembershipAndReturnTenant(user: UserIdentity, groupId: String): Future[String] = ???
+  def getConsentGroupUser(user: UserIdentity, groupId: String): Future[ConsentGroupUser] = ???
 }
 
 
@@ -220,14 +220,14 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     }
   }
 
-  override def authorizeConsentGroupMembershipAndReturnTenant(user: UserIdentity, groupId: String): Future[String] = {
+  override def getConsentGroupUser(user: UserIdentity, groupId: String): Future[ConsentGroupUser] = {
     val consentGroupQuery = for {
       groupQuery <- TableQuery[ConsentGroupTable].filter(_.id === groupId)
       _ <- consentGroupMembershipQuery(user, groupQuery.id) // User must be member
     } yield groupQuery
 
     db.run(consentGroupQuery.result.headOption).map {
-      case Some(group) => group.tenant
+      case Some(group) => ConsentGroupUser(id = user.id, groupId = group.id, tenant = group.tenant)
       case None => throw ConsentGroupSearchFailure(groupId)
     }
   }
