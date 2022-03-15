@@ -12,9 +12,11 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
+import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
 import org.cafienne.consentgroup.actorapi.ConsentGroupMessage;
 import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
 import org.cafienne.json.ValueMap;
+import scala.collection.Seq;
 
 /**
  * Consent Groups can be used to invite users from other tenants to join a case tam

@@ -28,9 +28,9 @@ import javax.ws.rs._
 class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends ConsentGroupRoute {
   override val userQueries: UserQueries = new TenantQueriesImpl
 
-  override def routes: Route = concat(createGroup, setGroupMember, removeGroupMember)
+  override def routes: Route = concat(replaceGroup, setGroupMember, removeGroupMember)
 
-  def createGroup: Route = post {
+  def replaceGroup: Route = post {
     validUser { platformUser =>
       path(Segment) { tenant =>
         entity(as[ConsentGroupFormat]) { newGroup =>
@@ -38,7 +38,7 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
           if (!tenantOwner.isOwner) {
             complete(StatusCodes.Unauthorized, "Only tenant owners can create consent groups")
           } else {
-            askModelActor(new CreateConsentGroup(tenantOwner, newGroup.asGroup(tenant)))
+            askModelActor(new ReplaceConsentGroup(tenantOwner, newGroup.asGroup(tenant)))
           }
         }
       }
