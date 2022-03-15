@@ -4,7 +4,7 @@ import org.cafienne.actormodel.identity.{Origin, PlatformUser}
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure, SearchFailure}
+import org.cafienne.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.querydb.record.{CaseRecord, CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 import org.cafienne.service.akkahttp.cases._
@@ -36,7 +36,7 @@ trait CaseQueries {
 
   def getPlanItemHistory(planItemId: String, user: PlatformUser): Future[PlanItemHistory] = ???
 
-  def getCasesStats(user: PlatformUser, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
+//  def getCasesStats(user: PlatformUser, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
 
   def getMyCases(user: PlatformUser, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 
@@ -309,75 +309,68 @@ class CaseQueriesImpl
     })
   }
 
-  override def getCasesStats(user: PlatformUser, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
-    // TODO
-    // Query must be converted to:
-    //   select count(*), case_name, state, failures from case_instance group by case_name, state, failures [having state == and case_name == ]
-    val definitionFilter = caseName.getOrElse("")
-    val statusFilter = status.getOrElse("")
-
-    val tenantSet = tenants(tenant, user)
-    // NOTE: this uses a direct query. Fields must be escaped with quotes for the in-memory Hsql Database usage.
-    val action = {
-      status match {
-        //        case Some(s) => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
-        case Some(s) => s.toLowerCase() match {
-          case "active" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Active'""".as[(Long, String, String, String, Int)]
-          case "completed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Completed'""".as[(Long, String, String, String, Int)]
-          case "terminated" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Terminated'""".as[(Long, String, String, String, Int)]
-          case "suspended" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Suspended'""".as[(Long, String, String, String, Int)]
-          case "failed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Failed'""".as[(Long, String, String, String, Int)]
-          case "closed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Closed'""".as[(Long, String, String, String, Int)]
-          case other => throw new SearchFailure(s"Status $other is invalid")
-        }
-        case None => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" """.as[(Long, String, String, String, Int)]
-      }
-
-    }
-    db.run(action).map { value =>
-      val r = collection.mutable.Map.empty[String, CaseList]
-      value.filter(caseInstance => tenantSet.contains(caseInstance._2)).foreach { caseInstance =>
-        val count = caseInstance._1
-        val caseName = caseInstance._3
-        if (definitionFilter == "" || definitionFilter == caseName) {
-          // Only add stats for a certain filter if it is the same
-          val state = caseInstance._4
-          val failures = caseInstance._5
-
-          if (statusFilter == "" || statusFilter == state) {
-            val caseList: CaseList = r.getOrElse(caseName, CaseList(caseName = caseName))
-            val newCaseList: CaseList = updateCaseList(state, count, failures, caseList)
-            r.put(caseName, newCaseList)
-          }
-        }
-      }
-      r.values.toSeq
-    }
-  }
-
-  // It will be nice if this code can be similar to the optionFilter class
-  private def tenants(optionalTenant: Option[String], user: PlatformUser): Seq[String] = {
-    optionalTenant match {
-      case Some(tenant) => Seq(tenant)
-      case None => user.tenants
-    }
-  }
-
-  private def updateCaseList(state: String, count: Long, failures: Int, caseList: CaseList) = {
-    var newCaseList: CaseList = state match {
-      case "Active" => caseList.copy(numActive = caseList.numActive + count)
-      case "Completed" => caseList.copy(numCompleted = caseList.numCompleted + count)
-      case "Terminated" => caseList.copy(numTerminated = caseList.numTerminated + count)
-      case "Suspended" => caseList.copy(numSuspended = caseList.numSuspended + count)
-      case "Failed" => caseList.copy(numFailed = caseList.numFailed + count)
-      case "Closed" => caseList.copy(numClosed = caseList.numClosed + count)
-      case _ => caseList
-    }
-    if (failures > 0) {
-      newCaseList = newCaseList.copy(numWithFailures = caseList.numWithFailures + count)
-    }
-    newCaseList
-  }
+//  override def getCasesStats(user: PlatformUser, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
+//    // TODO
+//    // Query must be converted to:
+//    //   select count(*), case_name, state, failures from case_instance group by case_name, state, failures [having state == and case_name == ]
+//    val definitionFilter = caseName.getOrElse("")
+//    val statusFilter = status.getOrElse("")
+//
+//    val tenantSet = tenant match {
+//      case Some(tenant) => Seq(tenant)
+//      case None => user.tenants
+//    }
+//    // NOTE: this uses a direct query. Fields must be escaped with quotes for the in-memory Hsql Database usage.
+//    val action = {
+//      status match {
+//        //        case Some(s) => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = '#$s' """.as[(Long, String, String, String, Int)]
+//        case Some(s) => s.toLowerCase() match {
+//          case "active" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Active'""".as[(Long, String, String, String, Int)]
+//          case "completed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Completed'""".as[(Long, String, String, String, Int)]
+//          case "terminated" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Terminated'""".as[(Long, String, String, String, Int)]
+//          case "suspended" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Suspended'""".as[(Long, String, String, String, Int)]
+//          case "failed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Failed'""".as[(Long, String, String, String, Int)]
+//          case "closed" => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" having "state" = 'Closed'""".as[(Long, String, String, String, Int)]
+//          case other => throw new SearchFailure(s"Status $other is invalid")
+//        }
+//        case None => sql"""select count("case_name") as count, "tenant", "case_name", "state", "failures" from  "case_instance" group by "tenant", "case_name", "state", "failures" """.as[(Long, String, String, String, Int)]
+//      }
+//
+//    }
+//    db.run(action).map { value =>
+//      val r = collection.mutable.Map.empty[String, CaseList]
+//      value.filter(caseInstance => tenantSet.contains(caseInstance._2)).foreach { caseInstance =>
+//        val count = caseInstance._1
+//        val caseName = caseInstance._3
+//        if (definitionFilter == "" || definitionFilter == caseName) {
+//          // Only add stats for a certain filter if it is the same
+//          val state = caseInstance._4
+//          val failures = caseInstance._5
+//
+//          if (statusFilter == "" || statusFilter == state) {
+//            val caseList: CaseList = r.getOrElse(caseName, CaseList(caseName = caseName))
+//            val newCaseList: CaseList = {
+//              var list: CaseList = state match {
+//                case "Active" => caseList.copy(numActive = caseList.numActive + count)
+//                case "Completed" => caseList.copy(numCompleted = caseList.numCompleted + count)
+//                case "Terminated" => caseList.copy(numTerminated = caseList.numTerminated + count)
+//                case "Suspended" => caseList.copy(numSuspended = caseList.numSuspended + count)
+//                case "Failed" => caseList.copy(numFailed = caseList.numFailed + count)
+//                case "Closed" => caseList.copy(numClosed = caseList.numClosed + count)
+//                case _ => caseList
+//              }
+//              if (failures > 0) {
+//                list = list.copy(numWithFailures = caseList.numWithFailures + count)
+//              }
+//              list
+//            }
+//            r.put(caseName, newCaseList)
+//          }
+//        }
+//      }
+//      r.values.toSeq
+//    }
+//  }
 
   override def getMyCases(user: PlatformUser, filter: CaseFilter, area: Area, sort: Sort): Future[Seq[CaseRecord]] = {
     // Note: you can only get cases if you are in the team ... This query and route makes no sense any more

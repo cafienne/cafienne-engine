@@ -11,7 +11,7 @@ import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
+import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -27,7 +27,6 @@ import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.cases._
 import org.cafienne.service.akkahttp.cases.model.CaseAPI._
 import org.cafienne.system.CaseSystem
 
@@ -39,7 +38,7 @@ import javax.ws.rs._
 class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   val caseQueries: CaseQueries = new CaseQueriesImpl
 
-  override def routes: Route = concat(getCases, stats, getCase, getCaseDefinition, startCase, debugCase)
+  override def routes: Route = concat(getCases, /*stats,*/ getCase, getCaseDefinition, startCase, debugCase)
 
   @GET
   @Operation(
@@ -75,36 +74,36 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
     }
   }
 
-  @Path("/stats")
-  @GET
-  @Operation(
-    summary = "Get statistics for all case definitions",
-    description = "Returns statistics of all case definitions",
-    tags = Array("case"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the statistics in", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0"), required = false),
-      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100"), required = false),
-      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Statistics found and returned", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseList]))))),
-      new ApiResponse(description = "No cases found based on query params", responseCode = "404")
-    )
-  )
-  @Produces(Array("application/json"))
-  def stats: Route = get {
-    path("stats") {
-      validUser { platformUser =>
-        parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
-        ) { (tenant, offset, numOfResults, caseName, definition, status) =>
-          val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
-          runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))
-        }
-      }
-    }
-  }
+//  @Path("/stats")
+//  @GET
+//  @Operation(
+//    summary = "Get statistics for all case definitions",
+//    description = "Returns statistics of all case definitions",
+//    tags = Array("case"),
+//    parameters = Array(
+//      new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the statistics in", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+//      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0"), required = false),
+//      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100"), required = false),
+//      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+//      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+//    ),
+//    responses = Array(
+//      new ApiResponse(description = "Statistics found and returned", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseList]))))),
+//      new ApiResponse(description = "No cases found based on query params", responseCode = "404")
+//    )
+//  )
+//  @Produces(Array("application/json"))
+//  def stats: Route = get {
+//    path("stats") {
+//      validUser { platformUser =>
+//        parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
+//        ) { (tenant, offset, numOfResults, caseName, definition, status) =>
+//          val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
+//          runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))
+//        }
+//      }
+//    }
+//  }
 
   @Path("/{caseInstanceId}")
   @GET

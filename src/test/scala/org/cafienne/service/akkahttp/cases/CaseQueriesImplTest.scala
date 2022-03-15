@@ -116,24 +116,24 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   // Responses of type CaseList
   // *******************************************************************************************************************
 
-  it should "filter all cases by definition" in {
-    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, caseName = Some("ddd EeE fff")), 1.second)
-    res.size must be (1)
-    res.head must be(caseListDDDEEEFFF)
-  }
-
-  it should "filter all cases by status - active" in {
-    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, status = Some("Active")), 1.second)
-    res.size must be (1)
-    res.head must be(caseListActive)
-  }
-
-
-  it should "filter all cases by status - terminated" in {
-    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, status = Some("Terminated")), 1.second)
-    res.size must be (1)
-    res.head must be(caseListTerminated)
-  }
+//  it should "filter all cases by definition" in {
+//    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, caseName = Some("ddd EeE fff")), 1.second)
+//    res.size must be (1)
+//    res.head must be(caseListDDDEEEFFF)
+//  }
+//
+//  it should "filter all cases by status - active" in {
+//    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, status = Some("Active")), 1.second)
+//    res.size must be (1)
+//    res.head must be(caseListActive)
+//  }
+//
+//
+//  it should "filter all cases by status - terminated" in {
+//    val res = Await.result(caseQueries.getCasesStats(user = user, Some(tenant), from = 0, numOfResults = 10, status = Some("Terminated")), 1.second)
+//    res.size must be (1)
+//    res.head must be(caseListTerminated)
+//  }
 
   it should "retrieve all planItems" in {
     val res = Await.result(caseQueries.getPlanItems(planItem1_1.caseInstanceId, user), 1.second)
