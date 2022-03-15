@@ -7,6 +7,7 @@
  */
 package org.cafienne.service.akkahttp.tenant.route
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -16,7 +17,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.ConsentGroupFormat
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command._
@@ -29,7 +32,7 @@ import scala.jdk.CollectionConverters._
 class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute {
   val userQueries: UserQueries = new TenantQueriesImpl
 
-  override def routes: Route = concat(getTenantOwners, setUser, putUser, removeUser, setTenant, putTenant, getDisabledUserAccounts)
+  override def routes: Route = concat(getTenantOwners, setUser, putUser, removeUser, createConsentGroup, setTenant, putTenant, getDisabledUserAccounts)
 
   @Path("/{tenant}/owners")
   @GET
@@ -139,6 +142,37 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
     validUser { platformUser =>
       path(Segment / "users" / Segment) { (tenant, userId) =>
         askTenant(platformUser, tenant, tenantOwner => new RemoveTenantUser(tenantOwner, tenant, userId))
+      }
+    }
+  }
+
+  @Path("/{tenant}/consent-groups")
+  @POST
+  @Operation(
+    summary = "Create a consent group",
+    description = "Register a new consent group in a tenant; the group must have members, and at least one member must be owner.",
+    tags = Array("tenant"),
+    parameters = Array(
+      new Parameter(name = "tenant", description = "The tenant to retrieve accounts from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(description = "Consent group updated successfully", responseCode = "204"),
+      new ApiResponse(responseCode = "404", description = "Consent group not found"),
+    )
+  )
+  @RequestBody(description = "Group to create", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupFormat]))))
+  @Consumes(Array("application/json"))
+  def createConsentGroup: Route = post {
+    validUser { platformUser =>
+      path(Segment / "consent-groups") { tenant =>
+        entity(as[ConsentGroupFormat]) { newGroup =>
+          val tenantOwner = platformUser.getTenantUser(tenant)
+          if (!tenantOwner.isOwner) {
+            complete(StatusCodes.Unauthorized, "Only tenant owners can create consent groups")
+          } else {
+            askModelActor(new CreateConsentGroup(tenantOwner, newGroup.asGroup(tenant)))
+          }
+        }
       }
     }
   }

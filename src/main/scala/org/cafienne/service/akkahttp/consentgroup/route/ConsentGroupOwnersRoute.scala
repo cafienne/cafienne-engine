@@ -30,22 +30,6 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
 
   override def routes: Route = concat(createGroup, setGroupMember, removeGroupMember)
 
-  @Path("{tenant}")
-  @POST
-  @Operation(
-    summary = "Create a new consent group in a tenant",
-    description = "Creates a new consent group in a tenant; the group must have members, and at least one member must be owner.",
-    tags = Array("consent-group"),
-    parameters = Array(
-      new Parameter(name = "group", description = "The consent group with the initial set of members", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Consent group updated successfully", responseCode = "204"),
-      new ApiResponse(responseCode = "404", description = "Consent group not found"),
-    )
-  )
-  @RequestBody(description = "Group to create", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupFormat]))))
-  @Consumes(Array("application/json"))
   def createGroup: Route = post {
     validUser { platformUser =>
       path(Segment) { tenant =>
