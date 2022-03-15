@@ -121,7 +121,7 @@ class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute
   }
 
   @Path("/{tenant}/users/{userId}")
-  @POST
+  @DELETE
   @Operation(
     summary = "Remove a tenant user",
     description = "Removes the user from the tenant (if it exists and is not the last owner)",
