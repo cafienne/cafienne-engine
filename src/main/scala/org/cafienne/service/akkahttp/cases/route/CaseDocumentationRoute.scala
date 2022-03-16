@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -23,8 +22,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(getPlanItemDocumentation, getCaseFileDocumentation)
 
   @Path("/{caseInstanceId}/documentation/planitems/{planItemId}")

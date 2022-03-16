@@ -24,7 +24,6 @@ import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.model.CaseAPI._
@@ -36,8 +35,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(getCases, /*stats,*/ getCase, getCaseDefinition, startCase, debugCase)
 
   @GET

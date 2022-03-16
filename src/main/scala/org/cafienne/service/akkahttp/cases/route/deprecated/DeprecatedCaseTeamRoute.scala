@@ -11,14 +11,11 @@ import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
 import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.cases.model.CaseTeamAPI.Compatible._
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
 import org.cafienne.system.CaseSystem
 
 class DeprecatedCaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-
-  val caseQueries: CaseQueries = new CaseQueriesImpl
   override val addToSwaggerRoutes = false
   override def routes: Route = concat(putCaseTeamMember, deleteCaseTeamMember)
 

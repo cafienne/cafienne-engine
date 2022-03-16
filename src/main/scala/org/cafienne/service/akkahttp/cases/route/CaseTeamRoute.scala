@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.removemember._
 import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole}
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.model.CaseTeamAPI._
 import org.cafienne.system.CaseSystem
@@ -28,8 +27,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(getCaseTeam, setCaseTeam, setUser, deleteUser, setGroup, deleteGroup, setTenantRole, deleteTenantRole)
 
   @Path("/{caseInstanceId}/caseteam")

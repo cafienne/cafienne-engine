@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.instance.Transition
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -26,8 +25,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(getPlanItems, getPlanItem, makePlanItemTransition)
 
   @Path("/{caseInstanceId}/planitems")

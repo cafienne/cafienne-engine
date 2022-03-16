@@ -17,14 +17,15 @@ import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser
 import org.cafienne.infrastructure.akkahttp.route.{CaseTeamValidator, CommandRoute, QueryRoute}
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.cases.CaseReader
-import org.cafienne.querydb.query.{CaseMembership, CaseQueries}
+import org.cafienne.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
 import org.cafienne.querydb.query.exception.CaseSearchFailure
 
 import scala.util.{Failure, Success}
 
 trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
   override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
-  val caseQueries: CaseQueries
+  val caseQueries: CaseQueries = new CaseQueriesImpl
+
 
   /**
     * Run the sub route with a valid platform user and case instance id

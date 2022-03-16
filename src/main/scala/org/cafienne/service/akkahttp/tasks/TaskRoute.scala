@@ -12,17 +12,14 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
 import org.cafienne.humantask.actorapi.command.WorkflowCommand
-import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.querydb.materializer.cases.CaseReader
-import org.cafienne.querydb.query.{CaseMembership, TaskQueries}
 import org.cafienne.querydb.query.exception.TaskSearchFailure
+import org.cafienne.querydb.query.{CaseMembership, TaskQueries, TaskQueriesImpl}
+import org.cafienne.service.akkahttp.cases.route.CasesRoute
 
 import scala.util.{Failure, Success}
 
-trait TaskRoute extends CommandRoute with QueryRoute {
-  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
-  val taskQueries: TaskQueries
+trait TaskRoute extends CasesRoute {
+  val taskQueries: TaskQueries = new TaskQueriesImpl
 
   def askTaskWithAssignee(platformUser: PlatformUser, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
     onComplete(taskQueries.getCaseMembership(taskId, platformUser)) {

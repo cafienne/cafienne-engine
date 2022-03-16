@@ -9,13 +9,10 @@ package org.cafienne.service.akkahttp.cases.route.deprecated
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
 import org.cafienne.system.CaseSystem
 
 class DeprecatedPlanItemHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override val addToSwaggerRoutes = false
   override def routes: Route = concat(deprecatedPlanItemHistory)
 

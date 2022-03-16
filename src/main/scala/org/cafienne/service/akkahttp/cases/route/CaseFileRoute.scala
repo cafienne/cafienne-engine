@@ -19,7 +19,6 @@ import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
 import org.cafienne.json.Value
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -28,8 +27,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(getCaseFile, createCaseFileItem, replaceCaseFileItem, updateCaseFileItem, deleteCaseFileItem)
 
   @Path("/{caseInstanceId}/casefile")
