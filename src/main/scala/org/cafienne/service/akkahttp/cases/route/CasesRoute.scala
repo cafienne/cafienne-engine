@@ -65,7 +65,7 @@ trait CasesRoute extends CommandRoute with QueryRoute {
     * @param subRoute
     * @return
     */
-  def caseInstanceSubRoute(prefix: String, subRoute: (UserIdentity, String) => Route): Route = {
+  def caseInstanceSubRoute(prefix: String)(subRoute: (UserIdentity, String) => Route): Route = {
     caseUser { user =>
       pathPrefix(Segment / prefix) { caseInstanceId =>
         subRoute(user, caseInstanceId)

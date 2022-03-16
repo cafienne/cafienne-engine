@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
@@ -144,7 +143,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
   )
   @Produces(Array("application/json"))
   def getCaseDefinition: Route = get {
-    caseInstanceSubRoute("definition", (user, caseInstanceId) => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, user)))
+    caseInstanceSubRoute("definition") { (user, caseInstanceId) =>
+      runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, user))
+    }
   }
 
   @POST
@@ -165,24 +166,20 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
       caseUser { user =>
         post {
           entity(as[StartCaseFormat]) { payload =>
-            try {
-              val tenant = user.resolveTenant(payload.tenant)
-              val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
-              val caseDefinition = definitionsDocument.getFirstCase
+            caseStarter(user, payload.tenant) { (user, tenant) =>
+              try {
+                val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
+                val caseDefinition = definitionsDocument.getFirstCase
 
-              val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
-              val inputParameters = payload.inputs
-              val caseTeam: CaseTeam = payload.caseTeam.asTeam
-              val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-              val caseStarter = new CaseUserIdentity {
-                override val id: String = user.id
-                override val origin: Origin = Origin.IDP
-                override val tenantRoles: Set[String] = Set()
+                val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
+                val inputParameters = payload.inputs
+                val caseTeam: CaseTeam = payload.caseTeam.asTeam
+                val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, user, newCaseId, caseDefinition, inputParameters, team, debugMode)))
+              } catch {
+                case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
+                case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
               }
-              validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, caseStarter, newCaseId, caseDefinition, inputParameters, team, debugMode)))
-            } catch {
-              case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
-              case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
             }
           }
         }

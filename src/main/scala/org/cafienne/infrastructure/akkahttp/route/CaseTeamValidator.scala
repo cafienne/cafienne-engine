@@ -3,10 +3,12 @@ package org.cafienne.infrastructure.akkahttp.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.Origin
+import org.cafienne.actormodel.exception.MissingTenantException
+import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.query.exception.SearchFailure
+import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -15,10 +17,27 @@ trait CaseTeamValidator extends TenantValidator {
   implicit val ec: ExecutionContext
   val userQueries: UserQueries = new TenantQueriesImpl
 
+  def caseStarter(user: UserIdentity, optionalTenant: Option[String])(innerRoute: (CaseUserIdentity, String) => Route): Route = {
+    val tenant = optionalTenant match {
+      case Some(value) => if (value.isBlank) Cafienne.config.platform.defaultTenant else value
+      case None => Cafienne.config.platform.defaultTenant
+    }
+    if (tenant.isBlank) {
+      throw new MissingTenantException("Tenant field is empty or missing and a default tenant is not configured")
+    }
+    onComplete(getUserOrigin(user.id, tenant)) {
+      case Success(user) => innerRoute(user, tenant)
+      case Failure(t) => throw t
+    }
+  }
+
   def getUserOrigin(user: CaseTeamUser, tenant: String): Future[CaseTeamUser] = validateCaseTeamUsers(Seq(user), tenant).map(_.head)
 
-  def getUserOrigin(user: String, tenant: String): Future[Origin] = {
-    userQueries.determineOriginOfUsers(Seq(user), tenant).map(_.headOption.fold(Origin.IDP)(_._2))
+  def getUserOrigin(user: String, tenant: String): Future[CaseUserIdentity] = {
+    userQueries
+      .determineOriginOfUsers(Seq(user), tenant)
+      .map(_.headOption.fold(Origin.IDP)(_._2))
+      .map(origin => CaseUserIdentity(user, origin))
   }
 
   def validateTenantAndTeam(team: CaseTeam, tenant: String, command: CaseTeam => Route): Route = {
