@@ -18,7 +18,7 @@ import org.cafienne.json.ValueMap;
 
 @Manifest
 public class DelegateTask extends AssignTask {
-    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, UserIdentity delegatee) {
+    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity delegatee) {
         super(user, caseInstanceId, taskId, delegatee);
     }
 

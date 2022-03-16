@@ -1,6 +1,8 @@
 package org.cafienne.humantask.instance;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.actormodel.identity.Origin;
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
@@ -70,7 +72,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
                 //  It is up to the application using the dynamic assignment to make sure it returns a valid user.
                 //  If not a valid user, then case owners have to change the task assignee.
                 if (newAssignee != null && !newAssignee.trim().isEmpty()) {
-                    assign(newAssignee);
+                    assign(CaseUserIdentity.apply(newAssignee, Origin.IDP));
                 }
             } catch (Exception e) {
                 addDebugInfo(() -> "Failed to evaluate expression to assign task", e);
@@ -136,33 +138,33 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         return historyTaskState;
     }
 
-    private boolean isNewAssignee(String newAssignee) {
-        return !Objects.equals(this.currentAssignee, newAssignee);
+    private boolean isNewAssignee(CaseUserIdentity newAssignee) {
+        return !Objects.equals(this.currentAssignee, newAssignee.id());
     }
 
-    private void addCaseTeamUser(String newMember) {
+    private void addCaseTeamUser(CaseUserIdentity newMember) {
         getCaseInstance().getCaseTeam().upsertCaseTeamUser(newMember, task.getPerformer());
     }
 
-    public void assign(String newAssignee) {
+    public void assign(CaseUserIdentity newAssignee) {
         if (isNewAssignee(newAssignee)) {
             addCaseTeamUser(newAssignee);
-            addEvent(new HumanTaskAssigned(task, newAssignee));
-            checkOwnershipChange(newAssignee);
+            addEvent(new HumanTaskAssigned(task, newAssignee.id()));
+            checkOwnershipChange(newAssignee.id());
         }
     }
 
-    public void claim(String claimer) {
+    public void claim(CaseUserIdentity claimer) {
         if (isNewAssignee(claimer)) {
-            addEvent(new HumanTaskClaimed(task, claimer));
-            checkOwnershipChange(claimer);
+            addEvent(new HumanTaskClaimed(task, claimer.id()));
+            checkOwnershipChange(claimer.id());
         }
     }
 
-    public void delegate(String newAssignee) {
+    public void delegate(CaseUserIdentity newAssignee) {
         if (isNewAssignee(newAssignee)) {
             addCaseTeamUser(newAssignee);
-            addEvent(new HumanTaskDelegated(task, newAssignee));
+            addEvent(new HumanTaskDelegated(task, newAssignee.id()));
         }
     }
 

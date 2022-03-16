@@ -10,7 +10,7 @@ package org.cafienne.service.akkahttp.tasks
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.UserIdentity
+import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.WorkflowCommand
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.querydb.query._
@@ -27,11 +27,8 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
       case Success(caseMember) =>
         val caseInstanceId = caseMember.caseInstanceId
         onComplete(getUserOrigin(assignee, caseMember.tenant)) {
-          case Success(origin) =>
+          case Success(assigneeIdentity) =>
 //            println(s"Found origin $origin for assignee $assignee")
-            val assigneeIdentity = new UserIdentity {
-              override val id: String = assignee
-            }
             askModelActor(createTaskCommand.apply(caseInstanceId, caseMember, assigneeIdentity))
           case Failure(t: Throwable) =>
             logger.warn(s"An error happened while retrieving user information on user '$assignee'", t)
@@ -55,7 +52,7 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
   }
 
   trait CreateTaskCommandWithAssignee {
-    def apply(caseInstanceId: String, user: CaseMembership, member: UserIdentity): WorkflowCommand
+    def apply(caseInstanceId: String, user: CaseMembership, member: CaseUserIdentity): WorkflowCommand
   }
 
   trait CreateTaskCommand {

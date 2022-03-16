@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.actorapi.command.team
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.Origin
+import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
 import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
 import org.cafienne.cmmn.actorapi.event.team.deprecated.member.{CaseOwnerAdded, CaseOwnerRemoved, TeamRoleCleared, TeamRoleFilled}
 import org.cafienne.cmmn.actorapi.event.team.deprecated.user.{TeamMemberAdded, TeamMemberRemoved}
@@ -40,8 +40,8 @@ trait CaseTeamUser extends CaseTeamMember {
 }
 
 object CaseTeamUser extends LazyLogging {
-  def create(newUserId: String, role: CaseRoleDefinition): CaseTeamUser =
-    CaseTeamUser.from(userId = newUserId, origin = Origin.IDP, caseRoles = {
+  def create(newUser: CaseUserIdentity, role: CaseRoleDefinition): CaseTeamUser =
+    CaseTeamUser.from(userId = newUser.id, origin = newUser.origin, caseRoles = {
       if (role == null) Set()
       else Set(role.getName)
     })

@@ -33,7 +33,7 @@ public class ClaimTask extends WorkflowCommand {
 
     @Override
     public HumanTaskResponse process(WorkflowTask workflowTask) {
-        workflowTask.claim(this.getUser().id());
+        workflowTask.claim(this.getUser());
         return new HumanTaskResponse(this);
     }
 }

@@ -283,14 +283,14 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
      * @param userId The tenant user id; note that assignment cannot be done on roles, only on users
      * @param role   The (optional) role that the team member must have for executing the task leading to this call
      */
-    public void upsertCaseTeamUser(String userId, CaseRoleDefinition role) {
-        CaseTeamUser existingMember = users.get(userId);
+    public void upsertCaseTeamUser(CaseUserIdentity user, CaseRoleDefinition role) {
+        CaseTeamUser existingMember = users.get(user.id());
         if (existingMember == null) {
-            addDebugInfo(() -> "Adding unknown user '" + userId + "' to case team because of dynamic task assignment");
-            setUser(CaseTeamUser.create(userId, role));
+            addDebugInfo(() -> "Adding unknown user '" + user.id() + "' to case team because of dynamic task assignment");
+            setUser(CaseTeamUser.create(user, role));
         } else {
             if (!existingMember.isOwner() && role != null && !existingMember.getCaseRoles().contains(role.getName())) {
-                addDebugInfo(() -> "Adding case role '" + role.getName() + "' to '" + userId + "' because of task assignment");
+                addDebugInfo(() -> "Adding case role '" + role.getName() + "' to '" + user.id() + "' because of task assignment");
                 setUser(existingMember.extend(role.getName()));
             }
         }
