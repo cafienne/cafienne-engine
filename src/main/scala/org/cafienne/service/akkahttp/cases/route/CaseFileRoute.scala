@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
 import org.cafienne.json.Value
@@ -46,9 +46,9 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getCaseFile: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment / "casefile") {
-        caseInstanceId => runQuery(caseQueries.getCaseFile(caseInstanceId, platformUser))
+        caseInstanceId => runQuery(caseQueries.getCaseFile(caseInstanceId, user))
       }
     }
   }
@@ -71,7 +71,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def createCaseFileItem: Route = post {
-    casefileContentRoute("create", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path)))
+    casefileContentRoute("create", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, tenantUser => new CreateCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/replace/{path}")
@@ -92,7 +92,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @RequestBody(description = "Case file item to create in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   @Consumes(Array("application/json"))
   def replaceCaseFileItem: Route = put {
-    casefileContentRoute("replace", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path)))
+    casefileContentRoute("replace", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, tenantUser => new ReplaceCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/update/{path}")
@@ -112,7 +112,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @RequestBody(description = "Case file item to update in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Map[String, _]]))))
   def updateCaseFileItem: Route = put {
-    casefileContentRoute("update", (platformUser, json, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path)))
+    casefileContentRoute("update", (user, json, caseInstanceId, path) => askCase(user, caseInstanceId, tenantUser => new UpdateCaseFileItem(tenantUser, caseInstanceId, json, path)))
   }
 
   @Path("/{caseInstanceId}/casefile/delete/{path}")
@@ -132,7 +132,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Consumes(Array("application/json"))
   def deleteCaseFileItem: Route = delete {
-    casefileRoute("delete", (platformUser, caseInstanceId, path) => askCase(platformUser, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path)))
+    casefileRoute("delete", (user, caseInstanceId, path) => askCase(user, caseInstanceId, tenantUser => new DeleteCaseFileItem(tenantUser, caseInstanceId, path)))
   }
 
   /**
@@ -141,10 +141,10 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
     * @param subRoute
     * @return
     */
-  private def casefileContentRoute(action: String, subRoute: (PlatformUser, Value[_], String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
-    casefileRoute(action, (platformUser, caseInstanceId, path) => {
+  private def casefileContentRoute(action: String, subRoute: (AuthenticatedUser, Value[_], String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
+    casefileRoute(action, (user, caseInstanceId, path) => {
       entity(as[Value[_]]) { json => {
-        subRoute(platformUser, json, caseInstanceId, path)
+        subRoute(user, json, caseInstanceId, path)
       }}
     })
   }
@@ -155,10 +155,10 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
     * @param subRoute
     * @return
     */
-  private def casefileRoute(action: String, subRoute: (PlatformUser, String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
-    validUser { platformUser =>
+  private def casefileRoute(action: String, subRoute: (AuthenticatedUser, String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
+    caseUser { user =>
       pathPrefix(Segment / "casefile" / action ) { caseInstanceId =>
-        withCaseFilePath(path => subRoute(platformUser, caseInstanceId, path))
+        withCaseFilePath(path => subRoute(user, caseInstanceId, path))
       }
     }
   }

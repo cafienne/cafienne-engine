@@ -3,16 +3,26 @@ package org.cafienne.infrastructure.akkahttp.route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.{Origin, PlatformUser}
+import org.cafienne.actormodel.identity.Origin
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser}
+import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.querydb.query.exception.SearchFailure
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-trait CaseTeamValidator extends AuthenticatedRoute with TenantValidator {
+trait CaseTeamValidator extends TenantValidator {
+  implicit val ec: ExecutionContext
+  val userQueries: UserQueries = new TenantQueriesImpl
+
+  def getUserOrigin(user: CaseTeamUser, tenant: String): Future[CaseTeamUser] = validateCaseTeamUsers(Seq(user), tenant).map(_.head)
+
+  def getUserOrigin(user: String, tenant: String): Future[Origin] = {
+    userQueries.determineOriginOfUsers(Seq(user), tenant).map(_.headOption.fold(Origin.IDP)(_._2))
+  }
+
   def validateTenantAndTeam(team: CaseTeam, tenant: String, command: CaseTeam => Route): Route = {
-    validateTenant(tenant, () => validateTeam(team, tenant, command))
+    validateTenant(tenant, validateTeam(team, tenant, command))
   }
 
   def validateTeam(team: CaseTeam, tenant: String, command: CaseTeam => Route): Route = {
@@ -29,18 +39,12 @@ trait CaseTeamValidator extends AuthenticatedRoute with TenantValidator {
   }
 
   private def validateCaseTeamUsers(users: Seq[CaseTeamUser], tenant: String): Future[Seq[CaseTeamUser]] = {
-    val userIds = users.map(_.userId)
-    userCache.getUsers(userIds).map(platformUsers => {
-      if (platformUsers.size != userIds.size) { // This will actually never happen
-        val unfoundUsers = userIds.filterNot(id => platformUsers.exists(user => user.id == id))
-        val msg = {
-          if (unfoundUsers.size == 1) s"Cannot find a registered user '${unfoundUsers.head}'"
-          else s"The users ${unfoundUsers.map(u => s"'$u'").mkString(", ")} are not registered"
-        }
-        throw new SearchFailure(msg)
-      }
-      val userInfo = platformUsers.map(u => u.id -> u).toMap[String, PlatformUser]
-      users.map(caseTeamUser => caseTeamUser.copy(newOrigin = userInfo.get(caseTeamUser.userId).fold(Origin.IDP)(_.origin(tenant))))
+    userQueries.determineOriginOfUsers(users.map(_.userId), tenant).map(origins => {
+      val newTeam = users.map(user => {
+        val origin = origins.find(_._1 == user.userId).fold(Origin.IDP)(_._2)
+        user.copy(newOrigin = origin)
+      })
+      newTeam
     })
   }
 
@@ -52,7 +56,7 @@ trait CaseTeamValidator extends AuthenticatedRoute with TenantValidator {
 
   private def validateConsentGroups(groups: Seq[CaseTeamGroup]): Future[Seq[CaseTeamGroup]] = {
     val groupIds = groups.map(_.groupId)
-    userCache.getConsentGroups(groupIds).map(consentGroups => {
+    userQueries.getConsentGroups(groupIds).map(consentGroups => {
       if (consentGroups.size != groupIds.size) {
         val unfoundGroups = groupIds.filterNot(id => consentGroups.exists(user => user.id == id))
         val msg = {

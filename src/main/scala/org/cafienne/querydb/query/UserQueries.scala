@@ -3,7 +3,7 @@ package org.cafienne.querydb.query
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity._
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
-import org.cafienne.querydb.query.exception.{ConsentGroupMemberSearchFailure, ConsentGroupSearchFailure, TenantSearchFailure, TenantUserSearchFailure, UserSearchFailure}
+import org.cafienne.querydb.query.exception._
 import org.cafienne.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
 import org.cafienne.querydb.schema.table.{ConsentGroupTables, TenantTables}
 
@@ -15,6 +15,8 @@ trait UserQueries {
   def getTenantUser(user: UserIdentity, tenant: String): Future[TenantUser] = ???
 
   def getPlatformUser(userId: String): Future[PlatformUser] = ???
+
+  def determineOriginOfUsers(users: Seq[String], tenant: String): Future[Seq[(String, Origin)]] = ???
 
   def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = ???
 
@@ -62,6 +64,28 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   }
 
   override def getPlatformUser(userId: String): Future[PlatformUser] = getPlatformUsers(Seq(userId)).map(_.head)
+
+  override def determineOriginOfUsers(users: Seq[String], tenant: String): Future[Seq[(String, Origin)]] = {
+//    println(s"Checking origin for ${users.length} users: $users")
+    val tenantMembership = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.tenant === tenant).filter(_.role_name === "").map(_.userId).distinct.take(users.length)
+    val platformRegistration = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filterNot(_.tenant === tenant).filter(_.role_name === "").map(_.userId).distinct.take(users.length)
+    val query = tenantMembership.joinFull(platformRegistration)
+    db.run(query.result).map(records => {
+//      println(s"Found ${records.length} results:\n"+records.map(record => record.toString() +"\n")  )
+      val tenantUserIds = records.filter(_._1.isDefined).map(_._1.get).toSet
+      val platformUserIds = records.filter(_._2.isDefined).map(_._2.get).toSet
+//      println(s"Found ${tenantUserIds.size} tenant users:$tenantUserIds" )
+//      println(s"Found ${platformUserIds.size} platform users:$platformUserIds" )
+
+      def determineOrigin(userId: String) = {
+        if (tenantUserIds.contains(userId)) Origin.Tenant
+        else if (platformUserIds.contains(userId)) Origin.Platform
+        else Origin.IDP
+      }
+
+      users.map(user => (user, determineOrigin(user)))
+    })
+  }
 
   override def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = {
     val tenantUsersQuery = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.enabled === true)

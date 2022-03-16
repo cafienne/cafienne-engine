@@ -20,10 +20,10 @@ class DeprecatedCaseTeamRoute(override val caseSystem: CaseSystem) extends Cases
   override def routes: Route = concat(putCaseTeamMember, deleteCaseTeamMember)
 
   def putCaseTeamMember: Route = put {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+    caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam") {
         entity(as[BackwardCompatibleTeamMemberFormat]) { input =>
-          askCase(platformUser, caseInstanceId, caseOwner => new DeprecatedUpsert(caseOwner, caseInstanceId, input.upsertMemberData))
+          askCase(user, caseInstanceId, caseOwner => new DeprecatedUpsert(caseOwner, caseInstanceId, input.upsertMemberData))
         }
       }
     }
@@ -31,13 +31,13 @@ class DeprecatedCaseTeamRoute(override val caseSystem: CaseSystem) extends Cases
   }
 
   def deleteCaseTeamMember: Route = delete {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / Segment) { memberId =>
         parameters("type".?) { memberType =>
           if (memberType.nonEmpty && memberType.get == "role") {
-            askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, memberId))
+            askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, memberId))
           } else {
-            askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, memberId))
+            askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, memberId))
           }
         }
       }

@@ -41,9 +41,9 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getPlanHistory: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("history" / "planitems") {
-         runListQuery(caseQueries.getCasePlanHistory(caseInstanceId, platformUser))
+         runListQuery(caseQueries.getCasePlanHistory(caseInstanceId, user))
       }
     }
   }
@@ -65,9 +65,9 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getPlanItemHistory: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("history" / "planitems" / Segment) { planItemId =>
-        runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))
+        runQuery(caseQueries.getPlanItemHistory(planItemId, user))
       }
     }
   }

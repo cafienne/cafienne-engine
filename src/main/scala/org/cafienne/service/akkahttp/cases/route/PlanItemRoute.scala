@@ -44,9 +44,9 @@ class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getPlanItems: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("planitems") {
-        runQuery(caseQueries.getPlanItems(caseInstanceId, platformUser))
+        runQuery(caseQueries.getPlanItems(caseInstanceId, user))
       }
     }
   }
@@ -69,9 +69,9 @@ class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getPlanItem: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("planitems" / Segment) {
-        planItemId => runQuery(caseQueries.getPlanItem(planItemId, platformUser))
+        planItemId => runQuery(caseQueries.getPlanItem(planItemId, user))
       }
     }
   }
@@ -96,13 +96,13 @@ class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def makePlanItemTransition: Route = post {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("planitems" / Segment / Segment) { (planItemId, transitionString) =>
         val transition = Transition.getEnum(transitionString)
         if (transition == null) {
           complete(StatusCodes.BadRequest, "Transition " + transition + " is not valid")
         } else {
-          askCase(platformUser, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
+          askCase(user, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
         }
       }
     }

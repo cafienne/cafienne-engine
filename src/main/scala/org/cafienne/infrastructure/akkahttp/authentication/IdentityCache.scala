@@ -4,7 +4,6 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
 import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
-import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
@@ -60,15 +59,4 @@ class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider 
     cache.remove(userId)
   }
 
-  override def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = {
-    userQueries.getPlatformUsers(userIds)
-  }
-
-  override def getUserRegistration(userId: String): Future[PlatformUser] = {
-    userQueries.getPlatformUser(userId)
-  }
-
-  override def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = {
-    userQueries.getConsentGroups(groupIds)
-  }
 }

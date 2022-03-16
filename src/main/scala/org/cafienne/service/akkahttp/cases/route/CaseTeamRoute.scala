@@ -7,6 +7,7 @@
  */
 package org.cafienne.service.akkahttp.cases.route
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -17,16 +18,18 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.command.team.removemember._
-import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole}
+import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
+import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.model.CaseTeamAPI._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
+import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with CaseTeamValidator {
   override def routes: Route = concat(getCaseTeam, setCaseTeam, setUser, deleteUser, setGroup, deleteGroup, setTenantRole, deleteTenantRole)
 
   @Path("/{caseInstanceId}/caseteam")
@@ -46,9 +49,9 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getCaseTeam: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam") {
-        runQuery(caseQueries.getCaseTeam(caseInstanceId, platformUser))
+        runQuery(caseQueries.getCaseTeam(caseInstanceId, user))
       }
     }
   }
@@ -70,11 +73,11 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @RequestBody(description = "Case team in JSON format", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TeamFormat]))))
   @Consumes(Array("application/json"))
   def setCaseTeam: Route = post {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+    caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam") {
         entity(as[Compatible.TeamFormat]) { input =>
           val teamInput = input.asTeam
-          authorizeCaseAccess(platformUser, caseInstanceId, member => validateTeam(teamInput, member.tenant, team => askModelActor(new SetCaseTeam(member, caseInstanceId, team))))
+          authorizeCaseAccess(user, caseInstanceId, member => validateTeam(teamInput, member.tenant, team => askModelActor(new SetCaseTeam(member, caseInstanceId, team))))
         }
       }
     }
@@ -98,10 +101,18 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @RequestBody(description = "Case Team User", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseTeamUserFormat]))))
   @Consumes(Array("application/json"))
   def setUser: Route = post {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+    caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam" / "users") {
         entity(as[CaseTeamUserFormat]) { input =>
-          putCaseTeamUser(platformUser, caseInstanceId, input.asCaseTeamUser)
+          authorizeCaseAccess(user, caseInstanceId, {
+            member => {
+              val newTeamMember = input.asCaseTeamUser
+              onComplete(getUserOrigin(newTeamMember, member.tenant)) {
+                case Success(enrichedUser: CaseTeamUser) => askModelActor(new SetCaseTeamUser(member, caseInstanceId, enrichedUser))
+                case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+              }
+            }
+          })
         }
       }
     }
@@ -133,9 +144,9 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Consumes(Array("application/json"))
   def deleteUser: Route = delete {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / "users" / Segment) { userId =>
-        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, userId))
+        askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, userId))
       }
     }
   }
@@ -157,10 +168,10 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @RequestBody(description = "Case Team Group", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[GroupFormat]))))
   @Consumes(Array("application/json"))
   def setGroup: Route = post {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+    caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam" / "groups") {
         entity(as[GroupFormat]) { input =>
-          askCase(platformUser, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, input.asGroup))
+          askCase(user, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, input.asGroup))
         }
       }
     }
@@ -192,9 +203,9 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Consumes(Array("application/json"))
   def deleteGroup: Route = delete {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / "groups" / Segment) { groupId =>
-        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamGroup(tenantUser, caseInstanceId, groupId))
+        askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamGroup(tenantUser, caseInstanceId, groupId))
       }
     }
   }
@@ -216,10 +227,10 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @RequestBody(description = "Tenant Role", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TenantRoleFormat]))))
   @Consumes(Array("application/json"))
   def setTenantRole: Route = post {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) => {
+    caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam" / "tenant-roles") {
         entity(as[TenantRoleFormat]) { input =>
-          askCase(platformUser, caseInstanceId, user => new SetCaseTeamTenantRole(user, caseInstanceId, input.asTenantRole))
+          askCase(user, caseInstanceId, user => new SetCaseTeamTenantRole(user, caseInstanceId, input.asTenantRole))
         }
       }
     }
@@ -251,9 +262,9 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Consumes(Array("application/json"))
   def deleteTenantRole: Route = delete {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / "tenant-roles" / Segment) { tenantRoleName =>
-        askCase(platformUser, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, tenantRoleName))
+        askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, tenantRoleName))
       }
     }
   }

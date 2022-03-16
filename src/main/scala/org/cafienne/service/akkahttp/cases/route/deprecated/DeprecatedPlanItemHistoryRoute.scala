@@ -17,14 +17,14 @@ class DeprecatedPlanItemHistoryRoute(override val caseSystem: CaseSystem) extend
   override def routes: Route = concat(deprecatedPlanItemHistory)
 
   def deprecatedPlanItemHistory: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment / "planitems" / Segment / "history") {
         (caseInstanceId, planItemId) => {
           extractUri { uri =>
             logger.warn(s"Using deprecated API to get plan item history:")
             logger.warn(s"Old: /$caseInstanceId/planitems/$planItemId/history")
             logger.warn(s"New: /$caseInstanceId/history/planitems/$planItemId")
-            runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))
+            runQuery(caseQueries.getPlanItemHistory(planItemId, user))
           }
         }
       }

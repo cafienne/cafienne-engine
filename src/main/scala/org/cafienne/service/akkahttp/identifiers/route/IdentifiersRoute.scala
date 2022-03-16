@@ -50,11 +50,11 @@ class IdentifiersRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @Produces(Array("application/json"))
   def getIdentifiers: Route = get {
     pathEndOrSingleSlash {
-      validUser { platformUser =>
+      caseUser { user =>
         parameters("tenant".?, "name".?, "offset".?(0), "numberOfResults".?(100), "sortBy".?, "sortOrder".?) {
           (tenant, name, offset, numResults, sortBy, sortOrder) =>
             val filter = IdentifierFilter(tenant, name)
-            runQuery(identifierQueries.getIdentifiers(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "name")))
+            runQuery(identifierQueries.getIdentifiers(user, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "name")))
         }
       }
     }
@@ -77,9 +77,9 @@ class IdentifiersRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   def getIdentifierNames: Route = get {
     path("names") {
       pathEndOrSingleSlash {
-        validUser { platformUser =>
+        caseUser { user =>
           parameters("tenant".?) { tenant =>
-            runListQuery(identifierQueries.getIdentifierNames(platformUser, tenant))
+            runListQuery(identifierQueries.getIdentifierNames(user, tenant))
           }
         }
       }

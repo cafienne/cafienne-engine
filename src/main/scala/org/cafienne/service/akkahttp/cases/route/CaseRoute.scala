@@ -23,6 +23,7 @@ import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
@@ -34,7 +35,7 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with CaseTeamValidator {
   override def routes: Route = concat(getCases, /*stats,*/ getCase, getCaseDefinition, startCase, debugCase)
 
   @GET
@@ -60,12 +61,12 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @Produces(Array("application/json"))
   def getCases: Route = get {
     pathEndOrSingleSlash {
-      validUser { platformUser =>
+      caseUser { user =>
         parameters("tenant".?,"identifiers".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?, "sortBy".?, "sortOrder".?) {
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
-            runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
+            runListQuery(caseQueries.getCases(user, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
         }
       }
     }
@@ -119,9 +120,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getCase: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment) {
-        caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, platformUser))
+        caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, user))
       }
     }
   }
@@ -143,7 +144,7 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getCaseDefinition: Route = get {
-    caseInstanceSubRoute("definition", (platformUser, caseInstanceId) => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, platformUser)))
+    caseInstanceSubRoute("definition", (user, caseInstanceId) => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, user)))
   }
 
   @POST
@@ -161,12 +162,12 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @Produces(Array("application/json"))
   def startCase: Route = post {
     pathEndOrSingleSlash {
-      validUser { platformUser =>
+      caseUser { user =>
         post {
           entity(as[StartCaseFormat]) { payload =>
             try {
-              val tenant = platformUser.resolveTenant(payload.tenant)
-              val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, payload.definition)
+              val tenant = user.resolveTenant(payload.tenant)
+              val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
               val caseDefinition = definitionsDocument.getFirstCase
 
               val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
@@ -174,9 +175,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
               val caseTeam: CaseTeam = payload.caseTeam.asTeam
               val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
               val caseStarter = new CaseUserIdentity {
-                override val id: String = platformUser.id
-                override val origin: Origin = platformUser.origin(tenant)
-                override val tenantRoles: Set[String] = platformUser.tenantRoles(tenant)
+                override val id: String = user.id
+                override val origin: Origin = Origin.IDP
+                override val tenantRoles: Set[String] = Set()
               }
               validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, caseStarter, newCaseId, caseDefinition, inputParameters, team, debugMode)))
             } catch {
@@ -206,9 +207,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def debugCase: Route = put {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("debug" / Segment) { debugMode =>
-        askCase(platformUser, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
+        askCase(user, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
       }
     }
   }

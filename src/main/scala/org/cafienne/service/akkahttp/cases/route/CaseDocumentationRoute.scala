@@ -42,9 +42,9 @@ class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesR
   )
   @Produces(Array("application/json"))
   def getPlanItemDocumentation: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment / "documentation" / "planitems" / Segment) {
-        (_, planItemId) => runQuery(caseQueries.getPlanItemDocumentation(planItemId, platformUser))
+        (_, planItemId) => runQuery(caseQueries.getPlanItemDocumentation(planItemId, user))
       }
     }
   }
@@ -66,9 +66,9 @@ class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesR
   )
   @Produces(Array("application/json"))
   def getCaseFileDocumentation: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment / "documentation" / "casefile") {
-        caseInstanceId => runQuery(caseQueries.getCaseFileDocumentation(caseInstanceId, platformUser))
+        caseInstanceId => runQuery(caseQueries.getCaseFileDocumentation(caseInstanceId, user))
       }
     }
   }

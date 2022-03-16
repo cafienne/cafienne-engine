@@ -56,7 +56,7 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   )
   @Produces(Array("application/json"))
   def getAllTasks: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       pathEndOrSingleSlash {
         parameters("tenant".?, "identifiers".?, "caseName".?, "taskName".?, "taskState".?, "assignee".?, "owner".?, "dueOn".?, "dueBefore".?, "dueAfter".?, "sortBy".?, "sortOrder".?, "offset".?(0), "numberOfResults".?(100)) {
           (tenant, identifiers, caseName, taskName, taskState, assignee, owner, dueOn, dueBefore, dueAfter, sortBy, sortOrder, offset, numberOfResults) =>
@@ -64,7 +64,7 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
               val area = Area(offset, numberOfResults)
               val sort = Sort.withDefault(sortBy, sortOrder, "lastModified")
               val taskFilter = TaskFilter(tenant = tenant, identifiers = identifiers, caseName = caseName, taskName = taskName, taskState = taskState, assignee = assignee, owner = owner, dueOn = dueOn, dueBefore = dueBefore, dueAfter = dueAfter, timeZone = timeZone)
-              runListQuery(taskQueries.getAllTasks(platformUser, taskFilter, area, sort))
+              runListQuery(taskQueries.getAllTasks(user, taskFilter, area, sort))
             }
         }
       }
@@ -88,9 +88,9 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   )
   @Produces(Array("application/json"))
   def getCaseTasks: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path("case" / Segment) {
-        caseInstanceId => runListQuery(taskQueries.getCaseTasks(caseInstanceId, platformUser))
+        caseInstanceId => runListQuery(taskQueries.getCaseTasks(caseInstanceId, user))
       }
     }
   }
@@ -113,9 +113,9 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   )
   @Produces(Array("application/json"))
   def getTask: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment) {
-        taskId => runQuery(taskQueries.getTask(taskId, platformUser))
+        taskId => runQuery(taskQueries.getTask(taskId, user))
       }
     }
   }
@@ -135,10 +135,10 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   )
   @Produces(Array("application/json"))
   def getTaskCount: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       parameters("tenant".?) { tenant =>
         path("user" / "count") {
-          runQuery(taskQueries.getCountForUser(platformUser, tenant))
+          runQuery(taskQueries.getCountForUser(user, tenant))
         }
       }
     }
@@ -163,10 +163,10 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   )
   @Produces(Array("application/json"))
   def getCaseDefinitionTasks: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path("case-name" / Segment) { caseName =>
         parameters("tenant".?) {
-          optionalTenant => runListQuery(taskQueries.getTasksWithCaseName(caseName, optionalTenant, platformUser))
+          optionalTenant => runListQuery(taskQueries.getTasksWithCaseName(caseName, optionalTenant, user))
         }
       }
     }
