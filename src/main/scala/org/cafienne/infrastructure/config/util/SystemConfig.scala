@@ -12,7 +12,7 @@ object SystemConfig extends LazyLogging {
   def load(): Config = {
     val fallback = ConfigFactory.defaultReference()
     val currentConfig = ConfigFactory.load().withFallback(fallback)
-    val newConfig = migrateEventDatabaseProvider(migrateTagging(migrateSerializer(currentConfig)))
+    val newConfig = migrateEventDatabaseProvider(dropTagging(migrateSerializer(currentConfig)))
     newConfig
   }
 
@@ -29,7 +29,7 @@ object SystemConfig extends LazyLogging {
     migrateConfigurationProperty(newConfig, bindingPath, oldKey, newKey)
   }
 
-  def migrateTagging(config: Config): Config = {
+  def dropTagging(config: Config): Config = {
     // Tagging is configured in the akka persistence journal.
     //  This journal has different configuration keys per type of persistence.
     //  Find the right path based on the config of the journal plugin.
@@ -39,12 +39,11 @@ object SystemConfig extends LazyLogging {
     val key = "tagging"
     val deprecatedValue = "org.cafienne.akka.actor.tagging.CaseTaggingEventAdapter"
     val newValue = "org.cafienne.actormodel.tagging.CaseTaggingEventAdapter"
-    val newConfig = migrateConfigurationValue(config, taggingPath, key, deprecatedValue, newValue)
+    val newConfig = dropConfigurationValue(config, taggingPath, key, deprecatedValue, newValue)
 
     val bindingPath = s"$akkaJournalPath.event-adapter-bindings"
-    val oldKey = "org.cafienne.akka.actor.event.ModelEvent"
     val newKey = "org.cafienne.actormodel.event.ModelEvent"
-    migrateConfigurationProperty(newConfig, bindingPath, oldKey, newKey)
+    dropConfigurationProperty(newConfig, bindingPath, newKey)
   }
 
   def migrateEventDatabaseProvider(config: Config): Config = {
@@ -80,8 +79,11 @@ object SystemConfig extends LazyLogging {
     s"${origin.url()}, line ${origin.lineNumber()}"
   }
 
+  def quoted(path: String, key: String): String = s"""$path.$key"""
+  def quotedKeyPath(path: String, key: String): String = quoted(path, s""""$key"""")
+
   def migrateConfigurationValue(config: Config, path: String, key: String, oldValue: AnyRef, newValue: AnyRef, showWarningOnDifferentValue: Boolean = true): Config = {
-    val keyPath = s"""$path.$key"""
+    val keyPath = quoted(path, key)
     if (config.hasPath(keyPath)) {
       val configValue = config.getValue(keyPath)
       val location = getLocationDescription(configValue)
@@ -99,6 +101,20 @@ object SystemConfig extends LazyLogging {
     config
   }
 
+  def dropConfigurationValue(config: Config, path: String, key: String, oldValue: AnyRef, newValue: AnyRef): Config = {
+    val keyPath = quoted(path, key)
+    if (config.hasPath(keyPath)) {
+      val configValue = config.getValue(keyPath)
+      val location = getLocationDescription(configValue)
+      val value = configValue.unwrapped()
+      if (value == oldValue || value == newValue) {
+        printWarning(s"""$location\n\tFound deprecated configuration property, please drop the line.\n\n\t\t$key = $value""")
+      }
+    }
+    // Return the existing config
+    config
+  }
+
   /**
     * This migrates the old key to the new key.
     * Note that the key is string escaped inside the method and then gets appended to the path
@@ -110,10 +126,8 @@ object SystemConfig extends LazyLogging {
     * @return
     */
   def migrateConfigurationProperty(config: Config, path: String, oldKey: String, newKey: String): Config = {
-    val quotedOldKey = s""""$oldKey""""
-    val quotedNewKey = s""""$newKey""""
-    val oldPath = s"$path.$quotedOldKey"
-    val newPath = s"$path.$quotedNewKey"
+    val oldPath = quotedKeyPath(path, oldKey)
+    val newPath = quotedKeyPath(path, newKey)
 
     if (!config.hasPath(newPath)) {
       if (config.hasPath(oldPath)) {
@@ -124,8 +138,20 @@ object SystemConfig extends LazyLogging {
         // Replace the old property
         return config.withoutPath(oldPath).withValue(newPath, ConfigValueFactory.fromAnyRef(value))
       } else {
-        printWarning(s"""Configuration property '$newKey' might be missing """)
+        printWarning(s"""Configuration property '$path' might be missing """)
       }
+    }
+    // Return the existing config
+    config
+  }
+
+  def dropConfigurationProperty(config: Config, path: String, key: String): Config = {
+    val propertyPath = quotedKeyPath(path, key)
+
+    if (config.hasPath(propertyPath)) {
+      val value = config.getValue(propertyPath)
+      val location = getLocationDescription(value)
+      printWarning(s"""$location\n\tFound deprecated configuration property, please drop the line.\n\n\t\t$key = ${value.unwrapped}""")
     }
     // Return the existing config
     config
