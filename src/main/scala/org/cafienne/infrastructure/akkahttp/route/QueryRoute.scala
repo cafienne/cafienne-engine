@@ -27,7 +27,7 @@ trait QueryRoute extends AuthenticatedRoute {
 
   def runXMLQuery(future: => Future[CaseDefinitionDocument]): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      handleXMLResult(handleSyncedQuery(() => future, caseLastModified))
+      handleXMLResult(runSyncedQuery(future, caseLastModified))
     }
   }
 
@@ -40,13 +40,13 @@ trait QueryRoute extends AuthenticatedRoute {
 
   def runQuery[T <: CafienneJson](future: => Future[T]): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      handleQueryResult(handleSyncedQuery(() => future, caseLastModified))
+      handleQueryResult(runSyncedQuery(future, caseLastModified))
     }
   }
 
   def runListQuery[T <: CafienneJson](future: => Future[Seq[T]]): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      handleQueryResultList(handleSyncedQuery(() => future, caseLastModified))
+      handleQueryResultList(runSyncedQuery(future, caseLastModified))
     }
   }
 
@@ -76,14 +76,22 @@ trait QueryRoute extends AuthenticatedRoute {
     }
   }
 
-  def handleSyncedQuery[A](query: () => Future[A], clm: Option[String]): Future[A] = {
-    clm match {
+  /**
+    * Runs the query after last modified registration has handled the optional last modified timestamp
+    * If the last modified timestamp is empty, then the query is ran immediately.
+    * @param query
+    * @param lastModified
+    * @tparam A
+    * @return
+    */
+  def runSyncedQuery[A](query: => Future[A], lastModified: Option[String] = None): Future[A] = {
+    lastModified match {
       case Some(s) =>
         // Now go to the writer and ask it to wait for the clm for this case instance id...
         val promise = lastModifiedRegistration.waitFor(new ActorLastModified(s))
-        promise.future.flatMap(_ => query())
+        promise.future.flatMap(_ => query)
       case None => // Nothing to do, just continue
-        query()
+        query
     }
   }
 }

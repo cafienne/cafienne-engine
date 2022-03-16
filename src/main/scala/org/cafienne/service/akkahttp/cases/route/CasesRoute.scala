@@ -83,7 +83,7 @@ trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
 
   def authorizeCaseAccess(platformUser: PlatformUser, caseInstanceId: String, subRoute: CaseMembership => Route): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      onComplete(handleSyncedQuery(() => caseQueries.getCaseMembership(caseInstanceId, platformUser), caseLastModified)) {
+      onComplete(runSyncedQuery(caseQueries.getCaseMembership(caseInstanceId, platformUser), caseLastModified)) {
         case Success(membership) => subRoute(membership)
         case Failure(error) =>
           error match {
