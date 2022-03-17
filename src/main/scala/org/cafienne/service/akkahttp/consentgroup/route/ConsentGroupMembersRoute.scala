@@ -43,9 +43,9 @@ class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends Cons
   )
   @Produces(Array("application/json"))
   def getGroup: Route = get {
-    validUser { platformUser =>
-      path(Segment) { groupId =>
-        runQuery(userQueries.getConsentGroup(platformUser, groupId))
+    consentGroupUser { user =>
+      pathEndOrSingleSlash { // Need to use pathEnd here otherwise getMember route gets swallowed
+        runQuery(userQueries.getConsentGroup(user, user.groupId))
       }
     }
   }
@@ -67,9 +67,9 @@ class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends Cons
   )
   @Produces(Array("application/json"))
   def getMember: Route = get {
-    validUser { platformUser =>
-      path(Segment / "members" / Segment) { (groupId, userId) =>
-        runQuery(userQueries.getConsentGroupMember(platformUser, groupId, userId))
+    consentGroupUser { user =>
+      path("members" / Segment) { userId =>
+        runQuery(userQueries.getConsentGroupMember(user, user.groupId, userId))
       }
     }
   }

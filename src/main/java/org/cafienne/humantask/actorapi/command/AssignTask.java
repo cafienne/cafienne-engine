@@ -24,16 +24,16 @@ import java.io.IOException;
 
 @Manifest
 public class AssignTask extends WorkflowCommand {
-    protected final String assignee;
+    protected final CaseUserIdentity assignee;
 
-    public AssignTask(CaseUserIdentity user, String caseInstanceId, String taskId, UserIdentity assignee) {
+    public AssignTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity assignee) {
         super(user, caseInstanceId, taskId);
-        this.assignee = assignee.id();
+        this.assignee = assignee;
     }
 
     public AssignTask(ValueMap json) {
         super(json);
-        this.assignee = json.readString(Fields.assignee);
+        this.assignee = readUser(json.with(Fields.assignee));
     }
 
     @Override
@@ -46,13 +46,13 @@ public class AssignTask extends WorkflowCommand {
         validateCaseTeamMembership(task, assignee);
     }
 
-    protected void validateCaseTeamMembership(HumanTask task, String assignee) {
+    protected void validateCaseTeamMembership(HumanTask task, CaseUserIdentity assignee) {
         if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
             // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
             return;
         }
         // Validate that the new assignee is part of the team
-        CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(assignee);
+        CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(assignee.id());
         if (member == null) {
             raiseException("There is no case team member with id '" + assignee + "'");
         } else {

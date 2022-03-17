@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
 import org.cafienne.cmmn.actorapi.response.CaseResponseModels
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.cases.model.CasePlanAPI._
 import org.cafienne.system.CaseSystem
 
@@ -26,8 +25,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class DiscretionaryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(retrieveDiscretionaryItem, planDiscretionaryItem)
 
   @Path("/{caseInstanceId}/discretionaryitems")
@@ -46,9 +43,9 @@ class DiscretionaryRoute(override val caseSystem: CaseSystem) extends CasesRoute
   )
   @Produces(Array("application/json"))
   def retrieveDiscretionaryItem: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment / "discretionaryitems") { caseInstanceId =>
-        askCase(platformUser, caseInstanceId, tenantUser => new GetDiscretionaryItems(tenantUser, caseInstanceId))
+        askCase(user, caseInstanceId, tenantUser => new GetDiscretionaryItems(tenantUser, caseInstanceId))
       }
     }
   }
@@ -71,10 +68,10 @@ class DiscretionaryRoute(override val caseSystem: CaseSystem) extends CasesRoute
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
   def planDiscretionaryItem: Route = post {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment / "discretionaryitems" / "plan") { caseInstanceId =>
         entity(as[PlanDiscretionaryItem]) { payload =>
-          askCase(platformUser, caseInstanceId, tenantUser => new AddDiscretionaryItem(tenantUser, caseInstanceId, payload.name, payload.definitionId, payload.parentId, payload.planItemId.orNull))
+          askCase(user, caseInstanceId, tenantUser => new AddDiscretionaryItem(tenantUser, caseInstanceId, payload.name, payload.definitionId, payload.parentId, payload.planItemId.orNull))
         }
       }
     }

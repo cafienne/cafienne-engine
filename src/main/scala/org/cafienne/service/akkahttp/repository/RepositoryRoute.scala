@@ -217,7 +217,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
     validUser { platformUser =>
       parameters("tenant".?) { optionalTenant =>
         val tenant = platformUser.resolveTenant(optionalTenant)
-        validateTenant(tenant, () => subRoute(platformUser, tenant))
+        validateTenant(tenant, subRoute(platformUser, tenant))
       }
     }
   }

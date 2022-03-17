@@ -11,23 +11,21 @@ import _root_.akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
+import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin}
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.cases._
 import org.cafienne.service.akkahttp.cases.model.CaseAPI._
 import org.cafienne.system.CaseSystem
 
@@ -36,10 +34,8 @@ import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
-class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
-  override def routes: Route = concat(getCases, stats, getCase, getCaseDefinition, startCase, debugCase)
+class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with CaseTeamValidator {
+  override def routes: Route = concat(getCases, /*stats,*/ getCase, getCaseDefinition, startCase, debugCase)
 
   @GET
   @Operation(
@@ -64,47 +60,47 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @Produces(Array("application/json"))
   def getCases: Route = get {
     pathEndOrSingleSlash {
-      validUser { platformUser =>
+      caseUser { user =>
         parameters("tenant".?,"identifiers".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?, "sortBy".?, "sortOrder".?) {
           (tenant, identifiers, offset, numResults, caseName, definition, state, sortBy, sortOrder) =>
             val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
             val filter = CaseFilter(tenant, identifiers = identifiers, caseName = backwardsCompatibleNameFilter, status = state)
-            runListQuery(caseQueries.getCases(platformUser, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
+            runListQuery(caseQueries.getCases(user, filter, Area(offset, numResults), Sort.withDefault(sortBy, sortOrder, "lastModified")))
         }
       }
     }
   }
 
-  @Path("/stats")
-  @GET
-  @Operation(
-    summary = "Get statistics for all case definitions",
-    description = "Returns statistics of all case definitions",
-    tags = Array("case"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the statistics in", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0"), required = false),
-      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100"), required = false),
-      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Statistics found and returned", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseList]))))),
-      new ApiResponse(description = "No cases found based on query params", responseCode = "404")
-    )
-  )
-  @Produces(Array("application/json"))
-  def stats: Route = get {
-    path("stats") {
-      validUser { platformUser =>
-        parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
-        ) { (tenant, offset, numOfResults, caseName, definition, status) =>
-          val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
-          runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))
-        }
-      }
-    }
-  }
+//  @Path("/stats")
+//  @GET
+//  @Operation(
+//    summary = "Get statistics for all case definitions",
+//    description = "Returns statistics of all case definitions",
+//    tags = Array("case"),
+//    parameters = Array(
+//      new Parameter(name = "tenant", description = "Optionally provide a specific tenant to read the statistics in", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+//      new Parameter(name = "offset", description = "Starting position", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "0"), required = false),
+//      new Parameter(name = "numberOfResults", description = "Number of cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[Integer], defaultValue = "100"), required = false),
+//      new Parameter(name = "caseName", description = "Get cases with this name", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+//      new Parameter(name = "state", description = "State of the cases", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
+//    ),
+//    responses = Array(
+//      new ApiResponse(description = "Statistics found and returned", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseList]))))),
+//      new ApiResponse(description = "No cases found based on query params", responseCode = "404")
+//    )
+//  )
+//  @Produces(Array("application/json"))
+//  def stats: Route = get {
+//    path("stats") {
+//      validUser { platformUser =>
+//        parameters("tenant".?, "offset".?(0), "numberOfResults".?(100), "caseName".?, "definition".?, "state".?
+//        ) { (tenant, offset, numOfResults, caseName, definition, status) =>
+//          val backwardsCompatibleNameFilter: Option[String] = caseName.fold(definition)(n => Some(n))
+//          runListQuery(caseQueries.getCasesStats(platformUser, tenant, offset, numOfResults, backwardsCompatibleNameFilter, status))
+//        }
+//      }
+//    }
+//  }
 
   @Path("/{caseInstanceId}")
   @GET
@@ -123,9 +119,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getCase: Route = get {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment) {
-        caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, platformUser))
+        caseInstanceId => runQuery(caseQueries.getFullCaseInstance(caseInstanceId, user))
       }
     }
   }
@@ -147,7 +143,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getCaseDefinition: Route = get {
-    caseInstanceSubRoute("definition", (platformUser, caseInstanceId) => runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, platformUser)))
+    caseInstanceSubRoute("definition") { (user, caseInstanceId) =>
+      runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, user))
+    }
   }
 
   @POST
@@ -165,27 +163,23 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   @Produces(Array("application/json"))
   def startCase: Route = post {
     pathEndOrSingleSlash {
-      validUser { platformUser =>
+      caseUser { user =>
         post {
           entity(as[StartCaseFormat]) { payload =>
-            try {
-              val tenant = platformUser.resolveTenant(payload.tenant)
-              val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, payload.definition)
-              val caseDefinition = definitionsDocument.getFirstCase
+            caseStarter(user, payload.tenant) { (user, tenant) =>
+              try {
+                val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, tenant, payload.definition)
+                val caseDefinition = definitionsDocument.getFirstCase
 
-              val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
-              val inputParameters = payload.inputs
-              val caseTeam: CaseTeam = payload.caseTeam.asTeam
-              val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
-              val caseStarter = new CaseUserIdentity {
-                override val id: String = platformUser.id
-                override val origin: Origin = platformUser.origin(tenant)
-                override val tenantRoles: Set[String] = platformUser.tenantRoles(tenant)
+                val newCaseId = payload.caseInstanceId.fold(UUID.randomUUID().toString.replace("-", "_"))(cid => cid)
+                val inputParameters = payload.inputs
+                val caseTeam: CaseTeam = payload.caseTeam.asTeam
+                val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
+                validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, user, newCaseId, caseDefinition, inputParameters, team, debugMode)))
+              } catch {
+                case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
+                case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
               }
-              validateTenantAndTeam(caseTeam, tenant, team => askModelActor(new StartCase(tenant, caseStarter, newCaseId, caseDefinition, inputParameters, team, debugMode)))
-            } catch {
-              case e: MissingDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
-              case e: InvalidDefinitionException => complete(StatusCodes.BadRequest, e.getMessage)
             }
           }
         }
@@ -210,9 +204,9 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def debugCase: Route = put {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("debug" / Segment) { debugMode =>
-        askCase(platformUser, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
+        askCase(user, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
       }
     }
   }

@@ -2,7 +2,7 @@ package org.cafienne.consentgroup.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.TenantUser;
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
 import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
@@ -16,8 +16,8 @@ import java.io.IOException;
 public class SetConsentGroupMember extends ConsentGroupCommand {
     private final ConsentGroupMember newMemberInfo;
 
-    public SetConsentGroupMember(TenantUser groupOwner, String groupId, ConsentGroupMember newMemberInfo) {
-        super(groupOwner, groupId);
+    public SetConsentGroupMember(ConsentGroupUser groupOwner, ConsentGroupMember newMemberInfo) {
+        super(groupOwner, groupOwner.groupId());
         this.newMemberInfo = newMemberInfo;
     }
 

@@ -1,9 +1,9 @@
 package org.cafienne.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.{ConsentGroupMembership, PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity._
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
-import org.cafienne.querydb.query.exception.{ConsentGroupMemberSearchFailure, ConsentGroupSearchFailure, TenantSearchFailure, UserSearchFailure}
+import org.cafienne.querydb.query.exception._
 import org.cafienne.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
 import org.cafienne.querydb.schema.table.{ConsentGroupTables, TenantTables}
 
@@ -12,23 +12,27 @@ import scala.concurrent.{ExecutionContext, Future}
 trait UserQueries {
   def getTenant(tenantId: String): Future[TenantRecord] = ???
 
+  def getTenantUser(user: UserIdentity, tenant: String): Future[TenantUser] = ???
+
   def getPlatformUser(userId: String): Future[PlatformUser] = ???
+
+  def determineOriginOfUsers(users: Seq[String], tenant: String): Future[Seq[(String, Origin)]] = ???
 
   def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = ???
 
-  def getTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
+  def getTenantUsers(tenantUser: TenantUser): Future[Seq[TenantUser]] = ???
 
-  def getDisabledTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = ???
+  def getDisabledTenantUserAccounts(tenantUser: TenantUser): Future[Seq[TenantUser]] = ???
 
-  def getTenantUser(platformUser: PlatformUser, tenant: String, userId: String): Future[TenantUser] = ???
+  def getTenantUser(tenantUser: TenantUser, userId: String): Future[TenantUser] = ???
 
-  def getConsentGroup(platformUser: PlatformUser, groupId: String): Future[ConsentGroup] = ???
+  def getConsentGroup(user: UserIdentity, groupId: String): Future[ConsentGroup] = ???
 
   def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = ???
 
-  def getConsentGroupMember(platformUser: PlatformUser, groupId: String, userId: String): Future[ConsentGroupMember] = ???
+  def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String): Future[ConsentGroupMember] = ???
 
-  def authorizeConsentGroupMembershipAndReturnTenant(platformUser: PlatformUser, groupId: String): Future[String] = ???
+  def getConsentGroupUser(user: UserIdentity, groupId: String): Future[ConsentGroupUser] = ???
 }
 
 
@@ -49,7 +53,35 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     }
   }
 
+  override def getTenantUser(user: UserIdentity, tenant: String): Future[TenantUser] = {
+    val query = TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.tenant === tenant)
+    db.run(query.result).map(records => {
+      // First find the user record itself. Throw an exception if that is not found. This is also done when records list is empty.
+      val userRecord = records.find(record => record.role_name.isBlank).fold(throw TenantUserSearchFailure(tenant, user.id))(r => r)
+      val roles = records.filter(record => !record.role_name.isBlank && record.enabled).map(_.role_name).toSet
+      createTenantUser(userRecord, roles)
+    })
+  }
+
   override def getPlatformUser(userId: String): Future[PlatformUser] = getPlatformUsers(Seq(userId)).map(_.head)
+
+  override def determineOriginOfUsers(users: Seq[String], tenant: String): Future[Seq[(String, Origin)]] = {
+    val tenantMembership = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.tenant === tenant).filter(_.role_name === "").map(_.userId).distinct.take(users.length)
+    val platformRegistration = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filterNot(_.tenant === tenant).filter(_.role_name === "").map(_.userId).distinct.take(users.length)
+    val query = tenantMembership.joinFull(platformRegistration)
+    db.run(query.result).map(records => {
+      val tenantUserIds = records.filter(_._1.isDefined).map(_._1.get).toSet
+      val platformUserIds = records.filter(_._2.isDefined).map(_._2.get).toSet
+
+      def determineOrigin(userId: String) = {
+        if (tenantUserIds.contains(userId)) Origin.Tenant
+        else if (platformUserIds.contains(userId)) Origin.Platform
+        else Origin.IDP
+      }
+
+      users.map(user => (user, determineOrigin(user)))
+    })
+  }
 
   override def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = {
     val tenantUsersQuery = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.enabled === true)
@@ -87,15 +119,15 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     PlatformUser(userId, tenantUsers, groups)
   }
 
-  override def getTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
-    readAllTenantUsers(platformUser, tenant).map(p => p.filter(t => t.enabled))
+  override def getTenantUsers(user: TenantUser): Future[Seq[TenantUser]] = {
+    readAllTenantUsers(user).map(p => p.filter(t => t.enabled))
   }
 
-  private def readAllTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
-    // First a security check
-    platformUser.shouldBelongTo(tenant)
+  private def readAllTenantUsers(user: TenantUser): Future[Seq[TenantUser]] = {
+//    // First a security check
+//    platformUser.shouldBelongTo(tenant)
 
-    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant)
+    val users = TableQuery[UserRoleTable].filter(_.tenant === user.tenant)
     db.run(users.result).map(records => {
       // First sort and store all roles by user-id
       val userRecords = records.filter(record => record.role_name.isBlank)
@@ -113,15 +145,13 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     TenantUser(user.userId, tenant = user.tenant, roles = roles, isOwner = user.isOwner, name = user.name, email = user.email, enabled = user.enabled)
   }
 
-  override def getDisabledTenantUsers(platformUser: PlatformUser, tenant: String): Future[Seq[TenantUser]] = {
-    readAllTenantUsers(platformUser, tenant).map(p => p.filterNot(t => t.enabled))
+  override def getDisabledTenantUserAccounts(tenantUser: TenantUser): Future[Seq[TenantUser]] = {
+    readAllTenantUsers(tenantUser).map(p => p.filterNot(t => t.enabled))
   }
 
   // Note: this also returns a user if the account for that user has been disabled
-  override def getTenantUser(platformUser: PlatformUser, tenant: String, userId: String): Future[TenantUser] = {
-    // First a security check
-    platformUser.shouldBelongTo(tenant)
-    val users = TableQuery[UserRoleTable].filter(_.tenant === tenant).filter(_.userId === userId)
+  override def getTenantUser(tenantUser: TenantUser, userId: String): Future[TenantUser] = {
+    val users = TableQuery[UserRoleTable].filter(_.tenant === tenantUser.tenant).filter(_.userId === userId)
     db.run(users.result).map(roleRecords => {
       // Filter out user
       val user = roleRecords.find(role => role.role_name.isBlank).getOrElse({
@@ -152,10 +182,10 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     })
   }
 
-  override def getConsentGroup(platformUser: PlatformUser, groupId: String): Future[ConsentGroup] = {
+  override def getConsentGroup(user: UserIdentity, groupId: String): Future[ConsentGroup] = {
     val consentGroupQuery = for {
       groupQuery <- TableQuery[ConsentGroupTable].filter(_.id === groupId)
-      _ <- consentGroupMembershipQuery(platformUser, groupQuery.id) // User must be member
+      _ <- consentGroupMembershipQuery(user, groupQuery.id) // User must be member
     } yield groupQuery
 
     val queries = for {
@@ -181,20 +211,20 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     })
   }
 
-  private def consentGroupMembershipQuery(platformUser: PlatformUser, groupId: Rep[String]): Query[ConsentGroupMemberTable, ConsentGroupMemberRecord, Seq] = {
-    TableQuery[ConsentGroupMemberTable].filter(_.group === groupId).filter(_.userId === platformUser.id).filter(_.role === "")
+  private def consentGroupMembershipQuery(user: UserIdentity, groupId: Rep[String]): Query[ConsentGroupMemberTable, ConsentGroupMemberRecord, Seq] = {
+    TableQuery[ConsentGroupMemberTable].filter(_.group === groupId).filter(_.userId === user.id).filter(_.role === "")
   }
 
-  override def getConsentGroupMember(platformUser: PlatformUser, groupId: String, userId: String): Future[ConsentGroupMember] = {
+  override def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String): Future[ConsentGroupMember] = {
     // Pay attention: This query filters both on the requested and requesting user; one used for authorization of the requesting user.
     val query = TableQuery[ConsentGroupMemberTable]
       .filter(_.group === groupId)
       .filter(member => member.userId === userId // Get all requested records
-        || (member.userId === platformUser.id && member.role === "")) // And the requestor record with blank role.
+        || (member.userId === user.id && member.role === "")) // And the requestor record with blank role.
 
     db.run(query.result).map { records =>
       // First check that the requestor is a group member
-      if (!records.exists(_.userId == platformUser.id)) {
+      if (!records.exists(_.userId == user.id)) {
         // The user does not have access to this group, so can also not ask for member information
         throw ConsentGroupSearchFailure(groupId)
       }
@@ -210,14 +240,14 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     }
   }
 
-  override def authorizeConsentGroupMembershipAndReturnTenant(platformUser: PlatformUser, groupId: String): Future[String] = {
+  override def getConsentGroupUser(user: UserIdentity, groupId: String): Future[ConsentGroupUser] = {
     val consentGroupQuery = for {
       groupQuery <- TableQuery[ConsentGroupTable].filter(_.id === groupId)
-      _ <- consentGroupMembershipQuery(platformUser, groupQuery.id) // User must be member
+      _ <- consentGroupMembershipQuery(user, groupQuery.id) // User must be member
     } yield groupQuery
 
     db.run(consentGroupQuery.result.headOption).map {
-      case Some(group) => group.tenant
+      case Some(group) => ConsentGroupUser(id = user.id, groupId = group.id, tenant = group.tenant)
       case None => throw ConsentGroupSearchFailure(groupId)
     }
   }

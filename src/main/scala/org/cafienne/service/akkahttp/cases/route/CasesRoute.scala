@@ -10,21 +10,24 @@ package org.cafienne.service.akkahttp.cases.route
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.identity.UserIdentity
+import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.actorapi.command._
-import org.cafienne.cmmn.actorapi.command.team._
-import org.cafienne.cmmn.actorapi.command.team.setmember.SetCaseTeamUser
-import org.cafienne.infrastructure.akkahttp.route.{CaseTeamValidator, CommandRoute, QueryRoute}
+import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.cases.CaseReader
-import org.cafienne.querydb.query.{CaseMembership, CaseQueries}
 import org.cafienne.querydb.query.exception.CaseSearchFailure
+import org.cafienne.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
 
 import scala.util.{Failure, Success}
 
-trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
+trait CasesRoute extends CommandRoute with QueryRoute {
   override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
-  val caseQueries: CaseQueries
+  val caseQueries: CaseQueries = new CaseQueriesImpl
+
+  def caseUser(subRoute: AuthenticatedUser => Route): Route = {
+    super.authenticatedUser(subRoute)
+  }
 
   /**
     * Run the sub route with a valid platform user and case instance id
@@ -32,11 +35,11 @@ trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
     * @param subRoute
     * @return
     */
-  def caseInstanceRoute(subRoute: (PlatformUser, String) => Route): Route = {
-    validUser { platformUser =>
+  def caseInstanceRoute(subRoute: (UserIdentity, String) => Route): Route = {
+    caseUser { user =>
       path(Segment) { caseInstanceId =>
         pathEndOrSingleSlash {
-          subRoute(platformUser, caseInstanceId)
+          subRoute(user, caseInstanceId)
         }
       }
     }
@@ -48,10 +51,10 @@ trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
     * @param subRoute
     * @return
     */
-  def caseInstanceSubRoute(subRoute: (PlatformUser, String) => Route): Route = {
-    validUser { platformUser =>
+  def caseInstanceSubRoute(subRoute: (UserIdentity, String) => Route): Route = {
+    caseUser { user =>
       pathPrefix(Segment) { caseInstanceId =>
-        subRoute(platformUser, caseInstanceId)
+        subRoute(user, caseInstanceId)
       }
     }
   }
@@ -62,28 +65,17 @@ trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
     * @param subRoute
     * @return
     */
-  def caseInstanceSubRoute(prefix: String, subRoute: (PlatformUser, String) => Route): Route = {
-    validUser { platformUser =>
+  def caseInstanceSubRoute(prefix: String)(subRoute: (UserIdentity, String) => Route): Route = {
+    caseUser { user =>
       pathPrefix(Segment / prefix) { caseInstanceId =>
-        subRoute(platformUser, caseInstanceId)
+        subRoute(user, caseInstanceId)
       }
     }
   }
 
-  def putCaseTeamUser(platformUser: PlatformUser, caseInstanceId: String, newUser: CaseTeamUser): Route = {
-    authorizeCaseAccess(platformUser, caseInstanceId, {
-      member => {
-        onComplete(userCache.getUserRegistration(newUser.userId)) {
-          case Success(registeredPlatformUser) => askModelActor(new SetCaseTeamUser(member, caseInstanceId, newUser.copy(newOrigin = registeredPlatformUser.origin(member.tenant))))
-          case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
-        }
-      }
-    })
-  }
-
-  def authorizeCaseAccess(platformUser: PlatformUser, caseInstanceId: String, subRoute: CaseMembership => Route): Route = {
+  def authorizeCaseAccess(user: UserIdentity, caseInstanceId: String, subRoute: CaseMembership => Route): Route = {
     readLastModifiedHeader() { caseLastModified =>
-      onComplete(handleSyncedQuery(() => caseQueries.getCaseMembership(caseInstanceId, platformUser), caseLastModified)) {
+      onComplete(runSyncedQuery(caseQueries.getCaseMembership(caseInstanceId, user), caseLastModified)) {
         case Success(membership) => subRoute(membership)
         case Failure(error) =>
           error match {
@@ -94,7 +86,7 @@ trait CasesRoute extends CommandRoute with QueryRoute with CaseTeamValidator {
     }
   }
 
-  def askCase(platformUser: PlatformUser, caseInstanceId: String, createCaseCommand: CaseMembership => CaseCommand): Route = {
-    authorizeCaseAccess(platformUser, caseInstanceId, caseMember => askModelActor(createCaseCommand.apply(caseMember)))
+  def askCase(user: UserIdentity, caseInstanceId: String, createCaseCommand: CaseMembership => CaseCommand): Route = {
+    authorizeCaseAccess(user, caseInstanceId, caseMember => askModelActor(createCaseCommand.apply(caseMember)))
   }
 }

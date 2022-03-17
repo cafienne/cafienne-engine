@@ -32,14 +32,14 @@ trait AuthenticationDirectives {
   //IdentityProvider to get the user
   protected val userCache: IdentityProvider
 
-  def user(tlm: Option[String]): Directive1[PlatformUser] = {
-    authenticateOAuth2Async("service", c => {
-      jwtToServiceUserAuthenticator(c, tlm)
-    })
-  }
-
   def authenticatedUser(): Directive1[AuthenticatedUser] = {
     authenticateOAuth2Async("service", verifyJWTToken)
+  }
+
+  def platformUser(tlm: Option[String]): Directive1[PlatformUser] = {
+    authenticateOAuth2Async("service", c => {
+      jwtToPlatformUser(c, tlm)
+    })
   }
 
   private def verifyJWTToken(credentials: Credentials): Future[Option[AuthenticatedUser]] = {
@@ -49,7 +49,7 @@ trait AuthenticationDirectives {
     }
   }
 
-  private def jwtToServiceUserAuthenticator(credentials: Credentials, tlm: Option[String]): Future[Option[PlatformUser]] = {
+  private def jwtToPlatformUser(credentials: Credentials, tlm: Option[String]): Future[Option[PlatformUser]] = {
     credentials match {
       case Credentials.Provided(token) => {
         for {

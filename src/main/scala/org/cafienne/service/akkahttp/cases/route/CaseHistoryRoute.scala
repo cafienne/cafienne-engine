@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.querydb.query.{CaseQueries, CaseQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 
@@ -23,8 +22,6 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/cases")
 class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
-  val caseQueries: CaseQueries = new CaseQueriesImpl
-
   override def routes: Route = concat(getPlanHistory, getPlanItemHistory)
 
   @Path("/{caseInstanceId}/history/planitems")
@@ -44,9 +41,9 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getPlanHistory: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("history" / "planitems") {
-         runListQuery(caseQueries.getCasePlanHistory(caseInstanceId, platformUser))
+         runListQuery(caseQueries.getCasePlanHistory(caseInstanceId, user))
       }
     }
   }
@@ -68,9 +65,9 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   )
   @Produces(Array("application/json"))
   def getPlanItemHistory: Route = get {
-    caseInstanceSubRoute { (platformUser, caseInstanceId) =>
+    caseInstanceSubRoute { (user, caseInstanceId) =>
       path("history" / "planitems" / Segment) { planItemId =>
-        runQuery(caseQueries.getPlanItemHistory(planItemId, platformUser))
+        runQuery(caseQueries.getPlanItemHistory(planItemId, user))
       }
     }
   }

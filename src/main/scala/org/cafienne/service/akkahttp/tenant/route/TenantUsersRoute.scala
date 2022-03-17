@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.querydb.query.exception.UserSearchFailure
-import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI.TenantUserFormat
 import org.cafienne.system.CaseSystem
 
@@ -29,8 +28,6 @@ import scala.util.{Failure, Success}
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tenant")
 class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute {
-  val userQueries: UserQueries = new TenantQueriesImpl
-
   override def routes: Route = concat(getTenantUsers, getTenantUser)
 
   @Path("/{tenant}/users")
@@ -49,9 +46,9 @@ class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute 
   )
   @Produces(Array("application/json"))
   def getTenantUsers: Route = get {
-    validUser { platformUser =>
-      path(Segment / "users") {
-        tenant => runListQuery(userQueries.getTenantUsers(platformUser, tenant))
+    tenantUser { platformUser =>
+      path("users") {
+        runListQuery(userQueries.getTenantUsers(platformUser))
       }
     }
   }
@@ -73,18 +70,18 @@ class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute 
   )
   @Produces(Array("application/json"))
   def getTenantUser: Route = get {
-    validUser { platformUser =>
-      path(Segment / "users" / Segment) { (tenant, userId) =>
-        onComplete(userQueries.getTenantUser(platformUser, tenant, userId)) {
+    tenantUser { tenantUser =>
+      path("users" / Segment) { userId =>
+        onComplete(userQueries.getTenantUser(tenantUser, userId)) {
           case Success(tenantUserInformation) =>
             if (tenantUserInformation.enabled) {
               completeJsonValue(tenantUserInformation.toValue)
             } else {
               // TODO: perhaps this should be allowed for tenant owners?
-              if (platformUser.getTenantUser(tenant).isOwner) {
-                logger.warn(s"Tenant owner '${platformUser.id}' tries to fetch tenant user '$userId' but that account has been disabled, hence no response is given")
+              if (tenantUser.isOwner) {
+                logger.warn(s"Tenant owner '${tenantUser.id}' tries to fetch tenant user '$userId' but that account has been disabled, hence no response is given")
               } else {
-                logger.warn(s"User with id '${platformUser.id}' tries to fetch tenant user '$userId' but that account has been disabled")
+                logger.warn(s"User with id '${tenantUser.id}' tries to fetch tenant user '$userId' but that account has been disabled")
               }
               complete(StatusCodes.NotFound)
             }
@@ -92,10 +89,9 @@ class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute 
             failure match {
               case u: UserSearchFailure => complete(StatusCodes.NotFound, u.getLocalizedMessage)
               case err: AuthorizationException => complete(StatusCodes.Unauthorized, err.getMessage)
-              case _ => {
-                logger.warn(s"Ran into an exception while getting user '$userId' in tenant '$tenant'", failure)
+              case _ =>
+                logger.warn(s"Ran into an exception while getting user '$userId' in tenant '${tenantUser.tenant}'", failure)
                 complete(StatusCodes.InternalServerError)
-              }
             }
         }
       }

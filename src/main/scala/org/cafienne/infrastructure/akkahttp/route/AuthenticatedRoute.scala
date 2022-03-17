@@ -7,9 +7,11 @@ import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
 import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.authentication.{AuthenticationException, CannotReachIDPException}
+import org.cafienne.actormodel.response.ActorLastModified
+import org.cafienne.authentication.{AuthenticatedUser, AuthenticationException, CannotReachIDPException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.{AuthenticationDirectives, IdentityProvider}
+import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.querydb.query.exception.SearchFailure
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.health.HealthMonitor
@@ -87,9 +89,25 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     }
   }
 
+  def authenticatedUser(subRoute: AuthenticatedUser => Route): Route = {
+    OIDCAuthentication.authenticatedUser() { user => {
+        caseSystemMustBeHealthy()
+        optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) {
+          case Some(s) =>
+            // Wait for the TenantReader to be informed about the tenant-last-modified timestamp
+            onComplete(TenantReader.lastModifiedRegistration.waitFor(new ActorLastModified(s)).future) {
+              _ => subRoute(user)
+            }
+          // Nothing to wait for, just continue and execute the query straight on
+          case None => subRoute(user)
+        }
+      }
+    }
+  }
+
   def validUser(subRoute: PlatformUser => Route): Route = {
     optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { tlm =>
-      OIDCAuthentication.user(tlm) { platformUser =>
+      OIDCAuthentication.platformUser(tlm) { platformUser =>
         caseSystemMustBeHealthy()
         subRoute(platformUser)
       }

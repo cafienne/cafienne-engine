@@ -2,11 +2,12 @@ package org.cafienne.consentgroup;
 
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
-import org.cafienne.actormodel.identity.UserIdentity;
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand;
 import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup;
+import org.cafienne.consentgroup.actorapi.command.ReplaceConsentGroup;
 import org.cafienne.consentgroup.actorapi.event.*;
 import org.cafienne.system.CaseSystem;
 
@@ -35,7 +36,7 @@ public class ConsentGroupActor extends ModelActor {
         return created;
     }
 
-    public boolean isOwner(UserIdentity user) {
+    public boolean isOwner(ConsentGroupUser user) {
         return members.values().stream().filter(ConsentGroupMember::isOwner).anyMatch(member -> member.userId().equals(user.id()));
     }
 
@@ -93,6 +94,12 @@ public class ConsentGroupActor extends ModelActor {
 
     public void create(CreateConsentGroup command) {
         addEvent(new ConsentGroupCreated(this, command.tenant()));
+        command.getMembers().foreach(this::setMember);
+    }
+
+    public void replace(ReplaceConsentGroup command) {
+        // Remove users that no longer exist
+        members.keySet().stream().filter(command::missingUserId).collect(Collectors.toList()).forEach(this::removeMember);
         command.getMembers().foreach(this::setMember);
     }
 

@@ -38,6 +38,8 @@ trait TenantTables extends QueryDBSchema {
     //  right now, it does not make sense to enter a user without enabling it
     lazy val enabled = column[Boolean]("enabled", O.Default(true))
 
+    lazy val indexUserRoleTenant = index("ix_user_role__userId_role_name_tenant", (userId, role_name, tenant))
+
     lazy val indexOwnership = index(oldStyleIxName(isOwner), (userId, tenant, role_name, isOwner))
   }
 

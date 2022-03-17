@@ -1,11 +1,9 @@
 package org.cafienne.infrastructure.akkahttp.authentication
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.identity.PlatformUser
+import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
 import org.cafienne.actormodel.response.ActorLastModified
-import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
-import org.cafienne.consentgroup.actorapi.ConsentGroup
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
@@ -21,7 +19,7 @@ class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider 
   private val cache = new SimpleLRUCache[String, PlatformUser](Cafienne.config.api.security.identityCacheSize)
   private val tenantCache = new SimpleLRUCache[String, TenantRecord](Cafienne.config.api.security.identityCacheSize)
 
-  override def getPlatformUser(user: AuthenticatedUser, tlm: Option[String]): Future[PlatformUser] = {
+  override def getPlatformUser(user: UserIdentity, tlm: Option[String]): Future[PlatformUser] = {
     tlm match {
       case Some(s) =>
         // Wait for the TenantReader to be informed about the tenant-last-modified timestamp
@@ -39,10 +37,10 @@ class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider 
     user
   }
 
-  private def executeUserQuery(user: AuthenticatedUser): Future[PlatformUser] = {
-    cache.get(user.userId) match {
+  private def executeUserQuery(user: UserIdentity): Future[PlatformUser] = {
+    cache.get(user.id) match {
       case user: PlatformUser => Future(user)
-      case null => userQueries.getPlatformUser(user.userId).map(cacheUser)
+      case null => userQueries.getPlatformUser(user.id).map(cacheUser)
     }
   }
 
@@ -61,15 +59,4 @@ class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider 
     cache.remove(userId)
   }
 
-  override def getUsers(userIds: Seq[String]): Future[Seq[PlatformUser]] = {
-    userQueries.getPlatformUsers(userIds)
-  }
-
-  override def getUserRegistration(userId: String): Future[PlatformUser] = {
-    userQueries.getPlatformUser(userId)
-  }
-
-  override def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = {
-    userQueries.getConsentGroups(groupIds)
-  }
 }

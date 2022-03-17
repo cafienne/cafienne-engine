@@ -12,7 +12,7 @@ import org.flywaydb.core.api.output.MigrateResult
 
 object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLogging {
   def verifyConnectivity(): MigrateResult = {
-    useSchema(Seq(QueryDB_1_0_0, QueryDB_1_1_5, QueryDB_1_1_6, QueryDB_1_1_10, QueryDB_1_1_11, QueryDB_1_1_16))
+    useSchema(Seq(QueryDB_1_0_0, QueryDB_1_1_5, QueryDB_1_1_6, QueryDB_1_1_10, QueryDB_1_1_11, QueryDB_1_1_16, QueryDB_1_1_18))
   }
 
   def open(caseSystem: CaseSystem): Unit = {

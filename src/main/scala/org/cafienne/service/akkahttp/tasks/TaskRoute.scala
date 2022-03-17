@@ -10,26 +10,26 @@ package org.cafienne.service.akkahttp.tasks
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
+import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.WorkflowCommand
-import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.querydb.materializer.cases.CaseReader
-import org.cafienne.querydb.query.{CaseMembership, TaskQueries}
+import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
+import org.cafienne.querydb.query._
 import org.cafienne.querydb.query.exception.TaskSearchFailure
+import org.cafienne.service.akkahttp.cases.route.CasesRoute
 
 import scala.util.{Failure, Success}
 
-trait TaskRoute extends CommandRoute with QueryRoute {
-  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
-  val taskQueries: TaskQueries
+trait TaskRoute extends CasesRoute with CaseTeamValidator {
+  val taskQueries: TaskQueries = new TaskQueriesImpl
 
-  def askTaskWithAssignee(platformUser: PlatformUser, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
-    onComplete(taskQueries.getCaseMembership(taskId, platformUser)) {
+  def askTaskWithAssignee(user: UserIdentity, taskId: String, assignee: String, createTaskCommand: CreateTaskCommandWithAssignee): Route = {
+    onComplete(taskQueries.getCaseMembership(taskId, user)) {
       case Success(caseMember) =>
         val caseInstanceId = caseMember.caseInstanceId
-        onComplete(userCache.getUserRegistration(assignee)) {
-          case Success(assignee: PlatformUser) => askModelActor(createTaskCommand.apply(caseInstanceId, caseMember, assignee))
+        onComplete(getUserOrigin(assignee, caseMember.tenant)) {
+          case Success(assigneeIdentity) =>
+//            println(s"Found origin $origin for assignee $assignee")
+            askModelActor(createTaskCommand.apply(caseInstanceId, caseMember, assigneeIdentity))
           case Failure(t: Throwable) =>
             logger.warn(s"An error happened while retrieving user information on user '$assignee'", t)
             complete(StatusCodes.InternalServerError, s"An internal error happened while retrieving user information on user '$assignee'")
@@ -41,19 +41,18 @@ trait TaskRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def askTask(platformUser: PlatformUser, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
-    onComplete(taskQueries.getCaseMembership(taskId, platformUser)) {
+  def askTask(user: UserIdentity, taskId: String, createTaskCommand: CreateTaskCommand): Route = {
+    onComplete(taskQueries.getCaseMembership(taskId, user)) {
       case Success(caseMember) => askModelActor(createTaskCommand.apply(caseMember.caseInstanceId, caseMember))
       case Failure(error) => error match {
         case t: TaskSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
         case _ => throw error
       }
-
     }
   }
 
   trait CreateTaskCommandWithAssignee {
-    def apply(caseInstanceId: String, user: CaseMembership, member: UserIdentity): WorkflowCommand
+    def apply(caseInstanceId: String, user: CaseMembership, member: CaseUserIdentity): WorkflowCommand
   }
 
   trait CreateTaskCommand {

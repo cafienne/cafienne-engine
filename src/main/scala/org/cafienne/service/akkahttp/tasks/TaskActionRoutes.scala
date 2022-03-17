@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.humantask.actorapi.command._
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
 import org.cafienne.json.ValueMap
-import org.cafienne.querydb.query.{TaskCount, TaskQueries, TaskQueriesImpl}
 import org.cafienne.service.akkahttp.tasks.model.TaskAPI._
 import org.cafienne.system.CaseSystem
 
@@ -27,33 +26,7 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/tasks")
 class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
-  val taskQueries: TaskQueries = new TaskQueriesImpl
-
   override def routes: Route = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)
-
-  @Path("/user/count")
-  @GET
-  @Operation(
-    summary = "Get task count",
-    description = "Count of assigned tasks for current user",
-    tags = Array("tasks"),
-    parameters = Array(
-      new Parameter(name = "tenant", description = "Optionally provide a specific tenant in which tasks must be counted", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Count of assigned and other tasks", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[TaskCount])))),
-    )
-  )
-  @Produces(Array("application/json"))
-  def getTaskCount: Route = get {
-    validUser { platformUser =>
-      parameters("tenant".?) { tenant =>
-        path("user" / "count") {
-          runQuery(taskQueries.getCountForUser(platformUser, tenant))
-        }
-      }
-    }
-  }
 
   @Path("/{taskId}")
   @POST
@@ -73,10 +46,10 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @RequestBody(description = "Task output to be validated", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.TaskOutputFormat]))))
   @Produces(Array("application/json"))
   def validateTaskOutput: Route = post {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment) { taskId =>
         entity(as[ValueMap]) {
-          outputParams => askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new ValidateTaskOutput(tenantUser, caseInstanceId, taskId, outputParams))
+          outputParams => askTask(user, taskId, (caseInstanceId, tenantUser) => new ValidateTaskOutput(tenantUser, caseInstanceId, taskId, outputParams))
         }
       }
     }
@@ -99,10 +72,10 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @RequestBody(description = "Task output to be saved", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[Examples.TaskOutputFormat]))))
   @Produces(Array("application/json"))
   def saveTaskOutput: Route = put {
-    validUser { platformUser =>
+    caseUser { user =>
       path(Segment) { taskId =>
         entity(as[ValueMap]) { outputParams =>
-          askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new SaveTaskOutput(tenantUser, caseInstanceId, taskId, outputParams))
+          askTask(user, taskId, (caseInstanceId, tenantUser) => new SaveTaskOutput(tenantUser, caseInstanceId, taskId, outputParams))
         }
       }
     }
@@ -125,9 +98,9 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @Produces(Array("application/json"))
   def claimTaskRoute: Route =
     put {
-      validUser { platformUser =>
+      caseUser { user =>
         path(Segment / "claim") {
-          taskId => askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new ClaimTask(tenantUser, caseInstanceId, taskId))
+          taskId => askTask(user, taskId, (caseInstanceId, tenantUser) => new ClaimTask(tenantUser, caseInstanceId, taskId))
         }
       }
     }
@@ -149,9 +122,9 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @Produces(Array("application/json"))
   def revokeTaskRoute: Route =
     put {
-      validUser { platformUser =>
+      caseUser { user =>
         path(Segment / "revoke") {
-          taskId => askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new RevokeTask(tenantUser, caseInstanceId, taskId))
+          taskId => askTask(user, taskId, (caseInstanceId, tenantUser) => new RevokeTask(tenantUser, caseInstanceId, taskId))
         }
       }
     }
@@ -174,12 +147,12 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @Produces(Array("application/json"))
   def assignTaskRoute: Route =
     put {
-      validUser { platformUser =>
+      caseUser { user =>
         path(Segment / "assign") {
           taskId =>
             requestEntityPresent {
               entity(as[Assignee]) { data =>
-                askTaskWithAssignee(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
+                askTaskWithAssignee(user, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new AssignTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }
@@ -204,12 +177,12 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @Produces(Array("application/json"))
   def delegateTaskRoute: Route =
     put {
-      validUser { platformUser =>
+      caseUser { user =>
         path(Segment / "delegate") {
           taskId =>
             requestEntityPresent {
               entity(as[Assignee]) { data =>
-                askTaskWithAssignee(platformUser, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
+                askTaskWithAssignee(user, taskId, data.assignee, (caseInstanceId, tenantUser, assignee) => new DelegateTask(tenantUser, caseInstanceId, taskId, assignee))
               }
             }
         }
@@ -235,16 +208,16 @@ class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   @Produces(Array("application/json"))
   def completeTaskRoute: Route =
     post {
-      validUser { platformUser =>
+      caseUser { user =>
         path(Segment / "complete") {
           taskId =>
             requestEntityPresent {
               entity(as[ValueMap]) { taskOutput =>
-                askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new CompleteHumanTask(tenantUser, caseInstanceId, taskId, taskOutput))
+                askTask(user, taskId, (caseInstanceId, tenantUser) => new CompleteHumanTask(tenantUser, caseInstanceId, taskId, taskOutput))
               }
             } ~ requestEntityEmpty {
               // Complete the task with empty output parameters
-              askTask(platformUser, taskId, (caseInstanceId, tenantUser) => new CompleteHumanTask(tenantUser, caseInstanceId, taskId, new ValueMap))
+              askTask(user, taskId, (caseInstanceId, tenantUser) => new CompleteHumanTask(tenantUser, caseInstanceId, taskId, new ValueMap))
             }
         }
       }

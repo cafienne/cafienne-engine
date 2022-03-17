@@ -23,6 +23,13 @@ trait CaseUserIdentity extends UserIdentity {
 }
 
 object CaseUserIdentity {
+  def apply(user: String, background: Origin): CaseUserIdentity = {
+    new CaseUserIdentity {
+      override val id: String = user
+      override val origin: Origin = background
+    }
+  }
+
   def deserialize(json: ValueMap): CaseUserIdentity = {
     new CaseUserIdentity {
       override val id: String = json.readString(Fields.userId)

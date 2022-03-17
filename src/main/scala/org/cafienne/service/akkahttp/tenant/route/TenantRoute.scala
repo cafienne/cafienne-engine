@@ -8,39 +8,51 @@
 package org.cafienne.service.akkahttp.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.complete
+import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName, pathPrefix}
+import akka.http.scaladsl.server.PathMatchers.Segment
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.{PlatformOwner, PlatformUser, TenantUser}
+import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.tenant.TenantReader
+import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.tenant.actorapi.command.TenantCommand
-import org.cafienne.tenant.actorapi.command.platform.PlatformTenantCommand
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 trait TenantRoute extends CommandRoute with QueryRoute {
+  val userQueries: UserQueries = new TenantQueriesImpl
 
   override val lastModifiedRegistration: LastModifiedRegistration = TenantReader.lastModifiedRegistration
 
   override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
 
-  def validPlatformOwner(subRoute: PlatformOwner => Route): Route = {
-    validUser { platformUser =>
-      if (platformUser.isPlatformOwner) {
-        subRoute(PlatformOwner(platformUser.id))
-      } else {
-        complete(StatusCodes.Unauthorized, "Only platform owners can access this route")
+  def tenantUser(subRoute: TenantUser => Route): Route = {
+    authenticatedUser { user =>
+      pathPrefix(Segment) { group =>
+        optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { lastModified =>
+          onComplete(getTenantUser(user, group, lastModified)) {
+            case Success(tenantUser) =>
+              if (tenantUser.enabled) {
+                subRoute(tenantUser)
+              } else {
+                complete(StatusCodes.Unauthorized, s"The user account ${tenantUser.id} has been disabled")
+              }
+            case Failure(t) => throw t
+          }
+        }
       }
     }
   }
 
-  def askPlatform(command: PlatformTenantCommand): Route = {
+  def getTenantUser(user: AuthenticatedUser, tenant: String, lastModified: Option[String]): Future[TenantUser] = {
+    runSyncedQuery(userQueries.getTenantUser(user, tenant), lastModified)
+  }
+
+  def askTenant(command: TenantCommand): Route = {
     askModelActor(command)
   }
-
-  def askTenant(platformUser: PlatformUser, tenant: String, createTenantCommand: TenantUser => TenantCommand): Route = {
-    askModelActor(createTenantCommand.apply(platformUser.getTenantUser(tenant)))
-  }
-
 }
-

@@ -2,6 +2,7 @@ package org.cafienne.consentgroup.actorapi.command;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.actormodel.identity.ConsentGroupUser;
 import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
@@ -15,8 +16,8 @@ import java.io.IOException;
 public class RemoveConsentGroupMember extends ConsentGroupCommand {
     public final String userId;
 
-    public RemoveConsentGroupMember(TenantUser groupOwner, String groupId, String userId) {
-        super(groupOwner, groupId);
+    public RemoveConsentGroupMember(ConsentGroupUser groupOwner, String userId) {
+        super(groupOwner, groupOwner.groupId());
         this.userId = userId;
     }
 

@@ -68,10 +68,7 @@ class AnonymousCaseDefinition(val myConfig: ConfigObject, val userConfig: Anonym
   }
   val anonymousPlatformUser: PlatformUser = userConfig.asUser(tenant)
 
-  val user: CaseUserIdentity = new CaseUserIdentity {
-    override val id: String = userConfig.userId
-    override val origin: Origin = Origin.Anonymous
-  }
+  val user: CaseUserIdentity = CaseUserIdentity(userConfig.userId, Origin.Anonymous)
 
   override def toString: String = {
     def ownerMapper(m: CaseTeamUser): String = {

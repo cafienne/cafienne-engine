@@ -16,7 +16,6 @@ object ConsentGroupAPI {
   case class ConsentGroupFormat(
                    @(Schema @field)(implementation = classOf[String], example = "Unique identifier of the group (optionally generated in the engine)")
                    id: Option[String],
-                   @(Schema @field)(implementation = classOf[ConsentGroupUserFormat], description = "Initial list of users that belong to the group")
                    members: Seq[ConsentGroupUserFormat]) {
     // Validate the list of members to not contain duplicates
     ApiValidator.runDuplicatesDetector("Consent group", "user", members.map(_.userId))
@@ -30,7 +29,7 @@ object ConsentGroupAPI {
   case class ConsentGroupUserFormat(
                    @(Schema @field)(implementation = classOf[String], example = "User id of the consent group member")
                    userId: String,
-                   @(Schema @field)(description = "Optional list of roles the user has within the consent group")
+                   @(Schema @field)(description = "Optional list of roles the user has within the consent group", example = "groupRole1, groupRole2")
                    roles: Set[String] = Set[String](),
                    @(Schema @field)(example = "Optional indicate of consent group ownership (defaults to false)", implementation = classOf[Boolean])
                    isOwner: Boolean = false) {

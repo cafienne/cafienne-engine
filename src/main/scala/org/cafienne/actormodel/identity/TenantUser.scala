@@ -12,13 +12,7 @@ final case class TenantUser(id: String, tenant: String, roles: Set[String] = Set
 
   import scala.jdk.CollectionConverters._
 
-  override def asCaseUserIdentity(): CaseUserIdentity = {
-    val user = this
-    new CaseUserIdentity {
-      override val id: String = user.id
-      override val origin: Origin = Origin.Tenant
-    }
-  }
+  override def asCaseUserIdentity(): CaseUserIdentity = CaseUserIdentity(id, Origin.Tenant)
 
   def getRoles: util.Set[String] = roles.asJava
 
