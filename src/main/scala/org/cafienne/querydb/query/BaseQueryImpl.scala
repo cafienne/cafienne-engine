@@ -5,7 +5,7 @@ import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIde
 import org.cafienne.querydb.record.{CaseBusinessIdentifierRecord, CaseRecord, ConsentGroupMemberRecord}
 import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseQueryImpl
   extends CaseTables
@@ -16,7 +16,7 @@ trait BaseQueryImpl
 
   import dbConfig.profile.api._
 
-  implicit val ec = db.ioExecutionContext // TODO: Is this the best execution context to pick?
+  implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
   val caseInstanceQuery = TableQuery[CaseInstanceTable]
   val caseDefinitionQuery = TableQuery[CaseInstanceDefinitionTable]
@@ -26,94 +26,104 @@ trait BaseQueryImpl
   val planItemTableQuery = TableQuery[PlanItemTable]
 
   def getCaseMembership(caseInstanceId: String, user: UserIdentity, exception: String => Exception, msg: String): Future[CaseMembership] = {
-    def v[A](o: A):A = o // Sort of "identity"
+//    if (msg == caseInstanceId) {
+//      println(s"Trying to fetch case '$caseInstanceId' ")
+//    } else {
+//      println(s"Trying to fetch case '$caseInstanceId' for task '$msg'")
+//    }
+
     def fail: String = throw exception(msg) // Fail when either caseId or tenantId remains to be empty
 
-    val groupMembership = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
-      .join(TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id))
-      .on((casegroup, group) => casegroup.groupId === group.group && (casegroup.groupRole === group.role || group.isOwner))
-      .map(join => {
-        val casegroup = join._1 // Member of the case team
-        val group = join._2 // Consent group that the user belongs to
-        // Note: we need GROUP ownership, not case team ownership!!!
-        (caseInstanceId, casegroup.tenant, casegroup.groupId, group.isOwner, casegroup.groupRole)
-      })
-
-    val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
-      .join(TableQuery[UserRoleTable].filter(_.userId === user.id))
-      .on((left, right) => left.tenantRole === right.role_name && left.tenant === right.tenant)
-      .map(_._1)
-      .map(caseTenantRoles => (caseInstanceId, caseTenantRoles.tenant, caseTenantRoles.tenantRole))
-
-    val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
-      .filter(_.userId === user.id)
-      .filter(_.caseInstanceId === caseInstanceId)
-      .map(user => (caseInstanceId, user.tenant, user.userId))
-
     val originQuery = {
-      val tenantUser = TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId).join(TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.role_name === "")).on(_.tenant === _.tenant).map(_._2.userId)
+      val tenantUser =
+        TableQuery[CaseInstanceTable]
+          .filter(_.id === caseInstanceId)
+          .joinLeft(TableQuery[UserRoleTable]
+            .filter(_.userId === user.id)
+            .filter(_.role_name === "")
+            .map(user => (user.userId, user.tenant)))
+          .on(_.tenant === _._2).map(join => (join._1.id, join._1.tenant, join._2))
       val platformUser = TableQuery[UserRoleTable].filter(_.userId === user.id).filter(_.role_name === "").map(_.userId).take(1)
 
       tenantUser.joinFull(platformUser)
     }
 
-    val records = for {
-      r1 <- db.run(groupMembership.result)
-      r2 <- db.run(tenantRoleBasedMembership.result)
-      r3 <- db.run(userIdBasedMembership.result)
-      r4 <- db.run(originQuery.result)
-    } yield (r1, r2, r3, r4)
+    val groupMembership = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
+      .join(TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id))
+      .on((casegroup, group) => casegroup.groupId === group.group && (casegroup.groupRole === group.role || group.isOwner))
+      .map(_._2).map(group => (group.group, group.isOwner, group.role)) // Note: we need GROUP ownership, not case team ownership!!!
+
+    val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
+      .join(TableQuery[UserRoleTable].filter(_.userId === user.id))
+      .on((left, right) => left.tenantRole === right.role_name && left.tenant === right.tenant)
+      .map(_._1.tenantRole)
+
+    val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.userId === user.id)
+      .filter(_.caseInstanceId === caseInstanceId)
+      .map(_.userId)
+
+    val query =
+      originQuery.joinLeft(
+        // Note: order matters. Putting group membership at the end generates an invalid SQL statement
+        //  guess that's some kind of issue in Slick
+        groupMembership.joinFull(tenantRoleBasedMembership.joinFull(userIdBasedMembership)))
+    val records = db.run(query.distinct.result)
 
     records.map(x => {
-      if (x._1.isEmpty && x._2.isEmpty && x._3.isEmpty) {
+      if (x.isEmpty) {
+//        println(" Failing because there records are not found")
         fail
       }
 
+      val originRecords = x.map(_._1)//filter(_.isDefined).map(_.get)
+      if (originRecords.headOption.isEmpty) {
+//        println(" Failing because head option is empty")
+        fail // Case does not exist
+      }
 
-      val userRecords: Set[(String, String, String)] = x._3.map(user => (user._1, user._2, user._3)).toSet
+      if (originRecords.head._1.isEmpty) {
+//        println(" Failing because head._1 is empty")
+        fail // Again, case apparently does not exist (then why do we have a head in the first place ??? Perhaps it is filled with all NULL values???
+      }
+
+      val caseId = originRecords.head._1.get._1
+      val tenantId = originRecords.head._1.get._2
+//      println(" Case id: " + caseId)
+//      println(" Tenant id: " + tenantId)
+      val origin = {
+        if (originRecords.isEmpty) Origin.IDP // No platform registration for this user id
+        else if (originRecords.head._1.get._3.isDefined) Origin.Tenant
+        else if (originRecords.head._2.isDefined) Origin.Platform
+        else Origin.IDP // Just a default, should not reach this statement at all.
+      }
+//      println(s" User ${user.id} has origin $origin")
+
+
+
+      val membershipRecords: Seq[(Option[(String, Boolean, String)], Option[(Option[String], Option[String])])] = x.map(_._2).filter(_.isDefined).map(_.get)
+      val userAndRoleRecords = membershipRecords.map(_._2).filter(_.isDefined).map(_.get)
+      val userIdBasedMembership: Set[String] = userAndRoleRecords.map(_._2).filter(_.isDefined).map(_.get).toSet
 //      println(s"Found ${userRecords.size} user records")
 
-      val tenantRoleRecords: Set[(String, String, String)] = x._2.map(role => (role._1, role._2, role._3)).toSet
+      val userTenantRoles: Set[String] = userAndRoleRecords.map(_._1).filter(_.isDefined).map(_.get).toSet
 //      println(s"Found ${tenantRoleRecords.size} tenant role records")
-      val groupRecords: Set[(String, String, ConsentGroupMemberRecord)] = x._1.map(group => {
-        val isOwner = group._4
-        if (isOwner) {
-//          println(s"User ${user.id} is owner of group ${group._2} with role ${group._4}")
-        } else {
-//          println(s"User ${user.id} is member of group ${group._2} with role ${group._4}")
-        }
-        (group._1, group._2, ConsentGroupMemberRecord(group = group._3, userId = user.id, isOwner = group._4, role = group._5))
-      }).toSet
+      val groupRecords: Set[ConsentGroupMemberRecord] = membershipRecords.map(_._1).filter(_.isDefined).map(_.get).map(group => ConsentGroupMemberRecord(group = group._1, userId = user.id, isOwner = group._2, role = group._3)).toSet
 //      println(s"Found ${groupRecords.size} group records")
-//      println("Creating user identity for user " + user.id)
 
-      if (userRecords.isEmpty && groupRecords.isEmpty && tenantRoleRecords.isEmpty) {
-        // All rows empty
-        fail
-      }
-
-      val caseId: String = userRecords.headOption.map(_._1).fold(groupRecords.headOption.map(_._1).fold(tenantRoleRecords.headOption.map(_._1).fold(fail)(v))(v))(v)
-      val tenantId: String = userRecords.headOption.map(_._2).fold(groupRecords.headOption.map(_._2).fold(tenantRoleRecords.headOption.map(_._2).fold(fail)(v))(v))(v)
-
-      val userIdBasedMembership: Set[String] = userRecords.map(_._3)
-
-      val groups = groupRecords.map(_._3).map(_.group)
+      val groups = groupRecords.map(_.group)
       val groupBasedMembership: Seq[ConsentGroupMembership] = groups.map(groupId => {
-        val groupElements = groupRecords.map(_._3).filter(_.group == groupId)
+        val groupElements = groupRecords.filter(_.group == groupId)
         val isOwner = groupElements.exists(_.isOwner)
         val roles = groupElements.map(_.role)
         ConsentGroupMembership(groupId, roles, isOwner)
       }).toSeq
-      val userTenantRoles: Set[String] = tenantRoleRecords.map(_._3)
 
       // ... and, if those are non empty only then we have an actual access to this case
-      if (userIdBasedMembership.isEmpty && groupBasedMembership.isEmpty && userTenantRoles.isEmpty) throw exception(msg)
-
-      val origin = {
-        if (x._4.isEmpty) Origin.IDP // No platform registration for this user id
-        else if (x._4.head._1.isDefined) Origin.Tenant
-        else if (x._4.head._2.isDefined) Origin.Platform
-        else Origin.IDP // Just a default, should not reach this statement at all.
+      if (userIdBasedMembership.isEmpty && groupBasedMembership.isEmpty && userTenantRoles.isEmpty) {
+        // All rows empty, no access to this case
+//        println("Failing because membership sets are empty")
+        fail
       }
 
       new CaseMembership(id = user.id, origin = origin, tenantRoles = userTenantRoles, groups = groupBasedMembership, caseInstanceId = caseId, tenant = tenantId)
