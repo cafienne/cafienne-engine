@@ -109,6 +109,7 @@ class Reception {
                 String error = actor + " cannot handle message '" + msg.getClass().getSimpleName() + "' because it has not recovered properly. Check the server logs for more details.";
                 actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)));
             }
+            actor.takeABreak("Removing ModelActor["+actor.getId()+"] because of recovery failure upon unexpected incoming message of type " + msg.getClass().getSimpleName());
         }
         return false;
     }
