@@ -49,5 +49,9 @@ public abstract class APIRootObject<T extends ModelActor> extends APIObject<T> {
         return new ValueList(args);
     }
 
+    public Object env(String key) {
+        return System.getenv(key);
+    }
+
     public abstract String getDescription();
 }
