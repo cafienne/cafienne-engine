@@ -215,8 +215,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
     }
 
     void takeABreak() {
-        getLogger().debug("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (Cafienne.config().actor().idlePeriod() / 1000) + " seconds");
-//            System.out.println("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (idlePeriod / 1000) + " seconds");
+        takeABreak("Removing actor " + getClass().getSimpleName() + " " + getId() + " from memory, as it has been idle for " + (Cafienne.config().actor().idlePeriod() / 1000) + " seconds");
+    }
+
+    void takeABreak(String msg) {
+        getLogger().debug(msg);
+//        System.out.println(msg);
         self().tell(PoisonPill.getInstance(), self());
     }
 
