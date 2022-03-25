@@ -15,7 +15,7 @@ import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.InlineSubProcessDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.definition.SubProcessMapping;
+import org.cafienne.processtask.definition.SubProcessOutputMappingDefinition;
 
 import java.util.Collection;
 
@@ -85,7 +85,7 @@ public abstract class InlineSubProcess<T extends InlineSubProcessDefinition> {
         task.getCaseInstance().addDebugInfo(appender);
     }
 
-    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessMapping> mappings) {
+    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessOutputMappingDefinition> mappings) {
         addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
         // No support for raw output mappings currently
         rawOutputParameters.getValue().forEach((name, value) -> {
