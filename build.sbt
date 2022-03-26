@@ -1,6 +1,13 @@
 import com.typesafe.sbt.packager.docker._
 
 /**
+  * Global settings
+  */
+name := "Cafienne Engine"
+packageName := "cafienne-engine"
+organization := "org.cafienne"
+
+/**
   * Resolver repositories
   */
 resolvers ++= Seq(
@@ -20,13 +27,6 @@ enablePlugins(JavaAppPackaging)
 enablePlugins(UniversalPlugin)
 enablePlugins(DockerPlugin)
 enablePlugins(ClasspathJarPlugin)
-
-/**
-  * Global settings
-  */
-organization := "org.cafienne"
-name := "Cafienne Engine"
-packageName := "cafienne-engine"
 
 /**
   * Docker packaging

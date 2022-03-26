@@ -55,8 +55,8 @@ class BackOffice {
             } catch (Throwable e) {
                 stagingArea.reportFailure(e, new ActorChokedFailure(command, e),"---------- Engine choked during validation of command with type " + command.getClass().getSimpleName() + " from user " + command.getUser().id() + " in " + this.actor + "\nwith exception");
             }
-        } else if (message instanceof ModelResponse) {
-            handleResponse((ModelResponse) message);
+        } else if (message.isResponse()) {
+            handleResponse(message.asResponse());
         }
 
         stagingArea.store();
