@@ -30,7 +30,7 @@ public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, 
     }
 
     @Override
-    final public ModelResponse process(ProcessTaskActor processTaskActor) {
+    public ModelResponse process(ProcessTaskActor processTaskActor) {
         process(processTaskActor, processTaskActor.getImplementation());
         return new ProcessResponse(this);
     }
