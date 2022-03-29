@@ -7,33 +7,32 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
-import org.cafienne.json.StringValue;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.implementation.SubProcess;
+import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.mail.*;
 import javax.mail.internet.*;
-import javax.mail.util.ByteArrayDataSource;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class Mail<D extends MailDefinition> extends SubProcess<D> {
-    private final static Logger logger = LoggerFactory.getLogger(Mail.class);
+public class Mail extends SubProcess<MailDefinition> {
+    private ValueMap input;
+    private List<MailAddress> from;
+    private List<MailAddress> replyTo;
+    private List<MailAddress> toList;
+    private List<MailAddress> ccList;
+    private List<MailAddress> bccList;
+    private String subject;
 
-    public Mail(ProcessTaskActor processTask, D definition) {
+    public Mail(ProcessTaskActor processTask, MailDefinition definition) {
         super(processTask, definition);
+
 //        logger.warn("\tSENDING MAIL\t" + processTask.getId() + "\n");
     }
 
@@ -44,6 +43,34 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
 
     private Session mailSession;
     private Transport transport;
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public List<MailAddress> getFrom() {
+        return from;
+    }
+
+    public List<MailAddress> getReplyTo() {
+        return replyTo;
+    }
+
+    public List<MailAddress> getToList() {
+        return toList;
+    }
+
+    public List<MailAddress> getCcList() {
+        return ccList;
+    }
+
+    public List<MailAddress> getBccList() {
+        return bccList;
+    }
+
+    private InternetAddress[] asArray(List<MailAddress> list) {
+        return list.stream().map(MailAddress::getAddress).toArray(InternetAddress[]::new);
+    }
 
     private void connectMailServer() throws MessagingException {
         processTaskActor.addDebugInfo(() -> "Connecting to mail server");
@@ -73,28 +100,31 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
         processTaskActor.addDebugInfo(() -> "Disconnecting from mail server took " + (done - now) + " milliseconds");
     }
 
-    private ValueMap getParameters() {
-        ValueMap input = processTaskActor.getMappedInputParameters();
-        return definition.convert(input);
-    }
-
     @Override
     public void start() {
-        // Get the input parameters
-        ValueMap input = getParameters();
+        input = processTaskActor.getMappedInputParameters();
 
         // Setup email message and recipients
         try {
             connectMailServer();
+
+            // Read email addresses (can be both statically defined or dynamically taken from input parameters)
+            from = resolveAddress(definition.getFrom(), "from");
+            replyTo = resolveAddress(definition.getReplyTo(), "replyTo");
+            toList = resolveAddressList(definition.getToList(), "to");
+            ccList = resolveAddressList(definition.getCcList(), "cc");
+            bccList = resolveAddressList(definition.getBccList(), "bcc");
+            subject = resolveSubject();
+
 
             // Create a mail session and message to fill.
             MimeMessage mailMessage = new MimeMessage(mailSession);
 
             // First validate the recipient list.
             try {
-                mailMessage.setRecipients(Message.RecipientType.TO, getAddresses(input.get("to"), "To"));
-                mailMessage.setRecipients(Message.RecipientType.CC, getAddresses(input.get("cc"), "Cc"));
-                mailMessage.setRecipients(Message.RecipientType.BCC, getAddresses(input.get("bcc"), "Bcc"));
+                mailMessage.setRecipients(Message.RecipientType.TO, asArray(toList));
+                mailMessage.setRecipients(Message.RecipientType.CC, asArray(ccList));
+                mailMessage.setRecipients(Message.RecipientType.BCC, asArray(bccList));
             } catch (InvalidMailException ime) {
                 raiseFault("Failed to set recipients for mail message", ime.getCause());
                 return;
@@ -107,77 +137,41 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
             }
 
             // Fill subject
-            String subject = input.raw("subject");
-            mailMessage.setSubject(subject);
             processTaskActor.addDebugInfo(() -> "Subject: " + subject);
+            mailMessage.setSubject(subject);
 
-            mailMessage.addFrom(getAddresses(input.get("from"), "From"));
-            InternetAddress[] replyTo = getAddresses(input.get("replyTo"), "Reply-To");
-            mailMessage.setReplyTo(replyTo);
+            mailMessage.addFrom(asArray(from));
+            mailMessage.setReplyTo(asArray(replyTo));
 
-            // Fill body/attachments
+            // Fill body, attachments and invites
             Multipart multipart = new MimeMultipart();
 
             // Set mail content / body
-            String body = input.raw("body");
-            processTaskActor.addDebugInfo(() -> "Body: " + body);
-            BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setContent(body, "text/html");
-            multipart.addBodyPart(messageBodyPart);
+            multipart.addBodyPart(resolveBody().asPart());
 
             // Add the attachments if any
-            ValueList attachments = input.withArray("attachments");
+            List<Attachment> attachments = resolveAttachments();
             processTaskActor.addDebugInfo(() -> "Adding " + attachments.size() + " attachments");
             attachments.forEach(attachment -> {
-                if (!attachment.isMap()) {
-                    processTaskActor.addDebugInfo(() -> "Attachment must be a json object with 'content' (base64 coded) and optional 'fileName' and 'mimeType'; found json content of type  " + attachment.getClass().getSimpleName());
-                    return;
-                }
-                String fileName = attachment.asMap().raw("fileName");
-                String content = attachment.asMap().raw("content");
-                String mimeType = attachment.asMap().raw("mimeType");
-                if (mimeType == null || mimeType.isBlank()) mimeType = "application/octet-stream";
-                if (fileName == null || fileName.isBlank()) fileName = "";
-                if (content == null || content.isBlank()) {
-                    processTaskActor.addDebugInfo(() -> "Attachment must be a json object with 'content' (base64 coded) and optional 'fileName' and 'mimeType'; skipping attachment, because 'content' is missing.");
-                    return;
-                }
-                BodyPart attachmentPart = new MimeBodyPart();
-                DataSource source = new ByteArrayDataSource(Base64.getDecoder().decode(content), mimeType);
                 try {
-                    attachmentPart.setDataHandler(new DataHandler(source));
-                    attachmentPart.setFileName(fileName);
-                    multipart.addBodyPart(attachmentPart);
-                    final String attachmentFileName = fileName;
-                    processTaskActor.addDebugInfo(() -> "Added attachment '" + attachmentFileName + "' of length " + content.length() + " bytes");
-
+                    multipart.addBodyPart(attachment.getBodyPart());
                 } catch (MessagingException e) {
-                    throw new InvalidMailException("Cannot add attachment with file name '" + fileName + "'", e);
+                    throw new InvalidMailException("Cannot add attachment with file name '" + attachment.getFileName() + "'", e);
                 }
             });
 
-            ValueMap invite = input.with("invite");
-            if (!invite.getValue().isEmpty()) {
-                BodyPart attachmentPart = new MimeBodyPart();
+            // As of now only dynamic invites are supported
+            List<CalendarInvite> invites = resolveInvites();
+            processTaskActor.addDebugInfo(() -> "Adding " + invites.size() + " calendar invite(s)");
+            invites.forEach(invite -> {
                 try {
-                    if (! invite.has("required") && ! invite.has("optional")) {
-                        invite.put("required", input.get("to"));
-                        invite.put("optional", input.get("cc"));
-                    }
-                    if (!invite.has("meetingName")) invite.plus("meetingName", subject);
-                    String content = new CalendarInvite(invite).invite;
-                    String fileName = "invite.ics";
-                    String mimeType = "text/calendar";
-                    DataSource source = new ByteArrayDataSource(content.getBytes(StandardCharsets.UTF_8), mimeType);
-                    attachmentPart.setDataHandler(new DataHandler(source));
-                    attachmentPart.setFileName(fileName);
-                    multipart.addBodyPart(attachmentPart);
-                    processTaskActor.addDebugInfo(() -> "Added calendar invite");
+                    multipart.addBodyPart(invite.asPart());
                 } catch (MessagingException e) {
                     throw new InvalidMailException("Cannot add the invite attachment", e);
                 }
-            }
+            });
 
+            // Finally, set the multipart content of the mail
             mailMessage.setContent(multipart);
 
             processTaskActor.addDebugInfo(() -> "Sending message to mail server");
@@ -213,57 +207,62 @@ public class Mail<D extends MailDefinition> extends SubProcess<D> {
     public void resume() {
     }
 
-    /**
-     * Convert the json structure to a list of addresses
-     *
-     * @param input
-     * @return
-     */
-    private InternetAddress[] getAddresses(Value<?> input, String fieldType) {
-        Collection<InternetAddress> list = new ArrayList<>();
-        if (input.isMap()) {
-            list.add(getAddress(input));
-        } else if (input.isList()) {
-            input.asList().forEach(value -> list.add(getAddress(value)));
-        } else if (input.getValue() == null) {
-            // do nothing, the field is not defined.
-        } else if (input.getValue() instanceof String) {
-            list.add(getAddress(input));
+    private String resolveSubject() {
+        if (definition.getSubject() == null) {
+            return input.has("subject") ? input.get("subject").getValue().toString() : "";
         } else {
-            // Wrong type of input; ignore it.
+            return definition.getSubject().resolve(processTaskActor);
         }
-        processTaskActor.addDebugInfo(() -> "Field " + fieldType + ": '" + list.stream().map(InternetAddress::toString).collect(Collectors.joining("; ")) + "'");
-        return list.toArray(new InternetAddress[list.size()]);
     }
 
-    /**
-     * Convert the json structure to an address
-     *
-     * @param value
-     * @return
-     */
-    private InternetAddress getAddress(Value<?> value) throws InvalidMailException {
-        String email = "";
-        String name = "";
+    private MailPart resolveBody() throws MessagingException {
+        MailPart body = new MailPart(processTaskActor, definition);
+        processTaskActor.addDebugInfo(() -> "Body: " + body);
+        return body;
+    }
 
-        if (value.isMap()) {
-            email = value.asMap().raw("email");
-            name = value.asMap().raw("name");
-            if (email == null) email = "";
-            if (name == null) name = "";
-        } else if (value.isPrimitive() && value instanceof StringValue) {
-            email = ((StringValue) value).getValue();
+    private List<Attachment> resolveAttachments() {
+        // If there are no attachments specified in the definition, we'll check whether there is an input json array called 'attachments'
+        if (definition.getAttachmentList().isEmpty()) {
+            // Try to dynamically resolve the attachments based on the "attachments" input parameter.
+            return input.withArray("attachments").getValue().stream().filter(value -> {
+                if (!value.isMap()) {
+                    processTaskActor.addDebugInfo(() -> "Attachment must be a json object with 'content' (base64 coded) and optional 'fileName' and 'mimeType'; found json content of type  " + value.getClass().getSimpleName());
+                }
+                return value.isMap();
+            }).map(Value::asMap).map(map -> new Attachment(map, processTaskActor)).filter(Attachment::hasContent).collect(Collectors.toList());
         } else {
-            throw new InvalidMailAddressException("Cannot extract an email address from an object of type " + value.getClass().getSimpleName());
+            return definition.getAttachmentList().stream().map(definition -> new Attachment(definition, processTaskActor)).filter(Attachment::hasContent).collect(Collectors.toList());
         }
-        if (email == null || email.isBlank()) {
-            throw new InvalidMailAddressException("Missing email address in object of type " + value.getClass().getSimpleName());
+    }
+
+    private List<CalendarInvite> resolveInvites() {
+        ValueMap invite = input.with("invite");
+        if (!invite.getValue().isEmpty()) {
+            return List.of(new CalendarInvite(this, invite));
+        } else {
+            return List.of();
         }
-        try {
-            InternetAddress ia = new InternetAddress(email, name);
-            return ia;
-        } catch (UnsupportedEncodingException ex) {
-            throw new InvalidMailAddressException("Invalid email address " + email + " " + ex.getMessage(), ex);
+    }
+
+    private List<MailAddress> resolveAddress(AddressDefinition address, String fieldType) {
+        // If the definition is null, we use an empty list.
+        List<AddressDefinition> list = address == null ? List.of() : List.of(address);
+        return resolveAddressList(list, fieldType);
+    }
+
+    private List<MailAddress> resolveAddressList(List<AddressDefinition> addresses, String fieldType) {
+        List<MailAddress> list;
+        if (addresses.isEmpty()) {
+            // Binding based on dynamic input.
+            Value<?> dynamicParameterValue = input.get(fieldType);
+            ValueList dynamicList = dynamicParameterValue.isList() ? dynamicParameterValue.asList() : dynamicParameterValue == Value.NULL ? new ValueList() : new ValueList(dynamicParameterValue);
+            list = dynamicList.getValue().stream().map(MailAddress::new).collect(Collectors.toList());
+        } else {
+            // Bind based on the hard coded definition
+            list = addresses.stream().map(address -> new MailAddress(address, processTaskActor)).collect(Collectors.toList());
         }
+        processTaskActor.addDebugInfo(() -> "Field " + fieldType + ": '" + list.stream().map(MailAddress::getAddress).map(InternetAddress::toString).collect(Collectors.joining("; ")) + "'");
+        return list;
     }
 }

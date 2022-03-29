@@ -10,12 +10,10 @@ package org.cafienne.processtask.implementation.mail;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.SubProcessDefinition;
+import org.cafienne.processtask.implementation.mail.definition.*;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.cafienne.util.StringTemplate;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
@@ -27,25 +25,57 @@ import java.util.Set;
  *
  */
 public class MailDefinition extends SubProcessDefinition {
-    private final StringTemplate subject;
-    private final BodyTemplate body;
-    private final List<AddressTemplate> toList = new ArrayList<>();
-    private final List<AddressTemplate> ccList = new ArrayList<>();
-    private final List<AddressTemplate> bccList = new ArrayList<>();
-    private final AddressTemplate from;
-    private final AddressTemplate replyTo;
-    private final List<AttachmentTemplate> attachmentList = new ArrayList<>();
+    private final SubjectDefinition subject;
+    private final BodyDefinition body;
+    private final AddressDefinition from;
+    private final AddressDefinition replyTo;
+    private final List<AddressDefinition> toList = new ArrayList<>();
+    private final List<AddressDefinition> ccList = new ArrayList<>();
+    private final List<AddressDefinition> bccList = new ArrayList<>();
+    private final List<AttachmentDefinition> attachmentList = new ArrayList<>();
 
     public MailDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        this.subject = parseTemplate("subject", false);
-        this.body = parse("mail-body", BodyTemplate.class, false);
-        parseGrandChildren("to", "address", AddressTemplate.class, toList);
-        parseGrandChildren("cc", "address", AddressTemplate.class, ccList);
-        parseGrandChildren("bcc", "address", AddressTemplate.class, bccList);
-        this.from = parse("from", AddressTemplate.class, false);
-        this.replyTo = parse("reply-to", AddressTemplate.class, false);
-        parseGrandChildren("attachments", "attachment", AttachmentTemplate.class, attachmentList);
+        this.subject = parse("subject", SubjectDefinition.class, false);
+        this.body = parse("mail-body", BodyDefinition.class, false);
+        this.from = parse("from", AddressDefinition.class, false);
+        this.replyTo = parse("reply-to", AddressDefinition.class, false);
+        parseGrandChildren("to", "address", AddressDefinition.class, toList);
+        parseGrandChildren("cc", "address", AddressDefinition.class, ccList);
+        parseGrandChildren("bcc", "address", AddressDefinition.class, bccList);
+        parseGrandChildren("attachments", "attachment", AttachmentDefinition.class, attachmentList);
+    }
+
+    public SubjectDefinition getSubject() {
+        return subject;
+    }
+
+    public AddressDefinition getFrom() {
+        return from;
+    }
+
+    public AddressDefinition getReplyTo() {
+        return replyTo;
+    }
+
+    public List<AddressDefinition> getToList() {
+        return toList;
+    }
+
+    public List<AddressDefinition> getCcList() {
+        return ccList;
+    }
+
+    public List<AddressDefinition> getBccList() {
+        return bccList;
+    }
+
+    public BodyDefinition getBody() {
+        return body;
+    }
+
+    public List<AttachmentDefinition> getAttachmentList() {
+        return attachmentList;
     }
 
     @Override
@@ -55,74 +85,12 @@ public class MailDefinition extends SubProcessDefinition {
     }
 
     public Properties getMailProperties() {
-        Properties properties = Cafienne.config().engine().mailService().asProperties();
-        return properties;
+        return Cafienne.config().engine().mailService().asProperties();
     }
 
     @Override
     public Mail createInstance(ProcessTaskActor processTaskActor) {
         return new Mail(processTaskActor, this);
-    }
-
-    public ValueMap convert(ValueMap input) {
-        // Template Parameters
-        ValueMap mailParameters = input.cloneValueNode();
-
-        convertList(toList, input, mailParameters, "to");
-        convertList(ccList, input, mailParameters, "cc");
-        convertList(bccList, input, mailParameters, "bcc");
-        convertTemplate(from, input, mailParameters, "from");
-        convertTemplate(replyTo, input, mailParameters, "replyTo");
-        convertString(subject, input, mailParameters, "subject");
-        if (body != null) {
-            mailParameters.put("body", body.resolve(input));
-        }
-        if (!attachmentList.isEmpty()) {
-            attachmentList.forEach(attachmentTemplate -> mailParameters.withArray("attachments").add(attachmentTemplate.resolve(input)));
-        }
-
-        // raw parameters required = {
-        // x  to:
-        // x  cc:
-        // x  bcc:
-        // x  from:
-        // x  replyTo:
-        // x  subject:
-        // x  body:
-        // x  attachments:
-        //   invite:
-        //  }
-
-        return mailParameters;
-    }
-
-    private void convertString(StringTemplate template, ValueMap input, ValueMap target, String type) {
-        if (template == null) {
-            // Nothing to convert!
-            return;
-        }
-        target.put(type, new StringValue(template.resolveParameters(input).toString()));
-    }
-
-    private void convertList(List<AddressTemplate> templates, ValueMap input, ValueMap target, String type) {
-        if (templates.isEmpty()) {
-            // Nothing to convert!
-            return;
-        }
-        ValueList list = target.withArray(type);
-        toList.forEach(address -> list.add(resolveAddress(address, input)));
-    }
-
-    private void convertTemplate(AddressTemplate template, ValueMap input, ValueMap target, String type) {
-        if (template == null) {
-            // Nothing to convert!
-            return;
-        }
-        target.put(type, resolveAddress(template, input));
-    }
-
-    private ValueMap resolveAddress(AddressTemplate template, ValueMap input) {
-        return new ValueMap("name", template.getName(input), "email", template.getEmail(input));
     }
 
     @Override

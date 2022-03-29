@@ -58,6 +58,8 @@ public enum Fields {
     definition,
     debugMode,
     content,
+    fileName,
+    mimeType,
     path,
     childPath,
     formerPath,
