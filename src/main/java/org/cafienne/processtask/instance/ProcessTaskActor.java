@@ -63,7 +63,6 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     public void updateState(ProcessInstanceEvent event) {
-
     }
 
     public void updateState(ProcessStarted event) {

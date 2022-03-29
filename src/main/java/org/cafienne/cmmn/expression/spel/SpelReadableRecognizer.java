@@ -23,7 +23,7 @@ public class SpelReadableRecognizer implements PropertyAccessor {
 
     public final ModelActor model;
 
-    SpelReadableRecognizer(ModelActor model) {
+    public SpelReadableRecognizer(ModelActor model) {
         this.model = model;
     }
 

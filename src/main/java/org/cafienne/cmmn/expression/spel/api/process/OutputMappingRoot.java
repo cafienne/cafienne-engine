@@ -10,12 +10,12 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
  * Can read the parameter name in the expression and resolve it to the parameter value.
  * Contains furthermore a task property, to provide for the task context for which this parameter transformation is being executed.
  */
-public class ProcessMappingRootObject extends ProcessActorRootObject {
+public class OutputMappingRoot extends ProcessActorRootObject {
 
     private final ParameterDefinition rawParameter;
     private final ParameterDefinition targetParameter;
 
-    public ProcessMappingRootObject(ParameterDefinition rawParameter, Value<?> parameterValue, ParameterDefinition targetParameter, ProcessTaskActor processTaskActor) {
+    public OutputMappingRoot(ParameterDefinition rawParameter, Value<?> parameterValue, ParameterDefinition targetParameter, ProcessTaskActor processTaskActor) {
         super(processTaskActor);
         this.rawParameter = rawParameter;
         this.targetParameter = targetParameter;

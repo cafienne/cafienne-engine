@@ -64,19 +64,19 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      * Note: these parameters are convention only.
      */
     public final static String EXCEPTION_PARAMETER = "exception";
-    private final Collection<SubProcessMapping> mappings = new ArrayList<>();
-    private final Collection<SubProcessMapping> successMappings = new ArrayList<>();
-    private final Collection<SubProcessMapping> failureMappings = new ArrayList<>();
+    private final Collection<SubProcessOutputMappingDefinition> mappings = new ArrayList<>();
+    private final Collection<SubProcessOutputMappingDefinition> successMappings = new ArrayList<>();
+    private final Collection<SubProcessOutputMappingDefinition> failureMappings = new ArrayList<>();
     private final boolean isAsync;
 
     protected SubProcessDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
         isAsync = Boolean.parseBoolean(parseAttribute("async", false, "true")); // By default, processes are executed asynchronously
-        parse("parameterMapping", SubProcessMapping.class, mappings);
+        parse("parameterMapping", SubProcessOutputMappingDefinition.class, mappings);
         successMappings.addAll(mappings);
         failureMappings.addAll(mappings);
-        parseGrandChildren("success", "parameterMapping", SubProcessMapping.class, successMappings);
-        parseGrandChildren("failure", "parameterMapping", SubProcessMapping.class, failureMappings);
+        parseGrandChildren("success", "parameterMapping", SubProcessOutputMappingDefinition.class, successMappings);
+        parseGrandChildren("failure", "parameterMapping", SubProcessOutputMappingDefinition.class, failureMappings);
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      *
      * @return parameter mapping
      */
-    public Collection<SubProcessMapping> getSuccessMappings() {
+    public Collection<SubProcessOutputMappingDefinition> getSuccessMappings() {
         return successMappings;
     }
 
@@ -115,7 +115,7 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      *
      * @return parameter mapping
      */
-    public Collection<SubProcessMapping> getFailureMappings() {
+    public Collection<SubProcessOutputMappingDefinition> getFailureMappings() {
         return failureMappings;
     }
 

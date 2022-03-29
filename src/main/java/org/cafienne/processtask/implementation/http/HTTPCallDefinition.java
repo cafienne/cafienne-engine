@@ -9,16 +9,23 @@ package org.cafienne.processtask.implementation.http;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
+import org.cafienne.cmmn.expression.spel.api.APIRootObject;
+import org.cafienne.cmmn.expression.spel.api.process.InputMappingRoot;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
-import org.cafienne.json.ValueMap;
+import org.cafienne.cmmn.instance.task.validation.TaskValidatorRootAPI;
+import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
+import org.cafienne.processtask.implementation.http.definition.ContentDefinition;
+import org.cafienne.processtask.implementation.http.definition.HeaderDefinition;
+import org.cafienne.processtask.implementation.http.definition.MethodDefinition;
+import org.cafienne.processtask.implementation.http.definition.URLDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HTTPCallDefinition extends SubProcessDefinition {
     // Raw, hard coded output parameter names
@@ -26,25 +33,17 @@ public class HTTPCallDefinition extends SubProcessDefinition {
     public static final String RESPONSE_CODE_PARAMETER = "responseCode";
     public static final String RESPONSE_MESSAGE_PARAMETER = "responseMessage";
     public static final String RESPONSE_HEADERS_PARAMETER = "responseHeaders";
-    private final String contentTemplate;
-    private final String httpMethod;
-    private final String sourceURL;
-    private final List<Header> httpHeaders = new ArrayList<>();
+    private final ContentDefinition contentTemplate;
+    private final MethodDefinition httpMethod;
+    private final URLDefinition sourceURL;
+    private final List<HeaderDefinition> httpHeaders = new ArrayList<>();
 
     public HTTPCallDefinition(Element element, ModelDefinition processDefinition, CMMNElementDefinition parentElement) {
         super(element, processDefinition, parentElement);
-        this.sourceURL = parseString("url", true);
-        this.httpMethod = parseString("method", true);
-        this.contentTemplate = parseString("post-content", false);
-        Element httpHeadersElement = XMLHelper.getElement(element, "http-headers");
-        if (httpHeadersElement != null) {
-            Collection<Element> headerElements = XMLHelper.getChildrenWithTagName(httpHeadersElement, "http-header");
-            for (Element headerElement : headerElements) {
-                String headerName = headerElement.getAttribute("name");
-                String headerValue = XMLHelper.getContent(headerElement, null, "");
-                httpHeaders.add(new Header(headerName, headerValue));
-            }
-        }
+        this.sourceURL = parse("url", URLDefinition.class, true);
+        this.httpMethod = parse("method", MethodDefinition.class, true);
+        this.contentTemplate = parse("post-content", ContentDefinition.class, false);
+        parseGrandChildren("http-headers", "http-header", HeaderDefinition.class, httpHeaders);
     }
 
     @Override
@@ -57,20 +56,24 @@ public class HTTPCallDefinition extends SubProcessDefinition {
         return pNames;
     }
 
-    public List<Header> getHeaders() {
-        return httpHeaders;
+    public List<Header> getHeaders(APIRootObject<?> context) {
+        return httpHeaders.stream().map(definedHeader -> definedHeader.getHeader(context)).collect(Collectors.toList());
     }
 
-    public StringTemplate getURL() {
-        return new StringTemplate(sourceURL);
+    public List<Header> getHeaders(ProcessTaskActor task) {
+        return getHeaders(new InputMappingRoot(task));
     }
 
-    public StringTemplate getMethod() {
-        return new StringTemplate(httpMethod);
+    public URLDefinition getURL() {
+        return sourceURL;
     }
 
-    public StringTemplate getContent() {
-        return new StringTemplate(contentTemplate);
+    public MethodDefinition getMethod() {
+        return httpMethod;
+    }
+
+    public ContentDefinition getContent() {
+        return contentTemplate;
     }
 
     @Override
@@ -80,41 +83,6 @@ public class HTTPCallDefinition extends SubProcessDefinition {
 
     public TaskOutputValidator createValidator(HumanTask task) {
         return new TaskOutputValidator(this, task);
-    }
-
-    public class Header {
-        private final String sourceName;
-        private final String sourceValue;
-
-        Header(String name, String value) {
-            this.sourceName = name;
-            this.sourceValue = value;
-        }
-
-        public String getName(ValueMap processInputParameters) {
-            StringTemplate nameTemplate = new StringTemplate(sourceName);
-            nameTemplate.resolveParameters(processInputParameters);
-            return nameTemplate.toString();
-        }
-
-        public String getValue(ValueMap processInputParameters) {
-            StringTemplate valueTemplate = new StringTemplate(sourceValue);
-            valueTemplate.resolveParameters(processInputParameters);
-            return valueTemplate.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Header)) return false;
-            Header header = (Header) o;
-            return Objects.equals(sourceName, header.sourceName) && Objects.equals(sourceValue, header.sourceValue);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(sourceName, sourceValue);
-        }
     }
 
     @Override
@@ -141,4 +109,5 @@ public class HTTPCallDefinition extends SubProcessDefinition {
         }
         return true;
     }
+
 }

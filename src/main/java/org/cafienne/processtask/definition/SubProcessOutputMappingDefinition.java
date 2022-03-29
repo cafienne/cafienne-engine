@@ -22,14 +22,14 @@ import org.w3c.dom.Element;
  * It is similar to {@link ParameterMappingDefinition}, but it is proprietary for the engine Process implementations.
  * Currently it only supports mapping output parameters of the implementation to the Process.
  */
-public class SubProcessMapping extends CMMNElementDefinition {
+public class SubProcessOutputMappingDefinition extends CMMNElementDefinition {
     private final String sourceRef;
     private final String targetRef;
     private final ExpressionDefinition transformation;
     private ParameterDefinition source;
     private ParameterDefinition target;
 
-    public SubProcessMapping(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+    public SubProcessOutputMappingDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
         this.sourceRef = parseAttribute("sourceRef", true);
         this.targetRef = parseAttribute("targetRef", true);
@@ -88,7 +88,7 @@ public class SubProcessMapping extends CMMNElementDefinition {
         return equalsWith(object, this::sameMapping);
     }
 
-    public boolean sameMapping(SubProcessMapping other) {
+    public boolean sameMapping(SubProcessOutputMappingDefinition other) {
         return same(transformation, other.transformation)
                 && same(source, other.source)
                 && same(target, other.target);

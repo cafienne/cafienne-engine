@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.expression.spel;
 
-import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.ParameterDefinition;
 import org.cafienne.cmmn.definition.sentry.IfPartDefinition;
@@ -25,7 +24,7 @@ import org.cafienne.cmmn.expression.spel.api.cmmn.plan.TimerExpressionAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.workflow.AssignmentAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.workflow.DueDateAPI;
 import org.cafienne.cmmn.expression.spel.api.process.CalculationAPI;
-import org.cafienne.cmmn.expression.spel.api.process.ProcessMappingRootObject;
+import org.cafienne.cmmn.expression.spel.api.process.OutputMappingRoot;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
@@ -41,11 +40,6 @@ import org.cafienne.processtask.implementation.calculation.definition.expression
 import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.springframework.expression.EvaluationException;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -53,10 +47,8 @@ import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 public class ExpressionEvaluator implements CMMNExpressionEvaluator {
-    private final ExpressionParser parser;
-    private final Expression spelExpression;
+    private final Evaluator evaluator;
     private final String expressionString;
-    private final CMMNElementDefinition expressionDefinition;
 
     public ExpressionEvaluator(ExpressionDefinition expressionDefinition) {
         this(expressionDefinition, expressionDefinition.getBody());
@@ -66,26 +58,9 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
         this(expressionDefinition, expressionDefinition.getExpression());
     }
 
-    private ExpressionEvaluator(CMMNElementDefinition expressionDefinition, String expressionString) {
-        this.parser = new SpelExpressionParser();
-        this.expressionDefinition = expressionDefinition;
+    public ExpressionEvaluator(CMMNElementDefinition expressionDefinition, String expressionString) {
+        this.evaluator = new Evaluator(expressionDefinition, expressionString);
         this.expressionString = expressionString;
-        this.spelExpression = parseExpression();
-    }
-
-    private Expression parseExpression() {
-        if (expressionString.isBlank()) {
-            // Empty expressions lead to IllegalStateException("no node") --> checking here gives a somewhat more understandable error ...
-            expressionDefinition.getModelDefinition().addDefinitionError(expressionDefinition.getContextDescription() + " has no expression");
-            return null;
-        }
-
-        try {
-            return parser.parseExpression(expressionString);
-        } catch (Exception spe) { // Parser uses Assert class of Spring, which raises also exceptions like IllegalStateException
-            expressionDefinition.getModelDefinition().addDefinitionError(expressionDefinition.getContextDescription() + " has an invalid expression:\n" + spe.getMessage());
-            return null;
-        }
     }
 
     /**
@@ -94,29 +69,10 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
      * @return
      */
     private <T> T evaluateExpression(APIRootObject<?> rootObject) {
-        ModelActor actor = rootObject.getActor();
-        // System.out.println("Now evaluating the expression " + definition.getBody());
-        StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
-        // The case file accessor can be used to dynamically resolve properties that belong to the case file
-        SpelReadableRecognizer spelPropertyReader = new SpelReadableRecognizer(actor);
-        context.addPropertyAccessor(spelPropertyReader);
-
-        // TODO: improve the type checking and raise better error message if we're getting back the wrong type.
-
-        try {
-            actor.addDebugInfo(() -> "Evaluating " + rootObject.getDescription() + ": " + expressionString.trim());
-            // Not checking it. If it fails, it really fails.
-            @SuppressWarnings("unchecked")
-            T value = (T) spelExpression.getValue(context);
-            actor.addDebugInfo(() -> "Outcome: " + value);
-            return value;
-        } catch (EvaluationException invalidExpression) {
-            actor.addDebugInfo(() -> "Failure in evaluating " + rootObject.getDescription() + ", with expression " + expressionString.trim(), invalidExpression);
-            throw new InvalidExpressionException("Could not evaluate " + spelExpression.getExpressionString() + "\n" + invalidExpression.getLocalizedMessage(), invalidExpression);
-        }
+        return evaluator.evaluate(rootObject);
     }
 
-    private boolean evaluateConstraint(PlanItemRootAPI contextObject) {
+    private boolean evaluateConstraint(PlanItemRootAPI<?> contextObject) {
         Object outcome = evaluateExpression(contextObject);
         if (outcome instanceof Boolean) {
             return (boolean) outcome;
@@ -142,7 +98,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public Value<?> evaluateOutputParameterTransformation(ProcessTaskActor processTaskActor, Value<?> value, ParameterDefinition rawOutputParameterDefinition, ParameterDefinition targetOutputParameterDefinition) {
-        ProcessMappingRootObject contextObject = new ProcessMappingRootObject(rawOutputParameterDefinition, value, targetOutputParameterDefinition, processTaskActor);
+        OutputMappingRoot contextObject = new OutputMappingRoot(rawOutputParameterDefinition, value, targetOutputParameterDefinition, processTaskActor);
         Object result = evaluateExpression(contextObject);
         return Value.convert(result);
     }
@@ -169,7 +125,7 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
 
     @Override
     public boolean evaluateItemControl(PlanItem<?> planItem, ConstraintDefinition ruleDefinition) {
-        return evaluateConstraint(new PlanItemRootAPI(ruleDefinition, planItem));
+        return evaluateConstraint(new PlanItemRootAPI<>(ruleDefinition, planItem));
     }
 
     @Override

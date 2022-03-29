@@ -12,7 +12,7 @@ import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.definition.SubProcessMapping;
+import org.cafienne.processtask.definition.SubProcessOutputMappingDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,9 +82,9 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         processOutputParameters.getValue().clear();
     }
 
-    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessMapping> mappings) {
+    protected void transformRawParametersToProcessOutputParameters(Collection<SubProcessOutputMappingDefinition> mappings) {
         processTaskActor.addDebugInfo(() -> "Found " + mappings.size() +" output parameter mappings");
-        for (SubProcessMapping mapping : mappings) {
+        for (SubProcessOutputMappingDefinition mapping : mappings) {
             String outputParameterName = mapping.getTarget().getName();
             processTaskActor.addDebugInfo(() -> "Mapping " + mapping.getSource().getName() +" to " + mapping.getTarget().getName());
             Value<?> outputParameterValue = mapping.transformOutput(processTaskActor, rawOutputParameters);

@@ -4,6 +4,7 @@ import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.json.*;
 import org.cafienne.processtask.implementation.http.HTTPCallDefinition;
+import org.cafienne.processtask.implementation.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +53,10 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
         );
 
         // Bind any parameters in the URL, any content and the http method to the input parameters of this task.
-        URL targetURL = definition.getURL().resolveParameters(requestPayloadJson).toURL();
+        TaskValidatorRootAPI expressionContext = new TaskValidatorRootAPI(task, requestPayloadJson);
+        URL targetURL = definition.getURL().resolveURL(expressionContext);
         String requestPayload = requestPayloadJson.toString();
-        String httpMethod = definition.getMethod().resolveParameters(requestPayloadJson).toString();
+        String httpMethod = definition.getMethod().resolve(expressionContext);
 
         addDebugInfo(() -> "Invoking task validation on output of task " + task.getName() + "[" + task.getId() + "] with " + httpMethod.toUpperCase() + " " + targetURL.toString() + " with ", requestPayloadJson);
 
@@ -78,7 +80,7 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
             }
 
             // Now fill the http headers
-            fillHttpHeaders(httpConnection, requestPayloadJson);
+            fillHttpHeaders(httpConnection, expressionContext);
 
             if (httpMethod.equalsIgnoreCase("POST") || httpMethod.equalsIgnoreCase("PUT")) {
                 // Only if there is any input to be posted to the URL will we setup an interactive connection and start writing the data
@@ -110,15 +112,13 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
                 // Here we explicitly convert the response headers to values;
                 ValueMap convertedResponseHeaders = output.with(HTTPCallDefinition.RESPONSE_HEADERS_PARAMETER);
                 responseHeaders = httpConnection.getHeaderFields();
-                responseHeaders.entrySet().forEach((entry) -> {
-                    String headerName = entry.getKey();
-                    List<String> values = entry.getValue();
-                    if (headerName == null) {
-                        headerName = ""; // Sometimes, odd enough, there is a nameless header ...
+                responseHeaders.forEach((name, values) -> {
+                    if (name == null) {
+                        name = ""; // Sometimes, odd enough, there is a nameless header ...
                     }
                     // TODO: mostly, the headers returned are single, i.e., not a real array. Maybe then it is better
                     //  to just convert the header to StringValue instead of to ValueList?
-                    convertedResponseHeaders.put(headerName, Value.convert(values));
+                    convertedResponseHeaders.put(name, Value.convert(values));
                 });
             } catch (IOException ioe) {
                 return new ValidationError("Failed to read response", ioe);
@@ -168,12 +168,11 @@ public class TaskOutputValidator extends CMMNElement<HTTPCallDefinition> {
         }
     }
 
-    private void fillHttpHeaders(final HttpURLConnection connection, ValueMap processInputParameters) {
+    private void fillHttpHeaders(final HttpURLConnection connection, TaskValidatorRootAPI expressionContext) {
         // Now fill the http headers.
-        definition.getHeaders().forEach((HTTPCallDefinition.Header header) ->
-        {
-            String headerName = header.getName(processInputParameters);
-            String headerValue = header.getValue(processInputParameters);
+        definition.getHeaders(expressionContext).forEach((Header header) -> {
+            String headerName = header.getName();
+            String headerValue = header.getValue();
             addDebugInfo(() -> "Setting http header " + headerName + " to " + headerValue);
             connection.setRequestProperty(headerName, headerValue);
         });
