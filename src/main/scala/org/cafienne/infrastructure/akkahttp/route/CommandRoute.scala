@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHe
 import akka.http.scaladsl.server.{Directive0, Route}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.ModelCommand
-import org.cafienne.actormodel.response.{CommandFailure, EngineChokedFailure, ModelResponse, SecurityFailure}
+import org.cafienne.actormodel.response._
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
@@ -31,9 +31,10 @@ object CommandRouteExecutor extends LazyLogging {
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
           case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
+          case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case value: HumanTaskResponse => completeWithLMH(StatusCodes.Accepted, value)
-          case value: CaseNotModifiedResponse => complete(StatusCodes.NotModified, "Transition has no effect")
+          case _: CaseNotModifiedResponse => complete(StatusCodes.NotModified, "Transition has no effect")
           case value: CaseResponse => completeWithLMH(StatusCodes.OK, value)
           case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
           case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
