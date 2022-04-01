@@ -6,6 +6,7 @@ import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.ActorChokedFailure;
+import org.cafienne.actormodel.response.ActorExistsFailure;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.infrastructure.serialization.DeserializationFailure;
 
@@ -115,12 +116,8 @@ class Reception {
     }
 
     private void handleAlreadyCreated(IncomingActorMessage msg) {
-        fail(msg, "Failure while handling message " + msg.getClass().getSimpleName() + ". Check the server logs for more details");
-    }
-
-    private void fail(IncomingActorMessage message, String errorMessage) {
-        if (message.isCommand()) {
-            fail(message.asCommand(), errorMessage);
+        if (msg.isCommand()) {
+            actor.reply(new ActorExistsFailure(msg.asCommand(), new IllegalArgumentException("Failure while handling message " + msg.getClass().getSimpleName() + ". Check the server logs for more details")));
         }
     }
 

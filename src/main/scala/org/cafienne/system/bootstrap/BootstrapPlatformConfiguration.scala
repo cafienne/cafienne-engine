@@ -3,7 +3,7 @@ package org.cafienne.system.bootstrap
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
+import org.cafienne.actormodel.response.{ActorExistsFailure, CommandFailure, ModelResponse}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant
@@ -144,12 +144,8 @@ object BootstrapPlatformConfiguration extends LazyLogging {
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
     caseSystem.gateway.request(bootstrapTenant).map {
-      case e: CommandFailure =>
-        if (e.exception().getMessage.toLowerCase().contains("already exists")) {
-          logger.info(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info")
-        } else {
-          logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
-        }
+      case _: ActorExistsFailure => logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' already exists; ignoring bootstrap info (even if it is updated)")
+      case e: CommandFailure => logger.warn(s"Bootstrap tenant '${bootstrapTenant.name}' creation failed with an unexpected exception", e)
       case _: TenantResponse => logger.warn(s"Completed creation of bootstrap tenant '${bootstrapTenant.name}'")
       case r: ModelResponse => logger.info("Unexpected response during creation of bootstrap tenant: " + r)
       case t: Throwable => throw t

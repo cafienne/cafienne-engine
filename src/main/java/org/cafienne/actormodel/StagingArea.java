@@ -2,6 +2,7 @@ package org.cafienne.actormodel;
 
 import akka.persistence.journal.Tagged;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.event.CommitEvent;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;
@@ -90,7 +91,9 @@ class StagingArea {
             // If there are only debug events, first respond and then persist the events (for performance).
             // Otherwise, only send a response upon successful persisting the events.
             if (hasStatefulEvents()) {
-                actor.completeTransaction(message);
+                if (needsCommitEvent()) {
+                    actor.completeTransaction(message);
+                }
                 persistEventsAndThenReply(response);
             } else {
                 replyAndPersistDebugEvent(response);
@@ -212,6 +215,14 @@ class StagingArea {
      */
     private boolean hasStatefulEvents() {
         return events.size() > 0;
+    }
+
+    /**
+     * If the last event is not a CommitEvent we need one.
+     * @return
+     */
+    private boolean needsCommitEvent() {
+        return events.size() > 0 && !(events.get(events.size() - 1) instanceof CommitEvent);
     }
 
     /**
