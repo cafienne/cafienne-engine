@@ -102,10 +102,14 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     @Override
     public void print(JsonGenerator generator) throws IOException {
         generator.writeStartObject();
+        printFields(generator);
+        generator.writeEndObject();
+    }
+
+    public void printFields(JsonGenerator generator) throws IOException {
         for (Entry<String, Value<?>> next : value.entrySet()) {
             printField(generator, next.getKey(), next.getValue());
         }
-        generator.writeEndObject();
     }
 
     private void printField(JsonGenerator generator, String fieldName, Value<?> fieldValue) throws IOException {
