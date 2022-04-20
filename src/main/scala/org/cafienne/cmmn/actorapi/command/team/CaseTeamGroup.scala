@@ -31,7 +31,7 @@ case class CaseTeamGroup(groupId: String, mappings: Seq[GroupRoleMapping] = Seq(
   def differsFrom(newGroup: CaseTeamGroup): Boolean = {
     val differentMappings: Seq[GroupRoleMapping] = {
       // Their mappings that we do not have, plus our mappings that they do not have
-      newGroup.mappings.filter(mapping => !this.mappings.exists(_.eq(mapping))) ++ this.mappings.filter(mapping => !newGroup.mappings.exists(_.eq(mapping)))
+      newGroup.mappings.filter(mapping => !this.mappings.exists(_.equals(mapping))) ++ this.mappings.filter(mapping => !newGroup.mappings.exists(_.equals(mapping)))
     }
     differentMappings.nonEmpty
   }
