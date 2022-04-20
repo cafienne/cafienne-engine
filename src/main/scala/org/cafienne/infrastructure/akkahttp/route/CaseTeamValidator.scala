@@ -57,7 +57,7 @@ trait CaseTeamValidator extends TenantValidator {
     }
   }
 
-  private def validateCaseTeamUsers(users: Seq[CaseTeamUser], tenant: String): Future[Seq[CaseTeamUser]] = {
+  def validateCaseTeamUsers(users: Seq[CaseTeamUser], tenant: String): Future[Seq[CaseTeamUser]] = {
     userQueries.determineOriginOfUsers(users.map(_.userId), tenant).map(origins => {
       val newTeam = users.map(user => {
         val origin = origins.find(_._1 == user.userId).fold(Origin.IDP)(_._2)
@@ -67,13 +67,13 @@ trait CaseTeamValidator extends TenantValidator {
     })
   }
 
-  private def validateTenantRoles(tenantRoles: Seq[CaseTeamTenantRole]): Future[Seq[CaseTeamTenantRole]] = {
+  def validateTenantRoles(tenantRoles: Seq[CaseTeamTenantRole]): Future[Seq[CaseTeamTenantRole]] = {
     // As for now no real tenant role validation, but still a hook that could be implemented to validate that
     //  there is at least one user in the tenant with the specified tenant roles
     Future.successful(tenantRoles)
   }
 
-  private def validateConsentGroups(groups: Seq[CaseTeamGroup]): Future[Seq[CaseTeamGroup]] = {
+  def validateConsentGroups(groups: Seq[CaseTeamGroup]): Future[Seq[CaseTeamGroup]] = {
     val groupIds = groups.map(_.groupId)
     userQueries.getConsentGroups(groupIds).map(consentGroups => {
       if (consentGroups.size != groupIds.size) {
