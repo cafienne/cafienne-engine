@@ -85,18 +85,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @param fieldValue
      */
-    public Value<?> put(String fieldName, Value<?> fieldValue) {
-        return value.put(fieldName, fieldValue);
-    }
-
-    /**
-     * Puts a field in the object. Returns the existing field with the same name if it was available.
-     *
-     * @param fieldName
-     * @param fieldValue
-     */
-    public Value<?> put(Fields fieldName, Value<?> fieldValue) {
-        return put(fieldName.toString(), fieldValue);
+    public Value<?> put(Object fieldName, Value<?> fieldValue) {
+        return value.put(String.valueOf(fieldName), fieldValue);
     }
 
     @Override
@@ -157,7 +147,7 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     @Override
     public void clearOwner() {
         super.clearOwner();
-        value.values().forEach(v -> v.clearOwner());
+        value.values().forEach(Value::clearOwner);
     }
 
     /**
@@ -176,16 +166,12 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public Value<?> get(String fieldName) {
-        Value<?> fieldValue = value.get(fieldName);
+    public Value<?> get(Object fieldName) {
+        Value<?> fieldValue = value.get(String.valueOf(fieldName));
         if (fieldValue == null) {
             fieldValue = Value.NULL;
         }
         return fieldValue;
-    }
-
-    public Value<?> get(Fields fieldName) {
-        return get(fieldName.toString());
     }
 
     /**
@@ -194,12 +180,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public boolean has(String fieldName) {
-        return value.containsKey(fieldName);
-    }
-
-    public boolean has(Fields fieldName) {
-        return has(fieldName.toString());
+    public boolean has(Object fieldName) {
+        return value.containsKey(String.valueOf(fieldName));
     }
 
     /**
@@ -210,37 +192,31 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public ValueMap with(String fieldName) {
-        Value<?> v = value.get(fieldName);
+    public ValueMap with(Object fieldName) {
+        String field = String.valueOf(fieldName);
+        Value<?> v = value.get(field);
         if (!(v instanceof ValueMap)) {
             v = new ValueMap();
-            value.put(fieldName, v);
+            value.put(field, v);
         }
         return v.asMap();
     }
 
-    public ValueMap with(Fields fieldName) {
-        return with(fieldName.toString());
-    }
-
     /**
-     * Similar to {@link #with(String)} method, except that it now works for array objects: if a field with the specified name is
+     * Similar to {@link #with(Object)} method, except that it now works for array objects: if a field with the specified name is
      * not found or it is not an array, then it will be replaced with an empty array.
      *
      * @param fieldName
      * @return
      */
-    public ValueList withArray(String fieldName) {
-        Value<?> v = value.get(fieldName);
+    public ValueList withArray(Object fieldName) {
+        String field = String.valueOf(fieldName);
+        Value<?> v = value.get(field);
         if (!(v instanceof ValueList)) {
             v = new ValueList();
-            value.put(fieldName, v);
+            value.put(field, v);
         }
         return v.asList();
-    }
-
-    public ValueList withArray(Fields fieldName) {
-        return withArray(fieldName.toString());
     }
 
     /**
@@ -250,14 +226,10 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public <T> T raw(String fieldName) {
+    public <T> T raw(Object fieldName) {
         @SuppressWarnings("unchecked")
-        T rawValue = (T) get(fieldName).value;
+        T rawValue = (T) get(String.valueOf(fieldName)).value;
         return rawValue;
-    }
-
-    public <T> T raw(Fields fieldName) {
-        return this.raw(fieldName.toString());
     }
 
     /**
@@ -266,13 +238,9 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public int rawInt(String fieldName) {
-        Value<?> v = get(fieldName);
+    public int rawInt(Object fieldName) {
+        Value<?> v = get(String.valueOf(fieldName));
         return ((Long) v.value).intValue();
-    }
-
-    public int rawInt(Fields fieldName) {
-        return rawInt(fieldName.toString());
     }
 
     /**
@@ -281,20 +249,12 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public Instant rawInstant(String fieldName) {
-        Value<?> v = get(fieldName);
+    public Instant rawInstant(Object fieldName) {
+        Value<?> v = get(String.valueOf(fieldName));
         if (v == Value.NULL) {
             return null;
         }
         return Instant.parse(v.value.toString());
-    }
-
-    public Instant rawInstant(Fields fieldName) {
-        return this.rawInstant(fieldName.toString());
-    }
-
-    private <T extends Enum<?>> T getEnum(Fields fieldName, Class<T> tClass) {
-        return getEnum(fieldName.toString(), tClass);
     }
 
     /**
@@ -305,8 +265,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T extends Enum<?>> T getEnum(String fieldName, Class<T> tClass) {
-        Value<?> v = get(fieldName);
+    private <T extends Enum<?>> T getEnum(Object fieldName, Class<T> tClass) {
+        Value<?> v = get(String.valueOf(fieldName));
         if (v == null || v == Value.NULL) {
             return null;
         }
@@ -367,25 +327,25 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     @SafeVarargs
-    public final <T> T readField(Fields fieldName, T... value) {
+    public final <T> T readField(Object fieldName, T... defaultValue) {
         if (has(fieldName)) {
             return raw(fieldName);
-        } else if (value.length > 0) {
-            return value[0];
+        } else if (defaultValue.length > 0) {
+            return defaultValue[0];
         } else {
             return null;
         }
     }
 
-    public <T extends Enum<?>> T readEnum(Fields fieldName, Class<T> enumClass) {
+    public <T extends Enum<?>> T readEnum(Object fieldName, Class<T> enumClass) {
         return getEnum(fieldName, enumClass);
     }
 
-    public String readString(Fields fieldName, String... value) {
+    public String readString(Object fieldName, String... value) {
         return readField(fieldName, value);
     }
 
-    public Boolean readBoolean(Fields fieldName, Boolean... value) {
+    public Boolean readBoolean(Object fieldName, Boolean... value) {
         if (value.length > 0) {
             return readField(fieldName, value);
         } else {
@@ -393,37 +353,37 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
     }
 
-    public Instant readInstant(Fields fieldName) {
+    public Instant readInstant(Object fieldName) {
         return rawInstant(fieldName);
     }
 
-    public String[] readStringList(Fields fieldName) {
+    public String[] readStringList(Object fieldName) {
         List<String> list = withArray(fieldName).rawList();
         return list.toArray(new String[0]);
     }
 
-    public ValueMap readMap(Fields fieldName) {
+    public ValueMap readMap(Object fieldName) {
         return with(fieldName);
     }
 
-    public <T> Set<T> readSet(Fields fieldName) {
+    public <T> Set<T> readSet(Object fieldName) {
         return new HashSet<>(withArray(fieldName).rawList());
     }
 
-    public <T extends CMMNElementDefinition> T readDefinition(Fields fieldName, Class<T> tClass) {
+    public <T extends CMMNElementDefinition> T readDefinition(Object fieldName, Class<T> tClass) {
         return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(fieldName), tClass);
     }
 
-    public Path readPath(Fields fieldName) {
+    public Path readPath(Object fieldName) {
         return new Path(readString(fieldName));
     }
 
-    public <T> T readObject(Fields fieldName, ValueMapParser<T> parser) {
+    public <T> T readObject(Object fieldName, ValueMapParser<T> parser) {
         ValueMap json = with(fieldName);
         return parser.convert(json);
     }
 
-    public <T> List<T> readObjects(Fields fieldName, ValueMapParser<T> parser) {
+    public <T> List<T> readObjects(Object fieldName, ValueMapParser<T> parser) {
         return withArray(fieldName).stream().map(json -> parser.convert(json.asMap())).collect(Collectors.toList());
     }
 }

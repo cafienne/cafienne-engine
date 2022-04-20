@@ -7,8 +7,6 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.json.CafienneJson;
 import org.cafienne.json.Value;
-import org.cafienne.json.ValueList;
-import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public interface CafienneSerializable {
     Logger logger = LoggerFactory.getLogger(CafienneSerializer.class);
@@ -57,8 +53,8 @@ public interface CafienneSerializable {
 
     void write(JsonGenerator generator) throws IOException;
 
-    default void writeListField(JsonGenerator generator, Fields fieldName, Collection<? extends CafienneJson> list) throws IOException {
-        generator.writeArrayFieldStart(fieldName.toString());
+    default void writeListField(JsonGenerator generator, Object fieldName, Collection<? extends CafienneJson> list) throws IOException {
+        generator.writeArrayFieldStart(String.valueOf(fieldName));
         for (CafienneJson string : list) {
             if (string == null) {
                 generator.writeNull();
@@ -69,8 +65,8 @@ public interface CafienneSerializable {
         generator.writeEndArray();
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, Collection<String> stringList) throws IOException {
-        generator.writeArrayFieldStart(fieldName.toString());
+    default void writeField(JsonGenerator generator, Object fieldName, Collection<String> stringList) throws IOException {
+        generator.writeArrayFieldStart(String.valueOf(fieldName));
         for (String string : stringList) {
             if (string == null) {
                 generator.writeNull();
@@ -81,74 +77,74 @@ public interface CafienneSerializable {
         generator.writeEndArray();
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, boolean value) throws IOException {
-        generator.writeBooleanField(fieldName.toString(), value);
+    default void writeField(JsonGenerator generator, Object fieldName, boolean value) throws IOException {
+        generator.writeBooleanField(String.valueOf(fieldName), value);
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, CMMNElementDefinition value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, CMMNElementDefinition value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeFieldName(fieldName.toString());
+            generator.writeFieldName(String.valueOf(fieldName));
             value.toJSON().print(generator);
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, Value<?> value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, Value<?> value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeFieldName(fieldName.toString());
+            generator.writeFieldName(String.valueOf(fieldName));
             value.print(generator);
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, String value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, String value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeStringField(fieldName.toString(), value);
+            generator.writeStringField(String.valueOf(fieldName), value);
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, Path value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, Path value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeStringField(fieldName.toString(), String.valueOf(value));
+            generator.writeStringField(String.valueOf(fieldName), String.valueOf(value));
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, Instant value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, Instant value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeStringField(fieldName.toString(), String.valueOf(value));
+            generator.writeStringField(String.valueOf(fieldName), String.valueOf(value));
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, Enum value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, Enum value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeStringField(fieldName.toString(), String.valueOf(value));
+            generator.writeStringField(String.valueOf(fieldName), String.valueOf(value));
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, CafienneJson value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, CafienneJson value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeFieldName(fieldName.toString());
+            generator.writeFieldName(String.valueOf(fieldName));
             value.write(generator);
         }
     }
 
-    default void writeField(JsonGenerator generator, Fields fieldName, CafienneSerializable value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, CafienneSerializable value) throws IOException {
         if (value == null) {
-            generator.writeNullField(fieldName.toString());
+            generator.writeNullField(String.valueOf(fieldName));
         } else {
-            generator.writeFieldName(fieldName.toString());
+            generator.writeFieldName(String.valueOf(fieldName));
             value.writeThisObject(generator);
         }
     }
