@@ -280,7 +280,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
     /**
      * Adds a member to the case team upon request of a Task that has dynamic assignment.
      *
-     * @param userId The tenant user id; note that assignment cannot be done on roles, only on users
+     * @param user The tenant user id; note that assignment cannot be done on roles, only on users
      * @param role   The (optional) role that the team member must have for executing the task leading to this call
      */
     public void upsertCaseTeamUser(CaseUserIdentity user, CaseRoleDefinition role) {

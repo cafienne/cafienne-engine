@@ -2,7 +2,6 @@ package org.cafienne.cmmn.actorapi.command.team
 
 import org.cafienne.cmmn.definition.team.CaseTeamDefinition
 import org.cafienne.cmmn.instance.team.{CaseTeamError, MemberType, Team}
-import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json._
 
 import java.util
@@ -46,10 +45,5 @@ trait CaseTeamMember extends CafienneJson {
 
   def getCaseRoles: util.Set[String] = {
     caseRoles.asJava
-  }
-
-  override def toValue: Value[_] = {
-    val json = new ValueMap(Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
-    json
   }
 }

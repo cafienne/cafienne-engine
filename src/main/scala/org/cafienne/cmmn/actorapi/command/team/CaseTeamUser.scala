@@ -23,7 +23,7 @@ trait CaseTeamUser extends CaseTeamMember {
 
   override def currentMember(team: Team): CaseTeamMember = team.getUser(memberId)
 
-  override def toValue: Value[_] = super.toValue.asMap().plus(Fields.userId, userId, Fields.origin, origin)
+  override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.origin, origin, Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
 
   def extend(caseRole: String): CaseTeamUser = this.copy(extraRoles = Set(caseRole))
 

@@ -40,7 +40,7 @@ case class CaseTeamGroup(groupId: String, mappings: Seq[GroupRoleMapping] = Seq(
     this.mappings.filter(mapping => !newGroup.mappings.exists(_.eq(mapping))).toSet.asJava
   }
 
-  override def toValue: Value[_] = super.toValue.asMap.plus(Fields.groupId, groupId, Fields.mappings, mappings)
+  override def toValue: Value[_] = new ValueMap(Fields.groupId, groupId, Fields.mappings, mappings)
 
   override def generateChangeEvent(team: Team, newRoles: Set[String]): Unit = team.setGroup(this.copy(mappings = this.mappings.map(m => m.copy(caseRoles = m.caseRoles.intersect(newRoles)))))
 }

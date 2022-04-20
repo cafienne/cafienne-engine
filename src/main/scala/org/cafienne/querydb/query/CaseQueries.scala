@@ -121,7 +121,7 @@ class CaseQueriesImpl
       val groupRoleMappings = groupRoles.map(groupRole => {
         val caseRoles = mappings.filter(_.groupRole == groupRole).map(_.caseRole).toSet
         val isOwner = mappings.filter(_.groupRole == groupRole).exists(_.isOwner)
-        GroupRoleMapping(caseRoles, groupRole, isOwner)
+        GroupRoleMapping(groupRole = groupRole, isOwner = isOwner, caseRoles = caseRoles)
       })
       CaseTeamGroup(groupId, groupRoleMappings.toSeq)
     }).toSeq
