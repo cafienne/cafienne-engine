@@ -19,7 +19,7 @@ case class CaseTeamTenantRole(tenantRoleName: String, override val caseRoles: Se
 
   override def currentMember(team: Team): CaseTeamMember = team.getTenantRole(tenantRoleName)
 
-  override def toValue: Value[_] = super.toValue.asMap().plus(Fields.tenantRole, tenantRoleName)
+  override def toValue: Value[_] = new ValueMap(Fields.tenantRole, tenantRoleName, Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
 
   override def generateChangeEvent(team: Team, newRoles: Set[String]): Unit = team.setTenantRole(this.copy(caseRoles = newRoles))
 }

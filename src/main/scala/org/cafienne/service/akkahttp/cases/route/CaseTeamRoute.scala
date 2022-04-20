@@ -171,7 +171,10 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with
     caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam" / "groups") {
         entity(as[GroupFormat]) { input =>
-          askCase(user, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, input.asGroup))
+          onComplete(validateConsentGroups(Seq(input.asGroup))) {
+            case Success(groups: Seq[CaseTeamGroup]) => askCase(user, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, groups.head))
+            case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+          }
         }
       }
     }

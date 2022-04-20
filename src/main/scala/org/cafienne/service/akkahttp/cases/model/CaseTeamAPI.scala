@@ -22,7 +22,7 @@ object CaseTeamAPI {
                                    example = "Unique identifier of the user",
                                    required = true,
                                    implementation = classOf[String])
-                                 userId: String,
+                                 userId: String = "",
                                  @(Schema@field)(
                                    required = false,
                                    implementation = classOf[Option[Boolean]],
@@ -34,7 +34,9 @@ object CaseTeamAPI {
                                    implementation = classOf[NewCaseTeamRolesForUser],
                                    description = "Zero or more case roles that will be added to the user",
                                    example = "Zero or more case roles that will be added to the user"))
-                                 caseRoles: Array[String]) {
+                                 caseRoles: Seq[String] = Seq()) {
+    ApiValidator.required(userId, "Case team users must have a userId")
+
     def asCaseTeamUser: CaseTeamUser = CaseTeamUser.from(userId = userId, origin = Origin.IDP, caseRoles = caseRoles.toSet, isOwner = isOwner.getOrElse(false))
   }
 
@@ -44,7 +46,7 @@ object CaseTeamAPI {
                                  example = "All users in the tenant with this role are member of the case team",
                                  required = true,
                                  implementation = classOf[String])
-                               tenantRole: String,
+                               tenantRole: String = "",
                                @(Schema@field)(
                                  required = false,
                                  implementation = classOf[Option[Boolean]],
@@ -55,7 +57,9 @@ object CaseTeamAPI {
                                  required = true,
                                  implementation = classOf[NewCaseTeamRolesForTenantRole],
                                  example = "Zero or more case roles that will be added to the tenant role based membership"))
-                               caseRoles: Array[String]) {
+                               caseRoles: Seq[String] = Seq()) {
+    ApiValidator.required(tenantRole, "Tenant role members must have a valid role name")
+
     def asTenantRole: CaseTeamTenantRole = {
       CaseTeamTenantRole(tenantRoleName = tenantRole, caseRoles = caseRoles.toSet, isOwner = isOwner.getOrElse(false))
     }
@@ -67,15 +71,22 @@ object CaseTeamAPI {
                             example = "Identification of the consent group",
                             required = true,
                             implementation = classOf[String])
-                          groupId: String,
+                          groupId: String = "",
                           @(ArraySchema@field)(schema = new Schema(
-                            description = "Mappings of consent group role to case team role",
+                            description = "Mappings of consent group role to case team roles",
                             required = true,
                             implementation = classOf[RoleMappingFormat]))
-                          mappings: Array[RoleMappingFormat],
+                          mappings: Seq[RoleMappingFormat] = Seq(),
                         ) {
+    // Group id must be filled, validation on existence is done further down the line.
+    ApiValidator.required(groupId, "Case team groups must have a groupId")
+    // Mappings must be set
+    if (mappings.isEmpty) {
+      throw new IllegalArgumentException("Case team groups must have one or more mappings defined")
+    }
+
     def asGroup: CaseTeamGroup = {
-      CaseTeamGroup(groupId = groupId, mappings = mappings.toSeq.map(_.asGroupRoleMapping))
+      CaseTeamGroup(groupId = groupId, mappings = mappings.map(_.asGroupRoleMapping))
     }
   }
 
@@ -97,9 +108,9 @@ object CaseTeamAPI {
                                   example = "[A, B, C]",
                                   required = true,
                                   implementation = classOf[String])
-                                caseRoles: Array[String],
+                                caseRoles: Seq[String] = Seq(),
                               ) {
-    def asGroupRoleMapping: GroupRoleMapping = GroupRoleMapping(caseRoles = caseRoles.toSet, groupRole = groupRole, isOwner = isOwner.getOrElse(false))
+    def asGroupRoleMapping: GroupRoleMapping = GroupRoleMapping(groupRole = groupRole, isOwner = isOwner.getOrElse(false), caseRoles = caseRoles.toSet)
   }
 
   // Simple classes to enable different example/description for each of the usages of 'caseRoles'
@@ -128,11 +139,8 @@ object CaseTeamAPI {
       private lazy val getGroups: Seq[CaseTeamGroup] = groups.map(_.asGroup)
       private lazy val getRoles: Seq[CaseTeamTenantRole] = tenantRoles.map(_.asTenantRole) ++ members.filterNot(_.isUser).map(_.asTenantRole)
 
-      // Run validations: mappings must be present and users, groups and roles should not contain duplicates
-      if (groups.exists(group => group.mappings.isEmpty)) {
-        throw new IllegalArgumentException("Case team groups must have one or more mappings defined")
-      }
-
+      // Run validations: users, groups and roles should not contain duplicates
+      //  Note, in addition individual members do their own validations
       ApiValidator.runDuplicatesDetector("Case team", "user", users.map(_.userId))
       ApiValidator.runDuplicatesDetector("Case team", "group", groups.map(_.groupId))
       ApiValidator.runDuplicatesDetector("Case team", "tenant role", tenantRoles.map(_.tenantRole))
