@@ -11,13 +11,13 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.json.Value;
 import org.cafienne.processtask.implementation.calculation.Calculation;
+import org.cafienne.processtask.implementation.calculation.CalculationDefinition;
 import org.cafienne.processtask.implementation.calculation.Result;
 import org.cafienne.processtask.implementation.calculation.definition.expression.CalculationExpressionDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.expression.ConditionDefinition;
 import org.cafienne.processtask.implementation.calculation.definition.source.InputReference;
 import org.cafienne.processtask.implementation.calculation.definition.source.SourceDefinition;
 import org.cafienne.processtask.implementation.calculation.operation.CalculationStep;
-import org.cafienne.processtask.implementation.calculation.operation.Source;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
@@ -48,6 +48,14 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
         this.condition = parse("condition", ConditionDefinition.class, false);
     }
 
+    protected StepDefinition(CalculationDefinition calculationDefinition, String identifier) {
+        super(calculationDefinition.getElement(), calculationDefinition.getModelDefinition(), calculationDefinition);
+        this.identifier = identifier;
+        this.expression = null;
+        this.condition = null;
+        this.inputs = new ArrayList<>();
+    }
+
     /**
      * Utility method for stream steps. Assures a single input only and returns that name
      *
@@ -66,7 +74,7 @@ public class StepDefinition extends CMMNElementDefinition implements SourceDefin
     }
 
     @Override
-    public Source<?> createInstance(Calculation calculation) {
+    public CalculationStep createInstance(Calculation calculation) {
         return new CalculationStep(calculation, this);
     }
 
