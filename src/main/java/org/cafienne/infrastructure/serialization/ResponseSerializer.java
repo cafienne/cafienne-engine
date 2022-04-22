@@ -1,9 +1,6 @@
 package org.cafienne.infrastructure.serialization;
 
-import org.cafienne.actormodel.response.ActorChokedFailure;
-import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.EngineChokedFailure;
-import org.cafienne.actormodel.response.SecurityFailure;
+import org.cafienne.actormodel.response.*;
 import org.cafienne.cmmn.actorapi.response.*;
 import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
 import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
@@ -46,6 +43,7 @@ public class ResponseSerializer extends CafienneSerializer {
         addManifestWrapper(CommandFailure.class, CommandFailure::new);
         addManifestWrapper(SecurityFailure.class, SecurityFailure::new);
         addManifestWrapper(ActorChokedFailure.class, ActorChokedFailure::new);
+        addManifestWrapper(ActorExistsFailure.class, ActorExistsFailure::new);
         addManifestWrapper(EngineChokedFailure.class, EngineChokedFailure::new);
     }
 

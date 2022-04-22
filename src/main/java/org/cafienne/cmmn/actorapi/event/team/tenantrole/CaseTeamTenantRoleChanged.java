@@ -7,19 +7,17 @@ import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
-import java.util.Set;
-
 /**
  * Event caused when a consent group is given access to the case.
  */
 @Manifest
 public class CaseTeamTenantRoleChanged extends CaseTeamMemberChanged<CaseTeamTenantRole> {
-    public CaseTeamTenantRoleChanged(Team team, CaseTeamTenantRole newMemberInfo, Set<String> removedRoles) throws CaseTeamError {
-        super(team, newMemberInfo, removedRoles);
+    public CaseTeamTenantRoleChanged(Team team, CaseTeamTenantRole newInfo) throws CaseTeamError {
+        super(team, newInfo);
     }
 
     public CaseTeamTenantRoleChanged(ValueMap json) {
-        super(json, CaseTeamTenantRole::deserialize);
+        super(json, CaseTeamTenantRole.getDeserializer(json));
     }
 
     @Override

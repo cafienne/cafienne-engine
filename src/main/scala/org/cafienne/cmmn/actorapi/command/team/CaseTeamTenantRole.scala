@@ -9,9 +9,9 @@ import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json._
 
 import java.util
-import scala.jdk.CollectionConverters.SetHasAsScala
+import scala.jdk.CollectionConverters._
 
-case class CaseTeamTenantRole(tenantRoleName: String, override val caseRoles: Set[String] = Set(), override val isOwner: Boolean = false) extends CaseTeamMember {
+case class CaseTeamTenantRole(tenantRoleName: String, override val caseRoles: Set[String] = Set(), override val isOwner: Boolean = false, override val rolesRemoved: Set[String] = Set()) extends CaseTeamMember {
   override val isTenantRole: Boolean = true
   override val memberType: MemberType = MemberType.TenantRole
 
@@ -19,17 +19,44 @@ case class CaseTeamTenantRole(tenantRoleName: String, override val caseRoles: Se
 
   override def currentMember(team: Team): CaseTeamMember = team.getTenantRole(tenantRoleName)
 
-  override def toValue: Value[_] = new ValueMap(Fields.tenantRole, tenantRoleName, Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
+  override def toValue: Value[_] = {
+    val json = memberKeyJson.plus(Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
+    jsonPlusOptionalField(json, Fields.rolesRemoved, rolesRemoved)
+  }
+
+  override def memberKeyJson: ValueMap = new ValueMap(Fields.tenantRole, tenantRoleName)
 
   override def generateChangeEvent(team: Team, newRoles: Set[String]): Unit = team.setTenantRole(this.copy(caseRoles = newRoles))
+
+  def differsFrom(that: CaseTeamTenantRole): Boolean = {
+    !(this.tenantRoleName.equals(that.tenantRoleName) &&
+      this.isOwner == that.isOwner &&
+      this.caseRoles.diff(that.caseRoles).isEmpty && that.caseRoles.diff(this.caseRoles).isEmpty)
+  }
+
+  def minus(existingUserInfo: CaseTeamTenantRole): CaseTeamTenantRole = {
+    val removedRoles = existingUserInfo.caseRoles.diff(caseRoles)
+    this.copy(rolesRemoved = removedRoles)
+  }
 }
 
 object CaseTeamTenantRole extends LazyLogging {
+  def getDeserializer(parent: ValueMap): CaseTeamMemberDeserializer[CaseTeamTenantRole] = {
+    // Special deserializer that can migrate rolesRemoved from parent json for older event format (Cafienne versions 1.1.16 - 1.1.18)
+    (json: ValueMap) => {
+      if (parent.has(Fields.rolesRemoved)) {
+        parent.withArray(Fields.rolesRemoved).getValue.asScala.foreach(json.withArray(Fields.rolesRemoved).add(_))
+      }
+      CaseTeamTenantRole.deserialize(json)
+    }
+  }
+
   def deserialize(json: ValueMap): CaseTeamTenantRole = {
     new CaseTeamTenantRole(
       tenantRoleName = json.readString(Fields.tenantRole),
       caseRoles = json.readStringList(Fields.caseRoles).toSet,
-      isOwner = json.readBoolean(Fields.isOwner))
+      isOwner = json.readBoolean(Fields.isOwner),
+      rolesRemoved = json.readStringList(Fields.rolesRemoved).toSet)
   }
 
   def handleDeprecatedTenantRoleEvent(tenantRoles: util.Map[String, CaseTeamTenantRole], event: DeprecatedCaseTeamEvent): Unit = {

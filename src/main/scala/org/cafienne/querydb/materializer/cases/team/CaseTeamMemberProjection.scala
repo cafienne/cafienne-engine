@@ -11,7 +11,6 @@ import org.cafienne.querydb.record.{CaseTeamGroupRecord, CaseTeamTenantRoleRecor
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, SetHasAsScala}
 
 class CaseTeamMemberProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val newCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
@@ -33,7 +32,7 @@ class CaseTeamMemberProjection(persistence: RecordsPersistence)(implicit val exe
       val memberId: String = member.memberId
       val isOwner: Boolean = member.isOwner
       val caseRoles: Set[String] = member.caseRoles ++ Set("")
-      val removedRoles: Set[String] = event.getRolesRemoved.asScala.toSet
+      val removedRoles: Set[String] = member.rolesRemoved
 
       member.memberType match {
         case MemberType.User =>
@@ -43,36 +42,39 @@ class CaseTeamMemberProjection(persistence: RecordsPersistence)(implicit val exe
         case MemberType.TenantRole =>
           newCaseTeamTenantRoleRoles.addAll(caseRoles.map(caseRole => CaseTeamTenantRoleRecord(caseInstanceId = caseInstanceId, tenantRole = memberId, tenant = event.tenant, caseRole = caseRole, isOwner = isOwner)))
           removedCaseTeamTenantRoleRoles.addAll(removedRoles.map(caseRole => CaseTeamTenantRoleRecord(caseInstanceId = caseInstanceId, tenantRole = memberId, tenant = event.tenant, caseRole = caseRole, isOwner = isOwner)))
-        case _ => // Ignor other events
+        case _ => // Ignore other events
       }
     }
   }
 
   def handleGroupEvent(event: CaseTeamMemberEvent[_]): Unit = {
     val group = event.member.asInstanceOf[CaseTeamGroup]
-    def asRecord(mapping: GroupRoleMapping): Set[CaseTeamGroupRecord] = {
-      mapping.caseRoles.map(caseRole => CaseTeamGroupRecord(caseInstanceId = event.getActorId, tenant = event.tenant, groupId = group.groupId, caseRole = caseRole, groupRole = mapping.groupRole, isOwner = mapping.isOwner))
-    }
+    def asRecords(mapping: GroupRoleMapping): Set[CaseTeamGroupRecord] = mapping.caseRoles.map(asRecord(mapping, _))
+    def asRecord(mapping: GroupRoleMapping, caseRole: String): CaseTeamGroupRecord = CaseTeamGroupRecord(caseInstanceId = event.getActorId, tenant = event.tenant, groupId = group.groupId, caseRole = caseRole, groupRole = mapping.groupRole, isOwner = mapping.isOwner)
 
     event match {
       // Add a record for each mapping
       case _: CaseTeamGroupAdded =>
-        newCaseTeamGroupMappings.addAll(group.mappings.flatMap(asRecord))
-      case event: CaseTeamGroupChanged =>
-        newCaseTeamGroupMappings.addAll(group.mappings.flatMap(asRecord))
-        removedGroupMappings.addAll(event.removedMappings.asScala.flatMap(asRecord))
+        newCaseTeamGroupMappings.addAll(group.mappings.flatMap(asRecords))
+      case _: CaseTeamGroupChanged =>
+        // Upsert new case roles
+        newCaseTeamGroupMappings.addAll(group.mappings.flatMap(asRecords))
+        // Delete removed case roles
+        removedGroupMappings.addAll(group.mappings.flatMap(mapping => mapping.rolesRemoved.map(asRecord(mapping, _))))
+        // Delete removed groupRoles
+        removedGroupMappings.addAll(group.removedMappings.flatMap(asRecords))
       case _ => // other events are not relevant
     }
   }
 
   def prepareCommit(): Unit = {
-    // Update case team changes
-    newCaseTeamUserRoles.foreach(roleUpdate => persistence.upsert(roleUpdate))
+    // Update case team changes. Note: order matters (a bit). So first delete, and then add new info.
     removedCaseTeamUserRoles.foreach(roleRemoved => persistence.delete(roleRemoved))
-    newCaseTeamTenantRoleRoles.foreach(roleUpdate => persistence.upsert(roleUpdate))
+    newCaseTeamUserRoles.foreach(roleUpdate => persistence.upsert(roleUpdate))
     removedCaseTeamTenantRoleRoles.foreach(roleRemoval => persistence.delete(roleRemoval))
-    newCaseTeamGroupMappings.foreach(groupMapping => persistence.upsert(groupMapping))
+    newCaseTeamTenantRoleRoles.foreach(roleUpdate => persistence.upsert(roleUpdate))
     removedGroupMappings.foreach(groupMapping => persistence.delete(groupMapping))
+    newCaseTeamGroupMappings.foreach(groupMapping => persistence.upsert(groupMapping))
     deletedMembers.foreach(persistence.deleteCaseTeamMember)
   }
 }
