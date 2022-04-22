@@ -102,24 +102,13 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         }
     }
 
-    private Set<String> getRemovedRoles(CaseTeamMember newMemberInfo, CaseTeamMember existingMember) {
-        return existingMember.getCaseRoles().stream().filter(role -> !newMemberInfo.getCaseRoles().contains(role)).collect(Collectors.toSet());
-    }
-
-    private boolean hasChangeInfo(CaseTeamMember newMemberInfo, CaseTeamMember existingMember) {
-        boolean ownershipChanged = newMemberInfo.isOwner() != existingMember.isOwner();
-        Set<String> rolesAdded = newMemberInfo.getCaseRoles().stream().filter(role -> !existingMember.getCaseRoles().contains(role)).collect(Collectors.toSet());
-        return (ownershipChanged || ! rolesAdded.isEmpty());
-    }
-
     public void setUser(CaseTeamUser newUserInfo) {
         CaseTeamUser existingUser = users.get(newUserInfo.userId());
         if (existingUser == null) {
             addEvent(new CaseTeamUserAdded(this, newUserInfo));
         } else {
-            Set<String> rolesRemoved = getRemovedRoles(newUserInfo, existingUser);
-            if (hasChangeInfo(newUserInfo, existingUser) || ! rolesRemoved.isEmpty()) {
-                addEvent(new CaseTeamUserChanged(this, newUserInfo, rolesRemoved));
+            if (existingUser.differsFrom(newUserInfo)) {
+                addEvent(new CaseTeamUserChanged(this, newUserInfo.minus(existingUser)));
             }
         }
     }
@@ -130,8 +119,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
             addEvent(new CaseTeamGroupAdded(this, newMemberInfo));
         } else {
             if (existingGroup.differsFrom(newMemberInfo)) {
-                Set<GroupRoleMapping> removedMappings = existingGroup.getRemovedMappings(newMemberInfo);
-                addEvent(new CaseTeamGroupChanged(this, newMemberInfo, removedMappings));
+                addEvent(new CaseTeamGroupChanged(this, newMemberInfo.minus(existingGroup)));
             }
         }
     }
@@ -141,9 +129,8 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         if (existingTenantRole == null) {
             addEvent(new CaseTeamTenantRoleAdded(this, newMemberInfo));
         } else {
-            Set<String> rolesRemoved = getRemovedRoles(newMemberInfo, existingTenantRole);
-            if (hasChangeInfo(newMemberInfo, existingTenantRole) || ! rolesRemoved.isEmpty()) {
-                addEvent(new CaseTeamTenantRoleChanged(this, newMemberInfo, rolesRemoved));
+            if (existingTenantRole.differsFrom(newMemberInfo)) {
+                addEvent(new CaseTeamTenantRoleChanged(this, newMemberInfo.minus(existingTenantRole)));
             }
         }
     }

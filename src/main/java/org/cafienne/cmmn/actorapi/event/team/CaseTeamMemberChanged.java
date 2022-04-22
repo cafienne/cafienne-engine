@@ -5,7 +5,6 @@ import org.cafienne.cmmn.actorapi.command.team.CaseTeamMember;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamMemberDeserializer;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -17,21 +16,12 @@ import java.util.Set;
  */
 @Manifest
 public abstract class CaseTeamMemberChanged<Member extends CaseTeamMember> extends CaseTeamMemberEvent<Member> {
-    public final Set<String> rolesRemoved;
-
-    public CaseTeamMemberChanged(Team team, Member newInfo, Set<String> rolesRemoved) throws CaseTeamError {
+    public CaseTeamMemberChanged(Team team, Member newInfo) throws CaseTeamError {
         super(team, newInfo);
-        this.rolesRemoved = rolesRemoved;
     }
 
     public CaseTeamMemberChanged(ValueMap json, CaseTeamMemberDeserializer<Member> reader) {
         super(json, reader);
-        rolesRemoved = json.readSet(Fields.rolesRemoved);
-    }
-
-    @Override
-    public Set<String> getRolesRemoved() {
-        return rolesRemoved;
     }
 
     @Override
@@ -41,6 +31,5 @@ public abstract class CaseTeamMemberChanged<Member extends CaseTeamMember> exten
 
     protected void writeMemberChangedEvent(JsonGenerator generator) throws IOException {
         writeCaseTeamMemberEvent(generator);
-        writeField(generator, Fields.rolesRemoved, rolesRemoved);
     }
 }

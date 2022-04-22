@@ -27,14 +27,6 @@ public abstract class CaseTeamMemberEvent<Member extends CaseTeamMember> extends
         this.member = reader.readMember(json.with(Fields.member));
     }
 
-    public Set<String> getCaseRoles() {
-        return member.getCaseRoles();
-    }
-
-    public Set<String> getRolesRemoved() {
-        return new HashSet<>();
-    }
-
     @Override
     public void write(JsonGenerator generator) throws IOException {
         writeCaseTeamMemberEvent(generator);

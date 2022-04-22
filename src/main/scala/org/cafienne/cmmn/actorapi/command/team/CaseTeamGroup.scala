@@ -5,9 +5,10 @@ import org.cafienne.cmmn.instance.team.{CaseTeamError, MemberType, Team}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json._
 
+import java.util
 import scala.jdk.CollectionConverters._
 
-case class CaseTeamGroup(groupId: String, mappings: Seq[GroupRoleMapping] = Seq()) extends CaseTeamMember {
+case class CaseTeamGroup(groupId: String, mappings: Seq[GroupRoleMapping] = Seq(), removedMappings: Seq[GroupRoleMapping] = Seq()) extends CaseTeamMember {
   override val isGroup: Boolean = true
   override val caseRoles: Set[String] = mappings.flatMap(_.caseRoles).toSet
   override val memberType: MemberType = MemberType.Group
@@ -24,32 +25,47 @@ case class CaseTeamGroup(groupId: String, mappings: Seq[GroupRoleMapping] = Seq(
     }
   }
 
-  def getMappings: java.util.List[GroupRoleMapping] = {
-    mappings.asJava
-  }
-
   def differsFrom(newGroup: CaseTeamGroup): Boolean = {
     val differentMappings: Seq[GroupRoleMapping] = {
       // Their mappings that we do not have, plus our mappings that they do not have
       newGroup.mappings.filter(mapping => !this.mappings.exists(_.equals(mapping))) ++ this.mappings.filter(mapping => !newGroup.mappings.exists(_.equals(mapping)))
     }
-    differentMappings.nonEmpty
+    ! (this.groupId.equals(newGroup.groupId)
+      && differentMappings.isEmpty)
   }
 
-  def getRemovedMappings(newGroup: CaseTeamGroup): java.util.Set[GroupRoleMapping] = {
-    this.mappings.filter(mapping => !newGroup.mappings.exists(_.eq(mapping))).toSet.asJava
+  def minus(existingGroup: CaseTeamGroup): CaseTeamGroup = {
+    def updateWithRemovedCaseRoles(newMapping: GroupRoleMapping): GroupRoleMapping = {
+      // Note, if existing mapping is not found, simply use the new mapping. That will then not have removed roles.
+      val existingMapping = existingGroup.mappings.find(_.groupRole == newMapping.groupRole).getOrElse(newMapping)
+      val removedCaseRoles = existingMapping.caseRoles.diff(newMapping.caseRoles)
+      newMapping.copy(rolesRemoved = removedCaseRoles)
+    }
+    val updatedMappings = this.mappings.map(updateWithRemovedCaseRoles)
+
+    val removedMappings = existingGroup.mappings.filterNot(mapping => this.mappings.exists(_.groupRole == mapping.groupRole))
+    this.copy(mappings = updatedMappings, removedMappings = removedMappings)
   }
 
-  override def toValue: Value[_] = new ValueMap(Fields.groupId, groupId, Fields.mappings, mappings)
+  override def toValue: Value[_] = {
+    val json = memberKeyJson.plus(Fields.mappings, mappings)
+    jsonPlusOptionalField(json, Fields.removedMappings, removedMappings)
+  }
+
+  override def memberKeyJson: ValueMap = new ValueMap(Fields.groupId, groupId)
 
   override def generateChangeEvent(team: Team, newRoles: Set[String]): Unit = team.setGroup(this.copy(mappings = this.mappings.map(m => m.copy(caseRoles = m.caseRoles.intersect(newRoles)))))
+
+  def getRemovedMappings: util.List[GroupRoleMapping] = removedMappings.asJava
 }
 
 object CaseTeamGroup {
   def deserialize(json: ValueMap): CaseTeamGroup = {
     val groupId = json.readString(Fields.groupId)
     val mappings = json.readObjects(Fields.mappings, GroupRoleMapping.deserialize).asScala.toSeq
-    CaseTeamGroup(groupId, mappings)
+    val removedMappings = json.readObjects(Fields.removedMappings, GroupRoleMapping.deserialize).asScala.toSeq
+
+    CaseTeamGroup(groupId, mappings, removedMappings)
   }
 }
 

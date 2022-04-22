@@ -9,6 +9,7 @@ import scala.jdk.CollectionConverters._
 
 trait CaseTeamMember extends CafienneJson {
   val caseRoles: Set[String] = Set()
+  val rolesRemoved: Set[String] = Set()
   val isOwner: Boolean = false
 
   val isUser = false
@@ -21,6 +22,19 @@ trait CaseTeamMember extends CafienneJson {
   lazy val description: String = s"$memberType - $memberId"
 
   def currentMember(team: Team): CaseTeamMember
+
+  def memberKeyJson: ValueMap
+
+  /**
+    * Add the field to the json with the list, but only if the list has elements.
+    */
+  def jsonPlusOptionalField(json: ValueMap, fieldName: AnyRef, list: Iterable[_]): ValueMap = {
+    if (list.nonEmpty) {
+      json.plus(fieldName, list)
+    } else {
+      json
+    }
+  }
 
   def validateRolesExist(definition: CaseTeamDefinition): Unit = {
     val allRolesUnderProcessing = caseRoles
@@ -43,7 +57,5 @@ trait CaseTeamMember extends CafienneJson {
     generateChangeEvent(team, newRoles)
   }
 
-  def getCaseRoles: util.Set[String] = {
-    caseRoles.asJava
-  }
+  def getCaseRoles: util.Set[String] = caseRoles.asJava
 }

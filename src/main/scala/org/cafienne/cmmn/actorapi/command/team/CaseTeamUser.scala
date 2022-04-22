@@ -11,11 +11,12 @@ import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json._
 
 import java.util
-import scala.jdk.CollectionConverters.SetHasAsScala
+import scala.jdk.CollectionConverters._
 
 trait CaseTeamUser extends CaseTeamMember {
   override val isUser: Boolean = true
   override val memberType: MemberType = MemberType.User
+  override val rolesRemoved: Set[String] = Set()
   val userId: String
   val origin: Origin
 
@@ -23,11 +24,27 @@ trait CaseTeamUser extends CaseTeamMember {
 
   override def currentMember(team: Team): CaseTeamMember = team.getUser(memberId)
 
-  override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.origin, origin, Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
+  override def toValue: Value[_] = {
+    val json = memberKeyJson.plus(Fields.isOwner, isOwner, Fields.caseRoles, caseRoles)
+    jsonPlusOptionalField(json, Fields.rolesRemoved, rolesRemoved)
+  }
+
+  override def memberKeyJson: ValueMap = new ValueMap(Fields.userId, userId, Fields.origin, origin)
 
   def extend(caseRole: String): CaseTeamUser = this.copy(extraRoles = Set(caseRole))
 
   override def generateChangeEvent(team: Team, newRoles: Set[String]): Unit = team.setUser(this.copy(newRoles = newRoles))
+
+  def differsFrom(that: CaseTeamUser): Boolean = {
+    !(this.userId.equals(that.userId) &&
+      this.isOwner == that.isOwner &&
+      this.caseRoles.diff(that.caseRoles).isEmpty && that.caseRoles.diff(this.caseRoles).isEmpty)
+  }
+
+  def minus(existingUserInfo: CaseTeamUser): CaseTeamUser = {
+    val removedRoles = existingUserInfo.caseRoles.diff(caseRoles)
+    this.copy(newRolesRemoved = removedRoles)
+  }
 
   def cloneUser(newUserId: String): CaseTeamUser = this.copy(newUserId = newUserId)
 
@@ -35,8 +52,8 @@ trait CaseTeamUser extends CaseTeamMember {
     * Copy method sort of resembles scala case class copy, but traits do not have that.
     * This method can also be to add extra roles
     */
-  def copy(newUserId: String = this.userId, newRoles: Set[String] = this.caseRoles, extraRoles: Set[String] = Set(), newOrigin: Origin = this.origin, newOwnership: Boolean = this.isOwner): CaseTeamUser =
-    CaseTeamUser.from(userId = newUserId, origin = newOrigin, caseRoles = newRoles ++ extraRoles, isOwner = newOwnership)
+  def copy(newUserId: String = this.userId, newRoles: Set[String] = this.caseRoles, extraRoles: Set[String] = Set(), newOrigin: Origin = this.origin, newOwnership: Boolean = this.isOwner, newRolesRemoved: Set[String] = this.rolesRemoved): CaseTeamUser =
+    CaseTeamUser.from(userId = newUserId, origin = newOrigin, caseRoles = newRoles ++ extraRoles, isOwner = newOwnership, rolesRemoved = newRolesRemoved)
 }
 
 object CaseTeamUser extends LazyLogging {
@@ -46,25 +63,36 @@ object CaseTeamUser extends LazyLogging {
       else Set(role.getName)
     })
 
-  def from(userId: String, origin: Origin, caseRoles: Set[String] = Set(), isOwner: Boolean = false): CaseTeamUser = {
-    val props = (userId, origin, caseRoles, isOwner) // Convert to props, as the inline implementation otherwise does not take the arguments of our function
+  def from(userId: String, origin: Origin, caseRoles: Set[String] = Set(), isOwner: Boolean = false, rolesRemoved: Set[String] = Set()): CaseTeamUser = {
+    val props = (userId, origin, caseRoles, isOwner, rolesRemoved) // Convert to props, as the inline implementation otherwise does not take the arguments of our function
     new CaseTeamUser {
       override val userId: String = props._1
       override val origin: Origin = props._2
       override val caseRoles: Set[String] = props._3
       override val isOwner: Boolean = props._4
+      override val rolesRemoved: Set[String] = props._5
     }
   }
 
   //  def createTestUser(user: TenantUser, isOwner: Boolean) = new CaseTeamUser(userId = user.id, origin = Origin.Tenant, caseRoles = user.roles, isOwner = isOwner)
 
-  def deserialize(json: ValueMap): CaseTeamUser = {
-    new CaseTeamUser {
-      override val userId: String = json.readString(Fields.userId)
-      override val origin: Origin = json.readEnum(Fields.origin, classOf[Origin])
-      override val caseRoles: Set[String] = json.readStringList(Fields.caseRoles).toSet
-      override val isOwner: Boolean = json.readBoolean(Fields.isOwner)
+  def getDeserializer(parent: ValueMap): CaseTeamMemberDeserializer[CaseTeamUser] = {
+    (json: ValueMap) =>  {
+      // Special deserializer that can migrate rolesRemoved from parent json for older event format (Cafienne versions 1.1.16 - 1.1.18)
+      if (parent.has(Fields.rolesRemoved)) {
+        parent.withArray(Fields.rolesRemoved).getValue.asScala.foreach(json.withArray(Fields.rolesRemoved).add(_))
+      }
+      CaseTeamUser.deserialize(json)
     }
+  }
+
+  def deserialize(json: ValueMap): CaseTeamUser = {
+    CaseTeamUser.from(
+      userId = json.readString(Fields.userId),
+      origin = json.readEnum(Fields.origin, classOf[Origin]),
+      caseRoles = json.readStringList(Fields.caseRoles).toSet,
+      isOwner = json.readBoolean(Fields.isOwner),
+      rolesRemoved = json.readStringList(Fields.rolesRemoved).toSet)
   }
 
   def handleDeprecatedUserEvent(users: util.Map[String, CaseTeamUser], event: DeprecatedCaseTeamEvent): Unit = {
