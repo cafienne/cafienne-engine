@@ -358,8 +358,13 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     public String[] readStringList(Object fieldName) {
-        List<String> list = withArray(fieldName).rawList();
-        return list.toArray(new String[0]);
+        String[] emptyArray = new String[0];
+        if (has(fieldName)) { // Avoid creating array in the json if it is not defined.
+            List<String> list = withArray(fieldName).rawList();
+            return list.toArray(emptyArray);
+        } else {
+            return emptyArray;
+        }
     }
 
     public ValueMap readMap(Object fieldName) {
@@ -367,7 +372,11 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     public <T> Set<T> readSet(Object fieldName) {
-        return new HashSet<>(withArray(fieldName).rawList());
+        if (has(fieldName)) { // Avoid creating array in the json if it is not defined.
+            return new HashSet<>(withArray(fieldName).rawList());
+        } else {
+            return new HashSet<>();
+        }
     }
 
     public <T extends CMMNElementDefinition> T readDefinition(Object fieldName, Class<T> tClass) {
@@ -384,6 +393,10 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     }
 
     public <T> List<T> readObjects(Object fieldName, ValueMapParser<T> parser) {
-        return withArray(fieldName).stream().map(json -> parser.convert(json.asMap())).collect(Collectors.toList());
+        if (has(fieldName)) { // Avoid creating array in the json if it is not defined.
+            return withArray(fieldName).stream().map(json -> parser.convert(json.asMap())).collect(Collectors.toList());
+        } else {
+            return List.of();
+        }
     }
 }
