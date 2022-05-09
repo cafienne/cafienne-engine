@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.querydb.query.exception.UserSearchFailure
-import org.cafienne.service.akkahttp.tenant.model.TenantAPI.TenantUserFormat
+import org.cafienne.service.akkahttp.tenant.model.TenantAPI.TenantUserResponseFormat
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -40,7 +40,7 @@ class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute 
       new Parameter(name = "tenant", description = "The tenant to retrieve users from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantUserFormat]))))),
+      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantUserResponseFormat]))))),
       new ApiResponse(responseCode = "404", description = "Tenant not found"),
     )
   )
@@ -64,7 +64,7 @@ class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute 
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantUserFormat]))))),
+      new ApiResponse(responseCode = "200", description = "List of user ids of that are registered in the tenant", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TenantUserResponseFormat]))))),
       new ApiResponse(responseCode = "404", description = "User (or tenant) not found"),
     )
   )

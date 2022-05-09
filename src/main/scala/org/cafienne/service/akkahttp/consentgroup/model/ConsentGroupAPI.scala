@@ -19,6 +19,7 @@ object ConsentGroupAPI {
                    members: Seq[ConsentGroupUserFormat]) {
     // Validate the list of members to not contain duplicates
     ApiValidator.runDuplicatesDetector("Consent group", "user", members.map(_.userId))
+    ApiValidator.requireElements(members, "Setting consent group requires a list of users with at least one owner")
 
     def asGroup(tenant: String): ConsentGroup = {
       val groupId = id.fold(new Guid().toString)(id => id)

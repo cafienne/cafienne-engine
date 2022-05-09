@@ -15,22 +15,19 @@ object TenantAPI {
 
   case class UserFormat(
                          @(Schema @field)(implementation = classOf[String], example = "User id (matched with token when user logs on)") userId: String,
-                         @(Schema @field)(description = "Option to set the list of roles the user has within the tenant") roles: Option[Set[String]],
-                         @(Schema @field)(example = "Option to indicate tenant ownership changes for this user (defaults to false)", implementation = classOf[String]) isOwner: Option[Boolean],
-                         @(Schema @field)(example = "Option to change the user name", implementation = classOf[String]) name: Option[String],
-                         @(Schema @field)(example = "Option to change the user email", implementation = classOf[String]) email: Option[String],
-                         @(Schema @field)(example = "Option to indicate whether account must be enabled/disabled (defaults to true)", implementation = classOf[String]) enabled: Option[Boolean]) {
+                         @(Schema @field)(description = "Option to set the list of roles the user has within the tenant") roles: Set[String] = Set(),
+                         @(Schema @field)(example = "Option to indicate tenant ownership changes for this user (defaults to false)", implementation = classOf[Boolean]) isOwner: Boolean = false,
+                         @(Schema @field)(example = "Option to change the user name", implementation = classOf[String]) name: String = "",
+                         @(Schema @field)(example = "Option to change the user email", implementation = classOf[String]) email: String = "",
+                         @(Schema @field)(example = "Option to indicate whether account must be enabled/disabled (defaults to true)", implementation = classOf[Boolean]) enabled: Boolean = true) {
     ApiValidator.required(userId, "Tenant users must have a userId")
-
     def asTenantUser(tenant: String): TenantUser = {
-      TenantUser(id = userId, tenant = tenant, roles = roles.getOrElse(Set()), isOwner = isOwner.getOrElse(false), name = name.getOrElse(""), email = email.getOrElse(""), enabled = enabled.getOrElse(true))
+      TenantUser(id = userId, tenant = tenant, roles = roles, isOwner = isOwner, name = name, email = email, enabled = enabled)
     }
   }
 
   private def validateUserList(users: Seq[UserFormat]): Unit = {
-    if (users.isEmpty) {
-      throw new IllegalArgumentException("Setting tenant requires a list of users with at least one owner")
-    }
+    ApiValidator.requireElements(users, "Setting tenant requires a list of users with at least one owner")
     ApiValidator.runDuplicatesDetector("Tenant", "user", users.map(_.userId))
   }
 
@@ -46,7 +43,7 @@ object TenantAPI {
     def getTenantUsers(tenant: String): Seq[TenantUser] = users.map(_.asTenantUser(tenant))
   }
 
-  case class TenantUserFormat(
+  case class TenantUserResponseFormat(
     @(Schema @field)(implementation = classOf[String], example = "Same as platform user id") userId: String,
     @(Schema @field)(example = "Tenant name", implementation = classOf[String]) tenant: String,
     @(Schema @field)(description = "List of roles the user has within the tenant") roles: Set[String],
@@ -55,5 +52,5 @@ object TenantAPI {
     @(Schema @field)(example = "Whether user is tenant owner", implementation = classOf[String]) isOwner: Boolean) {
   }
 
-  case class PlatformUserFormat(userId: String, tenants: Seq[TenantUserFormat])
+  case class PlatformUserFormat(userId: String, tenants: Seq[TenantUserResponseFormat])
 }
