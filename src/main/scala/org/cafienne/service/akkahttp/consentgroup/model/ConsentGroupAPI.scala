@@ -33,6 +33,7 @@ object ConsentGroupAPI {
                    roles: Set[String] = Set[String](),
                    @(Schema @field)(example = "Optional indicate of consent group ownership (defaults to false)", implementation = classOf[Boolean])
                    isOwner: Boolean = false) {
+    ApiValidator.required(userId, "Consent group users must have a userId")
     def asMember: ConsentGroupMember = ConsentGroupMember(userId, roles = roles, isOwner = isOwner)
   }
 }

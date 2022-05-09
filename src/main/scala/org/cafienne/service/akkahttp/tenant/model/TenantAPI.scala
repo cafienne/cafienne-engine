@@ -20,6 +20,8 @@ object TenantAPI {
                          @(Schema @field)(example = "Option to change the user name", implementation = classOf[String]) name: Option[String],
                          @(Schema @field)(example = "Option to change the user email", implementation = classOf[String]) email: Option[String],
                          @(Schema @field)(example = "Option to indicate whether account must be enabled/disabled (defaults to true)", implementation = classOf[String]) enabled: Option[Boolean]) {
+    ApiValidator.required(userId, "Tenant users must have a userId")
+
     def asTenantUser(tenant: String): TenantUser = {
       TenantUser(id = userId, tenant = tenant, roles = roles.getOrElse(Set()), isOwner = isOwner.getOrElse(false), name = name.getOrElse(""), email = email.getOrElse(""), enabled = enabled.getOrElse(true))
     }
