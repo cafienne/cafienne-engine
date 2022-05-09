@@ -18,8 +18,6 @@ trait UserQueries {
 
   def determineOriginOfUsers(users: Seq[String], tenant: String): Future[Seq[(String, Origin)]] = ???
 
-  def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = ???
-
   def getTenantUsers(tenantUser: TenantUser): Future[Seq[TenantUser]] = ???
 
   def getDisabledTenantUserAccounts(tenantUser: TenantUser): Future[Seq[TenantUser]] = ???
@@ -63,7 +61,39 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     })
   }
 
-  override def getPlatformUser(userId: String): Future[PlatformUser] = getPlatformUsers(Seq(userId)).map(_.head)
+  override def getPlatformUser(userId: String): Future[PlatformUser] = {
+    val tenantUsersQuery = TableQuery[UserRoleTable].filter(_.userId === userId).filter(_.enabled === true)
+    val consentGroupsQuery = TableQuery[ConsentGroupMemberTable].filter(_.userId === userId)
+
+    val dbRetrieval = for {
+      tenantRecords <- db.run(tenantUsersQuery.result)
+      groupRecords <- db.run(consentGroupsQuery.result)
+    } yield (tenantRecords, groupRecords)
+
+    dbRetrieval.map(records => {
+      val tenantRecords = records._1.filter(_.userId == userId)
+      val groupRecords = records._2.filter(_.userId == userId)
+
+      //    println(s"User $userId has ${tenantRecords.length} tenant roles and ${groupRecords.length} group roles")
+      val tenantUsers = tenantRecords.map(_.tenant).toSet[String].map(tenant => {
+        val userRecords = tenantRecords.filter(_.tenant == tenant)
+        val roles = userRecords.filterNot(_.role_name.isBlank).map(_.role_name).toSet
+        val user = userRecords.find(_.role_name.isBlank)
+        if (user.isEmpty) None // as we filter on 'enabled===true', it can happen that a disabled user account is fetched. This means user is not active in that tenant, and it should not return
+        else Some(createTenantUser(user.get, roles))
+      }).filter(_.nonEmpty).map(_.get).toSeq
+
+      val groups: Seq[ConsentGroupMembership] = groupRecords.filter(_.role.isBlank).map(_.group).toSet[String].map(groupId => {
+        val groupInfo = groupRecords.filter(_.group == groupId)
+        val roles = groupInfo.map(_.role).toSet
+        val isOwner: Boolean = groupInfo.exists(_.isOwner)
+        ConsentGroupMembership(groupId, roles = roles, isOwner = isOwner)
+      }).toSeq
+
+      //    println(s"User $userId is member of ${tenantUsers.length} tenants ${tenantUsers.map(_.tenant)} and ${groups.length} groups ${groups.map(_.groupId)}\n")
+      PlatformUser(userId, tenantUsers, groups)
+    })
+  }
 
   override def determineOriginOfUsers(users: Seq[String], tenant: String): Future[Seq[(String, Origin)]] = {
     val tenantMembership = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.tenant === tenant).filter(_.role_name === "").map(_.userId).distinct.take(users.length)
@@ -81,42 +111,6 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
 
       users.map(user => (user, determineOrigin(user)))
     })
-  }
-
-  override def getPlatformUsers(users: Seq[String]): Future[Seq[PlatformUser]] = {
-    val tenantUsersQuery = TableQuery[UserRoleTable].filter(_.userId.inSet(users)).filter(_.enabled === true)
-    val consentGroupsQuery = TableQuery[ConsentGroupMemberTable].filter(_.userId.inSet(users))
-
-    val usersQuery = tenantUsersQuery.joinFull(consentGroupsQuery).on((left, right) => left.userId === right.userId)
-
-    db.run(usersQuery.result).map(records => {
-      users.map(userId => {
-        val tenantRecords = records.filter(_._1.nonEmpty).map(_._1.get).filter(_.userId == userId)
-        val groupRecords = records.filter(_._2.nonEmpty).map(_._2.get).filter(_.userId == userId)
-        createPlatformUser(userId, tenantRecords, groupRecords)
-      })
-    })
-  }
-
-  private def createPlatformUser(userId: String, tenantRecords: Seq[UserRoleRecord], groupRecords: Seq[ConsentGroupMemberRecord]): PlatformUser = {
-    //    println(s"User $userId has ${tenantRecords.length} tenant roles and ${groupRecords.length} group roles")
-    val tenantUsers = tenantRecords.map(_.tenant).toSet[String].map(tenant => {
-      val userRecords = tenantRecords.filter(_.tenant == tenant)
-      val roles = userRecords.filterNot(_.role_name.isBlank).map(_.role_name).toSet
-      val user = userRecords.find(_.role_name.isBlank)
-      if (user.isEmpty) None // as we filter on 'enabled===true', it can happen that a disabled user account is fetched. This means user is not active in that tenant, and it should not return
-      else Some(createTenantUser(user.get, roles))
-    }).filter(_.nonEmpty).map(_.get).toSeq
-
-    val groups: Seq[ConsentGroupMembership] = groupRecords.filter(_.role.isBlank).map(_.group).toSet[String].map(groupId => {
-      val groupInfo = groupRecords.filter(_.group == groupId)
-      val roles = groupInfo.map(_.role).toSet
-      val isOwner: Boolean = groupInfo.exists(_.isOwner)
-      ConsentGroupMembership(groupId, roles = roles, isOwner = isOwner)
-    }).toSeq
-
-    //    println(s"User $userId is member of ${tenantUsers.length} tenants ${tenantUsers.map(_.tenant)} and ${groups.length} groups ${groups.map(_.groupId)}\n")
-    PlatformUser(userId, tenantUsers, groups)
   }
 
   override def getTenantUsers(user: TenantUser): Future[Seq[TenantUser]] = {
