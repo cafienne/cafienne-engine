@@ -8,6 +8,10 @@ object ApiValidator {
     }
   }
 
+  def requireElements(seq: Seq[Any], errorMessage: String): Unit = {
+    if (seq.isEmpty) throw new IllegalArgumentException(errorMessage)
+  }
+
   def runDuplicatesDetector(groupType: String, memberType: String, identifiers: Seq[String]): Unit = {
     val duplicates = identifiers.diff(identifiers.distinct)
     if (duplicates.nonEmpty) {
