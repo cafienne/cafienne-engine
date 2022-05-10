@@ -2,6 +2,9 @@ package org.cafienne.infrastructure.serialization;
 
 import akka.actor.ExtendedActorSystem;
 import akka.serialization.SerializerWithStringManifest;
+import org.cafienne.infrastructure.serialization.serializers.CommandSerializers;
+import org.cafienne.infrastructure.serialization.serializers.EventSerializers;
+import org.cafienne.infrastructure.serialization.serializers.ResponseSerializers;
 import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.ValueMap;
@@ -25,10 +28,9 @@ public class CafienneSerializer extends SerializerWithStringManifest {
     private final static Map<Class<?>, ManifestWrapper> manifestsByClass = new HashMap<>();
 
     static {
-        EventSerializer.register();
-        CommandSerializer.register();
-        ResponseSerializer.register();
-        SnapshotSerializer.register();
+        EventSerializers.register();
+        CommandSerializers.register();
+        ResponseSerializers.register();
     }
 
     static ManifestWrapper getManifest(String manifestString) {
@@ -45,15 +47,16 @@ public class CafienneSerializer extends SerializerWithStringManifest {
     }
 
     public static String getManifestString(Object o) {
-        if (o instanceof CafienneSerializable) {
-            ManifestWrapper manifest = manifestsByClass.get(o.getClass());
-            if (manifest != null) {
-                return manifest.toString();
-            } else {
+        ManifestWrapper manifest = manifestsByClass.get(o.getClass());
+        if (manifest != null) {
+            return manifest.toString();
+        } else {
+            if (o instanceof CafienneSerializable) {
                 throw new RuntimeException("A manifest wrapper for class " + o.getClass().getName() + " has not been registered");
+            } else {
+                throw new RuntimeException("CafienneSerializer can only serialize objects implementing CafienneSerializable");
             }
         }
-        throw new RuntimeException("The Akka Case Object Serializer can only serialize objects implementing CafienneSerializable");
     }
 
     protected CafienneSerializer() {
@@ -92,16 +95,6 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         } catch (Exception e) {
             return new DeserializationFailure(manifestString, e, bytesProvider.giveMeTheBytes());
         }
-    }
-
-    /**
-     * Deserialize an already parsed json structure into the object described by the manifest string
-     * @param json
-     * @param manifestString
-     * @return
-     */
-    public Object fromJson(ValueMap json, String manifestString) {
-        return deserialize(manifestString, () -> json, () -> json.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
