@@ -5,12 +5,12 @@ import org.cafienne.actormodel.identity.Origin
 import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
 import org.cafienne.cmmn.actorapi.event.team.deprecated.member._
 import org.cafienne.cmmn.actorapi.event.team.deprecated.user.{DeprecatedCaseTeamUserEvent, TeamMemberAdded}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.{CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.concurrent.ExecutionContext
 
-class DeprecatedCaseTeamEventProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class DeprecatedCaseTeamEventProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val upsertableUsers = scala.collection.mutable.HashMap[(String, String, String), CaseTeamUserRecord]()
   private val deletableUsers = scala.collection.mutable.HashMap[(String, String, String), CaseTeamUserRecord]()
   private val upsertableTenantRoles = scala.collection.mutable.HashMap[(String, String, String, String), CaseTeamTenantRoleRecord]()

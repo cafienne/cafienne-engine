@@ -9,7 +9,7 @@ import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetRecord}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
 import org.cafienne.querydb.materializer.cases.plan.CasePlanProjection
 import org.cafienne.querydb.materializer.cases.team.CaseTeamProjection
@@ -17,7 +17,7 @@ import org.cafienne.querydb.materializer.slick.SlickTransaction
 
 import scala.concurrent.Future
 
-class CaseTransaction(caseInstanceId: String, tenant: String, persistence: RecordsPersistence) extends SlickTransaction with LazyLogging {
+class CaseTransaction(caseInstanceId: String, tenant: String, persistence: QueryDBTransaction) extends SlickTransaction with LazyLogging {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private val caseTeamProjection = new CaseTeamProjection(persistence)

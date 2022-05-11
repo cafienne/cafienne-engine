@@ -9,7 +9,7 @@ import org.cafienne.querydb.record._
 
 import scala.concurrent.Future
 
-trait RecordsPersistence {
+trait QueryDBTransaction {
 
   //  def upsert[M: AnyRef, T <: CafienneTable[M]](record: M)
   // Not sure how to get something like above working here, would actually be great if we can achieve that (use ClassTag or so?)

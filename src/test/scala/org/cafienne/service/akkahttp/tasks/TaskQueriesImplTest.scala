@@ -3,7 +3,7 @@ package org.cafienne.service.akkahttp.tasks
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.materializer.slick.SlickRecordsPersistence
+import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
 import org.cafienne.querydb.query.TaskQueriesImpl
 import org.cafienne.querydb.query.exception.TaskSearchFailure
 import org.cafienne.querydb.record.{CaseRecord, TaskRecord}
@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDBSchema {
 
   val taskQueries = new TaskQueriesImpl
-  val updater = new SlickRecordsPersistence
+  val updater = new SlickQueryDBTransaction
 
   val tenant = "tenant"
   val case33 = "33"

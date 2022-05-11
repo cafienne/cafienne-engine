@@ -7,12 +7,12 @@ import org.cafienne.cmmn.actorapi.event.migration.{PlanItemDropped, PlanItemMigr
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.{PlanItemHistoryRecord, PlanItemRecord, TaskRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CasePlanProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CasePlanProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
 
   private val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
   private val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()

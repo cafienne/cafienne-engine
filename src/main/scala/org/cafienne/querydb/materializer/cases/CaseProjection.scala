@@ -6,13 +6,13 @@ import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated
 import org.cafienne.cmmn.actorapi.event.{CaseDefinitionApplied, CaseEvent, CaseModified}
 import org.cafienne.cmmn.instance.State
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
 import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseProjection(persistence: RecordsPersistence, caseFileProjection: CaseFileProjection)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseProjection(persistence: QueryDBTransaction, caseFileProjection: CaseFileProjection)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private var caseInstance: Option[CaseRecord] = None
   private var caseDefinition: Option[CaseDefinitionRecord] = None
 

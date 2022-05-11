@@ -5,14 +5,14 @@ import org.cafienne.cmmn.actorapi.command.team.{CaseTeamGroup, CaseTeamMember, C
 import org.cafienne.cmmn.actorapi.event.team.group.{CaseTeamGroupAdded, CaseTeamGroupChanged}
 import org.cafienne.cmmn.actorapi.event.team.{CaseTeamMemberEvent, CaseTeamMemberRemoved}
 import org.cafienne.cmmn.instance.team.MemberType
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.{CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
 
-class CaseTeamMemberProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseTeamMemberProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val newCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
   private val removedCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
   private val newCaseTeamTenantRoleRoles = ListBuffer[CaseTeamTenantRoleRecord]()

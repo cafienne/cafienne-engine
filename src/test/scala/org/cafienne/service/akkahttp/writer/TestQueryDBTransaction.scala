@@ -3,13 +3,13 @@ package org.cafienne.service.akkahttp.writer
 import akka.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.OffsetRecord
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record._
 
 import java.time.Instant
 import scala.concurrent.Future
 
-class TestPersistence() extends RecordsPersistence {
+class TestQueryDBTransaction() extends QueryDBTransaction {
 
   var records: Seq[AnyRef] = Seq()
 

@@ -3,13 +3,13 @@ package org.cafienne.querydb.materializer.consentgroup
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.consentgroup.actorapi.event._
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.ConsentGroupMemberRecord
 
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters.SetHasAsScala
 
-class GroupMemberProjection(groupId: String, persistence: RecordsPersistence) extends LazyLogging {
+class GroupMemberProjection(groupId: String, persistence: QueryDBTransaction) extends LazyLogging {
   private val rolesAdded = scala.collection.mutable.ListBuffer[ConsentGroupMemberRecord]()
   private val rolesRemoved = scala.collection.mutable.ListBuffer[ConsentGroupMemberRecord]()
 

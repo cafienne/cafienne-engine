@@ -4,13 +4,13 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
-import org.cafienne.querydb.materializer.slick.{SlickEventMaterializer, SlickRecordsPersistence}
+import org.cafienne.querydb.materializer.slick.{SlickEventMaterializer, SlickQueryDBTransaction}
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
 class ConsentGroupEventSink(val caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
-  val persistence = new SlickRecordsPersistence
+  val persistence = new SlickQueryDBTransaction
 
   lazy val offsetStorage: OffsetStorage = persistence.storage(ConsentGroupEventSink.offsetName)
   override val tag: String = ConsentGroupEvent.TAG

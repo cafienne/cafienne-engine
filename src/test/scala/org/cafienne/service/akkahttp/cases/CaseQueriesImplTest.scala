@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.querydb.materializer.slick.SlickRecordsPersistence
+import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
 import org.cafienne.querydb.query.CaseQueriesImpl
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.querydb.record.{CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
@@ -24,7 +24,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   val caseQueries = new CaseQueriesImpl
-  val updater = new SlickRecordsPersistence
+  val updater = new SlickQueryDBTransaction
 
   val tenant = "tenant"
 

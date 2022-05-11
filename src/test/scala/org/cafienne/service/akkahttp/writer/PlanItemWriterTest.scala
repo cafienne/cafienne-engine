@@ -47,7 +47,7 @@ class PlanItemWriterTest
     }
   }
 
-  val persistence = new TestPersistence()
+  val persistence = new TestQueryDBTransaction()
 
   val cpw = new CaseEventSink(new CaseSystem(system))
   cpw.start()

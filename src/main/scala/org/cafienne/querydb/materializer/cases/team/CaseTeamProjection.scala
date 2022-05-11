@@ -4,11 +4,11 @@ import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseTeamProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseTeamProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val memberProjection = new CaseTeamMemberProjection(persistence)
   private val deprecatedEventsProjection = new DeprecatedCaseTeamEventProjection(persistence)
 

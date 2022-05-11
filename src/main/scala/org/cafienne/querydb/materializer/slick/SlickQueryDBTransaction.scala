@@ -6,7 +6,7 @@ import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.cmmn.instance.team.MemberType
 import org.cafienne.infrastructure.cqrs.{OffsetRecord, OffsetStorage, OffsetStorageProvider}
 import org.cafienne.infrastructure.jdbc.cqrs.{JDBCOffsetStorage, OffsetStoreTables}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.querydb.record._
 import org.cafienne.querydb.schema.QueryDBSchema
@@ -16,8 +16,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
-class SlickRecordsPersistence
-  extends RecordsPersistence
+class SlickQueryDBTransaction
+  extends QueryDBTransaction
     with QueryDBSchema
     with OffsetStorageProvider
     with CaseTables
@@ -36,8 +36,8 @@ class SlickRecordsPersistence
 
   override def storage(name: String): OffsetStorage = new JDBCOffsetStorage {
     override val storageName: String = name
-    override implicit val ec: ExecutionContext = db.ioExecutionContext
     override lazy val dbConfig = meMyselfAndI_or_BasicallyThisOnly.dbConfig
+    override implicit val ec: ExecutionContext = meMyselfAndI_or_BasicallyThisOnly.ec
   }
 
   override def upsert(record: AnyRef): Unit = {

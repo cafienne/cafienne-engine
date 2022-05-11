@@ -5,12 +5,12 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.migration.{CaseFileItemDropped, CaseFileItemMigrated}
 import org.cafienne.json.{JSONReader, ValueMap}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.{CaseBusinessIdentifierRecord, CaseFileRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseFileProjection(persistence: RecordsPersistence, caseInstanceId: String, tenant: String)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseFileProjection(persistence: QueryDBTransaction, caseInstanceId: String, tenant: String)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val businessIdentifiers = scala.collection.mutable.Set[CaseBusinessIdentifierRecord]()
   private val bufferedCaseFileEvents = new CaseFileEventBuffer()
   private var caseFile: Option[ValueMap] = None

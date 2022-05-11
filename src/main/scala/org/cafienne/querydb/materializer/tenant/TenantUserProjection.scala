@@ -3,14 +3,14 @@ package org.cafienne.querydb.materializer.tenant
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.{UserRoleKey, UserRoleRecord}
 import org.cafienne.tenant.actorapi.event.deprecated._
 import org.cafienne.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TenantUserProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class TenantUserProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val deprecatedUserEventRecords = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
 
   private val userRolesAdded = scala.collection.mutable.ListBuffer[UserRoleRecord]()

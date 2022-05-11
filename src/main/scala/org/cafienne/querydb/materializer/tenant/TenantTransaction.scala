@@ -6,7 +6,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetRecord}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.slick.SlickTransaction
 import org.cafienne.tenant.actorapi.event._
 import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
@@ -15,7 +15,7 @@ import org.cafienne.tenant.actorapi.event.user.TenantMemberEvent
 
 import scala.concurrent.Future
 
-class TenantTransaction(tenant: String, persistence: RecordsPersistence, userCache: IdentityProvider) extends SlickTransaction with LazyLogging {
+class TenantTransaction(tenant: String, persistence: QueryDBTransaction, userCache: IdentityProvider) extends SlickTransaction with LazyLogging {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
