@@ -3,7 +3,7 @@ package org.cafienne.timerservice.persistence.jdbc
 import akka.Done
 import akka.persistence.query.Offset
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
 import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
 import org.cafienne.timerservice.Timer
@@ -20,7 +20,7 @@ class JDBCTimerStore extends TimerStore with JDBCOffsetStorage with CafienneJDBC
 
   import dbConfig.profile.api._
 
-  override implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
+  override implicit val ec: ExecutionContext = db.ioExecutionContext
 
   override def getTimers(window: Instant): Future[Seq[Timer]] = {
     val query = TableQuery[TimerServiceTable].filter(_.moment <= window)

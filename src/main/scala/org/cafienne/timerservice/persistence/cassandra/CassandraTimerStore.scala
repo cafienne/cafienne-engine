@@ -7,7 +7,7 @@ import akka.util.Timeout
 import com.datastax.driver.core.querybuilder.{Insert, QueryBuilder}
 import com.datastax.driver.core.schemabuilder.SchemaBuilder
 import com.datastax.driver.core.{BatchStatement, DataType}
-import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
 
@@ -51,7 +51,7 @@ class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore 
   }, cassandraTimeout.duration)
   logger.info(s"Completed Cassandra table creation")
 
-  override def getOffset(): Future[Offset] = {
+  override def getOffset: Future[Offset] = {
     logger.debug("Reading timer offset from Cassandra")
     readJournal.session.selectOne(s"SELECT offset_value FROM $keyspace.$offsetTable where name = ?", storageName).map(result => result.fold(Offset.noOffset)(row => {
       val offsetValue = row.getString("offset_value")

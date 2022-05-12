@@ -76,7 +76,7 @@ class CaseFileWriterTest
 //                             |    "From" : "admin"
 //                             |  }
 //                             |}""".stripMargin
-//      import org.cafienne.infrastructure.cqrs.OffsetRecord
+//      import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 //      import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
 
 //      Thread.sleep(2000)

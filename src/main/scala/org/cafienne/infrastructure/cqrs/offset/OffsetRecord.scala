@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.cqrs
+package org.cafienne.infrastructure.cqrs.offset
 
 import akka.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
 

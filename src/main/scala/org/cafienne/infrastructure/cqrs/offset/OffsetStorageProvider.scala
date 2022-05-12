@@ -1,4 +1,4 @@
-package org.cafienne.infrastructure.cqrs
+package org.cafienne.infrastructure.cqrs.offset
 
 import com.typesafe.scalalogging.LazyLogging
 

@@ -64,7 +64,7 @@ class CaseInstanceWriterTest
       sendEvent(caseDefinitionApplied)
       sendEvent(caseModifiedEvent)
 
-//      import org.cafienne.infrastructure.cqrs.OffsetRecord
+//      import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 //      import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseFileRecord, CaseRecord, CaseRoleRecord}
 
 //      eventually {

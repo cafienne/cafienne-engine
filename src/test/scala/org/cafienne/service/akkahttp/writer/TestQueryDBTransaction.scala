@@ -2,7 +2,7 @@ package org.cafienne.service.akkahttp.writer
 
 import akka.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
-import org.cafienne.infrastructure.cqrs.OffsetRecord
+import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record._
 

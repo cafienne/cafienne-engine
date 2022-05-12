@@ -1,7 +1,7 @@
 package org.cafienne.infrastructure.jdbc.cqrs
 
 import akka.persistence.query.Offset
-import org.cafienne.infrastructure.cqrs.{OffsetRecord, OffsetStorage}
+import org.cafienne.infrastructure.cqrs.offset.{OffsetRecord, OffsetStorage}
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -10,9 +10,9 @@ trait JDBCOffsetStorage extends OffsetStorage with OffsetStoreTables with Cafien
 
   val storageName: String
 
-  implicit val ec: ExecutionContext
-
   import dbConfig.profile.api._
+
+  implicit val ec: ExecutionContext = db.ioExecutionContext
 
   val offsetQuery = TableQuery[OffsetStoreTable]
 

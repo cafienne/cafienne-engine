@@ -4,8 +4,8 @@ import akka.Done
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.cmmn.instance.team.MemberType
-import org.cafienne.infrastructure.cqrs.{OffsetRecord, OffsetStorage, OffsetStorageProvider}
-import org.cafienne.infrastructure.jdbc.cqrs.{JDBCOffsetStorage, OffsetStoreTables}
+import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
+import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.querydb.record._
@@ -19,7 +19,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class SlickQueryDBTransaction
   extends QueryDBTransaction
     with QueryDBSchema
-    with OffsetStorageProvider
     with CaseTables
     with TaskTables
     with TenantTables
@@ -31,14 +30,6 @@ class SlickQueryDBTransaction
   implicit val ec: ExecutionContext = db.ioExecutionContext // TODO: Is this the best execution context to pick?
 
   val dbStatements: mutable.ListBuffer[DBIO[_]] = ListBuffer[DBIO[_]]()
-
-  private lazy val meMyselfAndI_or_BasicallyThisOnly = this
-
-  override def storage(name: String): OffsetStorage = new JDBCOffsetStorage {
-    override val storageName: String = name
-    override lazy val dbConfig = meMyselfAndI_or_BasicallyThisOnly.dbConfig
-    override implicit val ec: ExecutionContext = meMyselfAndI_or_BasicallyThisOnly.ec
-  }
 
   override def upsert(record: AnyRef): Unit = {
     if (record != null) {

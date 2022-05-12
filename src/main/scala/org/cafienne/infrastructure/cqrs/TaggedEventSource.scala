@@ -22,7 +22,7 @@ trait TaggedEventSource extends LazyLogging with ReadJournalProvider {
   /**
     * Provide the offset from which we should start sourcing events
     */
-  def getOffset(): Future[Offset]
+  def getOffset: Future[Offset]
 
   /**
     * Tag to scan events for
@@ -44,7 +44,7 @@ trait TaggedEventSource extends LazyLogging with ReadJournalProvider {
         // First read the last known offset, then get return the events by tag from that offset onwards.
         //  Note: when the source restarts, it will freshly fetch the last known offset, thereby avoiding
         //  consuming that were consumed already successfully before the source had to be restarted.
-        getOffset().map { offset: Offset =>
+        getOffset.map { offset: Offset =>
           logger.warn(s"Starting to read '$tag' events from offset " + offset)
           journal().eventsByTag(tag, offset)
         }

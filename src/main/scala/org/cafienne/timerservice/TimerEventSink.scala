@@ -14,7 +14,7 @@ import scala.util.{Failure, Success}
 class TimerEventSink(val timerService: TimerService) extends TaggedEventSource {
   override val caseSystem: CaseSystem = timerService.caseSystem
 
-  override def getOffset(): Future[Offset] = timerService.storage.getOffset()
+  override def getOffset: Future[Offset] = timerService.storage.getOffset
   override val tag: String = TimerBaseEvent.TAG
 
   def consumeModelEvent(envelope: ModelEventEnvelope): Future[Done] = {

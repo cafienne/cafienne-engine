@@ -68,7 +68,7 @@ class CaseTaskWriterTest
       sendEvent(planItemTransitioned)
       sendEvent(caseModifiedEvent)
 
-//      import org.cafienne.infrastructure.cqrs.OffsetRecord
+//      import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 //      import org.cafienne.querydb.record._
 
 //      Thread.sleep(2000)
