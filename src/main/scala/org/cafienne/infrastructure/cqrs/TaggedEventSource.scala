@@ -1,8 +1,8 @@
 package org.cafienne.infrastructure.cqrs
 
+import akka.NotUsed
 import akka.persistence.query.{EventEnvelope, Offset}
-import akka.stream.scaladsl.{RestartSource, Sink, Source}
-import akka.{Done, NotUsed}
+import akka.stream.scaladsl.{RestartSource, Source}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.Cafienne
@@ -10,17 +10,17 @@ import org.cafienne.infrastructure.serialization.{DeserializationFailure, Unreco
 import org.cafienne.system.health.HealthMonitor
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 /**
-  * Reads all events with a certain tag, based on last known offset.
+  * Provides a Source of ModelEvents having a certain Tag (wrapped in an envelope)
+  * Reads those events from the given offset onwards.
   */
-trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
+trait TaggedEventSource extends LazyLogging with ReadJournalProvider {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   /**
-    * Provide the offset from which we should start consuming events
+    * Provide the offset from which we should start sourcing events
     */
   def getOffset(): Future[Offset]
 
@@ -30,31 +30,15 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
   val tag: String
 
   /**
-    * This method must be implemented by the consumer to handle the wrapped ModelEvent
-    *
-    * @param envelope Wrapper around Akka EventEnvelop with a typed event (typed as ModelEvent)
-    * @return
+    * Returns the Source
     */
-  def consumeModelEvent(envelope: ModelEventEnvelope): Future[Done]
+  def taggedEvents: Source[ModelEventEnvelope, NotUsed] =
+    restartableTaggedEventSourceFromLastKnownOffset
+      .map(reportHealth) // The fact that we receive an event here is an indication that the readJournal is healthy
+      .filter(modelEventFilter) // Only interested in ModelEvents, but we log errors if it is an unexpected event or deserialization issue
+      .map(ModelEventEnvelope) // Construct a simple wrapper that understands we're dealing with ModelEvents
 
-  /**
-    * Start reading and processing events
-    */
-  def start(): Unit = {
-    runStream() onComplete {
-      case Success(_) => //
-      case Failure(ex) => {
-        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
-        HealthMonitor.readJournal.hasFailed(ex)
-      }
-    }
-  }
-
-  def runStream(): Future[Done] = {
-    restartableTaggedEventSourceFromLastKnownOffset.mapAsync(1)(consumeModelEvent).runWith(Sink.ignore)
-  }
-
-  private def restartableTaggedEventSourceFromLastKnownOffset: Source[ModelEventEnvelope, NotUsed] = {
+  def restartableTaggedEventSourceFromLastKnownOffset: Source[EventEnvelope, NotUsed] = {
     RestartSource.withBackoff(Cafienne.config.queryDB.restartSettings) { () =>
       Source.futureSource({
         // First read the last known offset, then get return the events by tag from that offset onwards.
@@ -62,10 +46,19 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
         //  consuming that were consumed already successfully before the source had to be restarted.
         getOffset().map { offset: Offset =>
           logger.warn(s"Starting to read '$tag' events from offset " + offset)
-          journal().eventsByTag(tag, offset).filter(modelEventFilter).map(ModelEventEnvelope)
+          journal().eventsByTag(tag, offset)
         }
       })
     }
+  }
+
+  /**
+    * Identity function that has side-effect to indicate a healthy read journal
+    */
+  def reportHealth(envelope: EventEnvelope): EventEnvelope = {
+    // The fact that we receive an event here is an indication that the readJournal is healthy
+    HealthMonitor.readJournal.isOK()
+    envelope
   }
 
   /**
@@ -74,9 +67,7 @@ trait TaggedEventConsumer extends LazyLogging with ReadJournalProvider {
     * @param element
     * @return
     */
-  private def modelEventFilter(element: EventEnvelope): Boolean = {
-    // The fact that we receive an event here is an indication that the readJournal is healthy
-    HealthMonitor.readJournal.isOK()
+  def modelEventFilter(element: EventEnvelope): Boolean = {
     element match {
       case EventEnvelope(_, _, _, _: ModelEvent) => true
       case _ =>

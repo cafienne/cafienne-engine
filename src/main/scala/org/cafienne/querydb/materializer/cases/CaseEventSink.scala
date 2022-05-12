@@ -4,12 +4,12 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.querydb.materializer.slick.{SlickEventMaterializer, SlickQueryDBTransaction}
+import org.cafienne.querydb.materializer.slick.{QueryDBEventSink, SlickQueryDBTransaction}
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
-class CaseEventSink(val caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
+class CaseEventSink(val caseSystem: CaseSystem) extends QueryDBEventSink with LazyLogging {
   val persistence = new SlickQueryDBTransaction
 
   override val tag: String = CaseEvent.TAG
