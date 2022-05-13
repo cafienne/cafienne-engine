@@ -9,17 +9,21 @@ import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
+import org.cafienne.infrastructure.cqrs.batch.EventBatch
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
+import org.cafienne.querydb.materializer.EventBatchTransaction
 import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
 import org.cafienne.querydb.materializer.cases.plan.CasePlanProjection
 import org.cafienne.querydb.materializer.cases.team.CaseTeamProjection
-import org.cafienne.querydb.materializer.slick.{SlickQueryDBTransaction, SlickTransaction}
+import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
 
 import scala.concurrent.Future
 
-class CaseTransaction(caseInstanceId: String, tenant: String) extends SlickTransaction with LazyLogging {
+class CaseTransaction(val batch: EventBatch) extends EventBatchTransaction with LazyLogging  {
   import scala.concurrent.ExecutionContext.Implicits.global
 
+  val caseInstanceId: String = batch.persistenceId
+  val tenant: String = batch.events.head.event.tenant()
   val persistence = new SlickQueryDBTransaction
 
   private val caseTeamProjection = new CaseTeamProjection(persistence)

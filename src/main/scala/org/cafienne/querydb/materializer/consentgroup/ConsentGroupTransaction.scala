@@ -6,14 +6,18 @@ import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.consentgroup.actorapi.event.{ConsentGroupCreated, ConsentGroupMemberEvent, ConsentGroupModified}
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
+import org.cafienne.infrastructure.cqrs.batch.EventBatch
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.slick.{SlickQueryDBTransaction, SlickTransaction}
+import org.cafienne.querydb.materializer.EventBatchTransaction
+import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
 
 import scala.concurrent.Future
 
-class ConsentGroupTransaction(groupId: String, userCache: IdentityProvider) extends SlickTransaction with LazyLogging {
+class ConsentGroupTransaction(batch: EventBatch, userCache: IdentityProvider) extends EventBatchTransaction with LazyLogging {
   import scala.concurrent.ExecutionContext.Implicits.global
   val persistence = new SlickQueryDBTransaction
+
+  val groupId: String = batch.persistenceId
 
   private val groupProjection = new GroupProjection(persistence)
   private val memberProjection = new GroupMemberProjection(groupId, persistence)
