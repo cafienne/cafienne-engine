@@ -15,7 +15,7 @@ import scala.concurrent.Future
   * Provides a Source of ModelEvents having a certain Tag (wrapped in an envelope)
   * Reads those events from the given offset onwards.
   */
-trait TaggedEventSource extends LazyLogging with ReadJournalProvider {
+trait TaggedEventSource extends ReadJournalProvider with LazyLogging  {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
