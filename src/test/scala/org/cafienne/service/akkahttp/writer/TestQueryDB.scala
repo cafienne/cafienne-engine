@@ -1,10 +1,12 @@
 package org.cafienne.service.akkahttp.writer
 
+import akka.persistence.query.Offset
 import org.cafienne.querydb.materializer.QueryDBStorage
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
 
 object TestQueryDB extends QueryDBStorage {
 
@@ -30,4 +32,6 @@ object TestQueryDB extends QueryDBStorage {
   override def createConsentGroupTransaction(groupId: String): ConsentGroupStorageTransaction = ???
 
   override def createTenantTransaction(tenant: String): TenantStorageTransaction = ???
+
+  override def getOffset(offsetName: String): Future[Offset] = Future.successful(Offset.noOffset)
 }
