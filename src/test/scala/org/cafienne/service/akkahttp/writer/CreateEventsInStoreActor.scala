@@ -2,9 +2,13 @@ package org.cafienne.service.akkahttp.writer
 
 import akka.actor.{ActorContext, ActorRef}
 import akka.persistence.PersistentActor
+import akka.persistence.journal.Tagged
+import org.cafienne.actormodel.event.ModelEvent
+
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 class CreateEventsInStoreActor extends PersistentActor {
-  override def persistenceId: String = "test-events-actor"
+  override def persistenceId: String = self.path.name
 
   override def receiveRecover: Receive = {
     case other => context.system.log.debug("received unknown event to recover:" + other)
@@ -15,10 +19,17 @@ class CreateEventsInStoreActor extends PersistentActor {
   }
 
   private def storeAndReply(replyTo: ActorRef, evt: Any)(implicit context: ActorContext): Unit = {
-    persist(evt) {
+    def addTags(event: Any): Any = {
+      event match {
+        case event1: ModelEvent => Tagged(event, event1.tags.asScala.toSet)
+        case _ => event
+      }
+    }
+
+    persist(addTags(evt)) {
       e =>
         context.system.log.debug(s"persisted $e")
-        replyTo ! e
+        replyTo ! evt
     }
   }
 

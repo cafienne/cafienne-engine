@@ -6,10 +6,8 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityProvider
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.infrastructure.cqrs.batch.EventBatch
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.EventBatchTransaction
-import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
+import org.cafienne.querydb.materializer.{EventBatchTransaction, QueryDBStorage}
 import org.cafienne.tenant.actorapi.event._
 import org.cafienne.tenant.actorapi.event.deprecated.DeprecatedTenantUserEvent
 import org.cafienne.tenant.actorapi.event.platform.PlatformEvent
@@ -17,14 +15,14 @@ import org.cafienne.tenant.actorapi.event.user.TenantMemberEvent
 
 import scala.concurrent.Future
 
-class TenantTransaction(batch: EventBatch, userCache: IdentityProvider) extends EventBatchTransaction with LazyLogging {
+class TenantTransaction(batch: TenantEventBatch, userCache: IdentityProvider, val storage: QueryDBStorage) extends EventBatchTransaction with LazyLogging {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-  val persistence = new SlickQueryDBTransaction
   val tenant: String = batch.persistenceId
+  val dBTransaction: TenantStorageTransaction = storage.createTenantTransaction(tenant)
 
-  private val tenantProjection = new TenantProjection(persistence)
-  private val userProjection = new TenantUserProjection(persistence)
+  private val tenantProjection = new TenantProjection(dBTransaction)
+  private val userProjection = new TenantUserProjection(dBTransaction)
 
   def createOffsetRecord(offset: Offset): OffsetRecord = OffsetRecord(TenantEventSink.offsetName, offset)
 
@@ -54,9 +52,9 @@ class TenantTransaction(batch: EventBatch, userCache: IdentityProvider) extends 
     tenantProjection.prepareCommit()
     userProjection.prepareCommit()
     // Update the offset of the last event handled in this projection
-    persistence.upsert(createOffsetRecord(envelope.offset))
+    dBTransaction.upsert(createOffsetRecord(envelope.offset))
     // Commit and then inform the last modified registration
-    persistence.commit().andThen(_ => {
+    dBTransaction.commit().andThen(_ => {
       // Clear the user cache for those user ids that have been updated
       userProjection.affectedUserIds.foreach(userCache.clear)
       TenantReader.lastModifiedRegistration.handle(tenantModified)
@@ -64,6 +62,6 @@ class TenantTransaction(batch: EventBatch, userCache: IdentityProvider) extends 
   }
 
   private def updateUserIds(event: TenantAppliedPlatformUpdate, offset: Offset): Future[Done] = {
-    persistence.updateTenantUserInformation(event.tenant, event.newUserInformation.info, createOffsetRecord(offset))
+    dBTransaction.updateTenantUserInformation(event.tenant, event.newUserInformation.info, createOffsetRecord(offset))
   }
 }

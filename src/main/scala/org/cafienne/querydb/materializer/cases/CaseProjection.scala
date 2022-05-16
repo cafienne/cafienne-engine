@@ -6,13 +6,12 @@ import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated
 import org.cafienne.cmmn.actorapi.event.{CaseDefinitionApplied, CaseEvent, CaseModified}
 import org.cafienne.cmmn.instance.State
-import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
 import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseProjection(persistence: QueryDBTransaction, caseFileProjection: CaseFileProjection)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseProjection(dBTransaction: CaseStorageTransaction, caseFileProjection: CaseFileProjection)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private var caseInstance: Option[CaseRecord] = None
   private var caseDefinition: Option[CaseDefinitionRecord] = None
 
@@ -50,12 +49,12 @@ class CaseProjection(persistence: QueryDBTransaction, caseFileProjection: CaseFi
     // First upsert the CaseDefinition, then all roles
     caseDefinition = Some(CaseDefinitionRecord(event.getActorId, event.getCaseName, event.getDefinition.documentation.text, event.getDefinition.getId, event.getDefinition.getDefinitionsDocument.getSource, event.tenant, event.getTimestamp, event.getUser.id))
     val roles = event.getDefinition.getCaseTeamModel.getCaseRoles.asScala.toSeq
-    roles.foreach(role => persistence.upsert(CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false)))
+    roles.foreach(role => dBTransaction.upsert(CaseRoleRecord(event.getCaseInstanceId, event.tenant, role.getName, assigned = false)))
   }
 
   private def migrateCaseDefinition(event: CaseDefinitionMigrated): Future[Done] = {
     // Remove existing roles
-    persistence.removeCaseRoles(event.getCaseInstanceId)
+    dBTransaction.removeCaseRoles(event.getCaseInstanceId)
     // Upsert case definition will add the new roles
     upsertCaseDefinitionRecords(event)
     changeCaseRecord(event, instance => instance.copy(caseName = event.getDefinition.getName))
@@ -71,7 +70,7 @@ class CaseProjection(persistence: QueryDBTransaction, caseFileProjection: CaseFi
     caseInstance match {
       case None =>
         logger.whenDebugEnabled(logger.debug(s"Retrieving Case[$caseInstanceId] from database"))
-        persistence.getCaseInstance(caseInstanceId).map {
+        dBTransaction.getCaseInstance(caseInstanceId).map {
           case Some(instance) =>
             this.caseInstance = Some(changer(instance))
             Done
@@ -87,7 +86,7 @@ class CaseProjection(persistence: QueryDBTransaction, caseFileProjection: CaseFi
   }
 
   def prepareCommit(): Unit = {
-    this.caseInstance.foreach(instance => persistence.upsert(instance))
-    this.caseDefinition.foreach(instance => persistence.upsert(instance))
+    this.caseInstance.foreach(instance => dBTransaction.upsert(instance))
+    this.caseDefinition.foreach(instance => dBTransaction.upsert(instance))
   }
 }

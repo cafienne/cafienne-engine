@@ -7,12 +7,12 @@ import org.cafienne.cmmn.actorapi.event.migration.{PlanItemDropped, PlanItemMigr
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
-import org.cafienne.querydb.materializer.QueryDBTransaction
+import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.querydb.record.{PlanItemHistoryRecord, PlanItemRecord, TaskRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CasePlanProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CasePlanProjection(dBTransaction: CaseStorageTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
 
   private val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
   private val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
@@ -31,7 +31,7 @@ class CasePlanProjection(persistence: QueryDBTransaction)(implicit val execution
   private def handlePlanItemEvent(event: PlanItemEvent): Future[Done] = {
     event match {
       case dropped: PlanItemDropped =>
-        persistence.deletePlanItemRecordAndHistory(dropped.getPlanItemId)
+        dBTransaction.deletePlanItemRecordAndHistory(dropped.getPlanItemId)
         Future.successful(Done)
       case _ =>
         // Always insert new items into history, no need to first fetch them from db.
@@ -70,7 +70,7 @@ class CasePlanProjection(persistence: QueryDBTransaction)(implicit val execution
         Future.successful(Some(item))
       case None =>
         logger.whenDebugEnabled(logger.debug(s"Retrieving plan item $planItemId from database"))
-        persistence.getPlanItem(planItemId)
+        dBTransaction.getPlanItem(planItemId)
     }
   }
 
@@ -94,7 +94,7 @@ class CasePlanProjection(persistence: QueryDBTransaction)(implicit val execution
   private def handleHumanTaskEvent(event: HumanTaskEvent): Future[Done] = {
     event match {
       case dropped: HumanTaskDropped =>
-        persistence.deleteTaskRecord(dropped.taskId)
+        dBTransaction.deleteTaskRecord(dropped.taskId)
         return Future.successful(Done)
       case _ =>
     }
@@ -130,15 +130,15 @@ class CasePlanProjection(persistence: QueryDBTransaction)(implicit val execution
     this.tasks.get(taskId) match {
       case None =>
         logger.whenDebugEnabled(logger.debug("Retrieving task " + taskId + " from database"))
-        persistence.getTask(taskId)
+        dBTransaction.getTask(taskId)
       case Some(task) => Future.successful(Some(task))
     }
   }
 
   def prepareCommit(caseModified: CaseModified): Unit = {
     // Add lastModified field to plan items and tasks
-    this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item)).foreach(item => persistence.upsert(item))
-    this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item)).foreach(item => persistence.upsert(item))
-    this.tasks.values.map(current => TaskMerger(caseModified, current)).foreach(item => persistence.upsert(item))
+    this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item)).foreach(item => dBTransaction.upsert(item))
+    this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item)).foreach(item => dBTransaction.upsert(item))
+    this.tasks.values.map(current => TaskMerger(caseModified, current)).foreach(item => dBTransaction.upsert(item))
   }
 }

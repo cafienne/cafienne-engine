@@ -9,27 +9,25 @@ import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
-import org.cafienne.infrastructure.cqrs.batch.EventBatch
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.EventBatchTransaction
+import org.cafienne.querydb.materializer.{EventBatchTransaction, QueryDBStorage}
 import org.cafienne.querydb.materializer.cases.file.CaseFileProjection
 import org.cafienne.querydb.materializer.cases.plan.CasePlanProjection
 import org.cafienne.querydb.materializer.cases.team.CaseTeamProjection
-import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
 
 import scala.concurrent.Future
 
-class CaseTransaction(val batch: EventBatch) extends EventBatchTransaction with LazyLogging  {
+class CaseTransaction(val batch: CaseEventBatch, val storage: QueryDBStorage) extends EventBatchTransaction with LazyLogging  {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val caseInstanceId: String = batch.persistenceId
   val tenant: String = batch.events.head.event.tenant()
-  val persistence = new SlickQueryDBTransaction
+  val dBTransaction: CaseStorageTransaction = storage.createCaseTransaction(batch.persistenceId)
 
-  private val caseTeamProjection = new CaseTeamProjection(persistence)
-  private val caseFileProjection = new CaseFileProjection(persistence, caseInstanceId, tenant)
-  private val casePlanProjection = new CasePlanProjection(persistence)
-  private val caseProjection = new CaseProjection(persistence, caseFileProjection)
+  private val caseTeamProjection = new CaseTeamProjection(dBTransaction)
+  private val caseFileProjection = new CaseFileProjection(dBTransaction, caseInstanceId, tenant)
+  private val casePlanProjection = new CasePlanProjection(dBTransaction)
+  private val caseProjection = new CaseProjection(dBTransaction, caseFileProjection)
 
   def createOffsetRecord(offset: Offset): OffsetRecord = OffsetRecord(CaseEventSink.offsetName, offset)
 
@@ -61,13 +59,13 @@ class CaseTransaction(val batch: EventBatch) extends EventBatchTransaction with 
     caseFileProjection.prepareCommit()
     casePlanProjection.prepareCommit(caseModified)
     // Update the offset storage with the latest & greatest offset we handled
-    persistence.upsert(createOffsetRecord(envelope.offset))
+    dBTransaction.upsert(createOffsetRecord(envelope.offset))
 
     // Commit and then inform the last modified registration
-    persistence.commit().andThen(_ => CaseReader.lastModifiedRegistration.handle(caseModified))
+    dBTransaction.commit().andThen(_ => CaseReader.lastModifiedRegistration.handle(caseModified))
   }
 
   private def updateUserIds(event: CaseAppliedPlatformUpdate, envelope: ModelEventEnvelope): Future[Done] = {
-    persistence.updateCaseUserInformation(event.getCaseInstanceId, event.newUserInformation.info, createOffsetRecord(envelope.offset))
+    dBTransaction.updateCaseUserInformation(event.getCaseInstanceId, event.newUserInformation.info, createOffsetRecord(envelope.offset))
   }
 }

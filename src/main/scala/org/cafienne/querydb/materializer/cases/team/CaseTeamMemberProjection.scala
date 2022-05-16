@@ -5,14 +5,14 @@ import org.cafienne.cmmn.actorapi.command.team.{CaseTeamGroup, CaseTeamMember, C
 import org.cafienne.cmmn.actorapi.event.team.group.{CaseTeamGroupAdded, CaseTeamGroupChanged}
 import org.cafienne.cmmn.actorapi.event.team.{CaseTeamMemberEvent, CaseTeamMemberRemoved}
 import org.cafienne.cmmn.instance.team.MemberType
-import org.cafienne.querydb.materializer.QueryDBTransaction
+import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.querydb.record.{CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
 
-class CaseTeamMemberProjection(persistence: QueryDBTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseTeamMemberProjection(dBTransaction: CaseStorageTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val newCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
   private val removedCaseTeamUserRoles = ListBuffer[CaseTeamUserRecord]()
   private val newCaseTeamTenantRoleRoles = ListBuffer[CaseTeamTenantRoleRecord]()
@@ -69,13 +69,13 @@ class CaseTeamMemberProjection(persistence: QueryDBTransaction)(implicit val exe
 
   def prepareCommit(): Unit = {
     // Update case team changes. Note: order matters (a bit). So first delete, and then add new info.
-    removedCaseTeamUserRoles.foreach(roleRemoved => persistence.delete(roleRemoved))
-    newCaseTeamUserRoles.foreach(roleUpdate => persistence.upsert(roleUpdate))
-    removedCaseTeamTenantRoleRoles.foreach(roleRemoval => persistence.delete(roleRemoval))
-    newCaseTeamTenantRoleRoles.foreach(roleUpdate => persistence.upsert(roleUpdate))
-    removedGroupMappings.foreach(groupMapping => persistence.delete(groupMapping))
-    newCaseTeamGroupMappings.foreach(groupMapping => persistence.upsert(groupMapping))
-    deletedMembers.foreach(persistence.deleteCaseTeamMember)
+    removedCaseTeamUserRoles.foreach(roleRemoved => dBTransaction.delete(roleRemoved))
+    newCaseTeamUserRoles.foreach(roleUpdate => dBTransaction.upsert(roleUpdate))
+    removedCaseTeamTenantRoleRoles.foreach(roleRemoval => dBTransaction.delete(roleRemoval))
+    newCaseTeamTenantRoleRoles.foreach(roleUpdate => dBTransaction.upsert(roleUpdate))
+    removedGroupMappings.foreach(groupMapping => dBTransaction.delete(groupMapping))
+    newCaseTeamGroupMappings.foreach(groupMapping => dBTransaction.upsert(groupMapping))
+    deletedMembers.foreach(dBTransaction.deleteCaseTeamMember)
   }
 }
 

@@ -3,7 +3,7 @@ package org.cafienne.service.akkahttp.tasks
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
-import org.cafienne.querydb.materializer.slick.SlickQueryDBTransaction
+import org.cafienne.querydb.materializer.slick.SlickQueryDB
 import org.cafienne.querydb.query.TaskQueriesImpl
 import org.cafienne.querydb.query.exception.TaskSearchFailure
 import org.cafienne.querydb.record.{CaseRecord, TaskRecord}
@@ -19,7 +19,8 @@ import scala.concurrent.duration._
 class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll with QueryDBSchema {
 
   val taskQueries = new TaskQueriesImpl
-  val updater = new SlickQueryDBTransaction
+  val caseUpdater = SlickQueryDB.createCaseTransaction(null)
+  val tenantUpdater = SlickQueryDB.createTenantTransaction(null)
 
   val tenant = "tenant"
   val case33 = "33"
@@ -33,31 +34,35 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     QueryDB.verifyConnectivity()
 
     println("Writing cases")
-    updater.upsert(CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
-    updater.upsert(CaseRecord(id = case44, tenant = tenant, rootCaseId = case44, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
-    Await.ready(updater.commit(), 2.seconds)
+    caseUpdater.upsert(CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
+    caseUpdater.upsert(CaseRecord(id = case44, tenant = tenant, rootCaseId = case44, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
+    Await.ready(caseUpdater.commit(), 2.seconds)
 
     println("Writing case team members")
-    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, ""))
-    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, "A"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, "B"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, ""))
-    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, "A"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, "B"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, ""))
-    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, "A"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, "B"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, ""))
-    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "A"))
-    updater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "B"))
-    Await.ready(updater.commit(), 2.seconds)
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, ""))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, "A"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, testUser, "B"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, ""))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, "A"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case33, tenant, userWithAandB, "B"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, ""))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, "A"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, testUser, "B"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, ""))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "A"))
+    caseUpdater.upsert(TestIdentityFactory.createTeamMember(case44, tenant, userWithAandB, "B"))
+    Await.ready(caseUpdater.commit(), 2.seconds)
 
     println("Writing tasks and tenant users")
-    updater.upsert(TaskRecord("1", case33, tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now))
-    updater.upsert(TaskRecord("2", case33, tenant = tenant, role = "A", owner = "Piet", taskState = "Unassigned", createdOn = Instant.now, lastModified = Instant.now))
-    updater.upsert(TaskRecord("3", case44, tenant = tenant, role = "B", owner = "Aart", createdOn = Instant.now, lastModified = Instant.now))
-    TestIdentityFactory.asDatabaseRecords(Seq(testUser, userWithAandB, userWithBandC)).foreach(user => updater.upsert(user))
-    Await.ready(updater.commit(), 2.seconds)
+    caseUpdater.upsert(TaskRecord("1", case33, tenant = tenant, role = "A", owner = "Jan", createdOn = Instant.now, lastModified = Instant.now))
+    caseUpdater.upsert(TaskRecord("2", case33, tenant = tenant, role = "A", owner = "Piet", taskState = "Unassigned", createdOn = Instant.now, lastModified = Instant.now))
+    caseUpdater.upsert(TaskRecord("3", case44, tenant = tenant, role = "B", owner = "Aart", createdOn = Instant.now, lastModified = Instant.now))
+    TestIdentityFactory.asDatabaseRecords(Seq(testUser, userWithAandB, userWithBandC)).foreach(user => tenantUpdater.upsert(user))
+
+    Await.ready({
+      caseUpdater.commit()
+      tenantUpdater.commit()
+    }, 1.seconds)
   }
 
   "Create a table" should "succeed the second time as well" in {
@@ -149,8 +154,8 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val current = Await.result(taskQueries.getTask("1", testUser), 3.seconds)
     val freshTask = current.copy(taskState = "Assigned")
     Await.ready({
-      updater.upsert(freshTask)
-      updater.commit()
+      caseUpdater.upsert(freshTask)
+      caseUpdater.commit()
     }, 3.seconds)
     val res = Await.result(taskQueries.getTask("1", testUser), 3.seconds)
     res.id must be("1")

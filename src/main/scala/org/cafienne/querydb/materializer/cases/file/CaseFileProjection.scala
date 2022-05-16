@@ -5,12 +5,12 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.migration.{CaseFileItemDropped, CaseFileItemMigrated}
 import org.cafienne.json.{JSONReader, ValueMap}
-import org.cafienne.querydb.materializer.QueryDBTransaction
+import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.querydb.record.{CaseBusinessIdentifierRecord, CaseFileRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseFileProjection(persistence: QueryDBTransaction, caseInstanceId: String, tenant: String)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseFileProjection(dBTransaction: CaseStorageTransaction, caseInstanceId: String, tenant: String)(implicit val executionContext: ExecutionContext) extends LazyLogging {
   private val businessIdentifiers = scala.collection.mutable.Set[CaseBusinessIdentifierRecord]()
   private val bufferedCaseFileEvents = new CaseFileEventBuffer()
   private var caseFile: Option[ValueMap] = None
@@ -66,7 +66,7 @@ class CaseFileProjection(persistence: QueryDBTransaction, caseInstanceId: String
   private def getCaseFile(caseInstanceId: String): Future[ValueMap] = {
     if (this.caseFile.isEmpty) {
       logger.whenDebugEnabled(logger.debug("Retrieving casefile caseInstanceId={} from database", caseInstanceId))
-      persistence.getCaseFile(caseInstanceId).map {
+      dBTransaction.getCaseFile(caseInstanceId).map {
         case Some(record) => JSONReader.parse(record.data)
         case None => new ValueMap()
       }.map {
@@ -81,8 +81,8 @@ class CaseFileProjection(persistence: QueryDBTransaction, caseInstanceId: String
 
   def prepareCommit(): Unit = {
     // Update case file and identifiers
-    this.caseFile.map(getUpdatedCaseFile).foreach(caseFile => persistence.upsert(caseFile))
-    this.businessIdentifiers.toSeq.foreach(item => persistence.upsert(item))
+    this.caseFile.map(getUpdatedCaseFile).foreach(caseFile => dBTransaction.upsert(caseFile))
+    this.businessIdentifiers.toSeq.foreach(item => dBTransaction.upsert(item))
   }
 
   /**

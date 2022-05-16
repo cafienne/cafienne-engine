@@ -45,7 +45,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     new CaseModified(json)
   }
 
-  def createPlanItemCreated(planItemId: String, planItemType: String, name: String, stageId: String, lastModified: Instant, user: TenantUser = user): PlanItemCreated = {
+  def createPlanItemCreated(planItemId: String, planItemType: String, name: String, stageId: String, user: TenantUser = user): PlanItemCreated = {
     val json = new ValueMap(
       Fields.name, name
       ,Fields.createdOn, Instant.now
@@ -62,13 +62,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     new PlanItemCreated(json)
   }
 
-  def createPlanItemTransitioned(planItemId: String,
-                                 planItemType: String,
-                                 currentState: State,
-                                 historyState: State,
-                                 transition: Transition,
-                                 lastModified: Instant,
-                                 user: TenantUser = user): PlanItemTransitioned = {
+  def createPlanItemTransitioned(planItemId: String, planItemType: String, currentState: State, historyState: State, transition: Transition, user: TenantUser = user): PlanItemTransitioned = {
     val json = new ValueMap(
       Fields.currentState, currentState.toString
       ,Fields.historyState, historyState.toString

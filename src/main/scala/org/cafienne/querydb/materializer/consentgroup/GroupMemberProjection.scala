@@ -3,13 +3,12 @@ package org.cafienne.querydb.materializer.consentgroup
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.consentgroup.actorapi.event._
-import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.record.ConsentGroupMemberRecord
 
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters.SetHasAsScala
 
-class GroupMemberProjection(groupId: String, persistence: QueryDBTransaction) extends LazyLogging {
+class GroupMemberProjection(groupId: String, dBTransaction: ConsentGroupStorageTransaction) extends LazyLogging {
   private val rolesAdded = scala.collection.mutable.ListBuffer[ConsentGroupMemberRecord]()
   private val rolesRemoved = scala.collection.mutable.ListBuffer[ConsentGroupMemberRecord]()
 
@@ -34,8 +33,8 @@ class GroupMemberProjection(groupId: String, persistence: QueryDBTransaction) ex
   def affectedUserIds: Set[String] = (rolesAdded.map(_.userId) ++ rolesRemoved.map(_.userId) ++ removedMembers).toSet
 
   def prepareCommit(): Unit = {
-    rolesAdded.foreach(persistence.upsert)
-    rolesRemoved.foreach(persistence.delete)
-    removedMembers.foreach(userId => persistence.deleteConsentGroupMember(groupId, userId))
+    rolesAdded.foreach(dBTransaction.upsert)
+    rolesRemoved.foreach(dBTransaction.delete)
+    removedMembers.foreach(userId => dBTransaction.deleteConsentGroupMember(groupId, userId))
   }
 }

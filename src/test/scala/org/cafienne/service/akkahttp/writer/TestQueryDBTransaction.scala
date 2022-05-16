@@ -1,43 +1,24 @@
 package org.cafienne.service.akkahttp.writer
 
 import akka.Done
-import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.querydb.materializer.QueryDBTransaction
-import org.cafienne.querydb.record._
 
-import java.time.Instant
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
-class TestQueryDBTransaction() extends QueryDBTransaction {
+class TestQueryDBTransaction(val persistenceId: String) extends QueryDBTransaction {
 
-  var records: Seq[AnyRef] = Seq()
+  println("\n\nCreating test query db transaction")
 
-  override def upsert(record: AnyRef) = {
-    records = records ++ Seq(record)
+  val records: ListBuffer[AnyRef] = ListBuffer()
+
+  def addRecord(record: AnyRef): Unit = {
+    records += record
+    println(s"Added record of type ${record.getClass.getSimpleName}, now having ${records.size} records")
   }
 
-  override def delete(record: AnyRef): Unit = {
-    throw new IllegalArgumentException("Deletion probably requires an implementation in testing")
-  }
-
-  override def removeCaseRoles(caseInstanceId: String): Unit = {
-  }
+  override def upsert(record: OffsetRecord): Unit = addRecord(record)
 
   override def commit(): Future[Done] = Future.successful(Done)
-
-  override def getUserRole(key: UserRoleKey): Future[Option[UserRoleRecord]] = Future.successful(None)
-
-  override def getPlanItem(planItemId: String): Future[Option[PlanItemRecord]] = Future.successful(None)
-
-  override def getTask(taskId: String): Future[Option[TaskRecord]] = Future.successful(Some(TaskRecord(id = "1", caseInstanceId = "1", tenant = "tenant", createdOn = Instant.now, lastModified = Instant.now)))
-
-  override def getCaseInstance(id: String): Future[Option[CaseRecord]] = Future.successful(None)
-
-  override def getCaseFile(caseInstanceId: String): Future[Option[CaseFileRecord]] = Future.successful(None)
-
-  override def updateCaseUserInformation(caseId: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = Future.successful(Done)
-
-  override def updateTenantUserInformation(tenant: String, info: Seq[NewUserInformation], offset: OffsetRecord): Future[Done] = Future.successful(Done)
-
 }
