@@ -1,4 +1,4 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.infrastructure.config
 
 import com.typesafe.config.ConfigFactory
 

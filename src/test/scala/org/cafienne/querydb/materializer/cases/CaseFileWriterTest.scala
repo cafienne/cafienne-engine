@@ -1,8 +1,9 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer.cases
 
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
 import org.cafienne.json.ValueMap
+import org.cafienne.querydb.materializer.TestQueryDB
 
 import java.time.Instant
 

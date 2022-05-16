@@ -1,7 +1,7 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer
 
 import akka.persistence.query.Offset
-import org.cafienne.querydb.materializer.QueryDBStorage
+import org.cafienne.querydb.materializer.cases.TestCaseStorageTransaction
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
 
@@ -19,12 +19,12 @@ object TestQueryDB extends QueryDBStorage {
   def hasTransaction(persistenceId: String): Boolean = transactions.exists(_.persistenceId == persistenceId)
 
   def getTransaction(persistenceId: String): TestQueryDBTransaction = {
-    println(s"Searching for transaction on case $persistenceId in ${transactions.size} transactions, with id's ${transactions.map(_.persistenceId)}")
+    // println(s"Searching for transaction on case $persistenceId in ${transactions.size} transactions, with id's ${transactions.map(_.persistenceId)}")
     transactions.find(_.persistenceId == persistenceId).getOrElse(throw new Exception(s"Cannot find a transaction for case $persistenceId"))
   }
 
   override def createCaseTransaction(caseInstanceId: String): TestCaseStorageTransaction = {
-    println(s"\n\nAsking for new case transaction on persistence id $caseInstanceId\n\n")
+    // println(s"\n\nAsking for new case transaction on persistence id $caseInstanceId\n\n")
     transactions += new TestCaseStorageTransaction(caseInstanceId)
     transactions.last
   }

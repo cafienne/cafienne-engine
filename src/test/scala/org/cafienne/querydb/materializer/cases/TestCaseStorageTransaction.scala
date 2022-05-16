@@ -1,9 +1,9 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer.cases
 
 import akka.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
+import org.cafienne.querydb.materializer.TestQueryDBTransaction
 import org.cafienne.querydb.materializer.cases.team.CaseTeamMemberKey
 import org.cafienne.querydb.record._
 

@@ -1,4 +1,4 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer.cases
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.event.{Logging, LoggingAdapter}
@@ -8,8 +8,8 @@ import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.test.TestScript
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.querydb.materializer.cases.CaseEventSink
-import org.cafienne.querydb.schema.QueryDB
+import org.cafienne.infrastructure.config.TestConfig
+import org.cafienne.querydb.materializer.{EventFactory, TestQueryDB}
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 import org.scalatest.BeforeAndAfterAll
@@ -28,9 +28,6 @@ class CaseEventSinkTest
     with Eventually {
 
   implicit val logger: LoggingAdapter = Logging(system, getClass)
-
-  // This is needed to get an offset
-  QueryDB.verifyConnectivity()
 
   val caseInstanceId: String = new Guid().toString
 

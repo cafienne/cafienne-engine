@@ -1,4 +1,4 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer.cases
 
 import akka.actor.{ActorContext, ActorRef}
 import akka.persistence.PersistentActor

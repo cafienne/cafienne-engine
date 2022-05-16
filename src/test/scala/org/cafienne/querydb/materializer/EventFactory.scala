@@ -1,4 +1,4 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer
 
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.event._

@@ -1,8 +1,7 @@
-package org.cafienne.service.akkahttp.writer
+package org.cafienne.querydb.materializer
 
 import akka.Done
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
-import org.cafienne.querydb.materializer.QueryDBTransaction
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
