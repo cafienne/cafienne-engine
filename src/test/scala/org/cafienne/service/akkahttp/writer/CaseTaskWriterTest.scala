@@ -46,7 +46,7 @@ class CaseTaskWriterTest
 
   val persistence = new TestPersistence()
 
-  val cpw = new CaseEventSink(new CaseSystem)
+  val cpw = new CaseEventSink(new CaseSystem(system))
   cpw.start()
 
 

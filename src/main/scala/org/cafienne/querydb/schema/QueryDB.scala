@@ -16,6 +16,8 @@ object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLo
   }
 
   def open(caseSystem: CaseSystem): Unit = {
+    verifyConnectivity()
+
     new CaseEventSink(caseSystem).start()
     new TenantEventSink(caseSystem).start()
     new ConsentGroupEventSink(caseSystem).start()

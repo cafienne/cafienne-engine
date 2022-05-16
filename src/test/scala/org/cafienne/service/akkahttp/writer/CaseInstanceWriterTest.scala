@@ -45,7 +45,7 @@ class CaseInstanceWriterTest
 
   val persistence = new TestPersistence()
 
-  val cpw = new CaseEventSink(new CaseSystem)
+  val cpw = new CaseEventSink(new CaseSystem(system))
   cpw.start()
 
   val caseInstanceId = "9fc49257_7d33_41cb_b28a_75e665ee3b2c"

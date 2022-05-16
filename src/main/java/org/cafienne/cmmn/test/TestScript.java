@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.test;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
@@ -173,7 +174,7 @@ public class TestScript {
     public TestScript(String testName) {
         logger.info("\n\n\t\t============ Creating new test '" + testName + "' ========================\n\n");
         this.testName = testName;
-        this.caseSystem = new CaseSystem("Case-Engine-Test-Script");
+        this.caseSystem = new CaseSystem(ActorSystem.create("Case-Engine-Test-Script"));
 
         // Start listening to the events coming out of the case persistence mechanism
         this.eventListener = new CaseEventListener(this);

@@ -10,6 +10,7 @@ package org.cafienne.service
 import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.querydb.schema.QueryDB
 import org.cafienne.service.akkahttp.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
@@ -23,6 +24,9 @@ object Main extends App with LazyLogging {
     val caseSystem: CaseSystem = new CaseSystem
     implicit val system: ActorSystem = caseSystem.system
     implicit val ec: ExecutionContextExecutor = system.dispatcher
+
+    // Start running the Event Sinks
+    QueryDB.open(caseSystem)
 
     // Create and start the http server
     new CafienneHttpServer(caseSystem).start().onComplete {

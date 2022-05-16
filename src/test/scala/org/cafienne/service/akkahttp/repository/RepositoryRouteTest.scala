@@ -1,5 +1,6 @@
 package org.cafienne.service.akkahttp.repository
 
+import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
@@ -13,7 +14,7 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
 
   val logger: LoggingAdapter = Logging(system, getClass)
 
-  implicit val caseSystem: CaseSystem = new CaseSystem("RepositoryRouteTest")
+  implicit val caseSystem: CaseSystem = new CaseSystem(ActorSystem("RepositoryRouteTest"))
 
   val repositoryRoute: RepositoryRoute = new RepositoryRoute(caseSystem) {
   }
