@@ -8,7 +8,7 @@ import org.cafienne.querydb.record.ConsentGroupMemberRecord
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters.SetHasAsScala
 
-class GroupMemberProjection(groupId: String, dBTransaction: ConsentGroupStorageTransaction) extends LazyLogging {
+class GroupMemberProjection(override val batch: ConsentGroupEventBatch) extends ConsentGroupEventMaterializer with LazyLogging {
   private val rolesAdded = scala.collection.mutable.ListBuffer[ConsentGroupMemberRecord]()
   private val rolesRemoved = scala.collection.mutable.ListBuffer[ConsentGroupMemberRecord]()
 

@@ -7,7 +7,7 @@ import org.cafienne.querydb.record.ConsentGroupRecord
 
 import scala.concurrent.Future
 
-class GroupProjection(dBTransaction: ConsentGroupStorageTransaction) extends LazyLogging {
+class GroupProjection(override val batch: ConsentGroupEventBatch) extends ConsentGroupEventMaterializer with LazyLogging {
   def handleGroupEvent(event: ConsentGroupCreated): Future[Done] = {
     val groupRecord = ConsentGroupRecord(id = event.getActorId, tenant = event.tenant)
     dBTransaction.upsert(groupRecord)

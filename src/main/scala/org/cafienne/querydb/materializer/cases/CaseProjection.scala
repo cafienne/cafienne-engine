@@ -11,7 +11,7 @@ import org.cafienne.querydb.record.{CaseDefinitionRecord, CaseRecord, CaseRoleRe
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseProjection(dBTransaction: CaseStorageTransaction, caseFileProjection: CaseFileProjection)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseProjection(override val batch: CaseEventBatch, caseFileProjection: CaseFileProjection)(implicit val executionContext: ExecutionContext) extends CaseEventMaterializer with LazyLogging {
   private var caseInstance: Option[CaseRecord] = None
   private var caseDefinition: Option[CaseDefinitionRecord] = None
 

@@ -7,7 +7,7 @@ import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated
 
 import scala.concurrent.Future
 
-class TenantProjection(dBTransaction: TenantStorageTransaction) extends LazyLogging {
+class TenantProjection(override val batch: TenantEventBatch) extends TenantEventMaterializer with LazyLogging {
   private val tenants = scala.collection.mutable.HashMap[String, TenantRecord]()
 
   def handlePlatformEvent(event: PlatformEvent): Future[Done] = {

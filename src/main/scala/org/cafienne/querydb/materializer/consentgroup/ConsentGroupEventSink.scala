@@ -19,3 +19,9 @@ class ConsentGroupEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage)
 object ConsentGroupEventSink {
   val offsetName = "ConsentGroupEventSink"
 }
+
+trait ConsentGroupEventMaterializer {
+  val batch: ConsentGroupEventBatch
+  lazy val groupId: String = batch.persistenceId
+  lazy val dBTransaction: ConsentGroupStorageTransaction = batch.dBTransaction
+}

@@ -9,7 +9,7 @@ import org.cafienne.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdd
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TenantUserProjection(dBTransaction: TenantStorageTransaction)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class TenantUserProjection(override val batch: TenantEventBatch)(implicit val executionContext: ExecutionContext) extends  TenantEventMaterializer with LazyLogging {
   private val deprecatedUserEventRecords = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
 
   private val userRolesAdded = scala.collection.mutable.ListBuffer[UserRoleRecord]()

@@ -19,3 +19,10 @@ class CaseEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends
 object CaseEventSink {
   val offsetName = "CaseEventSink"
 }
+
+trait CaseEventMaterializer {
+  val batch: CaseEventBatch
+  lazy val caseInstanceId: String = batch.persistenceId
+  lazy val dBTransaction: CaseStorageTransaction = batch.dBTransaction
+  lazy val tenant: String = batch.tenant
+}

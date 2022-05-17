@@ -19,3 +19,9 @@ class TenantEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) exten
 object TenantEventSink {
   val offsetName = "TenantEventSink"
 }
+
+trait TenantEventMaterializer {
+  val batch: TenantEventBatch
+  lazy val tenant: String = batch.persistenceId
+  lazy val dBTransaction: TenantStorageTransaction = batch.dBTransaction
+}
