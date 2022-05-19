@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait TimerStore extends LazyLogging {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  def getOffset(): Future[Offset]
+  def getOffset: Future[Offset]
 
   val storageName: String = "Timer Service Offset"
 

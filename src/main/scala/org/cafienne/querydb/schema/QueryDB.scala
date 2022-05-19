@@ -5,6 +5,7 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.jdbc.schema.CafienneDatabaseDefinition
 import org.cafienne.querydb.materializer.cases.CaseEventSink
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupEventSink
+import org.cafienne.querydb.materializer.slick.SlickQueryDB
 import org.cafienne.querydb.materializer.tenant.TenantEventSink
 import org.cafienne.querydb.schema.versions._
 import org.cafienne.system.CaseSystem
@@ -16,9 +17,11 @@ object QueryDB extends CafienneDatabaseDefinition with QueryDBSchema with LazyLo
   }
 
   def open(caseSystem: CaseSystem): Unit = {
-    new CaseEventSink(caseSystem).start()
-    new TenantEventSink(caseSystem).start()
-    new ConsentGroupEventSink(caseSystem).start()
+    verifyConnectivity()
+
+    new CaseEventSink(caseSystem, SlickQueryDB).start()
+    new TenantEventSink(caseSystem, SlickQueryDB).start()
+    new ConsentGroupEventSink(caseSystem, SlickQueryDB).start()
 
     // When running with H2, you can start a debug web server on port 8082.
     checkH2InDebugMode()

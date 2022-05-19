@@ -13,7 +13,7 @@ import scala.concurrent.Future
 class InMemoryStore extends TimerStore with LazyLogging {
   val timers = new mutable.HashMap[String, Timer]()
 
-  override def getOffset(): Future[Offset] = Future.successful(Offset.noOffset)
+  override def getOffset: Future[Offset] = Future.successful(Offset.noOffset)
 
   override def getTimers(window: Instant): Future[Seq[Timer]] = {
     Future.successful(timers.values.filter(_.moment.toEpochMilli <= window.toEpochMilli).toSeq)

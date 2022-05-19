@@ -8,7 +8,7 @@ import java.time.Instant
 class HealthMeasurePoint(val key: String) extends LazyLogging {
   private var healthy = true
   private var description = key + " is healthy "
-  private var changed: Instant = null
+  private var changed: Instant = _
 
   def unhealthy(): Boolean = !healthy
 
@@ -29,7 +29,7 @@ class HealthMeasurePoint(val key: String) extends LazyLogging {
     * @param throwable
     */
   def hasFailed(throwable: Throwable): Unit = {
-    logger.error("{} reported bad health", key, throwable)
+    logger.error(s"$key reported bad health", throwable)
 
     healthy = false
     description = "Failure: " + throwable.getLocalizedMessage

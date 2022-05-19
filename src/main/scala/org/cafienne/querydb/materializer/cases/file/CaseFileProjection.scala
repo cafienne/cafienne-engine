@@ -5,19 +5,21 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.file._
 import org.cafienne.cmmn.actorapi.event.migration.{CaseFileItemDropped, CaseFileItemMigrated}
 import org.cafienne.json.{JSONReader, ValueMap}
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.cases.{CaseEventBatch, CaseStorageTransaction}
 import org.cafienne.querydb.record.{CaseBusinessIdentifierRecord, CaseFileRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseFileProjection(persistence: RecordsPersistence, caseInstanceId: String, tenant: String)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class CaseFileProjection(batch: CaseEventBatch)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+  lazy val dBTransaction: CaseStorageTransaction = batch.dBTransaction
+  lazy val caseInstanceId: String = batch.caseInstanceId
+  lazy val tenant: String = batch.tenant
+
   private val businessIdentifiers = scala.collection.mutable.Set[CaseBusinessIdentifierRecord]()
   private val bufferedCaseFileEvents = new CaseFileEventBuffer()
   private var caseFile: Option[ValueMap] = None
 
-  def handleCaseCreation(): Unit = {
-    this.caseFile = Some(new ValueMap()) // Always create an empty case file
-  }
+  def handleCaseCreation(): Unit = setCaseFile(new ValueMap()) // Always create an empty case file
 
   def handleCaseFileEvent(event: CaseFileEvent): Future[Done] = {
     event match {
@@ -63,17 +65,18 @@ class CaseFileProjection(persistence: RecordsPersistence, caseInstanceId: String
     Future.successful(Done)
   }
 
+  private def setCaseFile(data: ValueMap): ValueMap = {
+    this.caseFile = Some(data)
+    data
+  }
+
   private def getCaseFile(caseInstanceId: String): Future[ValueMap] = {
     if (this.caseFile.isEmpty) {
       logger.whenDebugEnabled(logger.debug("Retrieving casefile caseInstanceId={} from database", caseInstanceId))
-      persistence.getCaseFile(caseInstanceId).map {
+      dBTransaction.getCaseFile(caseInstanceId).map {
         case Some(record) => JSONReader.parse(record.data)
         case None => new ValueMap()
-      }.map {
-        data =>
-          this.caseFile = Some(data)
-          data
-      }
+      }.map(setCaseFile)
     } else {
       Future.successful(this.caseFile.get)
     }
@@ -81,8 +84,8 @@ class CaseFileProjection(persistence: RecordsPersistence, caseInstanceId: String
 
   def prepareCommit(): Unit = {
     // Update case file and identifiers
-    this.caseFile.map(getUpdatedCaseFile).foreach(caseFile => persistence.upsert(caseFile))
-    this.businessIdentifiers.toSeq.foreach(item => persistence.upsert(item))
+    this.caseFile.map(getUpdatedCaseFile).foreach(caseFile => dBTransaction.upsert(caseFile))
+    this.businessIdentifiers.toSeq.foreach(item => dBTransaction.upsert(item))
   }
 
   /**

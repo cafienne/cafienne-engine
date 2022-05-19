@@ -4,13 +4,13 @@ import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent
-import org.cafienne.querydb.materializer.RecordsPersistence
+import org.cafienne.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CaseTeamProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
-  private val memberProjection = new CaseTeamMemberProjection(persistence)
-  private val deprecatedEventsProjection = new DeprecatedCaseTeamEventProjection(persistence)
+class CaseTeamProjection(override val batch: CaseEventBatch)(implicit val executionContext: ExecutionContext) extends CaseEventMaterializer with LazyLogging {
+  private val memberProjection = new CaseTeamMemberProjection(dBTransaction)
+  private val deprecatedEventsProjection = new DeprecatedCaseTeamEventProjection(dBTransaction)
 
   def handleCaseTeamEvent(event: CaseTeamEvent): Future[Done] = {
     // We handle 2 types of event: either the old ones (which carried all info in one shot) or the new ones, which are more particular

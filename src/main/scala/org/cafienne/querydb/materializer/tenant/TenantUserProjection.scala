@@ -3,14 +3,13 @@ package org.cafienne.querydb.materializer.tenant
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
-import org.cafienne.querydb.materializer.RecordsPersistence
 import org.cafienne.querydb.record.{UserRoleKey, UserRoleRecord}
 import org.cafienne.tenant.actorapi.event.deprecated._
 import org.cafienne.tenant.actorapi.event.user.{TenantMemberEvent, TenantUserAdded, TenantUserChanged, TenantUserRemoved}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TenantUserProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class TenantUserProjection(override val batch: TenantEventBatch)(implicit val executionContext: ExecutionContext) extends  TenantEventMaterializer with LazyLogging {
   private val deprecatedUserEventRecords = scala.collection.mutable.HashMap[UserRoleKey, UserRoleRecord]()
 
   private val userRolesAdded = scala.collection.mutable.ListBuffer[UserRoleRecord]()
@@ -43,7 +42,7 @@ class TenantUserProjection(persistence: RecordsPersistence)(implicit val executi
         Future.successful(value)
       case None =>
         logger.debug(s"Retrieving user_role[$key] from database")
-        persistence.getUserRole(key).map {
+        dBTransaction.getUserRole(key).map {
           case Some(value) => value
           case None => UserRoleRecord(key.userId, key.tenant, key.role_name, "", "", isOwner = false, enabled = true)
         }
@@ -71,9 +70,9 @@ class TenantUserProjection(persistence: RecordsPersistence)(implicit val executi
   def affectedUserIds: Set[String] = (deprecatedUserEventRecords.values ++ userRolesAdded ++ userRolesRemoved).map(_.userId).toSet ++ usersRemoved.map(_.id)
 
   def prepareCommit(): Unit = {
-    this.deprecatedUserEventRecords.values.foreach(instance => persistence.upsert(instance))
-    this.userRolesAdded.foreach(persistence.upsert)
-    this.userRolesRemoved.foreach(persistence.delete)
-    this.usersRemoved.foreach(persistence.deleteTenantUser)
+    this.deprecatedUserEventRecords.values.foreach(instance => dBTransaction.upsert(instance))
+    this.userRolesAdded.foreach(dBTransaction.upsert)
+    this.userRolesRemoved.foreach(dBTransaction.delete)
+    this.usersRemoved.foreach(dBTransaction.deleteTenantUser)
   }
 }

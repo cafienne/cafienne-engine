@@ -5,7 +5,8 @@ import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.infrastructure.cqrs.{OffsetRecord, ReadJournalProvider}
+import org.cafienne.infrastructure.cqrs.ReadJournalProvider
+import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.json.{ValueList, ValueMap}
 import org.cafienne.system.CaseSystem
 

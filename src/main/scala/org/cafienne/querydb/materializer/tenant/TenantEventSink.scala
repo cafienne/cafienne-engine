@@ -2,24 +2,26 @@ package org.cafienne.querydb.materializer.tenant
 
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, OffsetStorage}
-import org.cafienne.querydb.materializer.slick.{SlickEventMaterializer, SlickRecordsPersistence}
+import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
 import scala.concurrent.Future
 
-class TenantEventSink(val caseSystem: CaseSystem) extends SlickEventMaterializer with LazyLogging {
+class TenantEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
   override val tag: String = TenantEvent.TAG
 
-  val persistence = new SlickRecordsPersistence
-  def offsetStorage: OffsetStorage = persistence.storage(TenantEventSink.offsetName)
+  override def getOffset: Future[Offset] = storage.getOffset(TenantEventSink.offsetName)
 
-  override def getOffset(): Future[Offset] = offsetStorage.getOffset
-
-  override def createTransaction(envelope: ModelEventEnvelope): TenantTransaction = new TenantTransaction(envelope.persistenceId, persistence, caseSystem.userCache)
+  override def createBatch(persistenceId: String): TenantEventBatch = new TenantEventBatch(this, persistenceId, storage)
 }
 
 object TenantEventSink {
   val offsetName = "TenantEventSink"
+}
+
+trait TenantEventMaterializer {
+  val batch: TenantEventBatch
+  lazy val tenant: String = batch.persistenceId
+  lazy val dBTransaction: TenantStorageTransaction = batch.dBTransaction
 }

@@ -2,15 +2,13 @@ package org.cafienne.querydb.materializer.tenant
 
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.querydb.materializer.RecordsPersistence
 import org.cafienne.querydb.record.TenantRecord
 import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class TenantProjection(persistence: RecordsPersistence)(implicit val executionContext: ExecutionContext) extends LazyLogging {
+class TenantProjection(override val batch: TenantEventBatch) extends TenantEventMaterializer with LazyLogging {
   private val tenants = scala.collection.mutable.HashMap[String, TenantRecord]()
-
 
   def handlePlatformEvent(event: PlatformEvent): Future[Done] = {
     event match {
@@ -23,6 +21,6 @@ class TenantProjection(persistence: RecordsPersistence)(implicit val executionCo
   }
 
   def prepareCommit(): Unit = {
-    this.tenants.values.foreach(instance => persistence.upsert(instance))
+    this.tenants.values.foreach(instance => dBTransaction.upsert(instance))
   }
 }

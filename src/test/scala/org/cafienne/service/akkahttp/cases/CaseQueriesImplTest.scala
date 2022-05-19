@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import org.cafienne.cmmn.instance.State
 import org.cafienne.identity.TestIdentityFactory
-import org.cafienne.querydb.materializer.slick.SlickRecordsPersistence
+import org.cafienne.infrastructure.config.TestConfig
+import org.cafienne.querydb.materializer.slick.SlickQueryDB
 import org.cafienne.querydb.query.CaseQueriesImpl
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.querydb.record.{CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
 import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
-import org.cafienne.service.akkahttp.writer.TestConfig
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.must.Matchers
@@ -24,7 +24,8 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   val caseQueries = new CaseQueriesImpl
-  val updater = new SlickRecordsPersistence
+  val caseUpdater = SlickQueryDB.createCaseTransaction(null)
+  val tenantUpdater = SlickQueryDB.createTenantTransaction(null)
 
   val tenant = "tenant"
 
@@ -62,9 +63,18 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 
   override def beforeAll() = {
     QueryDB.verifyConnectivity()
-    val records = Seq(activeCase, planItem1_1, terminatedCase, completedCase, planItem2_1, planItemHistory2_1) ++ caseTeamMemberRecords ++ TestIdentityFactory.asDatabaseRecords(user)
-    records.foreach(record => updater.upsert(record))
-    Await.ready(updater.commit(), 1.seconds)
+    caseUpdater.upsert(activeCase)
+    caseUpdater.upsert(planItem1_1)
+    caseUpdater.upsert(terminatedCase)
+    caseUpdater.upsert(completedCase)
+    caseUpdater.upsert(planItem2_1)
+    caseUpdater.upsert(planItemHistory2_1)
+    caseTeamMemberRecords.foreach(caseUpdater.upsert)
+    TestIdentityFactory.asDatabaseRecords(user).foreach(tenantUpdater.upsert)
+    Await.ready({
+      caseUpdater.commit()
+      tenantUpdater.commit()
+    }, 1.seconds)
   }
 
   // *******************************************************************************************************************
