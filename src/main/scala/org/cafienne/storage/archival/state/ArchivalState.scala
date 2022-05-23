@@ -18,6 +18,7 @@
 package org.cafienne.storage.archival.state
 
 import akka.Done
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.serialization.{CafienneSerializer, Fields}
 import org.cafienne.json.{ValueList, ValueMap}
@@ -29,36 +30,40 @@ import org.cafienne.storage.querydb.QueryDBStorage
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait ArchivalState extends StorageActorState {
+trait ArchivalState extends StorageActorState with LazyLogging {
   override val actor: ActorDataArchiver
 
   def dbStorage: QueryDBStorage
 
   implicit def dispatcher: ExecutionContext = dbStorage.dispatcher
 
-  override def handleStorageEvent(event: StorageEvent): Unit = event match {
-    case event: ArchivalInitiated =>
-      printLogMessage(s"Starting archival for ${event.metadata}")
-      triggerArchivalProcess()
-      actor.sender() ! event
-    case event: QueryDataArchived =>
-      printLogMessage(s"QueryDB has been cleaned")
-      checkArchivingDone()
-    case event: ArchiveCreated => actor.afterArchiveStored(event)
-    case _: ModelActorArchived => actor.afterModelActorEventStored()
-    case _: ParentAccepted => actor.afterParentAccepted()
-    case event: ChildrenArchivalInitiated => triggerArchivalProcess()
-    case event: ChildArchived =>
-      if (event.metadata == actor.metadata) {
-        // It is us, let's clean and complete
-        actor.context.parent.tell(event, actor.context.self)
-      } else {
-        printLogMessage(s"Child ${event.metadata} reported completion")
+  override def handleStorageEvent(event: StorageEvent): Unit = {
+    event match {
+      case event: ArchivalInitiated =>
+        printLogMessage(s"Starting archival for ${event.metadata}")
+        triggerArchivalProcess()
+        actor.sender() ! event
+      case _: ChildrenArchivalInitiated => triggerChildArchivalProcess()
+      case _: QueryDataArchived =>
+        printLogMessage(s"QueryDB has been archived")
         checkArchivingDone()
-      }
-    case event =>
-      printLogMessage(s"Encountered unexpected storage event ${event.getClass.getName} on Actor [${event.actorId}] data on behalf of user ${event.user}")
+      case event: ChildArchived =>
+        actor.confirmChildArchived(event)
+        checkArchivingDone()
+      case event: ArchiveCreated => actor.afterArchiveCreated(event)
+      case _: ArchiveExported => actor.afterArchiveExported()
+      case _: ModelActorArchived => actor.afterModelActorEventStored()
+      case event =>
+        logger.error(s"Cannot handle event of type ${event.getClass.getName} in ${actor.getClass.getSimpleName}[${event.actorId}]")
+    }
   }
+
+
+  def isCreated: Boolean = events.exists(_.isInstanceOf[ArchiveCreated])
+
+  def isExported: Boolean = events.exists(_.isInstanceOf[ArchiveExported])
+
+  def isCleared: Boolean = events.exists(_.isInstanceOf[ModelActorArchived])
 
   /** Triggers the archival process upon recovery completion. But only if the ArchivalInitiated event is found.
    */
@@ -147,18 +152,33 @@ trait ArchivalState extends StorageActorState {
     printLogMessage(
       s"Running completion check: [queryDataCleared=$queryDataArchived; childrenMetadataAvailable=$childrenMetadataAvailable; children archived=${children.size - pendingChildArchivals.size}, pending=${pendingChildArchivals.size}]"
     )
-    if (childrenMetadataAvailable && pendingChildArchivals.isEmpty && queryDataArchived) {
-      if (! events.exists(_.isInstanceOf[ArchiveCreated])) {
-        actor.storeArchive()
+    if (childArchivesAvailable && queryDataArchived) {
+      if (! isCreated) {
+        actor.storeEvent(createArchiveEvent)
       }
     }
   }
+
+  def childArchivesAvailable: Boolean = childrenMetadataAvailable && pendingChildArchivals.isEmpty
 
   /**
    * Returns the archives of our children
    * @return
    */
   def childArchives: Seq[Archive] = eventsOfType(classOf[ChildArchived]).map(_.archive)
+
+  def createArchiveEvent: ArchiveCreated = {
+    printLogMessage(s"Starting final step to delete ourselves from event journal")
+
+    // Create the archive
+    val archive = createArchive
+    ArchiveCreated(metadata, archive)
+  }
+
+  def archive: ArchiveCreated = {
+    // Note: invoking this method when isCreated returns false ... throws something on None
+    events.find(_.isInstanceOf[ArchiveCreated]).get.asInstanceOf[ArchiveCreated]
+  }
 
   def createArchive: Archive = {
     val list: ValueList = new ValueList()
@@ -181,5 +201,5 @@ trait ArchivalState extends StorageActorState {
    * Up to the ModelActor specific type of state to give the event the proper name.
    * @return
    */
-  def createArchivedEvent: ModelActorArchived
+  def createModelActorEvent: ModelActorArchived
 }

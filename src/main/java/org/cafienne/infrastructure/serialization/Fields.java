@@ -147,6 +147,7 @@ public enum Fields {
     children,
     manifest,
     sequenceNr,
+    parent,
 
     className,
     message,

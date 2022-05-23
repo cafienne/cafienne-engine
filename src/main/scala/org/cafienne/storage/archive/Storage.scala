@@ -15,22 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.state
+package org.cafienne.storage.archive
 
 import akka.Done
-import org.cafienne.storage.actormodel.CaseChildrenFinder
-import org.cafienne.storage.archival.ActorDataArchiver
-import org.cafienne.storage.archival.event.{CaseArchived, ModelActorArchived}
-import org.cafienne.storage.querydb.CaseStorage
+import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.archival.Archive
 
 import scala.concurrent.Future
 
-class CaseArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with CaseChildrenFinder {
-  override val dbStorage: CaseStorage = new CaseStorage
+trait Storage {
+  def store(archive: Archive): Future[Done]
 
-  override def archiveQueryData(): Future[Done] = {
-    dbStorage.archiveCase(metadata.actorId)
-  }
-
-  override def createModelActorEvent: ModelActorArchived = new CaseArchived(metadata)
+  def retrieve(metadata: ActorMetadata): Future[Archive]
 }

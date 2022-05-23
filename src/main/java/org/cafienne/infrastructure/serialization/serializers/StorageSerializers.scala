@@ -40,8 +40,8 @@ object StorageSerializers {
     CafienneSerializer.addManifestWrapper(classOf[QueryDataArchived], QueryDataArchived.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildrenArchivalInitiated], ChildrenArchivalInitiated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildArchived], ChildArchived.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ParentAccepted], ParentAccepted.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ArchiveCreated], ArchiveCreated.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[ArchiveExported], ArchiveExported.deserialize)
 
     // ModelActor related "functional" events (the ones that remain in the journal)
     CafienneSerializer.addManifestWrapper(classOf[CaseArchived], CaseArchived.deserialize)

@@ -18,19 +18,19 @@
 package org.cafienne.storage.archival.state
 
 import akka.Done
-import org.cafienne.storage.actormodel.CaseChildrenFinder
+import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.archival.ActorDataArchiver
-import org.cafienne.storage.archival.event.{CaseArchived, ModelActorArchived}
-import org.cafienne.storage.querydb.CaseStorage
+import org.cafienne.storage.archival.event.{ModelActorArchived, ProcessArchived}
+import org.cafienne.storage.querydb.ProcessStorage
 
 import scala.concurrent.Future
 
-class CaseArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with CaseChildrenFinder {
-  override val dbStorage: CaseStorage = new CaseStorage
+class ProcessArchivalState(override val actor: ActorDataArchiver) extends ArchivalState {
+  override val dbStorage: ProcessStorage = new ProcessStorage
 
-  override def archiveQueryData(): Future[Done] = {
-    dbStorage.archiveCase(metadata.actorId)
-  }
+  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
 
-  override def createModelActorEvent: ModelActorArchived = new CaseArchived(metadata)
+  override def archiveQueryData(): Future[Done] = Future.successful(Done) // Nothing to archive here, just tell our actor we're done.
+
+  override def createModelActorEvent: ModelActorArchived = new ProcessArchived(metadata)
 }

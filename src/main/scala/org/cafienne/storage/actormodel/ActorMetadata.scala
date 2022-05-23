@@ -27,7 +27,7 @@ import org.cafienne.storage.actormodel.message.StorageSerializable
 import org.cafienne.tenant.TenantActor
 
 case class ActorMetadata(user: StorageUser, actorType: String, tenant: String, actorId: String, parentActorId: ActorMetadata = null) extends StorageSerializable with CafienneJson {
-  override def toValue: Value[_] = new ValueMap(Fields.user, user, Fields.`type`, actorType, Fields.actorId, actorId, Fields.tenant, tenant, Fields.parentActorId, parentActorId)
+  override def toValue: Value[_] = new ValueMap(Fields.user, user, Fields.`type`, actorType, Fields.actorId, actorId, Fields.tenant, tenant, Fields.parent, parentActorId)
 
   def path: String = {
     if (hasParent) {
@@ -70,8 +70,8 @@ object ActorMetadata {
     val actorType = json.readString(Fields.`type`)
     val actorId = json.readString(Fields.actorId)
     val tenant = json.readString(Fields.tenant)
-    val parentActor: ActorMetadata = if (json.get(Fields.parentActorId) != Value.NULL) {
-      deserialize(json.readMap(Fields.parentActorId))
+    val parentActor: ActorMetadata = if (json.get(Fields.parent) != Value.NULL) {
+      deserialize(json.readMap(Fields.parent))
     } else {
       null
     }
@@ -80,8 +80,8 @@ object ActorMetadata {
 }
 
 object ActorType {
-  val Case    = classOf[Case].getSimpleName
-  val Process = classOf[ProcessTaskActor].getSimpleName
-  val Group   = classOf[ConsentGroupActor].getSimpleName
-  val Tenant  = classOf[TenantActor].getSimpleName
+  val Case: String = classOf[Case].getSimpleName
+  val Process: String = classOf[ProcessTaskActor].getSimpleName
+  val Group: String = classOf[ConsentGroupActor].getSimpleName
+  val Tenant: String = classOf[TenantActor].getSimpleName
 }
