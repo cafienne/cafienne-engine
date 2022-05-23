@@ -83,23 +83,8 @@ trait CaseTeamValidator extends TenantValidator {
           else s"Cannot find consent groups ${unfoundGroups.map(u => s"'$u'").mkString(", ")}"
         }
         throw new SearchFailure(msg)
-      } else {
-        // Now check that the case team groups have existing consent group roles (empty string is considered membership).
-        val invalidGroupRoles: Seq[String] = groups.map(group => {
-          val consentGroup = consentGroups.find(_.id == group.groupId).get
-          val missingRoles = group.mappings.map(_.groupRole).filterNot(_.isBlank).filterNot(consentGroup.groupRoles.contains)
-          if (missingRoles.isEmpty) {
-            ""
-          } else {
-            s"Group ${group.groupId} does not have role(s) '${missingRoles.mkString("', '")}'"
-          }
-        }).filterNot(_.isBlank)
-        if (invalidGroupRoles.nonEmpty) {
-          throw new SearchFailure(invalidGroupRoles.mkString(",\n"))
-        }
       }
-      // If we reach this point, all consent groups have been validated, and we can return the groups.
-      //  Currently no need to add extra info (an example could be the tenant to which the group belongs, or perhaps the id's of the owners)
+      // Just return the source groups, no need to enrich
       groups
     })
   }
