@@ -12,6 +12,7 @@ target
 .tags
 *.iml
 
+/run/**/archive
 /run/**/journal
 /run/**/snapshots
 /run/**/snapshot

@@ -40,6 +40,8 @@ trait StorageActorState {
     case _ => throw new RuntimeException(s"Cannot handle actions on events of unknown actor type $metadata")
   }
 
+  def originalModelActorEvents: Seq[ModelEvent] = events.filterNot(_.isInstanceOf[StorageEvent]).toSeq
+
   def eventsOfType[T <: ModelEvent](clazz: Class[T]): Seq[T] = events.filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[T]).toSeq
 
   def printLogMessage(msg: String): Unit = actor.printLogMessage(msg)

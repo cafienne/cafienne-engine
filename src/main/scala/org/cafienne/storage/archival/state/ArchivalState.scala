@@ -18,7 +18,9 @@
 package org.cafienne.storage.archival.state
 
 import akka.Done
-import org.cafienne.json.ValueMap
+import org.cafienne.actormodel.event.ModelEvent
+import org.cafienne.infrastructure.serialization.{CafienneSerializer, Fields}
+import org.cafienne.json.{ValueList, ValueMap}
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, StorageActorState}
 import org.cafienne.storage.archival.event._
@@ -152,8 +154,26 @@ trait ArchivalState extends StorageActorState {
     }
   }
 
+  /**
+   * Returns the archives of our children
+   * @return
+   */
+  def childArchives: Seq[Archive] = eventsOfType(classOf[ChildArchived]).map(_.archive)
+
   def createArchive: Archive = {
-    Archive(new ValueMap("events", events.map(_.rawJson())))
+    val list: ValueList = new ValueList()
+    // Convert the events to JSON.
+    originalModelActorEvents.zipWithIndex.map(serializeEventToJson).foreach(list.add)
+    Archive(metadata, list, children = childArchives)
+  }
+
+  def serializeEventToJson(element: (ModelEvent, Int)): ValueMap = {
+    val event = element._1
+    //  Note: we're setting sequence_number of the event, starting with 1 instead of 0;
+    //  This makes it sort of compliant with how it is done by Akka in event journal. Helps relating events properly.
+    val sequenceNr = element._2 + 1
+
+    new ValueMap(Fields.sequenceNr, sequenceNr, Fields.manifest, CafienneSerializer.getManifestString(event), Fields.content, event.rawJson())
   }
 
   /**

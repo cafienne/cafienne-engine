@@ -144,6 +144,9 @@ public enum Fields {
     metadata,
     archive,
     events,
+    children,
+    manifest,
+    sequenceNr,
 
     className,
     message,

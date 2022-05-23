@@ -18,11 +18,16 @@
 package org.cafienne.storage.archival
 
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
+import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageSerializable
 
-case class Archive(events: ValueMap) extends StorageSerializable with CafienneJson {
-  override def toValue: Value[_] = new ValueMap(Fields.events, events)
+import scala.jdk.CollectionConverters.CollectionHasAsScala
+
+case class Archive(metadata: ActorMetadata, events: ValueList, children: Seq[Archive] = Seq()) extends StorageSerializable with CafienneJson {
+  override def toValue: Value[_] = new ValueMap(Fields.metadata, metadata, Fields.events, events, Fields.children, children)
+
+  override def toString(): String = toValue.toString
 }
 
 object Archive {
@@ -30,6 +35,10 @@ object Archive {
    * Convert a JSON object to an Archive instance
    */
   def deserialize(json: ValueMap): Archive = {
-    Archive(events = json.readMap(Fields.events))
+    Archive(
+      metadata = ActorMetadata.deserializeMetadata(json),
+      events = json.withArray(Fields.events),
+      children = json.withArray(Fields.children).getValue.asScala.toSeq.map(_.asInstanceOf[ValueMap]).map(Archive.deserialize)
+    )
   }
 }

@@ -24,9 +24,11 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
+import org.cafienne.storage.archival.Archive
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.archival.event.{ArchivalInitiated, ChildArchived, ParentAccepted}
 import org.cafienne.storage.deletion.command.RemoveActorData
@@ -34,6 +36,7 @@ import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
+import java.io.{File, FileWriter}
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -107,10 +110,11 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
       // Tell Cafienne Engine to remove this model actor from memory
       caseSystem.gateway.request(new TerminateModelActor(command.metadata.user, command.metadata.actorId))
       refs.getOrElseUpdate(command.metadata.actorId, createActorRef(command)).forward(command)
-    case message: ChildArchived => {
-      println("GOT AN ARCHIVE HERE! for " + message.metadata)
-      sender() ! ParentAccepted(message.metadata)
-    }
+    case message: ChildArchived =>
+      val archivedActorRef = sender()
+      writeArchive(message.metadata, message.archive).map(_ => {
+        archivedActorRef ! ParentAccepted(message.metadata)
+      })
     case event: RemovalCompleted =>
       // Nothing needs to be done, as the actor will stop itself and below we handle the resulting Termination message.
       logger.debug(s"Completed removal for ${event.metadata}")
@@ -120,6 +124,20 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
         logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the LocalRoutingService. Termination message is ignored")
       }
       logger.debug(s"Actor $actorId is removed from memory")
+  }
+
+  def writeArchive(metadata: ActorMetadata, archive: Archive): Future[Done] = {
+    println("Writing archive")
+    val directory = new File(Cafienne.config.storage.archive)
+    directory.mkdirs()
+
+    val nextFileName = s"${File.separator}archive-${metadata.actorType.toLowerCase()}-${metadata.actorId}.json"
+    val file = new File(directory.getAbsolutePath + nextFileName)
+        println("Opening file " + file + " to write " + archive.events.size() + " events")
+    val writer = new FileWriter(file, true)
+    writer.write(archive.toString())
+    writer.close()
+    Future.successful(Done)
   }
 
 }
