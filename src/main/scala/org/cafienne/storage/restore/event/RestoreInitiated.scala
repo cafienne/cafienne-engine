@@ -15,13 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.command
+package org.cafienne.storage.restore.event
 
-import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}
-import org.cafienne.storage.actormodel.message.StorageCommand
-import org.cafienne.storage.archival.ActorDataArchiver
+import org.cafienne.infrastructure.serialization.Manifest
+import org.cafienne.json.ValueMap
+import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.message.StorageActionInitiated
 
-case class RestoreActorData(metadata: ActorMetadata) extends StorageCommand {
-  override def toString: String = s"Restore command for $metadata"
-  val actorClass: Class[_ <: StorageActor[_]] = classOf[ActorDataArchiver]
+@Manifest
+case class RestoreInitiated(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionInitiated
+
+object RestoreInitiated {
+  def deserialize(json: ValueMap): RestoreInitiated = {
+    RestoreInitiated(ActorMetadata.deserializeMetadata(json), Some(json))
+  }
 }

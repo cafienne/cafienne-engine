@@ -23,8 +23,9 @@ import org.cafienne.infrastructure.config.FileStorageConfig
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.archival.Archive
 import org.cafienne.storage.archive.Storage
+import org.cafienne.json.{JSONReader, ValueMap}
 
-import java.io.{File, FileWriter}
+import java.io.{File, FileInputStream, FileWriter}
 import scala.concurrent.Future
 
 class FileBasedStorage(val config: FileStorageConfig) extends Storage with LazyLogging {
@@ -44,5 +45,9 @@ class FileBasedStorage(val config: FileStorageConfig) extends Storage with LazyL
     new File(directory.getAbsolutePath + fileName)
   }
 
-  override def retrieve(metadata: ActorMetadata): Future[Archive] = ???
+  override def retrieve(metadata: ActorMetadata): Future[Archive] = {
+    val file = getFile(metadata)
+    val json = JSONReader.parse(new FileInputStream(file)).asInstanceOf[ValueMap]
+    Future.successful(Archive.deserialize(json))
+  }
 }

@@ -48,7 +48,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
    */
   override def postStop(): Unit = {
     if (metadata.hasParent) {
-      printLogMessage(s"========== Finished Storage Archival for $metadata (child of ${metadata.parentActorId.path})\n")
+      printLogMessage(s"========== Finished Storage Archival for $metadata (child of ${metadata.parent.path})\n")
     } else {
       printLogMessage(s"========== Finished Storage Archival for $metadata\n")
     }

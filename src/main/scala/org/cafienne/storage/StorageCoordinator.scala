@@ -25,11 +25,13 @@ import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
+import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
-import org.cafienne.storage.archival.command.ArchiveActorData
+import org.cafienne.storage.archival.command.{ArchiveActorData, RestoreActorData}
 import org.cafienne.storage.archival.event.ArchivalInitiated
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.restore.event.RestoreInitiated
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
@@ -91,6 +93,7 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
           event match {
             case _: RemovalInitiated => restart(RemoveActorData)
             case _: ArchivalInitiated => restart(ArchiveActorData)
+            case _: RestoreInitiated => restart(RestoreActorData)
             case other => logger.warn(s"Cannot recover a storage process, because of unrecognized initiation event of type ${other.getClass.getName}")
           }
         }

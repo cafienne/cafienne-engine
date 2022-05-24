@@ -26,18 +26,18 @@ import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.message.StorageSerializable
 import org.cafienne.tenant.TenantActor
 
-case class ActorMetadata(user: StorageUser, actorType: String, tenant: String, actorId: String, parentActorId: ActorMetadata = null) extends StorageSerializable with CafienneJson {
-  override def toValue: Value[_] = new ValueMap(Fields.user, user, Fields.`type`, actorType, Fields.actorId, actorId, Fields.tenant, tenant, Fields.parent, parentActorId)
+case class ActorMetadata(user: StorageUser, actorType: String, tenant: String, actorId: String, parent: ActorMetadata = null) extends StorageSerializable with CafienneJson {
+  override def toValue: Value[_] = new ValueMap(Fields.user, user, Fields.`type`, actorType, Fields.actorId, actorId, Fields.tenant, tenant, Fields.parent, parent)
 
   def path: String = {
     if (hasParent) {
-      s"${parentActorId.path}/$actorType[$actorId]"
+      s"${parent.path}/$actorType[$actorId]"
     } else {
       s"$actorType[$actorId]"
     }
   }
 
-  val hasParent: Boolean = parentActorId != null
+  val hasParent: Boolean = parent != null
 
   val isRoot: Boolean = !hasParent
 
@@ -51,7 +51,7 @@ case class ActorMetadata(user: StorageUser, actorType: String, tenant: String, a
 
 
   private def member(memberId: String, memberType: String): ActorMetadata =
-    this.copy(actorType = memberType, actorId = memberId, parentActorId = this)
+    this.copy(actorType = memberType, actorId = memberId, parent = this)
 }
 
 object ActorMetadata {
@@ -75,7 +75,7 @@ object ActorMetadata {
     } else {
       null
     }
-    ActorMetadata(user = user, actorType = actorType, actorId = actorId, tenant = tenant, parentActorId = parentActor)
+    ActorMetadata(user = user, actorType = actorType, actorId = actorId, tenant = tenant, parent = parentActor)
   }
 }
 

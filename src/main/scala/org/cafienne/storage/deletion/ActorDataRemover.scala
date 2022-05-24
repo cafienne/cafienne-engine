@@ -46,7 +46,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
    */
   override def postStop(): Unit = {
     if (metadata.hasParent) {
-      printLogMessage(s"========== Finished Storage Deletion for $metadata (child of ${metadata.parentActorId.path})\n")
+      printLogMessage(s"========== Finished Storage Deletion for $metadata (child of ${metadata.parent.path})\n")
     } else {
       printLogMessage(s"========== Finished Storage Deletion for $metadata\n")
     }
@@ -104,7 +104,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
    */
   def deletionCompleted(msg: String = ""): Unit = {
     if (metadata.hasParent) {
-      printLogMessage(s"Completed clearing event journal $msg; informing parent ${metadata.parentActorId} with ref ${context.parent.path} and stopping ActorDataRemover on $metadata")
+      printLogMessage(s"Completed clearing event journal $msg; informing parent ${metadata.parent} with ref ${context.parent.path} and stopping ActorDataRemover on $metadata")
     } else {
       printLogMessage(s"Completed clearing event journal $msg; informing StorageCoordinator (since we have no parent) and stopping ActorDataRemover on $metadata")
     }

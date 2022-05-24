@@ -36,7 +36,7 @@ trait StorageEvent extends CafienneJson with ModelEvent {
   val user: StorageUser = metadata.user
   val actorId: String = metadata.actorId
   val actorType: String = metadata.actorType
-  val parentActorId: ActorMetadata = metadata.parentActorId
+  val parentActorId: ActorMetadata = metadata.parent
   val tenant: String = metadata.tenant
   val optionalJson: Option[ValueMap] = None
 

@@ -78,10 +78,10 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         }
     }
 
-    protected CafienneSerializer() {
+    public CafienneSerializer() {
     }
 
-    protected CafienneSerializer(ExtendedActorSystem system) {
+    public CafienneSerializer(ExtendedActorSystem system) {
     }
 
     @FunctionalInterface // Simplistic interface to avoid an if statement in the deserialize function

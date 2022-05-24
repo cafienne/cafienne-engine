@@ -102,20 +102,8 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   @Produces(Array("application/json"))
   def restoreCaseInstance: Route = put {
     caseUser { user =>
-      path("case" / Segment / "archive") { caseInstanceId =>
-        authorizeCaseAccess(user, caseInstanceId, { caseMember => {
-          val tenant = caseMember.tenant
-          onComplete(getTenantUser(user, tenant, None)) {
-            case Success(tenantUser) =>
-              if (tenantUser.enabled && tenantUser.isOwner) {
-                restoreActorData(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = tenant, actorId = caseInstanceId))
-              } else {
-                complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
-              }
-            case Failure(t) => throw t
-          }
-        }}
-        )
+      path("case" / Segment / "restore") { caseInstanceId =>
+        restoreActorData(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = "tenant", actorId = caseInstanceId))
       }
     }
   }

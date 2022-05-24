@@ -20,6 +20,8 @@ package org.cafienne.infrastructure.serialization.serializers
 import org.cafienne.infrastructure.serialization.CafienneSerializer
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.restore.command.RestoreArchive
+import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored, RestoreInitiated}
 
 object StorageSerializers {
   def register(): Unit = {
@@ -27,11 +29,16 @@ object StorageSerializers {
   }
 
   def registerStorageMessages(): Unit = {
+    registerDeletionMessages()
+    registerArchivalMessages()
+    registerRestoreMessages()
+  }
+
+  def registerDeletionMessages(): Unit = {
     CafienneSerializer.addManifestWrapper(classOf[RemovalInitiated], RemovalInitiated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[QueryDataRemoved], QueryDataRemoved.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildrenRemovalInitiated], ChildrenRemovalInitiated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RemovalCompleted], RemovalCompleted.deserialize)
-    registerArchivalMessages()
   }
 
   def registerArchivalMessages(): Unit = {
@@ -46,5 +53,12 @@ object StorageSerializers {
     // ModelActor related "functional" events (the ones that remain in the journal)
     CafienneSerializer.addManifestWrapper(classOf[CaseArchived], CaseArchived.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ProcessArchived], ProcessArchived.deserialize)
+  }
+
+  def registerRestoreMessages(): Unit = {
+    CafienneSerializer.addManifestWrapper(classOf[RestoreArchive], RestoreArchive.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[RestoreInitiated], RestoreInitiated.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[ArchiveRetrieved], ArchiveRetrieved.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[ChildRestored], ChildRestored.deserialize)
   }
 }
