@@ -97,6 +97,16 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         }
     }
 
+    /**
+     * Deserialize an already parsed json structure into the object described by the manifest string
+     * @param json
+     * @param manifestString
+     * @return
+     */
+    public Object fromJson(ValueMap json, String manifestString) {
+        return deserialize(manifestString, () -> json, () -> json.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
     public Object fromBinary(byte[] eventBlob, String manifestString) {
         return deserialize(manifestString, () -> JSONReader.parse(eventBlob), () -> eventBlob);
