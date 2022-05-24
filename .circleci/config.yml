@@ -77,6 +77,29 @@ jobs:
             docker logs cafienne
             docker rm -f cafienne
 
+      # Starting docker environment for testing start case with inline definitions
+      - run:
+          name: Start Cafienne Engine for testing start case with inline definitions
+          command: |
+            docker-compose -f .circleci/docker-config/engine-with-startcase-with-definition-configuration.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Docker logs of engine before running test
+          command: |
+            sudo chmod -R 777 ./
+            docker logs cafienne
+      - run:
+          name: Test StartCase With Inline Definition
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
+      - run:
+          name: Stop and remove the Cafienne container
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
+
       # Starting docker environment for In-memory testing
       - run:
           name: Start Cafienne Engine for in-memory testing
@@ -331,6 +354,29 @@ jobs:
             docker logs cafienne
             docker rm -f cafienne
 
+      # Starting docker environment for testing start case with inline definitions
+      - run:
+          name: Start Cafienne Engine for testing start case with inline definitions
+          command: |
+            docker-compose -f .circleci/docker-config/engine-with-startcase-with-definition-configuration.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Docker logs of engine before running test
+          command: |
+            sudo chmod -R 777 ./
+            docker logs cafienne
+      - run:
+          name: Test StartCase With Inline Definition
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
+      - run:
+          name: Stop and remove the Cafienne container
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
+
       # Starting docker environment for In-memory testing
       - run:
           name: Start Cafienne Engine for in-memory testing
@@ -432,6 +478,29 @@ jobs:
             cd ..
             cd ./cmmn-test-framework
             npm run prod PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
+      - run:
+          name: Stop and remove the Cafienne container
+          command: |
+            docker logs cafienne
+            docker rm -f cafienne
+
+      # Starting docker environment for testing start case with inline definitions
+      - run:
+          name: Start Cafienne Engine for testing start case with inline definitions
+          command: |
+            docker-compose -f .circleci/docker-config/engine-with-startcase-with-definition-configuration.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Docker logs of engine before running test
+          command: |
+            sudo chmod -R 777 ./
+            docker logs cafienne
+      - run:
+          name: Test StartCase With Inline Definition
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
       - run:
           name: Stop and remove the Cafienne container
           command: |
