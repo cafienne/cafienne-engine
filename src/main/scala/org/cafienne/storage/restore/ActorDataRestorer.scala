@@ -26,9 +26,11 @@ import org.cafienne.storage.archival.command.RestoreActorData
 import org.cafienne.storage.archive.Storage
 import org.cafienne.storage.restore.command.RestoreArchive
 import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored, RestoreInitiated}
+import org.cafienne.storage.restore.response.ArchiveNotFound
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 class ActorDataRestorer(override val caseSystem: CaseSystem, override val metadata: ActorMetadata) extends StorageActor[RestoreState] {
   override def persistenceId: String = s"RESTORE_ACTOR_FOR_${metadata.actorType.toUpperCase}_${metadata.actorId}"
@@ -39,9 +41,22 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
     val storage: Storage = Cafienne.config.storage.archive
-    storage.retrieve(command.metadata).map(archive => self ! ArchiveRetrieved(command.metadata, archive))
+    val senderRef = sender()
 
-    sender().tell(RestoreInitiated(metadata), self)
+    def raiseFailure(throwable: Throwable): Unit = {
+      logger.warn(s"Cannot find archive ${command.metadata}", throwable)
+      senderRef ! ArchiveNotFound(command.metadata)
+    }
+    try {
+      storage.retrieve(command.metadata).onComplete {
+        case Success(archive) =>
+          self ! ArchiveRetrieved(command.metadata, archive)
+          senderRef ! RestoreInitiated(metadata)
+        case Failure(throwable) => raiseFailure(throwable)
+      }
+    } catch {
+      case throwable: Throwable => raiseFailure(throwable)
+    }
   }
 
   def getChildActorRef(child: ActorMetadata): ActorRef = {

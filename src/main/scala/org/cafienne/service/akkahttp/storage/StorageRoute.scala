@@ -27,7 +27,7 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.storage.StorageCoordinator
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageActionRejected, StorageCommand}
+import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageActionRejected, StorageCommand, StorageFailure}
 import org.cafienne.storage.archival.command.{ArchiveActorData, RestoreActorData}
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.RemovalCompleted
@@ -78,6 +78,8 @@ object StorageRoute extends LazyLogging {
             complete(StatusCodes.NotFound)
           case _: RemovalCompleted =>
             complete(StatusCodes.NotFound, s"Cannot find ${command.metadata}")
+          case response: StorageFailure =>
+            complete(StatusCodes.NotFound, response.getMessage)
           case other => // Unknown new type of response that is not handled
             logger.error(s"Received an unexpected response after asking ${command.metadata} a command of type ${command.getClass.getSimpleName}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.Accepted)
