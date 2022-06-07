@@ -7,9 +7,7 @@ import org.cafienne.system.health.HealthMonitor
 
 import scala.util.{Failure, Success}
 
-trait QueryDBEventSink extends EventBatchSource with LazyLogging {
-  override def createBatch(persistenceId: String): QueryDBEventBatch
-
+trait QueryDBEventSink extends EventBatchSource[QueryDBEventBatch] with LazyLogging {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   /**

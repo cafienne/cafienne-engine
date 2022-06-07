@@ -12,7 +12,7 @@ import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
   * Reads model events with a certain tag into batches per persistence id.
   * The batches are considered "full" if a CommitEvent is encountered
   */
-trait EventBatchSource extends TaggedEventSource with LazyLogging {
+trait EventBatchSource[T <: EventBatch] extends TaggedEventSource with LazyLogging {
 
   /**
     * This method must be implemented by the consumer to handle the new batch of ModelEvents
@@ -22,21 +22,21 @@ trait EventBatchSource extends TaggedEventSource with LazyLogging {
     *
     * @param persistenceId The id of the ModelActor that produced the batch of events
     */
-  def createBatch(persistenceId: String): EventBatch
+  def createBatch(persistenceId: String): T
 
-  def batches: Source[EventBatch, NotUsed] = {
+  def batches: Source[T, NotUsed] = {
     taggedEvents
       .via(new BatchingFlow) // Join all ModelEvents that resulted from a single ModelCommand into a batch
       .filter(_.isDefined).map(_.get) // Is it possible to do this inside the batching flow?
   }
 
-  class BatchingFlow extends GraphStage[FlowShape[ModelEventEnvelope, Option[EventBatch]]] {
+  class BatchingFlow extends GraphStage[FlowShape[ModelEventEnvelope, Option[T]]] {
     val in: Inlet[ModelEventEnvelope] = Inlet[ModelEventEnvelope]("ModelEvent.BatchingFlow.in")
-    val out: Outlet[Option[EventBatch]] = Outlet[Option[EventBatch]]("ModelEvent.BatchingFlow.out")
-    val shape: FlowShape[ModelEventEnvelope, Option[EventBatch]] = FlowShape.of(in, out)
+    val out: Outlet[Option[T]] = Outlet[Option[T]]("ModelEvent.BatchingFlow.out")
+    val shape: FlowShape[ModelEventEnvelope, Option[T]] = FlowShape.of(in, out)
 
     override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new GraphStageLogic(shape) {
-      val f: ModelEventEnvelope => Option[EventBatch] = updateBatch
+      val f: ModelEventEnvelope => Option[T] = updateBatch
       setHandler(in, () => push(out, f(grab(in))))
       setHandler(out, () => pull(in))
     }
@@ -44,9 +44,9 @@ trait EventBatchSource extends TaggedEventSource with LazyLogging {
     import scala.collection.mutable
 
     // Map with batches per persistenceId that are currently streaming events to us.
-    private val currentBatches = new mutable.HashMap[String, EventBatch]()
+    private val currentBatches = new mutable.HashMap[String, T]()
 
-    private def updateBatch(envelope: ModelEventEnvelope): Option[EventBatch] = {
+    private def updateBatch(envelope: ModelEventEnvelope): Option[T] = {
       val persistenceId = envelope.persistenceId
       // Retrieve existing batch, or create a new one
       val batch = currentBatches.getOrElseUpdate(persistenceId, createBatch(persistenceId))
