@@ -13,7 +13,7 @@ trait QueryDBEventBatch extends EventBatch {
 
   def commit(envelope: ModelEventEnvelope, transactionEvent: CommitEvent): Future[Done]
 
-  override def consume(): Future[Done] = {
+  def consume(): Future[Done] = {
     import scala.concurrent.ExecutionContext.Implicits.global
 
     // Create a chain of futures to be executed on the events

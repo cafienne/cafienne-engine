@@ -30,6 +30,14 @@ trait TaggedEventSource extends ReadJournalProvider with LazyLogging  {
   val tag: String
 
   /**
+    * Query to retrieve the events as Source.
+    * Defaults to journal.eventsByTag, overrides can alternatively use journal.currentEventsByTag
+    * @param offset
+    * @return
+    */
+  def query(offset: Offset): Source[EventEnvelope, NotUsed] = journal().eventsByTag(tag, offset)
+
+  /**
     * Returns the Source
     */
   def taggedEvents: Source[ModelEventEnvelope, NotUsed] =
@@ -46,7 +54,7 @@ trait TaggedEventSource extends ReadJournalProvider with LazyLogging  {
         //  consuming that were consumed already successfully before the source had to be restarted.
         getOffset.map { offset: Offset =>
           logger.warn(s"Starting to read '$tag' events from offset " + offset)
-          journal().eventsByTag(tag, offset)
+          query(offset)
         }
       })
     }
