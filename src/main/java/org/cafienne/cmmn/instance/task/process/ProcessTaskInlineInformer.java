@@ -1,11 +1,12 @@
 package org.cafienne.cmmn.instance.task.process;
 
+import org.cafienne.cmmn.definition.ProcessTaskDefinition;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.implementation.InlineSubProcess;
 
 class ProcessTaskInlineInformer extends ProcessInformer {
 
-    private final InlineSubProcess implementation;
+    private final InlineSubProcess<?> implementation;
 
     public ProcessTaskInlineInformer(ProcessTask task) {
         super(task);
@@ -35,5 +36,10 @@ class ProcessTaskInlineInformer extends ProcessInformer {
     @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
         implementation.reactivate();
+    }
+
+    @Override
+    protected void migrateDefinition(ProcessTaskDefinition newDefinition) {
+        implementation.migrateDefinition(newDefinition.getImplementationDefinition().getInlineImplementation());
     }
 }

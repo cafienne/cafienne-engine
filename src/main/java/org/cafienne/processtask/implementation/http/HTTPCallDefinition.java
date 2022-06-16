@@ -91,23 +91,10 @@ public class HTTPCallDefinition extends SubProcessDefinition {
     }
 
     public boolean sameHTTPCall(HTTPCallDefinition other) {
-        return super.sameSubProcess(other)
+        return sameSubProcess(other)
                 && same(this.contentTemplate, other.contentTemplate)
                 && same(httpMethod, other.httpMethod)
                 && same(sourceURL, other.sourceURL)
-                && sameCollection(httpHeaders, other.httpHeaders);
+                && same(httpHeaders, other.httpHeaders);
     }
-
-    private boolean sameCollection(Collection<?> ours, Collection<?> theirs) {
-        if (ours.size() != theirs.size()) {
-            return false;
-        }
-        for (Object mine : ours) {
-            if (theirs.stream().noneMatch(his -> same(mine, his))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 }

@@ -159,6 +159,7 @@ public class EventSerializers {
         CafienneSerializer.addManifestWrapper(ProcessSuspended.class, ProcessSuspended::new);
         CafienneSerializer.addManifestWrapper(ProcessTerminated.class, ProcessTerminated::new);
         CafienneSerializer.addManifestWrapper(ProcessModified.class, ProcessModified::new);
+        CafienneSerializer.addManifestWrapper(ProcessDefinitionMigrated.class, ProcessDefinitionMigrated::new);
     }
 
     private static void registerTenantEvents() {

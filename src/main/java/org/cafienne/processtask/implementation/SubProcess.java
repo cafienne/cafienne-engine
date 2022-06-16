@@ -13,6 +13,7 @@ import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.definition.SubProcessOutputMappingDefinition;
+import org.cafienne.processtask.implementation.http.HTTPCallDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import java.util.Collection;
 public abstract class SubProcess<T extends SubProcessDefinition> {
     private final static Logger logger = LoggerFactory.getLogger(SubProcess.class);
     protected final ProcessTaskActor processTaskActor;
-    protected final T definition;
+    private T definition;
 
     /**
      * This map contains a typically (fixed) set of variables representing the outcome of the http call. That is: responseCode, responseMessage, output and headers
@@ -43,13 +44,21 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
         this.definition = processDefinition;
     }
 
+    public T getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(T definition) {
+        this.definition = definition;
+    }
+
     protected final void raiseComplete() {
-        transformRawParametersToProcessOutputParameters(definition.getSuccessMappings());
+        transformRawParametersToProcessOutputParameters(getDefinition().getSuccessMappings());
         processTaskActor.completed(processOutputParameters);
     }
 
     protected final void raiseFault(String description) {
-        transformRawParametersToProcessOutputParameters(definition.getFailureMappings());
+        transformRawParametersToProcessOutputParameters(getDefinition().getFailureMappings());
         processTaskActor.failed(description, processOutputParameters);
     }
 
@@ -155,4 +164,9 @@ public abstract class SubProcess<T extends SubProcessDefinition> {
      */
     public abstract void resume();
 
+    public void migrateDefinition(SubProcessDefinition implementation) {
+        processTaskActor.addDebugInfo(() -> "Setting new " + implementation.getClass().getSimpleName());
+        // Somewhere else (in the command MigrateProcessDefinition) we check that this new implementation has the same class
+        setDefinition((T) implementation);
+    }
 }

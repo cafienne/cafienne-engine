@@ -485,10 +485,17 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         if (!sameClass(object)) {
             return false;
         }
-        return matcher.match((E) object);
+
+        // TODO: it will be good if we can create a comparison report (a tree) on the definition and log that.
+        String currentIndent = indent;
+        indent += "  ";
+        boolean isEqual = matcher.match((E) object);
+        indent = currentIndent;
+//        System.out.println(indent + "Comparison result for " + this.getClass().getSimpleName() +"[" + getName() +"] is " + isEqual);
+        return isEqual;
     }
 
-    private static boolean logging = true;
+    private static String indent = "";
 
     /**
      * Find an equal definition in the collection, using the equalsWith method.
@@ -500,7 +507,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      */
     public static <T extends Z, Z extends XMLElementDefinition> T findDefinition(T mine, Collection<Z> theirs) {
         for (Z his : theirs) {
-            if (his.equalsWith(mine)) {
+            if (mine.equalsWith(his)) {
                 return (T) his; // Cast is ok, because it is checked inside the equalsWith method to be the same class.
             }
         }
@@ -534,8 +541,20 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         return obj1 == null && obj2 == null || obj1 != null && obj2 != null && obj1.equalsWith(obj2);
     }
 
+    protected boolean same(String obj1, String obj2) {
+        return Objects.equals(obj1, obj2);
+    }
+
+    protected <E extends Enum<?>> boolean same(E obj1, E obj2) {
+        return Objects.equals(obj1, obj2);
+    }
+
+    protected boolean same(boolean obj1, boolean obj2) {
+        return Objects.equals(obj1, obj2);
+    }
+
     /**
-     * Shortcut to Objects.equalsWith()
+     * Shortcut to Objects.equals()
      */
     protected boolean same(Object obj1, Object obj2) {
         return Objects.equals(obj1, obj2);

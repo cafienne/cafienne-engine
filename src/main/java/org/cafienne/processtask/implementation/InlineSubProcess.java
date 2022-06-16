@@ -162,4 +162,7 @@ public abstract class InlineSubProcess<T extends InlineSubProcessDefinition> {
      */
     public abstract void resume();
 
+    public void migrateDefinition(InlineSubProcessDefinition newDefinition) {
+        addDebugInfo(() -> "Migration ProcessDefinition for this type of inline process is not implemented for task " + task + ".");
+    }
 }

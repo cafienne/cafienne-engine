@@ -8,7 +8,6 @@ import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.processtask.actorapi.event.*;
-import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.system.CaseSystem;
@@ -40,6 +39,14 @@ public class ProcessTaskActor extends ModelActor {
         return msg instanceof ProcessInstanceEvent;
     }
 
+    public ProcessDefinition getDefinition() {
+        return definition;
+    }
+
+    private void setDefinition(ProcessDefinition definition) {
+        this.definition = definition;
+    }
+
     @Override
     public String getParentActorId() {
         return parentActorId;
@@ -60,9 +67,6 @@ public class ProcessTaskActor extends ModelActor {
 
     public <S extends SubProcess<?>> S getImplementation() {
         return (S) taskImplementation;
-    }
-
-    public void updateState(ProcessInstanceEvent event) {
     }
 
     public void updateState(ProcessStarted event) {
@@ -130,6 +134,13 @@ public class ProcessTaskActor extends ModelActor {
         }, success -> {
             addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
         });
+    }
+
+    public void updateState(ProcessDefinitionMigrated event) {
+        addDebugInfo(() -> "====== Migrating ProcessTask["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + event.getNewDefinition().getName() +"\n");
+        setDefinition(event.getNewDefinition());
+        getImplementation().migrateDefinition(event.getNewDefinition().getImplementation());
+        addDebugInfo(() -> "====== Completed Migration on ProcessTask["+getId()+"] with name " + getDefinition().getName());
     }
 
     @Override

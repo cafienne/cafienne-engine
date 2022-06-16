@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.instance.task.process;
 
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.cmmn.definition.ProcessTaskDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
@@ -60,4 +61,13 @@ class ProcessTaskActorInformer extends ProcessInformer {
             return;
         }
         getCaseInstance().askProcess(command, left -> task.goFault(new ValueMap("exception", left.toJson())));
-    }}
+    }
+
+    @Override
+    protected void migrateDefinition(ProcessTaskDefinition newDefinition) {
+        if (task.getState() != State.Null && task.getState() != State.Available) {
+            task.getCaseInstance().addDebugInfo(() -> this + ": telling sub process with id "+task.getId()+" to migrate it's definition");
+            tell(new MigrateProcessDefinition(getCaseInstance().getCurrentUser(), task.getId(), newDefinition.getImplementationDefinition()));
+        }
+    }
+}

@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueMap;
+import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
@@ -55,13 +56,13 @@ public class PDFReport extends SubProcess<PDFReportDefinition> {
             long start = System.currentTimeMillis();
 
             Map<String, Object> jasperParameters = new HashMap<>();
-            jasperParameters.put(JsonQueryExecuterFactory.JSON_INPUT_STREAM, definition.createDataStream(this));
+            jasperParameters.put(JsonQueryExecuterFactory.JSON_INPUT_STREAM, getDefinition().createDataStream(this));
             jasperParameters.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, "yyyy-MM-dd");
             jasperParameters.put(JsonQueryExecuterFactory.JSON_NUMBER_PATTERN, "#,##0.##");
             jasperParameters.put(JsonQueryExecuterFactory.JSON_LOCALE, Locale.ENGLISH);
             jasperParameters.put(JRParameter.REPORT_LOCALE, Locale.US);
 
-            definition.getSubReportDefinitions().forEach(subReport -> {
+            getDefinition().getSubReportDefinitions().forEach(subReport -> {
                 String subReportName = subReport.getSubReportName();
                 try {
                     JasperReport subReportje = subReport.createInstance(this);
@@ -75,7 +76,7 @@ public class PDFReport extends SubProcess<PDFReportDefinition> {
                 }
             });
 
-            JasperReport jReport = definition.getReportDefinition().createInstance(this);
+            JasperReport jReport = getDefinition().getReportDefinition().createInstance(this);
             JasperPrint jPrint = JasperFillManager.fillReport(jReport, jasperParameters);
 
             ByteArrayOutputStream reportOutput = new ByteArrayOutputStream();

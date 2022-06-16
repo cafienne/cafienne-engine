@@ -49,6 +49,6 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
 
     public boolean sameProcessTask(ProcessTaskDefinition other) {
         return sameTask(other)
-                && same(processDefinition, other.processDefinition);
+                && processDefinition.sameProcessDefinition(other.processDefinition);
     }
 }

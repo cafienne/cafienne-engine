@@ -4,9 +4,6 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.processtask.definition.Resolver;
 import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
-import org.cafienne.processtask.implementation.mail.Attachment;
-import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
 public class AttachmentDefinition extends SubProcessInputMappingDefinition {
@@ -37,6 +34,12 @@ public class AttachmentDefinition extends SubProcessInputMappingDefinition {
 
     @Override
     protected boolean equalsWith(Object object) {
-        return notYetImplemented();
+        return equalsWith(object, this::sameAttachmentDefinition);
+    }
+
+    private boolean sameAttachmentDefinition(AttachmentDefinition other) {
+        return super.sameMappingDefinition(other)
+                && same(fileNameResolver, other.fileNameResolver)
+                && same(mimeTypeResolver, other.mimeTypeResolver);
     }
 }

@@ -27,7 +27,7 @@ public class SubProcessInputMappingDefinition extends CMMNElementDefinition {
         this.resolver = createResolver(source);
     }
 
-    protected Resolver parseResolver(String attributeName, boolean presenceRequired, String ...defaultValue) {
+    protected Resolver parseResolver(String attributeName, boolean presenceRequired, String... defaultValue) {
         String attribute = parseAttribute(attributeName, presenceRequired, defaultValue);
         return createResolver(attribute);
     }
@@ -70,6 +70,10 @@ public class SubProcessInputMappingDefinition extends CMMNElementDefinition {
 
     @Override
     protected boolean equalsWith(Object object) {
-        return notYetImplemented();
+        return equalsWith(object, this::sameMappingDefinition);
+    }
+
+    public boolean sameMappingDefinition(SubProcessInputMappingDefinition other) {
+        return same(resolver, other.resolver);
     }
 }

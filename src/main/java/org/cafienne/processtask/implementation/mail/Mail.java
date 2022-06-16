@@ -10,6 +10,7 @@ package org.cafienne.processtask.implementation.mail;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
+import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
@@ -76,7 +77,7 @@ public class Mail extends SubProcess<MailDefinition> {
         processTaskActor.addDebugInfo(() -> "Connecting to mail server");
         long now = System.currentTimeMillis();
 
-        Properties mailServerProperties = definition.getMailProperties();
+        Properties mailServerProperties = getDefinition().getMailProperties();
         String userName = mailServerProperties.get("authentication.user").toString();
         String password = mailServerProperties.get("authentication.password").toString();
         mailSession = Session.getInstance(mailServerProperties, new Authenticator() {
@@ -109,11 +110,11 @@ public class Mail extends SubProcess<MailDefinition> {
             connectMailServer();
 
             // Read email addresses (can be both statically defined or dynamically taken from input parameters)
-            from = resolveAddress(definition.getFrom(), "from");
-            replyTo = resolveAddress(definition.getReplyTo(), "replyTo");
-            toList = resolveAddressList(definition.getToList(), "to");
-            ccList = resolveAddressList(definition.getCcList(), "cc");
-            bccList = resolveAddressList(definition.getBccList(), "bcc");
+            from = resolveAddress(getDefinition().getFrom(), "from");
+            replyTo = resolveAddress(getDefinition().getReplyTo(), "replyTo");
+            toList = resolveAddressList(getDefinition().getToList(), "to");
+            ccList = resolveAddressList(getDefinition().getCcList(), "cc");
+            bccList = resolveAddressList(getDefinition().getBccList(), "bcc");
             subject = resolveSubject();
 
 
@@ -208,22 +209,22 @@ public class Mail extends SubProcess<MailDefinition> {
     }
 
     private String resolveSubject() {
-        if (definition.getSubject() == null) {
+        if (getDefinition().getSubject() == null) {
             return input.has("subject") ? input.get("subject").getValue().toString() : "";
         } else {
-            return definition.getSubject().resolve(processTaskActor);
+            return getDefinition().getSubject().resolve(processTaskActor);
         }
     }
 
     private MailPart resolveBody() throws MessagingException {
-        MailPart body = new MailPart(processTaskActor, definition);
+        MailPart body = new MailPart(processTaskActor, getDefinition());
         processTaskActor.addDebugInfo(() -> "Body: " + body);
         return body;
     }
 
     private List<Attachment> resolveAttachments() {
         // If there are no attachments specified in the definition, we'll check whether there is an input json array called 'attachments'
-        if (definition.getAttachmentList().isEmpty()) {
+        if (getDefinition().getAttachmentList().isEmpty()) {
             // Try to dynamically resolve the attachments based on the "attachments" input parameter.
             return input.withArray("attachments").getValue().stream().filter(value -> {
                 if (!value.isMap()) {
@@ -232,7 +233,7 @@ public class Mail extends SubProcess<MailDefinition> {
                 return value.isMap();
             }).map(Value::asMap).map(map -> new Attachment(map, processTaskActor)).filter(Attachment::hasContent).collect(Collectors.toList());
         } else {
-            return definition.getAttachmentList().stream().map(definition -> new Attachment(definition, processTaskActor)).filter(Attachment::hasContent).collect(Collectors.toList());
+            return getDefinition().getAttachmentList().stream().map(definition -> new Attachment(definition, processTaskActor)).filter(Attachment::hasContent).collect(Collectors.toList());
         }
     }
 

@@ -14,17 +14,18 @@ import java.util.LinkedHashMap;
  * Enables multi-expression evaluation of process input parameters,
  * based on the apache commons text {@link StringSubstitutor}.
  */
-public class Resolver {
+public class Resolver extends CMMNElementDefinition {
     private final Action action;
     private final String source;
-    private final CMMNElementDefinition definition;
+    private final SubProcessInputMappingDefinition definition;
 
     @FunctionalInterface
     private interface Action {
         Object evaluate(APIRootObject<?> rootObject);
     }
 
-    public Resolver(CMMNElementDefinition definition, String source) {
+    public Resolver(SubProcessInputMappingDefinition definition, String source) {
+        super(definition.getElement(), definition.getModelDefinition(), definition);
         this.definition = definition;
         this.source = source;
         this.action = parseSource();
@@ -88,5 +89,14 @@ public class Resolver {
         } else {
             return (T) outcome;
         }
+    }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameResolver);
+    }
+
+    protected boolean sameResolver(Resolver other) {
+        return getSource().equals(other.getSource());
     }
 }
