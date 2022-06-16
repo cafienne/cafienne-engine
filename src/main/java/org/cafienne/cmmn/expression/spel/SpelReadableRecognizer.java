@@ -28,7 +28,7 @@ public class SpelReadableRecognizer implements PropertyAccessor {
     }
 
     @Override
-    public boolean canRead(EvaluationContext context, Object object, String propertyName) throws AccessException {
+    public boolean canRead(EvaluationContext context, Object object, String propertyName) {
         boolean canRead = false;
         if (object instanceof SpelReadable) {
             canRead = ((SpelReadable) object).canRead(propertyName);
@@ -37,7 +37,7 @@ public class SpelReadableRecognizer implements PropertyAccessor {
     }
 
     @Override
-    public TypedValue read(EvaluationContext arg0, Object object, String propertyName) throws AccessException {
+    public TypedValue read(EvaluationContext arg0, Object object, String propertyName) {
         if (object instanceof SpelReadable) {
             // Read the value
             Object value = ((SpelReadable) object).read(propertyName);

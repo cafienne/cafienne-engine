@@ -42,12 +42,17 @@ public class Resolver extends CMMNElementDefinition {
         //    In that case, the outcome of evaluation is always concatenated to a string.
         final LinkedHashMap<String, Evaluator> parsedExpressions = new LinkedHashMap<>();
         new StringSubstitutor(expression -> {
-            Evaluator parsedExpression = new Evaluator(definition, expression);
-            if (parsedExpression.isValid()) {
-                parsedExpressions.put(expression, parsedExpression);
+            if (getProcessDefinition().getInputParameters().containsKey(expression)) {
+                parsedExpressions.put(expression, new ParameterEvaluator(definition, expression));
                 return expression;
             } else {
-                return ""; // Error is added while parsing
+                Evaluator parsedExpression = new Evaluator(definition, expression);
+                if (parsedExpression.isValid()) {
+                    parsedExpressions.put(expression, parsedExpression);
+                    return expression;
+                } else {
+                    return ""; // Error is added while parsing
+                }
             }
         }).replace(source);
 

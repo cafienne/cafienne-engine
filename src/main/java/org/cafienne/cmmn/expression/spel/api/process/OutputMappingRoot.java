@@ -24,6 +24,6 @@ public class OutputMappingRoot extends ProcessActorRootObject {
 
     @Override
     public String getDescription() {
-        return " mapping process output '" + rawParameter.getName() + "' to '" + targetParameter.getName() + "'";
+        return "mapping process output '" + rawParameter.getName() + "' to '" + targetParameter.getName() + "'";
     }
 }

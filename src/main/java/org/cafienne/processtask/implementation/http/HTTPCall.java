@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,10 +7,8 @@
  */
 package org.cafienne.processtask.implementation.http;
 
-import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

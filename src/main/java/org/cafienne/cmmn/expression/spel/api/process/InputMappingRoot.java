@@ -15,6 +15,6 @@ public class InputMappingRoot extends ProcessActorRootObject {
 
     @Override
     public String getDescription() {
-        return " mapping process input";
+        return "mapping process input";
     }
 }
