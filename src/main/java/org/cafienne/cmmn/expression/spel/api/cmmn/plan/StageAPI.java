@@ -2,6 +2,7 @@ package org.cafienne.cmmn.expression.spel.api.cmmn.plan;
 
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.Task;
 
 import java.util.*;
 

@@ -61,7 +61,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
             return;
         }
         CaseCommand command = createIfParent.createCommand();
-        getCaseInstance().askCase(command, failure ->
+        getCaseInstance().informParent(command, failure ->
             // TTD: this needs better handling
 
             // Wow, now what? CaseTask did not accept our information, but why??

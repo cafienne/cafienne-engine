@@ -176,7 +176,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @param transition
      * @return
      */
-    boolean prepareTransition(Transition transition) {
+    protected boolean prepareTransition(Transition transition) {
         if (nextTransition != Transition.None) {
             addDebugInfo(() -> this + ": trying to prepareTransition " + transition + " on " + this + ", but we are already transitioning " + nextTransition);
             return false;

@@ -35,4 +35,3 @@ abstract class ProcessInformer {
 
     abstract protected void migrateDefinition(ProcessTaskDefinition newDefinition);
 }
-

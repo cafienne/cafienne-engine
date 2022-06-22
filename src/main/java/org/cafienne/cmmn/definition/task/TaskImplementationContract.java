@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition.task;
 
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
+import org.cafienne.cmmn.instance.Task;
 
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  * In practice, however, {@HumanTask} is typically associated with a workflow implementation, providing for it's own lifecycle.
  * The engine also provides an extension on top of CMMN to enable workflow.
  * <p>
- * With that, every {@link org.cafienne.cmmn.instance.Task} has an implementation, and there is mapping and binding of parameters to each implementation.
+ * With that, every {@link Task} has an implementation, and there is mapping and binding of parameters to each implementation.
  * The engine has abstracted this binding in the {@link TaskImplementationContract}, describing the inputs and outputs of the implementation.
  * See also {@link org.cafienne.cmmn.definition.CaseDefinition}, {@link org.cafienne.processtask.definition.ProcessDefinition} & {@link WorkflowTaskDefinition}
  */

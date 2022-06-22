@@ -11,6 +11,8 @@ import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
 import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.*;
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskCommandRejected;
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskImplementationStarted;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
 import org.cafienne.cmmn.actorapi.event.team.deprecated.member.CaseOwnerAdded;
@@ -109,6 +111,8 @@ public class EventSerializers {
         CafienneSerializer.addManifestWrapper(RequiredRuleEvaluated.class, RequiredRuleEvaluated::new);
         CafienneSerializer.addManifestWrapper(TaskInputFilled.class, TaskInputFilled::new);
         CafienneSerializer.addManifestWrapper(TaskOutputFilled.class, TaskOutputFilled::new);
+        CafienneSerializer.addManifestWrapper(TaskImplementationStarted.class, TaskImplementationStarted::new);
+        CafienneSerializer.addManifestWrapper(TaskCommandRejected.class, TaskCommandRejected::new);
         CafienneSerializer.addManifestWrapper(TimerSet.class, TimerSet::new);
         CafienneSerializer.addManifestWrapper(TimerCompleted.class, TimerCompleted::new);
         CafienneSerializer.addManifestWrapper(TimerTerminated.class, TimerTerminated::new);

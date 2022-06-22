@@ -20,7 +20,7 @@ class TimerJob(val timerService: TimerService, val timer: Timer, val scheduler: 
 
   def run(): Unit = {
     logger.whenDebugEnabled(logger.debug(s"Raising timer in case ${timer.caseInstanceId} for timer ${timer.timerId} on behalf of user ${timer.userId}"))
-    timerService.askCase(command, handleFailingCaseInvocation, handleCaseInvocation)
+    timerService.askModel(command, handleFailingCaseInvocation, handleCaseInvocation)
   }
 
   def cancel(): Boolean = {

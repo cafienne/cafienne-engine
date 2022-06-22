@@ -118,7 +118,7 @@ public class ProcessTaskActor extends ModelActor {
         this.outputParameters = event.output;
         addDebugInfo(() -> "Completing process task " + name + " of process type " + getImplementation().getClass().getName() + " with output:", outputParameters);
         if (recoveryFinished()) {
-            askCase(new CompleteTask(this, outputParameters),
+            informParent(new CompleteTask(this, outputParameters),
                     failure -> {
                         addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
                         logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
@@ -129,7 +129,7 @@ public class ProcessTaskActor extends ModelActor {
 
     public void updateState(ProcessFailed event) {
         outputParameters = event.output;
-        askCase(new FailTask(this, outputParameters), failure -> {
+        informParent(new FailTask(this, outputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
         }, success -> {
             addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");

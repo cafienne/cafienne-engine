@@ -10,7 +10,6 @@ package org.cafienne.cmmn.instance.parameter;
 import org.cafienne.cmmn.definition.parameter.BindingOperation;
 import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
-import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;

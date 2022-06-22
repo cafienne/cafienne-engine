@@ -15,6 +15,10 @@ public abstract class TaskStage<T extends PlanItemDefinitionDefinition> extends 
         super(id, index, itemDefinition, definition, caseInstance, parent, stateMachine);
     }
 
+    protected TaskStage(String id, int index, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage<?> parent) {
+        this(id, index, itemDefinition, definition, caseInstance, parent, StateMachine.TaskStage);
+    }
+
     /**
      * Entry transition comes out of the evalutation of ManualActivationRule.
      * This is currently not stored as an event in the journal. You may well consider that a bug.

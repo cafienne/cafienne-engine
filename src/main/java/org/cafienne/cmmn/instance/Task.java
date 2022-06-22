@@ -7,9 +7,10 @@
  */
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled;
+import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.cmmn.actorapi.event.plan.task.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
 import org.cafienne.cmmn.definition.TaskDefinition;
@@ -33,8 +34,10 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     private ValueMap givenOutput = new ValueMap();
     private ValueMap taskOutput = new ValueMap();
 
+    private final TaskImplementationActorState implementationState = new TaskImplementationActorState(this);
+
     protected Task(String id, int index, ItemDefinition itemDefinition, D definition, Stage<?> stage) {
-        super(id, index, itemDefinition, definition, stage.getCaseInstance(), stage, StateMachine.TaskStage);
+        super(id, index, itemDefinition, definition, stage.getCaseInstance(), stage);
     }
 
     @Override
@@ -48,7 +51,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     @Override
     final protected void startInstance() {
         transformInputParameters();
-        startImplementation(implementationInput);
+        startImplementation(getMappedInputParameters());
     }
 
     abstract protected void startImplementation(ValueMap inputParameters);
@@ -62,7 +65,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     @Override
     protected void reactivateInstance() {
         transformInputParameters();
-        reactivateImplementation(implementationInput);
+        reactivateImplementation(getMappedInputParameters());
     }
 
     abstract protected void reactivateImplementation(ValueMap inputParameters);
@@ -255,6 +258,14 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
         paramXML.appendChild(valueNode);
     }
 
+    public void updateState(TaskImplementationStarted event) {
+        getImplementationState().updateState(event);
+    }
+
+    public void updateState(TaskCommandRejected event) {
+        getImplementationState().updateState(event);
+    }
+
     public void updateState(TaskInputFilled event) {
         this.taskInput = event.getTaskInputParameters();
         this.implementationInput = event.getMappedInputParameters();
@@ -273,5 +284,104 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
             TaskOutputParameter outputParameter = new TaskOutputParameter(definition, this, value);
             outputParameter.bind();
         });
+    }
+
+    @Override
+    protected void migrateItemDefinition(ItemDefinition newItemDefinition, D newDefinition) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition);
+        if (hasNewMappings()) {
+            if (getState().isAlive()) {
+                addDebugInfo(() -> "Found new mapping definitions in task " + this +", transforming input parameters");
+                transformInputParameters();
+            }
+        }
+    }
+
+    private boolean hasNewMappings() {
+        return ! getPreviousDefinition().sameMappings(getDefinition());
+    }
+
+    public void startTaskImplementation(ModelCommand command) {
+        getCaseInstance().informImplementation(command, left -> handleRejection(command, left), right -> handleTaskStarted());
+    }
+
+    void handleTaskStarted() {
+        getCaseInstance().addEvent(new TaskImplementationStarted(this));
+        if (!getDefinition().isBlocking()) {
+            goComplete(new ValueMap());
+        }
+    }
+
+    void handleRejection(ModelCommand command, CommandFailure failure) {
+        getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
+    }
+
+    public void tellTaskImplementation(ModelCommand command) {
+        if (!getDefinition().isBlocking()) {
+            return;
+        }
+        getCaseInstance().informImplementation(command, left -> handleRejection(command, left));
+    }
+
+    public void giveNewDefinition(ModelCommand command) {
+        if (getState().isInitiated()) {
+            if (getImplementationState().isStarted()) {
+                getCaseInstance().addDebugInfo(() -> this + ": informing task implementation about new definition");
+                // Apparently process has failed so we can trying again
+                tellTaskImplementation(command);
+            } else {
+                getCaseInstance().addDebugInfo(() -> this + ": skipping definition migration for task implementation - task implementation state indicates it is not yet started. Hence upon start or reactivate the definition will be updated");
+            }
+        }
+
+    }
+
+    public TaskImplementationActorState getImplementationState() {
+        return implementationState;
+    }
+
+    public static class TaskImplementationActorState {
+        private final Task<?> task;
+        private boolean isStarted = false;
+        private boolean foundFailure = false;
+
+        TaskImplementationActorState(Task task) {
+            this.task = task;
+        }
+
+        public boolean isStarted() {
+            // For backwards compatibility:
+            //  If a task is successfully started in older versions of Cafienne, it will be in state Active;
+            //  However, if the task , but in older cases
+            //  the state of the task interaction is not stored.
+            //  In
+
+            return isStarted || (!foundFailure && task.getState().isAlive() );
+        }
+
+        public boolean foundFailures() {
+            return foundFailure;
+        }
+
+        void updateState(TaskImplementationStarted event) {
+            task.addDebugInfo(() -> "Task " + task +" confirmed a successful start.");
+            isStarted = true;
+        }
+
+        void updateState(TaskCommandRejected event) {
+            task.addDebugInfo(() -> "Task " + task +" reported a command rejection.", event.rawJson());
+            foundFailure = true;
+        }
+
+        @Override
+        public String toString() {
+            return "TaskImplementationActorState{" +
+                    "task=" + task +
+                    ", task.state=" + task.getState() +
+                    ", isStarted=" + isStarted +
+                    ", foundFailure=" + foundFailure +
+                    ", isStarted()=" + isStarted() +
+                    '}';
+        }
     }
 }

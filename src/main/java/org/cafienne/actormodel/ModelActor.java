@@ -246,30 +246,23 @@ public abstract class ModelActor extends AbstractPersistentActor {
         }
     }
 
+    public void informImplementation(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
+        askModel(command, left, right);
+    }
+
+    public void informParent(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
+        askModel(command, left, right);
+    }
+
     /**
-     * askCase allows inter-case communication. One case (or, typically, a plan item's special logic) can ask another case to execute
+     * askModel allows communication between ModelActors. One case (or, typically, a plan item's special logic) can ask another case to execute
      * a command, and when the response is received back from the other case, the handler is invoked with that response.
      * Note that nothing will be sent to the other actor when recovery is running.
      *
-     * @param command
+     * @param command The message to send
      * @param left    Listener to handle response failures.
      * @param right   Optional listener to handle response success.
      */
-    public void askCase(CaseCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
-    /**
-     * Similar to {@link #askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)}
-     *
-     * @param command
-     * @param left
-     * @param right
-     */
-    public void askProcess(ProcessCommand command, CommandFailureListener left, CommandResponseListener... right) {
-        askModel(command, left, right);
-    }
-
     public void askModel(ModelCommand command, CommandFailureListener left, CommandResponseListener... right) {
         if (recoveryRunning()) {
 //            System.out.println("Ignoring request to send command of type " + command.getClass().getName()+" because recovery is running");
