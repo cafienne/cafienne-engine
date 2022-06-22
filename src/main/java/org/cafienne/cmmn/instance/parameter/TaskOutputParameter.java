@@ -34,7 +34,7 @@ public class TaskOutputParameter extends TaskParameter<TaskOutputParameterDefini
         addDebugInfo(() -> "Validating property types of a " + item.getName() + " against value ", value);
         item.getDefinition().validatePropertyTypes(value);
 
-        if (item.getState() == State.Discarded) {
+        if (item.getState().isDiscarded()) {
             addDebugInfo(() -> "Cannot bind parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "], since the item is in state Discarded");
             throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
         }

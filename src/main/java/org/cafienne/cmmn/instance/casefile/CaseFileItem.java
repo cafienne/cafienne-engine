@@ -226,7 +226,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
             // Replace all existing, Available children with "null"
             getDefinition().getChildren().forEach(childDefinition -> {
                 CaseFileItem item = getItem(childDefinition.getName());
-                if (item.getState() == State.Available) {
+                if (item.getState().isAvailable()) {
                     item.deleteContent();
                 }
             });
@@ -238,9 +238,9 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 if (map.has(childName)) {
                     Value<?> newChildValue = map.get(childName);
                     CaseFileItem item = getItem(childName);
-                    if (item.getState() == State.Available) {
+                    if (item.getState().isAvailable()) {
                         item.replaceContent(newChildValue);
-                    } else if (item.getState() == State.Null && map.has(childName)) {
+                    } else if (item.getState().isNull() && map.has(childName)) {
                         item.createContent(map.get(childName));
                     }
                 }
@@ -281,7 +281,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
 
         // First check whether we should be triggering Create or Update.
         //  For Create logic is straightforward, for Update we need to do little more.
-        if (this.getState() == State.Null) {
+        if (this.getState().isNull()) {
             createContent(newContent);
             return;
         }
@@ -359,7 +359,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
         // EVENT ORDER for Delete Content: first delete children, then ourselves (optionally)
 
         // First recursively delete all of our 'Available' children...
-        getItems().stream().filter(item -> item.getState() == State.Available).forEach(CaseFileItem::deleteContent);
+        getItems().stream().filter(item -> item.getState().isAvailable()).forEach(CaseFileItem::deleteContent);
         // Only generate the event if we're not yet in discarded state.
         if (getState() != State.Discarded) addDeletedEvent(new CaseFileItemDeleted(this));
     }
@@ -534,7 +534,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     @Override
     public void validateTransition(CaseFileItemTransition intendedTransition, Value<?> content) {
         if (parent != null) {
-            if (parent.getState() == State.Discarded || parent.getState() == State.Null) {
+            if (parent.getState().isDiscarded() || parent.getState().isNull()) {
                 throw new CaseFileError(intendedTransition + "CaseFileItem[" + getPath() + "] cannot be done because the parent is in state " + parent.getState());
             }
         }

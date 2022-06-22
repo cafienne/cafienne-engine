@@ -62,7 +62,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             return null;
         }
         PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, planItemId, index));
-        if (this.getState() == State.Active) {
+        if (this.getState().isActive()) {
             // Only generate a start transition for the new discretionary item if this stage is active.
             //  Otherwise the start transition will be generated when this stage becomes active.
             pic.getCreatedPlanItem().makeTransition(Transition.Create);
@@ -163,7 +163,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         });
         for (PlanItem<?> childItem : planItems) {
             // There shouldn't be any active item.
-            if (childItem.getState() == State.Active) {
+            if (childItem.getState().isActive()) {
                 addDebugInfo(() -> "*** " + this + " cannot auto complete, because '" + childItem.toDescription() + "' is still Active");
                 return false;
             }

@@ -102,7 +102,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
 
     protected boolean allowTransition(CaseFileItemTransition intendedTransition) {
         // In CaseFileItemArray it is allowed to add new items to the existing array (through Create method)
-        if (this.getState() == State.Available && intendedTransition == CaseFileItemTransition.Create) return true;
+        if (this.getState().isAvailable() && intendedTransition == CaseFileItemTransition.Create) return true;
         return super.allowTransition(intendedTransition);
     }
 
@@ -118,7 +118,7 @@ public class CaseFileItemArray extends CaseFileItem implements List<CaseFileItem
         if (actualArrayItems.isEmpty()) {
             return State.Null;
         } else {
-            long available = actualArrayItems.stream().filter(item -> item.getState() == State.Available).count();
+            long available = actualArrayItems.stream().filter(item -> item.getState().isAvailable()).count();
             if (available > 0) {
                 return State.Available;
             } else {

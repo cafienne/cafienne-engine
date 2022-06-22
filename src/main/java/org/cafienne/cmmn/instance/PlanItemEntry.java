@@ -54,7 +54,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
 
     @Override
     public void satisfy(Criterion<?> criterion) {
-        if (item.getState() == State.Null) {
+        if (item.getState().isNull()) {
             // Criterion is an early bird considering our state, let's put it in the waiting room until our lifecycle starts
             earlyBird = criterion;
             return;
@@ -63,7 +63,7 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
     }
 
     private void handleCriterionSatisfied(Criterion<?> criterion) {
-        if (item.getIndex() == 0 && item.getState() == State.Available) {
+        if (item.getIndex() == 0 && item.getState().isAvailable()) {
             // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
             //  and also for the very first time. Therefore we should not yet repeat, but only make the
             //  entry transition.

@@ -616,7 +616,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
         super.migrateDefinition(newDefinition);
         setItemDefinition(newItemDefinition);
-        if (getState() != State.Null) {
+        if (getState().isCreated()) {
             if (hasNewNameOrId()) {
                 // Add a migration event if name or id has changed
                 addEvent(new PlanItemMigrated(this));

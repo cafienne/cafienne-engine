@@ -97,7 +97,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     @Override
     public void migrateItemDefinition(ItemDefinition newItemDefinition, CaseTaskDefinition newDefinition) {
         super.migrateItemDefinition(newItemDefinition, newDefinition);
-        if (this.getState() != State.Null && this.getState() != State.Available) {
+        if (this.getState().isInitiated()) {
             addDebugInfo(() -> this + ": telling sub case with id "+this.getId()+" to migrate it's definition");
             CaseDefinition subCaseDefinition = newDefinition.getImplementationDefinition();
             getCaseInstance().askCase(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), subCaseDefinition),
