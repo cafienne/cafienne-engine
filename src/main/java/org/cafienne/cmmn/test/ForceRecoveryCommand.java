@@ -11,6 +11,7 @@ import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -22,6 +23,10 @@ import java.io.IOException;
  */
 @Manifest
 public class ForceRecoveryCommand extends TestScriptCommand {
+    static {
+        CafienneSerializer.addManifestWrapper(ForceRecoveryCommand.class, ForceRecoveryCommand::new);
+    }
+
     public ForceRecoveryCommand(String tenant, CaseUserIdentity user, String caseInstanceId) {
         super(tenant, user, caseInstanceId);
     }

@@ -39,7 +39,7 @@ class BackOffice {
         StagingArea stagingArea = reception.warehouse.prepareNextShipment(message);
         if (message.isCommand()) {
             ModelCommand command = message.asCommand();
-            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getCommandDescription() , command.toJson());
+            actor.addDebugInfo(() -> "---------- User " + command.getUser().id() + " in " + actor + " starts command " + command.getCommandDescription() , command.rawJson());
 
             try {
                 // First, simple, validation

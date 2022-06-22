@@ -4,7 +4,7 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
 
 public interface ModelCommand extends IncomingActorMessage {
     /**
@@ -43,7 +43,7 @@ public interface ModelCommand extends IncomingActorMessage {
     /**
      * Return a ValueMap serialization of the command
      */
-    Value<?> toJson();
+    ValueMap rawJson();
 
     @Override
     default boolean isCommand() {

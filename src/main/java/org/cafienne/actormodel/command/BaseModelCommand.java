@@ -9,6 +9,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
@@ -154,7 +155,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
         return "Command [" + getCommandDescription() + "]" + super.toString();
     }
 
-    public Value<?> toJson() {
+    public ValueMap rawJson() {
         JsonFactory factory = new JsonFactory();
         StringWriter sw = new StringWriter();
         try {
@@ -162,7 +163,8 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
             generator.setPrettyPrinter(new DefaultPrettyPrinter());
             writeThisObject(generator);
             generator.close();
-            return JSONReader.parse(sw.toString());
+            Value<?> json = JSONReader.parse(sw.toString());
+            return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
         } catch (IOException | JSONParseFailure e) {
             return new ValueMap("message", "Could not make JSON out of command "+getClass().getName(), "exception", Value.convertThrowable(e));
         }
