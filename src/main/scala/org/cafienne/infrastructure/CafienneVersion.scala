@@ -1,21 +1,10 @@
 package org.cafienne.infrastructure
 
 import org.cafienne.BuildInfo
-import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.json.{JSONReader, Value, ValueMap}
 
-class CafienneVersion(val json: ValueMap = Value.convert(BuildInfo.toMap).asMap) {
-  val description: String = {
-    var headCommit = json.get("gitHeadCommit").toString
-    if (headCommit.startsWith("Some(")) {
-      headCommit = headCommit.substring(5, headCommit.length - 1)
-    }
-    if (json.get("gitCurrentBranch").equals(headCommit)) {
-      json.get("version").getValue.toString
-    } else {
-      "branch " + json.get("gitCurrentBranch") + " (" + json.get("version") + ")"
-    }
-  }
-
+// Note: json creation is somewhat cumbersome, but it is required in order to have the comparison mechanism work properly.
+class CafienneVersion(val json: ValueMap = JSONReader.parse(Value.convert(BuildInfo.toMap).asMap.toString).asInstanceOf[ValueMap]) {
   /**
     * Returns true if the two versions differ, false if they are the same.
     *

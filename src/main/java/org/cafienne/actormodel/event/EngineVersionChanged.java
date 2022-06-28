@@ -29,11 +29,6 @@ public class EngineVersionChanged extends BaseModelEvent<ModelActor> {
         actor.setEngineVersion(this.version);
     }
 
-    @Override
-    public String getDescription() {
-        return super.getDescription() +" to " + version.description();
-    }
-
     /**
      * Returns the version of the engine that is currently applied in the case
      * @return
