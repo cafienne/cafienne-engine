@@ -10,7 +10,8 @@ package org.cafienne.service.akkahttp.cases.route
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.media.{Content, Schema}
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
@@ -29,8 +30,8 @@ class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute
       startMigration
     }
 
-  @Path("/{caseInstanceId}/migration/start")
-  @GET
+  @Path("/{caseInstanceId}/migrate-definition")
+  @POST
   @Operation(
     summary = "Start migration of a case to a new definition",
     description = "Start migration of a case to a new definition",
@@ -44,6 +45,7 @@ class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute
       new ApiResponse(description = "Case not found", responseCode = "404")
     )
   )
+  @RequestBody(description = "case", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[MigrationDefinitionFormat]))))
   @Produces(Array("application/json"))
   def startMigration: Route = post {
     caseInstanceSubRoute { (user, caseInstanceId) =>

@@ -8,7 +8,6 @@ import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
 import org.cafienne.processtask.actorapi.event.*;
-import org.cafienne.processtask.actorapi.response.ProcessResponse;
 import org.cafienne.processtask.definition.ProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.system.CaseSystem;
@@ -40,6 +39,14 @@ public class ProcessTaskActor extends ModelActor {
         return msg instanceof ProcessInstanceEvent;
     }
 
+    public ProcessDefinition getDefinition() {
+        return definition;
+    }
+
+    private void setDefinition(ProcessDefinition definition) {
+        this.definition = definition;
+    }
+
     @Override
     public String getParentActorId() {
         return parentActorId;
@@ -60,9 +67,6 @@ public class ProcessTaskActor extends ModelActor {
 
     public <S extends SubProcess<?>> S getImplementation() {
         return (S) taskImplementation;
-    }
-
-    public void updateState(ProcessInstanceEvent event) {
     }
 
     public void updateState(ProcessStarted event) {
@@ -114,7 +118,7 @@ public class ProcessTaskActor extends ModelActor {
         this.outputParameters = event.output;
         addDebugInfo(() -> "Completing process task " + name + " of process type " + getImplementation().getClass().getName() + " with output:", outputParameters);
         if (recoveryFinished()) {
-            askCase(new CompleteTask(this, outputParameters),
+            informParent(new CompleteTask(this, outputParameters),
                     failure -> {
                         addDebugInfo(() -> "Could not complete process task " + getId() + " " + name + " in parent, due to:", failure.toJson());
                         logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
@@ -125,11 +129,18 @@ public class ProcessTaskActor extends ModelActor {
 
     public void updateState(ProcessFailed event) {
         outputParameters = event.output;
-        askCase(new FailTask(this, outputParameters), failure -> {
+        informParent(new FailTask(this, outputParameters), failure -> {
             logger.error("Could not complete process task " + getId() + " " + name + " in parent, due to:\n" + failure);
         }, success -> {
             addDebugInfo(() -> "Reporting failure of process task " + getId() + " " + name + " in parent was accepted");
         });
+    }
+
+    public void updateState(ProcessDefinitionMigrated event) {
+        addDebugInfo(() -> "====== Migrating ProcessTask["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + event.getNewDefinition().getName() +"\n");
+        setDefinition(event.getNewDefinition());
+        getImplementation().migrateDefinition(event.getNewDefinition().getImplementation());
+        addDebugInfo(() -> "====== Completed Migration on ProcessTask["+getId()+"] with name " + getDefinition().getName());
     }
 
     @Override

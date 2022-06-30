@@ -31,7 +31,7 @@ public class Evaluator {
         return expression;
     }
 
-    private Expression parseExpression() {
+    protected Expression parseExpression() {
         if (source.isBlank()) {
             // Empty expressions lead to IllegalStateException("no node") --> checking here gives a somewhat more understandable error ...
             definition.getModelDefinition().addDefinitionError(definition.getContextDescription() + " has no expression");
@@ -47,27 +47,37 @@ public class Evaluator {
     }
 
     public <T> T evaluate(APIRootObject<?> rootObject) {
-        ModelActor actor = rootObject.getActor();
         // System.out.println("Now evaluating the expression " + definition.getBody());
         StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
-        // The case file accessor can be used to dynamically resolve properties that belong to the case file
-        SpelReadableRecognizer spelPropertyReader = new SpelReadableRecognizer(actor);
+        // The property reader can dynamically resolve properties that belong to the ModelActor context.
+        SpelReadableRecognizer spelPropertyReader = new SpelReadableRecognizer(rootObject.getActor());
         context.addPropertyAccessor(spelPropertyReader);
 
-        // TODO: improve the type checking and raise better error message if we're getting back the wrong type.
+        return returnValue(rootObject, () -> expression.getValue(context));
+    }
 
+    protected <T> T returnValue(APIRootObject<?> rootObject, ExpressionRunner runner) {
+        rootObject.getActor().addDebugInfo(() -> "Evaluating " + rootObject.getDescription() + ". Expression: " + source.trim());
         try {
-            actor.addDebugInfo(() -> "Evaluating " + rootObject.getDescription() + ": " + source.trim());
-            // Not checking it. If it fails, it really fails.
+            // Java has no support for typechecking the outcome on the generic T.
+            //  Hence we add a log message with the actual return type and the value.
+            //  Further down the thread of execution a check for typesafety can be done, otherwise a ClassCastExeption will pop up.
             @SuppressWarnings("unchecked")
-            T value = (T) expression.getValue(context);
+            T value = (T) runner.calculate();
             String valueType = value == null ? "NULL" : value.getClass().getSimpleName();
-            actor.addDebugInfo(() -> "Outcome has type " + valueType + " and value: " + value);
+            rootObject.getActor().addDebugInfo(() -> "Outcome has type " + valueType + " and value: " + value);
             return value;
         } catch (EvaluationException invalidExpression) {
-            actor.addDebugInfo(() -> "Failure in evaluating " + rootObject.getDescription() + ", with expression " + source.trim(), invalidExpression);
+            rootObject.getActor().addDebugInfo(() -> "Failure in evaluating " + rootObject.getDescription() + ", with expression " + source.trim(), invalidExpression);
             throw new InvalidExpressionException("Could not evaluate " + expression.getExpressionString() + "\n" + invalidExpression.getLocalizedMessage(), invalidExpression);
+        } catch (Exception exception) {
+            rootObject.getActor().addDebugInfo(() -> "Failure in evaluating " + rootObject.getDescription() + ", with expression " + source.trim(), exception);
+            throw new InvalidExpressionException("Error during evaluation of " + expression.getExpressionString() + "\n" + exception.getLocalizedMessage(), exception);
         }
     }
 
+    @FunctionalInterface
+    public interface ExpressionRunner {
+        Object calculate();
+    }
 }

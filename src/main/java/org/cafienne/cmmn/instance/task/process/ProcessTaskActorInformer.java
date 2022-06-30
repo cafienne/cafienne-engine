@@ -1,6 +1,7 @@
 package org.cafienne.cmmn.instance.task.process;
 
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.cmmn.definition.ProcessTaskDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.command.*;
@@ -20,24 +21,19 @@ class ProcessTaskActorInformer extends ProcessInformer {
         final String rootActorId = task.getCaseInstance().getRootActorId();
         final String parentId = task.getCaseInstance().getId();
         final boolean debugMode = task.getCaseInstance().debugMode();
+        final StartProcess command = new StartProcess(user, tenant, taskId, taskName, task.getDefinition().getImplementationDefinition(), inputParameters, parentId, rootActorId, debugMode);
 
-        getCaseInstance().askProcess(new StartProcess(user, tenant, taskId, taskName, task.getDefinition().getImplementationDefinition(), inputParameters, parentId, rootActorId, debugMode),
-                left -> task.goFault(new ValueMap("exception", left.toJson())),
-                right -> {
-                    if (!task.getDefinition().isBlocking()) {
-                        task.goComplete(new ValueMap());
-                    }
-                });
+        task.startTaskImplementation(command);
     }
 
     @Override
     protected void suspendInstance() {
-        tell(new SuspendProcess(getCaseInstance().getCurrentUser(), task.getId()));
+        task.tellTaskImplementation(new SuspendProcess(getCaseInstance().getCurrentUser(), task.getId()));
     }
 
     @Override
     protected void resumeInstance() {
-        tell(new ResumeProcess(getCaseInstance().getCurrentUser(), task.getId()));
+        task.tellTaskImplementation(new ResumeProcess(getCaseInstance().getCurrentUser(), task.getId()));
     }
 
     @Override
@@ -45,19 +41,25 @@ class ProcessTaskActorInformer extends ProcessInformer {
         if (task.getHistoryState() == State.Available) {
             getCaseInstance().addDebugInfo(() -> "Terminating process task '" + task.getName() + "' without it being started; no need to inform the task actor");
         } else {
-            tell(new TerminateProcess(getCaseInstance().getCurrentUser(), task.getId()));
+            task.tellTaskImplementation(new TerminateProcess(getCaseInstance().getCurrentUser(), task.getId()));
         }
     }
 
     @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
-        // Apparently process has failed so we can trying again
-        tell(new ReactivateProcess(getCaseInstance().getCurrentUser(), task.getId(), inputParameters));
+        // TODO: reactivate is invoked after actual state has become active again,
+        //  and that means that task.getImplementationState.getStarted returns the wrong value
+        // NOT SURE WHAT THE IMPACT OF SUCH A SCENARIO is
+        if (task.getImplementationState().isStarted()) {
+            // Apparently process has failed so we can trying again
+            task.tellTaskImplementation(new ReactivateProcess(getCaseInstance().getCurrentUser(), task.getId(), inputParameters));
+        } else {
+            startImplementation(inputParameters);
+        }
     }
 
-    private void tell(ProcessCommand command) {
-        if (!task.getDefinition().isBlocking()) {
-            return;
-        }
-        getCaseInstance().askProcess(command, left -> task.goFault(new ValueMap("exception", left.toJson())));
-    }}
+    @Override
+    protected void migrateDefinition(ProcessTaskDefinition newDefinition) {
+        task.giveNewDefinition(new MigrateProcessDefinition(getCaseInstance().getCurrentUser(), task.getId(), newDefinition.getImplementationDefinition()));
+    }
+}

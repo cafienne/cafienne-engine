@@ -30,6 +30,6 @@ public class MilestoneDefinition extends PlanItemDefinitionDefinition {
 
     @Override
     protected boolean equalsWith(Object object) {
-        return equalsWith(object, super::samePlanItemDefinitionDefinition);
+        return equalsWith(object, this::samePlanItemDefinitionDefinition);
     }
 }

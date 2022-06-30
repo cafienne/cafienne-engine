@@ -9,5 +9,4 @@ public class SubjectDefinition extends SubProcessInputMappingDefinition {
     public SubjectDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
     }
-
 }

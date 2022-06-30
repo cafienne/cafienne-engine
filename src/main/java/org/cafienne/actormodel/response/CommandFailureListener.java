@@ -1,11 +1,11 @@
 package org.cafienne.actormodel.response;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.command.ModelCommand;
 
 /**
  * When sending a message to another model instance from within a model,
- * the method {@link Case#askCase(CaseCommand, CommandFailureListener, CommandResponseListener...)} can be used.
+ * the method {@link ModelActor#askModel(ModelCommand, CommandFailureListener, CommandResponseListener...)} can be used.
  * The case instance will respond to "this" case and this case will invoke the registered response listener.
  * This basically supports a simplified ask pattern between cases.
  *

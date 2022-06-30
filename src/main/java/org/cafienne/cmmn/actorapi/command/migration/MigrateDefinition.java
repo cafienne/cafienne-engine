@@ -22,35 +22,36 @@ import java.io.IOException;
 
 @Manifest
 public class MigrateDefinition extends CaseCommand {
-    private final CaseDefinition definition;
+    private final CaseDefinition newDefinition;
 
     /**
      * Migrate the definition of a case.
-     *  @param caseInstanceId      The instance identifier of the case
-     * @param definition          The case definition (according to the CMMN xsd) to be updated to
+     *
+     * @param caseInstanceId The instance identifier of the case
+     * @param newDefinition  The case definition (according to the CMMN xsd) to be updated to
      */
-    public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition definition) {
+    public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition newDefinition) {
         super(user, caseInstanceId);
-        this.definition = definition;
+        this.newDefinition = newDefinition;
     }
 
     public MigrateDefinition(ValueMap json) {
         super(json);
-        this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
+        this.newDefinition = json.readDefinition(Fields.definition, CaseDefinition.class);
     }
 
     @Override
     public String toString() {
-        return "Migrate Case Definition '" + definition.getName() + "'";
+        return "Migrate Case Definition '" + newDefinition.getName() + "'";
     }
 
     @Override
     public CaseResponse process(Case caseInstance) {
-        if (definition.getDefinitionsDocument().equals(caseInstance.getDefinition().getDefinitionsDocument())) {
+        if (newDefinition.getDefinitionsDocument().equals(caseInstance.getDefinition().getDefinitionsDocument())) {
             // ??? why again???? ;)
             caseInstance.addDebugInfo(() -> "No need to migrate definition of case " + caseInstance.getId() + " (proposed definition already in use by the case instance)");
         } else {
-            caseInstance.migrate(definition);
+            caseInstance.migrate(newDefinition);
         }
         return new MigrationStartedResponse(this);
     }
@@ -58,6 +59,6 @@ public class MigrateDefinition extends CaseCommand {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
-        writeField(generator, Fields.definition, definition);
+        writeField(generator, Fields.definition, newDefinition);
     }
 }

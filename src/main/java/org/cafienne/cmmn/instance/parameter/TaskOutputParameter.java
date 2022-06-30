@@ -10,7 +10,6 @@ package org.cafienne.cmmn.instance.parameter;
 import org.cafienne.cmmn.definition.parameter.BindingOperation;
 import org.cafienne.cmmn.definition.parameter.BindingRefinementDefinition;
 import org.cafienne.cmmn.definition.parameter.TaskOutputParameterDefinition;
-import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.cmmn.instance.TransitionDeniedException;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
@@ -34,7 +33,7 @@ public class TaskOutputParameter extends TaskParameter<TaskOutputParameterDefini
         addDebugInfo(() -> "Validating property types of a " + item.getName() + " against value ", value);
         item.getDefinition().validatePropertyTypes(value);
 
-        if (item.getState() == State.Discarded) {
+        if (item.getState().isDiscarded()) {
             addDebugInfo(() -> "Cannot bind parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "], since the item is in state Discarded");
             throw new TransitionDeniedException("Cannot bind parameter value, because case file item has been deleted");
         }

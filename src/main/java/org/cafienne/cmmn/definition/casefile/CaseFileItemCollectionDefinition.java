@@ -54,10 +54,10 @@ public class CaseFileItemCollectionDefinition extends CMMNElementDefinition {
 
     @Override
     protected boolean equalsWith(Object object) {
-        return equalsWith(object, this::sameCaseFileItemChildren);
+        return equalsWith(object, this::sameCollection);
     }
 
-    public boolean sameCaseFileItemChildren(CaseFileItemCollectionDefinition other) {
+    public boolean sameCollection(CaseFileItemCollectionDefinition other) {
         return sameIdentifiers(other)
                 && same(items, other.items);
     }

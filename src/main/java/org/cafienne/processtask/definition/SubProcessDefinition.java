@@ -156,8 +156,16 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
         return rawOutputParameters;
     }
 
+    public boolean sameType(SubProcessDefinition other) {
+        return this.getClass().equals(other.getClass());
+    }
+
     public boolean sameSubProcess(SubProcessDefinition other) {
-        return same(isAsync, other.isAsync)
+        // Note: in principle there is no need to run first check below on the implementation type, as that is
+        // also done by comparing classes before this method is invoked.
+        // However, for "functional clarity" invoking it here as well.
+        return sameType(other)
+                && same(isAsync, other.isAsync)
                 && same(mappings, other.mappings)
                 && same(successMappings, other.successMappings)
                 && same(failureMappings, other.failureMappings);

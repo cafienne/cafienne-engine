@@ -38,4 +38,15 @@ public class AddressDefinition extends SubProcessInputMappingDefinition {
             throw new InvalidMailAddressException("Invalid email address " + email + " " + ex.getMessage(), ex);
         }
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameAddressDefinition);
+    }
+
+    private boolean sameAddressDefinition(AddressDefinition other) {
+        return super.sameMappingDefinition(other)
+                && same(emailResolver, other.emailResolver)
+                && same(nameResolver, other.nameResolver);
+    }
 }

@@ -24,4 +24,15 @@ public class BodyDefinition extends SubProcessInputMappingDefinition {
     public String getBodyType(ProcessTaskActor task) {
         return bodyTypeResolver.getValue(task, "text/html");
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameBodyDefinition);
+    }
+
+    private boolean sameBodyDefinition(BodyDefinition other) {
+        return super.sameMappingDefinition(other)
+                && same(bodyResolver, other.bodyResolver)
+                && same(bodyTypeResolver, other.bodyTypeResolver);
+    }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,27 +27,86 @@ public enum State {
 
     /**
      * As per the spec
+     *
      * @return
      */
     public boolean isSemiTerminal() {
         return this == Closed || this == Completed || this == Disabled || this == Failed || this == Terminated;
     }
 
-    public boolean isFailed() {
-        return this == Failed;
+    public boolean isNull() {
+        return this == Null;
     }
 
     public boolean isActive() {
         return this == Active;
     }
 
-    public boolean isNull() {
-        return this == Null;
+    public boolean isAvailable() {
+        return this == Available;
+    }
+
+    public boolean isClosed() {
+        return this == Closed;
+    }
+
+    public boolean isCompleted() {
+        return this == Completed;
+    }
+
+    public boolean isDisabled() {
+        return this == Disabled;
+    }
+
+    public boolean isDiscarded() {
+        return this == Discarded;
+    }
+
+    public boolean isEnabled() {
+        return this == Enabled;
+    }
+
+    public boolean isFailed() {
+        return this == Failed;
+    }
+
+    public boolean isSuspended() {
+        return this == Suspended;
+    }
+
+    public boolean isTerminated() {
+        return this == Terminated;
     }
 
     /**
+     * Returns true if the state is beyond Null.
      *
      * @return
+     */
+    public boolean isCreated() {
+        return this != Null;
+    }
+
+    /**
+     * Returns true if the task is beyond creation (i.e., state is not null and not available)
+     *
+     * @return
+     */
+    public boolean isInitiated() {
+        return this != Null && this != Available;
+    }
+
+    /**
+     * Returns true if the lifecycle of the task is done (i.e., state is Completed or state is Terminated)
+     *
+     * @return
+     */
+    public boolean isDone() {
+        return this == Completed || this == Terminated;
+    }
+
+    /**
+     * Returns true if the lifecycle of the task is initiated and not yet done.
      */
     public boolean isAlive() {
         return this == Active || this == Suspended || this == Failed || this == Enabled || this == Disabled;

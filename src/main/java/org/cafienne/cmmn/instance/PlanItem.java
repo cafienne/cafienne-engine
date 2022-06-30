@@ -176,7 +176,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @param transition
      * @return
      */
-    boolean prepareTransition(Transition transition) {
+    protected boolean prepareTransition(Transition transition) {
         if (nextTransition != Transition.None) {
             addDebugInfo(() -> this + ": trying to prepareTransition " + transition + " on " + this + ", but we are already transitioning " + nextTransition);
             return false;
@@ -616,7 +616,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
         super.migrateDefinition(newDefinition);
         setItemDefinition(newItemDefinition);
-        if (getState() != State.Null) {
+        if (getState().isCreated()) {
             if (hasNewNameOrId()) {
                 // Add a migration event if name or id has changed
                 addEvent(new PlanItemMigrated(this));

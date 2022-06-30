@@ -131,7 +131,7 @@ public class CaseFileItemDefinition extends CaseFileItemCollectionDefinition {
     }
 
     public boolean sameCaseFileItem(CaseFileItemDefinition other) {
-        return sameCaseFileItemChildren(other)
+        return sameCollection(other)
                 && same(multiplicity, other.multiplicity)
                 && same(typeDefinition, other.typeDefinition)
                 && same(sourceRef, other.sourceRef)

@@ -7,7 +7,6 @@
  */
 package org.cafienne.cmmn.instance.task.cmmn;
 
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
@@ -16,6 +15,7 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.*;
+import org.cafienne.cmmn.instance.Task;
 import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,14 +69,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
         CaseTeam caseTeam = mainCase.getCaseTeam().createSubCaseTeam(subCaseDefinition);
 
         StartCase startCaseCommand = new StartCase(getCaseInstance().getTenant(), getCaseInstance().getCurrentUser(), subCaseId, subCaseDefinition, caseInputParameters, caseTeam, getCaseInstance().debugMode(), parentCaseId, rootCaseId);
-
-        getCaseInstance().askCase(startCaseCommand,
-            left -> goFault(new ValueMap("failure", left.toJson())),
-            right -> {
-                if (!getDefinition().isBlocking()) {
-                    makeTransition(Transition.Complete);
-                }
-            });
+        startTaskImplementation(startCaseCommand);
     }
 
     /**
@@ -86,23 +79,14 @@ public class CaseTask extends Task<CaseTaskDefinition> {
      * @param transition
      */
     private void tell(Transition transition) {
-        if (getDefinition().isBlocking()) {
-            CaseCommand command = new MakeCaseTransition(getCaseInstance().getCurrentUser(), subCaseId, transition);
-            getCaseInstance().askCase(command, left ->
-                // Is logging an error sufficient? Or should we go Fault?!
-                logger.error("Could not make transition " + transition + " on sub case implementation for task " + subCaseId + "\n" + left));
-        }
+        tellTaskImplementation(new MakeCaseTransition(getCaseInstance().getCurrentUser(), subCaseId, transition));
     }
 
     @Override
     public void migrateItemDefinition(ItemDefinition newItemDefinition, CaseTaskDefinition newDefinition) {
         super.migrateItemDefinition(newItemDefinition, newDefinition);
-        if (this.getState() != State.Null && this.getState() != State.Available) {
-            addDebugInfo(() -> this + ": telling sub case with id "+this.getId()+" to migrate it's definition");
-            CaseDefinition subCaseDefinition = newDefinition.getImplementationDefinition();
-            getCaseInstance().askCase(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), subCaseDefinition),
-                left -> logger.error("Failure while migrating definition of case task " + this.getDescription() + ": " + left.toJson()));
-        }
+
+        giveNewDefinition(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), newDefinition.getImplementationDefinition()));
     }
 
     @Override

@@ -91,12 +91,11 @@ abstract class TableItemDefinition extends CMMNElementDefinition {
         // however, the algorithm is described in a single place in the specification, section 7.7 on page 80.
         State planItemState = planItem.getState();
         if (planItem instanceof CasePlan) {
-            return planItemState == State.Active || planItemState == State.Failed || planItemState == State.Suspended || planItemState == State.Completed || planItemState == State.Terminated;
+            return planItemState.isActive() || planItemState.isFailed() || planItemState.isSuspended() || planItemState.isCompleted() || planItemState.isTerminated();
         } else if (planItem instanceof Stage) {
-            return planItemState == State.Active || planItemState == State.Available || planItemState == State.Enabled || planItemState == State.Disabled || planItemState == State.Failed
-                    || planItemState == State.Suspended;
+            return planItemState.isActive() || planItemState.isAvailable() || planItemState.isEnabled() || planItemState.isDisabled() || planItemState.isFailed() || planItemState.isSuspended();
         } else { // Must be a HumanTask
-            return planItemState == State.Active;
+            return planItemState.isActive();
         }
     }
 

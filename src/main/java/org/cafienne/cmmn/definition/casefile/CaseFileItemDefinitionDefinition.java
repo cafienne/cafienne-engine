@@ -79,9 +79,14 @@ public class CaseFileItemDefinitionDefinition extends ModelDefinition {
 
     public boolean sameCaseFileItemDefinitionDefinition(CaseFileItemDefinitionDefinition other) {
         return sameModelDefinition(other)
-                && same(definitionType, other.definitionType)
+                && sameDefinitionType(other)
                 && same(structureRef, other.structureRef)
                 && same(importDefinition, other.importDefinition)
                 && same(properties.values(), other.properties.values());
+    }
+
+    private boolean sameDefinitionType(CaseFileItemDefinitionDefinition other) {
+        // DefinitionType is just a plain object / class, and comparison must be done based on class rather than object
+        return this.definitionType.getClass().equals(other.definitionType.getClass());
     }
 }

@@ -32,5 +32,6 @@ abstract class ProcessInformer {
     abstract protected void resumeInstance();
 
     abstract protected void reactivateImplementation(ValueMap inputParameters);
-}
 
+    abstract protected void migrateDefinition(ProcessTaskDefinition newDefinition);
+}

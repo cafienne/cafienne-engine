@@ -10,12 +10,11 @@ package org.cafienne.cmmn.test;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.LongValue;
 import org.cafienne.json.ValueMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -25,7 +24,9 @@ import java.io.IOException;
  */
 @Manifest
 public class PingCommand extends TestScriptCommand {
-    private final static Logger logger = LoggerFactory.getLogger(PingCommand.class);
+    static {
+        CafienneSerializer.addManifestWrapper(PingCommand.class, PingCommand::new);
+    }
 
     private final long waitTime;
 

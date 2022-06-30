@@ -107,8 +107,20 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
     public boolean sameTask(TaskDefinition<T> other) {
         return samePlanItemDefinitionDefinition(other)
                 && same(isBlocking, other.isBlocking)
-                && same(inputs.values(), other.inputs.values())
-                && same(outputs.values(), other.outputs.values())
-                && same(mappings, other.mappings);
+                && sameInputParameters(other)
+                && sameOutputParameters(other)
+                && sameMappings(other);
+    }
+
+    public boolean sameInputParameters(TaskDefinition<T> other) {
+        return same(inputs.values(), other.inputs.values());
+    }
+
+    public boolean sameOutputParameters(TaskDefinition<T> other) {
+        return same(outputs.values(), other.outputs.values());
+    }
+
+    public boolean sameMappings(TaskDefinition<?> other) {
+        return same(mappings, other.mappings);
     }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 - 2019 Cafienne B.V.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,9 +52,9 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
 
     private boolean runCall() {
         // Bind any parameters in the URL, any content and the http method to the input parameters of this task.
-        URL targetURL = definition.getURL().resolveURL(processTaskActor);
+        URL targetURL = getDefinition().getURL().resolveURL(processTaskActor);
         result.setTargetURL(targetURL);
-        String requestMethod = definition.getMethod().resolve(processTaskActor);
+        String requestMethod = getDefinition().getMethod().resolve(processTaskActor);
         result.setRequestMethod(requestMethod);
 
         // Now fetch and open the URL
@@ -78,14 +78,14 @@ public class HTTPCall extends SubProcess<HTTPCallDefinition> {
         // Now fill the http headers
         // 1. Map headers to simple strings (does parameter substitution).
         Map<String, String> headers = new LinkedHashMap<>();
-        definition.getHeaders(processTaskActor).forEach(header -> headers.put(header.getName(), header.getValue()));
+        getDefinition().getHeaders(processTaskActor).forEach(header -> headers.put(header.getName(), header.getValue()));
         // Store the headers in the call status object for debugging purposes
         result.setRequestHeaders(headers);
         // Set the headers on the connection
         headers.forEach(httpConnection::setRequestProperty);
 
         if (requestMethod.equalsIgnoreCase("POST") || requestMethod.equalsIgnoreCase("PUT")) {
-            String requestPayload = definition.getContent().resolve(processTaskActor).toString();
+            String requestPayload = getDefinition().getContent().resolve(processTaskActor).toString();
             result.setRequestPayload(requestPayload);
 
             // Only if there is any input to be posted to the URL will we setup an interactive connection and start writing the data

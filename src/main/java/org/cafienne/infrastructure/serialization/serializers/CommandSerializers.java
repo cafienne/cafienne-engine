@@ -98,6 +98,7 @@ public class CommandSerializers {
         CafienneSerializer.addManifestWrapper(ReactivateProcess.class, ReactivateProcess::new);
         CafienneSerializer.addManifestWrapper(SuspendProcess.class, SuspendProcess::new);
         CafienneSerializer.addManifestWrapper(TerminateProcess.class, TerminateProcess::new);
+        CafienneSerializer.addManifestWrapper(MigrateProcessDefinition.class, MigrateProcessDefinition::new);
     }
 
     private static void addTenantCommands() {

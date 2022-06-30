@@ -23,4 +23,15 @@ public class HeaderDefinition extends SubProcessInputMappingDefinition {
         String name = nameResolver.getValue(context, "");
         return new Header(name, value);
     }
+
+    @Override
+    protected boolean equalsWith(Object object) {
+        return equalsWith(object, this::sameAttachmentDefinition);
+    }
+
+    private boolean sameAttachmentDefinition(HeaderDefinition other) {
+        return super.sameMappingDefinition(other)
+                && same(nameResolver, other.nameResolver)
+                && same(valueResolver, other.valueResolver);
+    }
 }
