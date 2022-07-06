@@ -131,13 +131,13 @@ configs(MultiJvm) // Not sure what this adds, actually
 /**
   * Dependencies
   */
-val akkaHttpVersion    = "10.2.7"
-val akkaVersion        = "2.6.18"
-val jacksonVersion     = "2.13.0"
+val akkaHttpVersion    = "10.2.9"
+val akkaVersion        = "2.6.19"
+val jacksonVersion     = "2.13.3"
 val enumeratumVersion  = "1.7.0"
-val swaggerVersion     = "2.1.11"
+val swaggerVersion     = "2.2.0"
 val slickVersion       = "3.3.3"
-val jasperVersion      = "6.18.1"
+val jasperVersion      = "6.19.1"
 
 /**
   * Add runtime dependencies
@@ -154,8 +154,8 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-persistence"                     % akkaVersion
   , "com.typesafe.akka"       %% "akka-persistence-query"               % akkaVersion
   , "com.typesafe.akka"       %% "akka-slf4j"                           % akkaVersion
-  , "com.typesafe"            %  "config"                               % "1.4.1"
-  , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.4"
+  , "com.typesafe"            %  "config"                               % "1.4.2"
+  , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
   , "com.typesafe.akka"       %% "akka-stream"  % akkaVersion
   , "com.typesafe.akka"		    %% "akka-persistence-cassandra" 		      % "0.107"
   , "com.datastax.cassandra"     % "cassandra-driver-extras"            % "3.11.0" // Needed for timestamp conversion
@@ -163,7 +163,7 @@ libraryDependencies ++= Seq(
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "javax.xml.bind"          % "jaxb-api"                              % "2.3.1" // Used in StringValue xsd date conversions
-  , "ch.megard"               %% "akka-http-cors"                       % "1.1.2"
+  , "ch.megard"               %% "akka-http-cors"                       % "1.1.3"
 
   , "org.flywaydb"            % "flyway-core"                           % "7.2.1"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
@@ -180,41 +180,39 @@ libraryDependencies ++= Seq(
   // Lowagie is for PDF document generation with Jasper. It must remain fixed on 2.1.7 because that is what Jasper needs.
   , "com.lowagie"             % "itext"                                 % "2.1.7" // DO NOT CHANGE THIS VALUE
 
-  , "com.sun.mail"            % "javax.mail"                            % "1.6.2"
-  , "com.nimbusds"            % "nimbus-jose-jwt"                       % "9.15.2"
-  , "org.mnode.ical4j"        % "ical4j"                                % "3.1.1"
+  , "com.nimbusds"            % "nimbus-jose-jwt"                       % "9.23"
+  , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
 
-  // As suggested in https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j
-  // to resolve blow-up due to swagger :  java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlRootElement.
-  , "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1"
-  , "com.jayway.jsonpath"  	  % "json-path"                             % "2.6.0"
-  , "com.h2database"          % "h2"                                    % "2.0.202"
-  , "org.hsqldb"              % "hsqldb"                                % "2.5.1"
+  , "org.mnode.ical4j"        % "ical4j"                                % "3.2.3"
+
+  , "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1" // Note: this one is still needed for swagger-akka-http :(
+  , "com.jayway.jsonpath"  	  % "json-path"                             % "2.6.0" // 2.7.0 is not compatible in expressions
+  , "com.h2database"          % "h2"                                    % "2.1.212"
+  , "org.hsqldb"              % "hsqldb"                                % "2.5.1" // Currently an issue in upgrading to 2.6.1, see https://sourceforge.net/p/hsqldb/bugs/1641/
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.2.10"
-  , "org.postgresql"          % "postgresql"                            % "42.3.1"
-  , "org.springframework"     %  "spring-expression"                    % "5.3.14"
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.2.11"
+  , "org.postgresql"          % "postgresql"                            % "42.3.6"
+  , "org.springframework"     %  "spring-expression"                    % "5.3.20"
   , "com.microsoft.sqlserver" % "mssql-jdbc"                            % "9.2.1.jre11"
   , "io.swagger.core.v3"      % "swagger-core"                          % swaggerVersion
   , "io.swagger.core.v3"      % "swagger-annotations"                   % swaggerVersion
   , "io.swagger.core.v3"      % "swagger-jaxrs2"                        % swaggerVersion
   , "io.swagger.core.v3"      % "swagger-models"                        % swaggerVersion
   , "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.5.2"
-  , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.59"
 )
 
 /**
   * Add test dependencies
   */
 libraryDependencies ++= Seq(
-  "org.junit.jupiter"       % "junit-jupiter-api"                     % "5.8.2"
-  , "com.novocode"            % "junit-interface"                     % "0.11"
-  , "org.scalamock"           %% "scalamock"                          % "5.2.0"
-  , "org.scalatest"           %% "scalatest"                          % "3.2.9"
-  , "commons-io"              %  "commons-io"                         % "20030203.000550"
-  , "com.typesafe.akka"       %% "akka-testkit"                       % akkaVersion
-  , "com.typesafe.akka"       %% "akka-http-testkit"                  % akkaHttpVersion
-  , "com.typesafe.akka"       %% "akka-multi-node-testkit"            % akkaVersion
-  , "com.github.dnvriend"     %% "akka-persistence-inmemory"          % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "com.github.tomakehurst"  % "wiremock"                            % "2.27.2"
+  "org.junit.jupiter"         % "junit-jupiter-api"                     % "5.8.2"
+  , "com.novocode"            % "junit-interface"                       % "0.11"
+  , "org.scalamock"           %% "scalamock"                            % "5.2.0"
+  , "org.scalatest"           %% "scalatest"                            % "3.2.12"
+  , "commons-io"              %  "commons-io"                           % "20030203.000550"
+  , "com.typesafe.akka"       %% "akka-testkit"                         % akkaVersion
+  , "com.typesafe.akka"       %% "akka-http-testkit"                    % akkaHttpVersion
+  , "com.typesafe.akka"       %% "akka-multi-node-testkit"              % akkaVersion
+  , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
+  , "com.github.tomakehurst"  % "wiremock"                              % "2.27.2"
 ).map(dep => dep % Test)
