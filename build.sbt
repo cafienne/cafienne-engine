@@ -35,13 +35,8 @@ Docker / packageName := "cafienne/engine"
 Docker / version := "latest"
 Docker / maintainer := """Cafienne <info@cafienne.io>"""
 Docker / defaultLinuxInstallLocation := "/opt/cafienne"
+dockerBaseImage := "eclipse-temurin:17.0.3_7-jre-jammy"
 dockerExposedPorts := Seq(2027, 9999)
-dockerBaseImage := "openjdk:17-slim"
-//Adding dependencies required for the PDF generation Process Task
-dockerCommands := dockerCommands.value.flatMap {
-  case c@Cmd("USER", "root") => Seq(c, Cmd("RUN",  "apt-get update && apt-get -y install fontconfig libfreetype6 && apt-get clean"))
-  case other => Seq(other)
-}
 bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value
 bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
 bashScriptExtraDefines += s"""addJava "-Dconfig.file=$${app_home}/../conf/local.conf""""
