@@ -1,5 +1,6 @@
 package org.cafienne.processtask.implementation.mail;
 
+import jakarta.mail.internet.InternetAddress;
 import net.fortuna.ical4j.model.parameter.Cn;
 import net.fortuna.ical4j.model.property.Attendee;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -8,7 +9,6 @@ import org.cafienne.json.Value;
 import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
-import javax.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 

@@ -7,17 +7,18 @@
  */
 package org.cafienne.processtask.implementation.mail;
 
+import jakarta.mail.*;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.implementation.SubProcess;
 import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;

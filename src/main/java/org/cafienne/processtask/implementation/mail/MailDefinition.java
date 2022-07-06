@@ -10,9 +10,11 @@ package org.cafienne.processtask.implementation.mail;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.definition.SubProcessDefinition;
-import org.cafienne.processtask.implementation.mail.definition.*;
+import org.cafienne.processtask.implementation.mail.definition.AddressDefinition;
+import org.cafienne.processtask.implementation.mail.definition.AttachmentDefinition;
+import org.cafienne.processtask.implementation.mail.definition.BodyDefinition;
+import org.cafienne.processtask.implementation.mail.definition.SubjectDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
