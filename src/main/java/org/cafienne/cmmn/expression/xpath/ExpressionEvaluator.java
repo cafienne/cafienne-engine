@@ -31,6 +31,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -94,15 +95,12 @@ public class ExpressionEvaluator implements CMMNExpressionEvaluator {
                     return prefixes.get(prefix);
                 }
             });
-            javax.xml.xpath.XPathExpression expr = xpath.compile(xpathExpression);
+            XPathExpression expr = xpath.compile(xpathExpression);
             String output = String.valueOf(contextObject);
             InputStream inputStream = new ByteArrayInputStream(output.getBytes());
             InputSource is = new InputSource(inputStream);
 
-            boolean value = Boolean.valueOf(expr.evaluate(is));
-
-            // System.out.println("X: "+value);
-            return value;
+            return Boolean.parseBoolean(expr.evaluate(is));
         } catch (Exception allKindsOfException) {
             throw new CommandException("Cannot evaluate XPath expression", allKindsOfException);
         }

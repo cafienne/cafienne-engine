@@ -1,16 +1,16 @@
 package org.cafienne.processtask.implementation.mail;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.BodyPart;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.implementation.mail.definition.AttachmentDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.util.ByteArrayDataSource;
 import java.util.Base64;
 
 public class Attachment {

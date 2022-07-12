@@ -8,6 +8,7 @@
 package org.cafienne.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import jakarta.xml.bind.DatatypeConverter;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -80,12 +81,12 @@ public class StringValue extends PrimitiveValue<String> {
         // TODO: figure out a means to conserve the conversion, i.e., avoid doing this conversion twice.
         // For that we'd probably have to introduce a DateTimeValue extending StringValue, and we'd also
         // have to replace this value in our parent (which is probably a ValueMap or a ValueList)
-        javax.xml.bind.DatatypeConverter.parseDateTime(value);
+        DatatypeConverter.parseDateTime(value);
         return true;
     }
 
     private boolean matchDate() {
-        javax.xml.bind.DatatypeConverter.parseDate(value);
+        DatatypeConverter.parseDate(value);
         return true;
     }
 
@@ -95,7 +96,7 @@ public class StringValue extends PrimitiveValue<String> {
     }
 
     private boolean matchTime() {
-        javax.xml.bind.DatatypeConverter.parseTime(value);
+        DatatypeConverter.parseTime(value);
         return true;
     }
 
@@ -133,7 +134,7 @@ public class StringValue extends PrimitiveValue<String> {
         // Currently no namespace support. We could take it from the definition,
         // or also from the current XML document that is being parsed (if at all).
         // But for now, we just don't do anything, let's first await a proper use case.
-        javax.xml.bind.DatatypeConverter.parseQName(value, new NamespaceContext() {
+        DatatypeConverter.parseQName(value, new NamespaceContext() {
             @Override
             public Iterator<String> getPrefixes(String namespaceURI) {
                 // TODO Auto-generated method stub

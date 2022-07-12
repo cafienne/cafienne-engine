@@ -10,12 +10,12 @@ services:
     hostname: cafienne
     container_name: cafienne
     environment:
-      EVENT_DB_PROFILE: ${EVENT_DB_PROFILE:-slick.jdbc.PostgresProfile$}
+      EVENT_DB_PROFILE: ${EVENT_DB_PROFILE:-slick.jdbc.PostgresProfile$$}
       EVENT_DB_DRIVER: ${EVENT_DB_DRIVER:-org.postgresql.Driver}
       EVENT_DB_USER: ${EVENT_DB_USER:-postgresuser}
       EVENT_DB_PASSWORD: ${EVENT_DB_PASSWORD:-mysecret}
       EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:postgresql://localhost:6431/cafienne-eventstore?reWriteBatchedInserts=true}
-      QUERY_DB_PROFILE: ${QUERY_DB_PROFILE:-slick.jdbc.PostgresProfile$}
+      QUERY_DB_PROFILE: ${QUERY_DB_PROFILE:-slick.jdbc.PostgresProfile$$}
       QUERY_DB_DRIVER: ${QUERY_DB_DRIVER:-org.postgresql.Driver}
       QUERY_DB_USER: ${QUERY_DB_USER:-postgresuser}
       QUERY_DB_PASSWORD: ${QUERY_DB_PASSWORD:-mysecret}
