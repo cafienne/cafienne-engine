@@ -1,5 +1,3 @@
-import com.typesafe.sbt.packager.docker._
-
 /**
   * Global settings
   */
