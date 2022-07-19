@@ -1,5 +1,3 @@
-import com.typesafe.sbt.packager.docker._
-
 /**
   * Global settings
   */
@@ -86,8 +84,6 @@ developers := List(Developer(
 versionScheme := Some("semver-spec")
 publishMavenStyle := true
 pomIncludeRepository := { _ => false }
-// Use old method for signing the published files.
-Global / useGpg := false
 
 // add sonatype repository settings
 // snapshot versions publish to sonatype snapshot repository
