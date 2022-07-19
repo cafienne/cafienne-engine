@@ -47,7 +47,7 @@ public class CaseEventListener {
         // Now create the callback mechanism for the case system
         this.responseHandlingActor = system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
         // And create a connection with the Akka Event database to receive events from the case system
-        this.readJournal = new CaseEventPublisher(this, testScript.getCaseSystem());
+        this.readJournal = new CaseEventPublisher(this, testScript.getCaseSystem().system());
     }
 
     void sendCommand(ModelCommand command) {

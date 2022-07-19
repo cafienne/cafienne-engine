@@ -1,14 +1,14 @@
 package org.cafienne.querydb.materializer.cases
 
+import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
-import org.cafienne.system.CaseSystem
 
 import scala.concurrent.Future
 
-class CaseEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
+class CaseEventSink(override val system: ActorSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
   override val tag: String = CaseEvent.TAG
 
   override def getOffset: Future[Offset] = storage.getOffset(CaseEventSink.offsetName)

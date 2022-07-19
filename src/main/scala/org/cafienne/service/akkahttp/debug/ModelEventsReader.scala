@@ -13,6 +13,8 @@ import org.cafienne.system.CaseSystem
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ModelEventsReader(val caseSystem: CaseSystem) extends LazyLogging with ReadJournalProvider {
+  override val system = caseSystem.system
+
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   def getEvents(user: PlatformUser, actorId: String, from: Long, to: Long): Future[ValueList] = {

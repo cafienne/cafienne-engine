@@ -12,7 +12,8 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class TimerEventSink(val timerService: TimerService) extends TaggedEventSource {
-  override val caseSystem: CaseSystem = timerService.caseSystem
+  val caseSystem: CaseSystem = timerService.caseSystem
+  override val system = caseSystem.system
 
   override def getOffset: Future[Offset] = timerService.storage.getOffset
   override val tag: String = TimerBaseEvent.TAG
