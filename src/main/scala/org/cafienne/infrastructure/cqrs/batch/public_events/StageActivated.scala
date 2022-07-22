@@ -20,10 +20,15 @@ case class StageActivated(identifier: String, name: String, caseInstanceId: Stri
 
 object StageActivated {
   def from(batch: PublicCaseEventBatch): Seq[StageActivated] = {
-    batch.filterMap(classOf[PlanItemCreated])
+    val planItemName = batch.filterMap(classOf[PlanItemCreated])
       .filter(_.getType == "Stage")
-      //.filter(_.getCurrentState == State.Active)
-      .map(event => StageActivated(event.getPlanItemId, event.getPlanItemName, event.getCaseInstanceId))
+      .map(event => event.getPlanItemName).headOption.getOrElse("")
+
+    batch.filterMap(classOf[PlanItemTransitioned])
+      .filter(_.getType == "Stage")
+      .filter(_.getCurrentState == State.Active)
+      .map(event => StageActivated(event.getPlanItemId, planItemName, event.getCaseInstanceId))
+
   }
 
   def deserialize(json: ValueMap): StageActivated = StageActivated(
