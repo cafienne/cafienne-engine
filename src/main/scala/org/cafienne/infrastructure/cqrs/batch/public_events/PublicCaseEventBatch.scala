@@ -30,16 +30,19 @@ class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with La
   lazy val humanTaskEvents: Seq[HumanTaskEvent] = filterMap(classOf[HumanTaskEvent])
   lazy val userEventEvents: Seq[PlanItemEvent] = planItemEvents.filter(_.getType.equals("UserEvent"))
   lazy val milestoneEvents: Seq[PlanItemEvent] = planItemEvents.filter(_.getType.equals("Milestone"))
+  lazy val stageEvents: Seq[PlanItemEvent] = planItemEvents.filter(_.getType.equals("Stage"))
   lazy val publicEvents: Seq[PublicEventWrapper] = {
     (Seq()
       // Note, order sort of matters. Typically, case started leads to events like HumanTaskStarted.
       //  But, also HumanTaskCompleted leads to new tasks getting started.
       //  Case Completed always comes at the end (we assume ;)
       ++ CaseStarted.from(this)
+      ++ StageCompleted.from(this)
       ++ HumanTaskCompleted.from(this)
       ++ HumanTaskTerminated.from(this)
       ++ MilestoneAchieved.from(this)
       ++ UserEventRaised.from(this)
+      ++ StageActivated.from(this)
       ++ HumanTaskStarted.from(this)
       ++ MilestoneAvailable.from(this)
       ++ UserEventCreated.from(this)
