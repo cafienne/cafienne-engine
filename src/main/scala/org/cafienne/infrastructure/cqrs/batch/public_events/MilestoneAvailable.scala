@@ -8,6 +8,8 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
+import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
+import org.cafienne.cmmn.instance.State
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
@@ -18,7 +20,15 @@ case class MilestoneAvailable(identifier: String, name: String, caseInstanceId: 
 
 object MilestoneAvailable {
   def from(batch: PublicCaseEventBatch): Seq[MilestoneAvailable] = {
-    Seq()
+    val planItemName = batch.filterMap(classOf[PlanItemCreated])
+      .filter(_.getType == "Milestone")
+      .map(event => event.getPlanItemName).headOption.getOrElse("")
+
+    batch.filterMap(classOf[PlanItemTransitioned])
+      .filter(_.getType == "Milestone")
+      .filter(_.getCurrentState == State.Available)
+      .map(event => MilestoneAvailable(event.getPlanItemId, planItemName, event.getCaseInstanceId))
+
   }
 
   def deserialize(json: ValueMap): MilestoneAvailable = MilestoneAvailable(
