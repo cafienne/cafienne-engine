@@ -20,10 +20,14 @@ case class StageCompleted(identifier: String, caseInstanceId: String) extends Ca
 
 object StageCompleted {
   def from(batch: PublicCaseEventBatch): Seq[StageCompleted] = {
-    batch.filterMap(classOf[PlanItemTransitioned])
-      .filter(_.getType == "Stage")
-      .filter(_.getCurrentState == State.Completed)
-      .map(event => StageCompleted(event.getPlanItemId, event.getCaseInstanceId))
+    batch.stageEvents.filter(_.getType == "Stage").groupBy(p => p.getPlanItemId).flatMap(stageEvents => {
+      stageEvents._2
+        .filter(_.getPlanItemId.equals(stageEvents._1))
+        .filter(_.isInstanceOf[PlanItemTransitioned])
+        .map(_.asInstanceOf[PlanItemTransitioned])
+        .filter(_.getCurrentState == State.Completed)
+        .map(event => StageCompleted(event.getPlanItemId, event.getCaseInstanceId))
+    }).toSeq
   }
 
   def deserialize(json: ValueMap): StageCompleted = StageCompleted(

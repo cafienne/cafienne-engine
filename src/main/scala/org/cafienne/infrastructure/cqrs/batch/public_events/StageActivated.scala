@@ -20,15 +20,20 @@ case class StageActivated(identifier: String, name: String, caseInstanceId: Stri
 
 object StageActivated {
   def from(batch: PublicCaseEventBatch): Seq[StageActivated] = {
-    val planItemName = batch.filterMap(classOf[PlanItemCreated])
-      .filter(_.getType == "Stage")
-      .map(event => event.getPlanItemName).headOption.getOrElse("")
+    batch.stageEvents.filter(_.getType == "Stage").groupBy(p => p.getPlanItemId).flatMap(stageEvents => {
+      val stageName = stageEvents._2
+        .filter(_.getPlanItemId.equals(stageEvents._1))
+        .filter(_.isInstanceOf[PlanItemCreated])
+        .map(_.asInstanceOf[PlanItemCreated])
+        .headOption.fold("")(p => p.getPlanItemName)
 
-    batch.filterMap(classOf[PlanItemTransitioned])
-      .filter(_.getType == "Stage")
-      .filter(_.getCurrentState == State.Active)
-      .map(event => StageActivated(event.getPlanItemId, planItemName, event.getCaseInstanceId))
-
+      stageEvents._2
+        .filter(_.getPlanItemId.equals(stageEvents._1))
+        .filter(_.isInstanceOf[PlanItemTransitioned])
+        .map(_.asInstanceOf[PlanItemTransitioned])
+        .filter(_.getCurrentState == State.Active)
+        .map(event => StageActivated(event.getPlanItemId, stageName, event.getCaseInstanceId))
+    }).toSeq
   }
 
   def deserialize(json: ValueMap): StageActivated = StageActivated(

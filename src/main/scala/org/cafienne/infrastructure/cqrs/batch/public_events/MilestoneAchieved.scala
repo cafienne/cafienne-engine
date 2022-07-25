@@ -20,11 +20,16 @@ case class MilestoneAchieved(identifier: String, caseInstanceId: String) extends
 
 object MilestoneAchieved {
   def from(batch: PublicCaseEventBatch): Seq[MilestoneAchieved] = {
-    batch.filterMap(classOf[PlanItemTransitioned])
-      .filter(_.getType == "Milestone")
-      .filter(_.getCurrentState == State.Completed)
-      .map(event => MilestoneAchieved(event.getPlanItemId, event.getCaseInstanceId))
+    batch.milestoneEvents.filter(_.getType == "Milestone").groupBy(p => p.getPlanItemId).flatMap(milestoneEvents => {
+      milestoneEvents._2
+        .filter(_.getPlanItemId .equals(milestoneEvents._1))
+        .filter(_.isInstanceOf[PlanItemTransitioned])
+        .map(_.asInstanceOf[PlanItemTransitioned])
+        .filter(_.getCurrentState == State.Completed)
+        .map(event => MilestoneAchieved(event.getPlanItemId, event.getCaseInstanceId))
+    }).toSeq
   }
+
 
   def deserialize(json: ValueMap): MilestoneAchieved = MilestoneAchieved(
     identifier = json.readField(Fields.identifier),
