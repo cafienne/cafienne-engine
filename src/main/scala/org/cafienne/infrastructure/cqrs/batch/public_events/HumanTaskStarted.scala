@@ -8,17 +8,19 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated
 import org.cafienne.humantask.actorapi.event.{HumanTaskActivated, HumanTaskInputSaved}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{JSONReader, StringValue, Value, ValueMap}
 
 @Manifest
-case class HumanTaskStarted(taskId: String, taskName: String, caseInstanceId: String, inputParameters: ValueMap, form: Value[_]) extends CafiennePublicEventContent {
+case class HumanTaskStarted(taskId: String, taskName: String, caseInstanceId: String, stageId:String, inputParameters: ValueMap, form: Value[_]) extends CafiennePublicEventContent {
   override def toValue: ValueMap = new ValueMap(
     Fields.taskId, taskId,
     Fields.taskName, taskName,
     Fields.caseInstanceId, caseInstanceId,
     Fields.inputParameters, inputParameters,
+    Fields.stageId, stageId,
     EFields.form, form)
 }
 
@@ -27,6 +29,7 @@ object HumanTaskStarted {
     taskId = json.readField(Fields.taskId),
     taskName = json.readField(Fields.taskName),
     caseInstanceId = json.readField(Fields.caseInstanceId),
+    stageId = Option(json.readField(Fields.stageId)).getOrElse(null),
     inputParameters = json.readMap(Fields.inputParameters),
     form = json.get(EFields.form)
   )
@@ -39,6 +42,12 @@ object HumanTaskStarted {
       val caseInstanceId = taskActivation.getCaseInstanceId
       val inputParameters = events.find(_.isInstanceOf[HumanTaskInputSaved]).get.asInstanceOf[HumanTaskInputSaved].getInput
       val taskModel = taskActivation.getTaskModel
+      val stageId = batch.planItemEvents
+        .filter(_.getPlanItemId.equals(taskId))
+        .filter(_.isInstanceOf[PlanItemCreated])
+        .filter(_.getType.equals("HumanTask"))
+        .map(_.asInstanceOf[PlanItemCreated])
+        .headOption.map(_.stageId).getOrElse(null)
       val form: Value[_] = try {
         JSONReader.parse(taskModel)
       } catch {
@@ -46,8 +55,7 @@ object HumanTaskStarted {
         // Note: perhaps we should fix this in the base event itself, as that converts the json to a string ...
         case _: Throwable => new StringValue(taskModel)
       }
-
-      HumanTaskStarted(taskId = taskId, taskName = taskName, caseInstanceId = caseInstanceId, inputParameters = inputParameters, form = form)
+      HumanTaskStarted(taskId = taskId, taskName = taskName, caseInstanceId = caseInstanceId, stageId = stageId, inputParameters = inputParameters, form = form)
     })
   }
 }
