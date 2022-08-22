@@ -19,6 +19,7 @@ trait AuthenticationDirectives {
   self: Directives =>
 
   //  implicit val ec = ExecutionContext.global
+  //TODO make the token verifier initialize with the list of tuple (issuer, keysource) as defined in AuthenticatedRoute
   lazy private val jwtTokenVerifier = new JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer)
   // The public RSA keys to validate the signatures will be sourced from the
   // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet

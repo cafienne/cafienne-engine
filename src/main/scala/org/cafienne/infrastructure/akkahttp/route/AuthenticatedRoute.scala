@@ -121,6 +121,8 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   }
 
   object OIDCAuthentication extends Directives with AuthenticationDirectives {
+    //TODO make the keySource and issuer a list of tuples (or case class, or config objects)
+    // based on a config that can list more than 1
     override protected val userCache: IdentityProvider = uc
     protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(Cafienne.config.OIDC.keysUrl))
     protected val issuer: String = Cafienne.config.OIDC.issuer

@@ -29,6 +29,8 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
   // The expected JWS algorithm of the access tokens (agreed out-of-band)
   val expectedJWSAlg: JWSAlgorithm = JWSAlgorithm.RS256
 
+  //TODO add the MultiIssuerJWSKeySelector here and move the JWSVerificationKeySelector to the MultiIssuerJWSKeySelector
+
   // Configure the JWT processor with a key selector to feed matching public
   // RSA keys sourced from the JWK set URL
   val keySelector: JWSKeySelector[SecurityContext] = new JWSVerificationKeySelector(expectedJWSAlg, keySource)
