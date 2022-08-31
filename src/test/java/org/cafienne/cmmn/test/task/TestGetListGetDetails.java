@@ -17,7 +17,6 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.filter.EventFilter;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.event.ProcessCompleted;
@@ -30,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.cafienne.cmmn.test.TestScript.*;
 
 /**
  * The flow tested in this case, is to get a list of identifiers from a web service,
@@ -39,8 +39,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
  * However, no more than 3 times are the details fetched (although this is not yet checked in the test case)
  */
 public class TestGetListGetDetails {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/getlist_getdetails.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/casefile/getlist_getdetails.xml");
 
     private static final int PORT_NUMBER = 18087; // TODO: have wiremock pick the port number
 
@@ -60,7 +59,7 @@ public class TestGetListGetDetails {
         /**
          *  Start the case
          */
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
 
         /**
          *  When the case` starts, GetCasesList & GetFirstCase tasks will be in available state

@@ -19,9 +19,11 @@ import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.junit.Test;
 
-public class EventListener {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/eventlistener.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestEventListener {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/eventlistener.xml");
+    private final TestUser testUser = createTestUser("Anonymous");
 
     @Test
     public void testEventListener() {
@@ -29,7 +31,7 @@ public class EventListener {
         String caseInstanceId = "EventListener";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 

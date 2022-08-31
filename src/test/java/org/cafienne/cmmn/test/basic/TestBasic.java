@@ -13,14 +13,15 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.PublishedEventsAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.junit.Test;
 
-public class Basic {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestBasic {
     @Test
     public void testBasic() {
         // This tests a set of basic plan item types, such as HumanTask, Stage, Milestone and UserEvent
@@ -28,10 +29,9 @@ public class Basic {
         // The test just starts the case and then validates the output, no specific actions are done (no transitions are made)
         String caseInstanceId = "Basic";
         TestScript testCase = new TestScript(caseInstanceId);
-        TestUser testUser = TestScript.getTestUser("Anonymous");
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/basic.xml");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/basic.xml");
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
 

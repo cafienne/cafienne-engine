@@ -14,21 +14,21 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
 import org.junit.Test;
 
-public class Simple {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/simple.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestSimple {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/simple.xml");
 
     @Test
     public void testSimple() {
         String caseInstanceId = "Simple";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertLastTransition(Transition.Create, State.Active, State.Null);
             StageAssertion stage1 = casePlan.assertStage("Stage1");

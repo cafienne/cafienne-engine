@@ -19,20 +19,21 @@ import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.CaseAssertion;
 import org.junit.Test;
 
-public class Role {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestRole {
 
     private final String testName = "roles";
     private final String caseInstanceId = testName;
-    private final TestUser anonymous = TestScript.getTestUser("Anonymous");
-    private final TestUser admin = TestScript.getTestUser("Admin", "Admin");
-    private final TestUser employee = TestScript.getTestUser("Employee", "Employee");
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/team/roles.xml");
+    private final TestUser admin = createTestUser("Admin", "Admin");
+    private final TestUser employee = createTestUser("Employee", "Employee");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/team/roles.xml");
 
     @Test
     public void testRolesBasedAuthorization() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous), admin, employee);
-        StartCase startCase = testCase.createCaseCommand(anonymous, caseInstanceId, definitions, caseTeam);
+        CaseTeam caseTeam = createCaseTeam(TestScript.createOwner(testUser), admin, employee);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, caseTeam);
 
         testCase.addStep(startCase, CaseAssertion::print);
 
@@ -43,9 +44,9 @@ public class Role {
         testCase.addStep(new MakePlanItemTransition(admin, caseInstanceId, "Item1", Transition.Complete), CaseAssertion::print);
 
         // With anonymous
-        testCase.addStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Suspend), CaseAssertion::print);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Suspend), CaseAssertion::print);
 
-        testCase.addStep(new MakeCaseTransition(anonymous, caseInstanceId, Transition.Reactivate), CaseAssertion::print);
+        testCase.addStep(new MakeCaseTransition(testUser, caseInstanceId, Transition.Reactivate), CaseAssertion::print);
 
         testCase.assertStepFails(new MakePlanItemTransition(employee, caseInstanceId, "Item1.1", Transition.Complete),
                 failure -> failure.assertException(TransitionDeniedException.class, "You do not have the permission to perform the task"));

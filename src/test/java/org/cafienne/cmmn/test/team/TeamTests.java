@@ -13,7 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    Role.class
+    TestRole.class
     })
 public class TeamTests {
 

@@ -16,9 +16,11 @@ import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
-public class VariousSpelExpressions2 {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/expression/spelexpressions2.xml");
-    private final CaseDefinition definitionsWithDifferentPlanOrder = TestScript.getCaseDefinition("testdefinition/expression/spelexpressions2-different-plan-order.xml");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestVariousSpelExpressions2 {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/expression/spelexpressions2.xml");
+    private final CaseDefinition definitionsWithDifferentPlanOrder = loadCaseDefinition("testdefinition/expression/spelexpressions2-different-plan-order.xml");
 
     private final String caseInstanceId = "SpelExpressionsTest";
     private final String input = "basic";
@@ -31,12 +33,12 @@ public class VariousSpelExpressions2 {
     private final ValueMap otherInput = new ValueMap(inputParameterName, other);
     private final ValueMap defaultTaskOutput = new ValueMap("Output", defaultOutput);
     private final ValueMap stopNowTaskOutput = new ValueMap("Output", stopNowOutput);
-    private final TestUser testUser = TestScript.getTestUser("user");
+    private final TestUser testUser = createTestUser("user");
 
     @Test
     public void testHumanTaskExpressions() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
@@ -63,7 +65,7 @@ public class VariousSpelExpressions2 {
     public void testMilestoneTerminationOnDifferentInput() {
         TestScript testCase = new TestScript("expressions");
         // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, otherInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, otherInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
 
@@ -118,7 +120,7 @@ public class VariousSpelExpressions2 {
 
         TestScript testCase = new TestScript("expressions");
         // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, otherInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, otherInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
 
@@ -160,7 +162,7 @@ public class VariousSpelExpressions2 {
     @Test
     public void testMilestoneDrivenTerminationOnTaskInstanceLimit() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
 
@@ -202,7 +204,7 @@ public class VariousSpelExpressions2 {
     @Test
     public void testMilestoneDrivenTerminationOnTaskOutputContent() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
             // Get the id of the first "HumanTask" in the case. It must be in state Active

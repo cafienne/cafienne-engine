@@ -15,19 +15,18 @@ import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
-public class MilestoneTesting {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestMilestone {
 
     private final String testName = "roles";
     private final String caseInstanceId = testName;
-    private final TestUser anonymous = TestScript.getTestUser("user");
-
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/milestonetransitions.xml");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/milestonetransitions.xml");
 
     @Test
     public void testDoubleMilestoneTransition() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(anonymous));
-        StartCase startCase = testCase.createCaseCommand(anonymous, caseInstanceId, definitions, caseTeam);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.getEvents().printEventList();

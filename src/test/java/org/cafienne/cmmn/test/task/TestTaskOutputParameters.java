@@ -12,10 +12,12 @@ import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
+import static org.cafienne.cmmn.test.TestScript.*;
+
 public class TestTaskOutputParameters {
 
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/requiredtaskparameters.xml");
-    private final TestUser testUser = TestScript.getTestUser("user");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/task/requiredtaskparameters.xml");
+    private final TestUser testUser = createTestUser("user");
     private final ValueMap inputs = new ValueMap();
     private final ValueMap emptyTaskOutput = new ValueMap();
     private final ValueMap invalidTaskOutput = new ValueMap("Non-Result", "This is an invalid output parameter");
@@ -26,7 +28,7 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskOutputParameters";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, act -> {
             PlanItemTransitioned taskWithRequiredOutput = testCase.getEventListener().awaitPlanItemState("TaskRequiredOutput", State.Active);
             String requiredTaskId = taskWithRequiredOutput.getPlanItemId();
@@ -52,7 +54,7 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskOutputParametersWithCaseFileBinding";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, act -> {
             PlanItemTransitioned taskRequiredOutputWithBinding = testCase.getEventListener().awaitPlanItemState("TaskRequiredOutputWithBinding", State.Active);
             String requiredTaskWithBindingId = taskRequiredOutputWithBinding.getPlanItemId();
@@ -84,7 +86,7 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskWithoutRequiredOutput";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, act -> {
             PlanItemTransitioned taskWithOutputNotRequired = testCase.getEventListener().awaitPlanItemState("TaskWithOutputNotRequired", State.Active);
             testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskWithOutputNotRequired.getPlanItemId(), emptyTaskOutput), response -> {
@@ -101,7 +103,7 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskWithoutRequiredOutput2";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, act -> {
             PlanItemTransitioned taskWithOutputNotRequired = testCase.getEventListener().awaitPlanItemState("TaskWithOutputNotRequired", State.Active);
             testCase.addStep(new CompleteHumanTask(testUser, caseInstanceId, taskWithOutputNotRequired.getPlanItemId(), invalidTaskOutput), response -> {
@@ -119,7 +121,7 @@ public class TestTaskOutputParameters {
         String caseInstanceId = "testTaskWithoutRequiredOutputButWithCaseFileBinding";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, act -> {
             PlanItemTransitioned taskWithoutOutputWithBinding = testCase.getEventListener().awaitPlanItemState("TaskWithOutputNotRequiredAndBinding", State.Active);
             String taskWithoutOutputWithBindingId = taskWithoutOutputWithBinding.getPlanItemId();

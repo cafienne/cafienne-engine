@@ -16,13 +16,15 @@ import org.junit.Test;
 
 import java.time.Instant;
 
+import static org.cafienne.cmmn.test.TestScript.*;
+
 public class TestHumanTask {
     @Test
     public void testHumanTask() {
         String caseInstanceId = "HumanTaskTest";
         TestScript testCase = new TestScript("HumanTaskTest");
 
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/testhumantask.xml");
+        CaseDefinition xml = loadCaseDefinition("testdefinition/task/testhumantask.xml");
 
         ValueMap inputs = new ValueMap();
         ValueMap taskInput = inputs.with("TaskInput");
@@ -32,12 +34,12 @@ public class TestHumanTask {
         taskContent.plus("Subject", "Decide on this topic");
         taskContent.plus("Decision", "Yet to be decided");
 
-        TestUser pete = TestScript.getTestUser("pete");
-        TestUser gimy = TestScript.getTestUser("gimy");
-        TestUser tom = TestScript.getTestUser("tom");
-        TestUser notInTeam = TestScript.getTestUser("not-in-team");
-        CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
-        StartCase startCase = testCase.createCaseCommand(pete, caseInstanceId, xml, team);
+        TestUser pete = createTestUser("pete");
+        TestUser gimy = createTestUser("gimy");
+        TestUser tom = createTestUser("tom");
+        TestUser notInTeam = createTestUser("not-in-team");
+        CaseTeam team = createCaseTeam(pete, gimy, TestScript.createOwner(tom));
+        StartCase startCase = createCaseCommand(pete, caseInstanceId, xml, team);
 
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();

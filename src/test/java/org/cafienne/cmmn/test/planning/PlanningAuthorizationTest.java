@@ -21,21 +21,23 @@ import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.junit.Test;
 
+import static org.cafienne.cmmn.test.TestScript.*;
+
 public class PlanningAuthorizationTest {
 
     private final String testName = "authorization-test";
     private final String caseInstanceId = testName;
-    private final TestUser caseOwner = TestScript.getTestUser("CaseOwner");
-    private final TestUser caseMember = TestScript.getTestUser("CaseMember");
-    private final TestUser planner = TestScript.getTestUser("Planner", "planner");
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/planning/authorization.xml");
+    private final TestUser caseOwner = createTestUser("CaseOwner");
+    private final TestUser caseMember = createTestUser("CaseMember");
+    private final TestUser planner = createTestUser("Planner", "planner");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/planning/authorization.xml");
 
     @Test
     public void testPlanningAuthorization() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(caseOwner), caseMember, planner);
+        CaseTeam caseTeam = createCaseTeam(TestScript.createOwner(caseOwner), caseMember, planner);
 
-        StartCase startCase = testCase.createCaseCommand(caseOwner, caseInstanceId, definitions, caseTeam);
+        StartCase startCase = createCaseCommand(caseOwner, caseInstanceId, definitions, caseTeam);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 
@@ -64,9 +66,9 @@ public class PlanningAuthorizationTest {
     @Test
     public void testGetDiscretionaryItems() {
         TestScript testCase = new TestScript(testName);
-        CaseTeam caseTeam = TestScript.getCaseTeam(TestScript.getOwner(caseOwner), caseMember, planner);
+        CaseTeam caseTeam = createCaseTeam(TestScript.createOwner(caseOwner), caseMember, planner);
 
-        StartCase startCase = testCase.createCaseCommand(caseOwner, caseInstanceId, definitions, caseTeam);
+        StartCase startCase = createCaseCommand(caseOwner, caseInstanceId, definitions, caseTeam);
         testCase.addStep(startCase, CaseAssertion::print);
 
         testCase.addStep(new GetDiscretionaryItems(caseOwner, caseInstanceId), action -> {

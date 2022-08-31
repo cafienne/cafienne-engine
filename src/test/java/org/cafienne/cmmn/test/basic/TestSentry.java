@@ -16,21 +16,21 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.DiscretionaryItemAssertion;
 import org.cafienne.cmmn.test.assertions.PlanningTableAssertion;
 import org.junit.Test;
 
-public class SentryTest {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/sentry.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestSentry {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/sentry.xml");
 
     @Test
     public void testSentry() {
         String caseInstanceId = "sentry";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);
@@ -77,7 +77,7 @@ public class SentryTest {
         String caseInstanceId = "sentryOnDiscretionary";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, case1 -> {
             case1.print();
             case1.assertPlanItem("Item1").assertState(State.Active);

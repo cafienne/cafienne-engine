@@ -18,8 +18,10 @@ import org.cafienne.json.LongValue;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
-public class VariousSpelExpressions {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/expression/spelexpressions.xml");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestVariousSpelExpressions {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/expression/spelexpressions.xml");
 
     private final String caseInstanceId = "SpelExpressionsTest";
     private final String input = "basic";
@@ -33,12 +35,12 @@ public class VariousSpelExpressions {
     private final ValueMap defaultTaskOutput = new ValueMap("Output", defaultOutput);
     private final ValueMap stopNowTaskOutput = new ValueMap("Output", stopNowOutput);
     private final ValueMap specialTaskOutput = new ValueMap("SpecialOutput", new ValueMap("Multi", new int[]{1, 2, 3, 4}));
-    private final TestUser testUser = TestScript.getTestUser("user");
+    private final TestUser testUser = createTestUser("user");
 
     @Test
     public void testHumanTaskExpressions() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
             String taskId = testCase.getEventListener().awaitPlanItemState("HumanTask", State.Active).getPlanItemId();
@@ -67,7 +69,7 @@ public class VariousSpelExpressions {
     public void testMilestoneTerminationOnMultipleMulti() {
         TestScript testCase = new TestScript("expressions");
         // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
             // Milestone must have occured, causing stage and task to be terminated
@@ -106,7 +108,7 @@ public class VariousSpelExpressions {
     public void testMilestoneTerminationOnDifferentInput() {
         TestScript testCase = new TestScript("expressions");
         // Using "other" input should immediately make the Milestone occur, and also have the HumanTask end up terminated, because the stage is terminated
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, otherInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, otherInput);
         testCase.addStep(startCase, caseStarted -> {
             caseStarted.print();
             // Milestone must have occured, causing stage and task to be terminated
@@ -120,7 +122,7 @@ public class VariousSpelExpressions {
     @Test
     public void testMilestoneDrivenTerminationOnTaskInstanceLimit() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 
@@ -164,7 +166,7 @@ public class VariousSpelExpressions {
     @Test
     public void testMilestoneDrivenTerminationOnTaskOutputContent() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, case1 -> {
             case1.print();
             // Get the id of the first "HumanTask" in the case. It must be in state Active
@@ -200,7 +202,7 @@ public class VariousSpelExpressions {
     @Test
     public void testMilestoneDrivenTerminationOnTaskMultiOutputContent() {
         TestScript testCase = new TestScript("expressions");
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, basicInput);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             // Get the id of the first "HumanTask" in the case. It must be in state Active

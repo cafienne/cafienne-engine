@@ -12,7 +12,6 @@ import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.junit.Rule;
@@ -22,10 +21,10 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.cafienne.cmmn.test.TestScript.*;
 
 public class TestPaxAlert {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/paxalert.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/task/paxalert.xml");
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9888);
@@ -59,7 +58,7 @@ public class TestPaxAlert {
         checkin.plus("departuretime", "2015-03-21T12:12:00Z");
         
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, caseStarted -> {
             testCase.getEventListener().awaitPlanItemState("Execute background check", State.Completed);
             caseStarted.print();

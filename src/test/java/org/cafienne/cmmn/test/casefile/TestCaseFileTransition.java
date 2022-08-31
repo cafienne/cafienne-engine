@@ -18,7 +18,6 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.TaskAssertion;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueList;
@@ -26,13 +25,14 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
-public class CaseFileTransitionTest {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestCaseFileTransition {
 
     private static final String REVIEW_STAGE = "ReviewStage";
     private static final String REVIEW_REQUEST = "ReviewRequest";
     private final String inputParameterName = "inputCaseFile";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repetitivefileitems.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/repetitivefileitems.xml");
     private final Path requestPath = new Path("Request");
     private final Path helperPath = new Path("Request/Helper");
     private final Path customerPath = new Path("Request/Customer");
@@ -63,7 +63,7 @@ public class CaseFileTransitionTest {
         ValueMap inputs = new ValueMap();
         inputs.put(inputParameterName, content);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertCaseFileItem(requestPath).assertValue(content).assertCaseFileItem(new Path("/Customer")).assertState(State.Null);

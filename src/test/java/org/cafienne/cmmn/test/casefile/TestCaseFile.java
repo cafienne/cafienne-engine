@@ -5,16 +5,16 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
-public class CaseFileTest {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestCaseFile {
     private final String caseName = "CaseFileTest";
     private final String inputParameterName = "aaa";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/casefiletest.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/casefile/casefiletest.xml");
 
     @Test
     public void testPropertyAccessingFromSentry() {
@@ -35,7 +35,7 @@ public class CaseFileTest {
 
         TestScript.debugMessage(rootValue.toString());
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, rootValue.cloneValueNode());
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, rootValue.cloneValueNode());
 
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
@@ -66,7 +66,7 @@ public class CaseFileTest {
         //  That is actually incorrect behavior of the engine
 
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, rootValue.cloneValueNode());
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, rootValue.cloneValueNode());
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertTask("FirstTask").assertLastTransition(Transition.Create, State.Available, State.Null);

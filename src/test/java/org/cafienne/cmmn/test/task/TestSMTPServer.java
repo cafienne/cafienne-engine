@@ -11,19 +11,19 @@ import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
 import java.util.Base64;
+
+import static org.cafienne.cmmn.test.TestScript.*;
 
 /**
  *
  *
  */
 public class TestSMTPServer {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/smtpcall.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/task/smtpcall.xml");
 
 
     @Test
@@ -45,7 +45,7 @@ public class TestSMTPServer {
         request.plus("attachment", attachmentContent);
         request.plus("filename", "abc.txt");
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 

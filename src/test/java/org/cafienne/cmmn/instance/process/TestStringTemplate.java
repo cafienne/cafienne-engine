@@ -17,9 +17,9 @@ import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 
-public class StringTemplateTest {
+public class TestStringTemplate {
 
-    public StringTemplateTest() {
+    public TestStringTemplate() {
         TestScript.debugMessage("Running StringTemplateTest");
     }
 

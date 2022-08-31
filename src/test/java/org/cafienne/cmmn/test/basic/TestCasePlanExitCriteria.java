@@ -13,9 +13,10 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.junit.Test;
+
+import static org.cafienne.cmmn.test.TestScript.*;
 
 /**
  * This case contains two tests on the case plan's exit criteria. The case plan exits when task Review2 is completed.
@@ -25,16 +26,15 @@ import org.junit.Test;
  * the case plan is not normally completed, and subsequently it is terminated, causing the Review task as well as the case plan
  * itself to go into Terminated state.
  */
-public class CasePlanExitCriteria {
+public class TestCasePlanExitCriteria {
 
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/caseplanexitcriteria.xml");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/caseplanexitcriteria.xml");
 
     @Test
     public void testCasePlanExitCompletion() {
         String caseInstanceId = "CasePlanExitCriteria-CompletionTest";
         TestScript testCase = new TestScript(caseInstanceId);
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");
             reviewTask.assertState(State.Active);
@@ -65,7 +65,7 @@ public class CasePlanExitCriteria {
         String caseInstanceId = "CasePlanExitCriteria-TerminationTest";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             PlanItemAssertion reviewTask = casePlan.assertTask("Review");

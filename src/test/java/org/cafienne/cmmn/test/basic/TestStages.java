@@ -13,20 +13,20 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.StageAssertion;
 import org.junit.Test;
 
-public class Stages {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestStages {
     @Test
     public void testStages() {
         String caseInstanceId = "stages";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/stages.xml");
-        TestUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/stages.xml");
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Available);

@@ -13,12 +13,12 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
-public class StageCompletion {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/stageCompletion.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestStageCompletion {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/stageCompletion.xml");
 
     @Test
     public void testStage1Completion() {
@@ -26,7 +26,7 @@ public class StageCompletion {
         TestScript testCase = new TestScript(caseInstanceId);
 
         // Case contains a stage with a required Task1; completing the stage can only be done if Task1 is in semi-terminal state.
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertStage("Stage1").assertState(State.Available);
             casePlan.assertStage("Stage2").assertState(State.Available);
@@ -72,7 +72,7 @@ public class StageCompletion {
         final TestScript testCase = new TestScript(caseInstanceId);
 
         // Case contains a stage with a required Task1; completing the stage can only be done if Task1 is in semi-terminal state.
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertStage("Stage1").assertState(State.Available);
             casePlan.assertStage(mainStageName).assertState(State.Available);
@@ -110,7 +110,7 @@ public class StageCompletion {
         final TestScript testCase = new TestScript(caseInstanceId);
 
         // Case contains a stage with a required Task1; completing the stage can only be done if Task1 is in semi-terminal state.
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.assertStage("Stage1").assertState(State.Available);
             casePlan.assertStage("Stage2").assertState(State.Available);

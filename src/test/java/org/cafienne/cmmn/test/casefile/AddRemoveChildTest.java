@@ -7,19 +7,19 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
+
+import static org.cafienne.cmmn.test.TestScript.*;
 
 public class AddRemoveChildTest {
     // This tests a set of basic case file types and properties
     // The test just starts the case and then validates the output, no specific actions are done (no transitions are made)
 
     private final String caseName = "addChildTest";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/addChildTest.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/addChildTest.xml");
     private final Path testPath = new Path("test");
     private final Path testChildPath = new Path("test/testChild");
 
@@ -28,7 +28,7 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
@@ -65,7 +65,7 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         ValueMap item = new ValueMap();
@@ -93,7 +93,7 @@ public class AddRemoveChildTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(testPath).assertValue(Value.NULL));
 
         // Add child item together with parent

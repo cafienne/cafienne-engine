@@ -13,19 +13,19 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
-public class RequiredRule {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestRequiredRule {
     @Test
     public void testRequiredRule() {
         String caseInstanceId = "requiredrule";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/requiredrule.xml");
-        TestUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/requiredrule.xml");
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             casePlan.assertPlanItem("Item1").assertState(State.Active);

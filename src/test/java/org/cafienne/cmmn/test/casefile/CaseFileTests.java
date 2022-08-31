@@ -13,14 +13,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    BasicTypes.class,
-    CaseFileTransitionTest.class,
-    CaseFileTest.class,
-    PathTest.class,
-    InvalidCaseFileDefinition.class,
-    MultiplicityTest.class,
-    NewCaseFileTest.class,
-    RepetitiveFileItems.class,
+    TestBasicTypes.class,
+    TestCaseFileTransition.class,
+    TestCaseFile.class,
+    TestPath.class,
+    TestInvalidCaseFileDefinition.class,
+    TestMultiplicity.class,
+    TestNewCaseFile.class,
+    TestRepetitiveFileItems.class,
     TestTaskInputMapping.class
     })
 public class CaseFileTests {

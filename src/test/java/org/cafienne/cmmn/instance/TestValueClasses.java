@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ValueTests {
+public class TestValueClasses {
 
     @Test
     public void testValueMap() {

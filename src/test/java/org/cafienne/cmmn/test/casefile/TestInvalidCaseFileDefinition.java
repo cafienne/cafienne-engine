@@ -13,7 +13,7 @@ import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.infrastructure.Cafienne;
 import org.junit.Test;
 
-public class InvalidCaseFileDefinition {
+public class TestInvalidCaseFileDefinition {
     // Simple test for casefile structure
     @Test
     public void testInvalidCaseDefinition() {

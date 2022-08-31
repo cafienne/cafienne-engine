@@ -4,17 +4,17 @@ package org.cafienne.cmmn.test.expression;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
-public class CaseFileContextExpressions {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestCaseFileContextExpressions {
     private final String caseName = "CaseFileContextExpressions";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/expression/casefilecontextexpressions.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/expression/casefilecontextexpressions.xml");
 
     @Test
     public void testContextSettingsFromTasks() {
@@ -28,7 +28,7 @@ public class CaseFileContextExpressions {
 
         ValueMap caseInput = new ValueMap("Container", new ValueMap("Child", new ValueList(child1, child2)));
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, caseInput.cloneValueNode());
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, caseInput.cloneValueNode());
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
             testCase.getEventListener().awaitTaskInputFilled("TaskWithExpression", taskEvent -> {

@@ -18,23 +18,23 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
-public class SubCase {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestSubCase {
     @Test
     public void testSubCase() {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");
 
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TestUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/task/subcase.xml");
 
         /**
          * Start the MainCase
          */
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
         /**
@@ -134,13 +134,12 @@ public class SubCase {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");
 
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TestUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/task/subcase.xml");
 
         /**
          * Start the MainCase
          */
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
         /**
@@ -182,13 +181,12 @@ public class SubCase {
         String caseInstanceId = "SubCaseTest";
         TestScript testCase = new TestScript("SubCase");
 
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/subcase.xml");
-        TestUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/task/subcase.xml");
 
         /**
          * Start the MainCase
          */
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, mainCasePlan -> mainCasePlan.print());
 
 

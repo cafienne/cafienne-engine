@@ -7,8 +7,8 @@
  */
 package org.cafienne.cmmn.test.sentry;
 
-import org.cafienne.cmmn.test.casefile.RepetitiveFileItems;
-import org.cafienne.cmmn.test.expression.VariousSpelExpressions;
+import org.cafienne.cmmn.test.casefile.TestRepetitiveFileItems;
+import org.cafienne.cmmn.test.expression.TestVariousSpelExpressions;
 import org.cafienne.cmmn.test.task.TestGetListGetDetails;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -16,10 +16,10 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        MilestoneTesting.class,
-        RepetitiveFileItems.class,
+        TestMilestone.class,
+        TestRepetitiveFileItems.class,
         TestGetListGetDetails.class,
-        VariousSpelExpressions.class
+        TestVariousSpelExpressions.class
     })
 public class SentryNetworkTests {
 

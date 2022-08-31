@@ -13,20 +13,20 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.PlanItemAssertion;
 import org.junit.Test;
 
-public class SentryRef {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/sentryRef.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestSentryRef {
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/sentryRef.xml");
 
     @Test
     public void testSentryRef() {
         String caseInstanceId = "SentryRefTest";
         TestScript testCase = new TestScript("sentryRef");
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, action -> action.print());
 
         MakePlanItemTransition completeTask1 = new MakePlanItemTransition(testUser, caseInstanceId, "Task_1", Transition.Complete);

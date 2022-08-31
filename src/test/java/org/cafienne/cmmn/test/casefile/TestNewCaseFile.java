@@ -8,7 +8,6 @@ import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
@@ -16,10 +15,11 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
-public class NewCaseFileTest {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestNewCaseFile {
     private final String caseName = "NewCaseFileTest";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/casefile.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/casefile/casefile.xml");
 
     private final Path rootPath = new Path("RootCaseFileItem");
 
@@ -29,7 +29,7 @@ public class NewCaseFileTest {
         String caseInstanceId = new Guid().toString();
         TestScript testCase = new TestScript(caseName);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
 
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();

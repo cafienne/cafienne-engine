@@ -13,20 +13,20 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.junit.Test;
 
-public class RepeatRule {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestRepeatRule {
 
     @Test
     public void testRepeatRule() {
         String caseInstanceId = "repeatrule";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/repeatrule.xml");
-        TestUser testUser = TestScript.getTestUser("Anonymous");
+        CaseDefinition definitions = loadCaseDefinition("testdefinition/repeatrule.xml");
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, case1 -> {
             case1.print();
             case1.assertPlanItem("Item1").assertState(State.Active);

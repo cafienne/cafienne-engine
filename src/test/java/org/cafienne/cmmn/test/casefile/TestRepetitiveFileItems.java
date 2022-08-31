@@ -13,18 +13,18 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 import org.junit.Test;
 
-public class RepetitiveFileItems {
+import static org.cafienne.cmmn.test.TestScript.*;
+
+public class TestRepetitiveFileItems {
 
     // Simple test for repetitive casefile structure
     private final String caseName = "repetitiveFileItems";
     private final TestScript testCase = new TestScript(caseName);
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/repeatcasefilecreation.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/casefile/repeatcasefilecreation.xml");
     private final Path topPath = new Path("TopCase");
     private final Path itemsPath = new Path("TopCase/items");
     private final Path item0 = new Path("TopCase/items[0]");
@@ -39,7 +39,7 @@ public class RepetitiveFileItems {
         // startCase
         String caseInstanceId = "CaseFileDefinitionTest";
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             casePlan.print();
 
@@ -185,7 +185,7 @@ public class RepetitiveFileItems {
         // startCase
         String caseInstanceId = "CaseFileDefinitionTest23";
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, casePlan -> {
             // There must be 1 review task in state available, and it must repeat because there are less than 2 item objects in the case file
             casePlan.assertPlanItems("Review").assertSize(1).assertStates(State.Available).assertRepeats();

@@ -7,21 +7,20 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
+import static org.cafienne.cmmn.test.TestScript.*;
 
-public class MultiplicityTest {
+
+public class TestMultiplicity {
     // This tests a set of basic case file types and properties
     // The test just starts the case and then validates the output, no specific actions are done (no transitions are made)
 
     private final String caseName = "multiTest";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/multiTest.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
-
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/multiTest.xml");
     private final Path parentPath = new Path("parent");
     private final Path childPath = new Path("parent/child");
     private final Path mChildPath = new Path("parent/mchild");
@@ -33,7 +32,7 @@ public class MultiplicityTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(parentPath).assertValue(Value.NULL));
 
 
@@ -84,7 +83,7 @@ public class MultiplicityTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(parentPath).assertValue(Value.NULL));
 
 
@@ -118,7 +117,7 @@ public class MultiplicityTest {
         TestScript testCase = new TestScript(caseName);
 
         String caseInstanceId = new Guid().toString();
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions);
         testCase.addStep(startCase, caseFile -> caseFile.assertCaseFileItem(parentPath).assertValue(Value.NULL));
 
 
