@@ -1,0 +1,40 @@
+<case id="public_event_test.case" name="public_event_test" expressionLanguage="spel" guid="_kZgA5">
+    <caseFileModel>
+        <caseFileItem id="_kZgA5_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
+    </caseFileModel>
+    <casePlanModel id="cm__kZgA5_0" name="public_event_test" autoComplete="true">
+        <planItem id="pi_ht__kZgA5_0" name="TopTask" definitionRef="ht__kZgA5_0"/>
+        <planItem id="pi__kZgA5_3" name="TopStage" definitionRef="_kZgA5_3"/>
+        <planItem id="pi_ms__kZgA5_0" name="TopMilestone" definitionRef="ms__kZgA5_0"/>
+        <planItem id="pi_ct__kZgA5_0" name="HelloWorld" definitionRef="ct__kZgA5_0"/>
+        <humanTask id="ht__kZgA5_0" name="TopTask" isBlocking="true"/>
+        <stage id="_kZgA5_3" name="TopStage" autoComplete="true">
+            <planItem id="pi_ht__kZgA5_1" name="NestedTask" definitionRef="ht__kZgA5_1"/>
+            <planItem id="pi__kZgA5_7" name="NestedStage" definitionRef="_kZgA5_7"/>
+        </stage>
+        <milestone id="ms__kZgA5_0" name="TopMilestone"/>
+        <humanTask id="ht__kZgA5_1" name="NestedTask" isBlocking="true"/>
+        <stage id="_kZgA5_7" name="NestedStage" autoComplete="true">
+            <planItem id="pi_ht__kZgA5_2" name="LaterTask" definitionRef="ht__kZgA5_2">
+                <entryCriterion id="_kZgA5_10" name="EntryCriterion_0" sentryRef="crit__kZgA5_0"/>
+            </planItem>
+            <planItem id="pi_ms__kZgA5_1" name="LaterMilestone" definitionRef="ms__kZgA5_1">
+                <entryCriterion id="_kZgA5_13" name="EntryCriterion_1" sentryRef="crit__kZgA5_1"/>
+            </planItem>
+            <sentry id="crit__kZgA5_0">
+                <planItemOnPart id="_kZgA5_11" sourceRef="pi_ht__kZgA5_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="crit__kZgA5_1">
+                <planItemOnPart id="_kZgA5_14" sourceRef="pi_ht__kZgA5_2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+        </stage>
+        <humanTask id="ht__kZgA5_2" name="LaterTask" isBlocking="true"/>
+        <milestone id="ms__kZgA5_1" name="LaterMilestone"/>
+        <caseTask id="ct__kZgA5_0" name="HelloWorld" isBlocking="true" caseRef="helloworld.case"/>
+    </casePlanModel>
+    <input id="_kZgA5_1" name="Root" bindingRef="_kZgA5_0"/>
+</case>
