@@ -28,5 +28,9 @@ trait PublicCaseEventBatchSource extends EventBatchSource[PublicCaseEventBatch] 
     */
   override def createBatch(persistenceId: String): PublicCaseEventBatch = new PublicCaseEventBatch(persistenceId)
 
-  def publicEvents: Source[PublicCaseEventBatch, NotUsed] = batches.map(_.createPublicEvents)
+  def publicEvents: Source[PublicCaseEventBatch, NotUsed] = {
+    // Note: we're filtering out empty batches! These occur e.g. when a subcase is started and it reports
+    //  back to the main case about successful start. This does not lead to any public events on the case.
+    batches.map(_.createPublicEvents).filter(_.publicEvents.nonEmpty)
+  }
 }
