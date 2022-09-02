@@ -8,12 +8,16 @@
         <planItem id="pi_ms__kZgA5_0" name="TopMilestone" definitionRef="ms__kZgA5_0"/>
         <planItem id="pi_ct__kZgA5_0" name="HelloWorld" definitionRef="ct__kZgA5_0"/>
         <humanTask id="ht__kZgA5_0" name="TopTask" isBlocking="true"/>
+        <humanTask id="ht__kZgA5_1" name="NestedTask" isBlocking="true"/>
+        <humanTask id="ht__kZgA5_2" name="LaterTask" isBlocking="true"/>
+        <caseTask id="ct__kZgA5_0" name="HelloWorld" isBlocking="true" caseRef="helloworld.case"/>
+        <milestone id="ms__kZgA5_0" name="TopMilestone"/>
+        <milestone id="ms__kZgA5_1" name="LaterMilestone"/>
         <stage id="_kZgA5_3" name="TopStage" autoComplete="true">
             <planItem id="pi_ht__kZgA5_1" name="NestedTask" definitionRef="ht__kZgA5_1"/>
             <planItem id="pi__kZgA5_7" name="NestedStage" definitionRef="_kZgA5_7"/>
+            <planItem id="pi_ue__kZgA5_0" name="UserEvent" definitionRef="ue__kZgA5_0"/>
         </stage>
-        <milestone id="ms__kZgA5_0" name="TopMilestone"/>
-        <humanTask id="ht__kZgA5_1" name="NestedTask" isBlocking="true"/>
         <stage id="_kZgA5_7" name="NestedStage" autoComplete="true">
             <planItem id="pi_ht__kZgA5_2" name="LaterTask" definitionRef="ht__kZgA5_2">
                 <entryCriterion id="_kZgA5_10" name="EntryCriterion_0" sentryRef="crit__kZgA5_0"/>
@@ -22,8 +26,8 @@
                 <entryCriterion id="_kZgA5_13" name="EntryCriterion_1" sentryRef="crit__kZgA5_1"/>
             </planItem>
             <sentry id="crit__kZgA5_0">
-                <planItemOnPart id="_kZgA5_11" sourceRef="pi_ht__kZgA5_1">
-                    <standardEvent>complete</standardEvent>
+                <planItemOnPart id="_kZgA5_11" sourceRef="pi_ue__kZgA5_0">
+                    <standardEvent>occur</standardEvent>
                 </planItemOnPart>
             </sentry>
             <sentry id="crit__kZgA5_1">
@@ -32,9 +36,7 @@
                 </planItemOnPart>
             </sentry>
         </stage>
-        <humanTask id="ht__kZgA5_2" name="LaterTask" isBlocking="true"/>
-        <milestone id="ms__kZgA5_1" name="LaterMilestone"/>
-        <caseTask id="ct__kZgA5_0" name="HelloWorld" isBlocking="true" caseRef="helloworld.case"/>
+        <userEvent id="ue__kZgA5_0" name="UserEvent"/>
     </casePlanModel>
     <input id="_kZgA5_1" name="Root" bindingRef="_kZgA5_0"/>
 </case>

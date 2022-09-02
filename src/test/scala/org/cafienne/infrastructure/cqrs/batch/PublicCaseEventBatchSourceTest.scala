@@ -45,17 +45,17 @@ class PublicCaseEventBatchSourceTest
   val caseInstanceId: String = new Guid().toString
   val caseDefinition: CaseDefinition = loadCaseDefinition("testdefinition/public_event_test.xml")
   val startCaseCommand: StartCase = TestScript.createCaseCommand(testUser, caseInstanceId, caseDefinition, new ValueMap("Root", "Test"))
-  val completeNestedTask = new MakePlanItemTransition(testUser, caseInstanceId, "NestedTask", Transition.Complete)
+  val triggerUserEvent = new MakePlanItemTransition(testUser, caseInstanceId, "UserEvent", Transition.Occur)
   val completeLaterTask = new MakePlanItemTransition(testUser, caseInstanceId, "LaterTask", Transition.Complete)
 
   "PublicCaseEventBatchSource" must {
     "publish events" in {
 
       // We have n number of commands ...
-      val commands = Seq(startCaseCommand, completeNestedTask, completeLaterTask)
+      val commands = Seq(startCaseCommand, triggerUserEvent, completeLaterTask)
 //      val commands = Seq(startCaseCommand)
       // ... and we expect also n number of batches to become available for our assertions
-      val streamReader: Future[Seq[PublicCaseEventBatch]] = source.publicEvents.take(3).runWith(Sink.seq)
+      val streamReader: Future[Seq[PublicCaseEventBatch]] = source.publicEvents.take(commands.size).runWith(Sink.seq)
 
 
       println(s"Sending ${commands.size} commands: [${commands.map(_.getClass.getSimpleName).mkString(", ")}]")
@@ -63,10 +63,19 @@ class PublicCaseEventBatchSourceTest
         println(s"Received ${responses.size} responses: [${responses.map(_.getClass.getSimpleName).mkString(", ")}]")
         whenReady(streamReader) { batches =>
           println("All public event batches have been received; checking each of them")
+
+          // Iterate batches and show the ful json of the event
           var number = 0
           batches.foreach(batch => {
+            number += 1
+            println(s"Batch[$number] has ${batch.publicEvents.size} events:\n- ${batch.publicEvents.map(_.toValue).mkString("\n- ")}\n")
+          })
+
+          // Iterate batches again and now just show the summary of the event (type + path)
+          number = 0
+          batches.foreach(batch => {
             number+=1
-            println(s"Batch[$number] has ${batch.publicEvents.size} events:\n- ${batch.publicEvents.map(_.content.getClass.getSimpleName).mkString("\n- ")}\n")
+            println(s"Batch[$number] has ${batch.publicEvents.size} events:\n- ${batch.publicEvents.map(_.content.toString).mkString("\n- ")}\n")
           })
 
 //          val eventBatch = batches.head

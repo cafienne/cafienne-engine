@@ -10,4 +10,7 @@ package org.cafienne.infrastructure.cqrs.batch.public_events
 
 import org.cafienne.json.CafienneJson
 
-trait CafiennePublicEventContent extends CafienneJson
+trait CafiennePublicEventContent extends CafienneJson {
+  override def toString: String = getClass.getSimpleName
+
+}
