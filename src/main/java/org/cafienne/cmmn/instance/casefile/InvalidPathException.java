@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.instance.casefile;
 
 import org.cafienne.actormodel.exception.InvalidCommandException;
+import org.cafienne.cmmn.instance.Path;
 
 /**
  * Thrown if a {@link Path} is not valid according to the CaseDefinition

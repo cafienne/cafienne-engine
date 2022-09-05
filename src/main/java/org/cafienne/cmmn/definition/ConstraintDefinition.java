@@ -12,7 +12,7 @@ import org.cafienne.cmmn.expression.DefaultValueEvaluator;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.w3c.dom.Element;
 
 public class ConstraintDefinition extends CMMNElementDefinition {

@@ -15,6 +15,7 @@ import org.cafienne.cmmn.definition.casefile.CaseFileError;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.definition.casefile.PropertyDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.sentry.CaseFileItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
@@ -473,10 +474,6 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
      */
     protected void setState(State newState) {
         this.state = newState;
-    }
-
-    public String getDescription() {
-        return getClass().getSimpleName() + "[" + getPath() + "]";
     }
 
     @Override

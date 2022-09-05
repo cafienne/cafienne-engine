@@ -424,8 +424,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public String getPath() {
-        return "'" + this.getName() + "." + this.index + "'";
+    @Override
+    public Path getPath() {
+        return new Path(this);
     }
 
     /**
@@ -477,11 +478,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public Stage<?> getStage() {
         return stage;
-    }
-
-    @Override
-    public String getDescription() {
-        return toString();
     }
 
     final String toDescription() {

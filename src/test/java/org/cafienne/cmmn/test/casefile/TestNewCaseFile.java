@@ -6,7 +6,7 @@ import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.definition.CaseDefinition;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
 import org.cafienne.json.Value;

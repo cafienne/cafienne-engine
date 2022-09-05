@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.cafienne.cmmn.instance.casefile;
+package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
-import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.casefile.*;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
@@ -17,7 +17,9 @@ import org.cafienne.json.ValueMap;
 import java.io.Serializable;
 
 /**
- * Represents a path into the case file to find a specific case file item
+ * Represents a path into the case plan or case file to reference a specific plan item or case file item.
+ * Takes the nested structure of both plan and file into account, including multiplicity,
+ * which is represented with square brackets. Nesting separator is a forward slash.
  */
 public class Path implements Serializable {
 
@@ -31,7 +33,7 @@ public class Path implements Serializable {
 
     /**
      * Create a new path from a string. Uses the case definition to validate the path.
-     * Throws an exception if the path is invalid, i.e., if not all the elements inside the path could be mapped to the case file definition.
+     * Throws an exception if the path is invalid, i.e., if it does not comply with the basic protocol.
      *
      * @param rawPath
      * @throws InvalidPathException
@@ -84,6 +86,27 @@ public class Path implements Serializable {
             this.depth = 0;
         } else {
             this.parent = new Path(parentItem, this);
+            this.root = parent.root;
+            this.depth = parent.depth + 1;
+        }
+        this.originalPath = toString();
+    }
+
+    public Path(PlanItem<?> planItem) {
+        this(planItem, null);
+    }
+
+    private Path(PlanItem<?> planItem, Path child) {
+        this.name = planItem.getName();
+        this.index = planItem.getItemDefinition().getPlanItemControl().getRepetitionRule().isDefault() ? -1 : planItem.getIndex();
+        this.child = child;
+        PlanItem<?> parentStage = planItem.getStage();
+        if (parentStage == null) {
+            this.parent = null;
+            this.root = this;
+            this.depth = 0;
+        } else {
+            this.parent = new Path(parentStage, this);
             this.root = parent.root;
             this.depth = parent.depth + 1;
         }
@@ -162,12 +185,12 @@ public class Path implements Serializable {
      *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
      *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
      */
-    public <C extends CaseFileItemCollection> C resolve(Case caseInstance) throws InvalidPathException {
+    public <C extends CaseFileItemCollection<?>> C resolve(Case caseInstance) throws InvalidPathException {
         CaseFile caseFile = caseInstance.getCaseFile();
         if (this.isEmpty()) {
             return (C) caseFile;
         } else {
-            return (C) root.resolve(caseFile);
+            return root.resolve(caseFile);
         }
     }
 
@@ -180,7 +203,7 @@ public class Path implements Serializable {
      *                              a non-existing array element that is more than 1 element behind the array size. E.g., if array size is 3, then
      *                              a path [4] will fail, as that assumes 5 elements in the array, whereas array[3] points to a potentially new 4th element.
      */
-    private <C extends CaseFileItemCollection> C resolve(CaseFileItemCollection<?> parentItem) throws InvalidPathException {
+    private <C extends CaseFileItemCollection<?>> C resolve(CaseFileItemCollection<?> parentItem) throws InvalidPathException {
         if (isEmpty()) {
             return (C) parentItem;
         }
@@ -288,7 +311,7 @@ public class Path implements Serializable {
 
     public String toString() {
         if (parent != null) {
-            return parent.toString() + "/" + getPart();
+            return parent + "/" + getPart();
         } else {
             return getPart();
         }
@@ -424,8 +447,8 @@ public class Path implements Serializable {
         if (rawPath == null) {
             throw new InvalidPathException("Missing path parameter");
         }
-        // Empty path elements are no allowed.
-        if (rawPath.indexOf("//") >= 0) {
+        // Empty elements inside the path string are not allowed.
+        if (rawPath.contains("//")) {
             throw new InvalidPathException("Path should not contain empty elements '//' " + rawPath);
         }
         // Remove optional trailing slash and ending slash

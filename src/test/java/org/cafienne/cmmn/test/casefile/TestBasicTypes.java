@@ -14,7 +14,7 @@ import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileError;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueList;

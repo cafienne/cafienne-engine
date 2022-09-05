@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;

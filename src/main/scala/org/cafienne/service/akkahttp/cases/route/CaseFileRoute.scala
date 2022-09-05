@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
+import org.cafienne.cmmn.instance
 import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
 import org.cafienne.json.Value
 import org.cafienne.service.akkahttp.Headers
@@ -141,7 +142,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
     * @param subRoute
     * @return
     */
-  private def casefileContentRoute(action: String, subRoute: (AuthenticatedUser, Value[_], String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
+  private def casefileContentRoute(action: String, subRoute: (AuthenticatedUser, Value[_], String, instance.Path) => Route): Route = {
     casefileRoute(action, (user, caseInstanceId, path) => {
       entity(as[Value[_]]) { json => {
         subRoute(user, json, caseInstanceId, path)
@@ -155,7 +156,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
     * @param subRoute
     * @return
     */
-  private def casefileRoute(action: String, subRoute: (AuthenticatedUser, String, org.cafienne.cmmn.instance.casefile.Path) => Route): Route = {
+  private def casefileRoute(action: String, subRoute: (AuthenticatedUser, String, instance.Path) => Route): Route = {
     caseUser { user =>
       pathPrefix(Segment / "casefile" / action ) { caseInstanceId =>
         withCaseFilePath(path => subRoute(user, caseInstanceId, path))
@@ -169,9 +170,9 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
     * @param subRoute
     * @return
     */
-  private def withCaseFilePath(subRoute: org.cafienne.cmmn.instance.casefile.Path => Route): Route = {
+  private def withCaseFilePath(subRoute: instance.Path => Route): Route = {
     // Creating a "cafienne-path" will validate the syntax
-    import org.cafienne.cmmn.instance.casefile.Path
+    import org.cafienne.cmmn.instance.Path
     pathEndOrSingleSlash {
       subRoute(new Path(""))
     } ~ path(Remaining) { rawPath =>

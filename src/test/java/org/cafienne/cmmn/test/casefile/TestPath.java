@@ -3,7 +3,7 @@ package org.cafienne.cmmn.test.casefile;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.casefile.InvalidPathException;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
