@@ -55,6 +55,17 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         plus(rawInputs);
     }
 
+    public static ValueMap fill(ValueMapFiller filler) {
+        ValueMap map = new ValueMap();
+        filler.fill(map);
+        return map;
+    }
+
+    @FunctionalInterface
+    public interface ValueMapFiller {
+        void fill(ValueMap map);
+    }
+
     /**
      * Add a number of properties to the map.
      * Note, the properties must come as name/value pairs.
