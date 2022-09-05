@@ -9,13 +9,15 @@
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned
-import org.cafienne.cmmn.instance.State
+import org.cafienne.cmmn.instance.{Path, State}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
 @Manifest
-case class StageCompleted(identifier: String, caseInstanceId: String) extends CafiennePublicEventContent {
-  override def toValue: Value[_] = new ValueMap(Fields.identifier, identifier, Fields.caseInstanceId, caseInstanceId)
+case class StageCompleted(identifier: String, path: Path, caseInstanceId: String) extends CafiennePublicEventContent {
+  override def toValue: Value[_] = new ValueMap(Fields.identifier, identifier, Fields.path, path, Fields.caseInstanceId, caseInstanceId)
+
+  override def toString: String = getClass.getSimpleName + "[" + path + "]"
 }
 
 object StageCompleted {
@@ -23,10 +25,11 @@ object StageCompleted {
       .filterMap(classOf[PlanItemTransitioned])
       .filter(_.getCurrentState == State.Completed)
       .filter(_.getType == "Stage")
-      .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), StageCompleted(event.getPlanItemId, event.getCaseInstanceId)))
+      .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), StageCompleted(event.getPlanItemId, event.path, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): StageCompleted = StageCompleted(
     identifier = json.readField(Fields.identifier),
+    path = json.readPath(Fields.path),
     caseInstanceId = json.readField(Fields.caseInstanceId)
   )
 }
