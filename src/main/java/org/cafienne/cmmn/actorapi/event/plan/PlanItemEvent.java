@@ -16,7 +16,7 @@ import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class PlanItemEvent extends CasePlanEvent<PlanItem<?>> {
+public abstract class PlanItemEvent extends CasePlanEvent {
     public final int seqNo;
     public final int index;
 
@@ -36,9 +36,12 @@ public abstract class PlanItemEvent extends CasePlanEvent<PlanItem<?>> {
 
     protected PlanItemEvent(ValueMap json) {
         super(json);
+
+        // TaskEvent is now also a PlanItemEvent.
+        //  Older versions of those events do not have a seqNo and index. We're providing -1 as the default value to recognize that.
         ValueMap planItemJson = json.readMap(Fields.planitem);
-        this.seqNo = ((Long) planItemJson.raw(Fields.seqNo)).intValue();
-        this.index = ((Long) planItemJson.raw(Fields.index)).intValue();
+        this.seqNo = planItemJson.readLong(Fields.seqNo, -1L).intValue();
+        this.index = planItemJson.readLong(Fields.index, -1L).intValue();
     }
 
     public void writePlanItemEvent(JsonGenerator generator) throws IOException {

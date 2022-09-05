@@ -52,7 +52,6 @@ public class TaskInputFilled extends TaskEvent<Task<?>> {
         return mappedInputParameters;
     }
 
-
     @Override
     public void updateState(Task<?> task) {
         task.updateState(this);

@@ -17,13 +17,13 @@ import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent {
-    private transient I planItem;
+public abstract class CasePlanEvent extends CaseBaseEvent {
+    private transient PlanItem<?> planItem;
 
     private final String planItemId;
     private final String type;
 
-    protected CasePlanEvent(I planItem) {
+    protected CasePlanEvent(PlanItem<?> planItem) {
         super(planItem.getCaseInstance());
         this.planItemId = planItem.getId();
         this.type = planItem.getType();
@@ -44,11 +44,11 @@ public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent
         this.planItem = null;
     }
 
-    protected void setPlanItem(I planItem) {
+    protected void setPlanItem(PlanItem planItem) {
         this.planItem = planItem;
     }
 
-    protected I getPlanItem() {
+    protected PlanItem getPlanItem() {
         return this.planItem;
     }
 
@@ -65,7 +65,7 @@ public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent
         updateState(planItem);
     }
 
-    public abstract void updateState(I item);
+    public abstract void updateState(PlanItem<?> item);
 
     public void writeCasePlanEvent(JsonGenerator generator) throws IOException {
         super.writeCaseEvent(generator);

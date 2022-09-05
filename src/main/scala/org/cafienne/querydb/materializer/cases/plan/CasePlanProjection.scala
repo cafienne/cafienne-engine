@@ -18,12 +18,12 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
   private val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
   private val tasks = scala.collection.mutable.HashMap[String, TaskRecord]()
 
-  def handleCasePlanEvent(event: CasePlanEvent[_]): Future[Done] = {
+  def handleCasePlanEvent(event: CasePlanEvent): Future[Done] = {
     event match {
-      case event: PlanItemEvent => handlePlanItemEvent(event)
       case event: HumanTaskCreated => deprecatedCreateTask(event)
       case event: HumanTaskActivated => createTask(event)
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
+      case event: PlanItemEvent => handlePlanItemEvent(event)
       case _ => Future.successful(Done) // ignore other events (e.g. TaskInputFilled and TaskOutputFilled)
     }
   }

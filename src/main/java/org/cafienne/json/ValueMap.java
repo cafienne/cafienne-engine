@@ -353,6 +353,14 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
     }
 
+    public Long readLong(Object fieldName, Long... value) {
+        if (value.length > 0) {
+            return readField(fieldName, value);
+        } else {
+            return readField(fieldName);
+        }
+    }
+
     public Instant readInstant(Object fieldName) {
         return rawInstant(fieldName);
     }

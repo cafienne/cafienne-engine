@@ -398,7 +398,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @param event
      */
     public void updateSequenceNumber(PlanItemEvent event) {
-        this.planItemEventCounter = event.getSequenceNumber();
+        if (event.getSequenceNumber() >= 0) { // Checking this, because older TaskEvents return -1.
+            this.planItemEventCounter = event.getSequenceNumber();
+        }
     }
 
     /**
