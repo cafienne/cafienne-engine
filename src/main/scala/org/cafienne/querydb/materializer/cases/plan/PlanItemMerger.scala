@@ -17,7 +17,7 @@ object PlanItemMerger {
       index = event.index,
       caseInstanceId = event.getCaseInstanceId,
       tenant = event.tenant,
-      planItemType = event.getType,
+      planItemType = event.getType.toString,
       lastModified = event.createdOn,
       modifiedBy = event.getUser.id,
       createdOn = event.createdOn,

@@ -66,9 +66,9 @@ public class DiscretionaryItem extends CMMNElement<DiscretionaryItemDefinition> 
         DiscretionaryItemDefinition definition = getDefinition();
         String name = definition.getName();
         String definitionId = definition.getId();
-        String type = definition.getType();
+        PlanItemType type = definition.getPlanItemDefinition().getItemType();
         String parentName = containingPlanItem.getName();
-        String parentType = containingPlanItem.getType();
+        PlanItemType parentType = containingPlanItem.getType();
         String parentId = containingPlanItem.getId();
         return new ValueMap(Fields.name, name, Fields.definitionId, definitionId, Fields.type, type, Fields.parentName, parentName, Fields.parentType, parentType, Fields.parentId, parentId);
     }

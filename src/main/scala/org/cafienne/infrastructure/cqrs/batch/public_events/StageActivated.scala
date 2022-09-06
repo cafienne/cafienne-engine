@@ -24,7 +24,7 @@ object StageActivated {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
     .filterMap(classOf[PlanItemTransitioned])
     .filter(_.getCurrentState == State.Active)
-    .filter(_.getType == "Stage")
+    .filter(_.getType.isStage)
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), StageActivated(event.getPlanItemId, event.path, event.path.name, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): StageActivated = StageActivated(

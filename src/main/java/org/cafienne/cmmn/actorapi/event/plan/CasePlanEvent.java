@@ -13,6 +13,7 @@ import org.cafienne.cmmn.actorapi.event.CaseBaseEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
@@ -25,13 +26,13 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     private transient PlanItem<?> planItem;
 
     private final String planItemId;
-    private final String type;
+    private final PlanItemType type;
 
     protected CasePlanEvent(PlanItem<?> planItem) {
         this(planItem.getCaseInstance(), planItem.getId(), planItem.getPath(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
     }
 
-    protected CasePlanEvent(Case actor, String planItemId, Path path, String type, int index, int seqNo, PlanItem<?> planItem) {
+    protected CasePlanEvent(Case actor, String planItemId, Path path, PlanItemType type, int index, int seqNo, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
         this.path = path;
@@ -45,7 +46,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         super(json);
         this.planItemId = json.readString(Fields.planItemId);
         this.path = json.readPath(Fields.path, "");
-        this.type = json.readString(Fields.type);
+        this.type = json.readEnum(Fields.type, PlanItemType.class);
         this.planItem = null;
 
         // TaskEvent and TimerEvent are now also a PlanItemEvent.
@@ -96,7 +97,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
      *
      * @return
      */
-    public String getType() {
+    public PlanItemType getType() {
         return this.type;
     }
 

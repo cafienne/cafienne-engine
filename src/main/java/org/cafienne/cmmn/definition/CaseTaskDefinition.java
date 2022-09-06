@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.task.cmmn.CaseTask;
 import org.w3c.dom.Element;
@@ -30,6 +31,11 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
             getCaseDefinition().addReferenceError("The case task '" + this.getName() + "' refers to a case named " + caseRef + ", but that definition is not found");
             return; // Avoid further checking on this element
         }
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.CaseTask;
     }
 
     @Override

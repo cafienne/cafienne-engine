@@ -13,6 +13,7 @@ import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
@@ -43,7 +44,7 @@ public class TestPlanning {
             testCase.insertStep(new GetDiscretionaryItems(testUser, caseInstanceId), items -> {
                 PlanningTableAssertion pta = new PlanningTableAssertion(items);
                 pta.assertItem("Opnieuw T1");
-                pta.assertItem("T4").assertType("HumanTask");
+                pta.assertItem("T4").assertType(PlanItemType.HumanTask);
             });
         });
 

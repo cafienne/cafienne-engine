@@ -7,15 +7,17 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Milestone;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
 public class MilestoneDefinition extends PlanItemDefinitionDefinition {
     public MilestoneDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.Milestone;
     }
 
     @Override

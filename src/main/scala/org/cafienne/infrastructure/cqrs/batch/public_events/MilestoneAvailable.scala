@@ -23,7 +23,7 @@ object MilestoneAvailable {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
     .filterMap(classOf[PlanItemTransitioned])
     .filter(_.getCurrentState == State.Available)
-    .filter(_.getType == "Milestone")
+    .filter(_.getType.isMilestone)
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), MilestoneAvailable(event.getPlanItemId, event.path, event.path.name, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): MilestoneAvailable = MilestoneAvailable(

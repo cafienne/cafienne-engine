@@ -1,13 +1,13 @@
 package org.cafienne.querydb.materializer.cases
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned
-import org.cafienne.cmmn.instance.{State, Transition}
+import org.cafienne.cmmn.instance.{PlanItemType, State, Transition}
 import org.cafienne.querydb.materializer.TestQueryDB
 
 import java.time.Instant
 
 class CaseTaskWriterTest extends CaseEventSinkTest {
-  val planItemTransitioned: PlanItemTransitioned = eventFactory.createPlanItemTransitioned("1", "HumanTask", State.Terminated, State.Active, Transition.Terminate)
+  val planItemTransitioned: PlanItemTransitioned = eventFactory.createPlanItemTransitioned("1", PlanItemType.HumanTask, State.Terminated, State.Active, Transition.Terminate)
 
   "CaseProjectionsWriter" must {
     "add and update tasks" in {

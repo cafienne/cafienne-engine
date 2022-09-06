@@ -1,13 +1,14 @@
 package org.cafienne.querydb.materializer.cases
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated
+import org.cafienne.cmmn.instance.PlanItemType
 import org.cafienne.querydb.materializer.TestQueryDB
 
 import java.time.Instant
 
 class PlanItemWriterTest extends CaseEventSinkTest {
 
-  val planItemCreated: PlanItemCreated = eventFactory.createPlanItemCreated("1", "CasePlan", "HelloWorld", "")
+  val planItemCreated: PlanItemCreated = eventFactory.createPlanItemCreated("1", PlanItemType.CasePlan, "HelloWorld", "")
 
   "CaseEventSink" must {
     "add and update plan items" in {

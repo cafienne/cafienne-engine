@@ -6,7 +6,7 @@ import org.cafienne.cmmn.actorapi.event.file.{CaseFileItemCreated, CaseFileItemT
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
 import org.cafienne.cmmn.definition.CaseDefinition
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition
-import org.cafienne.cmmn.instance.{State, Transition}
+import org.cafienne.cmmn.instance.{PlanItemType, State, Transition}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
@@ -45,7 +45,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     new CaseModified(json)
   }
 
-  def createPlanItemCreated(planItemId: String, planItemType: String, name: String, stageId: String, user: TenantUser = user): PlanItemCreated = {
+  def createPlanItemCreated(planItemId: String, planItemType: PlanItemType, name: String, stageId: String, user: TenantUser = user): PlanItemCreated = {
     val json = new ValueMap(
       Fields.name, name
       ,Fields.createdOn, Instant.now
@@ -62,7 +62,7 @@ class EventFactory(actorId: String, caseDefinition: CaseDefinition, user: Tenant
     new PlanItemCreated(json)
   }
 
-  def createPlanItemTransitioned(planItemId: String, planItemType: String, currentState: State, historyState: State, transition: Transition, user: TenantUser = user): PlanItemTransitioned = {
+  def createPlanItemTransitioned(planItemId: String, planItemType: PlanItemType, currentState: State, historyState: State, transition: Transition, user: TenantUser = user): PlanItemTransitioned = {
     val json = new ValueMap(
       Fields.currentState, currentState.toString
       ,Fields.historyState, historyState.toString

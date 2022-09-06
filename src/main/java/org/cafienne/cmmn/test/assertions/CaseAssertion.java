@@ -40,7 +40,7 @@ public class CaseAssertion extends StageAssertion {
 
     private static PlanItemCreated getCasePlan(CaseTestCommand testCommand) {
         PublishedEventsAssertion<PlanItemCreated> pea = testCommand.getEventListener().getEvents().filter(PlanItemCreated.class);
-        EventFilter<PlanItemCreated> filter = e -> e.getType().equals("CasePlan");
+        EventFilter<PlanItemCreated> filter = e -> e.getType().isCasePlan();
         return pea.filter(filter).getEvents().stream().findFirst().orElse(null);
     }
 

@@ -466,8 +466,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public String getType() {
-        return getDefinition().getType();
+    public PlanItemType getType() {
+        return getDefinition().getItemType();
     }
 
     /**
@@ -491,7 +491,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void dumpMemoryStateToXML(Element parentElement) {
-        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
+        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType().toString());
         parentElement.appendChild(planItemXML);
         planItemXML.setAttribute("_id", this.getId());
         planItemXML.setAttribute("name", this.getName());

@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.Stage;
 import org.w3c.dom.Element;
 
@@ -33,6 +34,11 @@ public class StageDefinition extends PlanFragmentDefinition {
         autoComplete = Boolean.parseBoolean(parseAttribute("autoComplete", false, "false"));
         planningTable = parse("planningTable", PlanningTableDefinition.class, false);
 
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.Stage;
     }
 
     public boolean autoCompletes() {

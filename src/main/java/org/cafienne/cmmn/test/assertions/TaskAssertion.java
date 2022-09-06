@@ -8,22 +8,18 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Task;
-import org.cafienne.cmmn.instance.task.cmmn.CaseTask;
-import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.cmmn.instance.task.process.ProcessTask;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.test.CaseTestCommand;
 
 public class TaskAssertion extends PlanItemAssertion {
 
     TaskAssertion(CaseTestCommand command, PlanItemCreated planItem) {
         super(command, planItem);
-        super.assertType(new Class[]{Task.class, HumanTask.class, ProcessTask.class, CaseTask.class});
+        super.assertType(PlanItemType.HumanTask, PlanItemType.ProcessTask, PlanItemType.CaseTask);
     }
 
     @Override
-    public <T extends PlanItem<?>> TaskAssertion assertType(Class<T> typeClass) {
-        return (TaskAssertion) super.assertType(typeClass);
+    public TaskAssertion assertType(PlanItemType expectedType) {
+        return (TaskAssertion) super.assertType(expectedType);
     }
 }

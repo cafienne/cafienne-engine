@@ -9,6 +9,7 @@ package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.CaseTestCommand;
@@ -24,7 +25,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion {
 
     private final String id;
     private final String name;
-    private final String type;
+    private final PlanItemType type;
     private final String description;
     private final List<CasePlanEvent> events;
 
@@ -49,9 +50,9 @@ public class PlanItemAssertion extends ModelTestCommandAssertion {
         return this.name;
     }
 
-    protected <T extends PlanItem<?>> PlanItemAssertion assertType(Class<T> ...typeClasses) {
-        for (int i=0; i<typeClasses.length; i++) {
-            if (this.type.equals(typeClasses[i].getSimpleName())) {
+    protected PlanItemAssertion assertType(PlanItemType ...expectedTypes) {
+        for (PlanItemType expectedType : expectedTypes) {
+            if (this.type.equals(expectedType)) {
                 return this;
             }
         }
@@ -60,12 +61,10 @@ public class PlanItemAssertion extends ModelTestCommandAssertion {
 
     /**
      * Asserts that the plan item's instance has the expected type (e.g., Task, Stage, Milestone)
-     *
-     * @param typeClass
      */
-    public <T extends PlanItem<?>> PlanItemAssertion assertType(Class<T> typeClass) {
-        if (!type.equals(typeClass.getSimpleName())) {
-            throw new AssertionError("Plan item " + name + " is of type " + type + ", but is expected to be of type " + typeClass.getSimpleName());
+    public <T extends PlanItem<?>> PlanItemAssertion assertType(PlanItemType expectedType) {
+        if (!type.equals(expectedType)) {
+            throw new AssertionError("Plan item " + name + " is of type " + type + ", but is expected to be of type " + expectedType);
         }
         return this;
     }

@@ -23,7 +23,7 @@ object UserEventRaised {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
     .filterMap(classOf[PlanItemTransitioned])
     .filter(_.getCurrentState == State.Completed)
-    .filter(_.getType == "UserEvent")
+    .filter(_.getType.isUserEvent)
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), UserEventRaised(event.getPlanItemId, event.path, event.path.name, event.getCaseInstanceId)))
 
 
