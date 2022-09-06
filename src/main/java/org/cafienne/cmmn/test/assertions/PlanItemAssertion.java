@@ -26,7 +26,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion {
     private final String name;
     private final String type;
     private final String description;
-    private final List<PlanItemEvent> events;
+    private final List<CasePlanEvent> events;
 
     PlanItemAssertion(CaseTestCommand command, PlanItemCreated pic) {
         super(command);
@@ -36,8 +36,8 @@ public class PlanItemAssertion extends ModelTestCommandAssertion {
         this.type = pic.getType();
         this.description = type + " '" + name + "' with id "+id;
 
-        PublishedEventsAssertion<PlanItemEvent> allPlanItemEvents = command.getEventListener().getEvents().filter(PlanItemEvent.class);
-        this.events = allPlanItemEvents.filter(pie -> pie.getPlanItemId().equals(this.id)).getEvents();
+        PublishedEventsAssertion<CasePlanEvent> allCasePlanEvents = command.getEventListener().getEvents().filter(CasePlanEvent.class);
+        this.events = allCasePlanEvents.filter(pie -> pie.getPlanItemId().equals(this.id)).getEvents();
         Collections.reverse(this.events);// Reverse order the events, such that last one comes first.
     }
 
@@ -188,7 +188,7 @@ public class PlanItemAssertion extends ModelTestCommandAssertion {
         return this;
     }
 
-    <T extends PlanItemEvent> T getLast(Class<T> tClass) {
+    <T extends CasePlanEvent> T getLast(Class<T> tClass) {
         List<T> transitionEvents = new PublishedEventsAssertion(events).filter(tClass).getEvents();
         if (transitionEvents.isEmpty()) {
             throw new AssertionError(description + " is not yet in a state (case: "+caseId);

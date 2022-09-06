@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class PlanItemCreated extends PlanItemEvent {
+public class PlanItemCreated extends CasePlanEvent {
     public final Instant createdOn;
     public final String createdBy;
     public final String planItemName;
@@ -37,7 +37,7 @@ public class PlanItemCreated extends PlanItemEvent {
     }
 
     private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage<?> stage, ItemDefinition definition, int index) {
-        super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0);
+        super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0, null);
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.planItemName = name;
@@ -79,7 +79,7 @@ public class PlanItemCreated extends PlanItemEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writePlanItemEvent(generator);
+        super.writeCasePlanEvent(generator);
         writeField(generator, Fields.name, planItemName);
         writeField(generator, Fields.definitionId, definitionId);
         writeField(generator, Fields.createdOn, createdOn);

@@ -19,7 +19,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent<Transition, PlanItem<?>> {
+public class PlanItemTransitioned extends CasePlanEvent implements StandardEvent<Transition, PlanItem<?>> {
     private final State currentState;
     private final State historyState;
     private final Transition transition;
@@ -87,7 +87,7 @@ public class PlanItemTransitioned extends PlanItemEvent implements StandardEvent
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        writePlanItemEvent(generator);
+        writeCasePlanEvent(generator);
         writeField(generator, Fields.historyState, historyState);
         writeField(generator, Fields.transition, transition);
         writeField(generator, Fields.currentState, currentState);

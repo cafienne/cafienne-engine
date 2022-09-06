@@ -3,7 +3,7 @@ package org.cafienne.cmmn.test.expression;
 
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
 import org.cafienne.cmmn.definition.CaseDefinition;
@@ -58,7 +58,7 @@ public class TestVariousSpelExpressions {
                     return true;
                 });
 
-                testCase.getEventListener().awaitPlanItemEvent("HumanTask", PlanItemTransitioned.class, e -> e.getTransition().equals(Transition.Complete));
+                testCase.getEventListener().awaitCasePlanEvent("HumanTask", PlanItemTransitioned.class, e -> e.getTransition().equals(Transition.Complete));
             });
         });
 
@@ -155,7 +155,7 @@ public class TestVariousSpelExpressions {
                     String lastTaskId = testCase.getEventListener().awaitPlanItemTransitioned("HumanTask",
                             e -> (!(e.getPlanItemId().equals(taskId) || e.getPlanItemId().equals(nextTaskId)) && e.getCurrentState().equals(State.Terminated))).getPlanItemId();
                     // Last task must not repeat
-                    testCase.getEventListener().awaitPlanItemEvent(lastTaskId, RepetitionRuleEvaluated.class, e -> !e.isRepeating());
+                    testCase.getEventListener().awaitCasePlanEvent(lastTaskId, RepetitionRuleEvaluated.class, e -> !e.isRepeating());
                 });
             });
         });
@@ -219,7 +219,7 @@ public class TestVariousSpelExpressions {
                 });
 
                 // Now fetch the next task id
-                String nextTaskId = testCase.getEventListener().awaitPlanItemEvent("HumanTask", PlanItemEvent.class, e -> !e.getPlanItemId().equals(taskId)).getPlanItemId();
+                String nextTaskId = testCase.getEventListener().awaitCasePlanEvent("HumanTask", CasePlanEvent.class, e -> !e.getPlanItemId().equals(taskId)).getPlanItemId();
 
 //                case2.print();
 

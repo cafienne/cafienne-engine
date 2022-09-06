@@ -18,23 +18,24 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 public abstract class CasePlanEvent extends CaseBaseEvent {
+    public final int seqNo;
+    public final int index;
     private transient PlanItem<?> planItem;
 
     private final String planItemId;
     private final String type;
 
     protected CasePlanEvent(PlanItem<?> planItem) {
-        super(planItem.getCaseInstance());
-        this.planItemId = planItem.getId();
-        this.type = planItem.getType();
-        this.planItem = planItem;
+        this(planItem.getCaseInstance(), planItem.getId(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
     }
 
-    protected CasePlanEvent(Case actor, String planItemId, String type) {
+    protected CasePlanEvent(Case actor, String planItemId, String type, int index, int seqNo, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
         this.type = type;
-        this.planItem = null;
+        this.seqNo = seqNo;
+        this.index = index;
+        this.planItem = planItem;
     }
 
     protected CasePlanEvent(ValueMap json) {
@@ -42,6 +43,12 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         this.planItemId = json.readString(Fields.planItemId);
         this.type = json.readString(Fields.type);
         this.planItem = null;
+
+        // TaskEvent and TimerEvent are now also a PlanItemEvent.
+        //  Older versions of those events do not have a seqNo and index. We're providing -1 as the default value to recognize that.
+        ValueMap planItemJson = json.readMap(Fields.planitem);
+        this.seqNo = planItemJson.readLong(Fields.seqNo, -1L).intValue();
+        this.index = planItemJson.readLong(Fields.index, -1L).intValue();
     }
 
     protected void setPlanItem(PlanItem planItem) {
@@ -61,16 +68,22 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
                 return;
             }
         }
-
-        updateState(planItem);
+        planItem.updateSequenceNumber(this);
+        updatePlanItemState(planItem);
     }
 
-    public abstract void updateState(PlanItem<?> item);
+    abstract protected void updatePlanItemState(PlanItem<?> planItem);
 
     public void writeCasePlanEvent(JsonGenerator generator) throws IOException {
         super.writeCaseEvent(generator);
         writeField(generator, Fields.planItemId, planItemId);
         writeField(generator, Fields.type, type);
+        // Make a special planitem section
+        generator.writeFieldName(Fields.planitem.toString());
+        generator.writeStartObject();
+        generator.writeNumberField(Fields.seqNo.toString(), seqNo);
+        generator.writeNumberField(Fields.index.toString(), index);
+        generator.writeEndObject();
     }
 
     /**
@@ -84,5 +97,21 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
 
     public String getPlanItemId() {
         return planItemId;
+    }
+
+    protected String getName() {
+        return getPlanItem() != null ? getPlanItem().getName() + "." + getIndex() : "PlanItem";
+    }
+
+    public String getId() {
+        return getPlanItemId() + "_" + seqNo;
+    }
+
+    public int getSequenceNumber() {
+        return seqNo;
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

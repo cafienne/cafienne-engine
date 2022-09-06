@@ -53,7 +53,7 @@ public class TestTaskInputMapping {
 
 //                casePlan.assertPlanItems("Task.AddChild").filter(State.Completed).assertSize(1);
                 // Fetch the active one, and complete that one with the some different output.
-                PlanItemTransitioned event = testCase.getEventListener().awaitPlanItemEvent("Task.AddChild", PlanItemTransitioned.class,
+                PlanItemTransitioned event = testCase.getEventListener().awaitCasePlanEvent("Task.AddChild", PlanItemTransitioned.class,
                         e -> !e.getPlanItemId().equals(taskAddChild) && e.getCurrentState().equals(State.Active));
                 String secondTaskAddChild = event.getPlanItemId();
                 testCase.insertStep(new CompleteHumanTask(testUser, caseInstanceId, secondTaskAddChild, new ValueMap("Result", child2)), secondResult -> {

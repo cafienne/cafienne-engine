@@ -11,10 +11,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
@@ -72,9 +69,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     private State state = State.Null;
     private State historyState = State.Null;
     /**
-     * Number of PlanItem events we have generated
+     * Number of CasePlanEvents we have generated
      */
-    private int planItemEventCounter = 0; // Akka event sequence number
+    private int eventCounter = 0; // Akka event sequence number
 
     protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, StateMachine stateMachine) {
         this(id, index, itemDefinition, definition, parent.getCaseInstance(), parent, stateMachine);
@@ -276,7 +273,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public int getNextEventNumber() {
-        return ++planItemEventCounter;
+        return ++eventCounter;
     }
 
     public boolean repeats() {
@@ -397,9 +394,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @param event
      */
-    public void updateSequenceNumber(PlanItemEvent event) {
+    public void updateSequenceNumber(CasePlanEvent event) {
         if (event.getSequenceNumber() >= 0) { // Checking this, because older TaskEvents return -1.
-            this.planItemEventCounter = event.getSequenceNumber();
+            this.eventCounter = event.getSequenceNumber();
         }
     }
 

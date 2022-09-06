@@ -8,7 +8,7 @@
 package org.cafienne.cmmn.actorapi.event.migration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -16,7 +16,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class PlanItemDropped extends PlanItemEvent {
+public class PlanItemDropped extends CasePlanEvent {
     public PlanItemDropped(PlanItem<?> item) {
         super(item);
     }
@@ -27,7 +27,7 @@ public class PlanItemDropped extends PlanItemEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writePlanItemEvent(generator);
+        super.writeCasePlanEvent(generator);
     }
 
     @Override

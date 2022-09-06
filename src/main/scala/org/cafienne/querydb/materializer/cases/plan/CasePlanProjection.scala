@@ -23,12 +23,12 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
       case event: HumanTaskCreated => deprecatedCreateTask(event)
       case event: HumanTaskActivated => createTask(event)
       case event: HumanTaskEvent => handleHumanTaskEvent(event)
-      case event: PlanItemEvent => handlePlanItemEvent(event)
+      case event: CasePlanEvent => handlePlanItemEvent(event)
       case _ => Future.successful(Done) // ignore other events (e.g. TaskInputFilled and TaskOutputFilled)
     }
   }
 
-  private def handlePlanItemEvent(event: PlanItemEvent): Future[Done] = {
+  private def handlePlanItemEvent(event: CasePlanEvent): Future[Done] = {
     event match {
       case dropped: PlanItemDropped =>
         dBTransaction.deletePlanItemRecordAndHistory(dropped.getPlanItemId)
@@ -41,7 +41,7 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
             val planItem = PlanItemMerger.merge(evt)
             planItems.put(planItem.id, planItem)
             Future.successful(Done)
-          case other: PlanItemEvent => getPlanItem(event.getPlanItemId).map {
+          case other: CasePlanEvent => getPlanItem(event.getPlanItemId).map {
             case Some(planItem) =>
               other match {
                 case evt: PlanItemTransitioned => planItems.put(planItem.id, PlanItemMerger.merge(evt, planItem))
@@ -56,8 +56,8 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
               logger.error("Expected PlanItem " + event.getPlanItemId + " in " + event.getCaseInstanceId + ", but not found in the database on event type " + event.getClass.getSimpleName)
               Done
           }
-          case unknownPlanItemEvent =>
-            logger.error("Apparently we have a new type of PlanItemEvent that is not being handled by this Projection. The type is " + unknownPlanItemEvent.getClass.getName)
+          case unknownCasePlanEvent =>
+            logger.error("Apparently we have a new type of CasePlanEvent that is not being handled by this Projection. The type is " + unknownCasePlanEvent.getClass.getName)
             Future.successful(Done)
         }
     }

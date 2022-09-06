@@ -3,7 +3,7 @@ package org.cafienne.cmmn.actorapi.event.plan.eventlistener;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.CaseEvent;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
+import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.TimerEvent;
@@ -17,7 +17,7 @@ import java.util.Set;
  * Base class for all TimerEventListener based akka events.
  * These events are tagged so that a projection can handle them and safely set timers.
  */
-public abstract class TimerBaseEvent extends PlanItemEvent {
+public abstract class TimerBaseEvent extends CasePlanEvent {
     public static final String TAG = "cafienne:timer";
 
     private static final Set<String> tags = Set.of(ModelEvent.TAG, CaseEvent.TAG, TimerBaseEvent.TAG);
@@ -55,7 +55,7 @@ public abstract class TimerBaseEvent extends PlanItemEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writePlanItemEvent(generator);
+        super.writeCasePlanEvent(generator);
         writeField(generator, Fields.timerId, timerId);
     }
 

@@ -16,7 +16,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class RequiredRuleEvaluated extends PlanItemEvent {
+public class RequiredRuleEvaluated extends CasePlanEvent {
     private final boolean isRequired;
 
     public RequiredRuleEvaluated(PlanItem<?> planItem, boolean isRequired) {
@@ -45,7 +45,7 @@ public class RequiredRuleEvaluated extends PlanItemEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        writePlanItemEvent(generator);
+        writeCasePlanEvent(generator);
         writeField(generator, Fields.isRequired, this.isRequired);
     }
 }
