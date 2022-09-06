@@ -19,16 +19,11 @@ case class StageCompleted(identifier: String, caseInstanceId: String) extends Ca
 }
 
 object StageCompleted {
-  def from(batch: PublicCaseEventBatch): Seq[StageCompleted] = {
-    batch.stageEvents.filter(_.getType == "Stage").groupBy(p => p.getPlanItemId).flatMap(stageEvents => {
-      stageEvents._2
-        .filter(_.getPlanItemId.equals(stageEvents._1))
-        .filter(_.isInstanceOf[PlanItemTransitioned])
-        .map(_.asInstanceOf[PlanItemTransitioned])
-        .filter(_.getCurrentState == State.Completed)
-        .map(event => StageCompleted(event.getPlanItemId, event.getCaseInstanceId))
-    }).toSeq
-  }
+  def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
+      .filterMap(classOf[PlanItemTransitioned])
+      .filter(_.getCurrentState == State.Completed)
+      .filter(_.getType == "Stage")
+      .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), StageCompleted(event.getPlanItemId, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): StageCompleted = StageCompleted(
     identifier = json.readField(Fields.identifier),

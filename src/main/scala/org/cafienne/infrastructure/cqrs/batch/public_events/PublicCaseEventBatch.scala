@@ -10,33 +10,14 @@ package org.cafienne.infrastructure.cqrs.batch.public_events
 
 import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.CaseEvent
-import org.cafienne.cmmn.actorapi.event.file.CaseFileEvent
-import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent
-import org.cafienne.cmmn.actorapi.event.plan.{CasePlanEvent, PlanItemEvent}
-import org.cafienne.cmmn.actorapi.event.team.CaseTeamEvent
-import org.cafienne.humantask.actorapi.event.HumanTaskEvent
+import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.cqrs.batch.EventBatch
 
 import java.time.Instant
 
 class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with LazyLogging {
-  lazy val caseEvents: Seq[CaseEvent] = events.map(_.event).filter(_.isInstanceOf[CaseEvent]).map(_.asInstanceOf[CaseEvent]).toSeq
-  lazy val caseFileEvents: Seq[CaseFileEvent] = filterMap(classOf[CaseFileEvent])
-  lazy val caseTeamEvents: Seq[CaseTeamEvent] = filterMap(classOf[CaseTeamEvent])
-  lazy val casePlanEvents: Seq[CasePlanEvent[_]] = filterMap(classOf[CasePlanEvent[_]])
-  lazy val planItemEvents: Seq[PlanItemEvent] = filterMap(classOf[PlanItemEvent])
-  lazy val taskEvents: Seq[TaskEvent[_]] = filterMap(classOf[TaskEvent[_]])
-  lazy val humanTaskEvents: Seq[HumanTaskEvent] = filterMap(classOf[HumanTaskEvent])
-  lazy val userEventEvents: Seq[PlanItemEvent] = planItemEvents.filter(_.getType.equals("UserEvent"))
-  lazy val milestoneEvents: Seq[PlanItemEvent] = planItemEvents.filter(_.getType.equals("Milestone"))
-  lazy val stageEvents: Seq[PlanItemEvent] = planItemEvents.filter(_.getType.equals("Stage"))
   lazy val publicEvents: Seq[PublicEventWrapper] = {
-    (Seq()
-      // Note, order sort of matters. Typically, case started leads to events like HumanTaskStarted.
-      //  But, also HumanTaskCompleted leads to new tasks getting started.
-      //  Case Completed always comes at the end (we assume ;)
-      ++ CaseStarted.from(this)
+    (CaseStarted.from(this)
       ++ StageCompleted.from(this)
       ++ HumanTaskCompleted.from(this)
       ++ HumanTaskTerminated.from(this)
@@ -47,13 +28,15 @@ class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with La
       ++ MilestoneAvailable.from(this)
       ++ UserEventCreated.from(this)
       ++ CaseCompleted.from(this))
-      // Wrap all public events and add a commit event with offset information
-      .map(event => new PublicEventWrapper(this.timestamp, event))
+      .sortBy(_.sequenceNr)
   }
-  lazy val timestamp: Instant = caseEvents.last.getTimestamp
+  lazy val timestamp: Instant = events.map(_.event).last.getTimestamp
   lazy val offset: Offset = events.last.offset
 
-  def filterMap[T <: CaseEvent](clazz: Class[T]): Seq[T] = caseEvents.filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[T])
+  def getSequenceNr(event: ModelEvent): Long = events.find(_.event == event).fold(throw new IllegalArgumentException("Cannot find event inside batch"))(_.sequenceNr)
+
+  // Simple mechanism to filter out all events that have or extend a certain class of ModelEvent
+  def filterMap[T <: ModelEvent](clazz: Class[T]): Seq[T] = events.map(_.event).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[T]).toSeq
 
   def createPublicEvents: PublicCaseEventBatch = {
     logger.whenDebugEnabled(logger.debug(s"Batch on case [$persistenceId] at offset [$offset] has ${publicEvents.size} public events: ${publicEvents.map(_.manifest).mkString(", ")}"))

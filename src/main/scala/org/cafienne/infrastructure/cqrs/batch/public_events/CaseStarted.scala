@@ -9,7 +9,7 @@
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
 import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied
-import org.cafienne.cmmn.actorapi.event.file.{CaseFileEvent, CaseFileItemTransitioned}
+import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 import org.cafienne.querydb.materializer.cases.file.CaseFileMerger
@@ -25,21 +25,19 @@ case class CaseStarted(caseInstanceId: String, caseName: String, parentCaseId: S
 }
 
 object CaseStarted {
-  def from(batch: PublicCaseEventBatch): Seq[CaseStarted] = {
-    batch.caseEvents.filter(_.isInstanceOf[CaseDefinitionApplied]).map(_.asInstanceOf[CaseDefinitionApplied]).map(event => {
+  def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
+    .filterMap(classOf[CaseDefinitionApplied])
+    .map(event => {
       val caseInstanceId = event.getCaseInstanceId
       val caseName = event.getCaseName
       val parentCaseId = event.getParentCaseId
       val rootCaseId = event.getRootCaseId
-      val caseFile = readCaseFile(batch.caseFileEvents)
-      new CaseStarted(caseInstanceId = caseInstanceId, caseName = caseName, parentCaseId = parentCaseId, rootCaseId = rootCaseId, caseFile = caseFile)
+      val caseFile = readCaseFile(batch.filterMap(classOf[CaseFileItemTransitioned]))
+      PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), CaseStarted(caseInstanceId = caseInstanceId, caseName = caseName, parentCaseId = parentCaseId, rootCaseId = rootCaseId, caseFile = caseFile))
     })
-  }
 
-  def readCaseFile(caseFileEvents: Seq[CaseFileEvent]): ValueMap = {
-    val map = new ValueMap()
-    caseFileEvents.filter(_.isInstanceOf[CaseFileItemTransitioned]).map(_.asInstanceOf[CaseFileItemTransitioned]).foreach(event => CaseFileMerger.merge(event, map))
-    map
+  def readCaseFile(caseFileEvents: Seq[CaseFileItemTransitioned]): ValueMap = {
+    ValueMap.fill(map => caseFileEvents.foreach(event => CaseFileMerger.merge(event, map)))
   }
 
   def deserialize(json: ValueMap): CaseStarted = new CaseStarted(

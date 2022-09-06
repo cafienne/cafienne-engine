@@ -19,22 +19,11 @@ case class StageActivated(identifier: String, name: String, caseInstanceId: Stri
 }
 
 object StageActivated {
-  def from(batch: PublicCaseEventBatch): Seq[StageActivated] = {
-    batch.stageEvents.filter(_.getType == "Stage").groupBy(p => p.getPlanItemId).flatMap(stageEvents => {
-      val stageName = stageEvents._2
-        .filter(_.getPlanItemId.equals(stageEvents._1))
-        .filter(_.isInstanceOf[PlanItemCreated])
-        .map(_.asInstanceOf[PlanItemCreated])
-        .headOption.fold("")(p => p.getPlanItemName)
-
-      stageEvents._2
-        .filter(_.getPlanItemId.equals(stageEvents._1))
-        .filter(_.isInstanceOf[PlanItemTransitioned])
-        .map(_.asInstanceOf[PlanItemTransitioned])
-        .filter(_.getCurrentState == State.Active)
-        .map(event => StageActivated(event.getPlanItemId, stageName, event.getCaseInstanceId))
-    }).toSeq
-  }
+  def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
+    .filterMap(classOf[PlanItemTransitioned])
+    .filter(_.getCurrentState == State.Active)
+    .filter(_.getType == "Stage")
+    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), StageActivated(event.getPlanItemId, event.path.name, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): StageActivated = StageActivated(
     identifier = json.readField(Fields.identifier),

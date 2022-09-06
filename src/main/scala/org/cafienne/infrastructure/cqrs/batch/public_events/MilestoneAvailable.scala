@@ -19,22 +19,11 @@ case class MilestoneAvailable(identifier: String, name: String, caseInstanceId: 
 }
 
 object MilestoneAvailable {
-  def from(batch: PublicCaseEventBatch): Seq[MilestoneAvailable] = {
-    batch.milestoneEvents.filter(_.getType == "Milestone").groupBy(p => p.getPlanItemId).flatMap(milestoneEvents => {
-      val planItemName = milestoneEvents._2
-        .filter(_.getPlanItemId.equals(milestoneEvents._1))
-        .filter(_.isInstanceOf[PlanItemCreated])
-        .map(_.asInstanceOf[PlanItemCreated])
-        .map(event => event.planItemName).headOption.getOrElse("")
-
-      milestoneEvents._2
-        .filter(_.getPlanItemId.equals(milestoneEvents._1))
-        .filter(_.isInstanceOf[PlanItemTransitioned])
-        .map(_.asInstanceOf[PlanItemTransitioned])
-        .filter(_.getCurrentState == State.Available)
-        .map(event => MilestoneAvailable(event.getPlanItemId, planItemName, event.getCaseInstanceId))
-    }).toSeq
-  }
+  def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
+    .filterMap(classOf[PlanItemTransitioned])
+    .filter(_.getCurrentState == State.Available)
+    .filter(_.getType == "Milestone")
+    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), MilestoneAvailable(event.getPlanItemId, event.path.name, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): MilestoneAvailable = MilestoneAvailable(
     identifier = json.readField(Fields.identifier),

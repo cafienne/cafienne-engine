@@ -8,6 +8,8 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned
+import org.cafienne.cmmn.instance.State
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
@@ -17,9 +19,12 @@ case class UserEventRaised(identifier: String, name: String, caseInstanceId: Str
 }
 
 object UserEventRaised {
-  def from(batch: PublicCaseEventBatch): Seq[UserEventCreated] = {
-    Seq()
-  }
+  def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
+    .filterMap(classOf[PlanItemTransitioned])
+    .filter(_.getCurrentState == State.Completed)
+    .filter(_.getType == "UserEvent")
+    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), UserEventRaised(event.getPlanItemId, event.path.name, event.getCaseInstanceId)))
+
 
   def deserialize(json: ValueMap): UserEventRaised = UserEventRaised(
     identifier = json.readField(Fields.identifier),

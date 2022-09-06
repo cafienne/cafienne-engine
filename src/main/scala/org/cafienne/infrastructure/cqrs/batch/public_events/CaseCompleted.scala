@@ -19,12 +19,11 @@ case class CaseCompleted(caseInstanceId: String) extends CafiennePublicEventCont
 }
 
 object CaseCompleted {
-  def from(batch: PublicCaseEventBatch): Seq[CaseCompleted] = {
-    batch.filterMap(classOf[PlanItemTransitioned])
-      .filter(_.getType == "CasePlan")
-      .filter(_.getCurrentState == State.Completed)
-      .map(event => CaseCompleted(event.getCaseInstanceId))
-  }
+  def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
+    .filterMap(classOf[PlanItemTransitioned])
+    .filter(_.getType == "CasePlan")
+    .filter(_.getCurrentState == State.Completed)
+    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), CaseCompleted(event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): CaseCompleted = CaseCompleted(caseInstanceId = json.readField(Fields.caseInstanceId))
 }

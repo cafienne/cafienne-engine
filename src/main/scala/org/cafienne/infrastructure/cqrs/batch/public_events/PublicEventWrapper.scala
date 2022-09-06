@@ -12,7 +12,7 @@ import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 import java.time.Instant
 
-class PublicEventWrapper(val timestamp: Instant, val content: CafiennePublicEventContent) extends CafienneJson {
+case class PublicEventWrapper(timestamp: Instant, sequenceNr: Long = 0, content: CafiennePublicEventContent) extends CafienneJson {
 
   lazy val manifest: String   = content.getClass.getSimpleName
 
@@ -21,12 +21,11 @@ class PublicEventWrapper(val timestamp: Instant, val content: CafiennePublicEven
   }
 
   override def toValue: Value[_] = {
-    val contentJson: ValueMap = content.toValue.asMap()
-    contentJson.plus("cafienne-event-type", manifest)
-    new ValueMap("metadata", metadata, "content", contentJson)
-  }
+    // Metadata carries manifest and timestamp.
+    val metadata = new ValueMap("manifest", manifest, "timestamp", timestamp)
+    // always enrich content with event type as well
+    val contentJson: ValueMap = content.toValue.asMap().plus("cafienne-event-type", manifest)
 
-  def metadata: ValueMap = {
-    new ValueMap("manifest", manifest, "timestamp", timestamp)
+    new ValueMap("metadata", metadata, "content", contentJson)
   }
 }
