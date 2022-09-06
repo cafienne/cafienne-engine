@@ -391,8 +391,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(fieldName), tClass);
     }
 
-    public Path readPath(Object fieldName) {
-        return new Path(readString(fieldName));
+    public Path readPath(Object fieldName, String ...value) {
+        return new Path(readString(fieldName, value));
     }
 
     public <T> T readObject(Object fieldName, ValueMapParser<T> parser) {

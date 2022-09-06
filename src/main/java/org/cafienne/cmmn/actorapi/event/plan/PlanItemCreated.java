@@ -10,6 +10,7 @@ package org.cafienne.cmmn.actorapi.event.plan;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -28,19 +29,26 @@ public class PlanItemCreated extends CasePlanEvent {
     public final String stageId;
     public final String definitionId;
 
+    private static Path createPath(Stage<?> stage, ItemDefinition definition, int index) {
+        String parentPath = stage == null ? "" : stage.getPath() + "/";
+        boolean mayRepeat = !definition.getPlanItemControl().getRepetitionRule().isDefault();
+        String myPath = definition.getName() + (mayRepeat ? "[" + index + "]" : "");
+        return new Path(parentPath + myPath);
+    }
+
     public PlanItemCreated(Case caseInstance) {
-        this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);
+        this(caseInstance, null, caseInstance.getDefinition().getCasePlanModel(), new Guid().toString(), 0);
     }
 
     public PlanItemCreated(Stage<?> stage, ItemDefinition definition, String planItemId, int index) {
-        this(stage.getCaseInstance(), planItemId, definition.getName(), stage, definition, index);
+        this(stage.getCaseInstance(), stage, definition, planItemId, index);
     }
 
-    private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage<?> stage, ItemDefinition definition, int index) {
-        super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0, null);
+    private PlanItemCreated(Case caseInstance, Stage<?> stage, ItemDefinition definition, String planItemId, int index) {
+        super(caseInstance, planItemId, createPath(stage, definition, index), definition.getPlanItemDefinition().getType(), index, 0, null);
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
-        this.planItemName = name;
+        this.planItemName = definition.getName();
         this.definitionId = definition.getId();
         this.stageId = stage == null ? "" : stage.getId();
     }

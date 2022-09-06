@@ -11,6 +11,7 @@ package org.cafienne.cmmn.actorapi.event.plan;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.event.CaseBaseEvent;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
@@ -18,6 +19,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 public abstract class CasePlanEvent extends CaseBaseEvent {
+    public final Path path;
     public final int seqNo;
     public final int index;
     private transient PlanItem<?> planItem;
@@ -26,12 +28,13 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     private final String type;
 
     protected CasePlanEvent(PlanItem<?> planItem) {
-        this(planItem.getCaseInstance(), planItem.getId(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
+        this(planItem.getCaseInstance(), planItem.getId(), planItem.getPath(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
     }
 
-    protected CasePlanEvent(Case actor, String planItemId, String type, int index, int seqNo, PlanItem<?> planItem) {
+    protected CasePlanEvent(Case actor, String planItemId, Path path, String type, int index, int seqNo, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
+        this.path = path;
         this.type = type;
         this.seqNo = seqNo;
         this.index = index;
@@ -41,6 +44,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     protected CasePlanEvent(ValueMap json) {
         super(json);
         this.planItemId = json.readString(Fields.planItemId);
+        this.path = json.readPath(Fields.path, "");
         this.type = json.readString(Fields.type);
         this.planItem = null;
 
@@ -51,11 +55,11 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         this.index = planItemJson.readLong(Fields.index, -1L).intValue();
     }
 
-    protected void setPlanItem(PlanItem planItem) {
+    protected void setPlanItem(PlanItem<?> planItem) {
         this.planItem = planItem;
     }
 
-    protected PlanItem getPlanItem() {
+    protected PlanItem<?> getPlanItem() {
         return this.planItem;
     }
 
@@ -77,6 +81,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     public void writeCasePlanEvent(JsonGenerator generator) throws IOException {
         super.writeCaseEvent(generator);
         writeField(generator, Fields.planItemId, planItemId);
+        writeField(generator, Fields.path, path);
         writeField(generator, Fields.type, type);
         // Make a special planitem section
         generator.writeFieldName(Fields.planitem.toString());
