@@ -25,7 +25,7 @@ class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with La
       ++ UserEventRaised.from(this)
       ++ StageActivated.from(this)
       ++ HumanTaskStarted.from(this)
-      ++ MilestoneAvailable.from(this)
+      ++ MilestonePending.from(this)
       ++ UserEventCreated.from(this)
       ++ CaseCompleted.from(this))
       .sortBy(_.sequenceNr)
