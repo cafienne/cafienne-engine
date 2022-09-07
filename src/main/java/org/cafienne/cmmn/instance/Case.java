@@ -266,8 +266,7 @@ public class Case extends ModelActor {
      * @return
      */
     public PlanItem<?> add(PlanItemCreated event) {
-        String stageId = event.getStageId();
-        if (stageId.isEmpty()) {
+        if (event.stageId.isEmpty()) {
             CasePlanDefinition definition = this.getDefinition().getCasePlanModel();
             this.casePlan = definition.createInstance(event.getPlanItemId(), 0, definition, null, this);
             return this.casePlan;
@@ -275,9 +274,9 @@ public class Case extends ModelActor {
             // Lookup the stage to which the plan item belongs,
             // then lookup the definition for the plan item
             // and then instantiate it.
-            Stage<?> stage = this.getPlanItemById(stageId);
+            Stage<?> stage = this.getPlanItemById(event.stageId);
             if (stage == null) {
-                logger.error("MAJOR ERROR: we cannot find the stage with id " + stageId + ", and therefore cannot recover plan item " + event);
+                logger.error("MAJOR ERROR: we cannot find the stage with id " + event.stageId + ", and therefore cannot recover plan item " + event);
                 return null;
             }
 
@@ -286,7 +285,8 @@ public class Case extends ModelActor {
             if (itemDefinition == null) {
                 itemDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
                 if (itemDefinition == null) {
-                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.getStageId() + ", and therefore cannot recover plan item " + event);
+                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.stageId + ", and therefore cannot recover plan item " + event);
+                    return null;
                 }
             }
 

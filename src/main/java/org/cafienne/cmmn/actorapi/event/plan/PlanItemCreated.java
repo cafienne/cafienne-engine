@@ -26,31 +26,29 @@ public class PlanItemCreated extends CasePlanEvent {
     public final Instant createdOn;
     public final String createdBy;
     public final String planItemName;
-    public final String stageId;
     public final String definitionId;
 
-    private static Path createPath(Stage<?> stage, ItemDefinition definition, int index) {
-        String parentPath = stage == null ? "" : stage.getPath() + "/";
+    private static Path createPath(Path parent, ItemDefinition definition, int index) {
+        String parentPath = parent.isEmpty() ? "" : parent + "/";
         boolean mayRepeat = !definition.getPlanItemControl().getRepetitionRule().isDefault();
         String myPath = definition.getName() + (mayRepeat ? "[" + index + "]" : "");
         return new Path(parentPath + myPath);
     }
 
     public PlanItemCreated(Case caseInstance) {
-        this(caseInstance, null, caseInstance.getDefinition().getCasePlanModel(), new Guid().toString(), 0);
+        this(caseInstance, new Guid().toString(), "", new Path(""), caseInstance.getDefinition().getCasePlanModel(), 0);
     }
 
     public PlanItemCreated(Stage<?> stage, ItemDefinition definition, String planItemId, int index) {
-        this(stage.getCaseInstance(), stage, definition, planItemId, index);
+        this(stage.getCaseInstance(), planItemId, stage.getId(), stage.getPath(), definition, index);
     }
 
-    private PlanItemCreated(Case caseInstance, Stage<?> stage, ItemDefinition definition, String planItemId, int index) {
-        super(caseInstance, planItemId, createPath(stage, definition, index), definition.getPlanItemDefinition().getItemType(), index, 0, null);
+    private PlanItemCreated(Case caseInstance, String planItemId, String parentStage, Path parentPath, ItemDefinition definition, int index) {
+        super(caseInstance, planItemId, parentStage, createPath(parentPath, definition, index), definition.getPlanItemDefinition().getItemType(), index, 0, null);
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
         this.planItemName = definition.getName();
         this.definitionId = definition.getId();
-        this.stageId = stage == null ? "" : stage.getId();
     }
 
     public PlanItemCreated(ValueMap json) {
@@ -59,20 +57,15 @@ public class PlanItemCreated extends CasePlanEvent {
         this.createdBy = json.readString(Fields.createdBy);
         this.planItemName = json.readString(Fields.name);
         this.definitionId = json.readString(Fields.definitionId, "");
-        this.stageId = json.readString(Fields.stageId);
     }
 
     @Override
     public String getDescription() {
-        return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]" + (getStageId().isEmpty() ? "" : " in stage " + getStageId());
+        return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]" + (stageId.isEmpty() ? "" : " in stage " + stageId);
     }
 
     public String getPlanItemName() {
         return planItemName;
-    }
-
-    public String getStageId() {
-        return stageId;
     }
 
     public PlanItem<?> getCreatedPlanItem() {
@@ -92,7 +85,6 @@ public class PlanItemCreated extends CasePlanEvent {
         writeField(generator, Fields.definitionId, definitionId);
         writeField(generator, Fields.createdOn, createdOn);
         writeField(generator, Fields.createdBy, createdBy);
-        writeField(generator, Fields.stageId, stageId);
     }
 
     @Override

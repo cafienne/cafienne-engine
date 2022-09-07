@@ -113,7 +113,7 @@ public class StageAssertion extends PlanItemAssertion {
      */
     protected Stream<PlanItemCreated> getPlanItems(String identifier) {
         PublishedEventsAssertion<PlanItemCreated> pea = testCommand.getEventListener().getEvents().filter(caseId).filter(PlanItemCreated.class);
-        EventFilter<PlanItemCreated> filter = e -> e.getStageId().equals(this.getId()) && (e.getPlanItemId().equals(identifier) || e.getPlanItemName().equals(identifier));
+        EventFilter<PlanItemCreated> filter = e -> e.stageId.equals(this.getId()) && (e.getPlanItemId().equals(identifier) || e.getPlanItemName().equals(identifier));
         return pea.filter(filter).getEvents().stream();
     }
 }

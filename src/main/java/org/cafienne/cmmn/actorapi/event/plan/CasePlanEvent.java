@@ -10,31 +10,34 @@ package org.cafienne.cmmn.actorapi.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.event.CaseBaseEvent;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Path;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.PlanItemType;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 public abstract class CasePlanEvent extends CaseBaseEvent {
+    public final String planItemId;
+    public final String stageId;
     public final Path path;
+    public final PlanItemType type;
     public final int seqNo;
     public final int index;
     private transient PlanItem<?> planItem;
 
-    private final String planItemId;
-    private final PlanItemType type;
-
-    protected CasePlanEvent(PlanItem<?> planItem) {
-        this(planItem.getCaseInstance(), planItem.getId(), planItem.getPath(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
+    private static String getStageId(PlanItem<?> planItem) {
+        Stage<?> stage = planItem.getStage();
+        return stage == null ? "" : stage.getId();
     }
 
-    protected CasePlanEvent(Case actor, String planItemId, Path path, PlanItemType type, int index, int seqNo, PlanItem<?> planItem) {
+    protected CasePlanEvent(PlanItem<?> planItem) {
+        this(planItem.getCaseInstance(), planItem.getId(), getStageId(planItem), planItem.getPath(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
+    }
+
+    protected CasePlanEvent(Case actor, String planItemId, String stageId, Path path, PlanItemType type, int index, int seqNo, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
+        this.stageId = stageId;
         this.path = path;
         this.type = type;
         this.seqNo = seqNo;
@@ -45,9 +48,11 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     protected CasePlanEvent(ValueMap json) {
         super(json);
         this.planItemId = json.readString(Fields.planItemId);
+        // Stage id is promoted from only PlanItemCreated into each CasePlanEvent. Older events do not have it, and get an empty value.
+        this.stageId = json.readString(Fields.stageId, "");
         this.path = json.readPath(Fields.path, "");
         this.type = json.readEnum(Fields.type, PlanItemType.class);
-        this.planItem = null;
+        this.planItem = null; // Not available in event reading, except inside recovery of an event.
 
         // TaskEvent and TimerEvent are now also a PlanItemEvent.
         //  Older versions of those events do not have a seqNo and index. We're providing -1 as the default value to recognize that.
@@ -82,6 +87,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     public void writeCasePlanEvent(JsonGenerator generator) throws IOException {
         super.writeCaseEvent(generator);
         writeField(generator, Fields.planItemId, planItemId);
+        writeField(generator, Fields.stageId, stageId);
         writeField(generator, Fields.path, path);
         writeField(generator, Fields.type, type);
         // Make a special planitem section
