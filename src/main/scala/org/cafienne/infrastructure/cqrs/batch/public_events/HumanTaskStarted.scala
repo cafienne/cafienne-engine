@@ -8,35 +8,34 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated
 import org.cafienne.cmmn.instance.Path
 import org.cafienne.humantask.actorapi.event.{HumanTaskActivated, HumanTaskEvent, HumanTaskInputSaved}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{JSONReader, StringValue, Value, ValueMap}
 
 @Manifest
-case class HumanTaskStarted(taskId: String, path: Path, taskName: String, caseInstanceId: String, stageId:String, inputParameters: ValueMap, form: Value[_]) extends CafiennePublicEventContent {
+case class HumanTaskStarted(taskId: String, path: Path, taskName: String, caseInstanceId: String, parentStage: String, inputParameters: ValueMap, form: Value[_]) extends CafiennePublicEventContent {
   override def toValue: ValueMap = new ValueMap(
     Fields.taskId, taskId,
     Fields.path, path,
     Fields.taskName, taskName,
     Fields.caseInstanceId, caseInstanceId,
     Fields.inputParameters, inputParameters,
-    Fields.stageId, stageId,
-    EFields.form, form)
+    Fields.parentStage, parentStage,
+    Fields.form, form)
 
   override def toString: String = getClass.getSimpleName + "[" + path + "]"
 }
 
 object HumanTaskStarted {
   def deserialize(json: ValueMap): HumanTaskStarted = HumanTaskStarted(
-    taskId = json.readField(Fields.taskId),
+    taskId = json.readString(Fields.taskId),
     path = json.readPath(Fields.path),
-    taskName = json.readField(Fields.taskName),
-    caseInstanceId = json.readField(Fields.caseInstanceId),
-    stageId = Option(json.readField(Fields.stageId)).orNull,
+    taskName = json.readString(Fields.taskName),
+    caseInstanceId = json.readString(Fields.caseInstanceId),
+    parentStage = json.readString(Fields.parentStage),
     inputParameters = json.readMap(Fields.inputParameters),
-    form = json.get(EFields.form)
+    form = json.get(Fields.form)
   )
 
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
@@ -47,9 +46,9 @@ object HumanTaskStarted {
       val path = event.path
       val taskName = event.getTaskName
       val caseInstanceId = event.getCaseInstanceId
+      val stageId = event.stageId
       val inputParameters = events.find(_.isInstanceOf[HumanTaskInputSaved]).get.asInstanceOf[HumanTaskInputSaved].getInput
       val taskModel = event.getTaskModel
-      val stageId = batch.filterMap(classOf[PlanItemCreated]).find(_.getPlanItemId == taskId).map(_.stageId).orNull
       val form: Value[_] = try {
         JSONReader.parse(taskModel)
       } catch {
@@ -57,6 +56,6 @@ object HumanTaskStarted {
         // Note: perhaps we should fix this in the base event itself, as that converts the json to a string ...
         case _: Throwable => new StringValue(taskModel)
       }
-      PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskStarted(taskId = taskId, path = path, taskName = taskName, caseInstanceId = caseInstanceId, stageId = stageId, inputParameters = inputParameters, form = form))
+      PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskStarted(taskId = taskId, path = path, taskName = taskName, caseInstanceId = caseInstanceId, parentStage = stageId, inputParameters = inputParameters, form = form))
     })
 }

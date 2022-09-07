@@ -14,8 +14,8 @@ import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
 @Manifest
-case class UserEventRaised(identifier: String, path: Path, name: String, caseInstanceId: String) extends CafiennePublicEventContent {
-  override def toValue: Value[_] = new ValueMap(Fields.identifier, identifier, Fields.path, path, Fields.name, name, Fields.caseInstanceId, caseInstanceId)
+case class UserEventRaised(eventId: String, path: Path, name: String, caseInstanceId: String) extends CafiennePublicEventContent {
+  override def toValue: Value[_] = new ValueMap(Fields.eventId, eventId, Fields.path, path, Fields.name, name, Fields.caseInstanceId, caseInstanceId)
   override def toString: String = getClass.getSimpleName + "[" + path + "]"
 }
 
@@ -28,9 +28,9 @@ object UserEventRaised {
 
 
   def deserialize(json: ValueMap): UserEventRaised = UserEventRaised(
-    identifier = json.readField(Fields.identifier),
+    eventId = json.readString(Fields.eventId),
     path = json.readPath(Fields.path),
-    name = json.readField(Fields.name),
-    caseInstanceId = json.readField(Fields.caseInstanceId)
+    name = json.readString(Fields.name),
+    caseInstanceId = json.readString(Fields.caseInstanceId)
   )
 }

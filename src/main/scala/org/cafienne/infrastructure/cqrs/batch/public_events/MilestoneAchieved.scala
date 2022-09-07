@@ -14,8 +14,8 @@ import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
 @Manifest
-case class MilestoneAchieved(identifier: String, path: Path, caseInstanceId: String) extends CafiennePublicEventContent {
-  override def toValue: Value[_] = new ValueMap(Fields.identifier, identifier, Fields.path, path, Fields.caseInstanceId, caseInstanceId)
+case class MilestoneAchieved(milestoneId: String, path: Path, caseInstanceId: String) extends CafiennePublicEventContent {
+  override def toValue: Value[_] = new ValueMap(Fields.milestoneId, milestoneId, Fields.path, path, Fields.caseInstanceId, caseInstanceId)
   override def toString: String = getClass.getSimpleName + "[" + path + "]"
 }
 
@@ -27,8 +27,8 @@ object MilestoneAchieved {
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), MilestoneAchieved(event.getPlanItemId, event.path, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): MilestoneAchieved = MilestoneAchieved(
-    identifier = json.readField(Fields.identifier),
+    milestoneId = json.readString(Fields.milestoneId),
     path = json.readPath(Fields.path),
-    caseInstanceId = json.readField(Fields.caseInstanceId)
+    caseInstanceId = json.readString(Fields.caseInstanceId)
   )
 }

@@ -20,9 +20,9 @@ object HumanTaskTerminated {
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskTerminated(event.taskId, event.path, event.getTaskName, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): HumanTaskTerminated = HumanTaskTerminated(
-    taskId = json.readField(Fields.taskId),
+    taskId = json.readString(Fields.taskId),
     path = json.readPath(Fields.path),
-    taskName = json.readField(Fields.taskName),
-    caseInstanceId = json.readField(Fields.caseInstanceId)
+    taskName = json.readString(Fields.taskName),
+    caseInstanceId = json.readString(Fields.caseInstanceId)
   )
 }

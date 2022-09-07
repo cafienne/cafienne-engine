@@ -19,9 +19,9 @@ case class CaseStarted(caseInstanceId: String, caseName: String, parentCaseId: S
   override def toValue: ValueMap = new ValueMap(
     Fields.caseInstanceId, caseInstanceId,
     Fields.caseName, caseName,
-    EFields.parentCaseId, parentCaseId,
-    EFields.rootCaseId, rootCaseId,
-    EFields.file, caseFile)
+    Fields.parentCaseId, parentCaseId,
+    Fields.rootCaseId, rootCaseId,
+    Fields.file, caseFile)
 }
 
 object CaseStarted {
@@ -41,10 +41,10 @@ object CaseStarted {
   }
 
   def deserialize(json: ValueMap): CaseStarted = new CaseStarted(
-    caseInstanceId = json.readField(Fields.caseInstanceId),
-    caseName = json.readField(Fields.caseName),
-    parentCaseId = json.read(EFields.parentCaseId).getValue.toString,
-    rootCaseId = json.read(EFields.rootCaseId).getValue.toString,
-    caseFile = json.read(EFields.file).asMap()
+    caseInstanceId = json.readString(Fields.caseInstanceId),
+    caseName = json.readString(Fields.caseName),
+    parentCaseId = json.readString(Fields.parentCaseId),
+    rootCaseId = json.readString(Fields.rootCaseId),
+    caseFile = json.readMap(Fields.file)
   )
 }

@@ -25,5 +25,5 @@ object CaseCompleted {
     .filter(_.getCurrentState == State.Completed)
     .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), CaseCompleted(event.getCaseInstanceId)))
 
-  def deserialize(json: ValueMap): CaseCompleted = CaseCompleted(caseInstanceId = json.readField(Fields.caseInstanceId))
+  def deserialize(json: ValueMap): CaseCompleted = CaseCompleted(caseInstanceId = json.readString(Fields.caseInstanceId))
 }
