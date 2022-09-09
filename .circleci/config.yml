@@ -272,11 +272,11 @@ jobs:
           command: docker logs cafienne
           when: always
 
-      # All good, push the image to docker hub if we're on the master branch
+      # All good, push the image to docker hub if we're on the main branch
       - run:
-          name: Push Cafienne 'latest' image to docker hub (only on master branch)
+          name: Push Cafienne 'latest' image to docker hub (only on main branch)
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ];
+            if [ "${CIRCLE_BRANCH}" == "main" ];
             then
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
               docker push cafienne/engine:latest
