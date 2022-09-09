@@ -11,6 +11,7 @@ import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
 import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.processtask.definition.ProcessDefinition;
@@ -39,6 +40,11 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
 
         workflowDefinition = parseWorkflowTaskDefinition();
         taskOutputValidatorRef = workflowDefinition.getElement().getAttribute("validatorRef");
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.HumanTask;
     }
 
     private WorkflowTaskDefinition parseWorkflowTaskDefinition() {

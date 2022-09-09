@@ -7,10 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.TimerEvent;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
 import java.time.Duration;
@@ -22,6 +19,11 @@ public class TimerEventDefinition extends EventListenerDefinition {
     public TimerEventDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
         timerExpression = parse("timerExpression", ExpressionDefinition.class, true);
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.TimerEvent;
     }
 
     /**

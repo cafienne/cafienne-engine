@@ -34,7 +34,7 @@ class CaseEventBatch(val sink: CaseEventSink, override val persistenceId: String
   override def handleEvent(envelope: ModelEventEnvelope): Future[Done] = {
     logger.whenDebugEnabled(logger.debug("Handling event of type " + envelope.event.getClass.getSimpleName + " in case " + caseInstanceId))
     envelope.event match {
-      case event: CasePlanEvent[_] => casePlanProjection.handleCasePlanEvent(event)
+      case event: CasePlanEvent => casePlanProjection.handleCasePlanEvent(event)
       case event: CaseFileEvent => caseFileProjection.handleCaseFileEvent(event)
       case event: CaseTeamEvent => caseTeamProjection.handleCaseTeamEvent(event)
       case event: CaseEvent => caseProjection.handleCaseEvent(event)

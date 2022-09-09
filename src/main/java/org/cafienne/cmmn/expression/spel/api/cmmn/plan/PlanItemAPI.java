@@ -13,7 +13,7 @@ public class PlanItemAPI<P extends PlanItem<?>> extends APIObject<Case> {
     protected final CaseAPI caseAPI;
 
     public String getName() {
-        return item.getType().toLowerCase();
+        return item.getType().toString().toLowerCase();
     }
 
     protected PlanItemAPI(CaseAPI caseAPI, P item, StageAPI parent) {

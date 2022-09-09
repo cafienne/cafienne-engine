@@ -7,9 +7,7 @@
  */
 package org.cafienne.cmmn.test;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
@@ -95,7 +93,7 @@ public class TestScript {
      * @param fileName
      * @return
      */
-    public static CaseDefinition getCaseDefinition(String fileName) throws MissingDefinitionException {
+    public static CaseDefinition loadCaseDefinition(String fileName) throws MissingDefinitionException {
         return getDefinitions(fileName).getFirstCase();
     }
 
@@ -121,9 +119,14 @@ public class TestScript {
      * @param roles
      * @return
      */
-    public static TestUser getTestUser(final String user, final String... roles) {
+    public static TestUser createTestUser(final String user, final String... roles) {
         return new TestUser(user, roles);
     }
+
+    /**
+     * A default static anonymous user. Can be used for creating commands
+     */
+    public static TestUser testUser = createTestUser("Anonymous");
 
     /**
      * Creates a CaseTeam that can be used in StartCase command based upon a list of user contexts
@@ -132,11 +135,11 @@ public class TestScript {
      *              members, with the tenant roles that they have passed to them
      * @return
      */
-    public static CaseTeam getCaseTeam(Object... users) {
+    public static CaseTeam createCaseTeam(Object... users) {
         List<CaseTeamUser> members = new ArrayList<>();
         for (Object user : users) {
             if (user instanceof TestUser) {
-                members.add(getMember((TestUser) user));
+                members.add(createMember((TestUser) user));
             } else if (user instanceof CaseTeamUser) {
                 members.add((CaseTeamUser) user);
             } else {
@@ -152,7 +155,7 @@ public class TestScript {
      * @param user
      * @return
      */
-    public static CaseTeamUser getOwner(TestUser user) {
+    public static CaseTeamUser createOwner(TestUser user) {
         return user.asCaseOwner();
     }
 
@@ -162,59 +165,66 @@ public class TestScript {
      * @param user
      * @return
      */
-    public static CaseTeamUser getMember(TestUser user) {
+    public static CaseTeamUser createMember(TestUser user) {
         return user.asCaseMember();
     }
 
     /**
      * Create a new {@link TestScript} with the specified name
      *
-     * @param testName
      */
     public TestScript(String testName) {
+        this(testName, new CaseSystem(ActorSystem.create(testName)));
+    }
+
+    /**
+     * Create a new {@link TestScript} with the specified name and the case system
+     *
+     */
+    public TestScript(String testName, CaseSystem caseSystem) {
         logger.info("\n\n\t\t============ Creating new test '" + testName + "' ========================\n\n");
         this.testName = testName;
-        this.caseSystem = new CaseSystem(ActorSystem.create("Case-Engine-Test-Script"));
+        this.caseSystem = caseSystem;
 
         // Start listening to the events coming out of the case persistence mechanism
         this.eventListener = new CaseEventListener(this);
         logger.info("Ready to receive responses from the case system for test '" + testName + "'");
     }
 
-    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions) {
+    public static StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions) {
         return createCaseCommand(user, caseInstanceId, definitions, new ValueMap());
     }
 
-    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs) {
-        return createCaseCommand(user, caseInstanceId, definitions, inputs, getCaseTeam(getOwner(user)));
+    public static StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs) {
+        return createCaseCommand(user, caseInstanceId, definitions, inputs, createCaseTeam(createOwner(user)));
     }
 
-    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, CaseTeam team) {
+    public static StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, CaseTeam team) {
         return createCaseCommand(user, caseInstanceId, definitions, new ValueMap(), team);
     }
 
-    public StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
+    public static StartCase createCaseCommand(TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
         return createCaseCommand(defaultTenant, user, caseInstanceId, definitions, inputs, team);
     }
 
-    public StartCase createCaseCommand(String tenant, TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
+    public static StartCase createCaseCommand(String tenant, TestUser user, String caseInstanceId, CaseDefinition definitions, ValueMap inputs, CaseTeam team) {
         return new StartCase(tenant, user, caseInstanceId, definitions, inputs, team, Cafienne.config().actor().debugEnabled());
     }
 
-    public PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {
+    public static PingCommand createPingCommand(TestUser user, String caseInstanceId, long waitTimeInMillis) {
         return new PingCommand(defaultTenant, user, caseInstanceId, waitTimeInMillis);
     }
 
-    public ForceRecoveryCommand createRecoveryCommand(TestUser user, String caseInstanceId) {
+    public static ForceRecoveryCommand createRecoveryCommand(TestUser user, String caseInstanceId) {
         return new ForceRecoveryCommand(defaultTenant, user, caseInstanceId);
     }
 
-    public ForceTermination createTerminationCommand(TestUser user, String caseInstanceId) {
+    public static ForceTermination createTerminationCommand(TestUser user, String caseInstanceId) {
         return new ForceTermination(defaultTenant, user, caseInstanceId);
     }
 
-    public CaseDefinition getDefinition(String fileName) throws MissingDefinitionException {
-        return TestScript.getCaseDefinition(fileName);
+    public static CaseDefinition getDefinition(String fileName) throws MissingDefinitionException {
+        return TestScript.loadCaseDefinition(fileName);
     }
 
     /**

@@ -7,10 +7,10 @@
  */
 package org.cafienne.cmmn.test.expression;
 
-import org.cafienne.cmmn.test.basic.Planning;
-import org.cafienne.cmmn.test.basic.RepeatRule;
-import org.cafienne.cmmn.test.basic.RequiredRule;
-import org.cafienne.cmmn.test.basic.SentryTest;
+import org.cafienne.cmmn.test.basic.TestPlanning;
+import org.cafienne.cmmn.test.basic.TestRepeatRule;
+import org.cafienne.cmmn.test.basic.TestRequiredRule;
+import org.cafienne.cmmn.test.basic.TestSentry;
 import org.cafienne.cmmn.test.task.TestGetListGetDetails;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -18,15 +18,15 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        Planning.class,
-        RepeatRule.class,
-        RequiredRule.class,
-        SentryTest.class,
+        TestPlanning.class,
+        TestRepeatRule.class,
+        TestRequiredRule.class,
+        TestSentry.class,
         TestGetListGetDetails.class,
         TestTimerExpression.class,
-        VariousSpelExpressions.class,
-        VariousSpelExpressions2.class,
-        CaseFileContextExpressions.class
+        TestVariousSpelExpressions.class,
+        TestVariousSpelExpressions2.class,
+        TestCaseFileContextExpressions.class
 })
 public class ExpressionTests {
 

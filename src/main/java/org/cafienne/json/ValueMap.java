@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;
@@ -53,6 +53,17 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
     public ValueMap(Object... rawInputs) {
         this();
         plus(rawInputs);
+    }
+
+    public static ValueMap fill(ValueMapFiller filler) {
+        ValueMap map = new ValueMap();
+        filler.fill(map);
+        return map;
+    }
+
+    @FunctionalInterface
+    public interface ValueMapFiller {
+        void fill(ValueMap map);
     }
 
     /**
@@ -353,6 +364,14 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
     }
 
+    public Long readLong(Object fieldName, Long... value) {
+        if (value.length > 0) {
+            return readField(fieldName, value);
+        } else {
+            return readField(fieldName);
+        }
+    }
+
     public Instant readInstant(Object fieldName) {
         return rawInstant(fieldName);
     }
@@ -383,8 +402,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         return CMMNElementDefinition.fromJSON(this.getClass().getName(), readMap(fieldName), tClass);
     }
 
-    public Path readPath(Object fieldName) {
-        return new Path(readString(fieldName));
+    public Path readPath(Object fieldName, String ...value) {
+        return new Path(readString(fieldName, value));
     }
 
     public <T> T readObject(Object fieldName, ValueMapParser<T> parser) {

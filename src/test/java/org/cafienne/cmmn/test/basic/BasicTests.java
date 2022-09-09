@@ -13,19 +13,19 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    Basic.class,
-    CasePlanExitCriteria.class,
-    EventListener.class,
-    HelloWorldTest.class,
-    Planning.class,
-    RepeatRule.class,
-    RequiredRule.class,
-    SentryTest.class,
-    SentryRef.class,
-    Simple.class,
-    Stages.class,
-    StageCompletion.class,
-    Timer.class
+    TestBasic.class,
+    TestCasePlanExitCriteria.class,
+    TestEventListener.class,
+    TestHelloWorld.class,
+    TestPlanning.class,
+    TestRepeatRule.class,
+    TestRequiredRule.class,
+    TestSentry.class,
+    TestSentryRef.class,
+    TestSimple.class,
+    TestStages.class,
+    TestStageCompletion.class,
+    TestTimer.class
     })
 public class BasicTests {
 

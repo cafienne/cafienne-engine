@@ -9,6 +9,8 @@ import org.cafienne.system.CaseSystem
 import scala.concurrent.Future
 
 class ConsentGroupEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
+  override val system = caseSystem.system
+
   override val tag: String = ConsentGroupEvent.TAG
 
   override def getOffset: Future[Offset] = storage.getOffset(ConsentGroupEventSink.offsetName)

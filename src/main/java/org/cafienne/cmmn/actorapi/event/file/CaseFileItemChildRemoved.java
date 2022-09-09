@@ -13,7 +13,7 @@ import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.cafienne.cmmn.instance.casefile.InvalidPathException;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.Value;

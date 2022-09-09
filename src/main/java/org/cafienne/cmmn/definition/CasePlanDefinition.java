@@ -10,6 +10,7 @@ package org.cafienne.cmmn.definition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.CasePlan;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.Stage;
 import org.w3c.dom.Element;
 
@@ -22,6 +23,11 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
     public CasePlanDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
         super.parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.CasePlan;
     }
 
     @Override

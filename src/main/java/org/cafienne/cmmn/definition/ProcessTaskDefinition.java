@@ -8,6 +8,7 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.cmmn.instance.task.process.ProcessTask;
 import org.cafienne.processtask.definition.ProcessDefinition;
@@ -20,6 +21,11 @@ public class ProcessTaskDefinition extends TaskDefinition<ProcessDefinition> {
     public ProcessTaskDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
         this.processRef = parseAttribute("processRef", true);
+    }
+
+    @Override
+    public PlanItemType getItemType() {
+        return PlanItemType.ProcessTask;
     }
 
     @Override

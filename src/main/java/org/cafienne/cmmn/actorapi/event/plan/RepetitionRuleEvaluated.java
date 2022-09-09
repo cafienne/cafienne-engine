@@ -16,7 +16,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class RepetitionRuleEvaluated extends PlanItemEvent {
+public class RepetitionRuleEvaluated extends CasePlanEvent {
     private final boolean isRepeating;
 
     public RepetitionRuleEvaluated(PlanItem<?> planItem, boolean repeats) {
@@ -45,7 +45,7 @@ public class RepetitionRuleEvaluated extends PlanItemEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        writePlanItemEvent(generator);
+        writeCasePlanEvent(generator);
         writeField(generator, Fields.isRepeating, this.isRepeating);
     }
 }

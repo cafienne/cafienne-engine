@@ -3,7 +3,7 @@ package org.cafienne.cmmn.test.assertions;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.filter.EventFilter;
@@ -26,17 +26,13 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
         this.events = publishedEvents;
     }
 
-    public PublishedEventsAssertion(PublishedEventsAssertion events) {
-        this.events = new ArrayList<>(events.getEvents());
-    }
-
     /**
      * Asserts the number of events that have been published
      *
      * @param expectedNumberOfEvents
      * @return
      */
-    public PublishedEventsAssertion assertSize(int expectedNumberOfEvents) {
+    public PublishedEventsAssertion<E> assertSize(int expectedNumberOfEvents) {
         if (events.size() != expectedNumberOfEvents) {
             String types = events.stream().map(e -> e.getClass().getSimpleName()).collect(Collectors.toSet()).toString();
             throw new AssertionError("Expecting " + expectedNumberOfEvents + ", but found " + events.size() + " events: " + types);
@@ -48,7 +44,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * Assert the set of events is not empty
      * @return
      */
-    public PublishedEventsAssertion assertNotEmpty() {
+    public PublishedEventsAssertion<E> assertNotEmpty() {
         if (events.isEmpty()) {
             throw new AssertionError("Expecting events, but found none");
         }
@@ -72,8 +68,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      */
     public <T extends ModelEvent> T assertEvent(String msg, Class<T> tClass, EventFilter<T> filter) {
         // First check if we find a match for the filter on the current set of events;
-        for (int i = 0; i < events.size(); i++) {
-            ModelEvent event = events.get(i);
+        for (ModelEvent event : events) {
             if (filterMatches(tClass, filter, event)) {
                 return (T) event;
             }
@@ -110,7 +105,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param path CaseFileItem path, e.g. /Root/Top/List[3]
      * @return
      */
-    public PublishedEventsAssertion assertNoCaseFileEvent(Path path) {
+    public PublishedEventsAssertion<E> assertNoCaseFileEvent(Path path) {
         return assertNoCaseFileEvent(path, e -> true);
     }
 
@@ -121,7 +116,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param filter
      * @return
      */
-    public PublishedEventsAssertion assertNoCaseFileEvent(Path path, EventFilter<CaseFileItemTransitioned> filter) {
+    public PublishedEventsAssertion<E> assertNoCaseFileEvent(Path path, EventFilter<CaseFileItemTransitioned> filter) {
         filter(CaseFileItemTransitioned.class).getEvents().forEach(event -> {
             if (path.matches(event.getPath()) && filter.matches(event)) {
                 throw new AssertionError("Did not expect to find a matching case file event on path "+path+", but found\n" + event);
@@ -136,7 +131,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param expectedNumberOfEvents
      * @return
      */
-    public PublishedEventsAssertion assertEventType(Class eventClass, int expectedNumberOfEvents) {
+    public <M extends ModelEvent> PublishedEventsAssertion<E> assertEventType(Class<M> eventClass, int expectedNumberOfEvents) {
         int filteredEventsSize = filter(eventClass).getEvents().size();
         if (filteredEventsSize != expectedNumberOfEvents) {
             throw new AssertionError("Expecting " + expectedNumberOfEvents + " events of type " + eventClass.getSimpleName() + ", but " + filteredEventsSize + " events found");
@@ -147,7 +142,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
 
     public String enumerateEventsByType() {
         Map<Class<?>, Integer> eventsByType = new LinkedHashMap<>();
-        events.forEach(event -> eventsByType.put(event.getClass(), (eventsByType.getOrDefault(event.getClass(), Integer.valueOf(0)) + 1)));
+        events.forEach(event -> eventsByType.put(event.getClass(), (eventsByType.getOrDefault(event.getClass(), 0) + 1)));
         StringBuilder sb = new StringBuilder();
         eventsByType.forEach((eventClass, number) -> sb.append(eventClass.getSimpleName() +": " + number + "\n"));
         return sb.toString();
@@ -169,8 +164,8 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param caseInstanceId
      * @return
      */
-    public PublishedEventsAssertion filter(String caseInstanceId) {
-        return new PublishedEventsAssertion(events.stream().filter(e -> e.getActorId().equals(caseInstanceId)).collect(Collectors.toList()));
+    public PublishedEventsAssertion<E> filter(String caseInstanceId) {
+        return new PublishedEventsAssertion<>(events.stream().filter(e -> e.getActorId().equals(caseInstanceId)).collect(Collectors.toList()));
     }
 
     /**
@@ -180,7 +175,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @return
      */
     public <T extends ModelEvent> PublishedEventsAssertion<T> filter(Class<T> eventClass) {
-        return new PublishedEventsAssertion(events.stream().filter(e -> eventClass.isAssignableFrom(e.getClass())).collect(Collectors.toList()));
+        return new PublishedEventsAssertion<>(events.stream().filter(e -> eventClass.isAssignableFrom(e.getClass())).map(e -> (T)e).collect(Collectors.toList()));
     }
 
     /**
@@ -190,7 +185,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @return
      */
     public <T extends E> PublishedEventsAssertion<T> filter(EventFilter<T> filter) {
-        return new PublishedEventsAssertion(events.stream().filter(e -> filter.matches((T)e)).collect(Collectors.toList()));
+        return new PublishedEventsAssertion<>(events.stream().map(e -> (T)e).filter(filter::matches).collect(Collectors.toList()));
     }
 
     /**
@@ -199,16 +194,16 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
      * @param lastModified
      * @return
      */
-    public PublishedEventsAssertion filter(Instant lastModified) {
-        List<ModelEvent> eventsSince = new ArrayList<>();
+    public PublishedEventsAssertion<E> filter(Instant lastModified) {
+        List<E> eventsSince = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
-            ModelEvent e = events.get(i);
+            E e = events.get(i);
             eventsSince.add(e);
             if (e instanceof CaseModified) {
                 CaseModified caseModified = (CaseModified) e;
                 if (caseModified.lastModified().equals(lastModified)) {
                     // Bingo, this is the event we needed.
-                    return new PublishedEventsAssertion(eventsSince);
+                    return new PublishedEventsAssertion<>(eventsSince);
                 } else {
                     // Clear the current list, as these are the events from a previous lastModified moment
                     eventsSince = new ArrayList<>();
@@ -216,7 +211,7 @@ public class PublishedEventsAssertion<E extends ModelEvent> {
             }
         }
         ;
-        return new PublishedEventsAssertion(eventsSince);
+        return new PublishedEventsAssertion<>(eventsSince);
     }
 
     /**

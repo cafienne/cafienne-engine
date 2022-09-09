@@ -9,6 +9,8 @@ import org.cafienne.tenant.actorapi.event.TenantEvent
 import scala.concurrent.Future
 
 class TenantEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
+  override val system = caseSystem.system
+
   override val tag: String = TenantEvent.TAG
 
   override def getOffset: Future[Offset] = storage.getOffset(TenantEventSink.offsetName)

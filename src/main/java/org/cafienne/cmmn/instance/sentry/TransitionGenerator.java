@@ -1,13 +1,16 @@
 package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 
 public interface TransitionGenerator<E extends StandardEvent<?,?>> {
     void updateStandardEvent(E event);
 
-    String getDescription();
+    default String getDescription(){
+        return getClass().getSimpleName() + "[" + getPath() + "]";
+    }
 
-    Object getPath();
+    Path getPath();
 
     Case getCaseInstance();
 

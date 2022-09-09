@@ -9,9 +9,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.json.StringValue;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.event.ProcessCompleted;
@@ -20,9 +19,10 @@ import org.junit.Test;
 
 import java.io.*;
 
+import static org.cafienne.cmmn.test.TestScript.*;
+
 public class TestPDFReport {
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/task/pdfreport.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/task/pdfreport.xml");
 
     @Test
     public void testReportGeneration() throws IOException {
@@ -39,7 +39,7 @@ public class TestPDFReport {
         request.plus("orderJrXml", subReportXml);
         request.plus("jsonData", customerData);
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, inputs);
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs);
         testCase.addStep(startCase, action -> {
             String reportTaskId = testCase.getEventListener().awaitPlanItemState("Generate Report", State.Available).getPlanItemId();
 

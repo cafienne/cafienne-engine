@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.cafienne.cmmn.test.TestScript.*;
 
 public class TestTaskOutputValidation {
     private final ValueMap taskOutputFailingValidation = new ValueMap("Decision", "KILLSWITCH");
@@ -36,9 +37,9 @@ public class TestTaskOutputValidation {
     private final ValueMap invalidDecisionResponse = new ValueMap("Status", "NOK", "details", "Field 'decision' has an improper value");
 
 
-    private final TestUser pete = TestScript.getTestUser("pete");
-    private final TestUser gimy = TestScript.getTestUser("gimy");
-    private final TestUser tom = TestScript.getTestUser("tom");
+    private final TestUser pete = createTestUser("pete");
+    private final TestUser gimy = createTestUser("gimy");
+    private final TestUser tom = createTestUser("tom");
 
 
     private final int port = 17382;
@@ -53,7 +54,7 @@ public class TestTaskOutputValidation {
         String caseInstanceId = "OutputValidationTest";
         TestScript testCase = new TestScript(caseInstanceId);
 
-        CaseDefinition xml = TestScript.getCaseDefinition("testdefinition/task/taskoutputvalidation.xml");
+        CaseDefinition xml = loadCaseDefinition("testdefinition/task/taskoutputvalidation.xml");
 
         ValueMap inputs = new ValueMap(
                 "TaskInput", new ValueMap(
@@ -65,8 +66,8 @@ public class TestTaskOutputValidation {
                 "HTTPConfig", new ValueMap("port", port)
         );
 
-        CaseTeam team = TestScript.getCaseTeam(pete, gimy, TestScript.getOwner(tom));
-        StartCase startCase = testCase.createCaseCommand(pete, caseInstanceId, xml, inputs, team);
+        CaseTeam team = createCaseTeam(pete, gimy, TestScript.createOwner(tom));
+        StartCase startCase = createCaseCommand(pete, caseInstanceId, xml, inputs, team);
         testCase.addStep(startCase, cp -> {
             // Depending on how fast the first (process) task starts, the "HumanTask" is either Active or still Available
             String taskId = cp.assertPlanItem("HumanTask").getId();

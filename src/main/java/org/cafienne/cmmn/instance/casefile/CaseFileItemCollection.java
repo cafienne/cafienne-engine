@@ -12,6 +12,7 @@ import org.cafienne.cmmn.definition.casefile.CaseFileItemCollectionDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;

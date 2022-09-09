@@ -10,45 +10,62 @@ package org.cafienne.cmmn.actorapi.event.plan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.event.CaseBaseEvent;
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
+import org.cafienne.cmmn.instance.*;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent {
-    private transient I planItem;
+public abstract class CasePlanEvent extends CaseBaseEvent {
+    public final String planItemId;
+    public final String stageId;
+    public final Path path;
+    public final PlanItemType type;
+    public final int seqNo;
+    public final int index;
+    private transient PlanItem<?> planItem;
 
-    private final String planItemId;
-    private final String type;
-
-    protected CasePlanEvent(I planItem) {
-        super(planItem.getCaseInstance());
-        this.planItemId = planItem.getId();
-        this.type = planItem.getType();
-        this.planItem = planItem;
+    private static String getStageId(PlanItem<?> planItem) {
+        Stage<?> stage = planItem.getStage();
+        return stage == null ? "" : stage.getId();
     }
 
-    protected CasePlanEvent(Case actor, String planItemId, String type) {
+    protected CasePlanEvent(PlanItem<?> planItem) {
+        this(planItem.getCaseInstance(), planItem.getId(), getStageId(planItem), planItem.getPath(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
+    }
+
+    protected CasePlanEvent(Case actor, String planItemId, String stageId, Path path, PlanItemType type, int index, int seqNo, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
+        this.stageId = stageId;
+        this.path = path;
         this.type = type;
-        this.planItem = null;
+        this.seqNo = seqNo;
+        this.index = index;
+        this.planItem = planItem;
     }
 
     protected CasePlanEvent(ValueMap json) {
         super(json);
         this.planItemId = json.readString(Fields.planItemId);
-        this.type = json.readString(Fields.type);
-        this.planItem = null;
+        // Stage id is promoted from only PlanItemCreated into each CasePlanEvent. Older events do not have it, and get an empty value.
+        this.stageId = json.readString(Fields.stageId, "");
+        this.path = json.readPath(Fields.path, "");
+        this.type = json.readEnum(Fields.type, PlanItemType.class);
+        this.planItem = null; // Not available in event reading, except inside recovery of an event.
+
+        // TaskEvent and TimerEvent are now also a PlanItemEvent.
+        //  Older versions of those events do not have a seqNo and index. We're providing -1 as the default value to recognize that.
+        ValueMap planItemJson = json.readMap(Fields.planitem);
+        this.seqNo = planItemJson.readLong(Fields.seqNo, -1L).intValue();
+        this.index = planItemJson.readLong(Fields.index, -1L).intValue();
     }
 
-    protected void setPlanItem(I planItem) {
+    protected void setPlanItem(PlanItem<?> planItem) {
         this.planItem = planItem;
     }
 
-    protected I getPlanItem() {
+    protected PlanItem<?> getPlanItem() {
         return this.planItem;
     }
 
@@ -61,16 +78,24 @@ public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent
                 return;
             }
         }
-
-        updateState(planItem);
+        planItem.updateSequenceNumber(this);
+        updatePlanItemState(planItem);
     }
 
-    public abstract void updateState(I item);
+    abstract protected void updatePlanItemState(PlanItem<?> planItem);
 
     public void writeCasePlanEvent(JsonGenerator generator) throws IOException {
         super.writeCaseEvent(generator);
         writeField(generator, Fields.planItemId, planItemId);
+        writeField(generator, Fields.stageId, stageId);
+        writeField(generator, Fields.path, path);
         writeField(generator, Fields.type, type);
+        // Make a special planitem section
+        generator.writeFieldName(Fields.planitem.toString());
+        generator.writeStartObject();
+        generator.writeNumberField(Fields.seqNo.toString(), seqNo);
+        generator.writeNumberField(Fields.index.toString(), index);
+        generator.writeEndObject();
     }
 
     /**
@@ -78,11 +103,27 @@ public abstract class CasePlanEvent<I extends PlanItem<?>> extends CaseBaseEvent
      *
      * @return
      */
-    public String getType() {
+    public PlanItemType getType() {
         return this.type;
     }
 
     public String getPlanItemId() {
         return planItemId;
+    }
+
+    protected String getName() {
+        return getPlanItem() != null ? getPlanItem().getName() + "." + getIndex() : "PlanItem";
+    }
+
+    public String getId() {
+        return getPlanItemId() + "_" + seqNo;
+    }
+
+    public int getSequenceNumber() {
+        return seqNo;
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

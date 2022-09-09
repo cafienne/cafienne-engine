@@ -7,10 +7,7 @@
  */
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.instance.Case;
-import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.Stage;
-import org.cafienne.cmmn.instance.Transition;
+import org.cafienne.cmmn.instance.*;
 import org.w3c.dom.Element;
 
 public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition {
@@ -24,6 +21,8 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
             defaultControl = new ItemControlDefinition(getModelDefinition(), this);
         }
     }
+
+    public abstract PlanItemType getItemType();
 
     public ItemControlDefinition getDefaultControl() {
         return defaultControl;

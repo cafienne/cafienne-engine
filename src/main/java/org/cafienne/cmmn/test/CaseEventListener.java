@@ -6,8 +6,8 @@ import akka.actor.Props;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
+import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskEvent;
 import org.cafienne.cmmn.actorapi.event.plan.task.TaskInputFilled;
@@ -47,7 +47,7 @@ public class CaseEventListener {
         // Now create the callback mechanism for the case system
         this.responseHandlingActor = system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
         // And create a connection with the Akka Event database to receive events from the case system
-        this.readJournal = new CaseEventPublisher(this, testScript.getCaseSystem());
+        this.readJournal = new CaseEventPublisher(this, testScript.getCaseSystem().system());
     }
 
     void sendCommand(ModelCommand command) {
@@ -124,8 +124,8 @@ public class CaseEventListener {
      * @param <T>
      * @return
      */
-    public <T extends PlanItemEvent> T awaitPlanItemEvent(String identifier, Class<T> tClass, EventFilter<T> filter, long... optionalDuration) {
-        return waitUntil("PlanItemEvent-"+identifier, tClass, event -> {
+    public <T extends CasePlanEvent> T awaitCasePlanEvent(String identifier, Class<T> tClass, EventFilter<T> filter, long... optionalDuration) {
+        return waitUntil("CasePlanEvent-"+identifier, tClass, event -> {
             if (event.getPlanItemId().equals(identifier)) {
                 logger.debug("Matching event for plan item "+identifier+" of type "+event.getType()+" for filter. Event "+event);
             }
@@ -183,7 +183,7 @@ public class CaseEventListener {
      * @return
      */
     public PlanItemTransitioned awaitPlanItemTransitioned(String identifier, EventFilter<PlanItemTransitioned> filter, long... optionalDuration) {
-        return awaitPlanItemEvent(identifier, PlanItemTransitioned.class, filter, optionalDuration);
+        return awaitCasePlanEvent(identifier, PlanItemTransitioned.class, filter, optionalDuration);
     }
 
     /**

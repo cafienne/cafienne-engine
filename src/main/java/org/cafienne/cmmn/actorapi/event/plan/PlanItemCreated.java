@@ -10,6 +10,7 @@ package org.cafienne.cmmn.actorapi.event.plan;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -21,28 +22,33 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class PlanItemCreated extends PlanItemEvent {
+public class PlanItemCreated extends CasePlanEvent {
     public final Instant createdOn;
     public final String createdBy;
     public final String planItemName;
-    public final String stageId;
     public final String definitionId;
 
+    private static Path createPath(Path parent, ItemDefinition definition, int index) {
+        String parentPath = parent.isEmpty() ? "" : parent + "/";
+        boolean mayRepeat = !definition.getPlanItemControl().getRepetitionRule().isDefault();
+        String myPath = definition.getName() + (mayRepeat ? "[" + index + "]" : "");
+        return new Path(parentPath + myPath);
+    }
+
     public PlanItemCreated(Case caseInstance) {
-        this(caseInstance, new Guid().toString(), caseInstance.getDefinition().getCasePlanModel().getName(), null, caseInstance.getDefinition().getCasePlanModel(), 0);
+        this(caseInstance, new Guid().toString(), "", new Path(""), caseInstance.getDefinition().getCasePlanModel(), 0);
     }
 
     public PlanItemCreated(Stage<?> stage, ItemDefinition definition, String planItemId, int index) {
-        this(stage.getCaseInstance(), planItemId, definition.getName(), stage, definition, index);
+        this(stage.getCaseInstance(), planItemId, stage.getId(), stage.getPath(), definition, index);
     }
 
-    private PlanItemCreated(Case caseInstance, String planItemId, String name, Stage<?> stage, ItemDefinition definition, int index) {
-        super(caseInstance, planItemId, definition.getPlanItemDefinition().getType(), index, 0);
+    private PlanItemCreated(Case caseInstance, String planItemId, String parentStage, Path parentPath, ItemDefinition definition, int index) {
+        super(caseInstance, planItemId, parentStage, createPath(parentPath, definition, index), definition.getPlanItemDefinition().getItemType(), index, 0, null);
         this.createdOn = caseInstance.getTransactionTimestamp();
         this.createdBy = caseInstance.getCurrentUser().id();
-        this.planItemName = name;
+        this.planItemName = definition.getName();
         this.definitionId = definition.getId();
-        this.stageId = stage == null ? "" : stage.getId();
     }
 
     public PlanItemCreated(ValueMap json) {
@@ -51,20 +57,15 @@ public class PlanItemCreated extends PlanItemEvent {
         this.createdBy = json.readString(Fields.createdBy);
         this.planItemName = json.readString(Fields.name);
         this.definitionId = json.readString(Fields.definitionId, "");
-        this.stageId = json.readString(Fields.stageId);
     }
 
     @Override
     public String getDescription() {
-        return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]" + (getStageId().isEmpty() ? "" : " in stage " + getStageId());
+        return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]" + (stageId.isEmpty() ? "" : " in stage " + stageId);
     }
 
     public String getPlanItemName() {
         return planItemName;
-    }
-
-    public String getStageId() {
-        return stageId;
     }
 
     public PlanItem<?> getCreatedPlanItem() {
@@ -79,12 +80,11 @@ public class PlanItemCreated extends PlanItemEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writePlanItemEvent(generator);
+        super.writeCasePlanEvent(generator);
         writeField(generator, Fields.name, planItemName);
         writeField(generator, Fields.definitionId, definitionId);
         writeField(generator, Fields.createdOn, createdOn);
         writeField(generator, Fields.createdBy, createdBy);
-        writeField(generator, Fields.stageId, stageId);
     }
 
     @Override

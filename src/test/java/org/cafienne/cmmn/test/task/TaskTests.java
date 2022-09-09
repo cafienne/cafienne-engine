@@ -7,17 +7,17 @@
  */
 package org.cafienne.cmmn.test.task;
 
-import org.cafienne.cmmn.test.basic.Basic;
-import org.cafienne.cmmn.test.basic.Simple;
+import org.cafienne.cmmn.test.basic.TestBasic;
+import org.cafienne.cmmn.test.basic.TestSimple;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    Basic.class,
-    Simple.class,
-    SubCase.class,
+    TestBasic.class,
+    TestSimple.class,
+    TestSubCase.class,
     TestPaxAlert.class,
     TestGetListGetDetails.class,
     TestHumanTask.class,

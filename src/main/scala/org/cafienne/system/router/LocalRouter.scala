@@ -9,7 +9,7 @@ import org.cafienne.system.CaseSystem
   * Facilitates actor management in a non-clustered actor system.
   */
 class LocalRouter(caseSystem: CaseSystem, actors: collection.concurrent.TrieMap[String, ActorRef]) extends CaseMessageRouter {
-  logger.info("Starting case system in local mode")
+  logger.info(s"Starting case system in local mode, opening router for ${self.path.name}")
 
   /**
     * Forward a command to the appropriate ModelActor. Actor will be created if it does not yet exist.

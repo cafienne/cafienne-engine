@@ -7,7 +7,6 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.test.TestScript;
-import org.cafienne.cmmn.test.TestUser;
 import org.cafienne.cmmn.test.assertions.HumanTaskAssertion;
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask;
 import org.cafienne.json.ValueList;
@@ -15,10 +14,11 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.util.Guid;
 import org.junit.Test;
 
+import static org.cafienne.cmmn.test.TestScript.*;
+
 public class TestTaskInputMapping {
     private final String caseName = "TaskInputMapping";
-    private final CaseDefinition definitions = TestScript.getCaseDefinition("testdefinition/casefile/taskinputmapping.xml");
-    private final TestUser testUser = TestScript.getTestUser("Anonymous");
+    private final CaseDefinition definitions = loadCaseDefinition("testdefinition/casefile/taskinputmapping.xml");
 
     @Test
     public void testContextSettingsFromTasks() {
@@ -28,7 +28,7 @@ public class TestTaskInputMapping {
         TestScript testCase = new TestScript(caseName);
         ValueMap caseInput = new ValueMap();
 
-        StartCase startCase = testCase.createCaseCommand(testUser, caseInstanceId, definitions, caseInput.cloneValueNode());
+        StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, caseInput.cloneValueNode());
         testCase.addStep(startCase, startPlan -> {
             startPlan.print();
             String taskAddChild = startPlan.assertTask("Task.AddChild").assertState(State.Active).getId();
@@ -53,7 +53,7 @@ public class TestTaskInputMapping {
 
 //                casePlan.assertPlanItems("Task.AddChild").filter(State.Completed).assertSize(1);
                 // Fetch the active one, and complete that one with the some different output.
-                PlanItemTransitioned event = testCase.getEventListener().awaitPlanItemEvent("Task.AddChild", PlanItemTransitioned.class,
+                PlanItemTransitioned event = testCase.getEventListener().awaitCasePlanEvent("Task.AddChild", PlanItemTransitioned.class,
                         e -> !e.getPlanItemId().equals(taskAddChild) && e.getCurrentState().equals(State.Active));
                 String secondTaskAddChild = event.getPlanItemId();
                 testCase.insertStep(new CompleteHumanTask(testUser, caseInstanceId, secondTaskAddChild, new ValueMap("Result", child2)), secondResult -> {

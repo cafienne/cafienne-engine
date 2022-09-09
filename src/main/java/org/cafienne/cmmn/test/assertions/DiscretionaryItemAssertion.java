@@ -1,5 +1,6 @@
 package org.cafienne.cmmn.test.assertions;
 
+import org.cafienne.cmmn.instance.PlanItemType;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.json.ValueMap;
 
@@ -20,7 +21,7 @@ public class DiscretionaryItemAssertion extends ModelTestCommandAssertion{
      *
      * @param expectedType
      */
-    public void assertType(String expectedType) {
+    public void assertType(PlanItemType expectedType) {
         if (!getType().equals(expectedType)) {
             throw new AssertionError("Discretionary item is of type " + getType() + " instead of the expected type " + expectedType);
         }
@@ -38,8 +39,8 @@ public class DiscretionaryItemAssertion extends ModelTestCommandAssertion{
         return item.raw("name");
     }
 
-    public String getType() {
-        return item.raw("type");
+    public PlanItemType getType() {
+        return item.readEnum("type", PlanItemType.class);
     }
 
     public String getParentId() {

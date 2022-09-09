@@ -11,10 +11,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemEvent;
-import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
-import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
-import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.*;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
@@ -72,9 +69,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     private State state = State.Null;
     private State historyState = State.Null;
     /**
-     * Number of PlanItem events we have generated
+     * Number of CasePlanEvents we have generated
      */
-    private int planItemEventCounter = 0; // Akka event sequence number
+    private int eventCounter = 0; // Akka event sequence number
 
     protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, StateMachine stateMachine) {
         this(id, index, itemDefinition, definition, parent.getCaseInstance(), parent, stateMachine);
@@ -276,7 +273,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * @return
      */
     public int getNextEventNumber() {
-        return ++planItemEventCounter;
+        return ++eventCounter;
     }
 
     public boolean repeats() {
@@ -397,8 +394,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @param event
      */
-    public void updateSequenceNumber(PlanItemEvent event) {
-        this.planItemEventCounter = event.getSequenceNumber();
+    public void updateSequenceNumber(CasePlanEvent event) {
+        if (event.getSequenceNumber() >= 0) { // Checking this, because older TaskEvents return -1.
+            this.eventCounter = event.getSequenceNumber();
+        }
     }
 
     /**
@@ -424,8 +423,9 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public String getPath() {
-        return "'" + this.getName() + "." + this.index + "'";
+    @Override
+    public Path getPath() {
+        return new Path(this);
     }
 
     /**
@@ -466,8 +466,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      *
      * @return
      */
-    public String getType() {
-        return getDefinition().getType();
+    public PlanItemType getType() {
+        return getDefinition().getItemType();
     }
 
     /**
@@ -477,11 +477,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     public Stage<?> getStage() {
         return stage;
-    }
-
-    @Override
-    public String getDescription() {
-        return toString();
     }
 
     final String toDescription() {
@@ -496,7 +491,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void dumpMemoryStateToXML(Element parentElement) {
-        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType());
+        Element planItemXML = parentElement.getOwnerDocument().createElement(this.getType().toString());
         parentElement.appendChild(planItemXML);
         planItemXML.setAttribute("_id", this.getId());
         planItemXML.setAttribute("name", this.getName());

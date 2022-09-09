@@ -2,13 +2,14 @@ package org.cafienne.cmmn.actorapi.event.plan.task;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent;
+import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent<T> {
+public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent {
     public final String taskId; // taskName is same as the planItem id
     private final String taskName; // taskName is same as the planItemName
 
@@ -41,6 +42,13 @@ public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent<T> {
         writeField(generator, Fields.taskName, taskName);
         writeField(generator, Fields.taskId, taskId);
     }
+
+    @Override
+    public void updatePlanItemState(PlanItem<?> item) {
+        updateState((T) item);
+    }
+
+    public abstract void updateState(T task);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {

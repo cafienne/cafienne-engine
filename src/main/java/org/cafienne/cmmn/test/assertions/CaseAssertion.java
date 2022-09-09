@@ -1,7 +1,7 @@
 package org.cafienne.cmmn.test.assertions;
 
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
-import org.cafienne.cmmn.instance.casefile.Path;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.test.CaseTestCommand;
 import org.cafienne.cmmn.test.TestScript;
 import org.cafienne.cmmn.test.assertions.file.CaseFileAssertion;
@@ -40,7 +40,7 @@ public class CaseAssertion extends StageAssertion {
 
     private static PlanItemCreated getCasePlan(CaseTestCommand testCommand) {
         PublishedEventsAssertion<PlanItemCreated> pea = testCommand.getEventListener().getEvents().filter(PlanItemCreated.class);
-        EventFilter<PlanItemCreated> filter = e -> e.getType().equals("CasePlan");
+        EventFilter<PlanItemCreated> filter = e -> e.getType().isCasePlan();
         return pea.filter(filter).getEvents().stream().findFirst().orElse(null);
     }
 

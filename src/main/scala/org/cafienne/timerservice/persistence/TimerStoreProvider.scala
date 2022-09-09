@@ -13,6 +13,7 @@ import org.cafienne.timerservice.persistence.jdbc.JDBCTimerStore
   * @param system
   */
 class TimerStoreProvider(val caseSystem: CaseSystem) extends ReadJournalProvider {
+  override val system = caseSystem.system
 
   val store: TimerStore = {
     journal() match {

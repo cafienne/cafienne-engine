@@ -5,14 +5,13 @@ import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.scaladsl._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.system.CaseSystem
 
 /**
   * Provides all query types of ReadJournal (eventsByTag, eventsById, etc.)
   */
 trait ReadJournalProvider extends LazyLogging {
-  implicit def system: ActorSystem = caseSystem.system
-  def caseSystem: CaseSystem
+  def system: ActorSystem
+  implicit def actorSystem = system
 
   lazy val configuredJournal: String = system.settings.config.getString("akka.persistence.journal.plugin")
   lazy val readJournalSetting: String = findReadJournalSetting()
