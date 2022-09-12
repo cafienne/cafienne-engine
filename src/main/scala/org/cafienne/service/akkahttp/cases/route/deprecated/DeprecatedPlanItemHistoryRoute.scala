@@ -8,22 +8,26 @@
 package org.cafienne.service.akkahttp.cases.route.deprecated
 
 import akka.http.scaladsl.server.Route
-import org.cafienne.service.akkahttp.cases.route.CasesRoute
+import org.cafienne.service.akkahttp.cases.route.CaseEventsBaseRoute
 import org.cafienne.system.CaseSystem
 
-class DeprecatedPlanItemHistoryRoute(override val caseSystem: CaseSystem) extends CasesRoute {
+import scala.util.{Failure, Success}
+
+class DeprecatedPlanItemHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBaseRoute {
   override val addToSwaggerRoutes = false
   override def routes: Route = concat(deprecatedPlanItemHistory)
 
   def deprecatedPlanItemHistory: Route = get {
-    caseUser { user =>
-      path(Segment / "planitems" / Segment / "history") {
-        (caseInstanceId, planItemId) => {
-          extractUri { uri =>
-            logger.warn(s"Using deprecated API to get plan item history:")
-            logger.warn(s"Old: /$caseInstanceId/planitems/$planItemId/history")
-            logger.warn(s"New: /$caseInstanceId/history/planitems/$planItemId")
-            runQuery(caseQueries.getPlanItemHistory(planItemId, user))
+    caseEventsSubRoute { caseEvents =>
+      path("history" / "planitems" / Segment) { planItemId =>
+        extractUri { uri =>
+          logger.warn(s"Using deprecated API to get plan item history:")
+          logger.warn(s"Old: /${caseEvents.caseInstanceId}/planitems/$planItemId/history")
+          logger.warn(s"New: /${caseEvents.caseInstanceId}/history/planitems/$planItemId")
+
+          onComplete(caseEvents.planitemHistory(planItemId)) {
+            case Success(value) => completeJsonValue(value.toValue)
+            case Failure(t) => handleFailure(t)
           }
         }
       }

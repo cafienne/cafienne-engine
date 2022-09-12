@@ -4,9 +4,14 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.CaseModified
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan._
+import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.querydb.record.PlanItemHistoryRecord
 
 object PlanItemHistoryMerger extends LazyLogging {
+  def mapModelEventEnvelope(evt: ModelEventEnvelope): Option[PlanItemHistoryRecord] = {
+    mapEventToHistory(evt.event.asInstanceOf[CasePlanEvent])
+  }
+
   def mapEventToHistory(evt: CasePlanEvent): Option[PlanItemHistoryRecord] = {
     evt match {
       case event: PlanItemCreated =>

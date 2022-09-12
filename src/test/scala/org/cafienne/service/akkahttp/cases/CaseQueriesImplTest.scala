@@ -155,11 +155,4 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     val res = Await.result(caseQueries.getPlanItem(planItem2_1.id, user), 1.second)
     res.record must be(planItem2_1)
   }
-
-  it should "retrieve planItemHistory records" in {
-    val res = Await.result(caseQueries.getPlanItemHistory(planItemHistory2_1.planItemId, user), 1.second)
-    res.records.size must be (1)
-    res.records.head must be(planItemHistory2_1)
-  }
-
 }
