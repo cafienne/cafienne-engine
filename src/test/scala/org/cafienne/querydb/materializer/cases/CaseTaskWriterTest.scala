@@ -23,12 +23,11 @@ class CaseTaskWriterTest extends CaseEventSinkTest {
         assert(TestQueryDB.hasTransaction(caseInstanceId))
         val transaction = TestQueryDB.getTransaction(caseInstanceId)
         println(s"Found ${transaction.records.length} records, of types ${transaction.records.map(_.getClass.getSimpleName).toSet.mkString(",")}")
-        transaction.records.length shouldBe 7
+        transaction.records.length shouldBe 6
         transaction.records.count(_.isInstanceOf[CaseDefinitionRecord]) shouldBe 1
         transaction.records.count(_.isInstanceOf[CaseRoleRecord]) shouldBe 2
         transaction.records.count(_.isInstanceOf[CaseRecord]) shouldBe 1
         transaction.records.count(_.isInstanceOf[CaseFileRecord]) shouldBe 1
-        transaction.records.count(_.isInstanceOf[PlanItemHistoryRecord]) shouldBe 1  // so ... then why is this called CaseTaskWriterTest???
         transaction.records.count(_.isInstanceOf[OffsetRecord]) shouldBe 1
       }
     }

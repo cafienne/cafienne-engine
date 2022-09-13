@@ -1,7 +1,6 @@
-package org.cafienne.querydb.materializer.cases.plan
+package org.cafienne.service.akkahttp.cases.route
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.event.CaseModified
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
 import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
@@ -39,7 +38,7 @@ object PlanItemHistoryMerger extends LazyLogging {
           historyState = event.getHistoryState.toString,
           currentState = event.getCurrentState.toString,
           transition = event.getTransition.toString,
-          lastModified = null,
+          lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
@@ -52,7 +51,7 @@ object PlanItemHistoryMerger extends LazyLogging {
           index = event.index,
           tenant = event.tenant,
           repeating = event.isRepeating,
-          lastModified = null,
+          lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
@@ -65,12 +64,12 @@ object PlanItemHistoryMerger extends LazyLogging {
           index = event.index,
           tenant = event.tenant,
           required = event.isRequired,
-          lastModified = null,
+          lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
         ))
-      case event: PlanItemMigrated => {
+      case event: PlanItemMigrated =>
         Some(PlanItemHistoryRecord(
           id = event.getId,
           planItemId = event.getPlanItemId,
@@ -78,18 +77,12 @@ object PlanItemHistoryMerger extends LazyLogging {
           index = event.index,
           tenant = event.tenant,
           name = event.planItemName,
-          lastModified = null,
+          lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
           eventType = evt.getClass.getName,
           sequenceNr = evt.getSequenceNumber
         ))
-      }
-      case other =>
-        logger.warn(s"Cannot handle plan item events of type ${evt.getClass.getName}")
-        None
+      case _ => None // No interest in other case plan events at this moment
     }
   }
-
-  def merge(modified: CaseModified, current: PlanItemHistoryRecord): PlanItemHistoryRecord =
-    current.copy(lastModified = modified.lastModified(), modifiedBy = modified.getUser.id)
 }

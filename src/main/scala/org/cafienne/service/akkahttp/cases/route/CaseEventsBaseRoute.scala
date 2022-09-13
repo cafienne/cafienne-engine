@@ -5,7 +5,6 @@ import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Sink
 import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
 import org.cafienne.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
-import org.cafienne.querydb.materializer.cases.plan.PlanItemHistoryMerger
 import org.cafienne.querydb.query.exception.PlanItemSearchFailure
 import org.cafienne.querydb.record.PlanItemHistoryRecord
 import org.cafienne.service.akkahttp.cases.PlanItemHistory

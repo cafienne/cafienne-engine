@@ -18,8 +18,6 @@ trait CaseStorageTransaction extends QueryDBTransaction {
 
   def upsert(record: PlanItemRecord): Unit
 
-  def upsert(record: PlanItemHistoryRecord): Unit
-
   def upsert(record: CaseFileRecord): Unit
 
   def upsert(record: CaseBusinessIdentifierRecord): Unit
@@ -42,7 +40,7 @@ trait CaseStorageTransaction extends QueryDBTransaction {
 
   def deleteCaseTeamMember(key: CaseTeamMemberKey): Unit
 
-  def deletePlanItemRecordAndHistory(planItemId: String): Unit
+  def deletePlanItemRecord(planItemId: String): Unit
 
   def removeCaseRoles(caseInstanceId: String): Unit
 

@@ -8,14 +8,13 @@ import org.cafienne.cmmn.actorapi.event.plan._
 import org.cafienne.humantask.actorapi.event._
 import org.cafienne.humantask.actorapi.event.migration.{HumanTaskDropped, HumanTaskMigrated}
 import org.cafienne.querydb.materializer.cases.{CaseEventBatch, CaseEventMaterializer}
-import org.cafienne.querydb.record.{PlanItemHistoryRecord, PlanItemRecord, TaskRecord}
+import org.cafienne.querydb.record.{PlanItemRecord, TaskRecord}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class CasePlanProjection(override val batch: CaseEventBatch)(implicit val executionContext: ExecutionContext) extends CaseEventMaterializer with LazyLogging {
 
   private val planItems = scala.collection.mutable.HashMap[String, PlanItemRecord]()
-  private val planItemsHistory = scala.collection.mutable.Buffer[PlanItemHistoryRecord]()
   private val tasks = scala.collection.mutable.HashMap[String, TaskRecord]()
 
   def handleCasePlanEvent(event: CasePlanEvent): Future[Done] = {
@@ -31,11 +30,9 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
   private def handlePlanItemEvent(event: CasePlanEvent): Future[Done] = {
     event match {
       case dropped: PlanItemDropped =>
-        dBTransaction.deletePlanItemRecordAndHistory(dropped.getPlanItemId)
+        dBTransaction.deletePlanItemRecord(dropped.getPlanItemId)
         Future.successful(Done)
       case _ =>
-        // Always insert new items into history, no need to first fetch them from db.
-        PlanItemHistoryMerger.mapEventToHistory(event).foreach(item => planItemsHistory += item)
         event match {
           case evt: PlanItemCreated =>
             val planItem = PlanItemMerger.merge(evt)
@@ -138,7 +135,6 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
   def prepareCommit(caseModified: CaseModified): Unit = {
     // Add lastModified field to plan items and tasks
     this.planItems.values.map(item => PlanItemMerger.merge(caseModified, item)).foreach(item => dBTransaction.upsert(item))
-    this.planItemsHistory.map(item => PlanItemHistoryMerger.merge(caseModified, item)).foreach(item => dBTransaction.upsert(item))
     this.tasks.values.map(current => TaskMerger(caseModified, current)).foreach(item => dBTransaction.upsert(item))
   }
 }

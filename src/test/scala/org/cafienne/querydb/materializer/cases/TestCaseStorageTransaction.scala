@@ -22,8 +22,6 @@ class TestCaseStorageTransaction(caseInstanceId: String) extends TestQueryDBTran
 
   override def upsert(record: PlanItemRecord): Unit = addRecord(record)
 
-  override def upsert(record: PlanItemHistoryRecord): Unit = addRecord(record)
-
   override def upsert(record: CaseFileRecord): Unit = addRecord(record)
 
   override def upsert(record: CaseBusinessIdentifierRecord): Unit = addRecord(record)
@@ -46,7 +44,7 @@ class TestCaseStorageTransaction(caseInstanceId: String) extends TestQueryDBTran
 
   override def deleteCaseTeamMember(key: CaseTeamMemberKey): Unit = ???
 
-  override def deletePlanItemRecordAndHistory(planItemId: String): Unit = ???
+  override def deletePlanItemRecord(planItemId: String): Unit = ???
 
   override def removeCaseRoles(caseInstanceId: String): Unit = {}
 

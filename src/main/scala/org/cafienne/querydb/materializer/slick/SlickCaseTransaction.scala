@@ -22,8 +22,6 @@ class SlickCaseTransaction extends SlickQueryDBTransaction with CaseStorageTrans
 
   override def upsert(record: PlanItemRecord): Unit = addStatement(TableQuery[PlanItemTable].insertOrUpdate(record))
 
-  override def upsert(record: PlanItemHistoryRecord): Unit = addStatement(TableQuery[PlanItemHistoryTable].insertOrUpdate(record))
-
   override def upsert(record: CaseFileRecord): Unit = addStatement(TableQuery[CaseFileTable].insertOrUpdate(record))
 
   override def upsert(record: CaseBusinessIdentifierRecord): Unit = addStatement(TableQuery[CaseBusinessIdentifierTable].insertOrUpdate(record))
@@ -71,9 +69,8 @@ class SlickCaseTransaction extends SlickQueryDBTransaction with CaseStorageTrans
     }
   }
 
-  override def deletePlanItemRecordAndHistory(planItemId: String): Unit = {
+  override def deletePlanItemRecord(planItemId: String): Unit = {
     addStatement(TableQuery[PlanItemTable].filter(_.id === planItemId).delete)
-    addStatement(TableQuery[PlanItemHistoryTable].filter(_.id === planItemId).delete)
   }
 
   override def removeCaseRoles(caseInstanceId: String): Unit = {
@@ -120,9 +117,6 @@ class SlickCaseTransaction extends SlickQueryDBTransaction with CaseStorageTrans
     }) ++ info.map(user => {
       // Update 'modifiedBy' field in planitem table
       (for {cases <- TableQuery[PlanItemTable].filter(r => r.caseInstanceId === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
-    }) ++ info.map(user => {
-      // Update 'modifiedBy' field in planitemhistory table
-      (for {cases <- TableQuery[PlanItemHistoryTable].filter(r => r.caseInstanceId === caseId && r.modifiedBy === user.existingUserId)} yield cases.modifiedBy).update(user.newUserId)
     }) ++ info.map(user => {
       // Update 'createdBy' field in task table
       (for {cases <- TableQuery[TaskTable].filter(r => r.caseInstanceId === caseId && r.createdBy === user.existingUserId)} yield cases.createdBy).update(user.newUserId)
