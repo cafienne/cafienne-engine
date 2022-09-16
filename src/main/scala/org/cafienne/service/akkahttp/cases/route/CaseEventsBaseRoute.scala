@@ -60,7 +60,7 @@ trait CaseEventsBaseRoute extends CasesRoute {
       val historyRecords: Seq[PlanItemHistoryRecord] = events.map(PlanItemHistoryMerger.mapModelEventEnvelope).filter(_.isDefined).map(_.get)
       var index = 0
       historyRecords.map(item => {
-        val sequenced = item.copy(sequenceNr = index)
+        val sequenced = item.copy(id = s"${planItemId}_$index", sequenceNr = index)
         index += 1
         sequenced
       })

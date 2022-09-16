@@ -15,72 +15,62 @@ object PlanItemHistoryMerger extends LazyLogging {
     evt match {
       case event: PlanItemCreated =>
         Some(PlanItemHistoryRecord(
-          id = event.getId,
           planItemId = event.getPlanItemId,
           stageId = event.stageId,
           name = event.planItemName,
-          index = event.index,
+          index = event.getIndex,
           caseInstanceId = event.getCaseInstanceId,
           tenant = event.tenant,
           planItemType = event.getType.toString,
           lastModified = event.createdOn,
           modifiedBy = event.getUser.id,
-          eventType = event.getClass.getName,
-          sequenceNr = event.getSequenceNumber
+          eventType = event.getClass.getName
         ))
       case event: PlanItemTransitioned =>
         Some(PlanItemHistoryRecord(
-          id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId,
-          index = event.index,
+          index = event.getIndex,
           tenant = event.tenant,
           historyState = event.getHistoryState.toString,
           currentState = event.getCurrentState.toString,
           transition = event.getTransition.toString,
           lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
-          eventType = evt.getClass.getName,
-          sequenceNr = evt.getSequenceNumber
+          eventType = evt.getClass.getName
         ))
       case event: RepetitionRuleEvaluated =>
         Some(PlanItemHistoryRecord(
-          id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId,
-          index = event.index,
+          index = event.getIndex,
           tenant = event.tenant,
           repeating = event.isRepeating,
           lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
-          eventType = evt.getClass.getName,
-          sequenceNr = evt.getSequenceNumber
+          eventType = evt.getClass.getName
         ))
       case event: RequiredRuleEvaluated =>
         Some(PlanItemHistoryRecord(
-          id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId,
-          index = event.index,
+          index = event.getIndex,
           tenant = event.tenant,
           required = event.isRequired,
           lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
-          eventType = evt.getClass.getName,
-          sequenceNr = evt.getSequenceNumber
+          eventType = evt.getClass.getName
         ))
       case event: PlanItemMigrated =>
         Some(PlanItemHistoryRecord(
-          id = event.getId,
           planItemId = event.getPlanItemId,
           caseInstanceId = event.getCaseInstanceId,
-          index = event.index,
+          index = event.getIndex,
           tenant = event.tenant,
           name = event.planItemName,
           lastModified = event.getTimestamp,
           modifiedBy = event.getUser.id,
-          eventType = evt.getClass.getName,
-          sequenceNr = evt.getSequenceNumber
+          eventType = evt.getClass.getName
         ))
       case _ => None // No interest in other case plan events at this moment
     }

@@ -14,7 +14,7 @@ object PlanItemMerger {
       definitionId = event.definitionId,
       stageId = event.stageId,
       name = event.planItemName,
-      index = event.index,
+      index = event.getIndex,
       caseInstanceId = event.getCaseInstanceId,
       tenant = event.tenant,
       planItemType = event.getType.toString,

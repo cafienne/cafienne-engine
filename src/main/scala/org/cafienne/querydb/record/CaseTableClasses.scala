@@ -108,7 +108,7 @@ final case class PlanItemRecord(id: String,
 
 }
 
-final case class PlanItemHistoryRecord(id: String,
+final case class PlanItemHistoryRecord(id: String = "",
                                        planItemId: String,
                                        stageId: String = "",
                                        name: String = "",
@@ -124,7 +124,7 @@ final case class PlanItemHistoryRecord(id: String,
                                        lastModified: Instant,
                                        modifiedBy: String,
                                        eventType: String,
-                                       sequenceNr: Long,
+                                       sequenceNr: Long = 0,
                                        taskInput: String = "",
                                        taskOutput: String = "",
                                        mappedInput: String = "",
