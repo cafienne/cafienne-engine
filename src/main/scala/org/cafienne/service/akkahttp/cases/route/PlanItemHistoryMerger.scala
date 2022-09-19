@@ -17,12 +17,12 @@ object PlanItemHistoryMerger extends LazyLogging {
         Some(PlanItemHistoryRecord(
           planItemId = event.getPlanItemId,
           stageId = event.stageId,
-          name = event.planItemName,
+          name = event.getPlanItemName,
           index = event.getIndex,
           caseInstanceId = event.getCaseInstanceId,
           tenant = event.tenant,
           planItemType = event.getType.toString,
-          lastModified = event.createdOn,
+          lastModified = event.getCreatedOn,
           modifiedBy = event.getUser.id,
           eventType = event.getClass.getName
         ))

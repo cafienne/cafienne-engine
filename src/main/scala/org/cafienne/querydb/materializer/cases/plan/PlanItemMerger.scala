@@ -13,14 +13,14 @@ object PlanItemMerger {
       id = event.getPlanItemId,
       definitionId = event.definitionId,
       stageId = event.stageId,
-      name = event.planItemName,
+      name = event.getPlanItemName,
       index = event.getIndex,
       caseInstanceId = event.getCaseInstanceId,
       tenant = event.tenant,
       planItemType = event.getType.toString,
-      lastModified = event.createdOn,
+      lastModified = event.getCreatedOn,
       modifiedBy = event.getUser.id,
-      createdOn = event.createdOn,
+      createdOn = event.getCreatedOn,
       createdBy = event.getUser.id)
   }
 

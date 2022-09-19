@@ -280,12 +280,12 @@ public class Case extends ModelActor {
                 return null;
             }
 
-            ItemDefinition itemDefinition = stage.getDefinition().getPlanItem(event.planItemName);
+            ItemDefinition itemDefinition = stage.getDefinition().getPlanItem(event.getPlanItemName());
             // If definition == null, try to see if it's a discretionaryItem
             if (itemDefinition == null) {
-                itemDefinition = stage.getDefinition().getDiscretionaryItem(event.planItemName);
+                itemDefinition = stage.getDefinition().getDiscretionaryItem(event.getPlanItemName());
                 if (itemDefinition == null) {
-                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.planItemName + "' in stage " + event.stageId + ", and therefore cannot recover plan item " + event);
+                    logger.error("MAJOR ERROR: we cannot find a plan item definition named '" + event.getPlanItemName() + "' in stage " + event.stageId + ", and therefore cannot recover plan item " + event);
                     return null;
                 }
             }

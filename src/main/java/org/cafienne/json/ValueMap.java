@@ -260,10 +260,10 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
      * @param fieldName
      * @return
      */
-    public Instant rawInstant(Object fieldName) {
+    public Instant rawInstant(Object fieldName, Instant... value) {
         Value<?> v = get(String.valueOf(fieldName));
         if (v == Value.NULL) {
-            return null;
+            return value.length > 0 ? value[0] : null;
         }
         return Instant.parse(v.value.toString());
     }
@@ -372,8 +372,8 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
         }
     }
 
-    public Instant readInstant(Object fieldName) {
-        return rawInstant(fieldName);
+    public Instant readInstant(Object fieldName, Instant... value) {
+        return rawInstant(fieldName, value);
     }
 
     public String[] readStringList(Object fieldName) {
