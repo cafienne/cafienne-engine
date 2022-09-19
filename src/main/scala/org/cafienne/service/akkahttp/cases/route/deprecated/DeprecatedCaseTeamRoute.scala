@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.akkahttp.cases.route.deprecated
 
-import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
 import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}

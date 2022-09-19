@@ -2,8 +2,6 @@ package org.cafienne.infrastructure.akkahttp.authentication
 
 import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.{Directive1, Directives}
-import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.SecurityContext
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.{AuthenticatedUser, JwtTokenVerifier, MissingTokenException}
 
@@ -15,21 +13,13 @@ import scala.concurrent.{ExecutionContext, Future}
   *
   *
   */
-trait AuthenticationDirectives {
-  self: Directives =>
+trait AuthenticationDirectives extends Directives {
 
-  //  implicit val ec = ExecutionContext.global
+  implicit val ex: ExecutionContext
+
   //TODO make the token verifier initialize with the list of tuple (issuer, keysource) as defined in AuthenticatedRoute
-  lazy private val jwtTokenVerifier = new JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer)
-  // The public RSA keys to validate the signatures will be sourced from the
-  // OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
-  // object caches the retrieved keys to speed up subsequent look-ups and can
-  // also handle key-rollover
-  protected val keySource: JWKSource[SecurityContext]
-  //Issuer that issues the token.
-  protected val issuer: String
+  lazy private val jwtTokenVerifier = new JwtTokenVerifier()
 
-  protected implicit val ec: ExecutionContext
   //IdentityProvider to get the user
   protected val userCache: IdentityProvider
 
@@ -61,8 +51,4 @@ trait AuthenticationDirectives {
       case Credentials.Missing => Future.failed(MissingTokenException)
     }
   }
-
-  //  def user(realm: String): Directive1[ServiceUserContext] = {
-  //    authenticateOAuth2Async(realm, jwtToServiceUserAuthenticator)
-  //  }
 }

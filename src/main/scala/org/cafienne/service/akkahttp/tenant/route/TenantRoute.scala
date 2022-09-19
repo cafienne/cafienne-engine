@@ -8,8 +8,6 @@
 package org.cafienne.service.akkahttp.tenant.route
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName, pathPrefix}
-import akka.http.scaladsl.server.PathMatchers.Segment
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.authentication.AuthenticatedUser

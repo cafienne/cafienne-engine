@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.akkahttp.consentgroup.route
 
-import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}

@@ -1,10 +1,7 @@
 package org.cafienne.infrastructure.akkahttp.route
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.Directives.{complete, extractUri, _}
-import akka.http.scaladsl.server.{Directives, ExceptionHandler, Route}
-import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
-import com.nimbusds.jose.proc.SecurityContext
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.actormodel.response.ActorLastModified
@@ -16,17 +13,16 @@ import org.cafienne.querydb.query.exception.SearchFailure
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.health.HealthMonitor
 
-import java.net.URL
 import scala.concurrent.ExecutionContext
 
 
 /**
   * Base for enabling authentication
   */
-trait AuthenticatedRoute extends CaseServiceRoute {
+trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives {
 
-  val userCache: IdentityProvider = caseSystem.userCache
-  val uc: IdentityProvider = userCache
+  override val userCache: IdentityProvider = caseSystem.userCache
+  override implicit val ex: ExecutionContext = caseSystem.system.dispatcher
 
   override def exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: CannotReachIDPException => handleIDPException(e)
@@ -90,7 +86,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
   }
 
   def authenticatedUser(subRoute: AuthenticatedUser => Route): Route = {
-    OIDCAuthentication.authenticatedUser() { user => {
+    authenticatedUser() { user => {
         caseSystemMustBeHealthy()
         optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) {
           case Some(s) =>
@@ -107,7 +103,7 @@ trait AuthenticatedRoute extends CaseServiceRoute {
 
   def validUser(subRoute: PlatformUser => Route): Route = {
     optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { tlm =>
-      OIDCAuthentication.platformUser(tlm) { platformUser =>
+      platformUser(tlm) { platformUser =>
         caseSystemMustBeHealthy()
         subRoute(platformUser)
       }
@@ -118,14 +114,5 @@ trait AuthenticatedRoute extends CaseServiceRoute {
     if (!HealthMonitor.ok()) {
       throw new UnhealthyCaseSystem("Refusing request, because Case System is not healthy")
     }
-  }
-
-  object OIDCAuthentication extends Directives with AuthenticationDirectives {
-    //TODO make the keySource and issuer a list of tuples (or case class, or config objects)
-    // based on a config that can list more than 1
-    override protected val userCache: IdentityProvider = uc
-    protected val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(new URL(Cafienne.config.OIDC.keysUrl))
-    protected val issuer: String = Cafienne.config.OIDC.issuer
-    override protected implicit val ec: ExecutionContext = caseSystem.system.dispatcher
   }
 }

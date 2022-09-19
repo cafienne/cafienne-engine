@@ -17,7 +17,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import java.security.KeyPairGenerator
 import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 import java.util.Date
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.jdk.CollectionConverters._
 
 class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with ScalaFutures with ScalatestRouteTest {
@@ -26,23 +26,21 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   final val tokenWithoutRole = generateTokenAndSource("subject2", List.empty[String])
   final val tokenWithoutUUID = generateTokenAndSource("nouuidsubject", List("A_ROLE"))
 
-  implicit val executionContext = ExecutionContext.global
+  implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
-  implicit val requestServiceExceptionHandler = ExceptionHandler {
+  implicit val requestServiceExceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: Exception => rc => rc.complete(StatusCodes.Unauthorized -> e.getMessage)
   }
 
   //Route setup that uses the token with a role included
-  object IncludeAuthDirectives extends Directives with AuthenticationDirectives {
-    override val keySource: JWKSource[SecurityContext] = tokenWithRole._2
-    override protected val issuer: String              = "issuerString"
+  object IncludeAuthDirectives extends AuthenticationDirectives {
     override protected val userCache: IdentityProvider = new IdentityProvider{}
-    override implicit val ec: ExecutionContext = executionContext
+    override implicit val ex: ExecutionContext = executionContext
   }
 
   object RouteWithRoles {
     import IncludeAuthDirectives._
-    val route = get {
+    val route: Route = get {
       path("secured") {
         platformUser(None) { userContext =>
           complete(s"The user context is $userContext")
@@ -52,16 +50,14 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   }
 
   //Route setup without roles included
-  object AuthDirectivesWithoutRoles extends Directives with AuthenticationDirectives {
-    override val keySource: JWKSource[SecurityContext] = tokenWithoutRole._2
-    override protected val issuer: String              = "issuerString"
+  object AuthDirectivesWithoutRoles extends AuthenticationDirectives {
     override protected val userCache: IdentityProvider = new IdentityProvider{}
-    override implicit val ec: ExecutionContext = executionContext
+    override implicit val ex: ExecutionContext = executionContext
   }
 
   object RouteWithoutRolesAndDifferentKeyPair {
     import AuthDirectivesWithoutRoles._
-    val route = get {
+    val route: Route = get {
       path("secured") {
         platformUser(None) { userContext =>
           complete(s"The user context is $userContext")
@@ -71,16 +67,14 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
   }
 
   //Route with a non - uuid subject
-  object AuthDirectivesNoUUID extends Directives with AuthenticationDirectives {
-    override val keySource: JWKSource[SecurityContext] = tokenWithoutUUID._2
-    override protected val issuer: String              = "issuerString"
+  object AuthDirectivesNoUUID extends AuthenticationDirectives {
     override protected val userCache: IdentityProvider = new IdentityProvider{}
-    override implicit val ec: ExecutionContext = executionContext
+    override implicit val ex: ExecutionContext = executionContext
   }
 
   object RouteNoUUIDinUser {
     import AuthDirectivesNoUUID._
-    val route = get {
+    val route: Route = get {
       path("secured") {
         platformUser(None) { userContext =>
           complete(s"The user context is $userContext")

@@ -7,8 +7,6 @@
  */
 package org.cafienne.service.akkahttp.consentgroup.route
 
-import akka.http.scaladsl.server.Directives.{onComplete, optionalHeaderValueByName, pathPrefix}
-import akka.http.scaladsl.server.PathMatchers.Segment
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.ConsentGroupUser
 import org.cafienne.authentication.AuthenticatedUser

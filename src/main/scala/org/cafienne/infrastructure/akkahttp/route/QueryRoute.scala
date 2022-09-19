@@ -1,7 +1,6 @@
 package org.cafienne.infrastructure.akkahttp.route
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
-import akka.http.scaladsl.server.Directives.{complete, onComplete, optionalHeaderValueByName}
 import akka.http.scaladsl.server.{Directive1, Route}
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.actormodel.response.ActorLastModified

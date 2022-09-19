@@ -8,7 +8,6 @@
 package org.cafienne.service.akkahttp.tasks
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.WorkflowCommand

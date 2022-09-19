@@ -20,7 +20,7 @@ class AnonymousConfig(val parent: ApiConfig) extends ChildConfigReader {
     })
     definitionMap.toMap
   }
-  val path = "anonymous-access"
+  def path = "anonymous-access"
   val enabled: Boolean = {
     val enabled = readBoolean("enabled", default = false)
     if (enabled) {

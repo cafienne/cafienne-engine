@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 
 class TimerServiceConfig(val parent: EngineConfig) extends ChildConfigReader {
-  val path = "timer-service"
+  def path = "timer-service"
 
   /**
     * Returns configuration path for the event store

@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.akkahttp.cases.route
 
-import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema

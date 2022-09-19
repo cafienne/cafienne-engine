@@ -1,6 +1,5 @@
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.server.Directives.onComplete
 import akka.http.scaladsl.server.Route
 
 import scala.util.{Failure, Success}

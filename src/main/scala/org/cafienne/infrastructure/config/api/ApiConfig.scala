@@ -4,7 +4,7 @@ import org.cafienne.infrastructure.config.util.MandatoryConfig
 import org.cafienne.infrastructure.config.CafienneConfig
 
 class ApiConfig(val parent: CafienneConfig) extends MandatoryConfig {
-  val path = "api"
+  def path = "api"
 
   lazy val bindHost: String = {
     config.getString("bindhost")

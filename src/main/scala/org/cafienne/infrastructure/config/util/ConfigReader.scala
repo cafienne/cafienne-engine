@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters._
   * Some utility methods to easily read properties from a scala Config object with e.g. default values
   */
 trait ConfigReader extends LazyLogging {
-  val config: Config
+  def config: Config
 
   def warn(msg: String): Unit = {
     logger.warn(msg)
