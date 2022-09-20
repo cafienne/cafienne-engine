@@ -161,7 +161,8 @@ libraryDependencies ++= Seq(
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-  , "com.nimbusds"            %  "nimbus-jose-jwt"                       % "9.24.4"
+  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.24.4"
+  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "9.43.1"
 
   // DB Schema
   , "org.flywaydb"            %  "flyway-core"                           % "7.2.1"
