@@ -41,8 +41,8 @@ object HumanTaskStarted {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
     .filterMap(classOf[HumanTaskActivated])
     .map(event => {
-      val events = batch.filterMap(classOf[HumanTaskEvent]).filter(_.taskId == event.taskId)
-      val taskId = event.taskId
+      val events = batch.filterMap(classOf[HumanTaskEvent]).filter(_.getTaskId == event.getTaskId)
+      val taskId = event.getTaskId
       val path = event.path
       val taskName = event.getTaskName
       val caseInstanceId = event.getCaseInstanceId

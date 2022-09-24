@@ -75,34 +75,34 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
     // See above comments. HumanTaskActivated has replaced HumanTaskCreated.
     //  We check here to see if our version is an old or a new one, by checking whether
     //  a task is already available in the transaction (that means HumanTaskCreated was still there, the old format).
-    val updatedTask = this.tasks.get(evt.taskId) match {
+    val updatedTask = this.tasks.get(evt.getTaskId) match {
       case None => TaskMerger.create(evt) // New format. TaskMerger will create the task
       case Some(task) => TaskMerger(evt, task) // Old format, must have been created in same transaction through HumanTaskCreated, fine too
     }
-    this.tasks.put(evt.taskId, updatedTask)
+    this.tasks.put(evt.getTaskId, updatedTask)
     Future.successful(Done)
   }
 
   private def deprecatedCreateTask(evt: HumanTaskCreated): Future[Done] = {
-    this.tasks.put(evt.taskId, TaskMerger.create(evt))
+    this.tasks.put(evt.getTaskId, TaskMerger.create(evt))
     Future.successful(Done)
   }
 
   private def handleHumanTaskEvent(event: HumanTaskEvent): Future[Done] = {
     event match {
       case dropped: HumanTaskDropped =>
-        dBTransaction.deleteTaskRecord(dropped.taskId)
+        dBTransaction.deleteTaskRecord(dropped.getTaskId)
         return Future.successful(Done)
       case _ =>
     }
 
     val fTask: Future[Option[TaskRecord]] = {
       event match {
-        case evt: HumanTaskInputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
-        case evt: HumanTaskOutputSaved => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
-        case evt: HumanTaskOwnerChanged => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
-        case evt: HumanTaskDueDateFilled => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
-        case evt: HumanTaskTransitioned => fetchTask(event.taskId).map(task => task.map(t => {
+        case evt: HumanTaskInputSaved => fetchTask(event.getTaskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskOutputSaved => fetchTask(event.getTaskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskOwnerChanged => fetchTask(event.getTaskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskDueDateFilled => fetchTask(event.getTaskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskTransitioned => fetchTask(event.getTaskId).map(task => task.map(t => {
           val copy = TaskMerger(evt, t)
           evt match {
             case evt: HumanTaskAssigned => TaskMerger(evt, copy)
@@ -112,14 +112,14 @@ class CasePlanProjection(override val batch: CaseEventBatch)(implicit val execut
             case other => copy // No need to do any further updates to the task record
           }
         }))
-        case evt: HumanTaskMigrated => fetchTask(event.taskId).map(t => t.map(task => TaskMerger(evt, task)))
+        case evt: HumanTaskMigrated => fetchTask(event.getTaskId).map(t => t.map(task => TaskMerger(evt, task)))
         case _ => Future.successful(None) // Ignore and error on other events
       }
     }
 
     fTask.map {
       case Some(task) => this.tasks.put(task.id, task)
-      case _ => logger.error(s"Could not find task '${event.getTaskName}' with id ${event.taskId} in the current database. This may lead to problems. Ignoring event of type ${event.getClass.getName}")
+      case _ => logger.error(s"Could not find task '${event.getTaskName}' with id ${event.getTaskId} in the current database. This may lead to problems. Ignoring event of type ${event.getClass.getName}")
     }.flatMap(_ => Future.successful(Done))
   }
 

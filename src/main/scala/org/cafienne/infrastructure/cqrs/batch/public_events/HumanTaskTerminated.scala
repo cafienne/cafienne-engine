@@ -17,7 +17,7 @@ case class HumanTaskTerminated(taskId: String, path: Path, taskName: String, cas
 object HumanTaskTerminated {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
     .filterMap(classOf[org.cafienne.humantask.actorapi.event.HumanTaskTerminated])
-    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskTerminated(event.taskId, event.path, event.getTaskName, event.getCaseInstanceId)))
+    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskTerminated(event.getTaskId, event.path, event.getTaskName, event.getCaseInstanceId)))
 
   def deserialize(json: ValueMap): HumanTaskTerminated = HumanTaskTerminated(
     taskId = json.readString(Fields.taskId),
