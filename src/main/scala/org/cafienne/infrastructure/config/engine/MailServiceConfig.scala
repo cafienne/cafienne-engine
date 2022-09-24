@@ -5,7 +5,7 @@ import org.cafienne.infrastructure.config.util.MandatoryConfig
 import java.util.Properties
 
 class MailServiceConfig(val parent: EngineConfig) extends MandatoryConfig {
-  val path = "mail-service"
+  def path = "mail-service"
 
   lazy val asProperties: Properties = {
     val mailProperties = new Properties

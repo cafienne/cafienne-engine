@@ -7,7 +7,7 @@ import org.cafienne.infrastructure.config.util.MandatoryConfig
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 class PlatformConfig(val parent: CafienneConfig) extends MandatoryConfig {
-  val path = "platform"
+  def path = "platform"
 
   val platformOwners: Seq[PlatformOwner] = config.getStringList("owners").asScala.map(PlatformOwner(_)).toSeq
   if (platformOwners.isEmpty) {

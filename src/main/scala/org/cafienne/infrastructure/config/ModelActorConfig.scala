@@ -6,7 +6,7 @@ import org.cafienne.infrastructure.config.util.ChildConfigReader
 import scala.concurrent.duration.SECONDS
 
 class ModelActorConfig(val parent: CafienneConfig) extends ChildConfigReader {
-  val path = "actor"
+  def path = "actor"
 
   lazy val askTimout: Timeout = {
     val default = 60

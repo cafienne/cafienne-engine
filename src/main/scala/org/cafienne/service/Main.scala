@@ -9,6 +9,7 @@ package org.cafienne.service
 
 import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.authentication.MultiIssuerJWSKeySelector
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.schema.QueryDB
 import org.cafienne.service.akkahttp.CafienneHttpServer
@@ -27,6 +28,8 @@ object Main extends App with LazyLogging {
 
     // Start running the Event Sinks
     QueryDB.open(caseSystem)
+
+    MultiIssuerJWSKeySelector.initialize()
 
     // Create and start the http server
     new CafienneHttpServer(caseSystem).start().onComplete {

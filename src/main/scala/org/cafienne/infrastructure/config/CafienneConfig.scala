@@ -56,7 +56,11 @@ class CafienneConfig extends ConfigReader with LazyLogging {
   /**
     * Returns the Open ID Connect configuration settings of this Case System
     */
-  lazy val OIDC: OIDCConfig = api.security.oidc
+  //TODO change the config to support more than one OIDCConfig to enable multi-issuer
+  //NOTE that we should configure the issuer URL and use that for validation, for security reasons ????
+  lazy val OIDC: OIDCConfig = OIDCList.head
+
+  lazy val OIDCList: Seq[OIDCConfig] = api.security.oidcList
 
   /**
     * Returns configuration options for reading and writing case definitions

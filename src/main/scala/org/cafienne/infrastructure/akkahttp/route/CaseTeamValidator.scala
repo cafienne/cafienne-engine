@@ -1,7 +1,6 @@
 package org.cafienne.infrastructure.akkahttp.route
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, onComplete}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.exception.MissingTenantException
 import org.cafienne.actormodel.identity.{CaseUserIdentity, Origin, UserIdentity}

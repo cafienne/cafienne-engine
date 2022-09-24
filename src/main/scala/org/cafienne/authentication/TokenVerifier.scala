@@ -1,8 +1,7 @@
 package org.cafienne.authentication
 
-import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.proc.{BadJOSEException, JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
-import com.nimbusds.jose.{JWSAlgorithm, RemoteKeySourceException}
+import com.nimbusds.jose.RemoteKeySourceException
+import com.nimbusds.jose.proc.{BadJOSEException, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
@@ -16,8 +15,7 @@ trait TokenVerifier[T] {
   def verifyToken(token: String): Future[T]
 }
 
-class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(implicit ec: ExecutionContext)
-    extends TokenVerifier[AuthenticatedUser] with LazyLogging {
+class JwtTokenVerifier()(implicit ec: ExecutionContext) extends TokenVerifier[AuthenticatedUser] with LazyLogging {
   import java.util
 
   val jwtProcessor: ConfigurableJWTProcessor[SecurityContext] = new DefaultJWTProcessor()
@@ -26,22 +24,13 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
   // Connect2id server, may not be set by other servers
   //jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier[_](new JOSEObjectType("at+jwt")))
 
-  // The expected JWS algorithm of the access tokens (agreed out-of-band)
-  val expectedJWSAlg: JWSAlgorithm = JWSAlgorithm.RS256
-
-  // Configure the JWT processor with a key selector to feed matching public
-  // RSA keys sourced from the JWK set URL
-  val keySelector: JWSKeySelector[SecurityContext] = new JWSVerificationKeySelector(expectedJWSAlg, keySource)
-
-  jwtProcessor.setJWSKeySelector(keySelector)
+  jwtProcessor.setJWTClaimsSetAwareJWSKeySelector(new MultiIssuerJWSKeySelector)
 
   // Check for the required claims inside the token.
   // "sub", "iat", "exp", "scp", "cid", "jti"
   jwtProcessor.setJWTClaimsSetVerifier(
     new DefaultJWTClaimsVerifier(
-      new JWTClaimsSet.Builder()
-        .issuer(issuer)
-        .build,
+      new JWTClaimsSet.Builder().build,
       new util.HashSet[String](util.Arrays.asList("sub", "exp"))
       //NOTE that groups as part of the scope is not required at this moment (like 'roles')
     )
@@ -96,6 +85,9 @@ class JwtTokenVerifier(keySource: JWKSource[SecurityContext], issuer: String)(im
             throw TokenVerificationException("Token cannot be verified: " + e.getLocalizedMessage)
           case e: ParseException =>
             throw TokenVerificationException("Token parse failure: " + e.getLocalizedMessage)
+          case i: InvalidIssuerException =>
+            // This is an exception of our self. Just throw it further
+            throw i
           case e: Throwable =>
             logger.error("Unexpected or unforeseen exception during token verification; throwing it further", e)
             throw new TokenVerificationException("Token verification failure of type " + e.getClass.getSimpleName, e)

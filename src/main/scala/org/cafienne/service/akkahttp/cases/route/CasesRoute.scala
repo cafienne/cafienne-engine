@@ -8,7 +8,6 @@
 package org.cafienne.service.akkahttp.cases.route
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.authentication.AuthenticatedUser

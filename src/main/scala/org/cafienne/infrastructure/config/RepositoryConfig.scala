@@ -4,7 +4,7 @@ import org.cafienne.cmmn.repository.DefinitionProvider
 import org.cafienne.infrastructure.config.util.MandatoryConfig
 
 class RepositoryConfig(val parent: CafienneConfig) extends MandatoryConfig {
-  val path = "definitions"
+  def path = "definitions"
   override val msg = "Cafienne Repository is not configured. Check for 'cafienne.definitions' settings"
 
   /**

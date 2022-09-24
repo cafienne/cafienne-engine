@@ -8,7 +8,7 @@ import scala.concurrent.duration.FiniteDuration
 
 
 class QueryDBConfig(val parent: CafienneConfig) extends MandatoryConfig {
-  val path = "query-db"
+  def path = "query-db"
   override val msg = "Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings"
 
   lazy val restartSettings: RestartSettings = new RestartConfig(this).settings
@@ -22,7 +22,7 @@ class QueryDBConfig(val parent: CafienneConfig) extends MandatoryConfig {
 }
 
 class RestartConfig(val parent: QueryDBConfig) extends ChildConfigReader {
-  val path = "restart-stream"
+  def path = "restart-stream"
 
   lazy val minBackoff: FiniteDuration = readDuration("min-back-off", FiniteDuration(500, TimeUnit.MILLISECONDS))
   lazy val maxBackoff: FiniteDuration = readDuration("max-back-off", FiniteDuration(30, TimeUnit.SECONDS))

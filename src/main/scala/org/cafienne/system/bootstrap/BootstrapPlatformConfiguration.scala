@@ -23,14 +23,14 @@ object BootstrapPlatformConfiguration extends LazyLogging {
 
   def run(caseSystem: CaseSystem): Unit = {
     try {
-      findConfigFile().map(parseConfigFile).map(c => sendCommand(caseSystem, c))
+      findConfigFile.map(parseConfigFile).map(c => sendCommand(caseSystem, c))
     } catch {
       case b: BootstrapFailure => throw b
       case t: Throwable => throw new BootstrapFailure("Unexpected error while reading bootstrap configuration", t)
     }
   }
 
-  private def findConfigFile(): Seq[File] = {
+  private def findConfigFile: Seq[File] = {
     logger.info("Checking presence of bootstrap configuration for the case system")
     val bootstrapTenantConfFiles = Cafienne.config.platform.bootstrapFile
     if (bootstrapTenantConfFiles.nonEmpty) {
