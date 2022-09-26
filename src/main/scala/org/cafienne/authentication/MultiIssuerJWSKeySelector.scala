@@ -10,6 +10,7 @@ import com.nimbusds.openid.connect.sdk.op._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.config.api.OIDCConfig
+import org.cafienne.json.JSONReader
 
 import java.net.URL
 import java.security.Key
@@ -21,7 +22,6 @@ class MultiIssuerJWSKeySelector extends JWTClaimsSetAwareJWSKeySelector[Security
 
   override def selectKeys(header: JWSHeader, claimsSet: JWTClaimsSet, context: SecurityContext): java.util.List[_ <: Key] = {
     val issuer = claimsSet.getIssuer
-
     // Exception if we cannot find the expected idp
     def unknownIDP = throw new InvalidIssuerException(s"JWT token has invalid issuer '$issuer', please use another identity provider")
     issuers.get(issuer).fold(unknownIDP)(_.selectJWSKeys(header, context))
@@ -75,7 +75,7 @@ object MultiIssuerJWSKeySelector extends LazyLogging {
 //    println(s"\nRetrieving metadata info for IDP Issuer ${config.issuer} from well known url ${config.connectUrl} ")
 
     val metadata: OIDCProviderMetadata = OIDCProviderMetadata.resolve(new Issuer(config.connectUrl))
-//    println("Metaprovider json: " + JSONReader.parse(metadata.toJSONObject.toJSONString()))
+    logger.info(s"Retrieved dynamic info from IDP ${config.connectUrl}: " + JSONReader.parse(metadata.toJSONObject.toJSONString()))
     val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(metadata.getJWKSetURI.toURL)
     val issuer: String = metadata.getIssuer.getValue
     val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)
