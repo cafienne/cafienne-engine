@@ -48,7 +48,7 @@ public class TimerSet extends TimerBaseEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
+        super.writeTimerEvent(generator);
         writeField(generator, Fields.targetMoment, targetMoment);
     }
 
