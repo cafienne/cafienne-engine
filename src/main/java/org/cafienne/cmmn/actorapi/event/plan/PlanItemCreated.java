@@ -23,9 +23,6 @@ import java.time.Instant;
 
 @Manifest
 public class PlanItemCreated extends CasePlanEvent {
-    public final Instant createdOn;
-    public final String createdBy;
-    public final String planItemName;
     public final String definitionId;
 
     private static Path createPath(Path parent, ItemDefinition definition, int index) {
@@ -44,19 +41,16 @@ public class PlanItemCreated extends CasePlanEvent {
     }
 
     private PlanItemCreated(Case caseInstance, String planItemId, String parentStage, Path parentPath, ItemDefinition definition, int index) {
-        super(caseInstance, planItemId, parentStage, createPath(parentPath, definition, index), definition.getPlanItemDefinition().getItemType(), index, 0, null);
-        this.createdOn = caseInstance.getTransactionTimestamp();
-        this.createdBy = caseInstance.getCurrentUser().id();
-        this.planItemName = definition.getName();
+        super(caseInstance, planItemId, parentStage, createPath(parentPath, definition, index), definition.getPlanItemDefinition().getItemType(), null);
         this.definitionId = definition.getId();
     }
 
     public PlanItemCreated(ValueMap json) {
         super(json);
-        this.createdOn = json.readInstant(Fields.createdOn);
-        this.createdBy = json.readString(Fields.createdBy);
-        this.planItemName = json.readString(Fields.name);
         this.definitionId = json.readString(Fields.definitionId, "");
+        // Note: createdOn and planItemName are no longer persisted, since the parent class contains all info.
+        //  However, older events may not carry it, so if parent class does not have it, then read it old style.
+        //  This is done in getters on these fields. Former field createdBy is no longer required.
     }
 
     @Override
@@ -64,8 +58,12 @@ public class PlanItemCreated extends CasePlanEvent {
         return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]" + (stageId.isEmpty() ? "" : " in stage " + stageId);
     }
 
+    public Instant getCreatedOn() {
+        return getTimestamp() == null ? rawJson().readInstant(Fields.createdOn) : getTimestamp();
+    }
+
     public String getPlanItemName() {
-        return planItemName;
+        return path.isEmpty() ? rawJson().readString(Fields.name) : path.name; // Compatibility with older events that do not carry path;
     }
 
     public PlanItem<?> getCreatedPlanItem() {
@@ -81,10 +79,7 @@ public class PlanItemCreated extends CasePlanEvent {
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeCasePlanEvent(generator);
-        writeField(generator, Fields.name, planItemName);
         writeField(generator, Fields.definitionId, definitionId);
-        writeField(generator, Fields.createdOn, createdOn);
-        writeField(generator, Fields.createdBy, createdBy);
     }
 
     @Override

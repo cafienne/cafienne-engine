@@ -51,7 +51,9 @@ class PlatformQueriesImpl extends PlatformQueries with LazyLogging
     } yield (cases.id, cases.tenant, cases.createdBy, cases.modifiedBy)
 
     val planQuery = for {
-      planitems <- TableQuery[PlanItemHistoryTable].filter(_.modifiedBy.inSet(userIds)).inTenants(tenants)
+      // Note: because of the "drop" of PlanItemHistoryTable, this query no longer gives a reliable result.
+      // To make it reliable again, it is required check the case events instead.
+      planitems <- TableQuery[PlanItemTable].filter(_.modifiedBy.inSet(userIds)).inTenants(tenants)
     } yield (planitems.caseInstanceId, planitems.tenant, planitems.modifiedBy)
 
     val taskQuery = for {

@@ -32,11 +32,7 @@ trait CaseQueries {
 
   def getPlanItemDocumentation(planItemId: String, user: UserIdentity): Future[Documentation] = ???
 
-  def getCasePlanHistory(caseInstanceId: String, user: UserIdentity): Future[Seq[PlanItemHistory]] = ???
-
-  def getPlanItemHistory(planItemId: String, user: UserIdentity): Future[PlanItemHistory] = ???
-
-//  def getCasesStats(user: UserIdentity, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
+  //  def getCasesStats(user: UserIdentity, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String], status: Option[String]): Future[Seq[CaseList]] = ??? // GetCaseList
 
   def getMyCases(user: UserIdentity, filter: CaseFilter, area: Area = Area.Default, sort: Sort = Sort.NoSort): Future[Seq[CaseRecord]] = ???
 
@@ -234,42 +230,7 @@ class CaseQueriesImpl
     }
   }
 
-  override def getCasePlanHistory(caseInstanceId: String, user: UserIdentity): Future[Seq[PlanItemHistory]] = {
-    val query = for {
-      // Get the item's history
-      baseQuery <- TableQuery[PlanItemHistoryTable].filter(_.caseInstanceId === caseInstanceId)
-      // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId)
-    } yield baseQuery
-
-    db.run(query.distinct.result).map(records => {
-      records.isEmpty match {
-        case true => throw CaseSearchFailure(caseInstanceId)
-        case false => {
-          // Loop through the plan item id's and store them in a set
-          val distinctPlanItemIds = records.map(r => r.planItemId).toSet
-          // Now convert the records into PlanItemHistory objects per plan item id
-          distinctPlanItemIds.map(id => PlanItemHistory(records.filter(r => r.planItemId == id))).toSeq
-        }
-      }
-    })
-  }
-
-  override def getPlanItemHistory(planItemId: String, user: UserIdentity): Future[PlanItemHistory] = {
-    val query = for {
-      // Get the item's history
-      baseQuery <- TableQuery[PlanItemHistoryTable].filter(_.planItemId === planItemId)
-      // Validate team membership
-      _ <- membershipQuery(user, baseQuery.caseInstanceId)
-    } yield baseQuery
-
-    db.run(query.distinct.result).map(records => {
-      if (records.isEmpty) throw PlanItemSearchFailure(planItemId)
-      PlanItemHistory(records)
-    })
-  }
-
-//  override def getCasesStats(user: UserIdentity, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
+  //  override def getCasesStats(user: UserIdentity, tenant: Option[String], from: Int, numOfResults: Int, caseName: Option[String] = None, status: Option[String] = None): Future[Seq[CaseList]] = {
 //    // TODO
 //    // Query must be converted to:
 //    //   select count(*), case_name, state, failures from case_instance group by case_name, state, failures [having state == and case_name == ]

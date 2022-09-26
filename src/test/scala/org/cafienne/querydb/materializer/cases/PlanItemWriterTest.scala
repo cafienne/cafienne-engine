@@ -22,7 +22,7 @@ class PlanItemWriterTest extends CaseEventSinkTest {
       eventually {
         assert(TestQueryDB.hasTransaction(caseInstanceId))
         val transaction = TestQueryDB.getTransaction(caseInstanceId)
-        transaction.records.length shouldBe 8
+        transaction.records.length shouldBe 7
         assert(transaction.records.exists(x => x.isInstanceOf[CaseRecord]))
         assert(transaction.records.exists(x => x.isInstanceOf[PlanItemRecord]))
       }

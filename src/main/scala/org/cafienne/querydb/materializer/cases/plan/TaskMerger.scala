@@ -6,9 +6,9 @@ import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated
 import org.cafienne.querydb.record.TaskRecord
 
 object TaskMerger {
-  def create(evt: HumanTaskActivated): TaskRecord = TaskRecord(id = evt.taskId, caseInstanceId = evt.getActorId, tenant = evt.tenant, taskName = evt.getTaskName, createdOn = evt.getCreatedOn, createdBy = evt.getCreatedBy, lastModified = evt.getCreatedOn, modifiedBy = evt.getCreatedBy, role = evt.getPerformer, taskState = evt.getCurrentState.name, taskModel = evt.getTaskModel)
+  def create(evt: HumanTaskActivated): TaskRecord = TaskRecord(id = evt.getTaskId, caseInstanceId = evt.getActorId, tenant = evt.tenant, taskName = evt.getTaskName, createdOn = evt.getCreatedOn, createdBy = evt.getCreatedBy, lastModified = evt.getCreatedOn, modifiedBy = evt.getCreatedBy, role = evt.getPerformer, taskState = evt.getCurrentState.name, taskModel = evt.getTaskModel)
 
-  def create(evt: HumanTaskCreated): TaskRecord = TaskRecord(id = evt.taskId, caseInstanceId = evt.getActorId, tenant = evt.tenant, taskName = evt.getTaskName, createdOn = evt.getCreatedOn, createdBy = evt.getCreatedBy, lastModified = evt.getCreatedOn, modifiedBy = evt.getCreatedBy)
+  def create(evt: HumanTaskCreated): TaskRecord = TaskRecord(id = evt.getTaskId, caseInstanceId = evt.getActorId, tenant = evt.tenant, taskName = evt.getTaskName, createdOn = evt.getCreatedOn, createdBy = evt.getCreatedBy, lastModified = evt.getCreatedOn, modifiedBy = evt.getCreatedBy)
 
   def apply(evt: HumanTaskActivated, current: TaskRecord): TaskRecord = current.copy(role = evt.getPerformer, taskModel = evt.getTaskModel, taskState = evt.getCurrentState.name)
 

@@ -8,7 +8,7 @@ import org.cafienne.infrastructure.config.TestConfig
 import org.cafienne.querydb.materializer.slick.SlickQueryDB
 import org.cafienne.querydb.query.CaseQueriesImpl
 import org.cafienne.querydb.query.filter.CaseFilter
-import org.cafienne.querydb.record.{CaseRecord, PlanItemHistoryRecord, PlanItemRecord}
+import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
 import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -45,10 +45,6 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     historyState = "", transition = "", planItemType = "CasePlan", required = false, repeating = false, lastModified = Instant.now,
     modifiedBy = "user1", createdOn = Instant.now, createdBy = "user1", taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
 
-  val planItemHistory2_1 = PlanItemHistoryRecord(id = UUID.randomUUID().toString, planItemId = planItem2_1.id, caseInstanceId = idOfTerminatedCase, tenant = tenant, stageId = "", name = "planitem2",
-    currentState = "", historyState = "", transition = "", index = 0, planItemType = "", required = false, repeating = false, lastModified = Instant.now,
-    modifiedBy = "user1", eventType="?", sequenceNr = 1, taskInput = "", taskOutput = "", mappedInput = "", rawOutput = "")
-
   val caseListActive = CaseList(caseName = "aaa bbb ccc", numActive = 1L, numClosed = 0L)
   val caseListDDDEEEFFF = CaseList(caseName = "ddd EeE fff", numTerminated = 1L, numCompleted = 1L)
   val caseListTerminated = CaseList(caseName = "ddd EeE fff", numTerminated = 1L)
@@ -68,7 +64,6 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     caseUpdater.upsert(terminatedCase)
     caseUpdater.upsert(completedCase)
     caseUpdater.upsert(planItem2_1)
-    caseUpdater.upsert(planItemHistory2_1)
     caseTeamMemberRecords.foreach(caseUpdater.upsert)
     TestIdentityFactory.asDatabaseRecords(user).foreach(tenantUpdater.upsert)
     Await.ready({
@@ -155,11 +150,4 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
     val res = Await.result(caseQueries.getPlanItem(planItem2_1.id, user), 1.second)
     res.record must be(planItem2_1)
   }
-
-  it should "retrieve planItemHistory records" in {
-    val res = Await.result(caseQueries.getPlanItemHistory(planItemHistory2_1.planItemId, user), 1.second)
-    res.records.size must be (1)
-    res.records.head must be(planItemHistory2_1)
-  }
-
 }

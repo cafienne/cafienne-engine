@@ -21,8 +21,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     public final String stageId;
     public final Path path;
     public final PlanItemType type;
-    public final int seqNo;
-    public final int index;
+    private final int index;
     private transient PlanItem<?> planItem;
 
     private static String getStageId(PlanItem<?> planItem) {
@@ -31,17 +30,16 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
     }
 
     protected CasePlanEvent(PlanItem<?> planItem) {
-        this(planItem.getCaseInstance(), planItem.getId(), getStageId(planItem), planItem.getPath(), planItem.getType(), planItem.getIndex(), planItem.getNextEventNumber(), planItem);
+        this(planItem.getCaseInstance(), planItem.getId(), getStageId(planItem), planItem.getPath(), planItem.getType(), planItem);
     }
 
-    protected CasePlanEvent(Case actor, String planItemId, String stageId, Path path, PlanItemType type, int index, int seqNo, PlanItem<?> planItem) {
+    protected CasePlanEvent(Case actor, String planItemId, String stageId, Path path, PlanItemType type, PlanItem<?> planItem) {
         super(actor);
         this.planItemId = planItemId;
         this.stageId = stageId;
         this.path = path;
         this.type = type;
-        this.seqNo = seqNo;
-        this.index = index;
+        this.index = readIndex(path, null);
         this.planItem = planItem;
     }
 
@@ -53,12 +51,24 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         this.path = json.readPath(Fields.path, "");
         this.type = json.readEnum(Fields.type, PlanItemType.class);
         this.planItem = null; // Not available in event reading, except inside recovery of an event.
+        this.index = readIndex(path, json);
+    }
 
-        // TaskEvent and TimerEvent are now also a PlanItemEvent.
-        //  Older versions of those events do not have a seqNo and index. We're providing -1 as the default value to recognize that.
-        ValueMap planItemJson = json.readMap(Fields.planitem);
-        this.seqNo = planItemJson.readLong(Fields.seqNo, -1L).intValue();
-        this.index = planItemJson.readLong(Fields.index, -1L).intValue();
+    private int readIndex(Path path, ValueMap json) {
+        if (path.isEmpty()) {
+            // This is older version of events. Path is not available, but a separate 'planitem' json containing the index.
+            // Furthermore, TaskEvent and TimerEvent are now also a PlanItemEvent.
+            //  Older versions of those events do not have path and also not the plan item with index. We're providing -1 as the default value to recognize that.
+            return json.with(Fields.planitem).readLong(Fields.index, -1L).intValue();
+        } else {
+            // Note, this code is quite particular. Path supports array style indices. If a plan item is _not_ repeating
+            //  i.e., if it does _not_ have a repetitionrule defined, then -1 is stored in the path to prevent it
+            //  from printing the square array brackets ([]). But ... inside the engine's CMMN logic, comparison is done
+            //  on index == 0. Better option is to change the engine algoritm to use logic based on the "-1" information
+            //  if that is available. This also means that path probably has to become a plan item constructor property.
+            return Math.max(0, path.index);
+//            return path.index;
+        }
     }
 
     protected void setPlanItem(PlanItem<?> planItem) {
@@ -74,11 +84,10 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         if (planItem == null) {
             planItem = actor.getPlanItemById(getPlanItemId());
             if (planItem == null) {
-                logger.error("MAJOR ERROR in " + getClass().getSimpleName() + ": Cannot recover event, because plan item with id " + planItemId + " cannot be found; Case instance " + getActorId() +" with definition name '" + actor.getDefinition().getName() + "'");
+                logger.error("MAJOR ERROR in " + getClass().getSimpleName() + ": Cannot recover event, because plan item with id " + planItemId + " cannot be found; Case instance " + getActorId() + " with definition name '" + actor.getDefinition().getName() + "'");
                 return;
             }
         }
-        planItem.updateSequenceNumber(this);
         updatePlanItemState(planItem);
     }
 
@@ -90,12 +99,6 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         writeField(generator, Fields.stageId, stageId);
         writeField(generator, Fields.path, path);
         writeField(generator, Fields.type, type);
-        // Make a special planitem section
-        generator.writeFieldName(Fields.planitem.toString());
-        generator.writeStartObject();
-        generator.writeNumberField(Fields.seqNo.toString(), seqNo);
-        generator.writeNumberField(Fields.index.toString(), index);
-        generator.writeEndObject();
     }
 
     /**
@@ -113,14 +116,6 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
 
     protected String getName() {
         return getPlanItem() != null ? getPlanItem().getName() + "." + getIndex() : "PlanItem";
-    }
-
-    public String getId() {
-        return getPlanItemId() + "_" + seqNo;
-    }
-
-    public int getSequenceNumber() {
-        return seqNo;
     }
 
     public int getIndex() {

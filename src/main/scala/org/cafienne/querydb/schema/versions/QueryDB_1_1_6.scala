@@ -5,7 +5,7 @@ import org.cafienne.querydb.schema.QueryDBSchema
 import org.cafienne.querydb.schema.table.{CaseTables, TaskTables}
 import slick.migration.api.{SqlMigration, TableMigration}
 
-trait CafienneTablesV2 extends QueryDBSchema with CaseTables {
+trait CafienneTablesV2 extends CafienneTablesV3 {
 
   import dbConfig.profile.api._
 
@@ -51,8 +51,7 @@ trait CafienneTablesV2 extends QueryDBSchema with CaseTables {
 object QueryDB_1_1_6 extends DbSchemaVersion with QueryDBSchema
   with CaseTables
   with TaskTables
-  with CafienneTablesV1
-  with CafienneTablesV2 {
+  with CafienneTablesV1 {
 
   val version = "1.1.6"
   val migrations = (

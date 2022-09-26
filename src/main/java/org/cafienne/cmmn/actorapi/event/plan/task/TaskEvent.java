@@ -10,23 +10,13 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent {
-    public final String taskId; // taskName is same as the planItem id
-    private final String taskName; // taskName is same as the planItemName
 
     protected TaskEvent(T task) {
         super(task);
-        this.taskName = task.getName();
-        this.taskId = task.getId();
     }
 
     protected TaskEvent(ValueMap json) {
         super(json);
-        this.taskName = json.readString(Fields.taskName);
-        // Not all old style task event carry task id, some have plan item id,
-        //  so taking that as default value if task id is missing.
-        //  Note: plan item id is parsed from json in the super constructor,
-        //  and available through the super getter (which is overridden below, so make sure to call super itself).
-        this.taskId = json.readString(Fields.taskId, super.getPlanItemId());
     }
 
     /**
@@ -39,8 +29,6 @@ public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent {
 
     public void writeTaskEvent(JsonGenerator generator) throws IOException {
         super.writeCasePlanEvent(generator);
-        writeField(generator, Fields.taskName, taskName);
-        writeField(generator, Fields.taskId, taskId);
     }
 
     @Override
@@ -59,7 +47,12 @@ public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent {
     public String getPlanItemId() {
         // Unfortunately need to override this, because recovery uses the plan item id,
         // and older versions of TaskEvent did not invoke parent's serializer.
-        return taskId;
+        String planItemId = super.getPlanItemId();
+        if (planItemId == null) {
+            return rawJson().readString(Fields.taskId);
+        } else {
+            return planItemId;
+        }
     }
 
     /**
@@ -67,6 +60,6 @@ public abstract class TaskEvent<T extends Task<?>> extends CasePlanEvent {
      * @return
      */
     public String getTaskName() {
-        return taskName;
+        return path.isEmpty() ? rawJson().readString(Fields.taskName) : path.name;
     }
 }

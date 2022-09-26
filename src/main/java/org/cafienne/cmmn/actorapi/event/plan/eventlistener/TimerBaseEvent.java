@@ -27,20 +27,16 @@ public abstract class TimerBaseEvent extends CasePlanEvent {
         return tags;
     }
 
-    private final String timerId;
-
     public TimerBaseEvent(TimerEvent timerEvent) {
         super(timerEvent);
-        this.timerId = timerEvent.getId();
     }
 
     public TimerBaseEvent(ValueMap json) {
         super(json);
-        this.timerId = json.readString(Fields.timerId);
     }
 
     public String getTimerId() {
-        return timerId;
+        return getPlanItemId();
     }
 
     @Override
@@ -49,18 +45,29 @@ public abstract class TimerBaseEvent extends CasePlanEvent {
     }
 
     @Override
+    public String getPlanItemId() {
+        // Unfortunately need to override this, because recovery uses the plan item id,
+        // and older versions of TimerBaseEvent wrote timerId and not plan item id.
+        // So we check for plan item id first (the new format) and if not present, rely on the older format.
+        String planItemId = super.getPlanItemId();
+        if (planItemId == null) {
+            return rawJson().readString(Fields.timerId);
+        } else {
+            return planItemId;
+        }
+    }
+
+    @Override
     protected void updatePlanItemState(PlanItem<?> planItem) {
         // Nothing to update.
     }
 
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
+    protected void writeTimerEvent(JsonGenerator generator) throws IOException {
         super.writeCasePlanEvent(generator);
-        writeField(generator, Fields.timerId, timerId);
     }
 
     @Override
-    public String toString() {
-        return "Timer " + getTimerId() + " has completed";
+    public void write(JsonGenerator generator) throws IOException {
+        writeTimerEvent(generator);
     }
 }
