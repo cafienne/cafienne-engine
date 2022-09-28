@@ -1,7 +1,7 @@
 package org.cafienne.querydb.materializer.cases.team
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeamGroup, CaseTeamMember, CaseTeamUser, GroupRoleMapping}
+import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.cmmn.actorapi.event.team.group.{CaseTeamGroupAdded, CaseTeamGroupChanged}
 import org.cafienne.cmmn.actorapi.event.team.{CaseTeamMemberEvent, CaseTeamMemberRemoved}
 import org.cafienne.cmmn.instance.team.MemberType
@@ -22,33 +22,43 @@ class CaseTeamMemberProjection(dBTransaction: CaseStorageTransaction)(implicit v
   private val deletedMembers = mutable.Set[CaseTeamMemberKey]()
 
   def handleEvent(event: CaseTeamMemberEvent[_]): Unit = {
-    val member: CaseTeamMember = event.member.asInstanceOf[CaseTeamMember]
     if (event.isInstanceOf[CaseTeamMemberRemoved[_]]) {
+      val member: CaseTeamMember = event.member.asInstanceOf[CaseTeamMember]
       deletedMembers += CaseTeamMemberKey(caseInstanceId = event.getActorId, memberId = member.memberId, memberType = member.memberType)
-    } else if (event.member.isInstanceOf[CaseTeamGroup]) {
-      handleGroupEvent(event)
     } else {
-      val caseInstanceId = event.getActorId
-      val memberId: String = member.memberId
-      val isOwner: Boolean = member.isOwner
-      val caseRoles: Set[String] = member.caseRoles ++ Set("")
-      val removedRoles: Set[String] = member.rolesRemoved
-
-      member.memberType match {
-        case MemberType.User =>
-          val origin: String = member.asInstanceOf[CaseTeamUser].origin.toString
-          newCaseTeamUserRoles.addAll(caseRoles.map(caseRole => CaseTeamUserRecord(caseInstanceId = caseInstanceId, tenant = event.tenant, userId = memberId, origin = origin, caseRole = caseRole, isOwner = isOwner)))
-          removedCaseTeamUserRoles.addAll(removedRoles.map(caseRole => CaseTeamUserRecord(caseInstanceId = caseInstanceId, tenant = event.tenant, userId = memberId, origin = origin, caseRole = caseRole, isOwner = isOwner)))
-        case MemberType.TenantRole =>
-          newCaseTeamTenantRoleRoles.addAll(caseRoles.map(caseRole => CaseTeamTenantRoleRecord(caseInstanceId = caseInstanceId, tenantRole = memberId, tenant = event.tenant, caseRole = caseRole, isOwner = isOwner)))
-          removedCaseTeamTenantRoleRoles.addAll(removedRoles.map(caseRole => CaseTeamTenantRoleRecord(caseInstanceId = caseInstanceId, tenantRole = memberId, tenant = event.tenant, caseRole = caseRole, isOwner = isOwner)))
-        case _ => // Ignore other events
+      event.member match {
+        case user: CaseTeamUser => handleUserEvent(event, user)
+        case role: CaseTeamTenantRole => handleTenantRoleEvent(event, role)
+        case group: CaseTeamGroup => handleGroupEvent(event, group)
+        case other => logger.warn(s"Unexpected type of case team member ${other.getClass.getSimpleName} while handling event of type ")
       }
     }
   }
 
-  def handleGroupEvent(event: CaseTeamMemberEvent[_]): Unit = {
-    val group = event.member.asInstanceOf[CaseTeamGroup]
+  def handleUserEvent(event: CaseTeamMemberEvent[_], user: CaseTeamUser): Unit = {
+    val caseInstanceId = event.getActorId
+    val memberId: String = user.memberId
+    val isOwner: Boolean = user.isOwner
+    val caseRoles: Set[String] = user.caseRoles ++ Set("")
+    val removedRoles: Set[String] = user.rolesRemoved
+    val origin: String = user.origin.toString
+
+    newCaseTeamUserRoles.addAll(caseRoles.map(caseRole => CaseTeamUserRecord(caseInstanceId = caseInstanceId, tenant = event.tenant, userId = memberId, origin = origin, caseRole = caseRole, isOwner = isOwner)))
+    removedCaseTeamUserRoles.addAll(removedRoles.map(caseRole => CaseTeamUserRecord(caseInstanceId = caseInstanceId, tenant = event.tenant, userId = memberId, origin = origin, caseRole = caseRole, isOwner = isOwner)))
+  }
+
+  def handleTenantRoleEvent(event: CaseTeamMemberEvent[_], teamTenantRole: CaseTeamTenantRole): Unit = {
+    val caseInstanceId = event.getActorId
+    val memberId: String = teamTenantRole.memberId
+    val isOwner: Boolean = teamTenantRole.isOwner
+    val caseRoles: Set[String] = teamTenantRole.caseRoles ++ Set("")
+    val removedRoles: Set[String] = teamTenantRole.rolesRemoved
+
+    newCaseTeamTenantRoleRoles.addAll(caseRoles.map(caseRole => CaseTeamTenantRoleRecord(caseInstanceId = caseInstanceId, tenantRole = memberId, tenant = event.tenant, caseRole = caseRole, isOwner = isOwner)))
+    removedCaseTeamTenantRoleRoles.addAll(removedRoles.map(caseRole => CaseTeamTenantRoleRecord(caseInstanceId = caseInstanceId, tenantRole = memberId, tenant = event.tenant, caseRole = caseRole, isOwner = isOwner)))
+  }
+
+  def handleGroupEvent(event: CaseTeamMemberEvent[_], group: CaseTeamGroup): Unit = {
     def asRecords(mapping: GroupRoleMapping): Set[CaseTeamGroupRecord] = mapping.caseRoles.map(asRecord(mapping, _))
     def asRecord(mapping: GroupRoleMapping, caseRole: String): CaseTeamGroupRecord = CaseTeamGroupRecord(caseInstanceId = event.getActorId, tenant = event.tenant, groupId = group.groupId, caseRole = caseRole, groupRole = mapping.groupRole, isOwner = mapping.isOwner)
 
