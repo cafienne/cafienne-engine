@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
+import org.cafienne.cmmn.instance.PlanItemType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,5 +30,9 @@ public interface ItemDefinition extends DefinitionElement {
 
     default boolean isDiscretionary() {
         return false;
+    }
+
+    default PlanItemType getItemType() {
+        return getPlanItemDefinition().getItemType();
     }
 }
