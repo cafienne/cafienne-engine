@@ -71,7 +71,12 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         if (getName().isEmpty()) {
             setName(definition.getName());
         }
-        if (planItemControl == null && this.definition != null) {
+    }
+
+    @Override
+    protected void validateElement() {
+        super.validateElement();
+        if (planItemControl == null) {
             // Create a default ItemControl
             planItemControl = this.definition.getDefaultControl();
         }

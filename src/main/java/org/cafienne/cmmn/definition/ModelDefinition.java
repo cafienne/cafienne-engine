@@ -116,6 +116,16 @@ public abstract class ModelDefinition extends CMMNElementDefinition {
         }
     }
 
+    @Override
+    protected void validateElement() {
+        super.validateElement();
+
+        // Now iterate all elements and tell them to validate
+        for (CMMNElementDefinition element : elements) {
+            element.validateElement();
+        }
+    }
+
     /**
      * During parsing of the definition, errors may be encountered. These can be registered on the case through this method without needing to immediately terminate the parsing process (e.g. by throwing
      * a java exception)
