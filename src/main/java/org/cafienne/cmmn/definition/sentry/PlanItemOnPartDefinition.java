@@ -7,9 +7,7 @@
  */
 package org.cafienne.cmmn.definition.sentry;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.PlanItemDefinition;
+import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.instance.Transition;
 import org.cafienne.cmmn.instance.sentry.Criterion;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
@@ -80,6 +78,11 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
     @Override
     public PlanItemDefinition getSourceDefinition() {
         return source;
+    }
+
+    @Override
+    public PlanItemOnPartDefinition asPlan() {
+        return this;
     }
 
     public ExitCriterionDefinition getRelatedExitCriterion() {

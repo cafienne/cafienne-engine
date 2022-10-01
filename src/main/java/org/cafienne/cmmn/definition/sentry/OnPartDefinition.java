@@ -21,4 +21,12 @@ public abstract class OnPartDefinition extends CMMNElementDefinition {
     public abstract CMMNElementDefinition getSourceDefinition();
 
     public abstract OnPart<?, ?, ?> createInstance(Criterion<?> criterion);
+
+    public CaseFileItemOnPartDefinition asFile() {
+        throw new IllegalArgumentException("Cannot cast a " + getClass().getSimpleName() +" to a CaseFileItemOnPartDefinition");
+    }
+
+    public PlanItemOnPartDefinition asPlan() {
+        throw new IllegalArgumentException("Cannot cast a " + getClass().getSimpleName() +" to a PlanItemOnPartDefinition");
+    }
 }

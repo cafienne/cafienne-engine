@@ -29,7 +29,20 @@ public class CaseTaskDefinition extends TaskDefinition<CaseDefinition> {
         this.subCaseDefinition = getCaseDefinition().getDefinitionsDocument().getCaseDefinition(this.caseRef);
         if (this.subCaseDefinition == null) {
             getCaseDefinition().addReferenceError("The case task '" + this.getName() + "' refers to a case named " + caseRef + ", but that definition is not found");
-            return; // Avoid further checking on this element
+        }
+    }
+
+    @Override
+    protected void validateElement() {
+        super.validateElement();
+        if (getImplementationDefinition().equals(this.getCaseDefinition())) {
+            PlanItemStarter starter = findItemDefinition().getStarter();
+            if (starter.isImmediate()) {
+                // Consideration: analyze the dependency chain and if there is a timer starter, it is ok if we have exits.
+                //  Note: this code is available, we can ask the PlanItemStarter for it. However, current consideration
+                //  would be that if someone needs this functionality, they can contact us and explain the use case :)
+                getCaseDefinition().addDefinitionError("CaseTask '"+getName()+"' leads to infinite recursion, because\n " + starter);
+            }
         }
     }
 

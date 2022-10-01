@@ -35,4 +35,16 @@ public interface ItemDefinition extends DefinitionElement {
     default PlanItemType getItemType() {
         return getPlanItemDefinition().getItemType();
     }
+
+    default PlanItemStarter getStarter() {
+        return PlanItemStarter.Later(this);
+    }
+
+    /**
+     * Indication whether exit criteria are defined on this item, or if not, on any of it's parent elements
+     * @return
+     */
+    default boolean hasExits() {
+        return getExitCriteria().size() > 0;
+    }
 }

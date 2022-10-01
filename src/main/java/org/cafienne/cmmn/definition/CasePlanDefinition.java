@@ -31,6 +31,11 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
     }
 
     @Override
+    public PlanItemStarter getStarter() {
+        return PlanItemStarter.isCasePlan(this);
+    }
+
+    @Override
     public CasePlan createInstance(String id, int index, ItemDefinition itemDefinition, Stage<?> stage, Case caseInstance) {
         return new CasePlan(id, this, caseInstance);
     }
