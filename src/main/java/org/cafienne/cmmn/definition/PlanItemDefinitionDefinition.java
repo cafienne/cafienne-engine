@@ -22,6 +22,16 @@ public abstract class PlanItemDefinitionDefinition extends CMMNElementDefinition
         }
     }
 
+    /**
+     * Returns the PlanItemDefinition or DiscretionaryItemDefinition that is associated with this PIDD.
+     * Note: in the spec it is possible to re-use the same PIDD across multiple PID or DID, but in our tooling
+     * we do not support that. As a matter of fact, no tooling supports that, because it cannot be visualized at all.
+     * We consider it a "bug" in the spec, and are still hoping for a use case that proves the opposite ;)
+     */
+    public ItemDefinition findItemDefinition() {
+        return getCaseDefinition().findElement(element -> element instanceof ItemDefinition && ((ItemDefinition) element).getPlanItemDefinition() == this);
+    }
+
     public abstract PlanItemType getItemType();
 
     public ItemControlDefinition getDefaultControl() {

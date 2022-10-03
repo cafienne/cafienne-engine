@@ -32,6 +32,16 @@ public class CaseFileItemCollectionDefinition extends CMMNElementDefinition {
         return getChild(identifier) == null;
     }
 
+    public boolean contains(CaseFileItemCollectionDefinition potentialChild) {
+        if (potentialChild == null) {
+            return false;
+        } else if (potentialChild == this) {
+            return true;
+        } else {
+            return contains(potentialChild.getParentElement());
+        }
+    }
+
     /**
      * Recursively searches this level and all children until an item with the specified name is found.
      *

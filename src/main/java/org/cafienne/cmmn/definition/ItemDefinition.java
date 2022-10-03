@@ -9,6 +9,7 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
+import org.cafienne.cmmn.instance.PlanItemType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,5 +30,21 @@ public interface ItemDefinition extends DefinitionElement {
 
     default boolean isDiscretionary() {
         return false;
+    }
+
+    default PlanItemType getItemType() {
+        return getPlanItemDefinition().getItemType();
+    }
+
+    default PlanItemStarter getStarter() {
+        return PlanItemStarter.Later(this);
+    }
+
+    /**
+     * Indication whether exit criteria are defined on this item, or if not, on any of it's parent elements
+     * @return
+     */
+    default boolean hasExits() {
+        return getExitCriteria().size() > 0;
     }
 }

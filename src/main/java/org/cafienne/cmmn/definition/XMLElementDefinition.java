@@ -145,6 +145,13 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
+     * New hook invoked after resolveReferences that can be used ot do logical validation of the element.
+     * Is only invoked when resolveReferences does not reveal errors.
+     */
+    protected void validateElement() {
+    }
+
+    /**
      * Creates a new instance of class T based on the XML element. If T is of type {@link String}, then it will simply return the text content of the
      * XML element. Otherwise T is expected to have a constructor with {@link Element}, {@link ModelDefinition} and {@link XMLElementDefinition}.
      *

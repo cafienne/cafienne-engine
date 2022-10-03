@@ -118,6 +118,12 @@ public class DefinitionsDocument implements Serializable {
         }
 
         checkForErrors();
+
+        for (ModelDefinition definition : getDefinitions()) {
+            definition.validateElement();
+        }
+
+        checkForErrors();
     }
 
     /**
