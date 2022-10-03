@@ -69,6 +69,7 @@ public class EventSerializers {
         CafienneSerializer.addManifestWrapper(CaseAppliedPlatformUpdate.class, CaseAppliedPlatformUpdate::new);
         CafienneSerializer.addManifestWrapper(EngineVersionChanged.class, EngineVersionChanged::new);
         CafienneSerializer.addManifestWrapper(CaseDefinitionMigrated.class, CaseDefinitionMigrated::new);
+        CafienneSerializer.addManifestWrapper(CaseOutputFilled.class, CaseOutputFilled::new);
         registerCaseTeamEvents();
         registerCasePlanEvents();
         registerCaseFileEvents();

@@ -1,0 +1,37 @@
+<definitions>
+    <caseFileItemDefinition name="unspecified" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="unspecified.cfid"/>
+    <case id="case_with_output.case" name="case_with_output" expressionLanguage="spel">
+        <caseFileModel>
+            <caseFileItem id="_nvtez_5" name="CaseInput" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
+            <caseFileItem id="_nvtez_6" name="CaseOutput" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__nvtez_0" name="case_with_output" autoComplete="true">
+            <planItem id="pi_ht__nvtez_0" name="SimpleTask" definitionRef="ht__nvtez_0"/>
+            <humanTask id="ht__nvtez_0" name="SimpleTask" isBlocking="true">
+                <inputs id="_nvtez_9" name="CaseInput" bindingRef="_nvtez_5"/>
+                <outputs id="_nvtez_10" name="CaseOutput" bindingRef="_nvtez_6"/>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation name="simplehumantask" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="task/simplehumantask.humantask">
+                        <input id="_Hun3_Input" name="Input"/>
+                        <input id="_sr1Z_Input2" name="Input2"/>
+                        <output id="_SkQG_Result" name="Result"/>
+                        <parameterMapping id="_nvtez_1" sourceRef="_nvtez_9" targetRef="_Hun3_Input"/>
+                        <parameterMapping id="_nvtez_3" sourceRef="_SkQG_Result" targetRef="_nvtez_10"/>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
+        </casePlanModel>
+        <input id="_nvtez_7" name="CaseInput" bindingRef="_nvtez_5"/>
+        <output id="_nvtez_8" name="CaseOutput" bindingRef="_nvtez_6"/>
+    </case>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__nvtez_0">
+                <Bounds x="20" y="20" width="530" height="350"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ht__nvtez_0">
+                <Bounds x="130" y="110" width="140" height="80"/>
+            </CMMNShape>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>

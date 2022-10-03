@@ -79,7 +79,7 @@ public class TestVariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 31;
+            int expectedNumberOfEvents = 32;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
@@ -96,6 +96,7 @@ public class TestVariousSpelExpressions2 {
                         "HumanTaskDueDateFilled: 1\n" +
                         "HumanTaskInputSaved: 1\n" +
                         "HumanTaskTerminated: 1\n" +
+                        "CaseOutputFilled: 1\n" +
                         "CaseModified: 1\n");
             }
             caseStarted.getEvents().assertSize(expectedNumberOfEvents);
@@ -134,7 +135,7 @@ public class TestVariousSpelExpressions2 {
 
             PublishedEventsAssertion startCaseEvents = caseStarted.getEvents().filter(caseInstanceId);
             TestScript.debugMessage("Start case generated these events:\n" + startCaseEvents.enumerateEventsByType());
-            int expectedNumberOfEvents = 31;
+            int expectedNumberOfEvents = 32;
             if (startCaseEvents.getEvents().size() != expectedNumberOfEvents) {
                 TestScript.debugMessage("Expected these events:\nStart case generated these events:\n" +
                         "CaseDefinitionApplied: 1\n" +
@@ -151,6 +152,7 @@ public class TestVariousSpelExpressions2 {
                         "HumanTaskDueDateFilled: 1\n" +
                         "HumanTaskInputSaved: 1\n" +
                         "HumanTaskTerminated: 1\n" +
+                        "CaseOutputFilled: 1\n" +
                         "CaseModified: 1\n");
             }
             caseStarted.getEvents().assertSize(expectedNumberOfEvents);
