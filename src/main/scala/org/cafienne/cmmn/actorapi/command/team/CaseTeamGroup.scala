@@ -12,6 +12,7 @@ case class CaseTeamGroup(groupId: String, mappings: Seq[GroupRoleMapping] = Seq(
   override val isGroup: Boolean = true
   override val caseRoles: Set[String] = mappings.flatMap(_.caseRoles).toSet
   override val memberType: MemberType = MemberType.Group
+  override val isOwner: Boolean = mappings.exists(_.isOwner)
 
   override def memberId: String = groupId
 
