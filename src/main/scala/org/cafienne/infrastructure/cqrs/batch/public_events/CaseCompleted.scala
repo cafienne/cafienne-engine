@@ -8,14 +8,15 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
+import org.cafienne.cmmn.actorapi.event.CaseOutputFilled
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned
 import org.cafienne.cmmn.instance.State
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
 @Manifest
-case class CaseCompleted(caseInstanceId: String) extends CafiennePublicEventContent {
-  override def toValue: Value[_] = new ValueMap(Fields.caseInstanceId, caseInstanceId)
+case class CaseCompleted(caseInstanceId: String, output: ValueMap) extends CafiennePublicEventContent {
+  override def toValue: Value[_] = new ValueMap(Fields.caseInstanceId, caseInstanceId, Fields.output, output)
 }
 
 object CaseCompleted {
@@ -23,7 +24,11 @@ object CaseCompleted {
     .filterMap(classOf[PlanItemTransitioned])
     .filter(_.getType.isCasePlan)
     .filter(_.getCurrentState == State.Completed)
-    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), CaseCompleted(event.getCaseInstanceId)))
+    .map(event => {
+      // Read the single case output filled event (there will be only 1) and put it's output into the public event.
+      val json = batch.filterMap(classOf[CaseOutputFilled]).map(_.output).headOption.fold(new ValueMap())(_.cloneValueNode())
+      PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), CaseCompleted(event.getCaseInstanceId, json))
+    })
 
-  def deserialize(json: ValueMap): CaseCompleted = CaseCompleted(caseInstanceId = json.readString(Fields.caseInstanceId))
+  def deserialize(json: ValueMap): CaseCompleted = CaseCompleted(caseInstanceId = json.readString(Fields.caseInstanceId), output = json.readMap(Fields.output))
 }

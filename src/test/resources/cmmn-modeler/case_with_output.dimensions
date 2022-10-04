@@ -1,0 +1,10 @@
+<CMMNDI>
+    <CMMNDiagram>
+        <CMMNShape cmmnElementRef="cm__nvtez_0">
+            <Bounds x="20" y="20" width="530" height="350"/>
+        </CMMNShape>
+        <CMMNShape cmmnElementRef="pi_ht__nvtez_0">
+            <Bounds x="130" y="110" width="140" height="80"/>
+        </CMMNShape>
+    </CMMNDiagram>
+</CMMNDI>

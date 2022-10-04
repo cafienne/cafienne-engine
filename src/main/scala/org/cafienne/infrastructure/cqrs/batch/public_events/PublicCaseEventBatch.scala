@@ -36,7 +36,9 @@ class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with La
   def getSequenceNr(event: ModelEvent): Long = events.find(_.event == event).fold(throw new IllegalArgumentException("Cannot find event inside batch"))(_.sequenceNr)
 
   // Simple mechanism to filter out all events that have or extend a certain class of ModelEvent
-  def filterMap[T <: ModelEvent](clazz: Class[T]): Seq[T] = events.map(_.event).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[T]).toSeq
+  def filterMap[ME <: ModelEvent](clazz: Class[ME]): Seq[ME] = events.map(_.event).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[ME]).toSeq
+
+  def publicEvents[PE <: CafiennePublicEventContent](clazz: Class[PE]): Seq[PE] = publicEvents.map(_.content).filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[PE])
 
   def createPublicEvents: PublicCaseEventBatch = {
     logger.whenDebugEnabled(logger.debug(s"Batch on case [$persistenceId] at offset [$offset] has ${publicEvents.size} public events: ${publicEvents.map(_.manifest).mkString(", ")}"))

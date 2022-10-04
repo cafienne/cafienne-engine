@@ -12,6 +12,7 @@ import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
+import org.cafienne.cmmn.actorapi.event.CaseOutputFilled;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
     @Override
     protected void completeInstance() {
         super.completeInstance();
+        addEvent(new CaseOutputFilled(getCaseInstance(), getCaseInstance().getOutputParameters()));
         informParent(() -> new CompleteTask(getCaseInstance(), getCaseInstance().getOutputParameters()));
     }
 
