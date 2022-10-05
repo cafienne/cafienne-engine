@@ -35,8 +35,6 @@ public class CaseFileItemTransitioned extends CaseFileEvent implements StandardE
     private final Value<?> value;
     private final State state;
 
-    protected transient CaseFileItem caseFileItem;
-
     public CaseFileItemTransitioned(CaseFileItemCollection<?> item, State newState, CaseFileItemTransition transition, Value<?> newValue) {
         super(item);
         this.transition = transition;
@@ -91,17 +89,6 @@ public class CaseFileItemTransitioned extends CaseFileEvent implements StandardE
      */
     public Value<?> getValue() {
         return value;
-    }
-
-    @Override
-    public void updateState(Case caseInstance) {
-        try {
-            // Resolve the path on the case file
-            caseFileItem = path.resolve(caseInstance);
-            caseFileItem.publishTransition(this);
-        } catch (InvalidPathException shouldNotHappen) {
-            logger.error("Could not recover path on case instance?!", shouldNotHappen);
-        }
     }
 
     @Override
