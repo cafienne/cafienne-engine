@@ -112,14 +112,16 @@ class TaskQueriesImpl extends TaskQueries
             || userCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
     }
 
+    // There can be multiple task states passed, as a semi-colon separated string. If any, extend the query for those.
+    val taskStateFilterQuery = filter.taskState.map(_.split(";")).fold(assignmentFilterQuery)(states => assignmentFilterQuery.filter(_.taskState inSet states))
+
     val query = for {
       caseNameFilter <- caseInstanceQuery.filterOpt(filter.caseName)(_.caseName === _)
 
-      baseQuery <- assignmentFilterQuery
+      baseQuery <- taskStateFilterQuery
         .filter(_.caseInstanceId === caseNameFilter.id)
         .filterOpt(filter.tenant)(_.tenant === _)
         .filterOpt(filter.taskName)(_.taskName === _)
-        .filterOpt(filter.taskState)(_.taskState === _)
         .filterOpt(filter.owner)(_.owner === _)
         .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
         .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
