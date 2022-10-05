@@ -56,7 +56,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     private final boolean isArray;
 
     private CaseFileItem(Case caseInstance, CaseFileItemDefinition definition, CaseFileItemCollection<?> parent, CaseFileItemArray array, int indexInArray, boolean isArray) {
-        super(caseInstance, definition);
+        super(caseInstance, definition, parent);
         this.parent = parent instanceof CaseFileItem ? (CaseFileItem) parent : null;
         this.container = array == null ? this : array;
         this.indexInArray = indexInArray;
@@ -608,7 +608,7 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     public void updateState(CaseFileItemDropped event) {
-        parent.childDropped(this);
+        host.childDropped(this); // Inform our host (whether CaseFile or CaseFileItem) about us leaving the grid.
         businessIdentifiers.values().forEach(BusinessIdentifier::lostDefinition);
         getCaseInstance().getSentryNetwork().disconnect(this);
     }

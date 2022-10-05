@@ -28,7 +28,7 @@ import java.io.IOException;
 public class CaseFileItemChildRemoved extends CaseFileItemTransitioned {
     private final Path childPath;
 
-    public CaseFileItemChildRemoved(CaseFileItemCollection item, Path childPath) {
+    public CaseFileItemChildRemoved(CaseFileItemCollection<?> item, Path childPath) {
         super(item, State.Available, CaseFileItemTransition.RemoveChild, Value.NULL);
         this.childPath = childPath;
     }
@@ -50,9 +50,11 @@ public class CaseFileItemChildRemoved extends CaseFileItemTransitioned {
     @Override
     public void updateState(Case caseInstance) {
         try {
-            // Resolve the path on the case file
-            CaseFileItemCollection<?> caseFileItem = path.resolve(caseInstance);
-            caseFileItem.updateState(this);
+            // Resolve the path on the case file.
+            //  Note: we need to override this method instead of implementing the updateState(CaseFileItem item) method,
+            //  since we need to find the host that dropped this child, and host can be the CaseFile as well.
+            CaseFileItemCollection<?> host = path.resolve(caseInstance);
+            host.updateState(this);
         } catch (InvalidPathException shouldNotHappen) {
             logger.error("Could not recover path on case instance?!", shouldNotHappen);
         }

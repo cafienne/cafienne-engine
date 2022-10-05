@@ -28,9 +28,11 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      * Child items of this collection.
      */
     private final List<CaseFileItem> items = new ArrayList<>();
+    protected final CaseFileItemCollection<?> host; // Either the case file or the parent item of this collection
 
-    protected CaseFileItemCollection(Case caseInstance, T definition) {
+    protected CaseFileItemCollection(Case caseInstance, T definition, CaseFileItemCollection<?> host) {
         super(caseInstance, definition);
+        this.host = host;
     }
 
     private CaseFileItem constructItem(CaseFileItemDefinition childDefinition) {
@@ -89,6 +91,13 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
      * @return
      */
     public CaseFileItem getItem(String childName) {
+        // Let's first iterate our existing items for a child with this name.
+        //  Reason: when recovering the event on a dropped case file item
+        //  the new definition no longer has this child, leading to recovery errors.
+        //  The item still exists, but not it's definition. Therefore we first check the existing items.
+        for (CaseFileItem item : getItems()) {
+            if (item.getName().equals(childName)) return item;
+        }
         CaseFileItemDefinition childDefinition = getDefinition().getChild(childName);
         if (childDefinition == null) {
             return null;

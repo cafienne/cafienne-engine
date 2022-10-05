@@ -20,7 +20,7 @@ import java.util.List;
 
 public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
     public CaseFile(Case caseInstance, CaseFileDefinition definition) {
-        super(caseInstance, definition);
+        super(caseInstance, definition, null);
     }
 
     /**
