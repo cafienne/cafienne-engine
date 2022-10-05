@@ -115,18 +115,22 @@ class TaskQueriesImpl extends TaskQueries
     // There can be multiple task states passed, as a semi-colon separated string. If any, extend the query for those.
     val taskStateFilterQuery = filter.taskState.map(_.split(";")).fold(assignmentFilterQuery)(states => assignmentFilterQuery.filter(_.taskState inSet states))
 
-    val query = for {
-      caseNameFilter <- caseInstanceQuery.filterOpt(filter.caseName)(_.caseName === _)
+    val taskFilterQuery = taskStateFilterQuery
+      .filterOpt(filter.tenant)(_.tenant === _)
+      .filterOpt(filter.taskName)(_.taskName === _)
+      .filterOpt(filter.owner)(_.owner === _)
+      .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
+      .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
+      .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
+      .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
 
-      baseQuery <- taskStateFilterQuery
-        .filter(_.caseInstanceId === caseNameFilter.id)
-        .filterOpt(filter.tenant)(_.tenant === _)
-        .filterOpt(filter.taskName)(_.taskName === _)
-        .filterOpt(filter.owner)(_.owner === _)
-        .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
-        .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
-        .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
-        .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
+    val query = for {
+      baseQuery <- {
+        // Potentially extend the taskFilter query with a join on the case name
+        filter.caseName.fold(taskFilterQuery)(caseName => {
+          taskFilterQuery.join(caseInstanceQuery.filter(_.caseName === caseName)).on(_.caseInstanceId === _.id).map(_._1)
+        })
+      }
 
       // Access control query
       _ <- membershipQuery(user, baseQuery.caseInstanceId, filter.identifiers)
