@@ -190,22 +190,19 @@ trait BaseQueryImpl
 
     def asQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq]  = {
       val topLevelQuery = filters.length match {
-        case 0 => {
+        case 0 =>
           // If no filter is specified, then there must be at least something in the business identifier table, i.e.,
           //  at least one business identifier must be filled in the case.
           TableQuery[CaseBusinessIdentifierTable].filter(_.caseInstanceId === caseInstanceId)
-        }
-        case 1 => {
+        case 1 =>
           logger.whenDebugEnabled{logger.debug(s"Simple filter: [$string]")}
           filters.head.toQuery(caseInstanceId)
-        }
-        case moreThanOne => {
+        case moreThanOne =>
           logger.whenDebugEnabled{logger.debug(s"Composite filter on $moreThanOne fields: [$string]")}
           for {
             topQuery <- filters.head.toQuery(caseInstanceId)
             _ <- createCompositeQuery(1, topQuery.caseInstanceId)
           } yield topQuery
-        }
       }
       topLevelQuery
     }

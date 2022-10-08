@@ -96,35 +96,75 @@ class TaskQueriesImpl extends TaskQueries
   }
 
   override def getAllTasks(user: UserIdentity, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
-    // If there is no assignee given, then we need to query tasks that have a role that the user also has.
-    //  Otherwise the query will not filter on roles
-    val assignmentFilterQuery = filter.assignee match {
-      case Some(assignee) => TableQuery[TaskTable].filter(_.assignee === assignee)
-      case None =>
-        // Select all tasks and filter for:
-        //  - consent groups that the user belongs to and that have the task.role equal to the users consent group roles
-        //  - tenant roles that the user has and that have a task role equals to the case role associated to that tenant role
-        //  - tasks that have a case role associated that the user has directly in the case team
-        TableQuery[TaskTable].filter(task =>
-          // Apply the filters: _1 is the case instance id, _2 is the case role
-          consentGroupCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
-            || tenantRoleCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
-            || userCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
+    // Note: the query to get all tasks for this specific user needs to include membership authorization.
+    //  The generic membershipQuery() method that is applied to all queries
+    //  proves to be not efficient enough (in terms database execution and query plan and so).
+    //  The optimization is not required when we retrieve tasks for a specific assignee.
+    //  Therefore we distinguish first whether or not a specific assignment on tasks is requested.
+    filter.assignee match {
+      case Some(assignee) => getAssignedTasks(user, assignee, filter, area, sort)
+      case None => getUserTasks(user, filter, area, sort)
+    }
+  }
+
+  def getUserTasks(user: UserIdentity, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
+    // User specific tasks executes the membership authorization in a different manner, namely through more close
+    //  querying on membership in relation to the task table, instead of going via the case instance tables.
+
+    val taskFilterQuery = TableQuery[TaskTable]
+      .filterOpt(filter.tenant)(_.tenant === _)
+      .filterOpt(filter.taskName)(_.taskName === _)
+      // There can be multiple task states passed, as a semi-colon separated string. If any, extend the query for those.
+      .filterOpt(filter.taskState)((row, state) => row.taskState inSet state.split(";"))
+      .filterOpt(filter.owner)(_.owner === _)
+      .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
+      .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
+      .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
+      .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
+      .filter(task =>
+        // Apply the filters: _1 is the case instance id, _2 is the case role
+        consentGroupCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+          || tenantRoleCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists
+          || userCoupledCaseRoles(user).filter(task.caseInstanceId === _._1).filter(task.role === _._2).exists)
+
+    // Potentially extend the taskFilter query with a join on the case name and also with the query on the business identifiers
+    val query = {
+      // First, extend the query to filter on case name as well
+      val extendedTaskFilterQuery = filter.caseName.fold(taskFilterQuery)(caseName => taskFilterQuery.join(caseInstanceQuery.filter(_.caseName === caseName)).on(_.caseInstanceId === _.id).map(_._1))
+      // Next, extend for business identifiers (if necessary)
+      if (filter.identifiers.nonEmpty) {
+        for {
+          baseQuery <- extendedTaskFilterQuery
+          _ <- new BusinessIdentifierFilterParser(filter.identifiers).asQuery(baseQuery.caseInstanceId)
+        } yield baseQuery
+      } else {
+        extendedTaskFilterQuery
+      }
     }
 
-    val query = for {
-      caseNameFilter <- caseInstanceQuery.filterOpt(filter.caseName)(_.caseName === _)
+    db.run(query.distinct.only(area).order(sort).result)
+  }
 
-      baseQuery <- assignmentFilterQuery
-        .filter(_.caseInstanceId === caseNameFilter.id)
-        .filterOpt(filter.tenant)(_.tenant === _)
-        .filterOpt(filter.taskName)(_.taskName === _)
-        .filterOpt(filter.taskState)(_.taskState === _)
-        .filterOpt(filter.owner)(_.owner === _)
-        .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
-        .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
-        .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
-        .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
+  def getAssignedTasks(user: UserIdentity, assignee: String, filter: TaskFilter, area: Area, sort: Sort): Future[Seq[TaskRecord]] = {
+    val taskFilterQuery = TableQuery[TaskTable]
+      .filter(_.assignee === assignee)
+      .filterOpt(filter.tenant)(_.tenant === _)
+      .filterOpt(filter.taskName)(_.taskName === _)
+      // There can be multiple task states passed, as a semi-colon separated string. If any, extend the query for those.
+      .filterOpt(filter.taskState)((row, state) => row.taskState inSet state.split(";"))
+      .filterOpt(filter.owner)(_.owner === _)
+      .filterOpt(filter.dueOn)(_.dueDate >= getStartDate(_, filter.timeZone))
+      .filterOpt(filter.dueOn)(_.dueDate <= getEndDate(_, filter.timeZone))
+      .filterOpt(filter.dueBefore)(_.dueDate < getStartDate(_, filter.timeZone))
+      .filterOpt(filter.dueAfter)(_.dueDate > getEndDate(_, filter.timeZone))
+
+    val query = for {
+      baseQuery <- {
+        // Potentially extend the taskFilter query with a join on the case name
+        filter.caseName.fold(taskFilterQuery)(caseName => {
+          taskFilterQuery.join(caseInstanceQuery.filter(_.caseName === caseName)).on(_.caseInstanceId === _.id).map(_._1)
+        })
+      }
 
       // Access control query
       _ <- membershipQuery(user, baseQuery.caseInstanceId, filter.identifiers)
@@ -183,16 +223,13 @@ class TaskQueriesImpl extends TaskQueries
   //  Resulting queries give a list of case instance id / case role pairs.
   private def consentGroupCoupledCaseRoles(user: UserIdentity): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
     TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id)
-      .join(TableQuery[CaseInstanceTeamGroupTable]).on(_.role === _.groupRole).map(_._2)
+      .join(TableQuery[CaseInstanceTeamGroupTable]).on((group, membership) => group.role === membership.groupRole && group.group === membership.groupId).map(_._2)
       .map(group => (group.caseInstanceId, group.caseRole))
   }
 
   private def tenantRoleCoupledCaseRoles(user: UserIdentity): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
-    TableQuery[UserRoleTable]
-      .filter(_.userId === user.id)
-      .join(TableQuery[CaseInstanceTeamTenantRoleTable])
-      .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
-      .map(_._2)
+    TableQuery[UserRoleTable].filter(_.userId === user.id)
+      .join(TableQuery[CaseInstanceTeamTenantRoleTable]).on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant).map(_._2)
       .map(tenantRole => (tenantRole.caseInstanceId, tenantRole.caseRole))
   }
 
