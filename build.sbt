@@ -153,8 +153,8 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
   , "com.typesafe"            %  "config"                               % "1.4.2"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.0"
-  , "org.apache.commons"      %  "commons-text"                          % "1.9" // StrSubstitutor usage inside process tasks
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.3"
+  , "org.apache.commons"      %  "commons-text"                         % "1.10.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
   , "ch.megard"               %% "akka-http-cors"                       % "1.1.3"
@@ -162,7 +162,7 @@ libraryDependencies ++= Seq(
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.24.4"
+  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.25.4"
   , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "9.43.1"
 
   // DB Schema
@@ -190,7 +190,7 @@ libraryDependencies ++= Seq(
 
   // Expression support (SPEL and JSONPath)
   , "com.jayway.jsonpath"  	  % "json-path"                             % "2.6.0" // 2.7.0 is not compatible in expressions
-  , "org.springframework"     %  "spring-expression"                    % "5.3.22"
+  , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
   , "com.h2database"          % "h2"                                    % "2.1.214"
