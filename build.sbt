@@ -144,8 +144,9 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-persistence"                     % akkaVersion
   , "com.typesafe.akka"       %% "akka-persistence-query"               % akkaVersion
   , "com.lightbend.akka"      %% "akka-persistence-jdbc"                % "5.1.0"
-  , "com.typesafe.akka"       %% "akka-persistence-cassandra"           % "0.107"
-  , "com.datastax.cassandra"  %  "cassandra-driver-extras"              % "3.11.2" // Needed for timestamp conversion
+  , "com.typesafe.akka"       %% "akka-persistence-cassandra"           % "1.0.6"
+  , "com.datastax.oss"        %  "java-driver-core"                     % "4.15.0"
+  , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.15.0"
 
   // Logging
   , "com.typesafe.akka"       %% "akka-slf4j"                           % akkaVersion
