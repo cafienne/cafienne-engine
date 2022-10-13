@@ -5,7 +5,7 @@ import org.cafienne.json.ValueMap
 
 import java.time.Instant
 
-class HealthMeasurePoint(val key: String) extends LazyLogging {
+class HealthMeasurePoint(val key: String, val isCritical: Boolean) extends LazyLogging {
   private var healthy = true
   private var description = key + " is healthy "
   private var changed: Instant = _
