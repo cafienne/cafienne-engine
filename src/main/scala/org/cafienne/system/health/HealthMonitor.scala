@@ -16,15 +16,16 @@ object HealthMonitor {
 
   val queryDB = addMeasure("query-db")
   val idp = addMeasure("idp")
-  val writeJournal = addMeasure("write-journal")
+  val writeJournal = addMeasure("write-journal", false)
   val readJournal = addMeasure("read-journal")
+  val timerService = addMeasure("timer-service", false)
 
   private def description = "Health indication of the Case Engine is currently " + health
 
   private def health: String = if (ok()) "OK" else "NOK"
 
   def ok(): Boolean = {
-    measures.find(p => p.unhealthy()).forall(_ => false)
+    measures.find(p => p.isCritical && p.unhealthy()).forall(_ => false)
   }
 
   def report: ValueMap = {
@@ -34,8 +35,8 @@ object HealthMonitor {
     json
   }
 
-  def addMeasure(key: String): HealthMeasurePoint = {
-    val measure = new HealthMeasurePoint(key)
+  def addMeasure(key: String, isCritical: Boolean = true): HealthMeasurePoint = {
+    val measure = new HealthMeasurePoint(key, isCritical)
     measures += measure
     measure
   }

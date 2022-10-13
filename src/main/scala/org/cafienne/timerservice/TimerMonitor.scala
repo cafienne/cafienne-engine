@@ -6,6 +6,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.system.health.HealthMonitor
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
@@ -29,7 +30,19 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
 
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done] = {
     activeTimers.remove(timerId).map(schedule => schedule.cancel())
-    timerService.storage.removeTimer(timerId, offset)
+    runStorage(timerService.storage.removeTimer(timerId, offset))
+  }
+
+  def runStorage(function: => Future[Done]): Future[Done] = {
+    try {
+      val result = function
+      HealthMonitor.timerService.isOK()
+      result
+    } catch {
+      case t: Throwable =>
+        HealthMonitor.timerService.hasFailed(t)
+        Future.successful(Done)
+    }
   }
 
   def addTimer(event: TimerSet, offset: Offset): Future[Done] = {
@@ -38,7 +51,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
     if (reader.fitsActiveWindow(job)) {
       scheduleTimer(job)
     }
-    timerService.storage.storeTimer(job, Some(offset))
+    runStorage(timerService.storage.storeTimer(job, Some(offset)))
   }
 
   def scheduleTimer(timer: Timer): Unit = {
