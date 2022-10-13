@@ -18,6 +18,7 @@ object HealthMonitor {
   val idp = addMeasure("idp")
   val writeJournal = addMeasure("write-journal", false)
   val readJournal = addMeasure("read-journal")
+  val timerService = addMeasure("timer-service", false)
 
   private def description = "Health indication of the Case Engine is currently " + health
 
