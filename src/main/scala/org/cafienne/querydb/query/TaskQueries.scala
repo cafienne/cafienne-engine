@@ -84,14 +84,18 @@ class TaskQueriesImpl extends TaskQueries
   override def getCaseTasks(caseInstanceId: String, user: UserIdentity): Future[Seq[TaskRecord]] = {
     val query = for {
       // Get the case
-      baseQuery <- TableQuery[TaskTable].filter(_.caseInstanceId === caseInstanceId)
+      baseQuery <- TableQuery[TaskTable]
+        .filter(_.caseInstanceId === caseInstanceId)
+        // Note: join full may sound heavy, but it is actually only on the case id, and that MUST exist as well.
+        //  This helps distinguishing between case-not-found and no-tasks-found-on-existing-case-that-we-have-access-to
+        .joinFull(TableQuery[CaseInstanceTable].filter(_.id === caseInstanceId).map(_.id)).on(_.caseInstanceId === _)
       // Access control query
-      _ <- membershipQuery(user, baseQuery.caseInstanceId)
+      _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
 
     db.run(query.distinct.result).map(records => {
-      if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
-      records
+      if (records.map(_._2).isEmpty) throw CaseSearchFailure(caseInstanceId)
+      records.map(_._1).filter(_.nonEmpty).map(_.get)
     })
   }
 
