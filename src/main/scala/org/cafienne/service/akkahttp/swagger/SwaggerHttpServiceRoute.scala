@@ -13,10 +13,7 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
   override val info = Info(description =
     """HTTP JSON interface to the Cafienne APIs""".stripMargin, version = "1.0.0")
 
-  val openIdSecurityScheme = new SecurityScheme()
-    .name("openId")
-    .`type`(SecurityScheme.Type.OPENIDCONNECT)
-    .openIdConnectUrl(Cafienne.config.OIDC.connectUrl)
+  val oidc = Cafienne.config.OIDC.issuers.head
 
   /* https://stackoverflow.com/questions/41918845/keycloak-integration-in-swagger
     "securityDefinitions": {
@@ -42,13 +39,11 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
               .addString("openid", "openid")
               .addString("profile", "profile")
           )
-          .tokenUrl(Cafienne.config.OIDC.tokenUrl)
-          //.extensions(Map("x-tokenName" -> "id_token").asInstanceOf[Map[String, AnyRef]].asJava) doesn't work with openapi 3
-          .authorizationUrl(Cafienne.config.OIDC.authorizationUrl)
+          .authorizationUrl(oidc.getAuthorizationEndpointURI.toString)
       )
     )
 
-  override def securitySchemes: Map[String, SecurityScheme] = Map("openId" -> oauth2ForOpenIdConnectHack)
+  override def securitySchemes: Map[String, SecurityScheme] = Map(SecurityScheme.Type.OAUTH2.toString -> oauth2ForOpenIdConnectHack)
 
   def route = get {
     routes ~
