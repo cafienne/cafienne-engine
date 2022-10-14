@@ -41,11 +41,11 @@ object MultiIssuerJWSKeySelector extends LazyLogging {
         logger.info(s"Reading static info for IDP ${config.issuer}")
         Some(readStaticConfiguration(config))
       } else if (config.connectUrl.nonEmpty) {
-        logger.info(s"Reading dynamic info for IDP ${config.issuer}")
-        Some(readDynamicConfiguration(config))
+        logger.info(s"Reading dynamic info for IDP ${config.issuer} from connect-url ${config.connectUrl}")
+        Some(readDynamicConfiguration(config.connectUrl))
       } else if (config.issuer.nonEmpty) {
-        logger.warn(s"Missing OIDC configuration information on IDP '${config.issuer}'")
-        None
+        logger.info(s"Reading dynamic info for IDP ${config.issuer}")
+        Some(readDynamicConfiguration(config.issuer))
       } else {
         logger.warn(s"Encountered empty IDP configuration; this configuration will be skipped")
         None
@@ -71,11 +71,10 @@ object MultiIssuerJWSKeySelector extends LazyLogging {
     (issuer, keySelector)
   }
 
-  def readDynamicConfiguration(config: OIDCConfig): (String, JWSKeySelector[SecurityContext]) = {
+  def readDynamicConfiguration(endpoint: String): (String, JWSKeySelector[SecurityContext]) = {
 //    println(s"\nRetrieving metadata info for IDP Issuer ${config.issuer} from well known url ${config.connectUrl} ")
-
-    val metadata: OIDCProviderMetadata = OIDCProviderMetadata.resolve(new Issuer(config.connectUrl))
-    logger.info(s"Retrieved dynamic info from IDP ${config.connectUrl}: " + JSONReader.parse(metadata.toJSONObject.toJSONString()))
+    val metadata: OIDCProviderMetadata = OIDCProviderMetadata.resolve(new Issuer(endpoint))
+    logger.info(s"Retrieved dynamic info from IDP $endpoint: " + JSONReader.parse(metadata.toJSONObject.toJSONString()))
     val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(metadata.getJWKSetURI.toURL)
     val issuer: String = metadata.getIssuer.getValue
     val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)
