@@ -74,10 +74,6 @@ class JwtTokenVerifier()(implicit ec: ExecutionContext) extends TokenVerifier[Au
             if (exceptionMessage.contains(missingClaimsMsg)) {
               throw new MissingClaimsException(exceptionMessage.replace(missingClaimsMsg, "JWT token misses claims"))
             }
-            if (exceptionMessage.contains(invalidIssuerMsg)) {
-              val invalidIssuer = exceptionMessage.replace(invalidIssuerMsg, "")
-              throw new InvalidIssuerException("JWT token has invalid issuer '" + invalidIssuer + "'. Issuers supported: " + Cafienne.config.OIDC.issuer)
-            }
             throw TokenVerificationException("Invalid token: " + nje.getLocalizedMessage)
           case e: BadJOSEException =>
             // This captures both JWS and JWE exceptions. These are really technical, and logger.debug must be enabled to understand them

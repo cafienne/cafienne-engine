@@ -29,8 +29,6 @@ object Main extends App with LazyLogging {
     // Start running the Event Sinks
     QueryDB.open(caseSystem)
 
-    MultiIssuerJWSKeySelector.initialize()
-
     // Create and start the http server
     new CafienneHttpServer(caseSystem).start().onComplete {
       case Success(answer) =>

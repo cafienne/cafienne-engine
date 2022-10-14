@@ -3,7 +3,7 @@ package org.cafienne.infrastructure.config.util
 import com.typesafe.config.Config
 
 trait MandatoryConfig extends ChildConfigReader {
-  val msg: String = s"Missing configuration property cafienne.$fullPath"
+  val msg: String = s"Missing configuration property $this"
 
   override lazy val config: Config = {
     if (parent.config.hasPath(path)) {

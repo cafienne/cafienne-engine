@@ -5,10 +5,13 @@
         </encoder>
     </appender>
 
-    <logger name="org.cafienne" level="WARN" />
+    <logger name="org.cafienne" level="WARN"/>
 
     <!-- Show HTTP traffic logging -->
     <!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
+
+    <!-- Show Authentication Setup logging -->
+    <!--    <logger name="org.cafienne.authentication" level="INFO" />-->
 
     <!-- Show logging for offset of projections -->
     <!--    <logger name="org.cafienne.querydb.materializer.cases.CaseEventSink" level="DEBUG" />-->
@@ -30,11 +33,11 @@
     <logger name="com.zaxxer.hikari" level="WARN"/>
 
     <logger name="slick" level="INFO"/>
-<!--    <logger name="slick.basic.BasicBackend.action" level="DEBUG"/>-->
-<!--    <logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG"/>-->
+    <!--    <logger name="slick.basic.BasicBackend.action" level="DEBUG"/>-->
+    <!--    <logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG"/>-->
     <!--<logger name="slick.jdbc.JdbcBackend.statementAndParameter" level="DEBUG"/>-->
     <!--<logger name="slick.jdbc.JdbcBackend.parameter" level="DEBUG"/>-->
-<!--    <logger name="org.flywaydb" level="INFO"/>-->
+    <!--    <logger name="org.flywaydb" level="INFO"/>-->
     <root level="INFO">
         <appender-ref ref="console"/>
     </root>
