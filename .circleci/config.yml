@@ -684,6 +684,32 @@ jobs:
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             docker tag cafienne/engine:latest cafienne/engine:$CIRCLE_TAG
             docker push cafienne/engine:$CIRCLE_TAG
+  multiarch-build:
+    working_directory: ~/cafienne-engine
+    machine:
+      image: ubuntu-2204:2022.04.1
+    resource_class: large
+#    environment:
+#      DOCKER_BUILDKIT: 1
+#      BUILDX_PLATFORMS: linux/amd64,linux/arm64
+    steps:
+      - checkout
+      - run:
+          name: Create the Multi Arch build structure
+          command: |
+            docker buildx create --use --name multi-arch-builder
+      - run:
+          name: Build and publish local docker image 'cafienne/engine'
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            sbt docker:stage
+            release=${CIRCLE_TAG-norelease}
+            echo "release: ${release}"
+            if [ $release = "norelease" ]; then
+              docker buildx build --platform=linux/arm64,linux/amd64 --push -t "cafienne/engine:latest" ./target/docker/stage
+            else
+              docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$release ./target/docker/stage
+            fi
 
 workflows:
   version: 2
@@ -703,6 +729,7 @@ workflows:
               ignore:
                 - main
                 - dependency-updates
+                - multiarch
       - release-build:
           context: automation-context
           filters:
@@ -710,3 +737,9 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
+      - multiarch-build:
+          context: automation-context
+          filters:
+            branches:
+              only:
+                - multiarch
