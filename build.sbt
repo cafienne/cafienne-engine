@@ -177,44 +177,44 @@ libraryDependencies ++= Seq(
   , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % jacksonVersion
 
   // PDF Task support
-  , "net.sf.jasperreports"    % "jasperreports"                         % jasperVersion
-  , "net.sf.jasperreports"    % "jasperreports-fonts"                   % jasperVersion
+  , "net.sf.jasperreports"    %  "jasperreports"                        % jasperVersion
+  , "net.sf.jasperreports"    %  "jasperreports-fonts"                  % jasperVersion
   // Lowagie is for PDF document generation with Jasper. It must remain fixed on 2.1.7 because that is what Jasper needs.
-  , "com.lowagie"             % "itext"                                 % "2.1.7" // DO NOT CHANGE THIS VALUE
+  , "com.lowagie"             %  "itext"                                % "2.1.7" // DO NOT CHANGE THIS VALUE
 
   // Mail & Calendar support
-  , "com.sun.activation"      % "jakarta.activation"                    % "2.0.1" // For mail & calendar support
-  , "jakarta.activation"      % "jakarta.activation-api"                % "2.1.0" // For mail & calendar support
-  , "jakarta.ws.rs"           % "jakarta.ws.rs-api"                     % "3.1.0" // For mail & calendar support
-  , "org.mnode.ical4j"        % "ical4j"                                % "3.2.3"
+  , "com.sun.activation"      %  "jakarta.activation"                   % "2.0.1" // For mail & calendar support
+  , "jakarta.activation"      %  "jakarta.activation-api"               % "2.1.0" // For mail & calendar support
+  , "jakarta.ws.rs"           %  "jakarta.ws.rs-api"                    % "3.1.0" // For mail & calendar support
+  , "org.mnode.ical4j"        %  "ical4j"                               % "3.2.3"
 
   // Expression support (SPEL and JSONPath)
-  , "com.jayway.jsonpath"  	  % "json-path"                             % "2.6.0" // 2.7.0 is not compatible in expressions
+  , "com.jayway.jsonpath"  	  %  "json-path"                            % "2.6.0" // 2.7.0 is not compatible in expressions
   , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
-  , "com.h2database"          % "h2"                                    % "2.1.214"
-  , "org.hsqldb"              % "hsqldb"                                % "2.7.1"
+  , "com.h2database"          %  "h2"                                   % "2.1.214"
+  , "org.hsqldb"              %  "hsqldb"                               % "2.7.1"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "org.postgresql"          % "postgresql"                            % "42.5.0"
-  , "com.microsoft.sqlserver" % "mssql-jdbc"                            % "9.2.1.jre11"
+  , "org.postgresql"          %  "postgresql"                           % "42.5.0"
+  , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
   // Swagger support
-  , "io.swagger.core.v3"      % "swagger-core"                          % swaggerVersion
-  , "io.swagger.core.v3"      % "swagger-annotations"                   % swaggerVersion
-  , "io.swagger.core.v3"      % "swagger-jaxrs2"                        % swaggerVersion
-  , "io.swagger.core.v3"      % "swagger-models"                        % swaggerVersion
+  , "io.swagger.core.v3"      %  "swagger-core"                         % swaggerVersion
+  , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
+  , "io.swagger.core.v3"      %  "swagger-jaxrs2"                       % swaggerVersion
+  , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
   , "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.5.2"
-  , "javax.ws.rs"             % "javax.ws.rs-api"                       % "2.1.1" // Note: this one is still needed for swagger-akka-http :(
-  , "javax.xml.bind"          % "jaxb-api"                              % "2.3.1" // Note: this one is still needed for swagger-akka-http :(
+  , "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-akka-http :(
+  , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-akka-http :(
 )
 
 /**
   * Add test dependencies
   */
 libraryDependencies ++= Seq(
-  "org.junit.jupiter"         % "junit-jupiter-api"                     % "5.9.0"
-  , "com.novocode"            % "junit-interface"                       % "0.11"
+  "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.9.0"
+  , "com.novocode"            %  "junit-interface"                      % "0.11"
   , "org.scalamock"           %% "scalamock"                            % "5.2.0"
   , "org.scalatest"           %% "scalatest"                            % "3.2.14"
   , "commons-io"              %  "commons-io"                           % "20030203.000550"
@@ -222,5 +222,5 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-http-testkit"                    % akkaHttpVersion
   , "com.typesafe.akka"       %% "akka-multi-node-testkit"              % akkaVersion
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "com.github.tomakehurst"  % "wiremock"                              % "2.27.2"
+  , "com.github.tomakehurst"  %  "wiremock"                             % "2.27.2"
 ).map(dep => dep % Test)
