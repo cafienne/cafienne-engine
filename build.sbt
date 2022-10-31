@@ -126,7 +126,7 @@ val akkaHttpVersion    = "10.2.10"
 val akkaVersion        = "2.6.20"
 val jacksonVersion     = "2.13.4"
 val enumeratumVersion  = "1.7.0"
-val swaggerVersion     = "2.2.2"
+val swaggerVersion     = "2.2.4"
 val slickVersion       = "3.3.3"
 val jasperVersion      = "6.20.0"
 
@@ -153,7 +153,7 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
   , "com.typesafe"            %  "config"                               % "1.4.2"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.3"
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.4"
   , "org.apache.commons"      %  "commons-text"                         % "1.10.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
@@ -162,8 +162,8 @@ libraryDependencies ++= Seq(
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.25.4"
-  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "9.43.1"
+  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.25.6"
+  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "10.0"
 
   // DB Schema
   , "org.flywaydb"            %  "flyway-core"                           % "7.2.1"
@@ -194,7 +194,7 @@ libraryDependencies ++= Seq(
 
   // Persistence support
   , "com.h2database"          % "h2"                                    % "2.1.214"
-  , "org.hsqldb"              % "hsqldb"                                % "2.7.0" // Currently an issue in upgrading to 2.6.1, see https://sourceforge.net/p/hsqldb/bugs/1641/
+  , "org.hsqldb"              % "hsqldb"                                % "2.7.1"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
   , "org.postgresql"          % "postgresql"                            % "42.5.0"
   , "com.microsoft.sqlserver" % "mssql-jdbc"                            % "9.2.1.jre11"
@@ -216,7 +216,7 @@ libraryDependencies ++= Seq(
   "org.junit.jupiter"         % "junit-jupiter-api"                     % "5.9.0"
   , "com.novocode"            % "junit-interface"                       % "0.11"
   , "org.scalamock"           %% "scalamock"                            % "5.2.0"
-  , "org.scalatest"           %% "scalatest"                            % "3.2.12"
+  , "org.scalatest"           %% "scalatest"                            % "3.2.14"
   , "commons-io"              %  "commons-io"                           % "20030203.000550"
   , "com.typesafe.akka"       %% "akka-testkit"                         % akkaVersion
   , "com.typesafe.akka"       %% "akka-http-testkit"                    % akkaHttpVersion

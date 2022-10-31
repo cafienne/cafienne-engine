@@ -5,7 +5,6 @@ import com.nimbusds.jose.proc.{BadJOSEException, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.{BadJWTException, ConfigurableJWTProcessor, DefaultJWTClaimsVerifier, DefaultJWTProcessor}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.infrastructure.Cafienne
 import org.cafienne.system.health.HealthMonitor
 
 import java.text.ParseException
@@ -65,7 +64,6 @@ class JwtTokenVerifier()(implicit ec: ExecutionContext) extends TokenVerifier[Au
             //        nje.printStackTrace()
             val exceptionMessage = nje.getMessage
             val missingClaimsMsg = """JWT missing required claims"""
-            val invalidIssuerMsg = """JWT "iss" claim doesn't match expected value: """
             if (nje.getCause.isInstanceOf[ParseException]) {
               //          println("Failure in parsing token")
               throw new TokenVerificationException("Token parse failure: " + nje.getCause.getLocalizedMessage)
