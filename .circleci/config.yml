@@ -272,14 +272,19 @@ jobs:
           command: docker logs cafienne
           when: always
 
-      # All good, push the image to docker hub if we're on the main branch
+      # All good, create and run setup of multi architecture build, then push the image to docker hub if we're on the main branch
+      - run:
+          name: Create the Multi Arch build structure
+          command: |
+            docker buildx create --use --name multi-arch-builder
       - run:
           name: Push Cafienne 'latest' image to docker hub (only on main branch)
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ];
             then
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-              docker push cafienne/engine:latest
+              sbt docker:stage
+              docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest ./target/docker/stage
             else
               echo "Not pushing image to docker hub"
             fi
@@ -400,7 +405,6 @@ jobs:
           name: Docker logs of engine after the test
           command: docker logs cafienne
           when: always
-
   release-build:
     working_directory: ~/cafienne-engine
     machine:
@@ -678,38 +682,17 @@ jobs:
           command: docker logs cafienne
           when: always
 
-      - run:
-          name: Push Cafienne 'latest' and '$CIRCLE_TAG' image to docker hub
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker tag cafienne/engine:latest cafienne/engine:$CIRCLE_TAG
-            docker push cafienne/engine:$CIRCLE_TAG
-  multiarch-build:
-    working_directory: ~/cafienne-engine
-    machine:
-      image: ubuntu-2204:2022.04.1
-    resource_class: large
-#    environment:
-#      DOCKER_BUILDKIT: 1
-#      BUILDX_PLATFORMS: linux/amd64,linux/arm64
-    steps:
-      - checkout
+      # All good, create and run setup of multi architecture build, then push the image to docker hub to latest and to release tags.
       - run:
           name: Create the Multi Arch build structure
           command: |
             docker buildx create --use --name multi-arch-builder
       - run:
-          name: Build and publish local docker image 'cafienne/engine'
+          name: Push Cafienne 'latest' and '$CIRCLE_TAG' image to docker hub
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             sbt docker:stage
-            release=${CIRCLE_TAG-norelease}
-            echo "release: ${release}"
-            if [ $release = "norelease" ]; then
-              docker buildx build --platform=linux/arm64,linux/amd64 --push -t "cafienne/engine:latest" ./target/docker/stage
-            else
-              docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$release ./target/docker/stage
-            fi
+            docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$CIRCLE_TAG ./target/docker/stage
 
 workflows:
   version: 2
@@ -729,7 +712,6 @@ workflows:
               ignore:
                 - main
                 - dependency-updates
-                - multiarch
       - release-build:
           context: automation-context
           filters:
@@ -737,9 +719,3 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-      - multiarch-build:
-          context: automation-context
-          filters:
-            branches:
-              only:
-                - multiarch
