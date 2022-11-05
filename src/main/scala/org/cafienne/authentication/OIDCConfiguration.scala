@@ -5,7 +5,7 @@ import com.nimbusds.oauth2.sdk.id.Issuer
 import com.nimbusds.openid.connect.sdk.SubjectType
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata
 import com.typesafe.config.Config
-import com.typesafe.scalalogging.{LazyLogging, Logger}
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.config.util.ConfigReader
 import org.cafienne.json.JSONReader
 

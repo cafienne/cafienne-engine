@@ -9,14 +9,13 @@ package org.cafienne.service
 
 import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.authentication.MultiIssuerJWSKeySelector
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.schema.QueryDB
 import org.cafienne.service.akkahttp.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.util.{Failure, Success}
 
 object Main extends App with LazyLogging {
