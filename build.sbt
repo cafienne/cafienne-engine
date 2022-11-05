@@ -33,7 +33,7 @@ Docker / packageName := "cafienne/engine"
 Docker / version := "latest"
 Docker / maintainer := """Cafienne <info@cafienne.io>"""
 Docker / defaultLinuxInstallLocation := "/opt/cafienne"
-dockerBaseImage := "eclipse-temurin:17.0.3_7-jre-jammy"
+dockerBaseImage := "eclipse-temurin:17.0.4.1_1-jre-jammy"
 dockerExposedPorts := Seq(2027, 9999)
 bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value
 bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
