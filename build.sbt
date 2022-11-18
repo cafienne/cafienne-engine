@@ -4,6 +4,8 @@
 name := "Cafienne Engine"
 packageName := "cafienne-engine"
 organization := "org.cafienne"
+organizationName := "Batav B.V."
+startYear := Some(2014)
 
 /**
   * Resolver repositories
@@ -70,7 +72,7 @@ Test / publishArtifact := false
   */
 homepage := Some(url("https://cafienne.org"))
 scmInfo := Some(ScmInfo(url("https://github.com/cafienne/cafienne-engine.git"), "git@github.com:cafienne/cafienne-engine.git"))
-licenses += ("Apache-2.0", url("https://www.mozilla.org/en-US/MPL/2.0/"))
+licenses += ("AGPL-3.0", url("https://www.gnu.org/licenses/agpl-3.0.txt"))
 developers := List(Developer(
   "tpetter",
   "Thijs Petter",

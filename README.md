@@ -106,9 +106,12 @@ This project uses the [C4 process](https://rfc.zeromq.org/spec:42/C4/) for all c
 After you installed the Case Service you are ready to start building and running your first demo CMMN Case Model.
 You can read the [Getting Started wiki](https://github.com/cafienne/cafienne-engine/wiki/Getting-Started) to learn how to use the Case Service.
 
-## 1.5 License
+## 1.5 Dual License
 
-Free use of this software is granted under the terms of the Mozilla Public License 2.0. For details see the file `LICENSE` included with the distribution.
+Free use of this software is granted under the terms of the GNU Affero General Public License version 3. 
+For details see the file `LICENSE` included with the distribution.
+
+Commercial use is covered by the Batav Cafienne SLA. 
 
 All the documentation is covered by the CC0 license *(do whatever you want with it - public domain)*.
 
