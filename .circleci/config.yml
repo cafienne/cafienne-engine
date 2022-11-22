@@ -280,6 +280,12 @@ jobs:
       - run:
           name: Push Cafienne 'latest' image to docker hub (only on main branch)
           command: |
+            echo "Run git reset --hard"
+            git reset --hard
+            echo
+            echo "Show git status"
+            echo
+            git status
             if [ "${CIRCLE_BRANCH}" == "main" ];
             then
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
@@ -690,6 +696,12 @@ jobs:
       - run:
           name: Push Cafienne 'latest' and '$CIRCLE_TAG' image to docker hub
           command: |
+            echo "Run git reset --hard"
+            git reset --hard
+            echo
+            echo "Show git status"
+            echo
+            git status
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             sbt docker:stage
             docker buildx build --platform=linux/arm64,linux/amd64 --push -t cafienne/engine:latest -t cafienne/engine:$CIRCLE_TAG ./target/docker/stage
