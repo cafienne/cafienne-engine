@@ -361,7 +361,7 @@ public class Case extends ModelActor {
     public void createCasePlan() {
         PlanItemCreated pic = new PlanItemCreated(this);
         addEvent(pic);
-        pic.getCreatedPlanItem().makeTransition(Transition.Create);
+        pic.getCreatedPlanItem().create();
     }
 
     public void releaseBootstrapCaseFileEvents() {

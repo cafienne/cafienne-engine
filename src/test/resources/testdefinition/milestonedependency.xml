@@ -1,0 +1,46 @@
+<definitions>
+    <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
+    <case id="milestonedependency.case" name="milestonedependency" expressionLanguage="spel">
+        <caseFileModel>
+            <caseFileItem id="_v6SP3_1" name="in" multiplicity="ExactlyOne" definitionRef="string.cfid"/>
+        </caseFileModel>
+        <casePlanModel id="cm__v6SP3_0" name="milestonedependency" autoComplete="true">
+            <planItem id="pi_ms__v6SP3_0" name="ImmediateMilestone" definitionRef="ms__v6SP3_0"/>
+            <planItem id="pi__v6SP3_2" name="Stage" definitionRef="_v6SP3_2">
+                <entryCriterion id="_v6SP3_4" name="EntryCriterion_0" sentryRef="crit__v6SP3_0"/>
+            </planItem>
+            <sentry id="crit__v6SP3_0">
+                <ifPart id="_v6SP3_6" contextRef="_v6SP3_1">
+                    <condition id="_v6SP3_7">
+                        <body>
+                            <![CDATA[true]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <planItemOnPart id="_v6SP3_5" sourceRef="pi_ms__v6SP3_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <milestone id="ms__v6SP3_0" name="ImmediateMilestone"/>
+            <stage id="_v6SP3_2" name="Stage" autoComplete="true"/>
+        </casePlanModel>
+        <input id="_v6SP3_8" name="in" bindingRef="_v6SP3_1"/>
+    </case>
+    <CMMNDI>
+        <CMMNDiagram>
+            <CMMNShape cmmnElementRef="cm__v6SP3_0">
+                <Bounds x="30" y="20" width="700" height="400"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi_ms__v6SP3_0">
+                <Bounds x="190" y="90" width="150" height="50"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="pi__v6SP3_2">
+                <Bounds x="50" y="220" width="420" height="140"/>
+            </CMMNShape>
+            <CMMNShape cmmnElementRef="_v6SP3_4">
+                <Bounds x="244" y="210" width="12" height="20"/>
+            </CMMNShape>
+            <CMMNEdge sourceCMMNElementRef="pi_ms__v6SP3_0" targetCMMNElementRef="_v6SP3_4"/>
+        </CMMNDiagram>
+    </CMMNDI>
+</definitions>
