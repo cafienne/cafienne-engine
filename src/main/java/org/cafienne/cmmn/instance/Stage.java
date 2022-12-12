@@ -64,24 +64,46 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     void planChild(DiscretionaryItem discretionaryItem, String planItemId) {
         // Determine index by iterating sibling plan items (i.e., those that have the same item definition).
         int index = Long.valueOf(this.planItems.stream().filter(item -> item.getItemDefinition().equals(discretionaryItem.getDefinition())).count()).intValue();
-        addChild(discretionaryItem.getDefinition(), planItemId, index);
+        addChild(discretionaryItem.getDefinition(), planItemId, index, true);
     }
 
-    PlanItem<?> addChild(ItemDefinition itemDefinition, String planItemId, int index) {
+    /**
+     * Repeat one of our children.
+     * @param child The child to be repeated.
+     * @return
+     */
+    PlanItem<?> repeatChild(PlanItem<?> child) {
+        // Generate an id for the repeat item
+        String repeatItemId = new Guid().toString();
+        ItemDefinition itemDefinition = child.getItemDefinition();
+        // Make sure we have a proper next index, by counting the number of existing plan items in this stage with the same definition
+        //  An alternative was to do (this.index + 1) but actually it can happen that multiple items are active simultaneously
+        //  and in that case, when completing an earlier one of those it may lead to a duplicate index if we apply only +1
+        int nextIndex = (int) getPlanItems().stream().map(PlanItem::getItemDefinition).filter(sibling -> sibling.equals(itemDefinition)).count();
+        // Create a new plan item
+        addDebugInfo(() -> child + ": creating repeat item with index " + nextIndex + " and id " + repeatItemId);
+        return addChild(itemDefinition, repeatItemId, nextIndex, true);
+    }
+
+    private PlanItem<?> addChild(ItemDefinition itemDefinition, String planItemId, int index, boolean triggerCreateTransition) {
         if (getCaseInstance().recoveryRunning()) {
             return null;
         }
         PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, planItemId, index));
-        if (this.getState().isActive()) {
+        if (triggerCreateTransition && this.getState().isActive()) {
             // Only generate a start transition for the new discretionary item if this stage is active.
             //  Otherwise the start transition will be generated when this stage becomes active.
-            pic.getCreatedPlanItem().makeTransition(Transition.Create);
+            pic.getCreatedPlanItem().create();
         }
         return pic.getCreatedPlanItem();
     }
 
-    private void createChild(PlanItemDefinition itemDefinition) {
-        addChild(itemDefinition, new Guid().toString(), 0);
+    /**
+     * Creates the child, but without triggering the lifecycle.
+     * @param itemDefinition
+     */
+    private void instantiateChild(PlanItemDefinition itemDefinition) {
+        addChild(itemDefinition, new Guid().toString(), 0, false);
     }
 
     /**
@@ -95,16 +117,16 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             addDebugInfo(() -> "Stage[" + getName() + "]: instantiating " + planItems.size() + " children having Null state. These are probably discretionary items that have been planned before the stage became active");
             planItems.forEach(item -> addDebugInfo(() -> "Item["+item.getName()+"."+item.getIndex() +"] in state "+ item.getState()));
         }
-        planItems.stream().filter(item -> item.getState().isNull()).forEach(item -> item.makeTransition(Transition.Create));
+        planItems.stream().filter(item -> item.getState().isNull()).forEach(PlanItem::create);
     }
 
     @Override
     protected void startInstance() {
-        // First start the discretionary items that have already been planned.
-        createNullItems();
-
         // Create the child plan items and begin their life-cycle
-        getDefinition().getPlanItems().forEach(this::createChild);
+        getDefinition().getPlanItems().forEach(this::instantiateChild);
+
+        // Now trigger the Create transition on our children
+        createNullItems();
     }
 
     @Override
@@ -309,7 +331,8 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         // When Stage is Terminated or Completed, there is nothing to be done in the remainder. E.g., we cannot re-activate a completed Stage.
         if (this.getState().isAlive()) {
             // Iterate for newly added children and create them.
-            newDefinition.getPlanItems().stream().filter(this::doesNotHaveChild).forEach(this::createChild);
+            newDefinition.getPlanItems().stream().filter(this::doesNotHaveChild).forEach(this::instantiateChild);
+            createNullItems();
         }
     }
 

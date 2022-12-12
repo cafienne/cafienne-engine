@@ -27,7 +27,6 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
 import org.cafienne.cmmn.instance.sentry.PlanItemOnPart;
 import org.cafienne.cmmn.instance.sentry.TransitionGenerator;
-import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
@@ -113,12 +112,24 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
         // Now connect to the rest of the network of plan items and sentries
         if (getStage() != null) {
-            // Register with parent stage
+            // Register with parent stage (unless we are the CasePlan, then we have no parent stage)
             getStage().register(this);
         }
 
+        // Upon recovery, the create() method is not invoked, and subsequently we would not be
+        //  connected to the sentry network. Hence, checking that and adding ourselves if needed.
+        if (getCaseInstance().recoveryRunning()) {
+            // Link ourselves to any existing sentries in the case
+            getCaseInstance().getSentryNetwork().connect(this);
+        }
+    }
+
+    void create() {
         // Link ourselves to any existing sentries in the case
         getCaseInstance().getSentryNetwork().connect(this);
+
+        // Trigger the Create transition.
+        makeTransition(Transition.Create);
     }
 
     @Override
@@ -157,15 +168,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
                 addDebugInfo(() -> this + ": not repeating because item is discretionary and needs to be planned explicitly");
                 return;
             }
-            // Generate an id for the repeat item
-            String repeatItemId = new Guid().toString();
-            // Make sure we have a proper next index, by counting the number of existing plan items in this stage with the same definition
-            //  An alternative was to do (this.index + 1) but actually it can happen that multiple items are active simultaneously
-            //  and in that case, when completing an earlier one of those it may lead to a duplicate index if we apply only +1
-            long nextIndex = stage.getPlanItems().stream().map(PlanItem::getItemDefinition).filter(sibling -> sibling.equals(this.getItemDefinition())).count();
-            // Create a new plan item
-            addDebugInfo(() -> this + ": creating repeat item with index " + nextIndex + " and id " + repeatItemId);
-            PlanItem<?> repeatedItem = stage.addChild(getItemDefinition(), repeatItemId, (int) nextIndex);
+            PlanItem<?> repeatedItem = stage.repeatChild(this);
             // Also let it Start immediately (or Occur, or Enable)
             Transition transition = getEntryTransition();
             addDebugInfo(() -> this + ": triggering transition " + repeatedItem + "." + transition + " within repeat (because " + msg + ")");
