@@ -127,6 +127,12 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
         // Now trigger the Create transition on our children
         createNullItems();
+
+        // When a Stage becomes active and it has no children, it should immediately try to complete.
+        if (getPlanItems().isEmpty()) {
+            // note ... we fake an event for logging purposes ...
+            tryCompletion(new PlanItemTransitioned(this, State.Completed, State.Active, Transition.Complete));
+        }
     }
 
     @Override
