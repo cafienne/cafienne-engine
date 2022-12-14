@@ -20,6 +20,7 @@ package org.cafienne.storage.archival
 import akka.actor.{ActorRef, Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.archival.command.ArchiveActorData
@@ -62,14 +63,14 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
 
     // First, tell the case system to remove the actual ModelActor (e.g. a Tenant or a Case) from memory
     //  This to avoid continued behavior of that specific actor.
-    informCafienneGateway(child.actorId)
-
-    // Now create a child archiver and tell it to clean up itself.
-    //  Keep watching the child to make sure we know that it is terminated and we need to remove it from the
-    //  collection of child references.
-    // NOTE: if the child already started the archival process, it will either respond with a ArchivalCompleted
-    //  or archival initiated. Both is fine, and are handled upon receiveCommand.
-    getChildActorRef(child).tell(ArchiveActorData(child), self)
+    informCafienneGateway(child.actorId, {
+      // After successful termination create a child archiver and tell it to clean up itself.
+      //  Keep watching the child to make sure we know that it is terminated and we need to remove it from the
+      //  collection of child references.
+      // NOTE: if the child already started the archival process, it will either respond with a ArchivalCompleted
+      //  or archival initiated. Both is fine, and are handled upon receiveCommand.
+      getChildActorRef(child).tell(ArchiveActorData(child), self)
+    })
   }
 
   def getChildActorRef(child: ActorMetadata): ActorRef = {
@@ -190,6 +191,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
     case event: ArchivalInitiated => // Event comes when one of the children has started archival
     case _: DeleteMessagesSuccess => archivalCompleted() // Event journal no longer contains our events
     case t: Terminated => childActorTerminated(t) // Akka has removed us from memory
+    case t: ActorTerminated => actorTerminated(t)
     case other => printLogMessage(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
   }
 }

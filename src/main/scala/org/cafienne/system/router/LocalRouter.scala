@@ -19,15 +19,17 @@ package org.cafienne.system.router
 
 import akka.actor.{ActorRef, Props, Terminated}
 import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.system.CaseSystem
+
+import scala.collection.mutable
 
 /**
   * In-memory router for akka messages sent in the CaseSystem.
   * Facilitates actor management in a non-clustered actor system.
   */
-class LocalRouter(caseSystem: CaseSystem, actors: collection.concurrent.TrieMap[String, ActorRef]) extends CaseMessageRouter {
+class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef], terminationRequests: mutable.Map[String, ActorRef]) extends CaseMessageRouter {
   logger.info(s"Starting case system in local mode, opening router for ${self.path.name}")
-
   /**
     * Forward a command to the appropriate ModelActor. Actor will be created if it does not yet exist.
     *
@@ -52,7 +54,12 @@ class LocalRouter(caseSystem: CaseSystem, actors: collection.concurrent.TrieMap[
   }
 
   override def terminateActor(actorId: String): Unit = {
-    actors.get(actorId).foreach(actor => context.stop(actor))
+    // If the actor is not (or no longer) in memory, We can immediately inform the sender
+    actors.get(actorId).fold(sender() ! ActorTerminated(actorId))(actor => {
+      // Otherwise, store the request, stop the actor and, when the Termination is received, we will inform the requester.
+      terminationRequests.put(actorId, sender())
+      context.stop(actor)
+    })
   }
 
   /**
@@ -67,5 +74,6 @@ class LocalRouter(caseSystem: CaseSystem, actors: collection.concurrent.TrieMap[
     if (actors.remove(actorId).isEmpty) {
       logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the LocalRoutingService. Termination message is ignored")
     }
+    terminationRequests.remove(actorId).foreach(requester => requester ! ActorTerminated(actorId))
   }
 }

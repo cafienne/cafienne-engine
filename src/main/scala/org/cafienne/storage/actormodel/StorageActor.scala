@@ -23,6 +23,7 @@ import akka.persistence.{PersistentActor, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.event.ModelEvent
+import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.system.CaseSystem
 
@@ -64,12 +65,30 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
   }
 
   /**
-   * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory
-   */
+    * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory
+    */
   def informCafienneGateway(actorId: String): Unit = {
     printLogMessage("Telling Cafienne Gateway to terminate " + actorId)
-    caseSystem.gateway.request(new TerminateModelActor(metadata.user, actorId))
+    caseSystem.gateway.inform(new TerminateModelActor(metadata.user, actorId), self)
   }
+
+  private val followups = mutable.Map[String, () => Unit]()
+
+  /**
+   * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory.
+    * Upon successful termination, the followup action will be triggered.
+   */
+  def informCafienneGateway(actorId: String, followUpAction: => Unit): Unit = {
+    followups.put(actorId, () => followUpAction)
+    informCafienneGateway(actorId)
+  }
+
+  /**
+    * Trigger this method when ActorTerminated is received in the StorageActor.
+    * Note: this must be explicitly invoked.
+    * @param t
+    */
+  def actorTerminated(t: ActorTerminated): Unit = followups.remove(t.actorId).foreach(action => action())
 
   /**
    * Recovery is pretty simple. Simply add all events to our state.

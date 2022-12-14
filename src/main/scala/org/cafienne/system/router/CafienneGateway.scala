@@ -31,12 +31,13 @@ import scala.concurrent.Future
 
 class CafienneGateway(caseSystem: CaseSystem) {
   private val system: ActorSystem = caseSystem.system
+  private val terminationRequests = collection.concurrent.TrieMap[String, ActorRef]()
   private val actors = collection.concurrent.TrieMap[String, ActorRef]()
-  private val caseService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "cases")
-  private val processTaskService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "process-tasks")
-  private val tenantService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "tenants")
-  private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "consent-groups")
-  private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors), "default-router")
+  private val caseService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "cases")
+  private val processTaskService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "process-tasks")
+  private val tenantService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "tenants")
+  private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "consent-groups")
+  private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-router")
 
   def request(message: ModelCommand): Future[Any] = {
     import akka.pattern.ask

@@ -20,6 +20,7 @@ package org.cafienne.storage.deletion
 import akka.actor.{Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalInitiated}
@@ -60,17 +61,17 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
 
     // First, tell the case system to remove the actual ModelActor (e.g. a Tenant or a Case) from memory
     //  This to avoid continued behavior of that specific actor.
-    informCafienneGateway(child.actorId)
-
-    // Now create a child remover and tell it to clean up itself.
-    //  Keep watching the child to make sure we know that it is terminated and we need to remove it from the
-    //  collection of child references.
-    // NOTE: if the child already started the removal process, it will either respond with a RemovalCompleted
-    //  or removal initiated. Both is fine, and are handled upon receiveCommand.
-    children.getOrElseUpdate(child.actorId, {
-      // If the child does not yet exist, create it.
-      context.watch(context.actorOf(Props(classOf[ActorDataRemover], caseSystem, child), child.actorId))
-    }).tell(command.RemoveActorData(child), self)
+    informCafienneGateway(child.actorId, {
+      // Now create a child remover and tell it to clean up itself.
+      //  Keep watching the child to make sure we know that it is terminated and we need to remove it from the
+      //  collection of child references.
+      // NOTE: if the child already started the removal process, it will either respond with a RemovalCompleted
+      //  or removal initiated. Both is fine, and are handled upon receiveCommand.
+      children.getOrElseUpdate(child.actorId, {
+        // If the child does not yet exist, create it.
+        context.watch(context.actorOf(Props(classOf[ActorDataRemover], caseSystem, child), child.actorId))
+      }).tell(command.RemoveActorData(child), self)
+    })
   }
 
   /**
@@ -155,6 +156,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
     case event: QueryDataRemoved => storeEvent(event) // Our state is removed from QueryDB
     case _: DeleteMessagesSuccess => deletionCompleted("because events have been deleted from the journal") // Event journal no longer contains our persistence id
     case t: Terminated => childActorTerminated(t) // Akka has removed one of our children from memory
+    case t: ActorTerminated => actorTerminated(t)
     case _: RemovalInitiated => // Less relevant, unless we use this to retrieve and expose state information
     //      printLogMessage(s"CHILD STARTED! ${childStarted.actorType}[${childStarted.actorId}]")
     case other => printLogMessage(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")

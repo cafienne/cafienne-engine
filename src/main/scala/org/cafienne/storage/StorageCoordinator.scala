@@ -24,6 +24,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
+import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
@@ -43,7 +44,7 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
   override val system: ActorSystem = caseSystem.system
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-  val refs: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
+  private val refs: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
 
   logger.warn("Launching Storage Coordination Service")
   start()
@@ -103,20 +104,35 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
     Future.successful(Done)
   }
 
+  private val followups = mutable.Map[String, (StorageCommand, ActorRef)]()
+  private def registerFollowup(command: StorageCommand, originalSender: ActorRef): Unit = {
+    followups.put(command.metadata.actorId, (command, originalSender))
+  }
+
+  private def handleFollowup(message: ActorTerminated): Unit = {
+    followups.remove(message.actorId).foreach(request => {
+      val command = request._1
+      val originalSender = request._2
+      logger.whenDebugEnabled(logger.debug(s"Actor ${message.actorId} terminated, triggering follow up: $command"))
+      refs.getOrElseUpdate(command.metadata.actorId, createActorRef(command)).tell(command, originalSender)
+    })
+  }
+
   override def receive: Receive = {
     case command: StorageCommand =>
-      logger.debug(s"Received $command")
+      logger.whenDebugEnabled(logger.debug(s"Received $command"))
+      registerFollowup(command, sender())
       // Tell Cafienne Engine to remove this model actor from memory
-      caseSystem.gateway.request(new TerminateModelActor(command.metadata.user, command.metadata.actorId))
-      refs.getOrElseUpdate(command.metadata.actorId, createActorRef(command)).forward(command)
+      caseSystem.gateway.inform(new TerminateModelActor(command.metadata.user, command.metadata.actorId), self)
+    case message: ActorTerminated => handleFollowup(message)
     case event: RemovalCompleted =>
       // Nothing needs to be done, as the actor will stop itself and below we handle the resulting Termination message.
-      logger.debug(s"Completed removal for ${event.metadata}")
+      logger.whenDebugEnabled(logger.debug(s"Completed removal for ${event.metadata}"))
     case t: Terminated =>
       val actorId = t.actor.path.name
       if (refs.remove(actorId).isEmpty) {
         logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the LocalRoutingService. Termination message is ignored")
       }
-      logger.debug(s"Actor $actorId is removed from memory")
+      logger.whenDebugEnabled(logger.debug(s"Actor $actorId is removed from memory"))
   }
 }
