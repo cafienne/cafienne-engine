@@ -18,7 +18,7 @@
 package org.cafienne.system.router
 
 import akka.actor.{ActorRef, Props, Terminated}
-import org.cafienne.actormodel.command.ModelCommand
+import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.system.CaseSystem
 
@@ -53,11 +53,14 @@ class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef],
     ref
   }
 
-  override def terminateActor(actorId: String): Unit = {
+  override def terminateActor(msg: TerminateModelActor): Unit = {
+    val actorId = msg.actorId;
     // If the actor is not (or no longer) in memory, We can immediately inform the sender
-    actors.get(actorId).fold(sender() ! ActorTerminated(actorId))(actor => {
+    actors.get(actorId).fold({
+      if (msg.needsResponse) sender() ! ActorTerminated(actorId)
+    })(actor => {
       // Otherwise, store the request, stop the actor and, when the Termination is received, we will inform the requester.
-      terminationRequests.put(actorId, sender())
+      if (msg.needsResponse) terminationRequests.put(actorId, sender())
       context.stop(actor)
     })
   }

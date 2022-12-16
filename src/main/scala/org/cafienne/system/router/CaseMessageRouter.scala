@@ -28,7 +28,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
   def receive: Actor.Receive = {
     case kill: TerminateModelActor =>
       logger.info(s"Received termination request for actor ${kill.actorId}")
-      terminateActor(kill.actorId)
+      terminateActor(kill)
     case m: ModelCommand => forwardMessage(m)
     case t: Terminated => removeActorRef(t)
     case other => handleUnknownMessage(other);
@@ -38,7 +38,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
 
   def forwardMessage(m: ModelCommand): Unit
 
-  def terminateActor(str: String): Unit
+  def terminateActor(msg: TerminateModelActor): Unit
 
   def handleUnknownMessage(value: Any): Unit = {
     logger.warn("The " + getClass.getSimpleName + " received an unknown message of type " + value.getClass.getName + ". Enable debug logging to see the contents of the message")

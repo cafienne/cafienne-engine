@@ -67,9 +67,9 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
   /**
     * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory
     */
-  def informCafienneGateway(actorId: String): Unit = {
+  def informCafienneGateway(actorId: String, needsResponse: Boolean = false): Unit = {
     printLogMessage("Telling Cafienne Gateway to terminate " + actorId)
-    caseSystem.gateway.inform(new TerminateModelActor(metadata.user, actorId), self)
+    caseSystem.gateway.inform(new TerminateModelActor(metadata.user, actorId, needsResponse), self)
   }
 
   private val followups = mutable.Map[String, () => Unit]()
@@ -80,7 +80,7 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
    */
   def informCafienneGateway(actorId: String, followUpAction: => Unit): Unit = {
     followups.put(actorId, () => followUpAction)
-    informCafienneGateway(actorId)
+    informCafienneGateway(actorId, true)
   }
 
   /**
