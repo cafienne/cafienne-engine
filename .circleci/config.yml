@@ -11,7 +11,7 @@ jobs:
       - setup-test-infra
       - build-docker-image
       - run-in-memory-tests
-      - show-engine-logs
+      - show-engine-logs-on-fail
 
   main-build:
     working_directory: ~/cafienne-engine
@@ -25,9 +25,10 @@ jobs:
       - setup-databases
       - build-docker-image
       - run-in-memory-tests
-      - run-database-tests
+      - run-jdbc-tests
+      - run-cassandra-tests
       - run-compatibility-tests
-      - show-engine-logs
+      - show-engine-logs-on-fail
       - reset-git-local-changes
       # All good; if we're really on the main branch, create and run setup of multi architecture build, then push the image to docker hub.
       - run:
@@ -42,6 +43,7 @@ jobs:
               echo "Not pushing image to docker hub"
             fi
 
+  
   release-build:
     working_directory: ~/cafienne-engine
     machine:
@@ -54,9 +56,10 @@ jobs:
       - setup-databases
       - build-docker-image
       - run-in-memory-tests
-      - run-database-tests
+      - run-jdbc-tests
+      - run-cassandra-tests
       - run-compatibility-tests
-      - show-engine-logs
+      - show-engine-logs-on-fail
       - reset-git-local-changes
       # All good, create and run setup of multi architecture build, then push the image to docker hub to latest and to release tags.
       - run:
@@ -155,10 +158,11 @@ commands:
           cd ./cmmn-test-framework
           npm run prod PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
     - run:
+        name: Docker logs of engine after the test
+        command: docker logs cafienne
+    - run:
         name: Stop and remove the Cafienne container
-        command: |
-          docker logs cafienne
-          docker rm -f cafienne
+        command: docker rm -f cafienne
 
     # Starting docker environment for testing start case with inline definitions
     - run:
@@ -178,10 +182,11 @@ commands:
           cd ./cmmn-test-framework
           npm run prod PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
     - run:
+        name: Docker logs of engine after the test
+        command: docker logs cafienne
+    - run:
         name: Stop and remove the Cafienne container
-        command: |
-          docker logs cafienne
-          docker rm -f cafienne
+        command: docker rm -f cafienne
 
     # Starting docker environment for in-memory testing
     - run:
@@ -200,14 +205,21 @@ commands:
           cd ..
           cd ./cmmn-test-framework
           npm run prod
+    - run:
+        name: Test archival & deletion
+        command: |
+          cd ..
+          cd ./cmmn-test-framework
+          npm run prod TestArchiveCase TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+    - run:
+        name: Docker logs of engine after the test
+        command: docker logs cafienne
+    - run:
+        name: Stop and remove the Cafienne container
+        command: docker rm -f cafienne
 
-
-  run-database-tests:
+  run-jdbc-tests:
     steps:
-      # First remove existing Cafienne container
-      - run:
-          name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
       # Starting docker environment for MS SQL Server testing
       - run:
           name: Start Cafienne Engine for MS SQL Server testing
@@ -227,11 +239,13 @@ commands:
             cd ..
             cd ./cmmn-test-framework
             npm run prod
+      - run:
+          name: Docker logs of engine after the test
+          command: docker logs cafienne
       # Stop engine, but also the sql server "without events" instance, and start the one "with events" for later usage
       - run:
           name: Stop and remove the Cafienne container, and also MS SQL Server container
           command: |
-            docker logs cafienne
             docker rm -f cafienne empty-sql-server
             sleep 3
             docker-compose -f .circleci/docker-config/databases-compatibility.yml up -d sql-server-with-events
@@ -263,11 +277,20 @@ commands:
             cd ./cmmn-test-framework
             npm run prod
       - run:
-          name: Stop and remove the Cafienne container
+          name: Test archival & deletion
           command: |
-            docker logs cafienne
-            docker rm -f cafienne
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod TestArchiveCase TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+      - run:
+          name: Docker logs of engine after the test
+          command: docker logs cafienne
+      - run:
+          name: Stop and remove the Cafienne container
+          command: docker rm -f cafienne
 
+  run-cassandra-tests:
+    steps:
       # Starting docker environment for Cassandra testing
       - run:
           name: Start Cafienne Engine for Cassandra testing
@@ -321,10 +344,17 @@ commands:
             cd ./cmmn-test-framework
             npm run prod
       - run:
-          name: Stop and remove the Cafienne container
+          name: Test archival & deletion
           command: |
-            docker logs cafienne
-            docker rm -f cafienne
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod TestArchiveCase TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+      - run:
+          name: Docker logs of engine after the test
+          command: docker logs cafienne
+      - run:
+          name: Stop and remove the Cafienne container
+          command: docker rm -f cafienne
 
       # Starting docker environment for backwards compatibility PostgreSQL testing against latest engine
       - run:
@@ -352,14 +382,26 @@ commands:
             cd ..
             cd ./cmmn-test-framework
             npm run prod
+      - run:
+          name: Test archival & deletion
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod TestArchiveCase TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+      - run:
+          name: Docker logs of engine after the test
+          command: docker logs cafienne
+      - run:
+          name: Stop and remove the Cafienne container
+          command: docker rm -f cafienne
 
-  show-engine-logs:
+  show-engine-logs-on-fail:
     steps:
       # Always show docker logs. This will give the cafienne engine console info when any of above tests fails.
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
-          when: always
+          when: on_fail
 
   reset-git-local-changes:
     steps:

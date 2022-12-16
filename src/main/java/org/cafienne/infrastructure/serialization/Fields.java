@@ -141,6 +141,14 @@ public enum Fields {
     moment,
     timers,
 
+    metadata,
+    archive,
+    events,
+    children,
+    manifest,
+    sequenceNr,
+    parent,
+
     className,
     message,
     cause,

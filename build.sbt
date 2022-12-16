@@ -139,6 +139,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"         %% "akka-actor"                           % akkaVersion
   , "com.typesafe.akka"       %% "akka-cluster-tools"                   % akkaVersion
   , "com.typesafe.akka"       %% "akka-cluster-sharding"                % akkaVersion
+  , "com.typesafe.akka"       %% "akka-serialization-jackson"           % akkaVersion
   , "com.typesafe.akka"       %% "akka-http"                            % akkaHttpVersion
   , "com.typesafe.akka"       %% "akka-http-core"                       % akkaHttpVersion
   , "com.typesafe.akka"       %% "akka-http-xml"                        % akkaHttpVersion

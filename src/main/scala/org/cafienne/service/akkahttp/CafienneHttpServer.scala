@@ -31,6 +31,7 @@ import org.cafienne.service.akkahttp.debug.DebugRoute
 import org.cafienne.service.akkahttp.identifiers.route.IdentifierRoutes
 import org.cafienne.service.akkahttp.platform.{CaseEngineHealthRoute, PlatformRoutes}
 import org.cafienne.service.akkahttp.repository.RepositoryRoute
+import org.cafienne.service.akkahttp.storage.StorageRoutes
 import org.cafienne.service.akkahttp.swagger.SwaggerHttpServiceRoute
 import org.cafienne.service.akkahttp.tasks.TaskRoutes
 import org.cafienne.service.akkahttp.tenant.route.TenantRoutes
@@ -41,26 +42,27 @@ import scala.concurrent.Future
 
 class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
 
-  val defaultRoutes: Seq[CaseServiceRoute] = {
-    val routes = Seq(new CaseEngineHealthRoute(caseSystem),
-      new CasesRoutes(caseSystem),
-      new IdentifierRoutes(caseSystem),
-      new TaskRoutes(caseSystem),
-      new TenantRoutes(caseSystem),
-      new ConsentGroupRoutes(caseSystem),
-      new PlatformRoutes(caseSystem),
-      new RepositoryRoute(caseSystem),
-      new DebugRoute(caseSystem),
-    )
-    // Optionally add the anonymous route
-    if (Cafienne.config.api.anonymousConfig.enabled) {
-      routes ++ Seq(new AnonymousRequestRoutes(caseSystem))
-    } else {
-      routes
-    }
-  }
-  val routes: ListBuffer[CaseServiceRoute] = new ListBuffer[CaseServiceRoute]().addAll(defaultRoutes)
+  val routes: ListBuffer[CaseServiceRoute] = new ListBuffer[CaseServiceRoute]()
 
+  addRoute(new CaseEngineHealthRoute(caseSystem))
+  addRoute(new CasesRoutes(caseSystem))
+  addRoute(new IdentifierRoutes(caseSystem))
+  addRoute(new TaskRoutes(caseSystem))
+  addRoute(new TenantRoutes(caseSystem))
+  addRoute(new ConsentGroupRoutes(caseSystem))
+  addRoute(new PlatformRoutes(caseSystem))
+  addRoute(new RepositoryRoute(caseSystem))
+  addRoute(new StorageRoutes(caseSystem))
+  addRoute(new DebugRoute(caseSystem))
+  // Optionally add the anonymous route
+  if (Cafienne.config.api.anonymousConfig.enabled) {
+    addRoute(new AnonymousRequestRoutes(caseSystem))
+  }
+
+  /**
+    * Method to extend the default routes that Cafienne exposes
+    * @param caseServiceRoute The additional Route must extend CaseServiceRoute
+    */
   def addRoute(caseServiceRoute: CaseServiceRoute): Unit = routes += caseServiceRoute
 
   def start(): Future[Http.ServerBinding] = {
@@ -71,7 +73,7 @@ class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
       // Find the API classes of the routes and pass them to Swagger
       val apiClasses = routes.flatMap(route => route.apiClasses())
       var mainRoute = new SwaggerHttpServiceRoute(apiClasses.toSet).route
-      def routeAppender(route: Route) = mainRoute = concat(mainRoute, route)
+      def routeAppender(route: Route): Unit = mainRoute = concat(mainRoute, route)
       routes.map(_.route).foreach(routeAppender)
       mainRoute
     }

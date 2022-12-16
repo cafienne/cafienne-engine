@@ -38,15 +38,22 @@ public class TerminateModelActor extends BaseModelCommand<ModelActor, UserIdenti
     }
 
     public final String actorId;
+    public final boolean needsResponse;
 
     public TerminateModelActor(UserIdentity user, String actorId) {
+        this(user, actorId, true);
+    }
+
+    public TerminateModelActor(UserIdentity user, String actorId, boolean needsResponse) {
         super(user, actorId);
         this.actorId = actorId;
+        this.needsResponse = needsResponse;
     }
 
     public TerminateModelActor(ValueMap json) {
         super(json);
         this.actorId = json.readString(Fields.actorId);
+        this.needsResponse = json.readBoolean((Fields.response), true);
     }
 
     @Override
@@ -66,6 +73,7 @@ public class TerminateModelActor extends BaseModelCommand<ModelActor, UserIdenti
     @Override
     public void write(JsonGenerator generator) throws IOException {
         writeField(generator, Fields.actorId, actorId);
+        writeField(generator, Fields.response, needsResponse);
     }
 }
 
