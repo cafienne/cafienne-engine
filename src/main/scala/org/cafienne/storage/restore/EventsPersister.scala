@@ -61,14 +61,19 @@ class EventsPersister(val caseSystem: CaseSystem, val metadata: ActorMetadata) e
     }
   }
 
-  def restoreCompleted(): Unit = {
+  def completedRestoringModelActorEvents(): Unit = {
     context.parent ! ChildRestored(metadata)
     context.stop(self) // Event journal no longer contains our events, we can be deleted
   }
 
+  private var startedClearing = false;
+
   def clearStorageEvents(): Unit = {
     log(s"Stored ${events.size} actor events; deleting events up to $lastSequenceNr - ${events.size} ==> ${lastSequenceNr - events.size}")
-    deleteMessages(lastSequenceNr - events.size)
+    if (! startedClearing) {
+      deleteMessages(lastSequenceNr - events.size)
+      startedClearing = true
+    }
   }
 
   def restoreEvents(): Unit = {
@@ -102,7 +107,7 @@ class EventsPersister(val caseSystem: CaseSystem, val metadata: ActorMetadata) e
       clearStorageEvents()
     } else if (hasModelEvents) {
       // Restored properly, let's tell and stop ourselves immediately
-      restoreCompleted()
+      completedRestoringModelActorEvents()
     } else if (hasArchive) {
       // Apparently not yet restored the archive, let's trigger that process again
       restoreEvents()
@@ -119,7 +124,7 @@ class EventsPersister(val caseSystem: CaseSystem, val metadata: ActorMetadata) e
 
   override def receiveCommand: Receive = {
     case command: RestoreArchive => validateCommand(command)
-    case _: DeleteMessagesSuccess => restoreCompleted()
+    case _: DeleteMessagesSuccess => completedRestoringModelActorEvents()
     case other => logger.warn(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
   }
 
