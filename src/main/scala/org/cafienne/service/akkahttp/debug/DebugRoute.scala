@@ -95,11 +95,13 @@ class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
   def forceRecovery: Route = patch {
     path("force-recovery" / Segment) { modelId =>
       validUser { user =>
-        if (! Cafienne.config.developerRouteOpen) {
+        if (!Cafienne.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          caseSystem.gateway.inform(new TerminateModelActor(user, modelId))
-          complete(StatusCodes.OK, s"Forced recovery of $modelId")
+          onComplete(caseSystem.gateway.request(new TerminateModelActor(user, modelId))) {
+            case Success(value) => complete(StatusCodes.OK, s"Forced recovery of $modelId")
+            case Failure(err) => throw err;
+          }
         }
       }
     }
