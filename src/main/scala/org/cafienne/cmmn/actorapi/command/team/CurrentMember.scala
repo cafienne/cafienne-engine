@@ -48,6 +48,7 @@ class CurrentMember(team: Team, user: CaseUserIdentity) extends CaseTeamUser {
   private lazy val groupsOwnedByThisUser: Seq[CaseTeamGroup] = user.groups.filter(_.isOwner).map(_.groupId).map(team.getGroup)
   override val userId: String = user.id
   override val origin: Origin = user.origin
+  override val caseRoles: Set[String] = getRoles.map(_.getName)
   override val isOwner: Boolean = userMembership.exists(_.isOwner) || tenantRoleMembership.exists(_.isOwner) || groupMembership.exists(_.isOwner)
 
   def hasRoles(caseRoles: java.util.Collection[CaseRoleDefinition]): Boolean = {
