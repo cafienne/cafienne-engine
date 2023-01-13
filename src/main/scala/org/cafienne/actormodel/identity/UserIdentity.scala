@@ -17,6 +17,9 @@
 
 package org.cafienne.actormodel.identity
 
+import org.cafienne.authentication.AuthenticatedUser
+import org.cafienne.cmmn.repository.file.SimpleLRUCache
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.serialization.{DeserializationError, Fields}
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
@@ -24,6 +27,15 @@ trait UserIdentity extends CafienneJson {
   val id: String
 
   override def toValue: Value[_] = new ValueMap(Fields.userId, id)
+
+  def token: String = {
+    val token = UserIdentity.tokens.get(id)
+    if (token != null) {
+      token
+    } else {
+      "" // Just return an empty string
+    }
+  }
 
   /**
     * Compatibility method for e.g. TenantUsers
@@ -34,6 +46,12 @@ trait UserIdentity extends CafienneJson {
 }
 
 object UserIdentity {
+  private val tokens = new SimpleLRUCache[String, String](Cafienne.config.api.security.tokenCacheSize)
+
+  def cacheUserToken(user: AuthenticatedUser): Unit = {
+    tokens.put(user.id, user.token)
+  }
+
   def deserialize(json: ValueMap): UserIdentity = {
     // Note: this is a somewhat "brute-force" deserialization method, mostly required for ModelEvent, ModelResponse and ProcessCommand
     //  It is probably more clean to apply the ModelCommand.readUser also for ModelEvent, but that can be added later.

@@ -28,9 +28,20 @@ class SecurityConfig(val parent: ApiConfig) extends MandatoryConfig {
     val key = "identity.cache.size"
     val size = readInt(key, 1000)
     if (size == 0) {
-      logger.info("Identity Caching is disabled")
+      logger.info("Identity caching is disabled")
     } else {
       logger.info("Running with Identity Cache of size " + size)
+    }
+    size
+  }
+
+  lazy val tokenCacheSize: Int = {
+    val key = "token.cache.size"
+    val size = readInt(key, 1000)
+    if (size == 0) {
+      logger.info("Token caching is disabled")
+    } else {
+      logger.info("Running with User Token Cache of size " + size)
     }
     size
   }

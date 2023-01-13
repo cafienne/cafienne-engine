@@ -19,6 +19,7 @@ package org.cafienne.cmmn.expression.spel.api;
 
 import org.cafienne.cmmn.expression.spel.api.cmmn.plan.CaseAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.plan.PlanItemAPI;
+import org.cafienne.cmmn.expression.spel.api.cmmn.team.CurrentMemberAPI;
 import org.cafienne.cmmn.expression.spel.api.cmmn.team.MemberAPI;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -31,7 +32,7 @@ public abstract class CaseRootObject extends APIRootObject<Case> {
     private final CaseAPI context;
 
     protected CaseRootObject(Case model) {
-        super(model, new MemberAPI(model.getCaseTeam(), model.getCurrentTeamMember()));
+        super(model, new CurrentMemberAPI(model));
         this.context = new CaseAPI(model);
         addContextProperty(this.context, "case", "caseInstance");
     }
