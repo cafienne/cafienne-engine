@@ -15,23 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.expression.spel.api;
+package org.cafienne.cmmn.expression.spel.api.cmmn.team;
 
-import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.identity.UserIdentity;
-
-import java.util.ArrayList;
+import org.cafienne.cmmn.instance.Case;
 
 /**
- * Wrapper to access user information from spel expressions
+ * Wrapper around the current user's case team membership, including the JWT token of the user.
  */
-public class UserContext extends APIObject<ModelActor> {
-    public UserContext(ModelActor actor, UserIdentity user) {
-        super(actor);
-        addPropertyReader("id", user::id);
-        addPropertyReader("token", user::token);
-        addDeprecatedReader("roles", ArrayList<String>::new);
-        addDeprecatedReader("name", () -> "");
-        addDeprecatedReader("email", () -> "");
+public class CurrentMemberAPI extends MemberAPI {
+    /**
+     * Create a member api for the current user - this includes the option to use the token of the currently active user,
+     * but not possible to the token of other case team members.
+     * @param caseInstance
+     */
+    public CurrentMemberAPI(Case caseInstance) {
+        super(caseInstance.getCaseTeam(), caseInstance.getCurrentTeamMember());
+        addPropertyReader("token", caseInstance.getCurrentUser()::token);
     }
 }
