@@ -18,5 +18,14 @@
 package org.cafienne.service.akkahttp.board.model
 
 object BoardAPI {
-  //TODO SEE BoardQueryProtocol
+  //SEE BoardQueryProtocol
+  //TODO (de)serialization
+
+  case class BoardRequestDetails(id: String, title: String)
+
+  case class BoardSummaryResponse(id: String, title: String)
+
+  case class ColumnRequestDetails(id: String, title: String)
+
+  case class TeamMemberDetails(userId: String, roles: Set[String])
 }
