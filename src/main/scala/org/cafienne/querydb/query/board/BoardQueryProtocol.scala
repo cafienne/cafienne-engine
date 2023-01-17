@@ -11,8 +11,6 @@ import scala.annotation.meta.field
 //TODO needs (de)serialization
 object BoardQueryProtocol {
 
-  case class BoardColumnKey(boardId: String, columnId: String)
-
   // "A board used to coordinate work"
   final case class Board(
     @(Schema @field)(implementation = classOf[String], example = "User id (matched with token when user logs on)")
@@ -20,15 +18,17 @@ object BoardQueryProtocol {
     @(Schema @field)(implementation = classOf[String], example = "Title of the board.")
     title: String,
     @(Schema @field)(implementation = classOf[String], example = "The user ID that is the owner of the ttp.")
-    ownerId: String
+    ownerId: String,
+    @(Schema @field)(implementation = classOf[List[Column]], example = "The colums of this board.")
+    columns: List[Column],
+    @(Schema @field)(implementation = classOf[List[TeamMember]], example = "The team for this board.")
+    team: List[TeamMember]
   )
 
   //"Team member that works with the ttp")
   final case class TeamMember(
     @(Schema @field)(implementation = classOf[String], example = "User ID of the team member")
     userId: String,
-    //@GraphQLExclude
-    boardId: String,
     @(Schema @field)(implementation = classOf[String], example = "Roles the user fulfills")
     roles: Seq[String],
     @(Schema @field)(implementation = classOf[String], example = "Name of the user")
@@ -39,22 +39,18 @@ object BoardQueryProtocol {
 
   //("A column within a ttp.")
   final case class Column(
-                           @(Schema @field)(implementation = classOf[String], example = "The unique jwtSub of the column within the ttp.")
+    @(Schema @field)(implementation = classOf[String], example = "The unique jwtSub of the column within the ttp.")
     id: String,
-                           @(Schema @field)(implementation = classOf[String], example = "Position of the column on the ttp (first left is position 0).")
+    @(Schema @field)(implementation = classOf[String], example = "Position of the column on the ttp (first left is position 0).")
     position: Int,
-                           @(Schema @field)(implementation = classOf[String], example = "Title of the column.")
+    @(Schema @field)(implementation = classOf[String], example = "Title of the column.")
     title: Option[String],
-    //@GraphQLExclude
-    boardId: String,
-                           @(Schema @field)(implementation = classOf[String], example = "Role allowed to execute tasks in this column, When empty everyone may execute tasks")
+    @(Schema @field)(implementation = classOf[String], example = "Role allowed to execute tasks in this column, When empty everyone may execute tasks")
     role: Option[String]
   )
 
   /** A Flow is an instance of related tasks running through the columns
-    * @param boardId
-    * @param flowId
-    * @param ownerId
+    * TODO Flow needs to be reflect case instances on the query side, maybe provide it directly in the API
     */
   final case class Flow(
     boardId: String,
@@ -66,6 +62,7 @@ object BoardQueryProtocol {
   )
 
   //"A task within a ttp.")
+  //TODO task needs to reflect HumanTask on the query side. Maybe provide it directly in the API.
   final case class Task(
     @(Schema @field)(implementation = classOf[String], example = "The unique jwtSub of the task within the ttp.")
     id: String,

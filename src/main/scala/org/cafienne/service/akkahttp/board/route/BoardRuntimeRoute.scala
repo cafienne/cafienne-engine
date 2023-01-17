@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.service.akkahttp.board.model.BoardAPI.{BoardSummaryResponse, TeamMemberDetails}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -23,7 +24,7 @@ import javax.ws.rs._
 @Path("/board")
 class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   import org.cafienne.querydb.query.board.BoardQueryProtocol._
-  override def routes: Route = concat(getBoards, getTeam, getBoard, addTeam, putTeam)
+  override def routes: Route = concat(getBoards, getTeam, getBoard, addTeam)
 
   @Path("/")
   @GET
@@ -32,19 +33,20 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
     description = "Retrieves the list of boards",
     tags = Array("board"),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "List of available boards", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[Board]))))),
+      new ApiResponse(responseCode = "200", description = "List of available boards", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[BoardSummaryResponse]))))),
     )
   )
   @Produces(Array("application/json"))
   def getBoards: Route = get {
-    boardUser { boardUser =>
-      pathEnd {
+    authenticatedUser { user =>
+      caseSystem.system.log.error(s"Found : $user")
+      pathEndOrSingleSlash {
         //TODO something like: boardQueries.getBoards(boardUser.toString)
-        complete(StatusCodes.NotImplemented)
+        // NOTE that this response should be of BoardSummaryResponse (giving a selection of the data available)
+        complete(StatusCodes.NotImplemented, user.toString)
       }
     }
   }
-
 
   @Path("/{board}")
   @GET
@@ -56,18 +58,18 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new Parameter(name = "board", description = "The board to retrieve details from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO return a detailed Board type with all required fields
-      new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[Set[String]])))),
+      new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[Board])))),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
   )
   @Produces(Array("application/json"))
   def getBoard: Route = get {
-    pathPrefix(Segment) { boardId =>
+    boardUser { boardUser =>
         //TODO something like boardQueries.getBoard(boardId)
-        complete(StatusCodes.NotImplemented)
+        caseSystem.system.log.error(s"Found : $boardUser")
+        complete(StatusCodes.NotImplemented, boardUser.toString)
       }
     }
-
 
   @Path("/{board}/team")
   @GET
@@ -79,7 +81,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new Parameter(name = "board", description = "The board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO have a team return type
-      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[String]])))),
+      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TeamMember]])))),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
   )
@@ -106,27 +108,17 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new ApiResponse(description = "Team information is invalid", responseCode = "400"),
     )
   ) //TODO have a Team input format
-  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
+  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TeamMemberDetails]))))
   @Consumes(Array("application/json"))
-  def addTeam: Route = post {
-    replaceTeam
-  }
-
-  // For compatibility continue to support PUT for some time on the same
-  def putTeam: Route = put {
-    replaceTeam
-  }
-
-  def replaceTeam: Route = {
+  def addTeam: Route = {
     boardUser { boardUser =>
       path("team") {
-        entity(as[String]) { newUser =>
+        entity(as[String]) { newUser => //entity as TeamMemberDetails
           complete(StatusCodes.NotImplemented)
           //askBoard(new SetTenantUser(tenantOwner, tenantOwner.tenant, newUser.asTenantUser(tenantOwner.tenant)))
         }
       }
     }
   }
-
 
 }

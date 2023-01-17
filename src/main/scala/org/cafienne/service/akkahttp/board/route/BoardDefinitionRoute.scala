@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
+import org.cafienne.service.akkahttp.board.model.BoardAPI.{BoardRequestDetails, ColumnRequestDetails}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -42,15 +42,12 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     summary = "Create a Board",
     description = "Creates a new board to overview the work on tasks",
     tags = Array("board"),
-    parameters = Array(
-      new Parameter(name = "board", description = "The board in which to create or replace the information", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
     responses = Array(
       new ApiResponse(description = "Board created or replaced successfully", responseCode = "204"),
       new ApiResponse(description = "Board information is invalid", responseCode = "400"),
     )
   )
-  @RequestBody(description = "Board to create or update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
+  @RequestBody(description = "Board to create or update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[BoardRequestDetails]))))
   @Consumes(Array("application/json"))
   def createBoard: Route = post {
     replaceBoard
@@ -62,7 +59,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
 
   private def replaceBoard: Route = {
     boardUser { boardUser =>
-      entity(as[String]) { newTenantInformation =>
+      entity(as[String]) { newTenantInformation => //TODO entity as BoardRequestDetails
         complete(StatusCodes.NotImplemented)
         //askBoard(new ReplaceTenant(tenantOwner, tenantOwner.tenant, users.asJava))
       }
@@ -82,7 +79,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       new ApiResponse(description = "Form updated successfully", responseCode = "204"),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
-  ) //TODO make serializer for the form definition
+  ) //TODO make serializer for the form definition (kind of JSValue?)
   @RequestBody(description = "Form to create", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/json"))
   def addOrReplaceStartForm: Route = post {
@@ -114,13 +111,13 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       new ApiResponse(description = "Column information is invalid", responseCode = "400"),
     )
   ) //TODO make class and serializer for the ColumnDetails
-  @RequestBody(description = "Column details", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
+  @RequestBody(description = "Column details", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ColumnRequestDetails]))))
   @Consumes(Array("application/json"))
   def addColumn: Route =
     post  {
-      boardUser { tenantOwner =>
+      boardUser { boardUser =>
         path(Segment / "columns") { boardId =>
-          entity(as[UserFormat]) { newUser =>
+          entity(as[String]) { newUser => //entity as ColumnRequestDetails
             complete(StatusCodes.NotImplemented)
             //askBoard(new SetTenantUser(tenantOwner, tenantOwner.tenant, newUser.asTenantUser(tenantOwner.tenant)))
           }
@@ -144,7 +141,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     )
   )
   def removeColumn: Route = delete {
-    boardUser { tenantOwner =>
+    boardUser { boardUser =>
       path(Segment / "columns" / Segment) { (boardId, columnId ) =>
         complete(StatusCodes.NotImplemented)
         //askBoard(new RemoveTenantUser(tenantOwner, tenantOwner.tenant, userId))
@@ -167,7 +164,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       new ApiResponse(responseCode = "404", description = "Board not found"),
       new ApiResponse(responseCode = "404", description = "Column not found"),
     )
-  ) //TODO attach serialized form
+  ) //TODO attach serialized form (JSValue like)
   @RequestBody(description = "Form to add or replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/json"))
   def addOrReplaceTaskForm: Route = post {
