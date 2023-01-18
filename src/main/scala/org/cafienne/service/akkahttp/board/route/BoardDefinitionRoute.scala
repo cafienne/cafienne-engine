@@ -25,6 +25,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.actormodel.identity.BoardUser
+import org.cafienne.board.actorapi.command.CreateBoard
 import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
 
@@ -34,7 +36,7 @@ import javax.ws.rs._
 @Path("/board")
 class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRoute {
 
-  override def routes: Route = concat(addColumn, removeColumn, addOrReplaceTaskForm, addOrReplaceStartForm, createBoard)
+  override def routes: Route = concat(createBoard, addColumn, removeColumn, addOrReplaceTaskForm, addOrReplaceStartForm)
 
   @Path("/")
   @POST
@@ -50,10 +52,11 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
   @RequestBody(description = "Board to create or update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[BoardRequestDetails]))))
   @Consumes(Array("application/json"))
   def createBoard: Route = post {
-    boardUser { boardUser =>
-      entity(as[BoardRequestDetails]) { newTenantInformation => //TODO entity as BoardRequestDetails
-        complete(StatusCodes.Created)
-        //askBoard(new ReplaceTenant(tenantOwner, tenantOwner.tenant, users.asJava))
+    authenticatedUser { user =>
+      entity(as[BoardRequestDetails]) { boardRequestDetails =>
+        val boardId = boardRequestDetails.id
+        val boardUser = BoardUser(user.id, boardId)
+        askBoard(new CreateBoard(boardUser, boardId, boardRequestDetails.title))
       }
     }
   }
@@ -109,7 +112,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     post  {
       boardUser { boardUser =>
         path(Segment / "columns") { boardId =>
-          entity(as[String]) { newUser => //entity as ColumnRequestDetails
+          entity(as[ColumnRequestDetails]) { newUser => //entity as ColumnRequestDetails
             complete(StatusCodes.NotImplemented)
             //askBoard(new SetTenantUser(tenantOwner, tenantOwner.tenant, newUser.asTenantUser(tenantOwner.tenant)))
           }

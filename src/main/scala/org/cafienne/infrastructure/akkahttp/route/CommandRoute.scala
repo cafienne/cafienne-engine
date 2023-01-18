@@ -23,6 +23,7 @@ import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response._
+import org.cafienne.board.actorapi.response.BoardResponse
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
@@ -50,6 +51,7 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
           case value: HumanTaskResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.CASE_LAST_MODIFIED)
           case _: CaseNotModifiedResponse => complete(StatusCodes.NotModified, "Transition has no effect")
           case value: CaseResponse => completeWithLMH(StatusCodes.OK, value, Headers.CASE_LAST_MODIFIED)
+          case value: BoardResponse => completeOnlyLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
           case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
           case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
           case value: ConsentGroupCreatedResponse => completeWithLMH(StatusCodes.OK, value, Headers.CONSENT_GROUP_LAST_MODIFIED)

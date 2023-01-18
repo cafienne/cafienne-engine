@@ -24,6 +24,7 @@ import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.response.BoardResponse;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -32,21 +33,21 @@ import java.io.IOException;
 
 @Manifest
 public class CreateBoard extends BoardCommand implements BootstrapMessage {
-    public final String subject;
+    public final String title;
 
-    public CreateBoard(BoardUser user, String tenantId, String subject) {
-        super(user, tenantId);
-        this.subject = subject;
+    public CreateBoard(BoardUser user, String boardId, String title) {
+        super(user, boardId);
+        this.title = title;
     }
 
     public CreateBoard(ValueMap json) {
         super(json);
-        this.subject = json.readString(Fields.subject);
+        this.title = json.readString(Fields.title);
     }
 
     @Override
     public String tenant() {
-        return subject;
+        return Cafienne.config().platform().defaultTenant();
     }
 
     @Override
@@ -56,14 +57,14 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
 
     @Override
     public void process(BoardActor board) {
-        board.addEvent(new BoardCreated(board, subject));
+        board.addEvent(new BoardCreated(board, title));
         setResponse(new BoardResponse(this));
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.subject, subject);
+        writeField(generator, Fields.title, title);
     }
 }
 
