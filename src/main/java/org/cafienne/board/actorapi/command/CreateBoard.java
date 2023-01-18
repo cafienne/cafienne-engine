@@ -32,21 +32,21 @@ import java.io.IOException;
 
 @Manifest
 public class CreateBoard extends BoardCommand implements BootstrapMessage {
-    public final String subject;
+    public final String title;
 
-    public CreateBoard(BoardUser user, String tenantId, String subject) {
-        super(user, tenantId);
-        this.subject = subject;
+    public CreateBoard(BoardUser user, String boardId, String title) {
+        super(user, boardId);
+        this.title = title;
     }
 
     public CreateBoard(ValueMap json) {
         super(json);
-        this.subject = json.readString(Fields.subject);
+        this.title = json.readString(Fields.title);
     }
 
     @Override
     public String tenant() {
-        return subject;
+        return title;
     }
 
     @Override
@@ -56,14 +56,14 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
 
     @Override
     public BoardResponse process(BoardActor board) {
-        board.addEvent(new BoardCreated(board, subject));
+        board.addEvent(new BoardCreated(board, title));
         return new BoardResponse(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.subject, subject);
+        writeField(generator, Fields.title, title);
     }
 }
 

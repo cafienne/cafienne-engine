@@ -155,6 +155,7 @@ public enum Fields {
     exception,
 
     boardId,
+    title,
     subject
 
 }

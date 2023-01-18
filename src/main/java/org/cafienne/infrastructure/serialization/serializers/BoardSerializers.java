@@ -17,21 +17,29 @@
 
 package org.cafienne.infrastructure.serialization.serializers;
 
+import org.cafienne.board.actorapi.command.CreateBoard;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 
 public class BoardSerializers {
     public static void register() {
         addBoardCommands();
         addBoardEvents();
+        addBoardResponses();
     }
 
     private static void addBoardCommands() {
+        CafienneSerializer.addManifestWrapper(CreateBoard.class, CreateBoard::new);
     }
 
     private static void addBoardEvents() {
         CafienneSerializer.addManifestWrapper(BoardCreated.class, BoardCreated::new);
         CafienneSerializer.addManifestWrapper(BoardModified.class, BoardModified::new);
+    }
+
+    private static void addBoardResponses() {
+        CafienneSerializer.addManifestWrapper(BoardResponse.class, BoardResponse::new);
     }
 }

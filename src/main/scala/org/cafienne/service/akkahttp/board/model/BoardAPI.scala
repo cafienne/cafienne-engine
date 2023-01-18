@@ -22,6 +22,9 @@ import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityRe
 object BoardAPI {
   //SEE BoardQueryProtocol
   implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
+  implicit val boardSummaryResponseReader: EntityReader[BoardSummaryResponse] = entityReader[BoardSummaryResponse]
+  implicit val columnRequestDetailsReader: EntityReader[ColumnRequestDetails] = entityReader[ColumnRequestDetails]
+  implicit val teamMemberDetailsReader: EntityReader[TeamMemberDetails] = entityReader[TeamMemberDetails]
 
   case class BoardRequestDetails(id: String, title: String)
 
