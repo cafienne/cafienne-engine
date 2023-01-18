@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.service.akkahttp.board.model.BoardAPI.{BoardRequestDetails, ColumnRequestDetails}
+import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -34,7 +34,7 @@ import javax.ws.rs._
 @Path("/board")
 class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRoute {
 
-  override def routes: Route = concat(addColumn, removeColumn, addOrReplaceTaskForm, addOrReplaceStartForm, createBoard, putBoard)
+  override def routes: Route = concat(addColumn, removeColumn, addOrReplaceTaskForm, addOrReplaceStartForm, createBoard)
 
   @Path("/")
   @POST
@@ -50,17 +50,9 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
   @RequestBody(description = "Board to create or update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[BoardRequestDetails]))))
   @Consumes(Array("application/json"))
   def createBoard: Route = post {
-    replaceBoard
-  }
-
-  def putBoard: Route = put {
-    replaceBoard // For backwards compatibility temporarily support PUT as well.
-  }
-
-  private def replaceBoard: Route = {
     boardUser { boardUser =>
-      entity(as[String]) { newTenantInformation => //TODO entity as BoardRequestDetails
-        complete(StatusCodes.NotImplemented)
+      entity(as[BoardRequestDetails]) { newTenantInformation => //TODO entity as BoardRequestDetails
+        complete(StatusCodes.Created)
         //askBoard(new ReplaceTenant(tenantOwner, tenantOwner.tenant, users.asJava))
       }
     }

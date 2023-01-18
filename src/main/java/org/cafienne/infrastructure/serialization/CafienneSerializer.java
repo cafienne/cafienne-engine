@@ -19,10 +19,7 @@ package org.cafienne.infrastructure.serialization;
 
 import akka.actor.ExtendedActorSystem;
 import akka.serialization.SerializerWithStringManifest;
-import org.cafienne.infrastructure.serialization.serializers.CommandSerializers;
-import org.cafienne.infrastructure.serialization.serializers.EventSerializers;
-import org.cafienne.infrastructure.serialization.serializers.ResponseSerializers;
-import org.cafienne.infrastructure.serialization.serializers.StorageSerializers;
+import org.cafienne.infrastructure.serialization.serializers.*;
 import org.cafienne.json.JSONParseFailure;
 import org.cafienne.json.JSONReader;
 import org.cafienne.json.ValueMap;
@@ -49,6 +46,7 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         EventSerializers.register();
         CommandSerializers.register();
         ResponseSerializers.register();
+        BoardSerializers.register();
         StorageSerializers.register();
     }
 
