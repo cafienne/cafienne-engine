@@ -15,19 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.model
+package org.cafienne.board.actorapi.response;
 
-import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import org.cafienne.actormodel.response.BaseModelResponse;
+import org.cafienne.board.actorapi.BoardMessage;
+import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
+import org.cafienne.tenant.actorapi.TenantMessage;
+import org.cafienne.tenant.actorapi.command.TenantCommand;
 
-object BoardAPI {
-  //SEE BoardQueryProtocol
-  implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
+@Manifest
+public class BoardResponse extends BaseModelResponse implements BoardMessage {
+    public BoardResponse(BoardCommand command) {
+        super(command);
+    }
 
-  case class BoardRequestDetails(id: String, title: String)
-
-  case class BoardSummaryResponse(id: String, title: String)
-
-  case class ColumnRequestDetails(id: String, title: String)
-
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+    public BoardResponse(ValueMap json) {
+        super(json);
+    }
 }

@@ -152,5 +152,9 @@ public enum Fields {
     className,
     message,
     cause,
-    exception
+    exception,
+
+    boardId,
+    subject
+
 }

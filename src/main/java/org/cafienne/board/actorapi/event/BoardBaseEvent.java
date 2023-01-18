@@ -15,19 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.model
+package org.cafienne.board.actorapi.event;
 
-import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.event.BaseModelEvent;
+import org.cafienne.board.BoardActor;
+import org.cafienne.json.ValueMap;
 
-object BoardAPI {
-  //SEE BoardQueryProtocol
-  implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
+import java.io.IOException;
 
-  case class BoardRequestDetails(id: String, title: String)
+/**
+ */
+public abstract class BoardBaseEvent extends BaseModelEvent<BoardActor> implements BoardEvent {
+    protected BoardBaseEvent(BoardActor tenant) {
+        super(tenant);
+    }
 
-  case class BoardSummaryResponse(id: String, title: String)
+    protected BoardBaseEvent(ValueMap json) {
+        super(json);
+    }
 
-  case class ColumnRequestDetails(id: String, title: String)
-
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+    protected void writeBoardEvent(JsonGenerator generator) throws IOException {
+        super.writeModelEvent(generator);
+    }
 }

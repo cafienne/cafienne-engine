@@ -15,19 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.model
+package org.cafienne.board.actorapi;
 
-import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import org.cafienne.actormodel.message.UserMessage;
+import org.cafienne.board.BoardActor;
 
-object BoardAPI {
-  //SEE BoardQueryProtocol
-  implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
-
-  case class BoardRequestDetails(id: String, title: String)
-
-  case class BoardSummaryResponse(id: String, title: String)
-
-  case class ColumnRequestDetails(id: String, title: String)
-
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+public interface BoardMessage extends UserMessage {
+    @Override
+    default Class<BoardActor> actorClass() {
+        return BoardActor.class;
+    }
 }

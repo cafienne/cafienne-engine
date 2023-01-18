@@ -33,6 +33,8 @@ object Headers {
   final val TENANT_LAST_MODIFIED = "Tenant-Last-Modified"
 
   final val CONSENT_GROUP_LAST_MODIFIED = "Consent-Group-Last-Modified"
+
+  final val BOARD_LAST_MODIFIED = "Board-Last-Modified"
 }
 
 trait LastModifiedHeader {
@@ -68,6 +70,10 @@ case class ConsentGroupLastModifiedHeader(override val value: Option[String]) ex
   override val registration: LastModifiedRegistration = ConsentGroupReader.lastModifiedRegistration
 }
 
+case class BoardLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
+  override val name = Headers.BOARD_LAST_MODIFIED
+  override val registration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
+}
 
 object LastModifiedHeader {
   val NONE = new LastModifiedHeader {
@@ -78,6 +84,7 @@ object LastModifiedHeader {
     case Headers.CASE_LAST_MODIFIED => CaseLastModifiedHeader(headerValue)
     case Headers.TENANT_LAST_MODIFIED => TenantLastModifiedHeader(headerValue)
     case Headers.CONSENT_GROUP_LAST_MODIFIED => ConsentGroupLastModifiedHeader(headerValue)
+    case Headers.BOARD_LAST_MODIFIED => BoardLastModifiedHeader(headerValue)
     case _ => throw new Exception(s"Unrecognized last modified header $headerName")
   }
 }

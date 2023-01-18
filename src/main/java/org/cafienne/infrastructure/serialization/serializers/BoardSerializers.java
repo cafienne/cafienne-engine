@@ -15,19 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.model
+package org.cafienne.infrastructure.serialization.serializers;
 
-import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import org.cafienne.board.actorapi.event.BoardCreated;
+import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
 
-object BoardAPI {
-  //SEE BoardQueryProtocol
-  implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
+public class BoardSerializers {
+    public static void register() {
+        addBoardCommands();
+        addBoardEvents();
+    }
 
-  case class BoardRequestDetails(id: String, title: String)
+    private static void addBoardCommands() {
+    }
 
-  case class BoardSummaryResponse(id: String, title: String)
-
-  case class ColumnRequestDetails(id: String, title: String)
-
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+    private static void addBoardEvents() {
+        CafienneSerializer.addManifestWrapper(BoardCreated.class, BoardCreated::new);
+        CafienneSerializer.addManifestWrapper(BoardModified.class, BoardModified::new);
+    }
 }

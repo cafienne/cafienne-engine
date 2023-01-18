@@ -15,19 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.model
+package org.cafienne.actormodel.identity
 
-import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.json.{Value, ValueMap}
 
-object BoardAPI {
-  //SEE BoardQueryProtocol
-  implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
+case class BoardUser(id: String, boardId: String) extends UserIdentity {
+  override def toValue: Value[_] = new ValueMap(Fields.userId, id, Fields.boardId, boardId)
 
-  case class BoardRequestDetails(id: String, title: String)
+  val isOwner = true
+}
 
-  case class BoardSummaryResponse(id: String, title: String)
-
-  case class ColumnRequestDetails(id: String, title: String)
-
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+object BoardUser {
+  def deserialize(json: ValueMap): BoardUser = {
+    BoardUser(
+      id = json.readString(Fields.userId),
+      boardId = json.readString(Fields.boardId)
+    )
+  }
 }

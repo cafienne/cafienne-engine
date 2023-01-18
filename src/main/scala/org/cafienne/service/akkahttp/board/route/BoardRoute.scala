@@ -17,14 +17,13 @@
 
 package org.cafienne.service.akkahttp.board.route
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
-import org.cafienne.actormodel.identity.TenantUser
+import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.authentication.AuthenticatedUser
+import org.cafienne.board.actorapi.command.BoardCommand
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
 import org.cafienne.querydb.query.board.{BoardQueries, BoardQueriesImpl}
-import org.cafienne.service.akkahttp.Headers
-import org.cafienne.tenant.actorapi.command.TenantCommand
+import org.cafienne.service.akkahttp.{Headers, LastModifiedHeader}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -32,19 +31,14 @@ import scala.util.{Failure, Success}
 trait BoardRoute extends CommandRoute with QueryRoute {
   val boardQueries: BoardQueries = new BoardQueriesImpl
 
-  override val lastModifiedHeaderName: String = Headers.TENANT_LAST_MODIFIED
+  override val lastModifiedHeaderName: String = Headers.BOARD_LAST_MODIFIED
 
-  def boardUser(subRoute: TenantUser => Route): Route = {
+  def boardUser(subRoute: BoardUser => Route): Route = {
     authenticatedUser { user =>
-      pathPrefix(Segment) { group =>
-        optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { lastModified =>
-          onComplete(getBoardUser(user, group, lastModified)) {
-            case Success(tenantUser) =>
-              if (tenantUser.enabled) {
-                subRoute(tenantUser)
-              } else {
-                complete(StatusCodes.Unauthorized, s"The user account ${tenantUser.id} has been disabled")
-              }
+      pathPrefix(Segment) { boardId =>
+        readLastModifiedHeader() { lastModified =>
+          onComplete(getBoardUser(user, boardId, lastModified)) {
+            case Success(boardUser) => subRoute(boardUser)
             case Failure(t) => throw t
           }
         }
@@ -52,12 +46,12 @@ trait BoardRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def getBoardUser(user: AuthenticatedUser, tenant: String, lastModified: Option[String]): Future[TenantUser] = {
+  def getBoardUser(user: AuthenticatedUser, boardId: String, lastModified: LastModifiedHeader): Future[BoardUser] = {
     //runSyncedQuery(boardQueries.getTeamByBoards(user, tenant), lastModified)
-    Future.successful(TenantUser("id", "tenant", Set.empty, true, "Board User", "lana@example.com", true))
+    Future.successful(BoardUser("userId", boardId))
   }
 
-  def askBoard(command: TenantCommand): Route = {
+  def askBoard(command: BoardCommand): Route = {
     askModelActor(command)
   }
 }
