@@ -17,6 +17,7 @@
 
 package org.cafienne.cmmn.instance;
 
+import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileDefinition;
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinition;
 import org.cafienne.cmmn.instance.casefile.*;
@@ -49,7 +50,17 @@ public class Path implements Serializable {
      * @throws InvalidPathException
      */
     public Path(String rawPath) throws InvalidPathException {
-        this(convertRawPath(rawPath), rawPath);
+        this(convertRawPath(rawPath, true), rawPath);
+    }
+
+    /**
+     * Returns a path object in which the individual names keep any trailing spaces.
+     * @param rawPath
+     * @return
+     * @throws InvalidPathException
+     */
+    public static Path untrimmed(String rawPath) throws InvalidPathException {
+        return new Path(convertRawPath(rawPath, false), rawPath);
     }
 
     /**
@@ -104,6 +115,16 @@ public class Path implements Serializable {
 
     public Path(PlanItem<?> planItem) {
         this(planItem, null);
+    }
+
+    public Path(Path parent, ItemDefinition definition, int index) {
+        this.parent = parent;
+        this.root = this.parent.root;
+        this.child = null;
+        this.depth = this.parent.depth + 1;
+        this.name = definition.getName();
+        this.index = index;
+        this.originalPath = toString();
     }
 
     private Path(PlanItem<?> planItem, Path child) {
@@ -453,7 +474,7 @@ public class Path implements Serializable {
      * @return
      * @throws InvalidPathException
      */
-    private static String[] convertRawPath(String rawPath) throws InvalidPathException {
+    private static String[] convertRawPath(String rawPath, boolean trim) throws InvalidPathException {
         if (rawPath == null) {
             throw new InvalidPathException("Missing path parameter");
         }
@@ -470,9 +491,11 @@ public class Path implements Serializable {
         }
 
         String[] pathElements = rawPath.split("/");
-        for (int i=0; i<pathElements.length; i++) {
-//            System.out.println("part["+i+"] = '" + pathElements[i] + "'");
-            pathElements[i] = pathElements[i].trim();
+        if (trim) {
+            for (int i=0; i<pathElements.length; i++) {
+//              System.out.println("part["+i+"] = '" + pathElements[i] + "'");
+                pathElements[i] = pathElements[i].trim();
+            }
         }
         return pathElements;
     }

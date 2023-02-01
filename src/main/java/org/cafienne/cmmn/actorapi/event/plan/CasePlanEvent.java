@@ -57,7 +57,7 @@ public abstract class CasePlanEvent extends CaseBaseEvent {
         this.planItemId = json.readString(Fields.planItemId);
         // Stage id is promoted from only PlanItemCreated into each CasePlanEvent. Older events do not have it, and get an empty value.
         this.stageId = json.readString(Fields.stageId, "");
-        this.path = json.readPath(Fields.path, "");
+        this.path = Path.untrimmed(json.readString(Fields.path, ""));
         this.type = json.readEnum(Fields.type, PlanItemType.class);
         this.planItem = null; // Not available in event reading, except inside recovery of an event.
         this.index = readIndex(path, json);
