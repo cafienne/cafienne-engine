@@ -56,11 +56,11 @@ public abstract class PlanFragmentDefinition extends PlanItemDefinitionDefinitio
     /**
      * Retrieve the definition of the plan item with the specified identifier, or null if no plan item with this id is available within this PlanFragment or Stage
      *
-     * @param planItemId
+     * @param identifier
      * @return
      */
-    public PlanItemDefinition getPlanItem(String planItemId) {
-        return planItems.stream().filter(p -> p.getId().equals(planItemId) || p.getName().equals(planItemId)).findFirst().orElse(null);
+    public PlanItemDefinition getPlanItem(String identifier) {
+        return planItems.stream().filter(p -> p.getId().equals(identifier) || p.getName().equals(identifier)).findFirst().orElse(null);
     }
 
     /**

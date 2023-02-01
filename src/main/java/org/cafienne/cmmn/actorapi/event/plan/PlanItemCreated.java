@@ -35,13 +35,6 @@ import java.time.Instant;
 public class PlanItemCreated extends CasePlanEvent {
     public final String definitionId;
 
-    private static Path createPath(Path parent, ItemDefinition definition, int index) {
-        String parentPath = parent.isEmpty() ? "" : parent + "/";
-        boolean mayRepeat = !definition.getPlanItemControl().getRepetitionRule().isDefault();
-        String myPath = definition.getName() + (mayRepeat ? "[" + index + "]" : "");
-        return new Path(parentPath + myPath);
-    }
-
     public PlanItemCreated(Case caseInstance) {
         this(caseInstance, new Guid().toString(), "", new Path(""), caseInstance.getDefinition().getCasePlanModel(), 0);
     }
@@ -51,7 +44,7 @@ public class PlanItemCreated extends CasePlanEvent {
     }
 
     private PlanItemCreated(Case caseInstance, String planItemId, String parentStage, Path parentPath, ItemDefinition definition, int index) {
-        super(caseInstance, planItemId, parentStage, createPath(parentPath, definition, index), definition.getPlanItemDefinition().getItemType(), null);
+        super(caseInstance, planItemId, parentStage, new Path(parentPath, definition, index), definition.getPlanItemDefinition().getItemType(), null);
         this.definitionId = definition.getId();
     }
 
