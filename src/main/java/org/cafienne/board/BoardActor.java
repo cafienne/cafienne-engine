@@ -24,6 +24,7 @@ import org.cafienne.board.actorapi.command.BoardCommand;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardEvent;
 import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.board.definition.BoardDefinition;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ public class BoardActor extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(BoardActor.class);
 
     private String subject;
+
+    private BoardDefinition definition;
 
     public BoardActor(CaseSystem caseSystem) {
         super(caseSystem);
@@ -57,6 +60,10 @@ public class BoardActor extends ModelActor {
 
     public void updateState(BoardCreated boardCreated) {
         this.subject = boardCreated.subject;
+        this.definition = new BoardDefinition(this.subject);
+        definition.addColumn("test");
+        definition.addColumn("Bingo");
+        System.out.println("Created definition for board:  " + definition.caseDefinition().getDefinitionsDocument().getSource());
         this.setEngineVersion(boardCreated.engineVersion);
     }
 
