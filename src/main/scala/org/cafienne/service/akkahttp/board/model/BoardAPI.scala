@@ -32,5 +32,25 @@ object BoardAPI {
 
   case class ColumnRequestDetails(id: String, title: String)
 
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+  case class TeamMemberDetails(userId: String, name: Option[String], roles: Set[String])
+
+  //TODO Column is a duplicate also found in BoardQueryProtocol
+  final case class Column(
+                     id: String,
+                     position: Int,
+                     title: Option[String],
+                     role: Option[String],
+                     tasks: Seq[Task]
+                   )
+
+  final case class Task(
+                     id: String,
+                     subject: Option[String],
+                     description: Option[String],
+                     position: Int,
+                     caseInstanceId: String,
+                     claimedBy: Option[String]
+                   )
+
+  case class BoardResponse(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column])
 }
