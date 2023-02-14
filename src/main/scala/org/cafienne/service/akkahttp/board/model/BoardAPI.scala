@@ -18,6 +18,8 @@
 package org.cafienne.service.akkahttp.board.model
 
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 object BoardAPI {
   //SEE BoardQueryProtocol
@@ -32,5 +34,33 @@ object BoardAPI {
 
   case class ColumnRequestDetails(id: String, title: String)
 
-  case class TeamMemberDetails(userId: String, roles: Set[String])
+  case class TeamMemberDetails(userId: String, name: Option[String], roles: Set[String]) extends CafienneJson {
+    override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.name, name, Fields.roles, roles)
+  }
+
+  //TODO Column is a duplicate also found in BoardQueryProtocol
+  final case class Column(
+                     id: String,
+                     position: Int,
+                     title: Option[String],
+                     role: Option[String],
+                     tasks: Seq[Task]
+                   ) extends CafienneJson {
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, "position", position, Fields.title, title, Fields.role, role, "tasks", tasks)
+  }
+
+  final case class Task(
+                     id: String,
+                     subject: Option[String],
+                     description: Option[String],
+                     position: Int,
+                     caseInstanceId: String,
+                     claimedBy: Option[String]
+                   ) extends CafienneJson {
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.description, description, "position", position, Fields.caseInstanceId, caseInstanceId, "claimedBy", claimedBy)
+  }
+
+  case class BoardResponse(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column]) extends CafienneJson {
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.team, team, Fields.columns, columns)
+  }
 }

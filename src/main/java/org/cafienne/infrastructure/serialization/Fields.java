@@ -154,8 +154,11 @@ public enum Fields {
     cause,
     exception,
 
+    id,
     boardId,
     title,
-    subject
+    subject,
+
+    columns
 
 }
