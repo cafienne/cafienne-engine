@@ -60,7 +60,7 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBa
     caseEventsSubRoute { caseEvents =>
       path("history" / "events") {
         onComplete(caseEvents.eventList()) {
-          case Success(value) => completeJsonValue(Value.convert(value.map(_.event.rawJson())))
+          case Success(events) => completeJson(Value.convert(events.map(_.event.rawJson())))
           case Failure(err) => complete(StatusCodes.NotFound, err)
         }
       }
@@ -87,7 +87,7 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBa
     caseEventsSubRoute { caseEvents =>
       path("history" / "planitems") {
         onComplete(caseEvents.casePlanHistory()) {
-          case Success(value) => completeJsonValue(Value.convert(value.map(v => v.toValue)))
+          case Success(items) => completeJson(Value.convert(items.map(_.toValue)))
           case Failure(t) => handleFailure(t)
         }
       }
@@ -114,7 +114,7 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBa
     caseEventsSubRoute { caseEvents =>
       path("history" / "planitems" / Segment) { planItemId =>
         onComplete(caseEvents.planitemHistory(planItemId)) {
-          case Success(value) => completeJsonValue(value.toValue)
+          case Success(value) => completeJson(value)
           case Failure(t) => handleFailure(t)
         }
       }

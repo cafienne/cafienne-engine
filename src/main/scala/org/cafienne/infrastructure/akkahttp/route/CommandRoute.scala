@@ -17,7 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.marshalling.Marshaller
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives.{complete, onComplete, respondWithHeader, respondWithHeaders}
 import akka.http.scaladsl.server.{Directive0, Route}
@@ -27,7 +28,6 @@ import org.cafienne.actormodel.response._
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
-import org.cafienne.infrastructure.akkahttp.ResponseMarshallers._
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
@@ -42,6 +42,13 @@ trait CommandRoute extends AuthenticatedRoute {
 }
 
 object CommandRouteExecutor extends LazyLogging {
+  /**
+    * Simple CaseResponse converter to JSON
+    */
+  implicit val modelResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: ModelResponse =>
+    HttpEntity(ContentTypes.`application/json`, value.toJson.toString)
+  }
+
   def askModelActor(caseSystem: CaseSystem, command: ModelCommand): Route = {
     onComplete(caseSystem.gateway.request(command)) {
       case Success(value) =>

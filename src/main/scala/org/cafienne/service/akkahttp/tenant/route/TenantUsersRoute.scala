@@ -90,7 +90,7 @@ class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute 
         onComplete(userQueries.getTenantUser(tenantUser, userId)) {
           case Success(tenantUserInformation) =>
             if (tenantUserInformation.enabled) {
-              completeJsonValue(tenantUserInformation.toValue)
+              completeJson(tenantUserInformation)
             } else {
               // TODO: perhaps this should be allowed for tenant owners?
               if (tenantUser.isOwner) {

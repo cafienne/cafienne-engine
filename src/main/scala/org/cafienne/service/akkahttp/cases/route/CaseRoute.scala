@@ -215,7 +215,7 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
   def debugCase: Route = put {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("debug" / Segment) { debugMode =>
-        askCase(user, caseInstanceId, tenantUser => new SwitchDebugMode(tenantUser, caseInstanceId, debugMode == "true"))
+        askCase(user, caseInstanceId, caseMember => new SwitchDebugMode(caseMember, caseInstanceId, debugMode == "true"))
       }
     }
   }

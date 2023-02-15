@@ -62,7 +62,7 @@ class CaseMigrationRoute(override val caseSystem: CaseSystem) extends CasesRoute
         entity(as[MigrationDefinitionFormat]) { migrateDefinition =>
           val definitionsDocument = Cafienne.config.repository.DefinitionProvider.read(user, "", migrateDefinition.newDefinition)
           val caseDefinition = definitionsDocument.getFirstCase
-          askCase(user, caseInstanceId, tenantUser => new MigrateDefinition(tenantUser, caseInstanceId, caseDefinition))
+          askCase(user, caseInstanceId, caseMember => new MigrateDefinition(caseMember, caseInstanceId, caseDefinition))
         }
       }
     }

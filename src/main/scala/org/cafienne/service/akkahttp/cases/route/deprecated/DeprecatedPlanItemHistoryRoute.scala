@@ -36,7 +36,7 @@ class DeprecatedPlanItemHistoryRoute(override val caseSystem: CaseSystem) extend
           logger.warn(s"New: /${caseEvents.caseInstanceId}/history/planitems/$planItemId")
 
           onComplete(caseEvents.planitemHistory(planItemId)) {
-            case Success(value) => completeJsonValue(value.toValue)
+            case Success(value) => completeJson(value)
             case Failure(t) => handleFailure(t)
           }
         }
