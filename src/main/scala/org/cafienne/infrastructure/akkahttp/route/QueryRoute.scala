@@ -68,14 +68,14 @@ trait QueryRoute extends AuthenticatedRoute {
 
   def handleQueryResult[T <: CafienneJson](future: => Future[T]): Route = {
     onComplete(future) {
-      case Success(value) => completeJsonValue(value.toValue)
+      case Success(value) => completeJson(value.toValue)
       case Failure(t) => handleFailure(t)
     }
   }
 
   def handleQueryResultList[T <: CafienneJson](future: => Future[Seq[T]]): Route = {
     onComplete(future) {
-      case Success(value) => completeJsonValue(Value.convert(value.map(v => v.toValue)))
+      case Success(value) => completeJson(Value.convert(value.map(v => v.toValue)))
       case Failure(t) => handleFailure(t)
     }
   }

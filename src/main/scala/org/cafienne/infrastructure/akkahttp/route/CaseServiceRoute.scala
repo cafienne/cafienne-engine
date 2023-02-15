@@ -29,6 +29,8 @@ import org.cafienne.actormodel.response.ModelResponse
 import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
+import org.cafienne.util.XMLHelper
+import org.w3c.dom.Node
 
 import scala.collection.immutable.Seq
 
@@ -118,13 +120,15 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
 
-  def completeCafienneJSONSeq(seq: Seq[CafienneJson]): Route = {
-    completeJsonValue(Value.convert(seq.map(element => element.toValue)))
-  }
+  def completeJson(seq: Seq[CafienneJson]): Route = completeJson(StatusCodes.OK, Value.convert(seq.map(_.toValue)))
 
-  def completeJsonValue(v: Value[_]): Route = {
-    complete(StatusCodes.OK, HttpEntity(ContentTypes.`application/json`, v.toString))
-  }
+  def completeJson(c: CafienneJson): Route = completeJson(StatusCodes.OK, c.toValue)
+
+  def completeJson(v: Value[_]): Route = completeJson(StatusCodes.OK, v)
+
+  def completeJson(statusCode: StatusCode, v: Value[_]) = complete(statusCode, HttpEntity(ContentTypes.`application/json`, v.toString))
+
+  def completeXML(n: Node, statusCode: StatusCode = StatusCodes.OK): Route = complete(statusCode, HttpEntity(ContentTypes.`text/xml(UTF-8)`, XMLHelper.printXMLNode(n)))
 
   private var concatenatedSubRoutes: Option[Route] = None
 

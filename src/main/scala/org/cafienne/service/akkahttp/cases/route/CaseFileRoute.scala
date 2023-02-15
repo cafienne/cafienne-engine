@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.actorapi.command.casefile.{CreateCaseFileItem, DeleteCaseFileItem, ReplaceCaseFileItem, UpdateCaseFileItem}
 import org.cafienne.cmmn.instance
-import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
+import org.cafienne.infrastructure.akkahttp.HttpJsonReader._
 import org.cafienne.json.Value
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem

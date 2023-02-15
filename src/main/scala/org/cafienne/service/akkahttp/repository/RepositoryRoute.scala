@@ -30,7 +30,7 @@ import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.cmmn.definition.{DefinitionsDocument, InvalidDefinitionException}
 import org.cafienne.cmmn.repository.{MissingDefinitionException, WriteDefinitionException}
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
+import org.cafienne.infrastructure.akkahttp.HttpXmlReader._
 import org.cafienne.infrastructure.akkahttp.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
 import org.cafienne.system.CaseSystem
@@ -70,11 +70,11 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
         try {
           logger.debug(s"Loading definitions '$modelName' from tenant '$tenant'")
           val model = Cafienne.config.repository.DefinitionProvider.read(platformUser, tenant, modelName)
-          complete(StatusCodes.OK, model.getDocument)
+          completeXML(model.getDocument)
         }
         catch {
           case m: MissingDefinitionException => complete(StatusCodes.NotFound, "A model with name " + modelName + " cannot be found")
-          case i: InvalidDefinitionException => complete(StatusCodes.InternalServerError, i.toXML)
+          case i: InvalidDefinitionException => completeXML(i.toXML, StatusCodes.InternalServerError)
           case t: MissingTenantException => complete(StatusCodes.BadRequest, t.getMessage)
           case other: Exception => {
             logger.error("Unexpected loading failure", other)
@@ -120,7 +120,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
           val model = new ValueMap("definitions", file, "description", description)
           models.withArray("models").add(model)
         }
-        completeJsonValue(models)
+        completeJson(models)
       }
       }
     }

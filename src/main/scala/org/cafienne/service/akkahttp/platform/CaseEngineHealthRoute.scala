@@ -77,7 +77,7 @@ class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseSer
   def health = get {
     pathPrefix("health") {
       pathEndOrSingleSlash {
-        completeJsonValue(HealthMonitor.report)
+        completeJson(HealthMonitor.report)
       }
     }
   }
@@ -96,7 +96,7 @@ class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseSer
   @Produces(Array("application/json"))
   def version = get {
     path("version") {
-      completeJsonValue(Cafienne.version.json)
+      completeJson(Cafienne.version.json)
     }
   }
 }

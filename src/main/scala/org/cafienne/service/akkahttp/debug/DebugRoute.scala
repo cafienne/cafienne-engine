@@ -67,7 +67,7 @@ class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
       optionalUser { platformUser =>
         parameters("from".?(0L), "to".?(Long.MaxValue)) { (from: Long, to: Long) => {
           onComplete(modelEventsReader.getEvents(platformUser, modelId, from, to)) {
-            case Success(value) => completeJsonValue(value)
+            case Success(value) => completeJson(value)
             case Failure(err) => complete(StatusCodes.NotFound, err)
           }
         }

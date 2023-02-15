@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.humantask.actorapi.command._
-import org.cafienne.infrastructure.akkahttp.ValueMarshallers._
+import org.cafienne.infrastructure.akkahttp.HttpJsonReader._
 import org.cafienne.json.ValueMap
 import org.cafienne.service.akkahttp.tasks.model.TaskAPI._
 import org.cafienne.system.CaseSystem
