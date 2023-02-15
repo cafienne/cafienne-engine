@@ -24,7 +24,9 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/board")
 class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute {
+
   import org.cafienne.querydb.query.board.BoardQueryProtocol._
+
   override def routes: Route = concat(getBoards, getTeam, getBoard, addTeam)
 
   @Path("/")
@@ -66,36 +68,38 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
   @Produces(Array("application/json"))
   def getBoard: Route = get {
     boardUser { boardUser =>
-        //TODO something like boardQueries.getBoard(boardId)
-        caseSystem.system.log.error(s"Found : $boardUser")
-        val team = Seq(
-          TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
-          TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
-        )
-        val columns = Seq(
-          BoardAPI.Column("column1", 0, Some("First Column"), Some("INTAKE_ROLE"),
-              Seq(BoardAPI.Task("task1", Some("Task 1"), Some("Task 1 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
-              Seq(BoardAPI.Task("task2", Some("Task 2"), Some("Task 2 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", Some(boardUser.id)),
-              Seq(BoardAPI.Task("task3", Some("Task 3"), Some("Task 3 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", None),
-            )
-          ),
-          BoardAPI.Column("column2", 1, Some("Second Column"), Some("BOARD_MANAGER"),
-              Seq(BoardAPI.Task("task4", Some("Task 4"), Some("Task 4 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
-              Seq(BoardAPI.Task("task5", Some("Task 5"), Some("Task 5 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", Some(boardUser.id)),
-              Seq(BoardAPI.Task("task6", Some("Task 6"), Some("Task 6 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", Some("userId2")),
-            )
-          ),
-          BoardAPI.Column("column3", 2, Some("Third Column"), Some("BOARD_MANAGER"),
-              Seq(BoardAPI.Task("task1", Some("Task 7"), Some("Task 7 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
-              Seq(BoardAPI.Task("task2", Some("Task 8"), Some("Task 8 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", None),
-              Seq(BoardAPI.Task("task3", Some("Task 9"), Some("Task 9 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", None),
-            )
+      //TODO something like boardQueries.getBoard(boardId)
+      caseSystem.system.log.error(s"Found : $boardUser")
+      val team = Seq(
+        TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
+        TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
+      )
+      val columns = Seq(
+        BoardAPI.Column("column1", 0, Some("First Column"), Some("INTAKE_ROLE"),
+          Seq(
+            BoardAPI.Task("task1", Some("Task 1"), Some("Task 1 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
+            BoardAPI.Task("task2", Some("Task 2"), Some("Task 2 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", Some(boardUser.id)),
+            BoardAPI.Task("task3", Some("Task 3"), Some("Task 3 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", None),
+          )
+        ),
+        BoardAPI.Column("column2", 1, Some("Second Column"), Some("BOARD_MANAGER"),
+          Seq(
+            BoardAPI.Task("task4", Some("Task 4"), Some("Task 4 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
+            BoardAPI.Task("task5", Some("Task 5"), Some("Task 5 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", Some(boardUser.id)),
+            BoardAPI.Task("task6", Some("Task 6"), Some("Task 6 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", Some("userId2")),
+          )
+        ),
+        BoardAPI.Column("column3", 2, Some("Third Column"), Some("BOARD_MANAGER"),
+          Seq(BoardAPI.Task("task1", Some("Task 7"), Some("Task 7 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
+            BoardAPI.Task("task2", Some("Task 8"), Some("Task 8 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", None),
+            BoardAPI.Task("task3", Some("Task 9"), Some("Task 9 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", None),
           )
         )
-        val response = BoardResponse("boardid1", Some("Board Title"), team, columns)
-        complete(StatusCodes.OK, response)
-      }
+      )
+      val response = BoardResponse("boardid1", Some("Board Title"), team, columns)
+      completeJson(response)
     }
+  }
 
   @Path("/{board}/team")
   @GET
@@ -119,7 +123,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
           TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
           TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
         )
-        complete(StatusCodes.OK, team)
+        completeJson(team)
       }
     }
   }
