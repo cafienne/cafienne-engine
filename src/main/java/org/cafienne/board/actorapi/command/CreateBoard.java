@@ -23,7 +23,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.event.BoardCreated;
-import org.cafienne.board.actorapi.response.BoardResponse;
+import org.cafienne.board.actorapi.response.BoardCreatedResponse;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -35,8 +35,8 @@ import java.io.IOException;
 public class CreateBoard extends BoardCommand implements BootstrapMessage {
     public final String title;
 
-    public CreateBoard(BoardUser user, String boardId, String title) {
-        super(user, boardId);
+    public CreateBoard(BoardUser user, String title) {
+        super(user);
         this.title = title;
     }
 
@@ -58,7 +58,7 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
     @Override
     public void process(BoardActor board) {
         board.addEvent(new BoardCreated(board, title));
-        setResponse(new BoardResponse(this));
+        setResponse(new BoardCreatedResponse(this, board.getId()));
     }
 
     @Override

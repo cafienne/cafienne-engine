@@ -15,21 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.response;
+package org.cafienne.board.actorapi
 
-import org.cafienne.actormodel.response.BaseModelResponse;
-import org.cafienne.board.actorapi.BoardMessage;
-import org.cafienne.board.actorapi.command.BoardCommand;
-import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.ValueMap;
+import org.cafienne.actormodel.message.UserMessage
+import org.cafienne.board.BoardActor
 
-@Manifest
-public class BoardResponse extends BaseModelResponse implements BoardMessage {
-    public BoardResponse(BoardCommand command) {
-        super(command);
-    }
-
-    public BoardResponse(ValueMap json) {
-        super(json);
-    }
+trait BoardMessage extends UserMessage {
+  override def actorClass(): Class[_] = classOf[BoardActor]
 }

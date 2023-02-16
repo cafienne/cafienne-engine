@@ -15,14 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi;
+package org.cafienne.board.actorapi.event.definition;
 
-import org.cafienne.actormodel.message.UserMessage;
 import org.cafienne.board.BoardActor;
+import org.cafienne.board.actorapi.event.BoardBaseEvent;
+import org.cafienne.json.ValueMap;
 
-public interface BoardMessage extends UserMessage {
+public abstract class BoardDefinitionEvent extends BoardBaseEvent {
+
+    public BoardDefinitionEvent(BoardActor board) {
+        super(board);
+    }
+
+    public BoardDefinitionEvent(ValueMap json) {
+        super(json);
+    }
+
     @Override
-    default Class<BoardActor> actorClass() {
-        return BoardActor.class;
+    public void updateState(BoardActor board) {
+        board.updateState(this);
     }
 }

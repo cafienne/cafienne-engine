@@ -15,46 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.event;
+package org.cafienne.board.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.board.actorapi.command.definition.column.AddColumnDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 @Manifest
-public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessage {
-    public final String title;
-    public final CafienneVersion engineVersion;
+public class ColumnAddedResponse extends BoardResponse {
+    public final String columnId;
 
-    public BoardCreated(BoardActor board, String title) {
-        super(board);
-        this.title = title;
-        this.engineVersion = Cafienne.version();
+    public ColumnAddedResponse(AddColumnDefinition command, String columnId) {
+        super(command);
+        this.columnId = columnId;
     }
 
-    public BoardCreated(ValueMap json) {
+    public ColumnAddedResponse(ValueMap json) {
         super(json);
-        this.title = json.readString(Fields.title);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.columnId = json.readString(Fields.columnId);
     }
 
     @Override
-    public void updateState(BoardActor board) {
-        board.updateState(this);
+    public Value<?> toJson() {
+        return new ValueMap(Fields.columnId, columnId);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeBoardEvent(generator);
-        writeField(generator, Fields.title, title);
-        writeField(generator, Fields.engineVersion, engineVersion.json());
+        super.write(generator);
+        writeField(generator, Fields.columnId, columnId);
     }
 }

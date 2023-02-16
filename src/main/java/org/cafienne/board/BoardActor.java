@@ -24,6 +24,7 @@ import org.cafienne.board.actorapi.command.BoardCommand;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardEvent;
 import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
 import org.cafienne.board.definition.BoardDefinition;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
@@ -35,9 +36,7 @@ import org.slf4j.LoggerFactory;
 public class BoardActor extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(BoardActor.class);
 
-    private String subject;
-
-    private BoardDefinition definition;
+    private BoardDefinition definition = new BoardDefinition(this.getId());
 
     public BoardActor(CaseSystem caseSystem) {
         super(caseSystem);
@@ -58,13 +57,25 @@ public class BoardActor extends ModelActor {
         return logger;
     }
 
+    public BoardDefinition getDefinition() {
+        return definition;
+    }
+
     public void updateState(BoardCreated boardCreated) {
-        this.subject = boardCreated.subject;
-        this.definition = new BoardDefinition(this.subject);
-        definition.addColumn("test");
-        definition.addColumn("Bingo");
-        System.out.println("Created definition for board:  " + definition.caseDefinition().getDefinitionsDocument().getSource());
+        definition.updateState(boardCreated);
         this.setEngineVersion(boardCreated.engineVersion);
+    }
+
+    public void updateState(BoardDefinitionEvent event) {
+        definition.updateState(event);
+        // And now, with the updated definition, we should iterate through all our case instances
+        //  and update their case definitions ...
+        //  Probably only when recovery is not running ...
+        addDebugInfo(() -> "Updated definition of board "+getId()+" to:  " + definition.caseDefinition().getDefinitionsDocument().getSource());
+
+        if (recoveryFinished()) {
+            System.out.println("Update case definitions of currently active flows");
+        }
     }
 
     @Override

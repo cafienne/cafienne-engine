@@ -15,46 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.event;
+package org.cafienne.board.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
+import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.board.actorapi.command.CreateBoard;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 @Manifest
-public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessage {
-    public final String title;
-    public final CafienneVersion engineVersion;
+public class BoardCreatedResponse extends BoardResponse {
+    public final String boardId;
 
-    public BoardCreated(BoardActor board, String title) {
-        super(board);
-        this.title = title;
-        this.engineVersion = Cafienne.version();
+    public BoardCreatedResponse(CreateBoard command, String boardId) {
+        super(command);
+        this.boardId = boardId;
     }
 
-    public BoardCreated(ValueMap json) {
+    public BoardCreatedResponse(ValueMap json) {
         super(json);
-        this.title = json.readString(Fields.title);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
+        this.boardId = json.readString(Fields.boardId);
     }
 
     @Override
-    public void updateState(BoardActor board) {
-        board.updateState(this);
+    public Value<?> toJson() {
+        return new ValueMap(Fields.boardId, boardId);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeBoardEvent(generator);
-        writeField(generator, Fields.title, title);
-        writeField(generator, Fields.engineVersion, engineVersion.json());
+        super.write(generator);
+        writeField(generator, Fields.boardId, boardId);
     }
 }

@@ -20,19 +20,25 @@ package org.cafienne.service.akkahttp.board.model
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import org.cafienne.util.Guid
 
 object BoardAPI {
   //SEE BoardQueryProtocol
   implicit val boardRequestReader: EntityReader[BoardRequestDetails] = entityReader[BoardRequestDetails]
+  implicit val boardUpdateReader: EntityReader[BoardDefinitionUpdate] = entityReader[BoardDefinitionUpdate]
   implicit val boardSummaryResponseReader: EntityReader[BoardSummaryResponse] = entityReader[BoardSummaryResponse]
   implicit val columnRequestDetailsReader: EntityReader[ColumnRequestDetails] = entityReader[ColumnRequestDetails]
+  implicit val columnUpdateDetailsReader: EntityReader[ColumnUpdateDetails] = entityReader[ColumnUpdateDetails]
   implicit val teamMemberDetailsReader: EntityReader[TeamMemberDetails] = entityReader[TeamMemberDetails]
 
-  case class BoardRequestDetails(id: String, title: String)
+  case class BoardRequestDetails(id: Option[String], title: String)
+  case class BoardDefinitionUpdate(title: Option[String], form: Option[ValueMap])
 
   case class BoardSummaryResponse(id: String, title: String)
 
-  case class ColumnRequestDetails(id: String, title: String)
+  case class ColumnRequestDetails(id: String = new Guid().toString, title: String, form: Option[ValueMap])
+
+  case class ColumnUpdateDetails(title: Option[String], form: Option[ValueMap])
 
   case class TeamMemberDetails(userId: String, name: Option[String], roles: Set[String]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.name, name, Fields.roles, roles)

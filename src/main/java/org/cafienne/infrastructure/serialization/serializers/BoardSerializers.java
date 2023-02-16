@@ -18,9 +18,17 @@
 package org.cafienne.infrastructure.serialization.serializers;
 
 import org.cafienne.board.actorapi.command.CreateBoard;
+import org.cafienne.board.actorapi.command.definition.column.AddColumnDefinition;
+import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition;
+import org.cafienne.board.actorapi.command.definition.column.UpdateColumnDefinition;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded;
+import org.cafienne.board.actorapi.event.definition.ColumnDefinitionUpdated;
+import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated;
+import org.cafienne.board.actorapi.response.BoardCreatedResponse;
 import org.cafienne.board.actorapi.response.BoardResponse;
+import org.cafienne.board.actorapi.response.ColumnAddedResponse;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 
 public class BoardSerializers {
@@ -32,14 +40,22 @@ public class BoardSerializers {
 
     private static void addBoardCommands() {
         CafienneSerializer.addManifestWrapper(CreateBoard.class, CreateBoard::new);
+        CafienneSerializer.addManifestWrapper(UpdateBoardDefinition.class, UpdateBoardDefinition::deserialize);
+        CafienneSerializer.addManifestWrapper(AddColumnDefinition.class, AddColumnDefinition::deserialize);
+        CafienneSerializer.addManifestWrapper(UpdateColumnDefinition.class, UpdateColumnDefinition::deserialize);
     }
 
     private static void addBoardEvents() {
         CafienneSerializer.addManifestWrapper(BoardCreated.class, BoardCreated::new);
+        CafienneSerializer.addManifestWrapper(BoardDefinitionUpdated.class, BoardDefinitionUpdated::new);
+        CafienneSerializer.addManifestWrapper(ColumnDefinitionAdded.class, ColumnDefinitionAdded::new);
+        CafienneSerializer.addManifestWrapper(ColumnDefinitionUpdated.class, ColumnDefinitionUpdated::new);
         CafienneSerializer.addManifestWrapper(BoardModified.class, BoardModified::new);
     }
 
     private static void addBoardResponses() {
         CafienneSerializer.addManifestWrapper(BoardResponse.class, BoardResponse::new);
+        CafienneSerializer.addManifestWrapper(BoardCreatedResponse.class, BoardCreatedResponse::new);
+        CafienneSerializer.addManifestWrapper(ColumnAddedResponse.class, ColumnAddedResponse::new);
     }
 }

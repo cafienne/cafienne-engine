@@ -120,6 +120,16 @@ public interface CafienneSerializable {
         }
     }
 
+
+    default void writeField(JsonGenerator generator, Object fieldName, scala.Option<?> value) throws IOException {
+        if (value == null || value.isEmpty()) {
+            generator.writeNullField(String.valueOf(fieldName));
+        } else {
+            writeField(generator, fieldName, Value.convert(value.get()));
+        }
+    }
+
+
     default void writeField(JsonGenerator generator, Object fieldName, String value) throws IOException {
         if (value == null) {
             generator.writeNullField(String.valueOf(fieldName));

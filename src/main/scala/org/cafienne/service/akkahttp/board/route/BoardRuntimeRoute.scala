@@ -42,7 +42,6 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
   @Produces(Array("application/json"))
   def getBoards: Route = get {
     authenticatedUser { user =>
-      caseSystem.system.log.error(s"Found : $user")
       pathEndOrSingleSlash {
         //TODO something like: boardQueries.getBoards(boardUser.toString)
         // NOTE that this response should be of BoardSummaryResponse (giving a selection of the data available)
@@ -69,7 +68,6 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
   def getBoard: Route = get {
     boardUser { boardUser =>
       //TODO something like boardQueries.getBoard(boardId)
-      caseSystem.system.log.error(s"Found : $boardUser")
       val team = Seq(
         TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
         TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),

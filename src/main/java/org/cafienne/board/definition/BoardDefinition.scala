@@ -1,32 +1,55 @@
 package org.cafienne.board.definition
 
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.board.actorapi.event.BoardCreated
+import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionUpdated}
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
-import org.cafienne.util.{Guid, XMLHelper}
+import org.cafienne.json.ValueMap
+import org.cafienne.util.XMLHelper
 import org.w3c.dom.Document
 
 import scala.collection.mutable.ListBuffer
 
-class BoardDefinition(val title: String) {
-
-  /**
-    * Used inside case definition to have unique element names
-    */
-  val guid = new Guid().toString
+/**
+  *
+  * @param boardId - Resembles in the case definition
+  */
+class BoardDefinition(val boardId: String) extends LazyLogging {
   /**
     * Identifier of case file item holding board metadata such as title.
     */
-  val boardFileIdentifier = s"_${guid}_BoardMetadata"
+  val boardFileIdentifier = s"_${boardId}_BoardMetadata"
   /**
     * Identifier of case file item holding board free format data.
     */
-  val dataFileIdentifier = s"_${guid}_Data"
+  val dataFileIdentifier = s"_${boardId}_Data"
 
   /**
     * List of columns defined in the board
     */
   val columns: ListBuffer[ColumnDefinition] = ListBuffer()
 
-  def startFlowForm = ""
+  private var title: String = ""
+
+  private var startForm: ValueMap = new ValueMap()
+
+  def getTitle: String = title
+
+  def getStartForm: ValueMap = startForm
+
+  def updateState(event: BoardDefinitionEvent): Unit = event match {
+    case event: BoardCreated => title = event.title
+    case event: BoardDefinitionUpdated =>
+      this.title = event.title.getOrElse(this.title)
+      this.startForm = event.form.getOrElse(this.startForm)
+    case event: ColumnDefinitionAdded => new ColumnDefinition(event.columnId, this, columns.lastOption).updateState(event)
+    case event: ColumnDefinitionUpdated => {
+      val column = columns.find(_.columnId == event.columnId).get
+      column.updateState(event)
+    }
+    case other => logger.warn(s"Board Definition cannot handle event of type ${other.getClass.getName}")
+  }
+
   def caseDefinition: CaseDefinition = {
     val string =
       s"""<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
@@ -43,7 +66,7 @@ class BoardDefinition(val title: String) {
          |            <caseFileItem id="${boardFileIdentifier}" name="BoardMetadata" multiplicity="ExactlyOne" definitionRef="ttpboard.cfid"/>
          |            <caseFileItem id="${dataFileIdentifier}" name="Data" multiplicity="ExactlyOne" definitionRef="ttpdata.cfid"/>
          |        </caseFileModel>
-         |        <casePlanModel id="cm__${guid}_0" name="${title}" autoComplete="true">
+         |        <casePlanModel id="cm__${boardId}_0" name="${title}" autoComplete="true">
          |            ${columns.map(_.planItemXML).mkString("\n")}
          |            ${columns.map(_.humanTaskXML).mkString("\n")}
          |
@@ -52,7 +75,7 @@ class BoardDefinition(val title: String) {
          |        <input id="_in_case_${dataFileIdentifier}" name="Data" bindingRef="${dataFileIdentifier}"/>
          |        <extensionElements mustUnderstand="false">
          |          <cafienne:start-case-model xmlns:cafienne="org.cafienne">
-         |            ${startFlowForm}
+         |            <![CDATA[${startForm.toString}]]>
          |          </cafienne:start-case-model>
          |        </extensionElements>
          |    </case>
@@ -62,7 +85,7 @@ class BoardDefinition(val title: String) {
     definitions.getFirstCase
   }
 
-  def addColumn(title: String): Unit = {
-    new ColumnDefinition(title, this, columns.lastOption)
+  def addColumn(columnId: String, title: String, form: ValueMap): Unit = {
+    new ColumnDefinition(columnId, this, columns.lastOption)
   }
 }
