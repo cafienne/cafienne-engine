@@ -15,14 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.event;
+package org.cafienne.board.actorapi.event.definition;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
-import org.cafienne.infrastructure.Cafienne;
-import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -30,31 +26,30 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessage {
-    public final String title;
-    public final CafienneVersion engineVersion;
+public class ColumnDefinitionUpdated extends BoardDefinitionEvent {
+    public final String columnId;
+    public final scala.Option<String> title;
+    public final scala.Option<ValueMap> form;
 
-    public BoardCreated(BoardActor board, String title) {
+    public ColumnDefinitionUpdated(BoardActor board, String columnId, scala.Option<String> title, scala.Option<ValueMap> form) {
         super(board);
+        this.columnId = columnId;
         this.title = title;
-        this.engineVersion = Cafienne.version();
+        this.form = form;
     }
 
-    public BoardCreated(ValueMap json) {
+    public ColumnDefinitionUpdated(ValueMap json) {
         super(json);
-        this.title = json.readString(Fields.title);
-        this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
-    }
-
-    @Override
-    public void updateState(BoardActor board) {
-        board.updateState(this);
+        this.columnId = json.readString(Fields.columnId);
+        this.title = json.readOption(Fields.title);
+        this.form = json.readOptionalMap(Fields.form);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeBoardEvent(generator);
+        writeField(generator, Fields.columnId, columnId);
         writeField(generator, Fields.title, title);
-        writeField(generator, Fields.engineVersion, engineVersion.json());
+        writeField(generator, Fields.form, form);
     }
 }

@@ -15,35 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command;
+package org.cafienne.board.actorapi.command.definition;
 
-import org.cafienne.actormodel.command.BaseModelCommand;
+import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.BoardMessage;
-import org.cafienne.json.ValueMap;
+import org.cafienne.board.actorapi.command.BoardCommand;
 
 /**
  * Base class for sending commands to a TenantActor
  */
-public abstract class BoardCommand extends BaseModelCommand<BoardActor, BoardUser> implements BoardMessage {
+public abstract class BoardDefinitionCommand extends BoardCommand {
     /**
      * Create a new command that can be sent to the board.
      *
      * @param user The user that issues this command.
      */
-    protected BoardCommand(BoardUser user) {
-        super(user, user.boardId());
-    }
-
-    protected BoardCommand(ValueMap json) {
-        super(json);
-    }
-
-    @Override
-    protected BoardUser readUser(ValueMap json) {
-        return BoardUser.deserialize(json);
+    protected BoardDefinitionCommand(BoardUser user) {
+        super(user);
     }
 
     /**
@@ -53,5 +43,8 @@ public abstract class BoardCommand extends BaseModelCommand<BoardActor, BoardUse
      * @throws InvalidCommandException If the command is invalid
      */
     public void validate(BoardActor tenant) throws InvalidCommandException {
+        if (! getUser().isOwner()) {
+            throw new AuthorizationException("Only bord managers can change board definitions");
+        }
     }
 }

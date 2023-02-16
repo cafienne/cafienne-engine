@@ -23,7 +23,7 @@ import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response._
-import org.cafienne.board.actorapi.response.BoardResponse
+import org.cafienne.board.actorapi.response.{BoardCreatedResponse, BoardResponse, ColumnAddedResponse}
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
@@ -44,18 +44,30 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
     onComplete(caseSystem.gateway.request(command)) {
       case Success(value) =>
         value match {
-          case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
-          case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
-          case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
-          case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
-          case value: HumanTaskResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.CASE_LAST_MODIFIED)
-          case _: CaseNotModifiedResponse => complete(StatusCodes.NotModified, "Transition has no effect")
-          case value: CaseResponse => completeWithLMH(StatusCodes.OK, value, Headers.CASE_LAST_MODIFIED)
-          case value: BoardResponse => completeOnlyLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
-          case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
-          case value: TenantResponse => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
-          case value: ConsentGroupCreatedResponse => completeWithLMH(StatusCodes.OK, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
-          case value: ConsentGroupResponse => completeOnlyLMH(StatusCodes.Accepted, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
+          case e: CommandFailure => value match {
+            case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
+            case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
+            case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
+            case _ => complete(StatusCodes.BadRequest, e.exception.getMessage)
+          }
+          case value: CaseResponse => value match {
+            case value: HumanTaskResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.CASE_LAST_MODIFIED)
+            case _: CaseNotModifiedResponse => complete(StatusCodes.NotModified, "Transition has no effect")
+            case other => completeWithLMH(StatusCodes.OK, other, Headers.CASE_LAST_MODIFIED)
+          }
+          case value: BoardResponse => value match {
+            case value: BoardCreatedResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
+            case value: ColumnAddedResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
+            case value => completeOnlyLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
+          }
+          case value: TenantResponse => value match {
+            case value: TenantOwnersResponse => complete(StatusCodes.OK, value)
+            case _ => completeOnlyLMH(StatusCodes.NoContent, value, Headers.TENANT_LAST_MODIFIED)
+          }
+          case value: ConsentGroupResponse => value match {
+            case value: ConsentGroupCreatedResponse => completeWithLMH(StatusCodes.OK, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
+            case _ => completeOnlyLMH(StatusCodes.Accepted, value, Headers.CONSENT_GROUP_LAST_MODIFIED)
+          }
           case other => // Unknown new type of response that is not handled
             logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
             complete(StatusCodes.OK)

@@ -1,23 +1,39 @@
 package org.cafienne.board.definition
 
-class ColumnDefinition(val name: String = "Column", val board: BoardDefinition, val previous: Option[ColumnDefinition] = None) {
+import org.cafienne.board.actorapi.event.definition.{ColumnDefinitionAdded, ColumnDefinitionUpdated}
+import org.cafienne.json.ValueMap
+
+class ColumnDefinition(val columnId: String, val board: BoardDefinition, val previous: Option[ColumnDefinition]) {
   val position = board.columns.size
   board.columns += this // This implicitly increases count of next column
 
-  private val columnIdentifier = s"${board.guid}_${position}"
+  private val columnIdentifier = s"${board.boardId}_${position}"
   private val sentryIdentifier = previous.fold("")(_ => s"crit__${columnIdentifier}")
   private val taskIdentifier = s"ht__${columnIdentifier}"
 
   lazy val entryCriterion: String = previous.fold("")(_ => {
-    s"""<entryCriterion id="_entry_${board.guid}_${position}" name="EntryCriterion_${position}" sentryRef="${sentryIdentifier}"/>"""
+    s"""<entryCriterion id="_entry_${board.boardId}_${position}" name="EntryCriterion_${position}" sentryRef="${sentryIdentifier}"/>"""
   })
   lazy val sentry: String = previous.fold("")(column => {
     s"""<sentry id="${sentryIdentifier}">
-       |   <planItemOnPart id="_${board.guid}_7" sourceRef="pi_ht__${column.columnIdentifier}">
+       |   <planItemOnPart id="_${board.boardId}_7" sourceRef="pi_ht__${column.columnIdentifier}">
        |      <standardEvent>complete</standardEvent>
        |   </planItemOnPart>
        |</sentry>""".stripMargin
   })
+
+  private var name: String = ""
+  private var form: ValueMap = new ValueMap()
+
+  def updateState(event: ColumnDefinitionAdded): Unit = {
+    this.name = event.title
+    this.form = event.form.getOrElse(this.form)
+  }
+
+  def updateState(event: ColumnDefinitionUpdated): Unit = {
+    this.name = event.title.getOrElse(this.name)
+    this.form = event.form.getOrElse(this.form)
+  }
 
   def planItemXML: String = {
     s"""<planItem id="pi_ht__${columnIdentifier}" name="${name}" definitionRef="${taskIdentifier}">
@@ -25,8 +41,6 @@ class ColumnDefinition(val name: String = "Column", val board: BoardDefinition, 
        |      </planItem>
        |${sentry}""".stripMargin
   }
-
-  lazy val form: String = ""
 
   def humanTaskXML: String = {
     val metadata = s"${columnIdentifier}_BoardMetadata"
@@ -47,12 +61,12 @@ class ColumnDefinition(val name: String = "Column", val board: BoardDefinition, 
        |            <input id="in_${columnIdentifier}_Data" name="Data"/>
        |            <output id="out_${columnIdentifier}_BoardMetadata" name="BoardMetadata"/>
        |            <output id="out_${columnIdentifier}_Data" name="Data"/>
-       |            <parameterMapping id="_${board.guid}_12" sourceRef="${inMetadata}" targetRef="in_${columnIdentifier}_BoardMetadata"/>
-       |            <parameterMapping id="_${board.guid}_13" sourceRef="${inData}" targetRef="in_${columnIdentifier}_Data"/>
-       |            <parameterMapping id="_${board.guid}_14" sourceRef="out_${columnIdentifier}_BoardMetadata" targetRef="${outMetadata}"/>
-       |            <parameterMapping id="_${board.guid}_15" sourceRef="out_${columnIdentifier}_Data" targetRef="${outData}"/>
+       |            <parameterMapping id="_${board.boardId}_12" sourceRef="${inMetadata}" targetRef="in_${columnIdentifier}_BoardMetadata"/>
+       |            <parameterMapping id="_${board.boardId}_13" sourceRef="${inData}" targetRef="in_${columnIdentifier}_Data"/>
+       |            <parameterMapping id="_${board.boardId}_14" sourceRef="out_${columnIdentifier}_BoardMetadata" targetRef="${outMetadata}"/>
+       |            <parameterMapping id="_${board.boardId}_15" sourceRef="out_${columnIdentifier}_Data" targetRef="${outData}"/>
        |            <task-model>
-       |                ${form}
+       |                ${form.toString}
        |            </task-model>
        |        </cafienne:implementation>
        |    </extensionElements>

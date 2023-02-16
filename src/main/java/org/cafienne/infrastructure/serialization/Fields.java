@@ -157,6 +157,7 @@ public enum Fields {
     id,
     boardId,
     title,
+    columnId,
     subject,
 
     columns

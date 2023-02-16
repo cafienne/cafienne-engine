@@ -27,8 +27,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.board.actorapi.command.CreateBoard
+import org.cafienne.board.actorapi.command.definition.{AddColumnDefinition, UpdateBoardDefinition, UpdateColumnDefinition}
 import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
+import org.cafienne.util.Guid
 
 import javax.ws.rs._
 
@@ -36,7 +38,7 @@ import javax.ws.rs._
 @Path("/board")
 class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRoute {
 
-  override def routes: Route = concat(createBoard, addColumn, removeColumn, addOrReplaceTaskForm, addOrReplaceStartForm)
+  override def routes: Route = concat(createBoard, updateBoard, addColumn, removeColumn, updateColumn)
 
   @Path("/")
   @POST
@@ -52,11 +54,13 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
   @RequestBody(description = "Board to create or update", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[BoardRequestDetails]))))
   @Consumes(Array("application/json"))
   def createBoard: Route = post {
-    authenticatedUser { user =>
-      entity(as[BoardRequestDetails]) { boardRequestDetails =>
-        val boardId = boardRequestDetails.id
-        val boardUser = BoardUser(user.id, boardId)
-        askBoard(new CreateBoard(boardUser, boardId, boardRequestDetails.title))
+    pathEndOrSingleSlash {
+      authenticatedUser { user =>
+        entity(as[BoardRequestDetails]) { boardRequestDetails =>
+          val boardId = boardRequestDetails.id.getOrElse(new Guid().toString)
+          val boardUser = BoardUser(user.id, boardId)
+          askBoard(new CreateBoard(boardUser, boardRequestDetails.title))
+        }
       }
     }
   }
@@ -74,19 +78,14 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       new ApiResponse(description = "Form updated successfully", responseCode = "204"),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
-  ) //TODO make serializer for the form definition (kind of JSValue?)
+  )
   @RequestBody(description = "Form to create", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/json"))
-  def addOrReplaceStartForm: Route = post {
+  def updateBoard: Route = post {
     boardUser { boardUser =>
-      path(Segment / "form") { boardId =>
-        entity(as[String]) { newForm =>
-          if (!boardUser.isOwner) {
-            complete(StatusCodes.Unauthorized, "Only bord managers  can change forms for boards")
-          } else {
-            complete(StatusCodes.NotImplemented)
-            //askModelActor(new CreateConsentGroup(groupOwner, group))
-          }
+      pathEndOrSingleSlash {
+        entity(as[BoardDefinitionUpdate]) { update =>
+          askBoard(UpdateBoardDefinition(boardUser, update.title, update.form))
         }
       }
     }
@@ -105,20 +104,21 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       new ApiResponse(description = "Column added successfully", responseCode = "204"),
       new ApiResponse(description = "Column information is invalid", responseCode = "400"),
     )
-  ) //TODO make class and serializer for the ColumnDetails
+  )
   @RequestBody(description = "Column details", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ColumnRequestDetails]))))
   @Consumes(Array("application/json"))
   def addColumn: Route =
-    post  {
-      boardUser { boardUser =>
-        path(Segment / "columns") { boardId =>
-          entity(as[ColumnRequestDetails]) { newUser => //entity as ColumnRequestDetails
-            complete(StatusCodes.NotImplemented)
-            //askBoard(new SetTenantUser(tenantOwner, tenantOwner.tenant, newUser.asTenantUser(tenantOwner.tenant)))
+    extractRequest { request =>
+      post {
+        boardUser { boardUser =>
+          path("columns") {
+            entity(as[ColumnRequestDetails]) { column => //entity as ColumnRequestDetails
+              askBoard(AddColumnDefinition(boardUser, column.id, column.title, column.form))
+            }
           }
         }
+      }
     }
-  }
 
   @Path("/{board}/columns/{columnId}")
   @DELETE
@@ -137,41 +137,36 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
   )
   def removeColumn: Route = delete {
     boardUser { boardUser =>
-      path(Segment / "columns" / Segment) { (boardId, columnId ) =>
+      path("columns" / Segment) { columnId =>
         complete(StatusCodes.NotImplemented)
         //askBoard(new RemoveTenantUser(tenantOwner, tenantOwner.tenant, userId))
       }
     }
   }
 
-  @Path("/{board}/columns/{columnId}/form")
+  @Path("/{board}/columns/{columnId}")
   @POST
   @Operation(
-    summary = "Add or replace a column form",
-    description = "Add or replace a column form - a custom form that is provided with the active task in the flow",
+    summary = "Update the column definition",
+    description = "Update or replace a column form - a custom form that is provided with the active task in the flow",
     tags = Array("board"),
     parameters = Array(
       new Parameter(name = "board", description = "The board to manipulate", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "columnId", description = "The id of the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Column form updated successfully", responseCode = "204"),
+      new ApiResponse(description = "Column updated successfully", responseCode = "204"),
       new ApiResponse(responseCode = "404", description = "Board not found"),
       new ApiResponse(responseCode = "404", description = "Column not found"),
     )
-  ) //TODO attach serialized form (JSValue like)
+  )
   @RequestBody(description = "Form to add or replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
   @Consumes(Array("application/json"))
-  def addOrReplaceTaskForm: Route = post {
+  def updateColumn: Route = post {
     boardUser { boardUser =>
-      path(Segment / "columns" / Segment / "form") { (boardId, columnId) =>
-        entity(as[String]) { newForm =>
-          if (!boardUser.isOwner) {
-            complete(StatusCodes.Unauthorized, "Only board managers can manage column forms")
-          } else {
-            complete(StatusCodes.NotImplemented)
-            //askModelActor(new CreateConsentGroup(groupOwner, group))
-          }
+      path("columns" / Segment) { columnId =>
+        entity(as[ColumnUpdateDetails]) { update =>
+          askBoard(UpdateColumnDefinition(boardUser, columnId, update.title, update.form))
         }
       }
     }
