@@ -25,6 +25,7 @@ import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.response.BoardCreatedResponse;
 import org.cafienne.board.actorapi.response.BoardResponse;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -47,7 +48,7 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
 
     @Override
     public String tenant() {
-        return title;
+        return Cafienne.config().platform().defaultTenant();
     }
 
     @Override
