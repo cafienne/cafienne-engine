@@ -23,7 +23,7 @@ import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response._
-import org.cafienne.board.actorapi.response.{BoardCreatedResponse, BoardResponse, ColumnAddedResponse}
+import org.cafienne.board.actorapi.response.{BoardResponse, BoardResponseWithContent}
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
@@ -56,8 +56,7 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
             case other => completeWithLMH(StatusCodes.OK, other, Headers.CASE_LAST_MODIFIED)
           }
           case value: BoardResponse => value match {
-            case value: BoardCreatedResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
-            case value: ColumnAddedResponse => completeWithLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
+            case value: BoardResponseWithContent => completeWithLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
             case value => completeOnlyLMH(StatusCodes.Accepted, value, Headers.BOARD_LAST_MODIFIED)
           }
           case value: TenantResponse => value match {

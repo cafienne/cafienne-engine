@@ -27,7 +27,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class ColumnAddedResponse extends BoardResponse {
+public class ColumnAddedResponse extends BoardResponseWithContent {
     public final String columnId;
 
     public ColumnAddedResponse(AddColumnDefinition command, String columnId) {

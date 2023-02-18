@@ -25,7 +25,13 @@ import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardEvent;
 import org.cafienne.board.actorapi.event.BoardModified;
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
+import org.cafienne.board.actorapi.event.flow.FlowActivated;
+import org.cafienne.board.actorapi.event.flow.FlowInitiated;
 import org.cafienne.board.definition.BoardDefinition;
+import org.cafienne.cmmn.actorapi.command.StartCase;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +82,22 @@ public class BoardActor extends ModelActor {
         if (recoveryFinished()) {
             System.out.println("Update case definitions of currently active flows");
         }
+    }
+
+    public void startFlow(FlowInitiated event) {
+        if (recoveryFinished()) {
+            ValueMap caseInput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, event.subject), BoardFields.Data, event.input);
+            StartCase startCase = new StartCase(getTenant(), event.getUser().asCaseUserIdentity(), event.flowId, definition.getCaseDefinition(), caseInput, definition.team().caseTeam(), true);
+            askModel(startCase, failure -> {
+                logger.warn("Failure while starting flow ", failure.exception());
+            }, success -> {
+                addEvent(new FlowActivated(this, event.flowId));
+            });
+        }
+    }
+
+    public void updateState(FlowActivated event) {
+        // TODO: make sure that we do not try to start this flow again after recovery finished
     }
 
     @Override

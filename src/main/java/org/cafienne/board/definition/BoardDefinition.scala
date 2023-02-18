@@ -24,6 +24,8 @@ class BoardDefinition(val boardId: String) extends LazyLogging {
     */
   val dataFileIdentifier = s"_${boardId}_Data"
 
+  val team: TeamDefinition = new TeamDefinition(this)
+
   /**
     * List of columns defined in the board
     */
@@ -54,7 +56,7 @@ class BoardDefinition(val boardId: String) extends LazyLogging {
     val string =
       s"""<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
          |    <caseFileItemDefinition name="ttpboard" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="ttpboard.cfid">
-         |        <property name="title" type="http://www.omg.org/spec/CMMN/PropertyType/string">
+         |        <property name="subject" type="http://www.omg.org/spec/CMMN/PropertyType/string">
          |            <extensionElements mustUnderstand="false">
          |                <cafienne:implementation xmlns:cafienne="org.cafienne" isBusinessIdentifier="true"/>
          |            </extensionElements>
@@ -71,6 +73,7 @@ class BoardDefinition(val boardId: String) extends LazyLogging {
          |            ${columns.map(_.humanTaskXML).mkString("\n")}
          |
          |        </casePlanModel>
+         |        ${team.caseTeamXML()}
          |        <input id="_in_case_${boardFileIdentifier}" name="BoardMetadata" bindingRef="${boardFileIdentifier}"/>
          |        <input id="_in_case_${dataFileIdentifier}" name="Data" bindingRef="${dataFileIdentifier}"/>
          |        <extensionElements mustUnderstand="false">

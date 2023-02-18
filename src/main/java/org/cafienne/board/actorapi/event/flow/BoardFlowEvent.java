@@ -15,24 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package org.cafienne.board.actorapi.event.flow;
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.board.BoardActor;
+import org.cafienne.board.actorapi.event.BoardBaseEvent;
+import org.cafienne.json.ValueMap;
 
-case class BoardUser(id: String, boardId: String) extends UserIdentity {
-  override def toValue: Value[_] = new ValueMap(Fields.userId, id, Fields.boardId, boardId)
+public abstract class BoardFlowEvent extends BoardBaseEvent {
 
-  override def asCaseUserIdentity(): CaseUserIdentity = CaseUserIdentity(id, Origin.IDP)
+    public BoardFlowEvent(BoardActor board) {
+        super(board);
+    }
 
-  val isOwner = true
-}
-
-object BoardUser {
-  def deserialize(json: ValueMap): BoardUser = {
-    BoardUser(
-      id = json.readString(Fields.userId),
-      boardId = json.readString(Fields.boardId)
-    )
-  }
+    public BoardFlowEvent(ValueMap json) {
+        super(json);
+    }
 }
