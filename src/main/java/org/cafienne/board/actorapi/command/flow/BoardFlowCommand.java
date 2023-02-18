@@ -15,24 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package org.cafienne.board.actorapi.command.flow;
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.json.ValueMap;
 
-case class BoardUser(id: String, boardId: String) extends UserIdentity {
-  override def toValue: Value[_] = new ValueMap(Fields.userId, id, Fields.boardId, boardId)
+/**
+ * Base class for sending commands to a TenantActor
+ */
+public abstract class BoardFlowCommand extends BoardCommand {
+    /**
+     * Create a new command that can be sent to the board.
+     *
+     * @param user The user that issues this command.
+     */
+    protected BoardFlowCommand(BoardUser user) {
+        super(user);
+    }
 
-  override def asCaseUserIdentity(): CaseUserIdentity = CaseUserIdentity(id, Origin.IDP)
-
-  val isOwner = true
-}
-
-object BoardUser {
-  def deserialize(json: ValueMap): BoardUser = {
-    BoardUser(
-      id = json.readString(Fields.userId),
-      boardId = json.readString(Fields.boardId)
-    )
-  }
+    protected BoardFlowCommand(ValueMap json) {
+        super(json);
+    }
 }

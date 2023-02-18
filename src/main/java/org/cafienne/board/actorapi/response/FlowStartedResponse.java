@@ -18,7 +18,7 @@
 package org.cafienne.board.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.board.actorapi.command.definition.AddColumnDefinition;
+import org.cafienne.board.actorapi.command.flow.StartFlow;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.Value;
@@ -27,27 +27,27 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class ColumnAddedResponse extends BoardResponseWithContent {
-    public final String columnId;
+public class FlowStartedResponse extends BoardResponseWithContent {
+    public final String flowId;
 
-    public ColumnAddedResponse(AddColumnDefinition command, String columnId) {
+    public FlowStartedResponse(StartFlow command, String flowId) {
         super(command);
-        this.columnId = columnId;
+        this.flowId = flowId;
     }
 
-    public ColumnAddedResponse(ValueMap json) {
+    public FlowStartedResponse(ValueMap json) {
         super(json);
-        this.columnId = json.readString(Fields.columnId);
+        this.flowId = json.readString(Fields.boardId);
     }
 
     @Override
     public Value<?> toJson() {
-        return new ValueMap(Fields.columnId, columnId);
+        return new ValueMap(Fields.flowId, flowId);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
-        writeField(generator, Fields.columnId, columnId);
+        writeField(generator, Fields.flowId, flowId);
     }
 }

@@ -30,6 +30,7 @@ object BoardAPI {
   implicit val columnRequestDetailsReader: EntityReader[ColumnRequestDetails] = entityReader[ColumnRequestDetails]
   implicit val columnUpdateDetailsReader: EntityReader[ColumnUpdateDetails] = entityReader[ColumnUpdateDetails]
   implicit val teamMemberDetailsReader: EntityReader[TeamMemberDetails] = entityReader[TeamMemberDetails]
+  implicit val startFlowFormatReader: EntityReader[StartFlowFormat] = entityReader[StartFlowFormat]
 
   case class BoardRequestDetails(id: Option[String], title: String)
   case class BoardDefinitionUpdate(title: Option[String], form: Option[ValueMap])
@@ -69,4 +70,8 @@ object BoardAPI {
   case class BoardResponse(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.team, team, Fields.columns, columns)
   }
+
+  case class StartFlowFormat(id: Option[String], subject: String, data: Option[ValueMap])
+
+  case class FlowStartedFormat(flowId: String)
 }

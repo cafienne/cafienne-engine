@@ -15,24 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.actormodel.identity
+package org.cafienne.board.actorapi.response;
 
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.json.ValueMap;
 
-case class BoardUser(id: String, boardId: String) extends UserIdentity {
-  override def toValue: Value[_] = new ValueMap(Fields.userId, id, Fields.boardId, boardId)
+public abstract class BoardResponseWithContent extends BoardResponse {
+    public BoardResponseWithContent(BoardCommand command) {
+        super(command);
+    }
 
-  override def asCaseUserIdentity(): CaseUserIdentity = CaseUserIdentity(id, Origin.IDP)
-
-  val isOwner = true
-}
-
-object BoardUser {
-  def deserialize(json: ValueMap): BoardUser = {
-    BoardUser(
-      id = json.readString(Fields.userId),
-      boardId = json.readString(Fields.boardId)
-    )
-  }
+    public BoardResponseWithContent(ValueMap json) {
+        super(json);
+    }
 }

@@ -27,4 +27,5 @@ class BoardRoutes(override val caseSystem: CaseSystem) extends BoardRoute {
 
   addSubRoute(new BoardDefinitionRoute(caseSystem))
   addSubRoute(new BoardRuntimeRoute(caseSystem))
+  addSubRoute(new BoardFlowsRoute(caseSystem))
 }

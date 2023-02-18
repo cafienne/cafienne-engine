@@ -15,39 +15,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.response;
+package org.cafienne.board.actorapi.event.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.board.actorapi.command.definition.AddColumnDefinition;
+import org.cafienne.board.BoardActor;
+import org.cafienne.board.actorapi.event.BoardEvent;
+import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
-import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 @Manifest
-public class ColumnAddedResponse extends BoardResponseWithContent {
-    public final String columnId;
+public class FlowInitiated extends BoardFlowEvent {
+    public final String flowId;
+    public final String subject;
+    public final ValueMap input;
 
-    public ColumnAddedResponse(AddColumnDefinition command, String columnId) {
-        super(command);
-        this.columnId = columnId;
+    public FlowInitiated(BoardActor board, String flowId, String subject, ValueMap input) {
+        super(board);
+        this.flowId = flowId;
+        this.subject = subject;
+        this.input = input;
     }
 
-    public ColumnAddedResponse(ValueMap json) {
+    public FlowInitiated(ValueMap json) {
         super(json);
-        this.columnId = json.readString(Fields.columnId);
+        this.flowId = json.readString(Fields.flowId);
+        this.subject = json.readString(Fields.subject);
+        this.input = json.readMap(Fields.input);
     }
 
     @Override
-    public Value<?> toJson() {
-        return new ValueMap(Fields.columnId, columnId);
+    public void updateState(BoardActor actor) {
+        actor.startFlow(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.columnId, columnId);
+        super.writeBoardEvent(generator);
+        writeField(generator, Fields.flowId, flowId);
+        writeField(generator, Fields.subject, subject);
+        writeField(generator, Fields.input, input);
     }
 }
