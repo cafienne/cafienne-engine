@@ -30,9 +30,4 @@ public abstract class BoardDefinitionEvent extends BoardBaseEvent {
     public BoardDefinitionEvent(ValueMap json) {
         super(json);
     }
-
-    @Override
-    public void updateState(BoardActor board) {
-        board.updateState(this);
-    }
 }

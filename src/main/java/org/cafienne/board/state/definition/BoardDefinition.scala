@@ -1,8 +1,10 @@
-package org.cafienne.board.definition
+package org.cafienne.board.state.definition
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.event.BoardCreated
 import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionUpdated}
+import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
 import org.cafienne.json.ValueMap
 import org.cafienne.util.XMLHelper
@@ -10,11 +12,8 @@ import org.w3c.dom.Document
 
 import scala.collection.mutable.ListBuffer
 
-/**
-  *
-  * @param boardId - Resembles in the case definition
-  */
-class BoardDefinition(val boardId: String) extends LazyLogging {
+class BoardDefinition(val board: BoardActor) extends FormElement with LazyLogging {
+  val boardId: String = board.getId
   /**
     * Identifier of case file item holding board metadata such as title.
     */
@@ -24,18 +23,14 @@ class BoardDefinition(val boardId: String) extends LazyLogging {
     */
   val dataFileIdentifier = s"_${boardId}_Data"
 
-  val team: TeamDefinition = new TeamDefinition(this)
+  val team: BoardTeam = new BoardTeam(this)
 
   /**
     * List of columns defined in the board
     */
   val columns: ListBuffer[ColumnDefinition] = ListBuffer()
 
-  private var title: String = ""
-
   private var startForm: ValueMap = new ValueMap()
-
-  def getTitle: String = title
 
   def getStartForm: ValueMap = startForm
 

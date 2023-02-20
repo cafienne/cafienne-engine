@@ -17,17 +17,29 @@
 
 package org.cafienne.board.actorapi.event.flow;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.event.BoardBaseEvent;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
-public abstract class BoardFlowEvent extends BoardBaseEvent {
+import java.io.IOException;
 
-    public BoardFlowEvent(BoardActor board) {
+public abstract class BoardFlowEvent extends BoardBaseEvent {
+    public final String flowId;
+
+    public BoardFlowEvent(BoardActor board, String flowId) {
         super(board);
+        this.flowId = flowId;
     }
 
     public BoardFlowEvent(ValueMap json) {
         super(json);
+        this.flowId = json.readString(Fields.flowId);
+    }
+
+    protected void writeBoardFlowEvent(JsonGenerator generator) throws IOException {
+        super.writeBoardEvent(generator);
+        writeField(generator, Fields.flowId, flowId);
     }
 }
