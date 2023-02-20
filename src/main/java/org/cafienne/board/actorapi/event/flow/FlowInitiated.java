@@ -19,8 +19,6 @@ package org.cafienne.board.actorapi.event.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.BoardEvent;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -29,33 +27,24 @@ import java.io.IOException;
 
 @Manifest
 public class FlowInitiated extends BoardFlowEvent {
-    public final String flowId;
     public final String subject;
     public final ValueMap input;
 
     public FlowInitiated(BoardActor board, String flowId, String subject, ValueMap input) {
-        super(board);
-        this.flowId = flowId;
+        super(board, flowId);
         this.subject = subject;
         this.input = input;
     }
 
     public FlowInitiated(ValueMap json) {
         super(json);
-        this.flowId = json.readString(Fields.flowId);
         this.subject = json.readString(Fields.subject);
         this.input = json.readMap(Fields.input);
     }
 
     @Override
-    public void updateState(BoardActor actor) {
-        actor.startFlow(this);
-    }
-
-    @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeBoardEvent(generator);
-        writeField(generator, Fields.flowId, flowId);
+        super.writeBoardFlowEvent(generator);
         writeField(generator, Fields.subject, subject);
         writeField(generator, Fields.input, input);
     }

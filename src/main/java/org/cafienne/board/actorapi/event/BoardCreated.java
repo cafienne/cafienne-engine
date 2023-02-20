@@ -48,7 +48,8 @@ public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessa
 
     @Override
     public void updateState(BoardActor board) {
-        board.updateState(this);
+        board.setEngineVersion(engineVersion);
+        super.updateState(board);
     }
 
     @Override

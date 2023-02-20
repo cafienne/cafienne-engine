@@ -1,8 +1,10 @@
-package org.cafienne.board.definition
+package org.cafienne.board.state.definition
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.event.BoardCreated
 import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionUpdated}
+import org.cafienne.board.state.StateElement
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
 import org.cafienne.json.ValueMap
 import org.cafienne.util.XMLHelper
@@ -14,7 +16,8 @@ import scala.collection.mutable.ListBuffer
   *
   * @param boardId - Resembles in the case definition
   */
-class BoardDefinition(val boardId: String) extends LazyLogging {
+class BoardDefinition(val board: BoardActor) extends StateElement with LazyLogging {
+  val boardId: String = board.getId
   /**
     * Identifier of case file item holding board metadata such as title.
     */

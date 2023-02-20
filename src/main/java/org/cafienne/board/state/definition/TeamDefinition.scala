@@ -1,4 +1,4 @@
-package org.cafienne.board.definition
+package org.cafienne.board.state.definition
 
 import org.cafienne.actormodel.identity.{Origin, UserIdentity}
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent
@@ -6,7 +6,7 @@ import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
 
 import scala.collection.mutable.ListBuffer
 
-class TeamDefinition(val board: BoardDefinition) {
+class TeamDefinition(val definition: BoardDefinition) extends DefinitionElement {
   private val users = new ListBuffer[UserIdentity]()
 
   def updateState(event: BoardDefinitionEvent): Unit = {

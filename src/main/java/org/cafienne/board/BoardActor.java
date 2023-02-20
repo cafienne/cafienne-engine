@@ -21,17 +21,10 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.board.actorapi.command.BoardCommand;
-import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardEvent;
 import org.cafienne.board.actorapi.event.BoardModified;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
-import org.cafienne.board.actorapi.event.flow.FlowActivated;
-import org.cafienne.board.actorapi.event.flow.FlowInitiated;
-import org.cafienne.board.definition.BoardDefinition;
-import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
-import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.ValueMap;
+import org.cafienne.board.state.BoardState;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.system.CaseSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class BoardActor extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(BoardActor.class);
 
-    private BoardDefinition definition = new BoardDefinition(this.getId());
+    public final BoardState state = new BoardState(this);
 
     public BoardActor(CaseSystem caseSystem) {
         super(caseSystem);
@@ -64,44 +57,13 @@ public class BoardActor extends ModelActor {
     }
 
     public BoardDefinition getDefinition() {
-        return definition;
+        return state.definition();
     }
 
-    public void updateState(BoardCreated boardCreated) {
-        definition.updateState(boardCreated);
-        this.setEngineVersion(boardCreated.engineVersion);
-    }
-
-    public void updateState(BoardDefinitionEvent event) {
-        definition.updateState(event);
-        // And now, with the updated definition, we should iterate through all our case instances
-        //  and update their case definitions ...
-        //  Probably only when recovery is not running ...
-        addDebugInfo(() -> "Updated definition of board "+getId()+" to:  " + definition.getCaseDefinition().getDefinitionsDocument().getSource());
-
-        if (recoveryFinished()) {
-            System.out.println("Update case definitions of currently active flows");
-        }
-    }
-
-    public void startFlow(FlowInitiated event) {
-        if (recoveryFinished()) {
-            ValueMap caseInput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, event.subject), BoardFields.Data, event.input);
-            StartCase startCase = new StartCase(getTenant(), event.getUser().asCaseUserIdentity(), event.flowId, definition.getCaseDefinition(), caseInput, definition.team().caseTeam(), true);
-            askModel(startCase, failure -> {
-                logger.warn("Failure while starting flow ", failure.exception());
-            }, success -> {
-                addEvent(new FlowActivated(this, event.flowId));
-            });
-        }
-    }
-
-    public void updateState(FlowActivated event) {
-        // TODO: make sure that we do not try to start this flow again after recovery finished
-    }
-
-    public void updateState(BoardModified event) {
-        setLastModified(event.lastModified());
+    @Override
+    protected void recoveryCompleted() {
+        super.recoveryCompleted();
+        state.recoveryCompleted();
     }
 
     @Override

@@ -38,4 +38,9 @@ public abstract class BoardBaseEvent extends BaseModelEvent<BoardActor> implemen
     protected void writeBoardEvent(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
     }
+
+    @Override
+    public void updateState(BoardActor board) {
+        board.state.updateState(this);
+    }
 }
