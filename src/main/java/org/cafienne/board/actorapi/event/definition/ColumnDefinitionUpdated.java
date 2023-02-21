@@ -29,12 +29,14 @@ import java.io.IOException;
 public class ColumnDefinitionUpdated extends BoardDefinitionEvent {
     public final String columnId;
     public final scala.Option<String> title;
+    public final scala.Option<String> role;
     public final scala.Option<ValueMap> form;
 
-    public ColumnDefinitionUpdated(BoardActor board, String columnId, scala.Option<String> title, scala.Option<ValueMap> form) {
+    public ColumnDefinitionUpdated(BoardActor board, String columnId, scala.Option<String> title, scala.Option<String> role, scala.Option<ValueMap> form) {
         super(board);
         this.columnId = columnId;
         this.title = title;
+        this.role = role;
         this.form = form;
     }
 
@@ -42,6 +44,7 @@ public class ColumnDefinitionUpdated extends BoardDefinitionEvent {
         super(json);
         this.columnId = json.readString(Fields.columnId);
         this.title = json.readOption(Fields.title);
+        this.role = json.readOption(Fields.role);
         this.form = json.readOptionalMap(Fields.form);
     }
 
@@ -50,6 +53,7 @@ public class ColumnDefinitionUpdated extends BoardDefinitionEvent {
         super.writeBoardEvent(generator);
         writeField(generator, Fields.columnId, columnId);
         writeField(generator, Fields.title, title);
+        writeField(generator, Fields.role, role);
         writeField(generator, Fields.form, form);
     }
 }

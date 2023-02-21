@@ -23,15 +23,24 @@ class ColumnDefinition(val columnId: String, val definition: BoardDefinition, va
   })
 
   private var title: String = ""
+  private var role: String = ""
   private var form: ValueMap = new ValueMap()
+
+  def getTitle: String = title
+
+  def getRole: String = role
+
+  def getForm: ValueMap = form
 
   def updateState(event: ColumnDefinitionAdded): Unit = {
     this.title = event.title
+    this.role = event.role.getOrElse(this.role)
     this.form = event.form.getOrElse(this.form)
   }
 
   def updateState(event: ColumnDefinitionUpdated): Unit = {
     this.title = event.title.getOrElse(this.title)
+    this.role = event.role.getOrElse(this.role)
     this.form = event.form.getOrElse(this.form)
   }
 
@@ -50,21 +59,21 @@ class ColumnDefinition(val columnId: String, val definition: BoardDefinition, va
     val outMetadata = s"_ht_out${metadata}"
     val outData = s"_ht_out${data}"
 
-    s"""<humanTask id="${taskIdentifier}" name="${title}" isBlocking="true">
-       |    <inputs id="${inMetadata}" name="BoardMetadata" bindingRef="${definition.boardFileIdentifier}"/>
-       |    <inputs id="${inData}" name="Data" bindingRef="${definition.dataFileIdentifier}"/>
-       |    <outputs id="${outMetadata}" name="BoardMetadata" bindingRef="${definition.boardFileIdentifier}"/>
-       |    <outputs id="${outData}" name="Data" bindingRef="${definition.dataFileIdentifier}"/>
+    s"""<humanTask id="$taskIdentifier" name="$title" isBlocking="true" performerRef="$role">
+       |    <inputs id="$inMetadata" name="BoardMetadata" bindingRef="${definition.boardFileIdentifier}"/>
+       |    <inputs id="$inData" name="Data" bindingRef="${definition.dataFileIdentifier}"/>
+       |    <outputs id="$outMetadata" name="BoardMetadata" bindingRef="${definition.boardFileIdentifier}"/>
+       |    <outputs id="$outData" name="Data" bindingRef="${definition.dataFileIdentifier}"/>
        |    <extensionElements mustUnderstand="false">
        |        <cafienne:implementation name="myboard_col2" xmlns:cafienne="org.cafienne" class="org.cafienne.cmmn.definition.task.WorkflowTaskDefinition" humanTaskRef="myboard_col2.humantask">
        |            <input id="in_${columnIdentifier}_BoardMetadata" name="BoardMetadata"/>
        |            <input id="in_${columnIdentifier}_Data" name="Data"/>
        |            <output id="out_${columnIdentifier}_BoardMetadata" name="BoardMetadata"/>
        |            <output id="out_${columnIdentifier}_Data" name="Data"/>
-       |            <parameterMapping id="_${definition.boardId}_12" sourceRef="${inMetadata}" targetRef="in_${columnIdentifier}_BoardMetadata"/>
-       |            <parameterMapping id="_${definition.boardId}_13" sourceRef="${inData}" targetRef="in_${columnIdentifier}_Data"/>
-       |            <parameterMapping id="_${definition.boardId}_14" sourceRef="out_${columnIdentifier}_BoardMetadata" targetRef="${outMetadata}"/>
-       |            <parameterMapping id="_${definition.boardId}_15" sourceRef="out_${columnIdentifier}_Data" targetRef="${outData}"/>
+       |            <parameterMapping id="_${definition.boardId}_12" sourceRef="$inMetadata" targetRef="in_${columnIdentifier}_BoardMetadata"/>
+       |            <parameterMapping id="_${definition.boardId}_13" sourceRef="$inData" targetRef="in_${columnIdentifier}_Data"/>
+       |            <parameterMapping id="_${definition.boardId}_14" sourceRef="out_${columnIdentifier}_BoardMetadata" targetRef="$outMetadata"/>
+       |            <parameterMapping id="_${definition.boardId}_15" sourceRef="out_${columnIdentifier}_Data" targetRef="$outData"/>
        |            <task-model>
        |                ${form.toString}
        |            </task-model>

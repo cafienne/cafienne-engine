@@ -37,9 +37,9 @@ object BoardAPI {
 
   case class BoardSummaryResponse(id: String, title: String)
 
-  case class ColumnRequestDetails(id: String = new Guid().toString, title: String, form: Option[ValueMap])
+  case class ColumnRequestDetails(id: String = new Guid().toString, title: String, role: Option[String], form: Option[ValueMap])
 
-  case class ColumnUpdateDetails(title: Option[String], form: Option[ValueMap])
+  case class ColumnUpdateDetails(title: Option[String], role: Option[String], form: Option[ValueMap])
 
   case class TeamMemberDetails(userId: String, name: Option[String], roles: Set[String]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.name, name, Fields.roles, roles)
