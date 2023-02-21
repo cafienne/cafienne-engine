@@ -17,6 +17,7 @@
 
 package org.cafienne.querydb.record
 
+import org.cafienne.humantask.instance.TaskState
 import org.cafienne.json._
 
 import java.time.Instant
@@ -46,6 +47,16 @@ final case class TaskRecord(id: String,
       } catch {
         case _: Throwable => new StringValue(value)
       }
+    }
+  }
+
+  def isActive(): Boolean = {
+    TaskState.valueOf(taskState) match {
+      case TaskState.Unassigned => true
+      case TaskState.Assigned => true
+      case TaskState.Delegated => true
+      case TaskState.Suspended => true
+      case other => false
     }
   }
 
