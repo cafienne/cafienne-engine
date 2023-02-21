@@ -6,7 +6,8 @@ import org.cafienne.board.actorapi.event.BoardCreated
 import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionUpdated}
 import org.cafienne.board.state.StateElement
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
-import org.cafienne.json.ValueMap
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Document
 
@@ -16,8 +17,7 @@ import scala.collection.mutable.ListBuffer
   *
   * @param boardId - Resembles in the case definition
   */
-class BoardDefinition(val board: BoardActor) extends StateElement with LazyLogging {
-  val boardId: String = board.getId
+class BoardDefinition(val board: BoardActor, val boardId: String, val optionalTitle: Option[String] = None) extends StateElement with CafienneJson with LazyLogging {
   /**
     * Identifier of case file item holding board metadata such as title.
     */
@@ -34,7 +34,7 @@ class BoardDefinition(val board: BoardActor) extends StateElement with LazyLoggi
     */
   val columns: ListBuffer[ColumnDefinition] = ListBuffer()
 
-  private var title: String = ""
+  private var title: String = optionalTitle.getOrElse("")
 
   private var startForm: ValueMap = new ValueMap()
 
@@ -47,7 +47,7 @@ class BoardDefinition(val board: BoardActor) extends StateElement with LazyLoggi
     case event: BoardDefinitionUpdated =>
       this.title = event.title.getOrElse(this.title)
       this.startForm = event.form.getOrElse(this.startForm)
-    case event: ColumnDefinitionAdded => new ColumnDefinition(event.columnId, this, columns.lastOption).updateState(event)
+    case event: ColumnDefinitionAdded => new ColumnDefinition(this, event.columnId).updateState(event)
     case event: ColumnDefinitionUpdated => {
       val column = columns.find(_.columnId == event.columnId).get
       column.updateState(event)
@@ -96,11 +96,18 @@ class BoardDefinition(val board: BoardActor) extends StateElement with LazyLoggi
     definitions.getFirstCase
   }
 
-  def addColumn(columnId: String, name: String, form: ValueMap): Unit = {
-    new ColumnDefinition(columnId, this, columns.lastOption)
+  override def toValue: Value[_] = {
+    new ValueMap(Fields.id, boardId, Fields.title, title, Fields.team, team.toValue, Fields.columns, new ValueList(columns.map(_.toValue).toArray))
   }
 }
 
 object BoardDefinition {
   val BOARD_IDENTIFIER = "__ttp__boardId__"
+
+  def deserialize(json: ValueMap): BoardDefinition = {
+    val definition = new BoardDefinition(null, json.readString(Fields.id), json.readOption[String](Fields.title))
+    definition.team.users.addAll(TeamDefinition.deserialize(json.withArray(Fields.team)))
+    json.withArray(Fields.columns).getValue.toArray(Array[ValueMap]()).map(ColumnDefinition.deserialize(definition, _))
+    definition
+  }
 }

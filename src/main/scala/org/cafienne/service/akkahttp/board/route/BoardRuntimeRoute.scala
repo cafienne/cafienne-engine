@@ -15,15 +15,27 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.actormodel.response.{ActorExistsFailure, CommandFailure, EngineChokedFailure, SecurityFailure}
+import org.cafienne.board.BoardFields
+import org.cafienne.board.actorapi.command.runtime.GetBoard
+import org.cafienne.board.actorapi.response.runtime.GetBoardResponse
+import org.cafienne.board.state.definition.BoardDefinition
+import org.cafienne.infrastructure.akkahttp.route.LastModifiedDirectives
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.querydb.query.filter.TaskFilter
+import org.cafienne.querydb.query.{TaskQueries, TaskQueriesImpl}
 import org.cafienne.service.akkahttp.board.model.BoardAPI
-import org.cafienne.service.akkahttp.board.model.BoardAPI.{BoardResponse, BoardSummaryResponse, TeamMemberDetails}
+import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
+import scala.collection.immutable.HashSet
+import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/board")
-class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute {
+class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute with LastModifiedDirectives {
+  val taskQueries: TaskQueries = new TaskQueriesImpl
 
   import org.cafienne.querydb.query.board.BoardQueryProtocol._
 
@@ -60,42 +72,57 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new Parameter(name = "board", description = "The board to retrieve details from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO return a detailed Board type with all required fields
-      new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[Board])))),
+      new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[BoardResponseFormat])))),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
   )
   @Produces(Array("application/json"))
   def getBoard: Route = get {
     boardUser { boardUser =>
-      //TODO something like boardQueries.getBoard(boardId)
-      val team = Seq(
-        TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
-        TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
-      )
-      val columns = Seq(
-        BoardAPI.Column("column1", 0, Some("First Column"), Some("INTAKE_ROLE"),
-          Seq(
-            BoardAPI.Task("task1", Some("Task 1"), Some("Task 1 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
-            BoardAPI.Task("task2", Some("Task 2"), Some("Task 2 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", Some(boardUser.id)),
-            BoardAPI.Task("task3", Some("Task 3"), Some("Task 3 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", None),
-          )
-        ),
-        BoardAPI.Column("column2", 1, Some("Second Column"), Some("BOARD_MANAGER"),
-          Seq(
-            BoardAPI.Task("task4", Some("Task 4"), Some("Task 4 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
-            BoardAPI.Task("task5", Some("Task 5"), Some("Task 5 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", Some(boardUser.id)),
-            BoardAPI.Task("task6", Some("Task 6"), Some("Task 6 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", Some("userId2")),
-          )
-        ),
-        BoardAPI.Column("column3", 2, Some("Third Column"), Some("BOARD_MANAGER"),
-          Seq(BoardAPI.Task("task1", Some("Task 7"), Some("Task 7 description"), 0, "240E5603-F515-4104-9F87-4E3F3387222C", None),
-            BoardAPI.Task("task2", Some("Task 8"), Some("Task 8 description"), 0, "B2C09D92-106F-4EB9-84F9-4D02517A53B4", None),
-            BoardAPI.Task("task3", Some("Task 9"), Some("Task 9 description"), 0, "D0A37625-931A-4361-8A6A-0CBBD6A79385", None),
-          )
-        )
-      )
-      val response = BoardResponse("boardid1", Some("Board Title"), team, columns)
-      completeJson(response)
+      val command = new GetBoard(boardUser)
+
+      val businessIdentifier = Some(s"${BoardDefinition.BOARD_IDENTIFIER}=${boardUser.boardId}")
+
+      val query = for {
+        commandResponse <- caseSystem.gateway.request(command)
+        // TODO: Somehow make it run SyncedQuery with the response last modifieds?
+        //    Yes. Idea: it should use BOARD_LAST_MODIFIED and Board should give most latest CaseLastModified as it's last modified
+//        tasks <- runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)))
+
+        tasks <- taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier))
+      } yield (commandResponse, tasks)
+
+      onComplete(query) {
+        case Success(result) =>
+          val response = result._1
+          val tasks = result._2
+          response match {
+            case e: CommandFailure => response match {
+              case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
+              case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
+              case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
+              case _ => complete(StatusCodes.BadRequest, e.exception.getMessage)
+            }
+            case value: GetBoardResponse => {
+              val definition = value.definition
+              val team = definition.team.users.toSeq.map(user => TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
+              val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
+                val columnTasks: Seq[BoardAPI.Task] = tasks.filter(column.getTitle == _.taskName).map(task => {
+                  val taskInput = task.getJSON(task.input).asMap()
+                  val data = taskInput.readMap(BoardFields.Data)
+                  val subject = taskInput.readMap(BoardFields.BoardMetadata).readString(Fields.subject, "")
+                  BoardAPI.Task(id = task.id, subject = Some(subject), flowId = task.caseInstanceId,
+                    claimedBy = Some(task.assignee), form = task.getJSON(task.taskModel).asMap(), data = data)
+                })
+                BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
+              })
+              completeJson(BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
+            }
+            case other => // Unknown new type of response that is not handled
+              logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
+              complete(StatusCodes.OK)
+          }
+        case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)      }
     }
   }
 

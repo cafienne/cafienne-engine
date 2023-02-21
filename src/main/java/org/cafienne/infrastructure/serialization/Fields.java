@@ -159,6 +159,7 @@ public enum Fields {
 
     flowId,
     title,
+    position,
     columnId,
     subject,
 

@@ -10,7 +10,7 @@ import org.cafienne.board.state.definition.BoardDefinition
 import scala.collection.mutable
 
 class BoardState(val board: BoardActor) extends StateElement with LazyLogging {
-  val definition = new BoardDefinition(board)
+  val definition = new BoardDefinition(board, board.getId)
   val flows = new mutable.HashMap[String, FlowState]()
 
   // Tell our flows we've completed recovery, so that they can start follow up actions when necessary

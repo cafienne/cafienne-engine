@@ -22,6 +22,7 @@ import org.cafienne.board.actorapi.command.definition.AddColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition;
 import org.cafienne.board.actorapi.command.definition.UpdateColumnDefinition;
 import org.cafienne.board.actorapi.command.flow.StartFlow;
+import org.cafienne.board.actorapi.command.runtime.GetBoard;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded;
@@ -33,6 +34,7 @@ import org.cafienne.board.actorapi.response.BoardCreatedResponse;
 import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.board.actorapi.response.ColumnAddedResponse;
 import org.cafienne.board.actorapi.response.FlowStartedResponse;
+import org.cafienne.board.actorapi.response.runtime.GetBoardResponse;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 
 public class BoardSerializers {
@@ -44,6 +46,7 @@ public class BoardSerializers {
 
     private static void addBoardCommands() {
         CafienneSerializer.addManifestWrapper(CreateBoard.class, CreateBoard::new);
+        CafienneSerializer.addManifestWrapper(GetBoard.class, GetBoard::new);
         CafienneSerializer.addManifestWrapper(UpdateBoardDefinition.class, UpdateBoardDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(AddColumnDefinition.class, AddColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(UpdateColumnDefinition.class, UpdateColumnDefinition::deserialize);
@@ -62,6 +65,7 @@ public class BoardSerializers {
 
     private static void addBoardResponses() {
         CafienneSerializer.addManifestWrapper(BoardResponse.class, BoardResponse::new);
+        CafienneSerializer.addManifestWrapper(GetBoardResponse.class, GetBoardResponse::new);
         CafienneSerializer.addManifestWrapper(BoardCreatedResponse.class, BoardCreatedResponse::new);
         CafienneSerializer.addManifestWrapper(ColumnAddedResponse.class, ColumnAddedResponse::new);
         CafienneSerializer.addManifestWrapper(FlowStartedResponse.class, FlowStartedResponse::new);
