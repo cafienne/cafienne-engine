@@ -7,11 +7,15 @@ import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowInitiated}
 import org.cafienne.board.actorapi.event.{BoardEvent, BoardModified}
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.board.state.flow.FlowState
+import org.cafienne.board.state.team.BoardTeam
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 import scala.collection.mutable
 
-class BoardState(val board: BoardActor) extends StateElement with LazyLogging {
+class BoardState(val board: BoardActor) extends StateElement with CafienneJson with LazyLogging {
   val definition = new BoardDefinition(board)
+  def team: BoardTeam = definition.team
   val flows = new mutable.HashMap[String, FlowState]()
 
   // Tell our flows we've completed recovery, so that they can start follow up actions when necessary
@@ -38,5 +42,16 @@ class BoardState(val board: BoardActor) extends StateElement with LazyLogging {
       System.out.println("Update case definitions of currently active flows")
       // Now take all flows and update their definitions ...
     }
+  }
+
+  override def toValue: Value[_] = {
+    new ValueMap(Fields.id, boardId, Fields.definition, definition.toValue)
+  }
+}
+
+object BoardState {
+  def deserialize(json: ValueMap): BoardState = {
+    val boardId = json.readString(Fields.id)
+    new BoardState(null)
   }
 }

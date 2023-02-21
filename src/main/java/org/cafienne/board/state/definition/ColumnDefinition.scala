@@ -1,10 +1,12 @@
 package org.cafienne.board.state.definition
 
 import org.cafienne.board.actorapi.event.definition.{ColumnDefinitionAdded, ColumnDefinitionUpdated}
-import org.cafienne.json.ValueMap
+import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-class ColumnDefinition(val columnId: String, val definition: BoardDefinition, val previous: Option[ColumnDefinition]) extends DefinitionElement {
-  val position = definition.columns.size
+class ColumnDefinition(val definition: BoardDefinition, val columnId: String) extends DefinitionElement with CafienneJson {
+  private val previous: Option[ColumnDefinition] = definition.columns.lastOption
+  val position: Int = definition.columns.size
   definition.columns += this // This implicitly increases count of next column
 
   private val columnIdentifier = s"${definition.boardId}_${position}"
@@ -80,5 +82,18 @@ class ColumnDefinition(val columnId: String, val definition: BoardDefinition, va
        |        </cafienne:implementation>
        |    </extensionElements>
        |</humanTask>""".stripMargin
+  }
+
+  override def toValue: Value[_] = new ValueMap(Fields.columnId, columnId, Fields.position, position, Fields.title, title, Fields.role, role, Fields.form, form)
+}
+
+object ColumnDefinition {
+  def deserialize(definition: BoardDefinition, json: ValueMap): ColumnDefinition = {
+    val id = json.readString(Fields.columnId)
+    val column = new ColumnDefinition(definition, id)
+    column.title = json.readString(Fields.title)
+    column.role = json.readString(Fields.role)
+    column.form = json.readMap(Fields.form)
+    column
   }
 }

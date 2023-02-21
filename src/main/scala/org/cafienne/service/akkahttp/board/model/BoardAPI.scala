@@ -59,15 +59,15 @@ object BoardAPI {
   final case class Task(
                      id: String,
                      subject: Option[String],
-                     description: Option[String],
-                     position: Int,
-                     caseInstanceId: String,
-                     claimedBy: Option[String]
+                     flowId: String,
+                     claimedBy: Option[String],
+                     form: ValueMap,
+                     data: ValueMap
                    ) extends CafienneJson {
-    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.description, description, "position", position, Fields.caseInstanceId, caseInstanceId, "claimedBy", claimedBy)
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.flowId, flowId, "claimedBy", claimedBy, Fields.form, form, "data", data)
   }
 
-  case class BoardResponse(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column]) extends CafienneJson {
+  case class BoardResponseFormat(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.team, team, Fields.columns, columns)
   }
 

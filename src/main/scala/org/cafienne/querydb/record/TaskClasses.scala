@@ -49,6 +49,10 @@ final case class TaskRecord(id: String,
     }
   }
 
+  def inputJson: Value[_] = getJSON(input)
+
+  def outputJson: Value[_] = getJSON(output)
+
   override def toValue: Value[_] = {
     val v = new ValueMap
     v.plus("id", id)
@@ -64,8 +68,8 @@ final case class TaskRecord(id: String,
     v.plus("dueDate", dueDate.getOrElse(""))
     v.plus("createdOn", createdOn)
     v.plus("createdBy", createdBy)
-    v.plus("input", getJSON(input))
-    v.plus("output", getJSON(output))
+    v.plus("input", inputJson)
+    v.plus("output", outputJson)
     v.plus("taskModel", getJSON(taskModel))
     v
   }
