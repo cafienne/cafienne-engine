@@ -13,9 +13,9 @@ import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import org.cafienne.board.actorapi.command.flow.{BoardFlowCommand, StartFlow}
+import org.cafienne.board.actorapi.command.flow.{BoardFlowCommand, CompleteFlowTask, StartFlow}
 import org.cafienne.json.ValueMap
-import org.cafienne.service.akkahttp.board.model.BoardAPI.{FlowStartedFormat, StartFlowFormat}
+import org.cafienne.service.akkahttp.board.model.FlowAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 
@@ -24,7 +24,7 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/board")
 class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
-  override def routes: Route = concat(startFlow)
+  override def routes: Route = concat(startFlow, completeFlowTask)
 
   @Path("{boardId}/flow")
   @POST
@@ -44,6 +44,30 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
         pathEndOrSingleSlash {
           entity(as[StartFlowFormat]) { flow =>
             askFlow(new StartFlow(user, flow.id.getOrElse(new Guid().toString), flow.subject, flow.data.getOrElse(new ValueMap)))
+          }
+        }
+      }
+    }
+  }
+
+  @Path("{boardId}/flow/{flowId}/tasks/{taskId}")
+  @POST
+  @Operation(
+    summary = "Complete a task in a flow on the board",
+    description = "Complete a task in a flow on the board",
+    tags = Array("board"),
+    responses = Array(
+      new ApiResponse(responseCode = "202", description = "Task completion initiated"),
+    )
+  )
+  @RequestBody(description = "Task to complete", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CompleteFlowTaskFormat]))))
+  @Produces(Array("application/json"))
+  def completeFlowTask: Route = post {
+    boardUser { user =>
+      path("flow" / Segment / "tasks" / Segment) { (flowId, taskId) =>
+        pathEndOrSingleSlash {
+          entity(as[CompleteFlowTaskFormat]) { output =>
+            askFlow(new CompleteFlowTask(user, flowId, taskId, output.subject, output.data))
           }
         }
       }

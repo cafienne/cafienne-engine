@@ -21,13 +21,14 @@ import org.cafienne.board.actorapi.command.CreateBoard;
 import org.cafienne.board.actorapi.command.definition.AddColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition;
 import org.cafienne.board.actorapi.command.definition.UpdateColumnDefinition;
+import org.cafienne.board.actorapi.command.flow.CompleteFlowTask;
 import org.cafienne.board.actorapi.command.flow.StartFlow;
 import org.cafienne.board.actorapi.command.runtime.GetBoard;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated;
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded;
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionUpdated;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated;
 import org.cafienne.board.actorapi.event.flow.FlowActivated;
 import org.cafienne.board.actorapi.event.flow.FlowInitiated;
 import org.cafienne.board.actorapi.response.BoardCreatedResponse;
@@ -51,6 +52,7 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(AddColumnDefinition.class, AddColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(UpdateColumnDefinition.class, UpdateColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(StartFlow.class, StartFlow::new);
+        CafienneSerializer.addManifestWrapper(CompleteFlowTask.class, CompleteFlowTask::new);
     }
 
     private static void addBoardEvents() {

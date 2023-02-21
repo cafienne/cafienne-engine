@@ -18,10 +18,10 @@
 package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.flow.FlowInitiated;
-import org.cafienne.board.actorapi.response.FlowStartedResponse;
+import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -29,33 +29,46 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class StartFlow extends BoardFlowCommand {
+public class CompleteFlowTask extends BoardFlowCommand {
+    public final String taskId;
     public final String subject;
     public final ValueMap data;
 
-    public StartFlow(BoardUser user, String flowId, String subject, ValueMap data) {
+    public CompleteFlowTask(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
         super(user, flowId);
+        this.taskId = taskId;
         this.subject = subject;
         this.data = data;
     }
 
-    public StartFlow(ValueMap json) {
+    public CompleteFlowTask(ValueMap json) {
         super(json);
+        this.taskId = json.readString(Fields.taskId);
         this.subject = json.readString(Fields.subject);
-        this.data = json.readMap(Fields.input);
+        this.data = json.readMap(Fields.output);
     }
 
     @Override
-    public FlowStartedResponse process(BoardActor board) {
-        board.addEvent(new FlowInitiated(board, flowId, subject, data));
-        return new FlowStartedResponse(this, flowId);
+    public void validate(BoardActor board) throws InvalidCommandException {
+        super.validate(board);
+        if (board.state.flows().get(flowId).isEmpty()) {
+            // TODO: come up with a good exception report that is secure ...
+            throw new InvalidCommandException("This flow does not exist");
+        }
+    }
+
+    @Override
+    public BoardResponse process(BoardActor board) {
+        board.state.flows().get(flowId).get().completeTask(getUser(), taskId, subject, data);
+        return new BoardResponse(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeFlowCommand(generator);
+        writeField(generator, Fields.taskId, taskId);
         writeField(generator, Fields.subject, subject);
-        writeField(generator, Fields.input, data);
+        writeField(generator, Fields.output, data);
     }
 }
 

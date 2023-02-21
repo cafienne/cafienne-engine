@@ -116,6 +116,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
                 })
                 BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
               })
+
               completeJson(BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
             }
             case other => // Unknown new type of response that is not handled

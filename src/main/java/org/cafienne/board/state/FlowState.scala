@@ -1,11 +1,13 @@
 package org.cafienne.board.state
 
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.board.{BoardActor, BoardFields}
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowActivated, FlowInitiated}
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.cmmn.actorapi.command.StartCase
+import org.cafienne.humantask.actorapi.command.CompleteHumanTask
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 
@@ -14,14 +16,20 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
   private var activationEvent: Option[FlowActivated] = None
 
   def isActive = activationEvent.nonEmpty
+
   def isCompleted = false // Can we know this?
 
-  if (board.recoveryFinished) start()
+  if (board.recoveryFinished) {
+    // This code is reached when the constructor is called, and hence the FlowInitiated event was triggered.
+    //  If in recovery mode, we should not do any further action;
+    //  But if in running mode, then let's create the underlying case
+    createCase()
+  }
 
   def recoveryCompleted(): Unit = {
     // If board completed recovery, and this flow does not have an Activation event, we should try to start the flow again
     if (activationEvent.isEmpty) {
-      start()
+      createCase()
     }
   }
 
@@ -31,8 +39,7 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     case other => logger.warn(s"Flow $flowId cannot handle event of type ${other.getClass.getName}")
   }
 
-
-  def start(): Unit = {
+  def createCase(): Unit = {
     val definition: BoardDefinition = board.state.definition
 
     // Take the latest & greatest case definition from our board definition
@@ -47,6 +54,15 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
       logger.warn("Failure while starting flow ", failure.exception)
     }, (success: ModelResponse) => {
       board.addEvent(new FlowActivated(board, event.flowId))
+    })
+  }
+
+  def completeTask(user: BoardUser, taskId: String, subject: String, output: ValueMap): Unit = {
+    val taskOutput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, subject), BoardFields.Data, output)
+    val completeCaseTask = new CompleteHumanTask(user.asCaseUserIdentity(), flowId, taskId, taskOutput)
+    board.askModel(completeCaseTask, (failure: CommandFailure) => {
+      logger.warn("Failure while completing task ", failure.exception)
+    }, (success: ModelResponse) => {
     })
   }
 }
