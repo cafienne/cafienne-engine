@@ -15,18 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.model
+package org.cafienne.board.actorapi.command.flow;
 
-import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
-import org.cafienne.json.ValueMap
+import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.board.state.FlowState;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
-object FlowAPI {
-  implicit val startFlowFormatReader: EntityReader[StartFlowFormat] = entityReader[StartFlowFormat]
-  implicit val completeFlowTaskFormatReader: EntityReader[FlowTaskOutputFormat] = entityReader[FlowTaskOutputFormat]
+@Manifest
+public class ClaimFlowTask extends FlowTaskCommand {
+    public ClaimFlowTask(BoardUser user, String flowId, String taskId) {
+        super(user, flowId, taskId);
+    }
 
-  case class StartFlowFormat(id: Option[String], subject: String, data: Option[ValueMap])
+    public ClaimFlowTask(ValueMap json) {
+        super(json);
+    }
 
-  case class FlowStartedFormat(flowId: String)
-
-  case class FlowTaskOutputFormat(subject: String, data: ValueMap)
+    @Override
+    public void process(FlowState flow) {
+        flow.claimTask(getUser(), taskId);
+    }
 }
+

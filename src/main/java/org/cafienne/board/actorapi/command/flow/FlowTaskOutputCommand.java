@@ -18,30 +18,37 @@
 package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.response.BoardResponse;
-import org.cafienne.board.state.FlowState;
 import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-@Manifest
-public class CompleteFlowTask extends FlowTaskOutputCommand {
-    public CompleteFlowTask(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
-        super(user, flowId, taskId, subject, data);
+public abstract class FlowTaskOutputCommand extends FlowTaskCommand {
+    public final String subject;
+    public final ValueMap data;
+
+    protected FlowTaskOutputCommand(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
+        super(user, flowId, taskId);
+        this.subject = subject;
+        this.data = data;
     }
 
-    public CompleteFlowTask(ValueMap json) {
+    protected FlowTaskOutputCommand(ValueMap json) {
         super(json);
+        this.subject = json.readString(Fields.subject);
+        this.data = json.readMap(Fields.output);
     }
 
     @Override
-    public void process(FlowState flow) {
-        flow.completeTask(getUser(), taskId, subject, data);
+    public void write(JsonGenerator generator) throws IOException {
+        writeFlowTaskOutputCommand(generator);
+    }
+
+    protected void writeFlowTaskOutputCommand(JsonGenerator generator) throws IOException {
+        super.writeFlowTaskCommand(generator);
+        writeField(generator, Fields.subject, subject);
+        writeField(generator, Fields.output, data);
     }
 }
 

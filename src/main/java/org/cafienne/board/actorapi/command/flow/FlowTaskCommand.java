@@ -29,19 +29,44 @@ import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-@Manifest
-public class CompleteFlowTask extends FlowTaskOutputCommand {
-    public CompleteFlowTask(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
-        super(user, flowId, taskId, subject, data);
+public abstract class FlowTaskCommand extends BoardFlowCommand {
+    public final String taskId;
+
+    protected FlowTaskCommand(BoardUser user, String flowId, String taskId) {
+        super(user, flowId);
+        this.taskId = taskId;
     }
 
-    public CompleteFlowTask(ValueMap json) {
+    protected FlowTaskCommand(ValueMap json) {
         super(json);
+        this.taskId = json.readString(Fields.taskId);
     }
 
     @Override
-    public void process(FlowState flow) {
-        flow.completeTask(getUser(), taskId, subject, data);
+    public void validate(BoardActor board) throws InvalidCommandException {
+        super.validate(board);
+        if (board.state.flows().get(flowId).isEmpty()) {
+            // TODO: come up with a good exception report that is secure ...
+            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be performed: the flow does not exist");
+        }
+    }
+
+    @Override
+    public BoardResponse process(BoardActor board) {
+        process(board.state.flows().get(flowId).get());
+        return new BoardResponse(this);
+    }
+
+    protected abstract void process(FlowState flow);
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        writeFlowTaskCommand(generator);
+    }
+
+    public void writeFlowTaskCommand(JsonGenerator generator) throws IOException {
+        super.writeFlowCommand(generator);
+        writeField(generator, Fields.taskId, taskId);
     }
 }
 

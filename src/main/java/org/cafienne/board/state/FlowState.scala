@@ -7,7 +7,7 @@ import org.cafienne.board.{BoardActor, BoardFields}
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowActivated, FlowInitiated}
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.cmmn.actorapi.command.StartCase
-import org.cafienne.humantask.actorapi.command.CompleteHumanTask
+import org.cafienne.humantask.actorapi.command.{ClaimTask, CompleteHumanTask, SaveTaskOutput}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 
@@ -57,10 +57,24 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     })
   }
 
+  def claimTask(user: BoardUser, taskId: String): Unit = {
+    board.askModel(new ClaimTask(user.asCaseUserIdentity(), flowId, taskId), (failure: CommandFailure) => {
+      logger.warn("Failure while completing task ", failure.exception)
+    }, (success: ModelResponse) => {
+    })
+  }
+
+  def saveTask(user: BoardUser, taskId: String, subject: String, output: ValueMap): Unit = {
+    val taskOutput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, subject), BoardFields.Data, output)
+    board.askModel(new SaveTaskOutput(user.asCaseUserIdentity(), flowId, taskId, taskOutput), (failure: CommandFailure) => {
+      logger.warn("Failure while completing task ", failure.exception)
+    }, (success: ModelResponse) => {
+    })
+  }
+
   def completeTask(user: BoardUser, taskId: String, subject: String, output: ValueMap): Unit = {
     val taskOutput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, subject), BoardFields.Data, output)
-    val completeCaseTask = new CompleteHumanTask(user.asCaseUserIdentity(), flowId, taskId, taskOutput)
-    board.askModel(completeCaseTask, (failure: CommandFailure) => {
+    board.askModel(new CompleteHumanTask(user.asCaseUserIdentity(), flowId, taskId, taskOutput), (failure: CommandFailure) => {
       logger.warn("Failure while completing task ", failure.exception)
     }, (success: ModelResponse) => {
     })
