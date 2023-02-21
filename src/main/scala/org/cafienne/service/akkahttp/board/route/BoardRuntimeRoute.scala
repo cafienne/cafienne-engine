@@ -87,7 +87,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
         commandResponse <- caseSystem.gateway.request(command)
         // TODO: Somehow make it run SyncedQuery with the response last modifieds?
         //    Yes. Idea: it should use BOARD_LAST_MODIFIED and Board should give most latest CaseLastModified as it's last modified
-//        tasks <- runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)))
+        //        tasks <- runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)))
 
         tasks <- taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier))
       } yield (commandResponse, tasks)
@@ -107,7 +107,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
               val definition = value.state.definition
               val team = value.state.team.users.toSeq.map(user => TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
               val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
-                val columnTasks: Seq[BoardAPI.Task] = tasks.filter(column.getTitle == _.taskName).map(task => {
+                val columnTasks: Seq[BoardAPI.Task] = tasks.filter(_.isActive).filter(column.getTitle == _.taskName).map(task => {
                   val taskData = task.inputJson.merge(task.outputJson).asMap()
                   val data = taskData.readMap(BoardFields.Data)
                   val subject = taskData.readMap(BoardFields.BoardMetadata).readString(Fields.subject, "")
@@ -116,13 +116,15 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
                 })
                 BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
               })
+
               completeJson(BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
             }
             case other => // Unknown new type of response that is not handled
               logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
               complete(StatusCodes.OK)
           }
-        case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)      }
+        case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
+      }
     }
   }
 

@@ -21,6 +21,9 @@ import org.cafienne.board.actorapi.command.CreateBoard;
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition;
 import org.cafienne.board.actorapi.command.definition.column.AddColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.column.UpdateColumnDefinition;
+import org.cafienne.board.actorapi.command.flow.ClaimFlowTask;
+import org.cafienne.board.actorapi.command.flow.CompleteFlowTask;
+import org.cafienne.board.actorapi.command.flow.SaveFlowTaskOutput;
 import org.cafienne.board.actorapi.command.flow.StartFlow;
 import org.cafienne.board.actorapi.command.runtime.GetBoard;
 import org.cafienne.board.actorapi.event.BoardCreated;
@@ -51,6 +54,9 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(AddColumnDefinition.class, AddColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(UpdateColumnDefinition.class, UpdateColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(StartFlow.class, StartFlow::new);
+        CafienneSerializer.addManifestWrapper(ClaimFlowTask.class, ClaimFlowTask::new);
+        CafienneSerializer.addManifestWrapper(SaveFlowTaskOutput.class, SaveFlowTaskOutput::new);
+        CafienneSerializer.addManifestWrapper(CompleteFlowTask.class, CompleteFlowTask::new);
     }
 
     private static void addBoardEvents() {

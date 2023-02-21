@@ -18,10 +18,11 @@
 package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.flow.FlowInitiated;
-import org.cafienne.board.actorapi.response.FlowStartedResponse;
+import org.cafienne.board.actorapi.response.BoardResponse;
+import org.cafienne.board.state.FlowState;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -29,33 +30,18 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class StartFlow extends BoardFlowCommand {
-    public final String subject;
-    public final ValueMap data;
-
-    public StartFlow(BoardUser user, String flowId, String subject, ValueMap data) {
-        super(user, flowId);
-        this.subject = subject;
-        this.data = data;
+public class CompleteFlowTask extends FlowTaskOutputCommand {
+    public CompleteFlowTask(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
+        super(user, flowId, taskId, subject, data);
     }
 
-    public StartFlow(ValueMap json) {
+    public CompleteFlowTask(ValueMap json) {
         super(json);
-        this.subject = json.readString(Fields.subject);
-        this.data = json.readMap(Fields.input);
     }
 
     @Override
-    public void process(BoardActor board) {
-        board.addEvent(new FlowInitiated(board, flowId, subject, data));
-        setResponse(new FlowStartedResponse(this, flowId));
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeFlowCommand(generator);
-        writeField(generator, Fields.subject, subject);
-        writeField(generator, Fields.input, data);
+    public void process(FlowState flow) {
+        flow.completeTask(getUser(), taskId, subject, data);
     }
 }
 

@@ -17,37 +17,24 @@
 
 package org.cafienne.board.actorapi.command.flow;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.board.actorapi.command.BoardCommand;
-import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.board.state.FlowState;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
-import java.io.IOException;
-
-/**
- * Base class for sending commands to a TenantActor
- */
-public abstract class BoardFlowCommand extends BoardCommand {
-    public final String flowId;
-
-    /**
-     * Create a new command that can be sent to the board.
-     *
-     * @param user The user that issues this command.
-     */
-    protected BoardFlowCommand(BoardUser user, String flowId) {
-        super(user);
-        this.flowId = flowId;
+@Manifest
+public class SaveFlowTaskOutput extends FlowTaskOutputCommand {
+    public SaveFlowTaskOutput(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
+        super(user, flowId, taskId, subject, data);
     }
 
-    protected BoardFlowCommand(ValueMap json) {
+    public SaveFlowTaskOutput(ValueMap json) {
         super(json);
-        this.flowId = json.readString(Fields.flowId);
     }
 
-    public void writeFlowCommand(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.flowId, flowId);
+    @Override
+    public void process(FlowState flow) {
+        flow.saveTask(getUser(), taskId, subject, data);
     }
 }
+
