@@ -40,7 +40,7 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     // Compose the case team based on the definition
     val caseTeam = definition.team.caseTeam
     // Take the case input from the event
-    val caseInput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, event.subject), BoardFields.Data, event.input)
+    val caseInput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, event.subject, BoardDefinition.BOARD_IDENTIFIER, board.getId), BoardFields.Data, event.input)
 
     val startCase = new StartCase(board.getTenant, event.getUser.asCaseUserIdentity(), flowId, caseDefinition, caseInput, caseTeam, true)
     board.askModel(startCase, (failure: CommandFailure) => {
