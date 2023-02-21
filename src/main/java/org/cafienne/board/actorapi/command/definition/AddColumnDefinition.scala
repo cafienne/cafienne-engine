@@ -10,7 +10,7 @@ import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 
 @Manifest
-case class AddColumnDefinition(val user: BoardUser, val columnId: String, val title: String, val form: Option[ValueMap]) extends BoardDefinitionCommand(user) {
+case class AddColumnDefinition(val user: BoardUser, val columnId: String, val title: String, val role: Option[String], val form: Option[ValueMap]) extends BoardDefinitionCommand(user) {
   /**
     * Method to be implemented to handle the command.
     *
@@ -18,7 +18,7 @@ case class AddColumnDefinition(val user: BoardUser, val columnId: String, val ti
     * @return
     */
   override def process(board: BoardActor): ModelResponse = {
-    board.addEvent(new ColumnDefinitionAdded(board, columnId, title, form))
+    board.addEvent(new ColumnDefinitionAdded(board, columnId, title, role, form))
     new ColumnAddedResponse(this, columnId)
   }
 
@@ -26,12 +26,13 @@ case class AddColumnDefinition(val user: BoardUser, val columnId: String, val ti
     super.writeModelCommand(generator)
     writeField(generator, Fields.columnId, columnId)
     writeField(generator, Fields.title, title)
+    writeField(generator, Fields.role, role)
     writeField(generator, Fields.form, form)
   }
 }
 
 object AddColumnDefinition {
   def deserialize(json: ValueMap): AddColumnDefinition = {
-    AddColumnDefinition(BoardUser.deserialize(json.readMap(Fields.user)), json.readString(Fields.columnId), json.readString(Fields.title), json.readOptionalMap(Fields.form))
+    AddColumnDefinition(user = BoardUser.deserialize(json.readMap(Fields.user)), columnId = json.readString(Fields.columnId), title = json.readString(Fields.title), role = json.readOption[String](Fields.role), form = json.readOptionalMap(Fields.form))
   }
 }

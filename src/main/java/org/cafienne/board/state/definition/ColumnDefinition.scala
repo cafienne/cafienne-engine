@@ -22,21 +22,30 @@ class ColumnDefinition(val columnId: String, val definition: BoardDefinition, va
        |</sentry>""".stripMargin
   })
 
-  private var name: String = ""
+  private var title: String = ""
+  private var role: String = ""
   private var form: ValueMap = new ValueMap()
 
+  def getTitle = title
+
+  def getRole = role
+
+  def getForm = form
+
   def updateState(event: ColumnDefinitionAdded): Unit = {
-    this.name = event.title
+    this.title = event.title
+    this.role = event.role.getOrElse(this.role)
     this.form = event.form.getOrElse(this.form)
   }
 
   def updateState(event: ColumnDefinitionUpdated): Unit = {
-    this.name = event.title.getOrElse(this.name)
+    this.title = event.title.getOrElse(this.title)
+    this.role = event.role.getOrElse(this.role)
     this.form = event.form.getOrElse(this.form)
   }
 
   def planItemXML: String = {
-    s"""<planItem id="pi_ht__${columnIdentifier}" name="${name}" definitionRef="${taskIdentifier}">
+    s"""<planItem id="pi_ht__${columnIdentifier}" name="${title}" definitionRef="${taskIdentifier}">
        |   ${entryCriterion}
        |      </planItem>
        |${sentry}""".stripMargin
@@ -50,7 +59,7 @@ class ColumnDefinition(val columnId: String, val definition: BoardDefinition, va
     val outMetadata = s"_ht_out${metadata}"
     val outData = s"_ht_out${data}"
 
-    s"""<humanTask id="${taskIdentifier}" name="${name}" isBlocking="true">
+    s"""<humanTask id="${taskIdentifier}" name="$title" isBlocking="true" performerRef="$role">
        |    <inputs id="${inMetadata}" name="BoardMetadata" bindingRef="${definition.boardFileIdentifier}"/>
        |    <inputs id="${inData}" name="Data" bindingRef="${definition.dataFileIdentifier}"/>
        |    <outputs id="${outMetadata}" name="BoardMetadata" bindingRef="${definition.boardFileIdentifier}"/>

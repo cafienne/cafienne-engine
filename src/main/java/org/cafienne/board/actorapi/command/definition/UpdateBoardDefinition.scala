@@ -11,6 +11,7 @@ import org.cafienne.json.ValueMap
 
 @Manifest
 case class UpdateBoardDefinition(val user: BoardUser, val title: Option[String], val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateDefinition {
+  val role = None
   /**
     * Method to be implemented to handle the command.
     *
