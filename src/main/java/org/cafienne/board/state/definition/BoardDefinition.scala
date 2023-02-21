@@ -51,12 +51,17 @@ class BoardDefinition(val board: BoardActor) extends FormElement with LazyLoggin
     val string =
       s"""<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
          |    <caseFileItemDefinition name="ttpboard" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="ttpboard.cfid">
+         |        <property name="${BoardDefinition.BOARD_IDENTIFIER}" type="http://www.omg.org/spec/CMMN/PropertyType/string">
+         |            <extensionElements mustUnderstand="false">
+         |                <cafienne:implementation xmlns:cafienne="org.cafienne" isBusinessIdentifier="true"/>
+         |            </extensionElements>
+         |        </property>
          |        <property name="subject" type="http://www.omg.org/spec/CMMN/PropertyType/string">
          |            <extensionElements mustUnderstand="false">
          |                <cafienne:implementation xmlns:cafienne="org.cafienne" isBusinessIdentifier="true"/>
          |            </extensionElements>
          |        </property>
-         |    </caseFileItemDefinition>
+         |         |    </caseFileItemDefinition>
          |    <caseFileItemDefinition name="ttpdata" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="ttpdata.cfid"/>
          |    <case id="${title}.case" name="${title}" expressionLanguage="spel">
          |        <caseFileModel>
@@ -86,4 +91,8 @@ class BoardDefinition(val board: BoardActor) extends FormElement with LazyLoggin
   def addColumn(columnId: String, title: String, form: ValueMap): Unit = {
     new ColumnDefinition(columnId, this, columns.lastOption)
   }
+}
+
+object BoardDefinition {
+  val BOARD_IDENTIFIER = "__ttp__boardId__"
 }
