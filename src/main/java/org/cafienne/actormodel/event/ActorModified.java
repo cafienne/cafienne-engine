@@ -64,7 +64,7 @@ public abstract class ActorModified extends BaseModelEvent<ModelActor> implement
     }
 
     @Override
-    public void updateState(ModelActor actor) {
+    public final void updateState(ModelActor actor) {
         actor.setLastModified(lastModified());
     }
 
