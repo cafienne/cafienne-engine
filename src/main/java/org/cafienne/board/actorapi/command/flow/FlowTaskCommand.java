@@ -22,9 +22,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.response.BoardResponse;
-import org.cafienne.board.state.FlowState;
 import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -53,11 +51,9 @@ public abstract class FlowTaskCommand extends BoardFlowCommand {
 
     @Override
     public BoardResponse process(BoardActor board) {
-        process(board.state.flows().get(flowId).get());
-        return new BoardResponse(this);
+        board.state.flows().get(flowId).get().handle(this);
+        return null; // Response is given when Case has replied instead of directory from this command
     }
-
-    protected abstract void process(FlowState flow);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {

@@ -19,9 +19,8 @@ package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.flow.FlowInitiated;
-import org.cafienne.board.actorapi.response.FlowStartedResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -46,9 +45,8 @@ public class StartFlow extends BoardFlowCommand {
     }
 
     @Override
-    public FlowStartedResponse process(BoardActor board) {
-        board.addEvent(new FlowInitiated(board, flowId, subject, data));
-        return new FlowStartedResponse(this, flowId);
+    public ModelResponse process(BoardActor board) {
+        return board.state.startFlow(this);
     }
 
     @Override

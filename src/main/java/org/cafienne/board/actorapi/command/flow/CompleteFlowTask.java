@@ -17,17 +17,9 @@
 
 package org.cafienne.board.actorapi.command.flow;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.response.BoardResponse;
-import org.cafienne.board.state.FlowState;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-
-import java.io.IOException;
 
 @Manifest
 public class CompleteFlowTask extends FlowTaskOutputCommand {
@@ -37,11 +29,6 @@ public class CompleteFlowTask extends FlowTaskOutputCommand {
 
     public CompleteFlowTask(ValueMap json) {
         super(json);
-    }
-
-    @Override
-    public void process(FlowState flow) {
-        flow.completeTask(getUser(), taskId, subject, data);
     }
 }
 

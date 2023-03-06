@@ -19,6 +19,7 @@ package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.board.BoardFields;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
@@ -38,6 +39,10 @@ public abstract class FlowTaskOutputCommand extends FlowTaskCommand {
         super(json);
         this.subject = json.readString(Fields.subject);
         this.data = json.readMap(Fields.output);
+    }
+
+    public final ValueMap output() {
+        return new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, subject), BoardFields.Data, data);
     }
 
     @Override

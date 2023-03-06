@@ -24,6 +24,7 @@ import org.cafienne.infrastructure.akkahttp.route.LastModifiedDirectives
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.querydb.query.filter.TaskFilter
 import org.cafienne.querydb.query.{TaskQueries, TaskQueriesImpl}
+import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.board.model.BoardAPI
 import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
@@ -78,52 +79,61 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
   )
   @Produces(Array("application/json"))
   def getBoard: Route = get {
-    boardUser { boardUser =>
-      val command = new GetBoard(boardUser)
+    readLastModifiedHeader(Headers.BOARD_LAST_MODIFIED) { lastModified =>
+      boardUser { boardUser =>
+        val command = new GetBoard(boardUser)
 
-      val businessIdentifier = Some(s"${BoardDefinition.BOARD_IDENTIFIER}=${boardUser.boardId}")
-
-      val query = for {
-        commandResponse <- caseSystem.gateway.request(command)
-        // TODO: Somehow make it run SyncedQuery with the response last modifieds?
-        //    Yes. Idea: it should use BOARD_LAST_MODIFIED and Board should give most latest CaseLastModified as it's last modified
-        //        tasks <- runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)))
-
-        tasks <- taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier))
-      } yield (commandResponse, tasks)
-
-      onComplete(query) {
-        case Success(result) =>
-          val response = result._1
-          val tasks = result._2
-          response match {
-            case e: CommandFailure => response match {
-              case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
-              case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
-              case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
-              case _ => complete(StatusCodes.BadRequest, e.exception.getMessage)
+        val businessIdentifier = Some(s"${BoardDefinition.BOARD_IDENTIFIER}=${boardUser.boardId}")
+        val query = for {
+          commandResponse <- caseSystem.gateway.request(command)
+          tasks <- {
+            // If last modified is filled, we can use that to await case updates.
+            // But then - that can only be done if last modified is not on the board itself
+            //  The reason behind this: if a board is created and updated, it gives last modified of board itself (i.e., timestamp with board id),
+            //  but if a task in a flow in the board is updated, that is actually something done on a case. In such a scenario, the case id with it's last timestamp
+            //  is set in the response header ("BOARD_LAST_MODIFIED"), and then the actor id of last modified is not equal to the board id.
+            //  So in that case, we can run a synced query against the CaseReader.lastModifiedRegistration.
+            if (lastModified.lastModified.map(_.actorId).getOrElse(boardUser.boardId) == boardUser.boardId) {
+              taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier))
+            } else {
+              runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)), lastModified)
             }
-            case value: GetBoardResponse => {
-              val definition = value.definition
-              val team = definition.team.users.toSeq.map(user => TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
-              val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
-                val columnTasks: Seq[BoardAPI.Task] = tasks.filter(_.isActive).filter(column.getTitle == _.taskName).map(task => {
-                  val taskInput = task.getJSON(task.input).asMap()
-                  val data = taskInput.readMap(BoardFields.Data)
-                  val subject = taskInput.readMap(BoardFields.BoardMetadata).readString(Fields.subject, "")
-                  BoardAPI.Task(id = task.id, subject = Some(subject), flowId = task.caseInstanceId,
-                    claimedBy = Some(task.assignee), form = task.getJSON(task.taskModel).asMap(), data = data)
-                })
-                BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
-              })
-
-              completeJson(BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
-            }
-            case other => // Unknown new type of response that is not handled
-              logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
-              complete(StatusCodes.OK)
           }
-        case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
+        } yield (commandResponse, tasks)
+
+        onComplete(query) {
+          case Success(result) =>
+            val response = result._1
+            val tasks = result._2
+            response match {
+              case e: CommandFailure => response match {
+                case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
+                case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
+                case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
+                case _ => complete(StatusCodes.BadRequest, e.exception.getMessage)
+              }
+              case value: GetBoardResponse => {
+                val definition = value.definition
+                val team = definition.team.users.toSeq.map(user => TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
+                val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
+                  val columnTasks: Seq[BoardAPI.Task] = tasks.filter(_.isActive()).filter(column.getTitle == _.taskName).map(task => {
+                    val taskInput = task.getJSON(task.input).asMap()
+                    val data = taskInput.readMap(BoardFields.Data)
+                    val subject = taskInput.readMap(BoardFields.BoardMetadata).readString(Fields.subject, "")
+                    BoardAPI.Task(id = task.id, subject = Some(subject), flowId = task.caseInstanceId,
+                      claimedBy = Some(task.assignee), form = task.getJSON(task.taskModel).asMap(), data = data)
+                  })
+                  BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
+                })
+
+                completeJson(BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
+              }
+              case other => // Unknown new type of response that is not handled
+                logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
+                complete(StatusCodes.OK)
+            }
+          case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
+        }
       }
     }
   }

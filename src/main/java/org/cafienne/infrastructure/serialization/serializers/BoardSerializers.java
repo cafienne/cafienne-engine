@@ -37,6 +37,7 @@ import org.cafienne.board.actorapi.response.BoardCreatedResponse;
 import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.board.actorapi.response.ColumnAddedResponse;
 import org.cafienne.board.actorapi.response.FlowStartedResponse;
+import org.cafienne.board.actorapi.response.runtime.FlowResponse;
 import org.cafienne.board.actorapi.response.runtime.GetBoardResponse;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 
@@ -72,6 +73,7 @@ public class BoardSerializers {
     private static void addBoardResponses() {
         CafienneSerializer.addManifestWrapper(BoardResponse.class, BoardResponse::new);
         CafienneSerializer.addManifestWrapper(GetBoardResponse.class, GetBoardResponse::new);
+        CafienneSerializer.addManifestWrapper(FlowResponse.class, FlowResponse::new);
         CafienneSerializer.addManifestWrapper(BoardCreatedResponse.class, BoardCreatedResponse::new);
         CafienneSerializer.addManifestWrapper(ColumnAddedResponse.class, ColumnAddedResponse::new);
         CafienneSerializer.addManifestWrapper(FlowStartedResponse.class, FlowStartedResponse::new);
