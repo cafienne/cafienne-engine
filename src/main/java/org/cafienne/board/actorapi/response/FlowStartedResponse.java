@@ -18,6 +18,7 @@
 package org.cafienne.board.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.board.actorapi.command.flow.StartFlow;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -30,8 +31,9 @@ import java.io.IOException;
 public class FlowStartedResponse extends BoardResponseWithContent {
     public final String flowId;
 
-    public FlowStartedResponse(StartFlow command, String flowId) {
+    public FlowStartedResponse(StartFlow command, String flowId, ActorLastModified lastModified) {
         super(command);
+        setLastModified(lastModified);
         this.flowId = flowId;
     }
 

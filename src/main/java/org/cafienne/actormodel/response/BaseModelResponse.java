@@ -31,7 +31,7 @@ import java.time.Instant;
  */
 public abstract class BaseModelResponse implements ModelResponse {
     private final String messageId;
-    private final String actorId;
+    private String actorId;
     private Instant lastModified;
     private final UserIdentity user;
     private final String commandType;
@@ -78,6 +78,11 @@ public abstract class BaseModelResponse implements ModelResponse {
 
     public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
+    }
+
+    protected void setLastModified(ActorLastModified alm) {
+        this.lastModified = alm.getLastModified();
+        this.actorId = alm.actorId;
     }
 
     public Instant getLastModified() {

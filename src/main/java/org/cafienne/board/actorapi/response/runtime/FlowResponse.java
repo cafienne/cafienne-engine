@@ -15,20 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command.flow;
+package org.cafienne.board.actorapi.response.runtime;
 
-import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.actormodel.response.ActorLastModified;
+import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest
-public class SaveFlowTaskOutput extends FlowTaskOutputCommand {
-    public SaveFlowTaskOutput(BoardUser user, String flowId, String taskId, String subject, ValueMap data) {
-        super(user, flowId, taskId, subject, data);
+public class FlowResponse extends BoardResponse {
+    public FlowResponse(BoardCommand command, ActorLastModified lastModified) {
+        super(command);
+        setLastModified(lastModified);
     }
 
-    public SaveFlowTaskOutput(ValueMap json) {
+    public FlowResponse(ValueMap json) {
         super(json);
     }
 }
-

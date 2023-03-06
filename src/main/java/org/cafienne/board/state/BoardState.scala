@@ -2,6 +2,7 @@ package org.cafienne.board.state
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.board.BoardActor
+import org.cafienne.board.actorapi.command.flow.StartFlow
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowInitiated}
 import org.cafienne.board.actorapi.event.{BoardEvent, BoardModified}
@@ -20,6 +21,15 @@ class BoardState(val board: BoardActor) extends StateElement with CafienneJson w
 
   // Tell our flows we've completed recovery, so that they can start follow up actions when necessary
   def recoveryCompleted(): Unit = flows.foreach(_._2.recoveryCompleted())
+
+  def startFlow(command: StartFlow): Unit = {
+    board.addEvent(new FlowInitiated(board, command.flowId, command.subject, command.data))
+    val flow = flows(command.flowId) // FlowInitiated event has updateState that adds the flow to our map of flows.
+    // This code is reached when the constructor is called, and hence the FlowInitiated event was triggered.
+    //  If in recovery mode, we should not do any further action;
+    //  But if in running mode, then let's create the underlying case
+    flow.createCase(Some(command))
+  }
 
   def updateState(event: BoardEvent): Unit = event match {
     case event: BoardDefinitionEvent => handleDefinitionUpdate(event)

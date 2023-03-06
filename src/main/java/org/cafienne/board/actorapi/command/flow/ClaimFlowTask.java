@@ -18,7 +18,6 @@
 package org.cafienne.board.actorapi.command.flow;
 
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.board.state.FlowState;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -30,11 +29,6 @@ public class ClaimFlowTask extends FlowTaskCommand {
 
     public ClaimFlowTask(ValueMap json) {
         super(json);
-    }
-
-    @Override
-    public void process(FlowState flow) {
-        flow.claimTask(getUser(), taskId);
     }
 }
 
