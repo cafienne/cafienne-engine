@@ -19,20 +19,16 @@ package org.cafienne.infrastructure.akkahttp.route
 
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.response.ModelResponse
 import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Node
-
-import scala.collection.immutable.Seq
 
 /**
   * Base class for Case Service APIs. All cors enabled
@@ -54,18 +50,18 @@ trait CaseServiceRoute extends LazyLogging {
 
   val route: Route = handleErrors {
     //extractExecutionContext { implicit executor =>
-      cors(corsSettings) {
-        handleErrors { req =>
-          //          println("Asking "+req.request.uri)
-          routes(req)
-//            .map(resp => {
-//              println("Responding to " + req.request.uri + ": " + resp)
-//              println("" + resp)
-//              resp
-//            })
-        }
+    cors(corsSettings) {
+      handleErrors { req =>
+        //          println("Asking "+req.request.uri)
+        routes(req)
+        //            .map(resp => {
+        //              println("Responding to " + req.request.uri + ": " + resp)
+        //              println("" + resp)
+        //              resp
+        //            })
       }
-   // }
+    }
+    // }
   }
 
   // Give more information back to client on various types of rejections
@@ -111,15 +107,6 @@ trait CaseServiceRoute extends LazyLogging {
     }
   }
 
-  def writeLastModifiedHeader(response: ModelResponse, headerName: String = Headers.CASE_LAST_MODIFIED): Directive0 = {
-    val lm = response.lastModifiedContent().toString
-    if (lm != null) {
-      respondWithHeader(RawHeader(headerName, response.lastModifiedContent.toString))
-    } else {
-      respondWithHeaders(Seq())
-    }
-  }
-
   def completeJson(seq: Seq[CafienneJson]): Route = completeJson(StatusCodes.OK, Value.convert(seq.map(_.toValue)))
 
   def completeJson(c: CafienneJson): Route = completeJson(StatusCodes.OK, c.toValue)
@@ -135,6 +122,7 @@ trait CaseServiceRoute extends LazyLogging {
   /**
     * Register a sub route; note: this requires an override of the prefix value as well,
     * and additionally the routes method should not be overridden
+    *
     * @param subRoute
     */
   def addSubRoute(subRoute: CaseServiceRoute): Unit = {
@@ -161,6 +149,7 @@ trait CaseServiceRoute extends LazyLogging {
 
   /**
     * Invoke this method to add it to the Swagger API classes
+    *
     * @param route
     * @return
     */

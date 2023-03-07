@@ -26,9 +26,9 @@ public class ActorLastModified {
     private final static String SEPARATOR = ";";
 
     //Variable to store the command completed moment
-    private final Instant lastModified;
+    public final Instant lastModified;
     //Variable to store the case instance identifier
-    private final String actorId;
+    public final String actorId;
     private final String string;
 
     public ActorLastModified(String actorId, Instant lastModified) {
@@ -41,7 +41,7 @@ public class ActorLastModified {
         return lastModified == null ? null : lastModified + SEPARATOR + actorId;
     }
 
-    public ActorLastModified(String lastModifiedContent) throws InvalidCaseLastModifiedException {
+    public ActorLastModified(String name, String lastModifiedContent) throws InvalidCaseLastModifiedException {
         try {
             String[] lastModifiedHeaderParts = lastModifiedContent.split(SEPARATOR);
             this.lastModified = java.time.Instant.parse(lastModifiedHeaderParts[0]);
@@ -49,9 +49,9 @@ public class ActorLastModified {
             this.string = asString();
         } catch (ArrayIndexOutOfBoundsException | DateTimeParseException | NullPointerException ex) {
             if (ex instanceof DateTimeParseException) {
-                throw new InvalidCaseLastModifiedException("Invalid time stamp '" + ((DateTimeParseException) ex).getParsedString() + "' received in CaseLastModified header");
+                throw new InvalidCaseLastModifiedException("Invalid time stamp '" + ((DateTimeParseException) ex).getParsedString() + "' received in " + name + " header");
             } else {
-                throw new InvalidCaseLastModifiedException("Provide a valid CaseLastModified header");
+                throw new InvalidCaseLastModifiedException("Provide a valid " + name + " header");
             }
         }
     }
@@ -71,11 +71,11 @@ public class ActorLastModified {
     }
 
     /**
-     * Returns case instance identifier
+     * Returns actor identifier
      *
      * @return String
      */
-    public String getCaseInstanceId() {
+    public String getActorId() {
         return actorId;
     }
 

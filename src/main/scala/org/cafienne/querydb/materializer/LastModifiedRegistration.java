@@ -47,20 +47,20 @@ public class LastModifiedRegistration {
         this.name = name;
     }
 
-    public Promise<?> waitFor(ActorLastModified notBefore) {
+    public Promise<String> waitFor(ActorLastModified notBefore) {
         log("Executing query after response for " + notBefore);
         Promise<String> p = Futures.promise();
 
-        Instant lastKnownMoment = lastModifiedRegistration.get(notBefore.getCaseInstanceId());
+        Instant lastKnownMoment = lastModifiedRegistration.get(notBefore.getActorId());
         if (lastKnownMoment == null) {
             if (notBefore.getLastModified().isBefore(startupMoment)) {
                 p.success("That's quite an old timestamp; we're not gonna wait for it; we started at " + startupMoment);
             } else {
-                log("Adding waiter for actor[" + notBefore.getCaseInstanceId() + "] modified at " + notBefore.getLastModified());
+                log("Adding waiter for actor[" + notBefore.getActorId() + "] modified at " + notBefore.getLastModified());
                 addWaiter(new Waiter(notBefore, p));
             }
         } else if (lastKnownMoment.isBefore(notBefore.getLastModified())) {
-            log("Adding waiter for entity " + notBefore.getCaseInstanceId() + ", because last known moment is " + lastKnownMoment + ", and we're waiting for " + notBefore.getLastModified());
+            log("Adding waiter for entity " + notBefore.getActorId() + ", because last known moment is " + lastKnownMoment + ", and we're waiting for " + notBefore.getLastModified());
             addWaiter(new Waiter(notBefore, p));
         } else {
             log("Returning because already available");
@@ -100,7 +100,7 @@ public class LastModifiedRegistration {
             log("Found " + newTimestamp + "/" + id+" for " + waiterList.size() + " waiters");
             for (Waiter waiter : waiterList) {
                 if (newTimestamp.isBefore(waiter.moment())) {
-                    log("-need " + waiter.notBefore.getLastModified() + "/" + waiter.notBefore.getCaseInstanceId());
+                    log("-need " + waiter.notBefore.getLastModified() + "/" + waiter.notBefore.getActorId());
                     newWaiters.add(waiter);
                 } else {
                     waiter.stopWaiting();
@@ -147,7 +147,7 @@ public class LastModifiedRegistration {
         }
 
         String id() {
-            return notBefore.getCaseInstanceId();
+            return notBefore.getActorId();
         }
 
         Instant moment() {
