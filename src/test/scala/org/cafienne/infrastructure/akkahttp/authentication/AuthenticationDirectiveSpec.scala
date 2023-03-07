@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jose.{JWSAlgorithm, JWSHeader}
 import com.nimbusds.jwt.{JWTClaimsSet, SignedJWT}
 import net.minidev.json.JSONArray
+import org.cafienne.service.akkahttp.LastModifiedHeader
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -42,7 +43,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import IncludeAuthDirectives._
     val route: Route = get {
       path("secured") {
-        platformUser(None) { userContext =>
+        platformUser(LastModifiedHeader.NONE) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
@@ -59,7 +60,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import AuthDirectivesWithoutRoles._
     val route: Route = get {
       path("secured") {
-        platformUser(None) { userContext =>
+        platformUser(LastModifiedHeader.NONE) { userContext =>
           complete(s"The user context is $userContext")
         }
       }
@@ -76,7 +77,7 @@ class AuthenticationDirectiveSpec extends AnyWordSpecLike with Matchers with Sca
     import AuthDirectivesNoUUID._
     val route: Route = get {
       path("secured") {
-        platformUser(None) { userContext =>
+        platformUser(LastModifiedHeader.NONE) { userContext =>
           complete(s"The user context is $userContext")
         }
       }

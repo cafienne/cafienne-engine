@@ -19,12 +19,11 @@ package org.cafienne.infrastructure.akkahttp.authentication
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
-import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.cmmn.repository.file.SimpleLRUCache
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.querydb.record.TenantRecord
+import org.cafienne.service.akkahttp.LastModifiedHeader
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,17 +35,8 @@ class IdentityCache(implicit val ec: ExecutionContext) extends IdentityProvider 
   private val cache = new SimpleLRUCache[String, PlatformUser](Cafienne.config.api.security.identityCacheSize)
   private val tenantCache = new SimpleLRUCache[String, TenantRecord](Cafienne.config.api.security.identityCacheSize)
 
-  override def getPlatformUser(user: UserIdentity, tlm: Option[String]): Future[PlatformUser] = {
-    tlm match {
-      case Some(s) =>
-        // Wait for the TenantReader to be informed about the tenant-last-modified timestamp
-        for {
-          p <- TenantReader.lastModifiedRegistration.waitFor(new ActorLastModified(s)).future
-          u <- executeUserQuery(user)
-        } yield (p, u)._2
-      // Nothing to wait for, just continue and execute the query straight on
-      case None => executeUserQuery(user)
-    }
+  override def getPlatformUser(user: UserIdentity, tenantLastModified: LastModifiedHeader): Future[PlatformUser] = {
+    tenantLastModified.available.flatMap(_ => executeUserQuery(user))
   }
 
   private def cacheUser(user: PlatformUser) = {

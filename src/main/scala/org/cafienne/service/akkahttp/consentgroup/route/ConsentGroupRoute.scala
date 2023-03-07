@@ -22,23 +22,20 @@ import org.cafienne.actormodel.identity.ConsentGroupUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.querydb.materializer.consentgroup.ConsentGroupReader
 import org.cafienne.querydb.query.UserQueries
-import org.cafienne.service.akkahttp.Headers
+import org.cafienne.service.akkahttp.{Headers, LastModifiedHeader}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait ConsentGroupRoute extends CommandRoute with QueryRoute {
-  override val lastModifiedRegistration: LastModifiedRegistration = ConsentGroupReader.lastModifiedRegistration
   override val lastModifiedHeaderName: String = Headers.CONSENT_GROUP_LAST_MODIFIED
   val userQueries: UserQueries
 
   def consentGroupUser(subRoute: ConsentGroupUser => Route): Route = {
     authenticatedUser { user =>
       pathPrefix(Segment) { group =>
-        optionalHeaderValueByName(Headers.CONSENT_GROUP_LAST_MODIFIED) { lastModified =>
+        readLastModifiedHeader(Headers.CONSENT_GROUP_LAST_MODIFIED) { lastModified =>
           onComplete(getConsentGroupUser(user, group, lastModified)) {
             case Success(groupUser) => subRoute(groupUser)
             case Failure(t) => throw t
@@ -48,7 +45,7 @@ trait ConsentGroupRoute extends CommandRoute with QueryRoute {
     }
   }
 
-  def getConsentGroupUser(user: AuthenticatedUser, group: String, groupLastModified: Option[String]): Future[ConsentGroupUser] = {
+  def getConsentGroupUser(user: AuthenticatedUser, group: String, groupLastModified: LastModifiedHeader): Future[ConsentGroupUser] = {
     runSyncedQuery(userQueries.getConsentGroupUser(user, group), groupLastModified)
   }
 
