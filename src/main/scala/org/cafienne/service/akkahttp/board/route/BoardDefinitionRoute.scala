@@ -86,7 +86,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     boardUser { boardUser =>
       pathEndOrSingleSlash {
         entity(as[BoardDefinitionUpdate]) { update =>
-          askBoard(UpdateBoardDefinition(boardUser, update.title, update.form))
+          askBoard(UpdateBoardDefinition(boardUser, update.title, asJson(update.form)))
         }
       }
     }
@@ -114,7 +114,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
         boardUser { boardUser =>
           path("columns") {
             entity(as[ColumnRequestDetails]) { column => //entity as ColumnRequestDetails
-              askBoard(AddColumnDefinition(boardUser, column.id, column.title, column.role, column.form))
+              askBoard(AddColumnDefinition(boardUser, column.id, column.title, column.role, asJson(column.form)))
             }
           }
         }
@@ -167,7 +167,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     boardUser { boardUser =>
       path("columns" / Segment) { columnId =>
         entity(as[ColumnUpdateDetails]) { update =>
-          askBoard(UpdateColumnDefinition(boardUser, columnId, update.title, update.role, update.form))
+          askBoard(UpdateColumnDefinition(boardUser, columnId, update.title, update.role, asJson(update.form)))
         }
       }
     }

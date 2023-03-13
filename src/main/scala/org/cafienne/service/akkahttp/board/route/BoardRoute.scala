@@ -22,6 +22,7 @@ import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.board.actorapi.command.BoardCommand
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
+import org.cafienne.json.{Value, ValueMap}
 import org.cafienne.service.akkahttp.{Headers, LastModifiedHeader}
 
 import scala.concurrent.Future
@@ -42,6 +43,10 @@ trait BoardRoute extends CommandRoute with QueryRoute {
       }
     }
   }
+
+  def asJson(map: Map[String, _]): ValueMap = Value.convert(map).asMap()
+
+  def asJson(map: Option[Map[String, _]]): Option[ValueMap] = map.map(Value.convert(_).asMap())
 
   def getBoardUser(user: AuthenticatedUser, boardId: String, lastModified: LastModifiedHeader): Future[BoardUser] = {
     //runSyncedQuery(boardQueries.getTeamByBoards(user, tenant), lastModified)

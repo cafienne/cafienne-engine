@@ -32,13 +32,14 @@ object BoardAPI {
   implicit val teamMemberDetailsReader: EntityReader[TeamMemberDetails] = entityReader[TeamMemberDetails]
 
   case class BoardRequestDetails(id: Option[String], title: String)
-  case class BoardDefinitionUpdate(title: Option[String], form: Option[ValueMap])
+
+  case class BoardDefinitionUpdate(title: Option[String], form: Option[Map[String, _]])
 
   case class BoardSummaryResponse(id: String, title: String)
 
-  case class ColumnRequestDetails(id: String = new Guid().toString, title: String, role: Option[String], form: Option[ValueMap])
+  case class ColumnRequestDetails(id: String = new Guid().toString, title: String, role: Option[String], form: Option[Map[String, _]])
 
-  case class ColumnUpdateDetails(title: Option[String], role: Option[String], form: Option[ValueMap])
+  case class ColumnUpdateDetails(title: Option[String], role: Option[String], form: Option[Map[String, _]])
 
   case class TeamMemberDetails(userId: String, name: Option[String], roles: Set[String]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.name, name, Fields.roles, roles)
@@ -68,5 +69,13 @@ object BoardAPI {
 
   case class BoardResponseFormat(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.team, team, Fields.columns, columns)
+  }
+
+  object Examples {
+    case class BoardResponse(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[ColumnExample])
+
+    case class ColumnExample(id: String, position: Int, title: Option[String], role: Option[String], tasks: Seq[TaskExample])
+
+    case class TaskExample(id: String, subject: Option[String], flowId: String, claimedBy: Option[String], form: Map[String, _], data: Map[String, _])
   }
 }

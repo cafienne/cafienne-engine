@@ -18,15 +18,14 @@
 package org.cafienne.service.akkahttp.board.model
 
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
-import org.cafienne.json.ValueMap
 
 object FlowAPI {
   implicit val startFlowFormatReader: EntityReader[StartFlowFormat] = entityReader[StartFlowFormat]
   implicit val completeFlowTaskFormatReader: EntityReader[FlowTaskOutputFormat] = entityReader[FlowTaskOutputFormat]
 
-  case class StartFlowFormat(id: Option[String], subject: String, data: Option[ValueMap])
+  case class StartFlowFormat(id: Option[String], subject: String, data: Option[Map[String, _]])
 
   case class FlowStartedFormat(flowId: String)
 
-  case class FlowTaskOutputFormat(subject: String, data: ValueMap)
+  case class FlowTaskOutputFormat(subject: String, data: Map[String, _])
 }

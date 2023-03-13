@@ -43,7 +43,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
       path("flow") {
         pathEndOrSingleSlash {
           entity(as[StartFlowFormat]) { flow =>
-            askFlow(new StartFlow(user, flow.id.getOrElse(new Guid().toString), flow.subject, flow.data.getOrElse(new ValueMap)))
+            askFlow(new StartFlow(user, flow.id.getOrElse(new Guid().toString), flow.subject, asJson(flow.data).getOrElse(new ValueMap())))
           }
         }
       }
@@ -89,7 +89,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
       path("flow" / Segment / "tasks" / Segment) { (flowId, taskId) =>
         pathEndOrSingleSlash {
           entity(as[FlowTaskOutputFormat]) { output =>
-            askFlow(new SaveFlowTaskOutput(user, flowId, taskId, output.subject, output.data))
+            askFlow(new SaveFlowTaskOutput(user, flowId, taskId, output.subject, asJson(output.data)))
           }
         }
       }
@@ -113,7 +113,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
       path("flow" / Segment / "tasks" / Segment) { (flowId, taskId) =>
         pathEndOrSingleSlash {
           entity(as[FlowTaskOutputFormat]) { output =>
-            askFlow(new CompleteFlowTask(user, flowId, taskId, output.subject, output.data))
+            askFlow(new CompleteFlowTask(user, flowId, taskId, output.subject, asJson(output.data)))
           }
         }
       }
