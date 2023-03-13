@@ -22,15 +22,12 @@ import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.board.actorapi.command.BoardCommand
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
-import org.cafienne.querydb.query.board.{BoardQueries, BoardQueriesImpl}
 import org.cafienne.service.akkahttp.{Headers, LastModifiedHeader}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait BoardRoute extends CommandRoute with QueryRoute {
-  val boardQueries: BoardQueries = new BoardQueriesImpl
-
   override val lastModifiedHeaderName: String = Headers.BOARD_LAST_MODIFIED
 
   def boardUser(subRoute: BoardUser => Route): Route = {
