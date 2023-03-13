@@ -26,7 +26,6 @@ import org.cafienne.querydb.query.filter.TaskFilter
 import org.cafienne.querydb.query.{TaskQueries, TaskQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.board.model.BoardAPI
-import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -47,7 +46,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
     description = "Retrieves the list of boards",
     tags = Array("board"),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "List of available boards", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[BoardSummaryResponse]))))),
+      new ApiResponse(responseCode = "200", description = "List of available boards", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[BoardAPI.BoardSummaryResponse]))))),
     )
   )
   @Produces(Array("application/json"))
@@ -71,7 +70,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new Parameter(name = "board", description = "The board to retrieve details from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO return a detailed Board type with all required fields
-      new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[BoardResponseFormat])))),
+      new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[BoardAPI.Examples.BoardResponse])))),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
   )
@@ -112,7 +111,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
               }
               case value: GetBoardResponse => {
                 val definition = value.definition
-                val team = definition.team.users.toSeq.map(user => TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
+                val team = definition.team.users.toSeq.map(user => BoardAPI.TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
                 val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
                   val columnTasks: Seq[BoardAPI.Task] = tasks.filter(_.isActive()).filter(column.getTitle == _.taskName).map(task => {
                     val taskInput = task.getJSON(task.input).asMap()
@@ -124,7 +123,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
                   BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
                 })
 
-                completeJson(BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
+                completeJson(BoardAPI.BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
               }
               case other => // Unknown new type of response that is not handled
                 logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
@@ -146,7 +145,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new Parameter(name = "board", description = "The board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO have a team return type
-      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TeamMemberDetails]])))),
+      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[BoardAPI.TeamMemberDetails]])))),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
   )
@@ -155,8 +154,8 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
     boardUser { boardUser =>
       path("team") {
         val team = Seq(
-          TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
-          TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
+          BoardAPI.TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
+          BoardAPI.TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
         )
         completeJson(team)
       }
@@ -177,7 +176,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new ApiResponse(description = "Team information is invalid", responseCode = "400"),
     )
   ) //TODO have a Team input format
-  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[TeamMemberDetails]))))
+  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[BoardAPI.TeamMemberDetails]))))
   @Consumes(Array("application/json"))
   def addTeam: Route = {
     boardUser { boardUser =>
