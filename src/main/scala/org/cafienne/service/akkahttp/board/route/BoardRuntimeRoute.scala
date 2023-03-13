@@ -38,8 +38,6 @@ import scala.util.{Failure, Success}
 class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute with LastModifiedDirectives {
   val taskQueries: TaskQueries = new TaskQueriesImpl
 
-  import org.cafienne.querydb.query.board.BoardQueryProtocol._
-
   override def routes: Route = concat(getBoards, getTeam, getBoard, addTeam)
 
   @Path("/")
@@ -147,7 +145,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       new Parameter(name = "board", description = "The board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO have a team return type
-      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TeamMember]])))),
+      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[TeamMemberDetails]])))),
       new ApiResponse(responseCode = "404", description = "Board not found"),
     )
   )
