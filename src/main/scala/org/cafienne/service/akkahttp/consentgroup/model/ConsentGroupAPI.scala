@@ -18,6 +18,7 @@
 package org.cafienne.service.akkahttp.consentgroup.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.cafienne.actormodel.identity.ConsentGroupUser
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.service.akkahttp.ApiValidator
@@ -42,7 +43,25 @@ object ConsentGroupAPI {
       val groupId = id.fold(new Guid().toString)(id => id)
       ConsentGroup(groupId, tenant, members.map(_.asMember))
     }
+
+    /**
+      * Specific implementation that ignores the optional id given in the format and instead takes it from the user.
+      * This is required for ReplaceConsentGroup command, that no longer should take the group id from the format itself.
+      * @param owner
+      * @return
+      */
+    def asGroup(owner: ConsentGroupUser): ConsentGroup = {
+      ConsentGroup(owner.groupId, "", members.map(_.asMember))
+    }
   }
+
+  /**
+    * This is the API format for replacing a group. Earlier we exposed full ConsentGroupFormat (i.e., including the optional id), but for
+    * replacing the group the optional id should not be used. However, for backwards compatibility we are still also allowing that (and ignoring any value in there)
+    *
+    * @param members
+    */
+  case class ReplaceConsentGroupFormat(members: Seq[ConsentGroupUserFormat])
 
   case class ConsentGroupUserFormat(
                    @(Schema @field)(implementation = classOf[String], example = "User id of the consent group member")

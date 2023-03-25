@@ -52,11 +52,11 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
       new ApiResponse(responseCode = "404", description = "Consent group not found"),
     )
   )
-  @RequestBody(description = "Group to replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupFormat]))))
+  @RequestBody(description = "Group to replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ReplaceConsentGroupFormat]))))
   @Consumes(Array("application/json"))  def replaceGroup: Route = post {
     consentGroupUser { groupOwner =>
         entity(as[ConsentGroupFormat]) { newGroup =>
-          askModelActor(new ReplaceConsentGroup(groupOwner, newGroup.asGroup("")))
+          askModelActor(new ReplaceConsentGroup(groupOwner, newGroup.asGroup(groupOwner)))
         }
     }
   }
