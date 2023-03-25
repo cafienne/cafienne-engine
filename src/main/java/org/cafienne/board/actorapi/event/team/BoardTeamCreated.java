@@ -15,15 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command;
+package org.cafienne.board.actorapi.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.response.BoardResponse;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -31,38 +26,23 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class CreateBoard extends BoardCommand implements BootstrapMessage {
-    public final String title;
+public class BoardTeamCreated extends BoardTeamEvent {
 
-    public CreateBoard(BoardUser user, String title) {
-        super(user);
-        this.title = title;
+    public final String teamId;
+
+    public BoardTeamCreated(BoardActor board, String teamId) {
+        super(board);
+        this.teamId = teamId;
     }
 
-    public CreateBoard(ValueMap json) {
+    public BoardTeamCreated(ValueMap json) {
         super(json);
-        this.title = json.readString(Fields.title);
-    }
-
-    @Override
-    public String tenant() {
-        return Cafienne.config().platform().defaultTenant();
-    }
-
-    @Override
-    public void validate(BoardActor tenant) throws InvalidCommandException {
-        super.validate(tenant);
-    }
-
-    @Override
-    public BoardResponse process(BoardActor board) {
-        return board.state.initialize(this);
+        this.teamId = json.readString(Fields.team);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.title, title);
+        super.writeBoardTeamEvent(generator);
+        writeField(generator, Fields.team, teamId);
     }
 }
-
