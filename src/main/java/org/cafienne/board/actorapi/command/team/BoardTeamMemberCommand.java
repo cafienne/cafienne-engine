@@ -15,18 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.route
+package org.cafienne.board.actorapi.command.team;
 
-import org.cafienne.system.CaseSystem
+import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
 
-import javax.ws.rs._
-
-@Path("/board")
-class BoardRoutes(override val caseSystem: CaseSystem) extends BoardRoute {
-  override val prefix: String = "board"
-
-  addSubRoute(new BoardDefinitionRoute(caseSystem))
-  addSubRoute(new BoardTeamRoute(caseSystem))
-  addSubRoute(new BoardRuntimeRoute(caseSystem))
-  addSubRoute(new BoardFlowsRoute(caseSystem))
+/**
+ * Base class for updating board teams
+ */
+public abstract class BoardTeamMemberCommand extends BoardDefinitionCommand {
+    /**
+     * Create a new command that can be sent to the board.
+     *
+     * @param user The user that issues this command.
+     */
+    protected BoardTeamMemberCommand(BoardUser user) {
+        super(user);
+    }
 }

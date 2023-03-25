@@ -4,6 +4,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.event.BoardCreated
 import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionUpdated}
+import org.cafienne.board.actorapi.event.team.BoardTeamEvent
 import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
 import org.cafienne.infrastructure.serialization.Fields
@@ -36,16 +37,18 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
 
   def getStartForm: ValueMap = startForm
 
+  def recoveryCompleted(): Unit = team.recoveryCompleted()
+
   def updateState(event: BoardDefinitionEvent): Unit = event match {
-    case event: BoardCreated => title = event.title
+    case event: BoardCreated =>
+      title = event.title
+      team.updateState(event)
     case event: BoardDefinitionUpdated =>
       this.title = event.title.getOrElse(this.title)
       this.startForm = event.form.getOrElse(this.startForm)
     case event: ColumnDefinitionAdded => new ColumnDefinition(this, event.columnId).updateState(event)
-    case event: ColumnDefinitionUpdated => {
-      val column = columns.find(_.columnId == event.columnId).get
-      column.updateState(event)
-    }
+    case event: ColumnDefinitionUpdated => columns.find(_.columnId == event.columnId).foreach(_.updateState(event)) // Note: ignores event when column not found (which would be kinda really weird anyways)
+    case event: BoardTeamEvent => team.updateState(event)
     case other => logger.warn(s"Board Definition cannot handle event of type ${other.getClass.getName}")
   }
 

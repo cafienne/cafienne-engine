@@ -15,14 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command;
+package org.cafienne.board.actorapi.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.BootstrapMessage;
-import org.cafienne.actormodel.exception.InvalidCommandException;
-import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.board.BoardActor;
-import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -30,38 +27,22 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class CreateBoard extends BoardCommand implements BootstrapMessage {
-    public final String title;
+public class BoardTeamCreationFailed extends BoardTeamEvent {
+    public final CommandFailure failure;
 
-    public CreateBoard(BoardUser user, String title) {
-        super(user);
-        this.title = title;
+    public BoardTeamCreationFailed(BoardActor board, CommandFailure failure) {
+        super(board);
+        this.failure = failure;
     }
 
-    public CreateBoard(ValueMap json) {
+    public BoardTeamCreationFailed(ValueMap json) {
         super(json);
-        this.title = json.readString(Fields.title);
-    }
-
-    @Override
-    public String tenant() {
-        return Cafienne.config().platform().defaultTenant();
-    }
-
-    @Override
-    public void validate(BoardActor board) throws InvalidCommandException {
-        super.validate(board);
-    }
-
-    @Override
-    public void process(BoardActor board) {
-        board.state.initialize(this);
+        this.failure = new CommandFailure(json.with(Fields.failure));
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.write(generator);
-        writeField(generator, Fields.title, title);
+        super.writeBoardTeamEvent(generator);
+        writeField(generator, Fields.failure, failure);
     }
 }
-

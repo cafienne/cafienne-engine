@@ -2,10 +2,12 @@ package org.cafienne.board.state
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.board.BoardActor
+import org.cafienne.board.actorapi.command.CreateBoard
 import org.cafienne.board.actorapi.command.flow.StartFlow
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowInitiated}
-import org.cafienne.board.actorapi.event.{BoardEvent, BoardModified}
+import org.cafienne.board.actorapi.event.{BoardCreated, BoardEvent, BoardModified}
+import org.cafienne.board.actorapi.response.BoardCreatedResponse
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.board.state.flow.FlowState
 import org.cafienne.board.state.team.BoardTeam
@@ -20,7 +22,16 @@ class BoardState(val board: BoardActor) extends StateElement with CafienneJson w
   val flows = new mutable.HashMap[String, FlowState]()
 
   // Tell our flows we've completed recovery, so that they can start follow up actions when necessary
-  def recoveryCompleted(): Unit = flows.foreach(_._2.recoveryCompleted())
+  def recoveryCompleted(): Unit = {
+    definition.recoveryCompleted()
+    flows.foreach(_._2.recoveryCompleted())
+  }
+
+  def initialize(command: CreateBoard): Unit = {
+    board.addEvent(new BoardCreated(board, command.title))
+    definition.team.createTeam(command.getUser)
+    command.setResponse(new BoardCreatedResponse(command, board.getId))
+  }
 
   def startFlow(command: StartFlow): Unit = {
     board.addEvent(new FlowInitiated(board, command.flowId, command.subject, command.data))

@@ -23,6 +23,7 @@ import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.board.actorapi.command.BoardCommand
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
 import org.cafienne.json.{Value, ValueMap}
+import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.akkahttp.{Headers, LastModifiedHeader}
 
 import scala.concurrent.Future
@@ -30,6 +31,7 @@ import scala.util.{Failure, Success}
 
 trait BoardRoute extends CommandRoute with QueryRoute {
   override val lastModifiedHeaderName: String = Headers.BOARD_LAST_MODIFIED
+  val userQueries: UserQueries = new TenantQueriesImpl
 
   def boardUser(subRoute: BoardUser => Route): Route = {
     authenticatedUser { user =>
@@ -49,8 +51,7 @@ trait BoardRoute extends CommandRoute with QueryRoute {
   def asJson(map: Option[Map[String, _]]): Option[ValueMap] = map.map(Value.convert(_).asMap())
 
   def getBoardUser(user: AuthenticatedUser, boardId: String, lastModified: LastModifiedHeader): Future[BoardUser] = {
-    //runSyncedQuery(boardQueries.getTeamByBoards(user, tenant), lastModified)
-    Future.successful(BoardUser("userId", boardId))
+    Future.successful(BoardUser(user.id, boardId))
   }
 
   def askBoard(command: BoardCommand): Route = {

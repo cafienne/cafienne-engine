@@ -15,18 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.board.route
+package org.cafienne.board.actorapi.event.team;
 
-import org.cafienne.system.CaseSystem
+import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.board.BoardActor;
+import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
+import org.cafienne.json.ValueMap;
 
-import javax.ws.rs._
+import java.io.IOException;
 
-@Path("/board")
-class BoardRoutes(override val caseSystem: CaseSystem) extends BoardRoute {
-  override val prefix: String = "board"
+public abstract class BoardTeamEvent extends BoardDefinitionEvent {
+    public BoardTeamEvent(BoardActor board) {
+        super(board);
+    }
 
-  addSubRoute(new BoardDefinitionRoute(caseSystem))
-  addSubRoute(new BoardTeamRoute(caseSystem))
-  addSubRoute(new BoardRuntimeRoute(caseSystem))
-  addSubRoute(new BoardFlowsRoute(caseSystem))
+    public BoardTeamEvent(ValueMap json) {
+        super(json);
+    }
+
+    protected void writeBoardTeamEvent(JsonGenerator generator) throws IOException {
+        super.writeBoardEvent(generator);
+    }
 }

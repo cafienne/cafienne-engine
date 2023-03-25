@@ -29,7 +29,6 @@ object BoardAPI {
   implicit val boardSummaryResponseReader: EntityReader[BoardSummaryResponse] = entityReader[BoardSummaryResponse]
   implicit val columnRequestDetailsReader: EntityReader[ColumnRequestDetails] = entityReader[ColumnRequestDetails]
   implicit val columnUpdateDetailsReader: EntityReader[ColumnUpdateDetails] = entityReader[ColumnUpdateDetails]
-  implicit val teamMemberDetailsReader: EntityReader[TeamMemberDetails] = entityReader[TeamMemberDetails]
 
   case class BoardRequestDetails(id: Option[String], title: String)
 
@@ -40,10 +39,6 @@ object BoardAPI {
   case class ColumnRequestDetails(id: String = new Guid().toString, title: String, role: Option[String], form: Option[Map[String, _]])
 
   case class ColumnUpdateDetails(title: Option[String], role: Option[String], form: Option[Map[String, _]])
-
-  case class TeamMemberDetails(userId: String, name: Option[String], roles: Set[String]) extends CafienneJson {
-    override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.name, name, Fields.roles, roles)
-  }
 
   //TODO Column is a duplicate also found in BoardQueryProtocol
   final case class Column(
@@ -67,12 +62,12 @@ object BoardAPI {
     override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.flowId, flowId, "claimedBy", claimedBy, Fields.form, form, "data", data)
   }
 
-  case class BoardResponseFormat(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[Column]) extends CafienneJson {
+  case class BoardResponseFormat(id: String, title: Option[String], team: BoardTeamAPI.BoardTeamFormat, columns: Seq[Column]) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.team, team, Fields.columns, columns)
   }
 
   object Examples {
-    case class BoardResponse(id: String, title: Option[String], team: Seq[TeamMemberDetails], columns: Seq[ColumnExample])
+    case class BoardResponse(id: String, title: Option[String], team: BoardTeamAPI.BoardTeamFormat, columns: Seq[ColumnExample])
 
     case class ColumnExample(id: String, position: Int, title: Option[String], role: Option[String], tasks: Seq[TaskExample])
 

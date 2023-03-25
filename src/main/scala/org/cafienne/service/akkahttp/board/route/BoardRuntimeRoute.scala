@@ -11,7 +11,6 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
-import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
@@ -25,7 +24,7 @@ import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.querydb.query.filter.TaskFilter
 import org.cafienne.querydb.query.{TaskQueries, TaskQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.board.model.BoardAPI
+import org.cafienne.service.akkahttp.board.model.{BoardAPI, BoardTeamAPI}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -37,7 +36,7 @@ import scala.util.{Failure, Success}
 class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute with LastModifiedDirectives {
   val taskQueries: TaskQueries = new TaskQueriesImpl
 
-  override def routes: Route = concat(getBoards, getTeam, getBoard, addTeam)
+  override def routes: Route = concat(getBoards, getBoard)
 
   @Path("/")
   @GET
@@ -110,7 +109,11 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
               }
               case value: GetBoardResponse => {
                 val definition = value.state.definition
-                val team = value.state.team.users.toSeq.map(user => BoardAPI.TeamMemberDetails(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
+                val team = {
+                  val members = value.state.team.users.toSeq.map(user => BoardTeamAPI.TeamMemberFormat(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
+                  val roles = members.flatMap(_.roles).toSet
+                  BoardTeamAPI.BoardTeamFormat(roles, members)
+                }
                 val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
                   val columnTasks: Seq[BoardAPI.Task] = tasks.filter(_.isActive).filter(column.getTitle == _.taskName).map(task => {
                     val taskData = task.inputJson.merge(task.outputJson).asMap()
@@ -133,59 +136,4 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       }
     }
   }
-
-  @Path("/{board}/team")
-  @GET
-  @Operation(
-    summary = "Get the team of this board",
-    description = "Retrieves the definition of a board",
-    tags = Array("board", "team"),
-    parameters = Array(
-      new Parameter(name = "board", description = "The board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array( //TODO have a team return type
-      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[Set[BoardAPI.TeamMemberDetails]])))),
-      new ApiResponse(responseCode = "404", description = "Board not found"),
-    )
-  )
-  @Produces(Array("application/json"))
-  def getTeam: Route = get {
-    boardUser { boardUser =>
-      path("team") {
-        val team = Seq(
-          BoardAPI.TeamMemberDetails(boardUser.id, Some("Board User 1"), Set("BOARD_MANAGER")),
-          BoardAPI.TeamMemberDetails("userId2", Some("Board User 2"), Set("INTAKE_ROLE")),
-        )
-        completeJson(team)
-      }
-    }
-  }
-
-  @Path("/{board}/team")
-  @POST
-  @Operation(
-    summary = "Add or replace team",
-    description = "Add or replace the team that is connected to this board",
-    tags = Array("board", "team"),
-    parameters = Array(
-      new Parameter(name = "board", description = "The board in where the team needs to change", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(description = "Team adapted successfully", responseCode = "204"),
-      new ApiResponse(description = "Team information is invalid", responseCode = "400"),
-    )
-  ) //TODO have a Team input format
-  @RequestBody(description = "User information", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[BoardAPI.TeamMemberDetails]))))
-  @Consumes(Array("application/json"))
-  def addTeam: Route = {
-    boardUser { boardUser =>
-      path("team") {
-        entity(as[String]) { newUser => //entity as TeamMemberDetails
-          complete(StatusCodes.NotImplemented)
-          //askBoard(new SetTenantUser(tenantOwner, tenantOwner.tenant, newUser.asTenantUser(tenantOwner.tenant)))
-        }
-      }
-    }
-  }
-
 }

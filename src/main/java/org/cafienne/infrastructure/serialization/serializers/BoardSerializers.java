@@ -26,6 +26,7 @@ import org.cafienne.board.actorapi.command.flow.CompleteFlowTask;
 import org.cafienne.board.actorapi.command.flow.SaveFlowTaskOutput;
 import org.cafienne.board.actorapi.command.flow.StartFlow;
 import org.cafienne.board.actorapi.command.runtime.GetBoard;
+import org.cafienne.board.actorapi.command.team.SetBoardTeam;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated;
@@ -33,6 +34,8 @@ import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded;
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionUpdated;
 import org.cafienne.board.actorapi.event.flow.FlowActivated;
 import org.cafienne.board.actorapi.event.flow.FlowInitiated;
+import org.cafienne.board.actorapi.event.team.BoardTeamCreated;
+import org.cafienne.board.actorapi.event.team.BoardTeamCreationFailed;
 import org.cafienne.board.actorapi.response.BoardCreatedResponse;
 import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.board.actorapi.response.ColumnAddedResponse;
@@ -58,6 +61,7 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(ClaimFlowTask.class, ClaimFlowTask::new);
         CafienneSerializer.addManifestWrapper(SaveFlowTaskOutput.class, SaveFlowTaskOutput::new);
         CafienneSerializer.addManifestWrapper(CompleteFlowTask.class, CompleteFlowTask::new);
+        CafienneSerializer.addManifestWrapper(SetBoardTeam.class, SetBoardTeam::deserialize);
     }
 
     private static void addBoardEvents() {
@@ -68,6 +72,8 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(BoardModified.class, BoardModified::new);
         CafienneSerializer.addManifestWrapper(FlowInitiated.class, FlowInitiated::new);
         CafienneSerializer.addManifestWrapper(FlowActivated.class, FlowActivated::new);
+        CafienneSerializer.addManifestWrapper(BoardTeamCreated.class, BoardTeamCreated::new);
+        CafienneSerializer.addManifestWrapper(BoardTeamCreationFailed.class, BoardTeamCreationFailed::new);
     }
 
     private static void addBoardResponses() {
