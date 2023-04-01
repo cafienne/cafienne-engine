@@ -31,12 +31,10 @@ import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.processtask.actorapi.command.ProcessCommand;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.system.health.HealthMonitor;
 import org.slf4j.Logger;
@@ -308,15 +306,12 @@ public abstract class ModelActor extends AbstractPersistentActor {
     public void reply(ModelResponse response) {
         // Always reset the transaction timestamp before replying. Even if there is no reply.
         resetTransactionTimestamp();
+        reception.tryUnlock(response);
         if (response == null) {
             // Double check there is a response.
             return;
         }
 
-        if (!(response instanceof CommandFailure)) {
-            // Having handled a ModelCommand and properly stored the events we can unlock the reception.
-            reception.unlock();
-        }
         if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
             if (response instanceof CommandFailure) {

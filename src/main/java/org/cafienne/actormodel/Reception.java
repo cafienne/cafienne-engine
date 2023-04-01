@@ -25,6 +25,7 @@ import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.actormodel.response.ActorChokedFailure;
 import org.cafienne.actormodel.response.ActorExistsFailure;
 import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.infrastructure.serialization.DeserializationFailure;
 
 /**
@@ -103,6 +104,15 @@ class Reception {
         }
 
         return true;
+    }
+
+    void tryUnlock(ModelResponse response) {
+        // We should unlock if there is no response or the response is not a failure.
+        //  If there is no response, it means a command has been handled, but the response may be given asynchronously.
+        if (response == null || !(response instanceof CommandFailure)) {
+            // Having handled a ModelCommand and properly stored the events we can unlock the reception.
+            unlock();
+        }
     }
 
     void unlock() {
