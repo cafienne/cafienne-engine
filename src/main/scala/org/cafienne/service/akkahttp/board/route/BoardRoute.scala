@@ -21,10 +21,11 @@ import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.board.actorapi.command.BoardCommand
+import org.cafienne.board.state.definition.TeamDefinition
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
 import org.cafienne.json.{Value, ValueMap}
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.service.akkahttp.{Headers, LastModifiedHeader}
+import org.cafienne.service.akkahttp.{ConsentGroupLastModifiedHeader, Headers, LastModifiedHeader}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -50,8 +51,20 @@ trait BoardRoute extends CommandRoute with QueryRoute {
 
   def asJson(map: Option[Map[String, _]]): Option[ValueMap] = map.map(Value.convert(_).asMap())
 
-  def getBoardUser(user: AuthenticatedUser, boardId: String, lastModified: LastModifiedHeader): Future[BoardUser] = {
-    Future.successful(BoardUser(user.id, boardId))
+  def getBoardUser(user: AuthenticatedUser, boardId: String, header: LastModifiedHeader): Future[BoardUser] = {
+    // We need to check if the board header has the team extension or not. If not, then we directly query the consent group information on the user,
+    //  otherwise, apparently last action on board was a board-team action, which resulted in a consent group update, and then we need to first await the event handling in the group projection.
+    val optionalValue = header.lastModified.flatMap(blm =>
+        if (blm.actorId.endsWith(TeamDefinition.EXTENSION)) {
+          Some(blm.toString)
+        } else {
+          None
+        })
+    val groupLastModified = ConsentGroupLastModifiedHeader(optionalValue)
+    runSyncedQuery(userQueries.getConsentGroupUser(user, boardId + TeamDefinition.EXTENSION), groupLastModified).map(consentGroupUser => {
+      // TODO: extend board user with the roles the user has in the board, in order to be able to enrich the CaseUserIdentity on flows.
+      BoardUser(consentGroupUser.id, boardId)
+    })
   }
 
   def askBoard(command: BoardCommand): Route = {

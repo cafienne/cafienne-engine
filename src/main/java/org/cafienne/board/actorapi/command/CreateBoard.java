@@ -56,7 +56,8 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
 
     @Override
     public BoardResponse process(BoardActor board) {
-        return board.state.initialize(this);
+        board.state.initialize(this);
+        return null;
     }
 
     @Override

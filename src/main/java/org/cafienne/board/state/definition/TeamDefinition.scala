@@ -3,8 +3,10 @@ package org.cafienne.board.state.definition
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{BoardUser, ConsentGroupUser, Origin}
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
+import org.cafienne.board.actorapi.command.CreateBoard
 import org.cafienne.board.actorapi.event.BoardCreated
 import org.cafienne.board.actorapi.event.team.{BoardTeamCreated, BoardTeamCreationFailed, BoardTeamEvent}
+import org.cafienne.board.actorapi.response.BoardCreatedResponse
 import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamUser}
 import org.cafienne.consentgroup.actorapi.command.CreateConsentGroup
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
@@ -20,11 +22,11 @@ class TeamDefinition(val definition: BoardDefinition, val users: ListBuffer[Boar
   def recoveryCompleted(): Unit = {
     // If board completed recovery, and the board's consent group is not yet created, we should try to do that
     if (boardCreatedEvent.nonEmpty && teamCreatedEvent.isEmpty) {
-      createTeam(users.head)
+      createTeam(None, users.head)
     }
   }
 
-  def createTeam(user: BoardUser): Unit = {
+  def createTeam(command: Option[CreateBoard] = None, user: BoardUser): Unit = {
     // Trigger the creation of the underlying consent group.
     //  Note: this method is called when recovery finished and we do not yet have a consent group
     //  and it is also called from the board creation command.
@@ -32,13 +34,14 @@ class TeamDefinition(val definition: BoardDefinition, val users: ListBuffer[Boar
     val user: ConsentGroupUser = ConsentGroupUser(users.head.id, teamId, board.getTenant)
     val group = ConsentGroup(teamId, board.getTenant, members = Seq(ConsentGroupMember(user.id, Seq(), true)))
     val createGroupCommand = new CreateConsentGroup(user, group)
+    val sender = command.map(_ => board.sender())
 
     board.askModel(createGroupCommand, (failure: CommandFailure) => {
       logger.warn("Failure while creating board team as consent group ", failure.exception)
       board.addEvent(new BoardTeamCreationFailed(board, failure))
     }, (response: ModelResponse) => {
-      val teamLastModified = response.lastModifiedContent()
       board.addEvent(new BoardTeamCreated(board, teamId))
+      sender.map(_ ! new BoardCreatedResponse(command.get, board.getId, response.lastModifiedContent))
     })
   }
 
