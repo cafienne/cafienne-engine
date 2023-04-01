@@ -27,3 +27,4 @@ case class TenantSearchFailure(tenantId: String) extends SearchFailure(s"An acti
 case class TenantUserSearchFailure(tenantId: String, user: String) extends SearchFailure(s"Tenant '$tenantId' does not exist, or user '$user' is not registered in it")
 case class ConsentGroupSearchFailure(groupId: String) extends SearchFailure(s"A consent group with id '$groupId' cannot be found.")
 case class ConsentGroupMemberSearchFailure(userId: String) extends SearchFailure(s"A consent group member with user id '$userId' cannot be found.")
+case class BoardSearchFailure(boardId: String) extends SearchFailure(s"A board with id '$boardId' cannot be found.")

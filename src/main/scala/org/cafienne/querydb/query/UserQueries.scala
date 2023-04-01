@@ -45,7 +45,7 @@ trait UserQueries {
 
   def getConsentGroups(groupIds: Seq[String]): Future[Seq[ConsentGroup]] = ???
 
-  def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String): Future[ConsentGroupMember] = ???
+  def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String, exception: Option[Throwable] = None): Future[ConsentGroupMember] = ???
 
   def getConsentGroupUser(user: UserIdentity, groupId: String): Future[ConsentGroupUser] = ???
 }
@@ -226,7 +226,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
     TableQuery[ConsentGroupMemberTable].filter(_.group === groupId).filter(_.userId === user.id).filter(_.role === "")
   }
 
-  override def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String): Future[ConsentGroupMember] = {
+  override def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String, exception: Option[Throwable] = None): Future[ConsentGroupMember] = {
     // Pay attention: This query filters both on the requested and requesting user; one used for authorization of the requesting user.
     val query = TableQuery[ConsentGroupMemberTable]
       .filter(_.group === groupId)
@@ -237,7 +237,7 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
       // First check that the requestor is a group member
       if (!records.exists(_.userId == user.id)) {
         // The user does not have access to this group, so can also not ask for member information
-        throw ConsentGroupSearchFailure(groupId)
+        throw exception.getOrElse(ConsentGroupSearchFailure(groupId))
       }
 
       // Now create the group member information.

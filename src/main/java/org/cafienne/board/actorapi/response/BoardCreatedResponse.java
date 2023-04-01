@@ -18,6 +18,7 @@
 package org.cafienne.board.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.board.actorapi.command.CreateBoard;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -30,8 +31,10 @@ import java.io.IOException;
 public class BoardCreatedResponse extends BoardResponseWithContent {
     public final String boardId;
 
-    public BoardCreatedResponse(CreateBoard command, String boardId) {
+    public BoardCreatedResponse(CreateBoard command, String boardId, ActorLastModified consentGroupCreated) {
         super(command);
+        // We override last modified with the one from the consent group, in order to have the getBoardUser info work properly
+        setLastModified(consentGroupCreated);
         this.boardId = boardId;
     }
 
