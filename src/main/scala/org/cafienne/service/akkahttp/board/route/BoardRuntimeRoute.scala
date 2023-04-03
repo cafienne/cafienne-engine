@@ -19,6 +19,7 @@ import org.cafienne.board.BoardFields
 import org.cafienne.board.actorapi.command.runtime.GetBoard
 import org.cafienne.board.actorapi.response.runtime.GetBoardResponse
 import org.cafienne.board.state.definition.BoardDefinition
+import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.infrastructure.akkahttp.route.LastModifiedDirectives
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.querydb.query.filter.TaskFilter
@@ -28,7 +29,6 @@ import org.cafienne.service.akkahttp.board.model.{BoardAPI, BoardTeamAPI}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
-import scala.collection.immutable.HashSet
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
@@ -93,13 +93,22 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
               taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier))
             } else {
               runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)), lastModified)
-            }          }
-        } yield (commandResponse, tasks)
+            }
+          }
+          consentGroup <- {
+            if (lastModified.lastModified.map(_.actorId).getOrElse(boardUser.boardId) == boardUser.boardId) {
+              userQueries.getConsentGroup(boardUser, boardUser.boardId + BoardTeam.EXTENSION)
+            } else {
+              runSyncedQuery(userQueries.getConsentGroup(boardUser, boardUser.boardId + BoardTeam.EXTENSION), lastModified)
+            }
+          }
+        } yield (commandResponse, tasks, consentGroup)
 
         onComplete(query) {
           case Success(result) =>
             val response = result._1
             val tasks = result._2
+            val group = result._3
             response match {
               case e: CommandFailure => response match {
                 case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
@@ -110,8 +119,8 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
               case value: GetBoardResponse => {
                 val definition = value.state.definition
                 val team = {
-                  val members = value.state.team.users.toSeq.map(user => BoardTeamAPI.TeamMemberFormat(userId = user.id, name = Some(s"Name of ${user.id}"), roles = HashSet[String]()))
-                  val roles = members.flatMap(_.roles).toSet
+                  val members = group.members.toSeq.map(BoardTeamAPI.TeamMemberFormat.fromMember)
+                  val roles = value.state.team.roles.toSet
                   BoardTeamAPI.BoardTeamFormat(roles, members)
                 }
                 val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {

@@ -45,6 +45,10 @@ object BoardTeamAPI {
     }
   }
 
+  object TeamMemberFormat {
+    def fromMember(m: ConsentGroupMember): TeamMemberFormat = TeamMemberFormat(m.userId, Some(s"Name of ${m.userId}"), m.roles)
+  }
+
   case class ReplaceTeamMemberFormat(name: Option[String], roles: Set[String], isBoardManager: Option[Boolean]) {
     ApiValidator.requireNonNullElements(roles.toSeq, "Roles cannot be null")
 
