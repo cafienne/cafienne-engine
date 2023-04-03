@@ -87,7 +87,7 @@ class TeamDefinition(val definition: BoardDefinition, val users: ListBuffer[Boar
   def caseTeam: CaseTeam = {
     // TODO: keep track of a list of BoardManagers, and make them all case owner?
     val groups = Seq(new CaseTeamGroup(teamId, mappings = roles.map(r => GroupRoleMapping(r, caseRoles = immutable.Set(r))).toSeq))
-    CaseTeam(users = users.map(u => CaseTeamUser.from(userId = u.id, origin = Origin.IDP)).toSeq, groups = groups, tenantRoles = Seq())
+    CaseTeam(users = users.map(u => CaseTeamUser.from(userId = u.id, origin = Origin.IDP, isOwner = true)).toSeq, groups = groups, tenantRoles = Seq())
   }
 
   def caseTeamXML(): String = {
