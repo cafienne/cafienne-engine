@@ -18,6 +18,7 @@
 package org.cafienne.service.akkahttp
 
 import org.cafienne.actormodel.response.ActorLastModified
+import org.cafienne.board.state.definition.TeamDefinition
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.cases.CaseReader
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupReader
@@ -41,7 +42,7 @@ trait LastModifiedHeader {
   val name: String
   val registration: LastModifiedRegistration
   val value: Option[String] = None
-  val lastModified = value.map(new ActorLastModified(name, _))
+  val lastModified: Option[ActorLastModified] = value.map(new ActorLastModified(name, _))
 
   override def toString: String = name + ": " + value
 
@@ -56,23 +57,31 @@ trait LastModifiedHeader {
 }
 
 case class CaseLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
-  override val name = Headers.CASE_LAST_MODIFIED
+  override val name: String = Headers.CASE_LAST_MODIFIED
   override val registration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
 }
 
 case class TenantLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
-  override val name = Headers.TENANT_LAST_MODIFIED
+  override val name: String = Headers.TENANT_LAST_MODIFIED
   override val registration: LastModifiedRegistration = TenantReader.lastModifiedRegistration
 }
 
 case class ConsentGroupLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
-  override val name = Headers.CONSENT_GROUP_LAST_MODIFIED
+  override val name: String = Headers.CONSENT_GROUP_LAST_MODIFIED
   override val registration: LastModifiedRegistration = ConsentGroupReader.lastModifiedRegistration
 }
 
 case class BoardLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
-  override val name = Headers.BOARD_LAST_MODIFIED
-  override val registration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
+  override val name: String = Headers.BOARD_LAST_MODIFIED
+  override val registration: LastModifiedRegistration = {
+    lastModified.fold(CaseReader.lastModifiedRegistration)(alm => {
+      if (alm.actorId.endsWith(TeamDefinition.EXTENSION)) {
+        ConsentGroupReader.lastModifiedRegistration
+      } else {
+        CaseReader.lastModifiedRegistration
+      }
+    })
+  }
 }
 
 object LastModifiedHeader {
