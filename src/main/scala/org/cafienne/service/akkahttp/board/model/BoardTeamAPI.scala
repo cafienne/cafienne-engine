@@ -17,6 +17,7 @@
 
 package org.cafienne.service.akkahttp.board.model
 
+import org.cafienne.consentgroup.actorapi.ConsentGroupMember
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
@@ -25,7 +26,8 @@ import org.cafienne.service.akkahttp.ApiValidator
 object BoardTeamAPI {
   //SEE BoardQueryProtocol
   implicit val teamReader: EntityReader[BoardTeamFormat] = entityReader[BoardTeamFormat]
-  implicit val teamMemberDetailsReader: EntityReader[TeamMemberFormat] = entityReader[TeamMemberFormat]
+  implicit val setTeamMemberDetailsReader: EntityReader[TeamMemberFormat] = entityReader[TeamMemberFormat]
+  implicit val replaceTeamMemberDetailsReader: EntityReader[ReplaceTeamMemberFormat] = entityReader[ReplaceTeamMemberFormat]
 
   case class BoardTeamFormat(roles: Set[String] = Set(), members: Seq[TeamMemberFormat]) extends CafienneJson {
     ApiValidator.requireNonNullElements(roles.toSeq, "Roles cannot be null")
@@ -33,9 +35,21 @@ object BoardTeamAPI {
     override def toValue: Value[_] = new ValueMap(Fields.roles, roles, Fields.members, members)
   }
 
-  case class TeamMemberFormat(userId: String, name: Option[String], roles: Set[String]) extends CafienneJson {
+  case class TeamMemberFormat(userId: String, name: Option[String], roles: Set[String], isBoardManager: Option[Boolean] = None) extends CafienneJson {
     ApiValidator.requireNonNullElements(roles.toSeq, "Roles cannot be null")
 
     override def toValue: Value[_] = new ValueMap(Fields.userId, userId, Fields.name, name, Fields.roles, roles)
+
+    def asMember(): ConsentGroupMember = {
+      ConsentGroupMember(userId = userId, roles = roles, isOwner = isBoardManager.getOrElse(false))
+    }
+  }
+
+  case class ReplaceTeamMemberFormat(name: Option[String], roles: Set[String], isBoardManager: Option[Boolean]) {
+    ApiValidator.requireNonNullElements(roles.toSeq, "Roles cannot be null")
+
+    def asMember(userId: String): ConsentGroupMember = {
+      ConsentGroupMember(userId = userId, roles = roles, isOwner = isBoardManager.getOrElse(false))
+    }
   }
 }

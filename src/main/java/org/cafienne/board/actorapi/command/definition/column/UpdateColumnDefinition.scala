@@ -27,7 +27,13 @@ case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, val
       // Cannot find column definition, let's return an error
       throw new InvalidCommandException("Board does not have a column with id " + columnId)
     })
-    if (titleChanged(definition.getTitle) || roleChanged(definition.getRole) || formChanged(definition.getForm)) {
+    val hasTitleChange = titleChanged(definition.getTitle)
+    val hasRoleChange = roleChanged(definition.getRole)
+    val hasFormChange = formChanged(definition.getForm)
+    if (hasTitleChange || hasRoleChange || hasFormChange) {
+      if (hasRoleChange && role.nonEmpty) {
+        board.getDefinition.team.upsertTeamRole(role.get)
+      }
       board.addEvent(new ColumnDefinitionUpdated(board, columnId, title, role, form))
     }
     setResponse(new BoardResponse(this))

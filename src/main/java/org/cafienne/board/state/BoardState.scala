@@ -52,13 +52,14 @@ class BoardState(val board: BoardActor) extends StateElement with CafienneJson w
     case other => logger.warn(s"Board Definition cannot handle event of type ${other.getClass.getName}")
   }
 
-  def handleDefinitionUpdate(event: BoardDefinitionEvent): Unit = {
+  private def handleDefinitionUpdate(event: BoardDefinitionEvent): Unit = {
     definition.updateState(event)
     // And now, with the updated definition, we should iterate through all our case instances
     //  and update their case definitions ...
     //  Probably only when recovery is not running ...
-    addDebugInfo(() => "Updated definition of board " + board.getId + " to:  " + definition.getCaseDefinition().getDefinitionsDocument.getSource)
+    addDebugInfo(() => "Updated definition of board " + board.getId + " to:  " + definition.caseDefinition.getDefinitionsDocument.getSource)
 
+    // TODO: when it was a change to membership in the consent group, then no need to update the definition of the flows
     if (board.recoveryFinished && flows.nonEmpty) {
       System.out.println("Update case definitions of currently active flows")
       // Now take all flows and update their definitions ...

@@ -20,6 +20,9 @@ case class AddColumnDefinition(val user: BoardUser, val columnId: String, val ti
   }
 
   override def process(board: BoardActor): Unit = {
+    if (role.nonEmpty) {
+      board.getDefinition.team.upsertTeamRole(role.get)
+    }
     board.addEvent(new ColumnDefinitionAdded(board, columnId, title, role, form))
     setResponse(new ColumnAddedResponse(this, columnId))
   }
