@@ -17,22 +17,27 @@
 
 package org.cafienne.actormodel.identity
 
+import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{Value, ValueMap}
 
-case class BoardUser(id: String, boardId: String) extends UserIdentity {
-  override def toValue: Value[_] = new ValueMap(Fields.userId, id, Fields.boardId, boardId)
+case class BoardUser(id: String, boardId: String, roles: Set[String] = Set(), isOwner: Boolean = false) extends CaseUserIdentity {
+  override def toValue: Value[_] = new ValueMap(Fields.userId, id, Fields.boardId, boardId, Fields.isOwner, isOwner, Fields.roles, roles, Fields.groups, groups, Fields.origin, origin)
 
-  override def asCaseUserIdentity(): CaseUserIdentity = CaseUserIdentity(id, Origin.IDP)
+  override val groups: Seq[ConsentGroupMembership] = {
+    Seq(ConsentGroupMembership(boardId + BoardTeam.EXTENSION, roles, isOwner))
+  }
 
-  val isOwner = true
+  override val origin: Origin = Origin.IDP
 }
 
 object BoardUser {
   def deserialize(json: ValueMap): BoardUser = {
     BoardUser(
       id = json.readString(Fields.userId),
-      boardId = json.readString(Fields.boardId)
+      boardId = json.readString(Fields.boardId),
+      roles = json.readStringList(Fields.roles).toSet,
+      isOwner = json.readBoolean(Fields.isOwner)
     )
   }
 }

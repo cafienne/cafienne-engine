@@ -64,7 +64,7 @@ trait BoardRoute extends CommandRoute with QueryRoute {
     val groupLastModified = ConsentGroupLastModifiedHeader(optionalValue)
     runSyncedQuery(userQueries.getConsentGroupMember(user, boardId + BoardTeam.EXTENSION, user.id, Some(BoardSearchFailure(boardId))), groupLastModified).map(consentGroupUser => {
       // TODO: extend board user with the roles the user has in the board, in order to be able to enrich the CaseUserIdentity on flows.
-      BoardUser(consentGroupUser.userId, boardId)
+      BoardUser(consentGroupUser.userId, boardId, consentGroupUser.roles, consentGroupUser.isOwner)
     })
   }
 

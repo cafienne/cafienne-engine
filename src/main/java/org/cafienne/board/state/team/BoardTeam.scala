@@ -20,9 +20,10 @@ import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import scala.collection.mutable.ListBuffer
 import scala.collection.{immutable, mutable}
 
-class BoardTeam(val definition: BoardDefinition, val users: ListBuffer[BoardUser] = new ListBuffer[BoardUser]()) extends DefinitionElement with CafienneJson with LazyLogging {
+class BoardTeam(val definition: BoardDefinition) extends DefinitionElement with CafienneJson with LazyLogging {
   val teamId: String = board.getId + BoardTeam.EXTENSION
   val roles: mutable.Set[String] = new mutable.HashSet[String]()
+  val users: ListBuffer[BoardUser] = new ListBuffer[BoardUser]()
   private var boardCreatedEvent: Option[BoardCreated] = None
   private var teamCreatedEvent: Option[BoardTeamCreated] = None
 
@@ -88,14 +89,11 @@ class BoardTeam(val definition: BoardDefinition, val users: ListBuffer[BoardUser
     case other => logger.warn(s"Team Definition cannot handle event of type ${other.getClass.getName}")
   }
 
-  def members(): Array[BoardUser] = users.toArray
-
-  //  def roles(): Set[String] = users.flatMap(_.)
-
   def caseTeam: CaseTeam = {
     // TODO: keep track of a list of BoardManagers, and make them all case owner?
-    val groups = Seq(new CaseTeamGroup(teamId, mappings = roles.map(r => GroupRoleMapping(r, caseRoles = immutable.Set(r))).toSeq))
-    CaseTeam(users = users.map(u => CaseTeamUser.from(userId = u.id, origin = Origin.IDP)).toSeq, groups = groups, tenantRoles = Seq())
+    val mappings = roles.map(r => GroupRoleMapping(r, caseRoles = immutable.Set(r))).toSeq ++ Seq(GroupRoleMapping(groupRole = "", caseRoles = Set("")))
+    val groups = Seq(new CaseTeamGroup(teamId, mappings = mappings))
+    CaseTeam(users = users.map(u => CaseTeamUser.from(userId = u.id, origin = Origin.IDP, isOwner = true)).toSeq, groups = groups, tenantRoles = Seq())
   }
 
   def caseTeamXML(): String = {

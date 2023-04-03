@@ -18,7 +18,7 @@
 package org.cafienne.service.akkahttp
 
 import org.cafienne.actormodel.response.ActorLastModified
-import org.cafienne.board.state.definition.TeamDefinition
+import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.querydb.materializer.LastModifiedRegistration
 import org.cafienne.querydb.materializer.cases.CaseReader
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupReader
@@ -75,7 +75,7 @@ case class BoardLastModifiedHeader(override val value: Option[String]) extends L
   override val name: String = Headers.BOARD_LAST_MODIFIED
   override val registration: LastModifiedRegistration = {
     lastModified.fold(CaseReader.lastModifiedRegistration)(alm => {
-      if (alm.actorId.endsWith(TeamDefinition.EXTENSION)) {
+      if (alm.actorId.endsWith(BoardTeam.EXTENSION)) {
         ConsentGroupReader.lastModifiedRegistration
       } else {
         CaseReader.lastModifiedRegistration
