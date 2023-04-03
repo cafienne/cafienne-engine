@@ -203,6 +203,13 @@ public abstract class Value<T> implements Serializable {
             ValueMap valueMap = new ValueMap();
             map.foreach(entry -> valueMap.put(String.valueOf(entry._1()), convert(entry._2())));
             return valueMap;
+        } else if (object instanceof scala.Option) {
+            scala.Option option = (scala.Option) object;
+            if (option.isEmpty()) {
+                return Value.NULL;
+            } else {
+                return Value.convert(option.get());
+            }
         } else if (object instanceof scala.collection.Iterable) {
             scala.collection.Iterable<?> list = (scala.collection.Iterable<?>) object;
             ValueList valueList = new ValueList();
