@@ -7,7 +7,6 @@
  */
 package org.cafienne.service.akkahttp.board.route
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -16,19 +15,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.board.actorapi.command.team.{AddTeamRole, RemoveMember, RemoveTeamRole, SetMember}
-import org.cafienne.board.state.definition.TeamDefinition
-import org.cafienne.service.akkahttp.LastModifiedHeader
 import org.cafienne.service.akkahttp.board.model.BoardTeamAPI
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
-import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/board")
 class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
 
-  override def routes: Route = concat(addMember, replaceMember, removeMember, addRole, removeRole, getTeam, setTeam)
+  override def routes: Route = concat(addMember, replaceMember, removeMember, addRole, removeRole)
 
   @Path("/{board}/team/members")
   @POST
@@ -100,7 +96,6 @@ class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   def removeMember: Route = delete {
     boardUser { boardUser =>
       path("team" / "members" / Segment) { memberId =>
-        println("Removing team member: " + memberId)
         askBoard(new RemoveMember(boardUser, memberId))
       }
     }
@@ -148,48 +143,6 @@ class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     boardUser { boardUser =>
       path("team" / "roles" / Segment) { role =>
         askBoard(new RemoveTeamRole(boardUser, role))
-      }
-    }
-  }
-
-  @Path("/{board}/team")
-  @GET
-  @Operation(
-    summary = "Get the team of this board",
-    description = "Retrieves the definition of a board",
-    tags = Array("board"),
-    parameters = Array(
-      new Parameter(name = "board", description = "The board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-    ),
-    responses = Array(
-      new ApiResponse(responseCode = "204", description = "The team for this board", content = Array(new Content(schema = new Schema(implementation = classOf[BoardTeamAPI.BoardTeam])))),
-      new ApiResponse(responseCode = "404", description = "Board not found"),
-    )
-  )
-  @Produces(Array("application/json"))
-  def getTeam: Route = get {
-    boardUser { boardUser =>
-      path("team") {
-        pathEndOrSingleSlash {
-          onComplete(runSyncedQuery(userQueries.getConsentGroup(boardUser, boardUser.boardId + TeamDefinition.EXTENSION), LastModifiedHeader.NONE)) {
-            case Success(group) =>
-              val team = BoardTeamAPI.BoardTeam(roles = group.groupRoles, members = group.members.map(m => BoardTeamAPI.TeamMemberFormat(m.userId, None, m.roles)))
-              completeJson(team)
-            case Failure(f) => throw f
-          }
-        }
-      }
-    }
-  }
-
-  def setTeam: Route = {
-    boardUser { boardUser =>
-      path("team") {
-        pathEndOrSingleSlash {
-          entity(as[BoardTeamAPI.BoardTeam]) { newUser => //entity as TeamMemberDetails
-            complete(StatusCodes.BadRequest, "This command is no longer supported; use SetMember, ReplaceMember or RemoveMember")
-          }
-        }
       }
     }
   }

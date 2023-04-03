@@ -40,6 +40,10 @@ object BoardTeamAPI {
     }
   }
 
+  object TeamMemberFormat {
+    def fromMember(m: ConsentGroupMember): TeamMemberFormat = TeamMemberFormat(m.userId, Some(s"Name of ${m.userId}"), m.roles)
+  }
+
   case class ReplaceTeamMemberFormat(name: Option[String], roles: Set[String], isBoardManager: Option[Boolean]) {
     def asMember(userId: String): ConsentGroupMember = {
       ConsentGroupMember(userId = userId, roles = roles, isOwner = isBoardManager.getOrElse(false))
