@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.expression.spel.SpelReadable;
-import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.cmmn.instance.Path;
+import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonDeserializer;
 import org.cafienne.infrastructure.serialization.ValueMapJacksonSerializer;
@@ -428,4 +428,15 @@ public class ValueMap extends Value<Map<String, Value<?>>> implements SpelReadab
             return List.of();
         }
     }
+
+    public final scala.Option<ValueMap> readOptionalMap(Object fieldName) {
+        Value<?> value = get(fieldName);
+        return value == Value.NULL ? scala.Option.apply(null) : new scala.Some<>(value.asMap());
+    }
+
+    public final <T> scala.Option<T> readOption(Object fieldName) {
+        T rawValue = raw(fieldName);
+        return rawValue == null ? scala.Option.apply(null) : new scala.Some<>(rawValue);
+    }
 }
+
