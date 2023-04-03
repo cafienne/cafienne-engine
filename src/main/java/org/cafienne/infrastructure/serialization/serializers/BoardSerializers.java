@@ -26,7 +26,10 @@ import org.cafienne.board.actorapi.command.flow.CompleteFlowTask;
 import org.cafienne.board.actorapi.command.flow.SaveFlowTaskOutput;
 import org.cafienne.board.actorapi.command.flow.StartFlow;
 import org.cafienne.board.actorapi.command.runtime.GetBoard;
-import org.cafienne.board.actorapi.command.team.SetBoardTeam;
+import org.cafienne.board.actorapi.command.team.AddTeamRole;
+import org.cafienne.board.actorapi.command.team.RemoveMember;
+import org.cafienne.board.actorapi.command.team.RemoveTeamRole;
+import org.cafienne.board.actorapi.command.team.SetMember;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated;
@@ -36,10 +39,9 @@ import org.cafienne.board.actorapi.event.flow.FlowActivated;
 import org.cafienne.board.actorapi.event.flow.FlowInitiated;
 import org.cafienne.board.actorapi.event.team.BoardTeamCreated;
 import org.cafienne.board.actorapi.event.team.BoardTeamCreationFailed;
-import org.cafienne.board.actorapi.response.BoardCreatedResponse;
-import org.cafienne.board.actorapi.response.BoardResponse;
-import org.cafienne.board.actorapi.response.ColumnAddedResponse;
-import org.cafienne.board.actorapi.response.FlowStartedResponse;
+import org.cafienne.board.actorapi.event.team.BoardTeamRoleAdded;
+import org.cafienne.board.actorapi.event.team.BoardTeamRoleRemoved;
+import org.cafienne.board.actorapi.response.*;
 import org.cafienne.board.actorapi.response.runtime.FlowResponse;
 import org.cafienne.board.actorapi.response.runtime.GetBoardResponse;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
@@ -61,7 +63,10 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(ClaimFlowTask.class, ClaimFlowTask::new);
         CafienneSerializer.addManifestWrapper(SaveFlowTaskOutput.class, SaveFlowTaskOutput::new);
         CafienneSerializer.addManifestWrapper(CompleteFlowTask.class, CompleteFlowTask::new);
-        CafienneSerializer.addManifestWrapper(SetBoardTeam.class, SetBoardTeam::deserialize);
+        CafienneSerializer.addManifestWrapper(SetMember.class, SetMember::deserialize);
+        CafienneSerializer.addManifestWrapper(RemoveMember.class, RemoveMember::deserialize);
+        CafienneSerializer.addManifestWrapper(AddTeamRole.class, AddTeamRole::deserialize);
+        CafienneSerializer.addManifestWrapper(RemoveTeamRole.class, RemoveTeamRole::deserialize);
     }
 
     private static void addBoardEvents() {
@@ -73,6 +78,8 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(FlowInitiated.class, FlowInitiated::new);
         CafienneSerializer.addManifestWrapper(FlowActivated.class, FlowActivated::new);
         CafienneSerializer.addManifestWrapper(BoardTeamCreated.class, BoardTeamCreated::new);
+        CafienneSerializer.addManifestWrapper(BoardTeamRoleAdded.class, BoardTeamRoleAdded::new);
+        CafienneSerializer.addManifestWrapper(BoardTeamRoleRemoved.class, BoardTeamRoleRemoved::new);
         CafienneSerializer.addManifestWrapper(BoardTeamCreationFailed.class, BoardTeamCreationFailed::new);
     }
 
@@ -80,6 +87,7 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(BoardResponse.class, BoardResponse::new);
         CafienneSerializer.addManifestWrapper(GetBoardResponse.class, GetBoardResponse::new);
         CafienneSerializer.addManifestWrapper(FlowResponse.class, FlowResponse::new);
+        CafienneSerializer.addManifestWrapper(BoardTeamResponse.class, BoardTeamResponse::new);
         CafienneSerializer.addManifestWrapper(BoardCreatedResponse.class, BoardCreatedResponse::new);
         CafienneSerializer.addManifestWrapper(ColumnAddedResponse.class, ColumnAddedResponse::new);
         CafienneSerializer.addManifestWrapper(FlowStartedResponse.class, FlowStartedResponse::new);

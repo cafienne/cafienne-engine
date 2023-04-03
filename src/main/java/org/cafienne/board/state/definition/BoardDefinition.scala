@@ -45,7 +45,7 @@ class BoardDefinition(val board: BoardActor, val boardId: String, val optionalTi
 
   def recoveryCompleted(): Unit = team.recoveryCompleted()
 
-  def updateState(event: BoardDefinitionEvent) = event match {
+  def updateState(event: BoardDefinitionEvent): Unit = event match {
     case event: BoardCreated =>
       title = event.title
       team.updateState(event)
@@ -58,7 +58,7 @@ class BoardDefinition(val board: BoardActor, val boardId: String, val optionalTi
     case other => logger.warn(s"Board Definition cannot handle event of type ${other.getClass.getName}")
   }
 
-  def getCaseDefinition(): CaseDefinition = {
+  def caseDefinition: CaseDefinition = {
     val string =
       s"""<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
          |    <caseFileItemDefinition name="ttpboard" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="ttpboard.cfid">

@@ -40,7 +40,7 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     val definition: BoardDefinition = board.state.definition
 
     // Take the latest & greatest case definition from our board definition
-    val caseDefinition = definition.getCaseDefinition()
+    val caseDefinition = definition.caseDefinition
     // Compose the case team based on the definition
     val caseTeam = definition.team.caseTeam
     // Take the case input from the event

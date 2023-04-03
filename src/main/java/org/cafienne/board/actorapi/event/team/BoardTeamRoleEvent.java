@@ -15,29 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command.team;
+package org.cafienne.board.actorapi.event.team;
 
-import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.actormodel.response.ModelResponse;
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.ValueMap;
 
-/**
- * Base class for updating board teams
- */
-public abstract class BoardTeamCommand extends BoardDefinitionCommand {
-    /**
-     * Create a new command that can be sent to the board.
-     *
-     * @param user The user that issues this command.
-     */
-    protected BoardTeamCommand(BoardUser user) {
-        super(user);
+import java.io.IOException;
+
+public class BoardTeamRoleEvent extends BoardTeamEvent {
+
+    public final String roleName;
+
+    protected BoardTeamRoleEvent(BoardActor board, String roleName) {
+        super(board);
+        this.roleName = roleName;
+    }
+
+    protected BoardTeamRoleEvent(ValueMap json) {
+        super(json);
+        this.roleName = json.readString(Fields.role);
     }
 
     @Override
-    public ModelResponse process(BoardActor board) {
-        board.getDefinition().team().handle(this);
-        return null;
+    public void write(JsonGenerator generator) throws IOException {
+        super.writeBoardTeamEvent(generator);
+        writeField(generator, Fields.role, roleName);
     }
 }

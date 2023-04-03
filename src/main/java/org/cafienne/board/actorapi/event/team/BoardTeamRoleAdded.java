@@ -15,29 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command.team;
+package org.cafienne.board.actorapi.event.team;
 
-import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
+import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.ValueMap;
 
-/**
- * Base class for updating board teams
- */
-public abstract class BoardTeamCommand extends BoardDefinitionCommand {
-    /**
-     * Create a new command that can be sent to the board.
-     *
-     * @param user The user that issues this command.
-     */
-    protected BoardTeamCommand(BoardUser user) {
-        super(user);
+@Manifest
+public class BoardTeamRoleAdded extends BoardTeamRoleEvent {
+    public BoardTeamRoleAdded(BoardActor board, String roleName) {
+        super(board, roleName);
     }
 
-    @Override
-    public ModelResponse process(BoardActor board) {
-        board.getDefinition().team().handle(this);
-        return null;
+    public BoardTeamRoleAdded(ValueMap json) {
+        super(json);
     }
 }

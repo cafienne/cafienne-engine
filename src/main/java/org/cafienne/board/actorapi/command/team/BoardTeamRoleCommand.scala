@@ -5,28 +5,16 @@ import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.actormodel.response.ModelResponse
 import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.response.BoardResponse
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
-import org.cafienne.json.ValueMap
+import org.cafienne.infrastructure.serialization.Fields
 
-@Manifest
-case class SetBoardTeam(user: BoardUser) extends BoardTeamCommand(user) {
-  /**
-    * Method to be implemented to handle the command.
-    *
-    * @param board
-    * @return
-    */
+class BoardTeamRoleCommand(user: BoardUser, roleName: String) extends BoardTeamCommand(user) {
   override def process(board: BoardActor): ModelResponse = {
+    super.process(board)
     new BoardResponse(this)
   }
 
   override def write(generator: JsonGenerator): Unit = {
     super.writeModelCommand(generator)
-  }
-}
-
-object SetBoardTeam {
-  def deserialize(json: ValueMap): SetBoardTeam = {
-    SetBoardTeam(BoardUser.deserialize(json.readMap(Fields.user)))
+    writeField(generator, Fields.role, roleName)
   }
 }
