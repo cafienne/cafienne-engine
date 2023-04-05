@@ -46,9 +46,10 @@ object BoardAPI {
                      position: Int,
                      title: Option[String],
                      role: Option[String],
+                     form: ValueMap,
                      tasks: Seq[Task]
                    ) extends CafienneJson {
-    override def toValue: Value[_] = new ValueMap(Fields.id, id, "position", position, Fields.title, title, Fields.role, role, "tasks", tasks)
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, "position", position, Fields.title, title, Fields.role, role, Fields.form, form, "tasks", tasks)
   }
 
   final case class Task(
@@ -56,14 +57,13 @@ object BoardAPI {
                      subject: Option[String],
                      flowId: String,
                      claimedBy: Option[String],
-                     form: ValueMap,
                      data: ValueMap
                    ) extends CafienneJson {
-    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.flowId, flowId, "claimedBy", claimedBy, Fields.form, form, "data", data)
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.flowId, flowId, "claimedBy", claimedBy, "data", data)
   }
 
-  case class BoardResponseFormat(id: String, title: Option[String], team: BoardTeamAPI.BoardTeamFormat, columns: Seq[Column]) extends CafienneJson {
-    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.team, team, Fields.columns, columns)
+  case class BoardResponseFormat(id: String, title: Option[String], team: BoardTeamAPI.BoardTeamFormat, form: ValueMap, columns: Seq[Column]) extends CafienneJson {
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.title, title, Fields.form, form, Fields.team, team, Fields.columns, columns)
   }
 
   object Examples {

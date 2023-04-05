@@ -128,13 +128,12 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
                     val taskData = task.inputJson.merge(task.outputJson).asMap()
                     val data = taskData.readMap(BoardFields.Data)
                     val subject = taskData.readMap(BoardFields.BoardMetadata).readString(Fields.subject, "")
-                    BoardAPI.Task(id = task.id, subject = Some(subject), flowId = task.caseInstanceId,
-                      claimedBy = Some(task.assignee), form = task.getJSON(task.taskModel).asMap(), data = data)
+                    BoardAPI.Task(id = task.id, subject = Some(subject), flowId = task.caseInstanceId, claimedBy = Some(task.assignee), data = data)
                   })
-                  BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
+                  BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks, form = column.getForm)
                 })
 
-                completeJson(BoardAPI.BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))
+                completeJson(BoardAPI.BoardResponseFormat(id = definition.boardId, title = Some(definition.get  Title), form = definition.getStartForm, team = team, columns = columns))
               }
               case other => // Unknown new type of response that is not handled
                 logger.error(s"Received an unexpected response after asking CaseSystem a command of type ${command.getCommandDescription}. Response is of type ${other.getClass.getSimpleName}")
