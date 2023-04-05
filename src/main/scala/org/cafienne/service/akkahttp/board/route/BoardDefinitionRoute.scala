@@ -27,8 +27,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.board.actorapi.command.CreateBoard
-import org.cafienne.board.actorapi.command.definition.column.{AddColumnDefinition, UpdateColumnDefinition}
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition
+import org.cafienne.board.actorapi.command.definition.column.{AddColumnDefinition, UpdateColumnDefinition}
+import org.cafienne.json.ValueMap
 import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
@@ -60,7 +61,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
         entity(as[BoardRequestDetails]) { boardRequestDetails =>
           val boardId = boardRequestDetails.id.getOrElse(new Guid().toString)
           val boardUser = BoardUser(user.id, boardId)
-          askBoard(new CreateBoard(boardUser, boardRequestDetails.title))
+          askBoard(new CreateBoard(boardUser, boardRequestDetails.title, asJson(boardRequestDetails.form).getOrElse(new ValueMap())))
         }
       }
     }

@@ -27,7 +27,7 @@ class BoardState(val board: BoardActor) extends StateElement with CafienneJson w
   }
 
   def initialize(command: CreateBoard): Unit = {
-    board.addEvent(new BoardCreated(board, command.title))
+    board.addEvent(new BoardCreated(board, command.title, command.form))
     // Be aware: create team is asynchronous, as it creates a Consent Group underneath.
     //  The createTeam is responsible for informing the sender with BoardCreatedResponse.
     definition.team.createTeam(Some(command), command.getUser)

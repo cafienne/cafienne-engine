@@ -30,7 +30,7 @@ object BoardAPI {
   implicit val columnRequestDetailsReader: EntityReader[ColumnRequestDetails] = entityReader[ColumnRequestDetails]
   implicit val columnUpdateDetailsReader: EntityReader[ColumnUpdateDetails] = entityReader[ColumnUpdateDetails]
 
-  case class BoardRequestDetails(id: Option[String], title: String)
+  case class BoardRequestDetails(id: Option[String], title: String, form: Option[Map[String, _]])
 
   case class BoardDefinitionUpdate(title: Option[String], form: Option[Map[String, _]])
 

@@ -42,6 +42,7 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
   def updateState(event: BoardDefinitionEvent): Unit = event match {
     case event: BoardCreated =>
       title = event.title
+      startForm = event.form
       team.updateState(event)
     case event: BoardDefinitionUpdated =>
       this.title = event.title.getOrElse(this.title)

@@ -32,17 +32,20 @@ import java.io.IOException;
 @Manifest
 public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessage {
     public final String title;
+    public final ValueMap form;
     public final CafienneVersion engineVersion;
 
-    public BoardCreated(BoardActor board, String title) {
+    public BoardCreated(BoardActor board, String title, ValueMap form) {
         super(board);
         this.title = title;
+        this.form = form;
         this.engineVersion = Cafienne.version();
     }
 
     public BoardCreated(ValueMap json) {
         super(json);
         this.title = json.readString(Fields.title);
+        this.form = json.readMap(Fields.form);
         this.engineVersion = json.readObject(Fields.engineVersion, CafienneVersion::new);
     }
 
@@ -56,6 +59,7 @@ public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessa
     public void write(JsonGenerator generator) throws IOException {
         super.writeBoardEvent(generator);
         writeField(generator, Fields.title, title);
+        writeField(generator, Fields.form, form);
         writeField(generator, Fields.engineVersion, engineVersion.json());
     }
 }

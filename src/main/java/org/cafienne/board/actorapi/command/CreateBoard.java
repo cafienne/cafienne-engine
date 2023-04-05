@@ -32,15 +32,18 @@ import java.io.IOException;
 @Manifest
 public class CreateBoard extends BoardCommand implements BootstrapMessage {
     public final String title;
+    public final ValueMap form;
 
-    public CreateBoard(BoardUser user, String title) {
+    public CreateBoard(BoardUser user, String title, ValueMap form) {
         super(user);
         this.title = title;
+        this.form = form;
     }
 
     public CreateBoard(ValueMap json) {
         super(json);
         this.title = json.readString(Fields.title);
+        this.form = json.readMap(Fields.form);
     }
 
     @Override
@@ -62,6 +65,7 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
     public void write(JsonGenerator generator) throws IOException {
         super.write(generator);
         writeField(generator, Fields.title, title);
+        writeField(generator, Fields.form, form);
     }
 }
 
