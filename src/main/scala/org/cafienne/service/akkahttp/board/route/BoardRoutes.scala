@@ -21,9 +21,9 @@ import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
-@Path("/board")
+@Path("/boards")
 class BoardRoutes(override val caseSystem: CaseSystem) extends BoardRoute {
-  override val prefix: String = "board"
+  override val prefix: String = "boards"
 
   addSubRoute(new BoardDefinitionRoute(caseSystem))
   addSubRoute(new BoardTeamRoute(caseSystem))

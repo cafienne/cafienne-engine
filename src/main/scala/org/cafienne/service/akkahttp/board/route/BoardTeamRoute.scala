@@ -22,19 +22,19 @@ import org.cafienne.system.CaseSystem
 import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/board")
+@Path("/boards")
 class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
 
   override def routes: Route = concat(addMember, replaceMember, removeMember, addRole, removeRole)
 
-  @Path("/{board}/team/members")
+  @Path("/{boardId}/team/members")
   @POST
   @Operation(
     summary = "Add a new board team member",
     description = "Add the new member to the board team",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board to retrieve the team from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
       new ApiResponse(responseCode = "202", description = "The member is being added to the team of this board"),
@@ -52,14 +52,14 @@ class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("/{board}/team/members/{memberId}")
+  @Path("/{boardId}/team/members/{memberId}")
   @POST
   @Operation(
     summary = "Replace the board team member",
     description = "Replace the roles and/or the name of this member in the board team",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to replace the member in", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board to replace the member in", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "memberId", description = "The user id of the member to replace", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
@@ -78,14 +78,14 @@ class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("/{board}/team/members/{memberId}")
+  @Path("/{boardId}/team/members/{memberId}")
   @DELETE
   @Operation(
     summary = "Remove this member from the board team",
     description = "Remove this member from the board team",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to remove the member from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The  id of the board to remove the member from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "memberId", description = "The user id of the member to remove", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
@@ -101,14 +101,14 @@ class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("/{board}/team/roles/{roleName}")
+  @Path("/{boardId}/team/roles/{roleName}")
   @PUT
   @Operation(
     summary = "Add a role to the board team",
     description = "Add a role to the board team",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to replace the member in", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The  id of the board to add the role to", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "roleName", description = "The team role to add", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
@@ -124,14 +124,14 @@ class BoardTeamRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("/{board}/team/roles/{roleName}")
+  @Path("/{boardId}/team/roles/{roleName}")
   @DELETE
   @Operation(
     summary = "Remove a role from the board team",
     description = "Remove the role from the board team",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to remove the member from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The  id of the board to remove the role from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "roleName", description = "The team role to remove", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(

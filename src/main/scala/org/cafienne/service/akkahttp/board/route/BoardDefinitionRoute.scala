@@ -36,7 +36,7 @@ import org.cafienne.util.Guid
 import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/board")
+@Path("/boards")
 class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRoute {
 
   override def routes: Route = concat(createBoard, updateBoard, addColumn, removeColumn, updateColumn)
@@ -66,14 +66,14 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     }
   }
 
-  @Path("/{board}/form")
+  @Path("/{boardId}/form")
   @POST
   @Operation(
     summary = "Add or replace a board start form",
     description = "Add or replace a board start form - a custom form that is provided to be filled when a case instance starts",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to manipulate", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board to manipulate", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
       new ApiResponse(description = "Form updated successfully", responseCode = "204"),
@@ -92,14 +92,14 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     }
   }
 
-  @Path("/{board}/columns")
+  @Path("/{boardId}/columns")
   @POST
   @Operation(
     summary = "Add a column",
     description = "Add a column to the board",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board in which to add the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board in which to add the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
       new ApiResponse(description = "Column added successfully", responseCode = "204"),
@@ -121,14 +121,14 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       }
     }
 
-  @Path("/{board}/columns/{columnId}")
+  @Path("/{boardId}/columns/{columnId}")
   @DELETE
   @Operation(
     summary = "Remove a column",
     description = "Removes the column from the board",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board from which to remove the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board from which to remove the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "columnId", description = "The id of the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
@@ -145,14 +145,14 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
     }
   }
 
-  @Path("/{board}/columns/{columnId}")
+  @Path("/{boardId}/columns/{columnId}")
   @POST
   @Operation(
     summary = "Update the column definition",
     description = "Update or replace a column form - a custom form that is provided with the active task in the flow",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to manipulate", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board to manipulate", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "columnId", description = "The id of the column", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
@@ -161,7 +161,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
       new ApiResponse(responseCode = "404", description = "Column not found"),
     )
   )
-  @RequestBody(description = "Form to add or replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[String]))))
+  @RequestBody(description = "Form to add or replace", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[ColumnUpdateDetails]))))
   @Consumes(Array("application/json"))
   def updateColumn: Route = post {
     boardUser { boardUser =>

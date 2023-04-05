@@ -32,7 +32,7 @@ import javax.ws.rs._
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/board")
+@Path("/boards")
 class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute with LastModifiedDirectives {
   val taskQueries: TaskQueries = new TaskQueriesImpl
 
@@ -59,14 +59,14 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
     }
   }
 
-  @Path("/{board}")
+  @Path("/{boardId}")
   @GET
   @Operation(
     summary = "Get the board and its details",
     description = "Retrieves Board, Columns, Tasks and team for a specific board",
     tags = Array("board"),
     parameters = Array(
-      new Parameter(name = "board", description = "The board to retrieve details from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "boardId", description = "The id of the board to retrieve", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array( //TODO return a detailed Board type with all required fields
       new ApiResponse(responseCode = "200", description = "Board and its details", content = Array(new Content(schema = new Schema(implementation = classOf[BoardAPI.Examples.BoardResponse])))),

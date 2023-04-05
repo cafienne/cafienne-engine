@@ -8,7 +8,8 @@
 package org.cafienne.service.akkahttp.board.route
 
 import akka.http.scaladsl.server.Route
-import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -22,11 +23,11 @@ import org.cafienne.util.Guid
 import javax.ws.rs._
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
-@Path("/board")
+@Path("/boards")
 class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   override def routes: Route = concat(startFlow, completeFlowTask, claimFlowTask, saveFlowTask)
 
-  @Path("{boardId}/flow")
+  @Path("{boardId}/flows")
   @POST
   @Operation(
     summary = "Start a flow in the board",
@@ -40,7 +41,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   @Produces(Array("application/json"))
   def startFlow: Route = post {
     boardUser { user =>
-      path("flow") {
+      path("flows") {
         pathEndOrSingleSlash {
           entity(as[StartFlowFormat]) { flow =>
             askFlow(new StartFlow(user, flow.id.getOrElse(new Guid().toString), flow.subject, asJson(flow.data).getOrElse(new ValueMap())))
@@ -50,12 +51,17 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("{boardId}/flow/{flowId}/tasks/{taskId}/claim")
+  @Path("{boardId}/flows/{flowId}/tasks/{taskId}/claim")
   @PUT
   @Operation(
     summary = "Claim a task in a flow on the board",
     description = "Claim a task in a flow on the board",
     tags = Array("board"),
+    parameters = Array(
+      new Parameter(name = "boardId", description = "The id of the board", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "flowId", description = "The id of the flow containing the task", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "taskId", description = "The id of the task to claim", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
     responses = Array(
       new ApiResponse(responseCode = "202", description = "Task claimed"),
     )
@@ -64,7 +70,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   def claimFlowTask: Route = put {
     // TODO: SWAGGER document the path parameters
     boardUser { user =>
-      path("flow" / Segment / "tasks" / Segment / "claim") { (flowId, taskId) =>
+      path("flows" / Segment / "tasks" / Segment / "claim") { (flowId, taskId) =>
         pathEndOrSingleSlash {
           askFlow(new ClaimFlowTask(user, flowId, taskId))
         }
@@ -72,12 +78,17 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("{boardId}/flow/{flowId}/tasks/{taskId}")
-  @POST
+  @Path("{boardId}/flows/{flowId}/tasks/{taskId}")
+  @PUT
   @Operation(
     summary = "Save a task in a flow on the board",
     description = "Save a task in a flow on the board",
     tags = Array("board"),
+    parameters = Array(
+      new Parameter(name = "boardId", description = "The id of the board", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "flowId", description = "The id of the flow containing the task", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "taskId", description = "The id of the task to save", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
     responses = Array(
       new ApiResponse(responseCode = "202", description = "Task completion initiated"),
     )
@@ -86,7 +97,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   @Produces(Array("application/json"))
   def saveFlowTask: Route = put {
     boardUser { user =>
-      path("flow" / Segment / "tasks" / Segment) { (flowId, taskId) =>
+      path("flows" / Segment / "tasks" / Segment) { (flowId, taskId) =>
         pathEndOrSingleSlash {
           entity(as[FlowTaskOutputFormat]) { output =>
             askFlow(new SaveFlowTaskOutput(user, flowId, taskId, output.subject, asJson(output.data)))
@@ -96,12 +107,17 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
-  @Path("{boardId}/flow/{flowId}/tasks/{taskId}")
+  @Path("{boardId}/flows/{flowId}/tasks/{taskId}")
   @POST
   @Operation(
     summary = "Complete a task in a flow on the board",
     description = "Complete a task in a flow on the board",
     tags = Array("board"),
+    parameters = Array(
+      new Parameter(name = "boardId", description = "The id of the board", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "flowId", description = "The id of the flow containing the task", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "taskId", description = "The id of the task to complete", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
     responses = Array(
       new ApiResponse(responseCode = "202", description = "Task completion initiated"),
     )
@@ -110,7 +126,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
   @Produces(Array("application/json"))
   def completeFlowTask: Route = post {
     boardUser { user =>
-      path("flow" / Segment / "tasks" / Segment) { (flowId, taskId) =>
+      path("flows" / Segment / "tasks" / Segment) { (flowId, taskId) =>
         pathEndOrSingleSlash {
           entity(as[FlowTaskOutputFormat]) { output =>
             askFlow(new CompleteFlowTask(user, flowId, taskId, output.subject, asJson(output.data)))
