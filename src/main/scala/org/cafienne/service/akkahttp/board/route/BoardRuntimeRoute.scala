@@ -130,7 +130,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
                     BoardAPI.Task(id = task.id, subject = Some(subject), flowId = task.caseInstanceId,
                       claimedBy = Some(task.assignee), form = task.getJSON(task.taskModel).asMap(), data = data)
                   })
-                  BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), tasks = columnTasks)
+                  BoardAPI.Column(column.columnId, column.position, Some(column.getTitle), Some(column.getRole), column.getForm, tasks = columnTasks)
                 })
 
                 completeJson(BoardAPI.BoardResponseFormat(definition.boardId, Some(definition.getTitle), team, columns))

@@ -42,23 +42,24 @@ object BoardAPI {
 
   //TODO Column is a duplicate also found in BoardQueryProtocol
   final case class Column(
-                     id: String,
-                     position: Int,
-                     title: Option[String],
-                     role: Option[String],
-                     tasks: Seq[Task]
-                   ) extends CafienneJson {
-    override def toValue: Value[_] = new ValueMap(Fields.id, id, "position", position, Fields.title, title, Fields.role, role, "tasks", tasks)
+                           id: String,
+                           position: Int,
+                           title: Option[String],
+                           role: Option[String],
+                           form: ValueMap,
+                           tasks: Seq[Task]
+                         ) extends CafienneJson {
+    override def toValue: Value[_] = new ValueMap(Fields.id, id, "position", position, Fields.title, title, Fields.role, role, Fields.form, form, "tasks", tasks)
   }
 
   final case class Task(
-                     id: String,
-                     subject: Option[String],
-                     flowId: String,
-                     claimedBy: Option[String],
-                     form: ValueMap,
-                     data: ValueMap
-                   ) extends CafienneJson {
+                         id: String,
+                         subject: Option[String],
+                         flowId: String,
+                         claimedBy: Option[String],
+                         form: ValueMap,
+                         data: ValueMap
+                       ) extends CafienneJson {
     override def toValue: Value[_] = new ValueMap(Fields.id, id, Fields.subject, subject, Fields.flowId, flowId, "claimedBy", claimedBy, Fields.form, form, "data", data)
   }
 
