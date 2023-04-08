@@ -79,15 +79,9 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
     envelope match {
       // Trigger deletion process on actors that still have a StorageEvent (the first one is always RemovalInitiated).
       //  But only trigger it on top level removals, as they will themselves instantiate their children that have not yet been deleted.
-      case EventEnvelope(_, _, _, event: RemovalInitiated) =>
-        if (event.metadata.isRoot) {
-          val command = RemoveActorData(event.metadata)
-          logger.info(s"Recovering root deletion actor ${event.metadata}")
-          getActorRef(command).tell(command, self)
-        }
       case EventEnvelope(_, _, _, event: StorageActionInitiated) =>
         if (event.metadata.isRoot) {
-          def restart(commandMaker: ActorMetadata => StorageCommand) = {
+          def restart(commandMaker: ActorMetadata => StorageCommand): Unit = {
             val command = commandMaker(event.metadata)
             logger.info(s"Recovering storage process '${command.getClass.getSimpleName}' on actor ${event.metadata}")
             getActorRef(command).tell(command, self)
