@@ -31,11 +31,12 @@ object HealthMonitor {
   // Make it an ordered set, so that the json structure is stable.
   private val measures: Set[HealthMeasurePoint] = new util.LinkedHashSet[HealthMeasurePoint]().asScala
 
-  val queryDB = addMeasure("query-db")
-  val idp = addMeasure("idp")
-  val writeJournal = addMeasure("write-journal", false)
-  val readJournal = addMeasure("read-journal")
-  val timerService = addMeasure("timer-service", false)
+  val queryDB: HealthMeasurePoint = addMeasure("query-db")
+  val idp: HealthMeasurePoint = addMeasure("idp")
+  val writeJournal: HealthMeasurePoint = addMeasure("write-journal", isCritical = false)
+  val readJournal: HealthMeasurePoint = addMeasure("read-journal")
+  val timerService: HealthMeasurePoint = addMeasure("timer-service", isCritical = false)
+  val storageService: HealthMeasurePoint = addMeasure("storage-service", isCritical = false)
 
   private def description = "Health indication of the Case Engine is currently " + health
 

@@ -69,8 +69,8 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
       case Success(_) =>
         logger.info("Completed re-activating Storage Deletion Actors")
       case Failure(ex) =>
-        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
-        HealthMonitor.readJournal.hasFailed(ex)
+        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from.", ex)
+        HealthMonitor.storageService.hasFailed(ex)
     }
   }
 
