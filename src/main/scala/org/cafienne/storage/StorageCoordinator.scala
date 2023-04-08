@@ -49,12 +49,14 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
   logger.warn("Launching Storage Coordination Service")
   start()
 
-  private def createActorRef(command: StorageCommand): ActorRef = {
-    // Note: we create the ModelActor as a child to our context
-    val ref = context.actorOf(Props(command.actorClass, caseSystem, command.metadata), command.metadata.actorId)
-    // Also start watching the lifecycle of the model actor
-    context.watch(ref)
-    ref
+  private def getActorRef(command: StorageCommand): ActorRef = {
+    refs.getOrElseUpdate(command.metadata.actorId, {
+      // Note: we create the ModelActor as a child to our context
+      val ref = context.actorOf(Props(command.actorClass, caseSystem, command.metadata), command.metadata.actorId)
+      // Also start watching the lifecycle of the model actor
+      context.watch(ref)
+      ref
+    })
   }
 
   def start(): Unit = {
@@ -81,14 +83,14 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
         if (event.metadata.isRoot) {
           val command = RemoveActorData(event.metadata)
           logger.info(s"Recovering root deletion actor ${event.metadata}")
-          createActorRef(command).tell(command, self)
+          getActorRef(command).tell(command, self)
         }
       case EventEnvelope(_, _, _, event: StorageActionInitiated) =>
         if (event.metadata.isRoot) {
           def restart(commandMaker: ActorMetadata => StorageCommand) = {
             val command = commandMaker(event.metadata)
             logger.info(s"Recovering storage process '${command.getClass.getSimpleName}' on actor ${event.metadata}")
-            createActorRef(command).tell(command, self)
+            getActorRef(command).tell(command, self)
           }
 
           event match {
@@ -114,7 +116,7 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
       val command = request._1
       val originalSender = request._2
       logger.whenDebugEnabled(logger.debug(s"Actor ${message.actorId} terminated, triggering follow up: $command"))
-      refs.getOrElseUpdate(command.metadata.actorId, createActorRef(command)).tell(command, originalSender)
+      getActorRef(command).tell(command, originalSender)
     })
   }
 
