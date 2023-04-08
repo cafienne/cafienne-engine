@@ -24,7 +24,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.actormodel.response.ActorTerminated
-import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
 import org.cafienne.system.CaseSystem
 
 import scala.collection.mutable
@@ -104,6 +104,22 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
   def storeEvent(event: StorageEvent): Unit = {
     // Tag the event, and then after persistence add it to our state and start handling it.
     persist(Tagged(event, Set(ModelEvent.TAG, StorageEvent.TAG)))(_ => state.addEvent(event))
+  }
+
+  /**
+    * Triggers the storage process on the state directly if the state already
+    * has an initiation event, else if will simply add the given event
+    * which triggers the storage process in the state.
+    * @param event The initiation event to store if one is not yet available
+    */
+  def triggerStorageProcess(command: StorageCommand, event: StorageActionInitiated): Unit = {
+    if (state.hasInitiationEvent) {
+      state.continueStorageProcess()
+    } else {
+      state.addEvent(event)
+    }
+    // Inform the sender of the command about the event
+    sender() ! event
   }
 }
 

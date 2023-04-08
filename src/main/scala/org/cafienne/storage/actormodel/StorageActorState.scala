@@ -21,7 +21,7 @@ import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
-import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageEvent}
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
 import scala.collection.mutable.ListBuffer
@@ -53,6 +53,14 @@ trait StorageActorState {
     .headOption // Take the actor class of the bootstrap message found, or else just give a message with the event types that are found.
     .getOrElse(s"Bootstrap message is missing; found ${events.length} events of types: [${events.map(_.getClass.getName).toSet.mkString(",")}]")
 
+  def hasInitiationEvent: Boolean = events.exists(_.isInstanceOf[StorageActionInitiated])
+
+  /**
+    * Continues the storage process.
+    * Note, this method must be idempotent as it can be invoked multiple times.
+    */
+  def continueStorageProcess(): Unit
+
   def addEvent(event: ModelEvent): Unit = {
     events += event
     // If an event is added during recovery, we should not invoke follow up actions, since first full recovery has to complete.
@@ -68,7 +76,13 @@ trait StorageActorState {
   /**
    * Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
    */
-  def handleRecoveryCompletion(): Unit
+  def handleRecoveryCompletion(): Unit = {
+    printLogMessage(s"Recovery completed with ${events.size} events")
+    if (hasInitiationEvent) {
+      printLogMessage("Triggering storage process upon recovery")
+      continueStorageProcess()
+    }
+  }
 
   /**
     * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,

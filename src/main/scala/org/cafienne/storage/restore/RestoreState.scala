@@ -30,20 +30,10 @@ class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with 
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
     event match {
-      case _: ArchiveRetrieved => continueRestoreProcess()
-      case _: ChildRestored => continueRestoreProcess()
+      case _: ArchiveRetrieved => continueStorageProcess()
+      case _: ChildRestored => continueStorageProcess()
       case event =>
         logger.error(s"Cannot handle event of type ${event.getClass.getName} in ${actor.getClass.getSimpleName}[${event.actorId}]")
-    }
-  }
-
-  /** Triggers the archival process upon recovery completion. But only if the ArchivalInitiated event is found.
-   */
-  def handleRecoveryCompletion(): Unit = {
-    printLogMessage(s"Recovery completed with ${events.size} events")
-    if (hasArchive) {
-      printLogMessage("Continuing recovered archival process")
-      continueRestoreProcess()
     }
   }
 
@@ -61,7 +51,7 @@ class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with 
     list.toSeq
   }
 
-  def continueRestoreProcess(): Unit = {
+  override def continueStorageProcess(): Unit = {
     val archivesRestored = archives.filter(archive => eventsOfType(classOf[ChildRestored]).exists(_.metadata.actorId == archive.metadata.actorId))
     val archivesPending = archives.filterNot(archive => eventsOfType(classOf[ChildRestored]).exists(_.metadata.actorId == archive.metadata.actorId))
     val archivesToRestore = archivesPending.filter(archive => {

@@ -40,8 +40,7 @@ trait ArchivalState extends StorageActorState with LazyLogging {
     event match {
       case event: ArchivalInitiated =>
         printLogMessage(s"Starting archival for ${event.metadata}")
-        triggerArchivalProcess()
-        actor.sender() ! event
+        continueStorageProcess()
       case _: ChildrenArchivalInitiated => triggerChildArchivalProcess()
       case _: QueryDataArchived =>
         printLogMessage(s"QueryDB has been archived")
@@ -64,16 +63,6 @@ trait ArchivalState extends StorageActorState with LazyLogging {
 
   def isCleared: Boolean = events.exists(_.isInstanceOf[ModelActorArchived])
 
-  /** Triggers the archival process upon recovery completion. But only if the ArchivalInitiated event is found.
-   */
-  def handleRecoveryCompletion(): Unit = {
-    printLogMessage(s"Recovery completed with ${events.size} events")
-    if (events.exists(_.isInstanceOf[ArchivalInitiated])) {
-      printLogMessage("Launching recovered archival process")
-      triggerArchivalProcess()
-    }
-  }
-
   /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
    * events of this specific ModelActor.
    */
@@ -83,7 +72,7 @@ trait ArchivalState extends StorageActorState with LazyLogging {
    * It is typically triggered when recovery is done or after the first incoming ArchiveActorData command is received.
    * It triggers both child archival and cleaning query data.
    */
-  def triggerArchivalProcess(): Unit = {
+  override def continueStorageProcess(): Unit = {
     triggerChildArchivalProcess()
     triggerQueryDBCleanupProcess()
   }
