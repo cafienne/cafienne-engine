@@ -25,6 +25,7 @@ import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.response.ActorTerminated
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
@@ -46,15 +47,21 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
 
   private val refs: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
 
-  logger.warn("Launching Storage Coordination Service")
-  start()
+  if (Cafienne.config.engine.storage.recoveryDisabled) {
+    logger.warn("WARNING: Storage Coordination Service does not recover any existing unfinished storage processes; set 'engine.storage-service.auto-start = true' to enable recovery ")
+  } else {
+    logger.warn("Launching Storage Coordination Service")
+    start()
+  }
 
-  private def createActorRef(command: StorageCommand): ActorRef = {
-    // Note: we create the ModelActor as a child to our context
-    val ref = context.actorOf(Props(command.actorClass, caseSystem, command.metadata), command.metadata.actorId)
-    // Also start watching the lifecycle of the model actor
-    context.watch(ref)
-    ref
+  private def getActorRef(command: StorageCommand): ActorRef = {
+    refs.getOrElseUpdate(command.metadata.actorId, {
+      // Note: we create the ModelActor as a child to our context
+      val ref = context.actorOf(Props(command.actorClass, caseSystem, command.metadata), command.metadata.actorId)
+      // Also start watching the lifecycle of the model actor
+      context.watch(ref)
+      ref
+    })
   }
 
   def start(): Unit = {
@@ -62,8 +69,8 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
       case Success(_) =>
         logger.info("Completed re-activating Storage Deletion Actors")
       case Failure(ex) =>
-        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from. Stopping case engine.", ex)
-        HealthMonitor.readJournal.hasFailed(ex)
+        logger.error(getClass.getSimpleName + " bumped into an issue that it cannot recover from.", ex)
+        HealthMonitor.storageService.hasFailed(ex)
     }
   }
 
@@ -77,18 +84,12 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
     envelope match {
       // Trigger deletion process on actors that still have a StorageEvent (the first one is always RemovalInitiated).
       //  But only trigger it on top level removals, as they will themselves instantiate their children that have not yet been deleted.
-      case EventEnvelope(_, _, _, event: RemovalInitiated) =>
-        if (event.metadata.isRoot) {
-          val command = RemoveActorData(event.metadata)
-          logger.info(s"Recovering root deletion actor ${event.metadata}")
-          createActorRef(command).tell(command, self)
-        }
       case EventEnvelope(_, _, _, event: StorageActionInitiated) =>
         if (event.metadata.isRoot) {
-          def restart(commandMaker: ActorMetadata => StorageCommand) = {
+          def restart(commandMaker: ActorMetadata => StorageCommand): Unit = {
             val command = commandMaker(event.metadata)
             logger.info(s"Recovering storage process '${command.getClass.getSimpleName}' on actor ${event.metadata}")
-            createActorRef(command).tell(command, self)
+            getActorRef(command).tell(command, self)
           }
 
           event match {
@@ -114,7 +115,7 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
       val command = request._1
       val originalSender = request._2
       logger.whenDebugEnabled(logger.debug(s"Actor ${message.actorId} terminated, triggering follow up: $command"))
-      refs.getOrElseUpdate(command.metadata.actorId, createActorRef(command)).tell(command, originalSender)
+      getActorRef(command).tell(command, originalSender)
     })
   }
 

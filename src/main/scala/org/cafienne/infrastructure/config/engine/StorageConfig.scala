@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config
+package org.cafienne.infrastructure.config.engine
 
 import org.cafienne.infrastructure.config.util.ChildConfigReader
 import org.cafienne.storage.archive.Storage
@@ -23,23 +23,29 @@ import org.cafienne.storage.archive.file.FileBasedStorage
 
 import java.io.File
 
-class StorageConfig (val parent: CafienneConfig) extends ChildConfigReader {
-  val path = "archive"
+class StorageConfig(val parent: EngineConfig) extends ChildConfigReader {
+  val path = "storage-service"
 
   val enabled: Boolean = readBoolean("enabled", default = false)
 
-  val archive: Storage = {
-    val plugin = readString("plugin", "file")
-    plugin match {
-      case "file" =>
-        new FileBasedStorage(new FileStorageConfig(this))
+  val recoveryDisabled: Boolean = readBoolean("disable-recovery", default = false)
+
+  val archive = new ArchiveConfig(this)
+}
+
+class ArchiveConfig(val parent: StorageConfig) extends ChildConfigReader {
+  val path = "archive"
+  val plugin: Storage = {
+    readString("plugin", "file") match {
+      case "file" => new FileBasedStorage(new FileStorageConfig(this))
       case "db" => fail("Database plugin is not yet available")
       case other => fail(s"Plugin of type $other is not supported")
     }
   }
+
 }
 
-class FileStorageConfig(val parent: StorageConfig) extends ChildConfigReader {
+class FileStorageConfig(val parent: ArchiveConfig) extends ChildConfigReader {
   val path = "file"
 
   val directory: File = {

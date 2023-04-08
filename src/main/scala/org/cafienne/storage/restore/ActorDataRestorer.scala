@@ -40,7 +40,7 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
     //  Use the system dispatcher for handling the export success
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-    val storage: Storage = Cafienne.config.storage.archive
+    val storage: Storage = Cafienne.config.engine.storage.archive.plugin
     val senderRef = sender()
 
     def raiseFailure(throwable: Throwable): Unit = {

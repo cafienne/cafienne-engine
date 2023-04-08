@@ -19,6 +19,7 @@ package org.cafienne.actormodel;
 
 import akka.actor.PoisonPill;
 import akka.persistence.AbstractPersistentActor;
+import akka.persistence.JournalProtocol;
 import akka.persistence.SnapshotOffer;
 import akka.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
@@ -224,7 +225,11 @@ public abstract class ModelActor extends AbstractPersistentActor {
     protected void handleSnapshot(SnapshotOffer snapshot) {
     }
 
-    protected void handleSnapshotProtocolMessage(SnapshotProtocol.Response message) {
+    protected void handleSnapshotProtocolMessage(SnapshotProtocol.Message message) {
+    }
+
+    protected void handleJournalProtocolMessage(JournalProtocol.Message message) {
+//        System.out.println(this + ": Received " + message.getClass().getName());
     }
 
     protected void recoveryCompleted() {

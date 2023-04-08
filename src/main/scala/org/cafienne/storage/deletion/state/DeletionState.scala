@@ -34,31 +34,20 @@ trait DeletionState extends StorageActorState {
   override def handleStorageEvent(event: StorageEvent): Unit = event match {
     case event: RemovalInitiated =>
       printLogMessage(s"Starting removal for ${event.metadata}")
-      triggerRemovalProcess()
-      actor.sender() ! event
+      continueStorageProcess()
     case event: ChildrenRemovalInitiated =>
       printLogMessage(s"Initiating deletion of ${event.members.size} children")
       triggerChildRemovalProcess()
     case event: QueryDataRemoved =>
       printLogMessage(s"QueryDB has been cleaned")
-      checkCleaningDone()
+      checkDeletionProcessCompletion()
     case event: RemovalCompleted =>
       printLogMessage(s"Child ${event.metadata} reported completion")
-      checkCleaningDone()
+      checkDeletionProcessCompletion()
     case event =>
       printLogMessage(
         s"Encountered unexpected storage event ${event.getClass.getName} on Actor [${event.actorId}] data on behalf of user ${event.user}"
       )
-  }
-
-  /** Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
-    */
-  def handleRecoveryCompletion(): Unit = {
-    printLogMessage(s"Recovery completed with ${events.size} events")
-    if (events.exists(_.isInstanceOf[RemovalInitiated])) {
-      printLogMessage("Launching recovered removal process")
-      triggerRemovalProcess()
-    }
   }
 
   /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
@@ -70,7 +59,7 @@ trait DeletionState extends StorageActorState {
     * It is typically triggered when recovery is done or after the first incoming RemoveActorData command is received.
     * It triggers both child removal and cleaning query data.
     */
-  def triggerRemovalProcess(): Unit = {
+  override def continueStorageProcess(): Unit = {
     triggerChildRemovalProcess()
     triggerQueryDBCleanupProcess()
   }
@@ -96,8 +85,8 @@ trait DeletionState extends StorageActorState {
         pendingChildRemovals.foreach(actor.deleteChildActorData)
       } else {
         printLogMessage(s"No children found that have pending removal")
-        checkCleaningDone()
       }
+      checkDeletionProcessCompletion()
     }
   }
 
@@ -108,7 +97,7 @@ trait DeletionState extends StorageActorState {
       printLogMessage("Deleting query data")
       clearQueryData().map(_ => actor.self ! QueryDataRemoved(metadata))
     }
-    checkCleaningDone()
+    checkDeletionProcessCompletion()
   }
 
   /** Determine if we have an event with the metadata of all our children
@@ -136,10 +125,8 @@ trait DeletionState extends StorageActorState {
   /** Determine if all data is removed from children and also from QueryDB.
     * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
     */
-  def checkCleaningDone(): Unit = {
-    printLogMessage(
-      s"Running completion check: [queryDataCleared=$queryDataCleared; childrenMetadataAvailable=$childrenMetadataAvailable; children removed=${children.size - pendingChildRemovals.size}, pending=${pendingChildRemovals.size}]"
-    )
+  def checkDeletionProcessCompletion(): Unit = {
+    printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared; childrenMetadataAvailable=$childrenMetadataAvailable; children removed=${children.size - pendingChildRemovals.size}, pending=${pendingChildRemovals.size}]")
     if (childrenMetadataAvailable && pendingChildRemovals.isEmpty && queryDataCleared) {
       actor.completeDeletionProcess()
     }
