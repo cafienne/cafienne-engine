@@ -122,7 +122,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
       //  Use the system dispatcher for handling the export success
       implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
-      val storage: Storage = Cafienne.config.storage.archive
+      val storage: Storage = Cafienne.config.engine.storage.archive.plugin
       storage.store(event.archive).map(_ => self ! ArchiveExported(event.metadata))
     } else {
       // Inform parent about our archive. Parent will send us "ArchiveExported"

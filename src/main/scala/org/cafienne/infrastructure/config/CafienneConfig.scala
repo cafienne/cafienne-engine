@@ -80,8 +80,6 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     */
   lazy val repository: RepositoryConfig = new RepositoryConfig(this)
 
-  lazy val storage: StorageConfig = new StorageConfig(this)
-
   /**
     * Returns configuration options for the engine and it's internal services
     */

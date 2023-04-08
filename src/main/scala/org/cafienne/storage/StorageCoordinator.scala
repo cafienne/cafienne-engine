@@ -25,6 +25,7 @@ import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.response.ActorTerminated
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
@@ -46,8 +47,12 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
 
   private val refs: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
 
-  logger.warn("Launching Storage Coordination Service")
-  start()
+  if (Cafienne.config.engine.storage.recoveryDisabled) {
+    logger.warn("WARNING: Storage Coordination Service does not recover any existing unfinished storage processes; set 'engine.storage-service.auto-start = true' to enable recovery ")
+  } else {
+    logger.warn("Launching Storage Coordination Service")
+    start()
+  }
 
   private def getActorRef(command: StorageCommand): ActorRef = {
     refs.getOrElseUpdate(command.metadata.actorId, {

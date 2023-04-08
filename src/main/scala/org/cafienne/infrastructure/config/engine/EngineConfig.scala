@@ -32,4 +32,6 @@ class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
     * Config property for settings of the mail service to use
     */
   lazy val mailService = new MailServiceConfig(this)
+
+  lazy val storage: StorageConfig = new StorageConfig(this)
 }
