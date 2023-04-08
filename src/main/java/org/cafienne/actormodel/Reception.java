@@ -17,6 +17,7 @@
 
 package org.cafienne.actormodel;
 
+import akka.persistence.JournalProtocol;
 import akka.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
@@ -64,9 +65,11 @@ class Reception {
             if (visitor.isResponse() || canPass(visitor.asCommand())) {
                 backoffice.handleVisitor(visitor);
             }
-        } else if (message instanceof SnapshotProtocol.Response) {
+        } else if (message instanceof SnapshotProtocol.Message) {
             // Weirdly enough snapshotting takes a different route than event persistence...
-            actor.handleSnapshotProtocolMessage((SnapshotProtocol.Response) message);
+            actor.handleSnapshotProtocolMessage((SnapshotProtocol.Message) message);
+        } else if (message instanceof JournalProtocol.Message) {
+            actor.handleJournalProtocolMessage((JournalProtocol.Message) message);
         } else {
             actor.getLogger().warn(actor + " received a message it cannot handle, of type " + message.getClass().getName());
         }
