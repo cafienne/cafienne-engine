@@ -240,6 +240,12 @@ commands:
             cd ./cmmn-test-framework
             npm run prod
       - run:
+          name: Test archival & deletion
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run prod TestArchiveCase TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+      - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
       # Stop engine, but also the sql server "without events" instance, and start the one "with events" for later usage
