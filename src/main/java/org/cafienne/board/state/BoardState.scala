@@ -30,7 +30,7 @@ class BoardState(val board: BoardActor) extends StateElement with CafienneJson w
     board.addEvent(new BoardCreated(board, command.title, command.form))
     // Be aware: create team is asynchronous, as it creates a Consent Group underneath.
     //  The createTeam is responsible for informing the sender with BoardCreatedResponse.
-    definition.team.createTeam(Some(command), command.getUser)
+    definition.team.createTeam(Some(command), command.getUser.id)
   }
 
   def startFlow(command: StartFlow): Unit = {

@@ -24,7 +24,6 @@ import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.BoardCommand;
 
 /**
- * Base class for sending commands to a TenantActor
  */
 public abstract class BoardDefinitionCommand extends BoardCommand {
     /**
@@ -38,7 +37,7 @@ public abstract class BoardDefinitionCommand extends BoardCommand {
 
     public void validate(BoardActor board) throws InvalidCommandException {
         super.validate(board);
-        if (! getUser().isOwner()) {
+        if (! board.getDefinition().team().boardManagers().contains(getUser().id())) {
             throw new AuthorizationException("Only bord managers can change board definitions");
         }
     }

@@ -35,6 +35,8 @@ import org.cafienne.board.actorapi.event.BoardModified;
 import org.cafienne.board.actorapi.event.definition.*;
 import org.cafienne.board.actorapi.event.flow.FlowActivated;
 import org.cafienne.board.actorapi.event.flow.FlowInitiated;
+import org.cafienne.board.actorapi.event.team.BoardManagerAdded;
+import org.cafienne.board.actorapi.event.team.BoardManagerRemoved;
 import org.cafienne.board.actorapi.event.team.BoardTeamCreated;
 import org.cafienne.board.actorapi.event.team.BoardTeamCreationFailed;
 import org.cafienne.board.actorapi.response.*;
@@ -76,6 +78,8 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(BoardTeamCreated.class, BoardTeamCreated::new);
         CafienneSerializer.addManifestWrapper(RoleDefinitionAdded.class, RoleDefinitionAdded::new);
         CafienneSerializer.addManifestWrapper(RoleDefinitionRemoved.class, RoleDefinitionRemoved::new);
+        CafienneSerializer.addManifestWrapper(BoardManagerAdded.class, BoardManagerAdded::new);
+        CafienneSerializer.addManifestWrapper(BoardManagerRemoved.class, BoardManagerRemoved::new);
         CafienneSerializer.addManifestWrapper(BoardTeamCreationFailed.class, BoardTeamCreationFailed::new);
     }
 

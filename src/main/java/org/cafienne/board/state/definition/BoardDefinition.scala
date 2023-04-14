@@ -95,7 +95,7 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
   }
 
   override def toValue: Value[_] = {
-    new ValueMap(Fields.id, boardId, Fields.title, title, Fields.form, startForm, Fields.team, team.toValue, Fields.columns, new ValueList(columns.map(_.toValue).toArray))
+    new ValueMap(Fields.id, boardId, Fields.title, title, Fields.form, startForm, Fields.owners, team.toValue, Fields.columns, new ValueList(columns.map(_.toValue).toArray))
   }
 }
 
@@ -105,7 +105,7 @@ object BoardDefinition {
   def deserialize(json: ValueMap): BoardDefinition = {
     val definition = new BoardDefinition(null, json.readOption[String](Fields.title))
     definition.startForm = json.readMap(Fields.form)
-    definition.team.users.addAll(BoardTeam.deserialize(json.withArray(Fields.team)))
+    definition.team.boardManagers.addAll(BoardTeam.deserialize(json.withArray(Fields.owners)))
     json.withArray(Fields.columns).getValue.toArray(Array[ValueMap]()).map(ColumnDefinition.deserialize(definition, _))
     definition
   }
