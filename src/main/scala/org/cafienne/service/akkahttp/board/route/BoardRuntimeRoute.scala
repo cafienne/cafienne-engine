@@ -18,12 +18,10 @@ import org.cafienne.actormodel.response.{ActorExistsFailure, CommandFailure, Eng
 import org.cafienne.board.BoardFields
 import org.cafienne.board.actorapi.command.runtime.GetBoard
 import org.cafienne.board.actorapi.response.runtime.GetBoardResponse
-import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.infrastructure.akkahttp.route.LastModifiedDirectives
 import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.querydb.query.filter.TaskFilter
-import org.cafienne.querydb.query.{TaskQueries, TaskQueriesImpl}
+import org.cafienne.querydb.query.{BoardQueries, BoardQueriesImpl}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.board.model.{BoardAPI, BoardTeamAPI}
 import org.cafienne.system.CaseSystem
@@ -34,7 +32,7 @@ import scala.util.{Failure, Success}
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/boards")
 class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute with LastModifiedDirectives {
-  val taskQueries: TaskQueries = new TaskQueriesImpl
+  val boardQueries: BoardQueries = new BoardQueriesImpl
 
   override def routes: Route = concat(getBoards, getBoard)
 
@@ -79,7 +77,6 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       boardUser { boardUser =>
         val command = new GetBoard(boardUser)
 
-        val businessIdentifier = Some(s"${BoardDefinition.BOARD_IDENTIFIER}=${boardUser.boardId}")
         val query = for {
           commandResponse <- caseSystem.gateway.request(command)
           tasks <- {
@@ -90,9 +87,9 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
             //  is set in the response header ("BOARD_LAST_MODIFIED"), and then the actor id of last modified is not equal to the board id.
             //  So in that case, we can run a synced query against the CaseReader.lastModifiedRegistration.
             if (lastModified.lastModified.map(_.actorId).getOrElse(boardUser.boardId) == boardUser.boardId) {
-              taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier))
+              boardQueries.getBoardTasks(boardUser)
             } else {
-              runSyncedQuery(taskQueries.getAllTasks(boardUser, TaskFilter(identifiers = businessIdentifier)), lastModified)
+              runSyncedQuery(boardQueries.getBoardTasks(boardUser), lastModified)
             }
           }
           consentGroup <- {
