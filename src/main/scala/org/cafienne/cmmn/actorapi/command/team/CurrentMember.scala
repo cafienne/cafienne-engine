@@ -41,7 +41,7 @@ class CurrentMember(team: Team, user: CaseUserIdentity) extends CaseTeamUser {
       } else {
         // Others just have the case roles that belong to their group roles.
         val userGroupRoles = userGroups.filter(_.groupId == group.groupId).flatMap(_.roles)
-        group.mappings.filter(mapping => userGroupRoles.contains(mapping.groupRole))
+        group.mappings.filter(mapping => mapping.groupRole.isEmpty || userGroupRoles.contains(mapping.groupRole))
       }
     }).toSet
   }
