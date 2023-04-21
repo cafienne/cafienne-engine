@@ -17,7 +17,6 @@
 
 package org.cafienne.service.akkahttp.board.route
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -28,7 +27,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.board.actorapi.command.CreateBoard
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition
-import org.cafienne.board.actorapi.command.definition.column.{AddColumnDefinition, UpdateColumnDefinition}
+import org.cafienne.board.actorapi.command.definition.column.{AddColumnDefinition, RemoveColumnDefinition, UpdateColumnDefinition}
 import org.cafienne.json.ValueMap
 import org.cafienne.service.akkahttp.board.model.BoardAPI._
 import org.cafienne.system.CaseSystem
@@ -140,8 +139,7 @@ class BoardDefinitionRoute(override val caseSystem: CaseSystem) extends BoardRou
   def removeColumn: Route = delete {
     boardUser { boardUser =>
       path("columns" / Segment) { columnId =>
-        complete(StatusCodes.NotImplemented)
-        //askBoard(new RemoveTenantUser(tenantOwner, tenantOwner.tenant, userId))
+        askBoard(RemoveColumnDefinition(boardUser, columnId))
       }
     }
   }

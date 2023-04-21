@@ -1,17 +1,23 @@
 package org.cafienne.board.state.definition
 
-import org.cafienne.board.actorapi.event.definition.{ColumnDefinitionAdded, ColumnDefinitionUpdated}
+import org.cafienne.board.actorapi.event.definition.{ColumnDefinitionRemoved, WriteColumnDefinitionEvent}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 class ColumnDefinition(val definition: BoardDefinition, val columnId: String) extends DefinitionElement with CafienneJson {
-  private val previous: Option[ColumnDefinition] = definition.columns.lastOption
-  val position: Int = definition.columns.size
+  def previous: Option[ColumnDefinition] = {
+    if (this.position == 0) {
+      None
+    } else {
+      Some(definition.columns(this.position - 1))
+    }
+  }
+  def position: Int = definition.columns.indexOf(this)
   definition.columns += this // This implicitly increases count of next column
 
-  private val columnIdentifier = s"${definition.boardId}_${position}"
-  private val sentryIdentifier = previous.fold("")(_ => s"crit__${columnIdentifier}")
-  private val taskIdentifier = s"ht__${columnIdentifier}"
+  private def columnIdentifier = s"${definition.boardId}_${position}"
+  private def sentryIdentifier = previous.fold("")(_ => s"crit__${columnIdentifier}")
+  private def taskIdentifier = s"ht__${columnIdentifier}"
 
   lazy val entryCriterion: String = previous.fold("")(_ => {
     s"""<entryCriterion id="_entry_${definition.boardId}_${position}" name="EntryCriterion_${position}" sentryRef="${sentryIdentifier}"/>"""
@@ -34,17 +40,16 @@ class ColumnDefinition(val definition: BoardDefinition, val columnId: String) ex
 
   def getForm: ValueMap = form
 
-  def updateState(event: ColumnDefinitionAdded): Unit = {
-    this.title = event.title
-    this.role = event.role.getOrElse(this.role)
-    this.form = event.form.getOrElse(this.form)
-  }
-
-  def updateState(event: ColumnDefinitionUpdated): Unit = {
+  def updateState(event: WriteColumnDefinitionEvent): Unit = {
     this.title = event.title.getOrElse(this.title)
     this.role = event.role.getOrElse(this.role)
     this.form = event.form.getOrElse(this.form)
   }
+
+  def updateState(event: ColumnDefinitionRemoved): Unit = {
+    definition.columns.remove(position, 1)
+  }
+
 
   def planItemXML: String = {
     s"""<planItem id="pi_ht__${columnIdentifier}" name="${title}" definitionRef="${taskIdentifier}">

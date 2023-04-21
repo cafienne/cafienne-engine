@@ -20,15 +20,14 @@ package org.cafienne.board.actorapi.event.definition;
 import org.cafienne.board.BoardActor;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-import scala.Some;
 
 @Manifest
-public class ColumnDefinitionAdded extends WriteColumnDefinitionEvent {
-    public ColumnDefinitionAdded(BoardActor board, String columnId, String title, scala.Option<String> role, scala.Option<ValueMap> form) {
-        super(board, columnId, new Some<String>(title), role, form);
+public class ColumnDefinitionRemoved extends ColumnDefinitionEvent {
+    public ColumnDefinitionRemoved(BoardActor board, String columnId) {
+        super(board, columnId);
     }
 
-    public ColumnDefinitionAdded(ValueMap json) {
+    public ColumnDefinitionRemoved(ValueMap json) {
         super(json);
     }
 }

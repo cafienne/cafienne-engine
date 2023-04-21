@@ -18,6 +18,7 @@
 package org.cafienne.infrastructure.serialization.serializers;
 
 import org.cafienne.board.actorapi.command.CreateBoard;
+import org.cafienne.board.actorapi.command.definition.column.RemoveColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition;
 import org.cafienne.board.actorapi.command.definition.column.AddColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.column.UpdateColumnDefinition;
@@ -57,6 +58,7 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(UpdateBoardDefinition.class, UpdateBoardDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(AddColumnDefinition.class, AddColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(UpdateColumnDefinition.class, UpdateColumnDefinition::deserialize);
+        CafienneSerializer.addManifestWrapper(RemoveColumnDefinition.class, RemoveColumnDefinition::deserialize);
         CafienneSerializer.addManifestWrapper(StartFlow.class, StartFlow::new);
         CafienneSerializer.addManifestWrapper(ClaimFlowTask.class, ClaimFlowTask::new);
         CafienneSerializer.addManifestWrapper(SaveFlowTaskOutput.class, SaveFlowTaskOutput::new);
@@ -72,6 +74,7 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(BoardDefinitionUpdated.class, BoardDefinitionUpdated::new);
         CafienneSerializer.addManifestWrapper(ColumnDefinitionAdded.class, ColumnDefinitionAdded::new);
         CafienneSerializer.addManifestWrapper(ColumnDefinitionUpdated.class, ColumnDefinitionUpdated::new);
+        CafienneSerializer.addManifestWrapper(ColumnDefinitionRemoved.class, ColumnDefinitionRemoved::new);
         CafienneSerializer.addManifestWrapper(BoardModified.class, BoardModified::new);
         CafienneSerializer.addManifestWrapper(FlowInitiated.class, FlowInitiated::new);
         CafienneSerializer.addManifestWrapper(FlowActivated.class, FlowActivated::new);

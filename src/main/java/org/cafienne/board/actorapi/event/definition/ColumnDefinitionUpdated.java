@@ -17,43 +17,17 @@
 
 package org.cafienne.board.actorapi.event.definition;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.BoardActor;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
-import java.io.IOException;
-
 @Manifest
-public class ColumnDefinitionUpdated extends BoardDefinitionEvent {
-    public final String columnId;
-    public final scala.Option<String> title;
-    public final scala.Option<String> role;
-    public final scala.Option<ValueMap> form;
-
+public class ColumnDefinitionUpdated extends WriteColumnDefinitionEvent {
     public ColumnDefinitionUpdated(BoardActor board, String columnId, scala.Option<String> title, scala.Option<String> role, scala.Option<ValueMap> form) {
-        super(board);
-        this.columnId = columnId;
-        this.title = title;
-        this.role = role;
-        this.form = form;
+        super(board, columnId, title, role, form);
     }
 
     public ColumnDefinitionUpdated(ValueMap json) {
         super(json);
-        this.columnId = json.readString(Fields.columnId);
-        this.title = json.readOption(Fields.title);
-        this.role = json.readOption(Fields.role);
-        this.form = json.readOptionalMap(Fields.form);
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeBoardEvent(generator);
-        writeField(generator, Fields.columnId, columnId);
-        writeField(generator, Fields.title, title);
-        writeField(generator, Fields.role, role);
-        writeField(generator, Fields.form, form);
     }
 }

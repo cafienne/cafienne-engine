@@ -17,18 +17,33 @@
 
 package org.cafienne.board.actorapi.event.definition;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.BoardActor;
-import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
-import scala.Some;
 
-@Manifest
-public class ColumnDefinitionAdded extends WriteColumnDefinitionEvent {
-    public ColumnDefinitionAdded(BoardActor board, String columnId, String title, scala.Option<String> role, scala.Option<ValueMap> form) {
-        super(board, columnId, new Some<String>(title), role, form);
+import java.io.IOException;
+
+abstract class ColumnDefinitionEvent extends BoardDefinitionEvent {
+    public final String columnId;
+
+    protected ColumnDefinitionEvent(BoardActor board, String columnId) {
+        super(board);
+        this.columnId = columnId;
     }
 
-    public ColumnDefinitionAdded(ValueMap json) {
+    protected ColumnDefinitionEvent(ValueMap json) {
         super(json);
+        this.columnId = json.readString(Fields.columnId);
+    }
+
+    protected void writeColumnDefinitionEvent(JsonGenerator generator) throws IOException {
+        super.writeBoardEvent(generator);
+        writeField(generator, Fields.columnId, columnId);
+    }
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        writeColumnDefinitionEvent(generator);
     }
 }

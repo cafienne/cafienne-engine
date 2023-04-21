@@ -13,6 +13,13 @@ import org.cafienne.json.ValueMap
 
 @Manifest
 case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, val title: Option[String], val role: Option[String], val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateFormElement {
+  override def validate(board: BoardActor): Unit = {
+    super.validate(board)
+    if (!board.getDefinition.columns.exists(_.columnId == columnId)) {
+      throw new InvalidCommandException("Board does not have a column with id " + columnId)
+    }
+  }
+
   /**
     * Method to be implemented to handle the command.
     *
@@ -25,6 +32,7 @@ case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, val
     // Check if title or form is to be updated and has actual changes
     val definition: ColumnDefinition = board.getDefinition.columns.find(_.columnId == columnId).getOrElse({
       // Cannot find column definition, let's return an error
+      /// actually done already in the validate ... but also do it here, just in case
       throw new InvalidCommandException("Board does not have a column with id " + columnId)
     })
     val hasTitleChange = titleChanged(definition.getTitle)

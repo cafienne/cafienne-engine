@@ -3,7 +3,7 @@ package org.cafienne.board.state.definition
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.event.BoardCreated
-import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionUpdated}
+import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionRemoved, ColumnDefinitionUpdated}
 import org.cafienne.board.actorapi.event.team.BoardTeamEvent
 import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
@@ -49,8 +49,13 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
       this.startForm = event.form.getOrElse(this.startForm)
     case event: ColumnDefinitionAdded => new ColumnDefinition(this, event.columnId).updateState(event)
     case event: ColumnDefinitionUpdated => columns.find(_.columnId == event.columnId).foreach(_.updateState(event)) // Note: ignores event when column not found (which would be kinda really weird anyways)
+    case event: ColumnDefinitionRemoved => columns.find(_.columnId == event.columnId).foreach(_.updateState(event))
     case event: BoardTeamEvent => team.updateState(event)
     case other => logger.warn(s"Board Definition cannot handle event of type ${other.getClass.getName}")
+  }
+
+  def removeColumn(column: ColumnDefinition): Unit = {
+    columns.remove(column.position, 0)
   }
 
   def caseDefinition: CaseDefinition = {
