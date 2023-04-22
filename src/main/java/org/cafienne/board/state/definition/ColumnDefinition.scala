@@ -4,7 +4,7 @@ import org.cafienne.board.actorapi.event.definition.{ColumnDefinitionRemoved, Wr
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-class ColumnDefinition(val definition: BoardDefinition, val columnId: String) extends DefinitionElement with CafienneJson {
+class ColumnDefinition(val definition: BoardDefinition, val columnId: String) extends DefinitionElement with FormElement with CafienneJson {
   def previous: Option[ColumnDefinition] = {
     if (this.position == 0) {
       None
@@ -30,26 +30,15 @@ class ColumnDefinition(val definition: BoardDefinition, val columnId: String) ex
        |</sentry>""".stripMargin
   })
 
-  private var title: String = ""
-  private var role: String = ""
-  private var form: ValueMap = new ValueMap()
-
-  def getTitle: String = title
-
-  def getRole: String = role
-
-  def getForm: ValueMap = form
-
   def updateState(event: WriteColumnDefinitionEvent): Unit = {
-    this.title = event.title.getOrElse(this.title)
-    this.role = event.role.getOrElse(this.role)
-    this.form = event.form.getOrElse(this.form)
+    this.title = event.title
+    this.role = event.role
+    this.form = event.form
   }
 
   def updateState(event: ColumnDefinitionRemoved): Unit = {
     definition.columns.remove(position, 1)
   }
-
 
   def planItemXML: String = {
     s"""<planItem id="pi_ht__${columnIdentifier}" name="${title}" definitionRef="${taskIdentifier}">

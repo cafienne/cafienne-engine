@@ -25,7 +25,7 @@ import org.cafienne.board.actorapi.BoardMessage;
 import org.cafienne.json.ValueMap;
 
 /**
- * Base class for sending commands to a TenantActor
+ * Base class for sending commands to a Board
  */
 public abstract class BoardCommand extends BaseModelCommand<BoardActor, BoardUser> implements BoardMessage {
     /**

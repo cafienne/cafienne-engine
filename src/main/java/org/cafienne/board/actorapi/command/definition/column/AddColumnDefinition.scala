@@ -7,6 +7,7 @@ import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded
 import org.cafienne.board.actorapi.response.ColumnAddedResponse
+import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 
@@ -19,11 +20,11 @@ case class AddColumnDefinition(val user: BoardUser, val columnId: String, val ti
     }
   }
 
-  override def process(board: BoardActor): Unit = {
+  override def process(definition: BoardDefinition): Unit = {
     if (role.nonEmpty) {
-      board.getDefinition.team.upsertTeamRole(role.get)
+      definition.team.upsertTeamRole(role.get)
     }
-    board.addEvent(new ColumnDefinitionAdded(board, columnId, title, role, form))
+    definition.addEvent(new ColumnDefinitionAdded(definition, columnId, title, role.getOrElse(""), form.getOrElse(new ValueMap())))
     setResponse(new ColumnAddedResponse(this, columnId))
   }
 

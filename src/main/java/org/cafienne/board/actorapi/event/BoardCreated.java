@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -35,8 +36,8 @@ public class BoardCreated extends BoardDefinitionEvent implements BootstrapMessa
     public final ValueMap form;
     public final CafienneVersion engineVersion;
 
-    public BoardCreated(BoardActor board, String title, ValueMap form) {
-        super(board);
+    public BoardCreated(BoardDefinition definition, String title, ValueMap form) {
+        super(definition);
         this.title = title;
         this.form = form;
         this.engineVersion = Cafienne.version();

@@ -7,12 +7,12 @@ import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.{BoardDefinitionCommand, UpdateFormElement}
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionUpdated
 import org.cafienne.board.actorapi.response.BoardResponse
-import org.cafienne.board.state.definition.ColumnDefinition
+import org.cafienne.board.state.definition.{BoardDefinition, ColumnDefinition}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 
 @Manifest
-case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, val title: Option[String], val role: Option[String], val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateFormElement {
+case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, override val title: Option[String], override val role: Option[String], override val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateFormElement {
   override def validate(board: BoardActor): Unit = {
     super.validate(board)
     if (!board.getDefinition.columns.exists(_.columnId == columnId)) {
@@ -26,24 +26,20 @@ case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, val
     * @param board
     * @return
     */
-  override def process(board: BoardActor): Unit = {
+  override def process(definition: BoardDefinition): Unit = {
     // TODO: Verify the column exists
 
     // Check if title or form is to be updated and has actual changes
-    val definition: ColumnDefinition = board.getDefinition.columns.find(_.columnId == columnId).getOrElse({
+    val columnDefinition: ColumnDefinition = definition.columns.find(_.columnId == columnId).getOrElse({
       // Cannot find column definition, let's return an error
       /// actually done already in the validate ... but also do it here, just in case
       throw new InvalidCommandException("Board does not have a column with id " + columnId)
     })
-    val hasTitleChange = titleChanged(definition.getTitle)
-    val hasRoleChange = roleChanged(definition.getRole)
-    val hasFormChange = formChanged(definition.getForm)
-    if (hasTitleChange || hasRoleChange || hasFormChange) {
-      if (hasRoleChange && role.nonEmpty) {
-        board.getDefinition.team.upsertTeamRole(role.get)
-      }
-      board.addEvent(new ColumnDefinitionUpdated(board, columnId, title, role, form))
+
+    if (roleChanged(columnDefinition.getRole) && role.nonEmpty) {
+      definition.team.upsertTeamRole(role.get)
     }
+    runChangeDetector(columnDefinition, (newTitle, newForm, newRole) => new ColumnDefinitionUpdated(definition, columnId, newTitle, newRole, newForm))
     setResponse(new BoardResponse(this))
   }
 

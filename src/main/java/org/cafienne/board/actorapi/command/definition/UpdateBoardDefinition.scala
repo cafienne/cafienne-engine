@@ -2,27 +2,17 @@ package org.cafienne.board.actorapi.command.definition
 
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.identity.BoardUser
-import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated
 import org.cafienne.board.actorapi.response.BoardResponse
+import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 
 @Manifest
-case class UpdateBoardDefinition(val user: BoardUser, val title: Option[String], val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateFormElement {
-  /**
-    * Method to be implemented to handle the command.
-    *
-    * @param board
-    * @return
-    */
-  override def process(board: BoardActor): Unit = {
+case class UpdateBoardDefinition(user: BoardUser, override val title: Option[String], override val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateFormElement {
+  override def process(definition: BoardDefinition): Unit = {
     // Check if title or form is to be updated and has actual changes
-    if (titleChanged(board.getDefinition.getTitle) || formChanged(board.getDefinition.getStartForm)) {
-      board.addEvent(new BoardDefinitionUpdated(board, title, form))
-    } else {
-//      System.out.println("Board has no updates for title or form")
-    }
+    runChangeDetector(definition, (newTitle, newForm, _) => new BoardDefinitionUpdated(definition, newTitle, newForm))
     setResponse(new BoardResponse(this))
   }
 

@@ -19,8 +19,8 @@ package org.cafienne.board.actorapi.command.team;
 
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
+import org.cafienne.board.state.definition.BoardDefinition;
 
 /**
  * Base class for updating board teams
@@ -36,7 +36,7 @@ public abstract class BoardTeamMemberCommand extends BoardDefinitionCommand {
     }
 
     @Override
-    public void process(BoardActor board) {
-        board.getDefinition().team().handle(this);
+    public void process(BoardDefinition definition) {
+        definition.team().handle(this);
     }
 }

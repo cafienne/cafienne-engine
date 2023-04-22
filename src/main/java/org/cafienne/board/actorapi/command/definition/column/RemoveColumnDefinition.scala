@@ -7,26 +7,23 @@ import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionRemoved
 import org.cafienne.board.actorapi.response.BoardResponse
+import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 
 @Manifest
 case class RemoveColumnDefinition(val user: BoardUser, val columnId: String) extends BoardDefinitionCommand(user) {
-  /**
-    * Method to be implemented to handle the command.
-    *
-    * @param board
-    * @return
-    */
-  override def process(board: BoardActor): Unit = {
-    // TODO: Verify the column exists
-
+  override def validate(board: BoardActor): Unit = {
+    super.validate(board)
     // Check if title or form is to be updated and has actual changes
-    if (!board.getDefinition.columns.exists(_.columnId == columnId)) {
+    if (!board.state.definition.columns.exists(_.columnId == columnId)) {
       // Cannot find column definition, let's return an error
       throw new InvalidCommandException("Board does not have a column with id " + columnId)
     }
-    board.addEvent(new ColumnDefinitionRemoved(board, columnId))
+  }
+
+  override def process(definition: BoardDefinition): Unit = {
+    definition.addEvent(new ColumnDefinitionRemoved(definition, columnId))
     setResponse(new BoardResponse(this))
   }
 

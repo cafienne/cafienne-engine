@@ -17,13 +17,13 @@
 
 package org.cafienne.board.actorapi.event.definition;
 
-import org.cafienne.board.BoardActor;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest
 public class ColumnDefinitionRemoved extends ColumnDefinitionEvent {
-    public ColumnDefinitionRemoved(BoardActor board, String columnId) {
+    public ColumnDefinitionRemoved(BoardDefinition board, String columnId) {
         super(board, columnId);
     }
 

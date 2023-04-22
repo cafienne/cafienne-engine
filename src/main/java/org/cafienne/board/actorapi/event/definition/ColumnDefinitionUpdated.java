@@ -17,13 +17,13 @@
 
 package org.cafienne.board.actorapi.event.definition;
 
-import org.cafienne.board.BoardActor;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest
 public class ColumnDefinitionUpdated extends WriteColumnDefinitionEvent {
-    public ColumnDefinitionUpdated(BoardActor board, String columnId, scala.Option<String> title, scala.Option<String> role, scala.Option<ValueMap> form) {
+    public ColumnDefinitionUpdated(BoardDefinition board, String columnId, String title, String role, ValueMap form) {
         super(board, columnId, title, role, form);
     }
 

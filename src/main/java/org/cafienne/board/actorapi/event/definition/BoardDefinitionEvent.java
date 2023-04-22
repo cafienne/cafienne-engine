@@ -17,17 +17,17 @@
 
 package org.cafienne.board.actorapi.event.definition;
 
-import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.event.BoardBaseEvent;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.json.ValueMap;
 
 public abstract class BoardDefinitionEvent extends BoardBaseEvent {
 
-    public BoardDefinitionEvent(BoardActor board) {
-        super(board);
+    protected BoardDefinitionEvent(BoardDefinition definition) {
+        super(definition.board());
     }
 
-    public BoardDefinitionEvent(ValueMap json) {
+    protected BoardDefinitionEvent(ValueMap json) {
         super(json);
     }
 }

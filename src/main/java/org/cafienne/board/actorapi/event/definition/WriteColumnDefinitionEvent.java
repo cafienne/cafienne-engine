@@ -18,18 +18,18 @@
 package org.cafienne.board.actorapi.event.definition;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.board.BoardActor;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 public abstract class WriteColumnDefinitionEvent extends ColumnDefinitionEvent {
-    public final scala.Option<String> title;
-    public final scala.Option<String> role;
-    public final scala.Option<ValueMap> form;
+    public final String title;
+    public final String role;
+    public final ValueMap form;
 
-    protected WriteColumnDefinitionEvent(BoardActor board, String columnId, scala.Option<String> title, scala.Option<String> role, scala.Option<ValueMap> form) {
+    protected WriteColumnDefinitionEvent(BoardDefinition board, String columnId, String title, String role, ValueMap form) {
         super(board, columnId);
         this.title = title;
         this.role = role;
@@ -38,9 +38,9 @@ public abstract class WriteColumnDefinitionEvent extends ColumnDefinitionEvent {
 
     protected WriteColumnDefinitionEvent(ValueMap json) {
         super(json);
-        this.title = json.readOption(Fields.title);
-        this.role = json.readOption(Fields.role);
-        this.form = json.readOptionalMap(Fields.form);
+        this.title = json.readString(Fields.title);
+        this.role = json.readString(Fields.role);
+        this.form = json.readMap(Fields.form);
     }
 
     @Override

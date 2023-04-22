@@ -3,7 +3,7 @@ package org.cafienne.board.state.definition
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.event.BoardCreated
-import org.cafienne.board.actorapi.event.definition.{BoardDefinitionEvent, BoardDefinitionUpdated, ColumnDefinitionAdded, ColumnDefinitionRemoved, ColumnDefinitionUpdated}
+import org.cafienne.board.actorapi.event.definition._
 import org.cafienne.board.actorapi.event.team.BoardTeamEvent
 import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.cmmn.definition.{CaseDefinition, DefinitionsDocument}
@@ -14,7 +14,7 @@ import org.w3c.dom.Document
 
 import scala.collection.mutable.ListBuffer
 
-class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] = None) extends FormElement with CafienneJson with LazyLogging {
+class BoardDefinition(val board: BoardActor) extends FormElement with CafienneJson with LazyLogging {
   /**
     * Identifier of case file item holding board metadata such as title.
     */
@@ -31,22 +31,18 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
     */
   val columns: ListBuffer[ColumnDefinition] = ListBuffer()
 
-  title = optionalTitle.getOrElse("")
-
-  private var startForm: ValueMap = new ValueMap()
-
-  def getStartForm: ValueMap = startForm
+  def getStartForm: ValueMap = getForm
 
   def recoveryCompleted(): Unit = team.recoveryCompleted()
 
   def updateState(event: BoardDefinitionEvent): Unit = event match {
     case event: BoardCreated =>
       title = event.title
-      startForm = event.form
+      form = event.form
       team.updateState(event)
     case event: BoardDefinitionUpdated =>
-      this.title = event.title.getOrElse(this.title)
-      this.startForm = event.form.getOrElse(this.startForm)
+      this.title = event.title
+      this.form = event.form
     case event: ColumnDefinitionAdded => new ColumnDefinition(this, event.columnId).updateState(event)
     case event: ColumnDefinitionUpdated => columns.find(_.columnId == event.columnId).foreach(_.updateState(event)) // Note: ignores event when column not found (which would be kinda really weird anyways)
     case event: ColumnDefinitionRemoved => columns.find(_.columnId == event.columnId).foreach(_.updateState(event))
@@ -89,7 +85,7 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
          |        <input id="_in_case_${dataFileIdentifier}" name="Data" bindingRef="${dataFileIdentifier}"/>
          |        <extensionElements mustUnderstand="false">
          |          <cafienne:start-case-model xmlns:cafienne="org.cafienne">
-         |            <![CDATA[${startForm.toString}]]>
+         |            <![CDATA[${form.toString}]]>
          |          </cafienne:start-case-model>
          |        </extensionElements>
          |    </case>
@@ -100,7 +96,7 @@ class BoardDefinition(val board: BoardActor, val optionalTitle: Option[String] =
   }
 
   override def toValue: Value[_] = {
-    new ValueMap(Fields.id, boardId, Fields.title, title, Fields.form, startForm, Fields.owners, team.toValue, Fields.columns, new ValueList(columns.map(_.toValue).toArray))
+    new ValueMap(Fields.id, boardId, Fields.title, title, Fields.form, form, Fields.owners, team.toValue, Fields.columns, new ValueList(columns.map(_.toValue).toArray))
   }
 }
 
@@ -108,8 +104,9 @@ object BoardDefinition {
   val BOARD_IDENTIFIER = "__ttp__boardId__"
 
   def deserialize(json: ValueMap): BoardDefinition = {
-    val definition = new BoardDefinition(null, json.readOption[String](Fields.title))
-    definition.startForm = json.readMap(Fields.form)
+    val definition = new BoardDefinition(null)
+    definition.title = json.readString(Fields.title)
+    definition.form = json.readMap(Fields.form)
     definition.team.boardManagers.addAll(BoardTeam.deserialize(json.withArray(Fields.owners)))
     json.withArray(Fields.columns).getValue.toArray(Array[ValueMap]()).map(ColumnDefinition.deserialize(definition, _))
     definition

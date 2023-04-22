@@ -18,7 +18,7 @@
 package org.cafienne.board.actorapi.event.definition;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.board.BoardActor;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -27,19 +27,19 @@ import java.io.IOException;
 
 @Manifest
 public class BoardDefinitionUpdated extends BoardDefinitionEvent {
-    public final scala.Option<String> title;
-    public final scala.Option<ValueMap> form;
+    public final String title;
+    public final ValueMap form;
 
-    public BoardDefinitionUpdated(BoardActor board, scala.Option<String> title, scala.Option<ValueMap> form) {
-        super(board);
+    public BoardDefinitionUpdated(BoardDefinition definition, String title, ValueMap form) {
+        super(definition);
         this.title = title;
         this.form = form;
     }
 
     public BoardDefinitionUpdated(ValueMap json) {
         super(json);
-        this.title = json.readOption(Fields.title);
-        this.form = json.readOptionalMap(Fields.form);
+        this.title = json.readString(Fields.title);
+        this.form = json.readMap(Fields.form);
     }
 
     @Override

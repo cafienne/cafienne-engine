@@ -18,7 +18,7 @@
 package org.cafienne.board.actorapi.event.definition;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.board.BoardActor;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
@@ -27,8 +27,8 @@ import java.io.IOException;
 abstract class ColumnDefinitionEvent extends BoardDefinitionEvent {
     public final String columnId;
 
-    protected ColumnDefinitionEvent(BoardActor board, String columnId) {
-        super(board);
+    protected ColumnDefinitionEvent(BoardDefinition definition, String columnId) {
+        super(definition);
         this.columnId = columnId;
     }
 
