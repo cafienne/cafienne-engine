@@ -1,6 +1,7 @@
 package org.cafienne.querydb.materializer
 
 import akka.persistence.query.Offset
+import org.cafienne.querydb.materializer.board.BoardStorageTransaction
 import org.cafienne.querydb.materializer.cases.TestCaseStorageTransaction
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
@@ -32,6 +33,8 @@ object TestQueryDB extends QueryDBStorage {
   override def createConsentGroupTransaction(groupId: String): ConsentGroupStorageTransaction = ???
 
   override def createTenantTransaction(tenant: String): TenantStorageTransaction = ???
+
+  override def createBoardTransaction(tenant: String): BoardStorageTransaction = ???
 
   override def getOffset(offsetName: String): Future[Offset] = Future.successful(Offset.noOffset)
 }

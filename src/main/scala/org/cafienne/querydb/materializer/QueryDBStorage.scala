@@ -21,6 +21,7 @@ import org.cafienne.querydb.materializer.cases.CaseStorageTransaction
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction
 import akka.persistence.query.Offset
+import org.cafienne.querydb.materializer.board.BoardStorageTransaction
 
 import scala.concurrent.Future
 
@@ -35,6 +36,8 @@ trait QueryDBStorage {
   def createConsentGroupTransaction(groupId: String): ConsentGroupStorageTransaction
 
   def createTenantTransaction(tenant: String): TenantStorageTransaction
+
+  def createBoardTransaction(tenant: String): BoardStorageTransaction
 
   def getOffset(offsetName: String): Future[Offset]
 }

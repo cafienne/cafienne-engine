@@ -23,7 +23,7 @@ import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables
 import org.cafienne.querydb.materializer.QueryDBTransaction
 import org.cafienne.querydb.schema.QueryDBSchema
-import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
+import org.cafienne.querydb.schema.table.{BoardTables, CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -36,6 +36,7 @@ class SlickQueryDBTransaction
     with TaskTables
     with TenantTables
     with ConsentGroupTables
+    with BoardTables
     with OffsetStoreTables {
 
   import dbConfig.profile.api._

@@ -17,15 +17,19 @@
 
 package org.cafienne.querydb.query
 
-import org.cafienne.actormodel.identity.BoardUser
+import org.cafienne.actormodel.identity.{BoardUser, UserIdentity}
 import org.cafienne.board.state.definition.BoardDefinition
-import org.cafienne.querydb.record.TaskRecord
+import org.cafienne.querydb.record.{BoardRecord, TaskRecord}
 
 import scala.concurrent.Future
 
 trait BoardQueries {
 
-  def getBoardTasks(user: BoardUser): Future[Seq[TaskRecord]] = ???
+  def getBoards(user: UserIdentity): Future[Seq[BoardRecord]]
+
+  def getBoardTasks(user: BoardUser): Future[Seq[TaskRecord]]
+
+  def getBoardUser(): Future[BoardUser]
 }
 
 class BoardQueriesImpl extends BoardQueries
@@ -33,6 +37,15 @@ class BoardQueriesImpl extends BoardQueries
 
   import dbConfig.profile.api._
 
+  override def getBoards(user: UserIdentity): Future[Seq[BoardRecord]] = {
+    val query = TableQuery[BoardTable]
+      .join(TableQuery[ConsentGroupMemberTable]
+        .filter(_.userId === user.id))
+      .on(_.team === _.group)
+      .map(_._1)
+
+    db.run(query.distinct.result)
+  }
 
   override def getBoardTasks(user: BoardUser): Future[Seq[TaskRecord]] = {
     val boardId = user.boardId
@@ -51,5 +64,9 @@ class BoardQueriesImpl extends BoardQueries
           .map(_._2.caseInstanceId).filter(task.caseInstanceId === _).exists)
 
     db.run(query.distinct.result)
+  }
+
+  override def getBoardUser(): Future[BoardUser] = {
+    ???
   }
 }

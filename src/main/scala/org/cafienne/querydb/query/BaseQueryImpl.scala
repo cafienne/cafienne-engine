@@ -20,7 +20,7 @@ package org.cafienne.querydb.query
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
 import org.cafienne.querydb.record.{CaseBusinessIdentifierRecord, CaseRecord, ConsentGroupMemberRecord}
-import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
+import org.cafienne.querydb.schema.table.{BoardTables, CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,6 +29,7 @@ trait BaseQueryImpl
     with TaskTables
     with TenantTables
     with ConsentGroupTables
+    with BoardTables
     with LazyLogging {
 
   import dbConfig.profile.api._

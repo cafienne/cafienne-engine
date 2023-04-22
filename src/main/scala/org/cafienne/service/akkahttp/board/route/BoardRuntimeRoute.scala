@@ -52,7 +52,7 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
       pathEndOrSingleSlash {
         //TODO something like: boardQueries.getBoards(boardUser.toString)
         // NOTE that this response should be of BoardSummaryResponse (giving a selection of the data available)
-        complete(StatusCodes.NotImplemented, user.toString)
+        runListQuery(boardQueries.getBoards(user))
       }
     }
   }
