@@ -20,9 +20,9 @@ package org.cafienne.querydb.materializer.board
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.board.actorapi.event.{BoardCreated, BoardEvent, BoardModified}
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated
-import org.cafienne.board.state.definition.TeamDefinition
+import org.cafienne.board.actorapi.event.{BoardCreated, BoardEvent, BoardModified}
+import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.querydb.materializer.cases.CaseReader
@@ -45,7 +45,7 @@ class BoardEventBatch(val sink: BoardEventSink, override val persistenceId: Stri
 
   def upsertBoard(event: BoardEvent, title: String): Future[Done] = {
     val boardId = event.getActorId
-    val teamId = boardId + TeamDefinition.EXTENSION
+    val teamId = boardId + BoardTeam.EXTENSION
     val tenant = event.tenant()
     dBTransaction.upsert(BoardRecord(id = boardId, title = title, tenant = tenant, team = teamId))
     Future.successful(Done)

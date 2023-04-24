@@ -15,36 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.board.actorapi.command.flow;
+package org.cafienne.board.actorapi.event.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.board.BoardActor;
+import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class FlowTaskCommand extends BoardFlowCommand {
-    public final String taskId;
+@Manifest
+public class FlowCanceled extends BoardFlowEvent {
 
-    protected FlowTaskCommand(BoardUser user, String flowId, String taskId) {
-        super(user, flowId);
-        this.taskId = taskId;
+    public FlowCanceled(BoardActor board, String flowId) {
+        super(board, flowId);
     }
 
-    protected FlowTaskCommand(ValueMap json) {
+    public FlowCanceled(ValueMap json) {
         super(json);
-        this.taskId = json.readString(Fields.taskId);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        writeFlowTaskCommand(generator);
-    }
-
-    public void writeFlowTaskCommand(JsonGenerator generator) throws IOException {
-        super.writeFlowCommand(generator);
-        writeField(generator, Fields.taskId, taskId);
+        super.writeBoardFlowEvent(generator);
     }
 }
-

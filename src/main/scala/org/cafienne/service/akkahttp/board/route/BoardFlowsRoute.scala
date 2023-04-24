@@ -9,11 +9,11 @@ package org.cafienne.service.akkahttp.board.route
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.board.actorapi.command.flow._
 import org.cafienne.json.ValueMap
 import org.cafienne.service.akkahttp.board.model.FlowAPI._
@@ -25,7 +25,7 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/boards")
 class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
-  override def routes: Route = concat(startFlow, completeFlowTask, claimFlowTask, saveFlowTask)
+  override def routes: Route = concat(startFlow, cancelFlow, completeFlowTask, claimFlowTask, saveFlowTask)
 
   @Path("{boardId}/flows")
   @POST
@@ -51,6 +51,30 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     }
   }
 
+  @Path("{boardId}/flows/{flowId}")
+  @DELETE
+  @Operation(
+    summary = "Cancel a flow on the board",
+    description = "Cancel a flow on the board",
+    tags = Array("board"),
+    parameters = Array(
+      new Parameter(name = "boardId", description = "The id of the board", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "flowId", description = "The id of the flow to cancel", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "202", description = "Flow canceled"),
+    )
+  )
+  def cancelFlow: Route = delete {
+    boardUser { user =>
+      path("flows" / Segment) { flowId =>
+        pathEndOrSingleSlash {
+          askFlow(CancelFlow(user, flowId))
+        }
+      }
+    }
+  }
+
   @Path("{boardId}/flows/{flowId}/tasks/{taskId}/claim")
   @PUT
   @Operation(
@@ -66,9 +90,7 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
       new ApiResponse(responseCode = "202", description = "Task claimed"),
     )
   )
-  @Produces(Array("application/json"))
   def claimFlowTask: Route = put {
-    // TODO: SWAGGER document the path parameters
     boardUser { user =>
       path("flows" / Segment / "tasks" / Segment / "claim") { (flowId, taskId) =>
         pathEndOrSingleSlash {
@@ -94,7 +116,6 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     )
   )
   @RequestBody(description = "Task to save", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[FlowTaskOutputFormat]))))
-  @Produces(Array("application/json"))
   def saveFlowTask: Route = put {
     boardUser { user =>
       path("flows" / Segment / "tasks" / Segment) { (flowId, taskId) =>
@@ -123,7 +144,6 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
     )
   )
   @RequestBody(description = "Task to complete", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[FlowTaskOutputFormat]))))
-  @Produces(Array("application/json"))
   def completeFlowTask: Route = post {
     boardUser { user =>
       path("flows" / Segment / "tasks" / Segment) { (flowId, taskId) =>

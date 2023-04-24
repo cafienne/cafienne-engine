@@ -18,6 +18,7 @@
 package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.BoardActor;
@@ -42,6 +43,14 @@ public class StartFlow extends BoardFlowCommand {
         super(json);
         this.subject = json.readString(Fields.subject);
         this.data = json.readMap(Fields.input);
+    }
+
+    @Override
+    public void validate(BoardActor board) throws InvalidCommandException {
+        if (board.state.flows().get(flowId).nonEmpty()) {
+            // TODO: come up with a good exception report that is secure ...
+            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be performed: the flow already exists");
+        }
     }
 
     @Override

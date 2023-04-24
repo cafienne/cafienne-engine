@@ -18,7 +18,10 @@
 package org.cafienne.board.actorapi.command.flow;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.actormodel.response.ModelResponse;
+import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.BoardCommand;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
@@ -44,6 +47,25 @@ public abstract class BoardFlowCommand extends BoardCommand {
     protected BoardFlowCommand(ValueMap json) {
         super(json);
         this.flowId = json.readString(Fields.flowId);
+    }
+
+    @Override
+    public void validate(BoardActor board) throws InvalidCommandException {
+        super.validate(board);
+        if (board.state.flows().get(flowId).isEmpty()) {
+            // TODO: come up with a good exception report that is secure ...
+            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be performed: the flow does not exist");
+        }
+    }
+
+    @Override
+    public void process(BoardActor board) {
+        board.state.flows().get(flowId).get().handle(this);
+    }
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        writeFlowCommand(generator);
     }
 
     public void writeFlowCommand(JsonGenerator generator) throws IOException {

@@ -5,13 +5,15 @@ import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.CaseUserIdentity
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.board.actorapi.command.flow._
-import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowActivated, FlowInitiated}
+import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowActivated, FlowCanceled, FlowInitiated}
 import org.cafienne.board.actorapi.response.FlowStartedResponse
 import org.cafienne.board.actorapi.response.runtime.FlowResponse
 import org.cafienne.board.state.StateElement
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.board.{BoardActor, BoardFields}
+import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition
 import org.cafienne.cmmn.actorapi.command.{CaseCommand, StartCase}
+import org.cafienne.cmmn.instance.Transition
 import org.cafienne.humantask.actorapi.command.{ClaimTask, CompleteHumanTask, SaveTaskOutput}
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
@@ -33,6 +35,7 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
   def updateState(event: BoardFlowEvent): Unit = event match {
     case event: FlowInitiated => // Handled already
     case event: FlowActivated => activationEvent = Some(event)
+    case event: FlowCanceled => board.state.flows.remove(flowId)
     case other => logger.warn(s"Flow $flowId cannot handle event of type ${other.getClass.getName}")
   }
 
@@ -58,6 +61,16 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     })
   }
 
+  def cancel(command: CancelFlow): Unit = {
+    val sender = board.sender()
+    board.askModel(new MakeCaseTransition(command.getUser.asCaseUserIdentity(), command.flowId, Transition.Terminate), (failure: CommandFailure) => {
+      sender ! failure // TODO: wrap it in a board failure or so
+    }, (success: ModelResponse) => {
+      addEvent(new FlowCanceled(board, command.flowId))
+      sender ! new FlowResponse(command, success.lastModifiedContent())
+    })
+  }
+
   private def delegate(command: FlowTaskCommand, commandCreator: (CaseUserIdentity, String, String) => CaseCommand, errorMsg: String): Unit = {
     val sender = board.sender()
     board.askModel(commandCreator(command.getUser.asCaseUserIdentity(), command.flowId, command.taskId), (failure: CommandFailure) => {
@@ -67,10 +80,11 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     })
   }
 
-  def handle(command: FlowTaskCommand): Unit = command match {
+  def handle(command: BoardFlowCommand): Unit = command match {
     case command: ClaimFlowTask => delegate(command, (u, f, t) => new ClaimTask(u, f, t), "claim task")
     case command: SaveFlowTaskOutput => delegate(command, (u, f, t) => new SaveTaskOutput(u, f, t, command.output()), "save task output")
     case command: CompleteFlowTask => delegate(command, (u, f, t) => new CompleteHumanTask(u, f, t, command.output()), "complete task")
+    case command: CancelFlow => cancel(command)
     case other => throw new InvalidCommandException(s"Cannot handle commands of type ${other.getClass.getName}")
   }
 }
