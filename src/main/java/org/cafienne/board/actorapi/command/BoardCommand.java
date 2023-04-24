@@ -22,6 +22,7 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.BoardMessage;
+import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.json.ValueMap;
 
 /**
@@ -41,6 +42,14 @@ public abstract class BoardCommand extends BaseModelCommand<BoardActor, BoardUse
         super(json);
     }
 
+    /**
+     * BoardCommands by default are asynchronous, i.e., not directly sending a response, but only
+     * later on after informing flows or teams about updates.
+     */
+    protected boolean isAsync() {
+        return false;
+    }
+
     @Override
     protected BoardUser readUser(ValueMap json) {
         return BoardUser.deserialize(json);
@@ -48,4 +57,18 @@ public abstract class BoardCommand extends BaseModelCommand<BoardActor, BoardUse
 
     public void validate(BoardActor board) throws InvalidCommandException {
     }
+
+    @Override
+    public void process(BoardActor board) {
+        processBoardCommand(board);
+        if (hasNoResponse()) {
+            if (! isAsync()) {
+                setResponse(new BoardResponse(this));
+//            } else {
+//                System.out.println("No response on async command " + getClass().getSimpleName());
+            }
+        }
+    }
+
+    protected abstract void processBoardCommand(BoardActor board);
 }

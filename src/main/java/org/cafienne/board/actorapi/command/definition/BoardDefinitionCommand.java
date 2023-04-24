@@ -20,7 +20,6 @@ package org.cafienne.board.actorapi.command.definition;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.BoardCommand;
 import org.cafienne.board.state.definition.BoardDefinition;
@@ -45,9 +44,9 @@ public abstract class BoardDefinitionCommand extends BoardCommand {
     }
 
     @Override
-    public void process(BoardActor board) {
-        process(board.state.definition());
+    public void processBoardCommand(BoardActor board) {
+        processBoardDefinitionCommand(board.state.definition());
     }
 
-    protected abstract void process(BoardDefinition definition);
+    protected abstract void processBoardDefinitionCommand(BoardDefinition definition);
 }

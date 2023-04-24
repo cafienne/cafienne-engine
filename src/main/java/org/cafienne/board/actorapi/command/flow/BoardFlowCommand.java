@@ -20,7 +20,6 @@ package org.cafienne.board.actorapi.command.flow;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.BoardCommand;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -59,7 +58,13 @@ public abstract class BoardFlowCommand extends BoardCommand {
     }
 
     @Override
-    public void process(BoardActor board) {
+    protected boolean isAsync() {
+        // These commands are async
+        return true;
+    }
+
+    @Override
+    public void processBoardCommand(BoardActor board) {
         board.state.flows().get(flowId).get().handle(this);
     }
 

@@ -6,7 +6,6 @@ import org.cafienne.actormodel.identity.BoardUser
 import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.{BoardDefinitionCommand, UpdateFormElement}
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionUpdated
-import org.cafienne.board.actorapi.response.BoardResponse
 import org.cafienne.board.state.definition.{BoardDefinition, ColumnDefinition}
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
@@ -26,7 +25,7 @@ case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, ove
     * @param board
     * @return
     */
-  override def process(definition: BoardDefinition): Unit = {
+  override def processBoardDefinitionCommand(definition: BoardDefinition): Unit = {
     // TODO: Verify the column exists
 
     // Check if title or form is to be updated and has actual changes
@@ -40,7 +39,6 @@ case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, ove
       definition.team.upsertTeamRole(role.get)
     }
     runChangeDetector(columnDefinition, (newTitle, newForm, newRole) => new ColumnDefinitionUpdated(definition, columnId, newTitle, newRole, newForm))
-    setResponse(new BoardResponse(this))
   }
 
   override def write(generator: JsonGenerator): Unit = {

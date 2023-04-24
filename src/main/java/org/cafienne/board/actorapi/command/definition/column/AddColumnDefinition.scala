@@ -20,7 +20,7 @@ case class AddColumnDefinition(val user: BoardUser, val columnId: String, val ti
     }
   }
 
-  override def process(definition: BoardDefinition): Unit = {
+  override def processBoardDefinitionCommand(definition: BoardDefinition): Unit = {
     if (role.nonEmpty) {
       definition.team.upsertTeamRole(role.get)
     }

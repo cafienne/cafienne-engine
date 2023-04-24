@@ -47,6 +47,11 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
     }
 
     @Override
+    protected boolean isAsync() {
+        return true;
+    }
+
+    @Override
     public String tenant() {
         return Cafienne.config().platform().defaultTenant();
     }
@@ -57,7 +62,7 @@ public class CreateBoard extends BoardCommand implements BootstrapMessage {
     }
 
     @Override
-    public void process(BoardActor board) {
+    public void processBoardCommand(BoardActor board) {
         board.state.initialize(this);
     }
 

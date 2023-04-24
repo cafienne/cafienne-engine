@@ -18,7 +18,6 @@
 package org.cafienne.board.actorapi.command.team;
 
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
 import org.cafienne.board.state.definition.BoardDefinition;
 
@@ -36,7 +35,12 @@ public abstract class BoardTeamMemberCommand extends BoardDefinitionCommand {
     }
 
     @Override
-    public void process(BoardDefinition definition) {
+    protected boolean isAsync() {
+        return true;
+    }
+
+    @Override
+    public void processBoardDefinitionCommand(BoardDefinition definition) {
         definition.team().handle(this);
     }
 }

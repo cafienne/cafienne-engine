@@ -20,7 +20,6 @@ package org.cafienne.board.actorapi.command.flow;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.board.BoardActor;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -54,7 +53,7 @@ public class StartFlow extends BoardFlowCommand {
     }
 
     @Override
-    public void process(BoardActor board) {
+    public void processBoardCommand(BoardActor board) {
         board.state.startFlow(this);
     }
 

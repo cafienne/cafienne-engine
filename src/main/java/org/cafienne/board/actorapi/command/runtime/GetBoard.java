@@ -21,7 +21,6 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.BoardCommand;
-import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.board.actorapi.response.runtime.GetBoardResponse;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -43,7 +42,7 @@ public class GetBoard extends BoardCommand {
     }
 
     @Override
-    public void process(BoardActor board) {
+    public void processBoardCommand(BoardActor board) {
         setResponse(new GetBoardResponse(this, board.state));
     }
 }
