@@ -20,7 +20,6 @@ package org.cafienne.cmmn.actorapi.command.debug;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -58,9 +57,8 @@ public class SwitchDebugMode extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         caseInstance.upsertDebugMode(debugMode);
-        return new CaseResponse(this);
     }
 
     @Override

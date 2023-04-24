@@ -40,7 +40,7 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
     private transient final TestScript testScript;
     private transient final CaseResponseValidator validator;
     private final CaseCommand actualCommand;
-    private CaseResponse actualResponse;
+    private ModelResponse actualResponse;
     private CommandFailure actualFailure;
 
     CaseTestCommand(TestScript testScript, CaseCommand command, CaseResponseValidator validator) {
@@ -99,14 +99,14 @@ public class CaseTestCommand extends CaseCommand implements BootstrapMessage {
     }
 
     @Override
-    public ModelResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         // Just have the actual command do its processing
-        ModelResponse response = actualCommand.process(caseInstance);
+        actualCommand.processCaseCommand(caseInstance);
+        actualResponse = actualCommand.getResponse();
+        setResponse(actualResponse);
 
         // Take a final snap after command has been processed
         caseSnapshotString = caseInstance.stateToXMLString();
-
-        return response;
     }
 
     /**

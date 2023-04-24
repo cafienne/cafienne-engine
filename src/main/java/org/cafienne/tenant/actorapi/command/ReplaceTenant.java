@@ -23,7 +23,6 @@ import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,9 +43,8 @@ public class ReplaceTenant extends TenantCommand {
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
+    public void processTenantCommand(TenantActor tenant) {
         tenant.replaceInstance(users);
-        return new TenantResponse(this);
     }
 
     @Override

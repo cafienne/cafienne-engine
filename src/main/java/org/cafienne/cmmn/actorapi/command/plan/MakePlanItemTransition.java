@@ -113,16 +113,15 @@ public class MakePlanItemTransition extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         boolean transitioned = false;
         List<PlanItem<?>> planItemsByName = getTargetPlanItems(caseInstance);
         for (int i = planItemsByName.size() - 1; i >= 0; i--) {
             transitioned = transitioned || caseInstance.makePlanItemTransition(planItemsByName.get(i), transition);
         }
-        if (! transitioned) {
-            return new CaseNotModifiedResponse(this);
-        }
-        return new CaseResponse(this);
+
+        CaseResponse response = transitioned ? new CaseResponse(this) : new CaseNotModifiedResponse(this);
+        setResponse(response);
     }
 
     @Override

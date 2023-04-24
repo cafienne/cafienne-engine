@@ -20,7 +20,6 @@ package org.cafienne.cmmn.actorapi.command.migration;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
@@ -56,14 +55,14 @@ public class MigrateDefinition extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         if (newDefinition.getDefinitionsDocument().equals(caseInstance.getDefinition().getDefinitionsDocument())) {
             // ??? why again???? ;)
             caseInstance.addDebugInfo(() -> "No need to migrate definition of case " + caseInstance.getId() + " (proposed definition already in use by the case instance)");
         } else {
             caseInstance.migrate(newDefinition);
         }
-        return new MigrationStartedResponse(this);
+        setResponse(new MigrationStartedResponse(this));
     }
 
     @Override

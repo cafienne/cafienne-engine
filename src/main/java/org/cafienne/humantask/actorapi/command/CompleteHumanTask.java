@@ -19,7 +19,6 @@ package org.cafienne.humantask.actorapi.command;
 
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -50,9 +49,8 @@ public class CompleteHumanTask extends TaskOutputCommand {
     }
 
     @Override
-    public HumanTaskResponse process(WorkflowTask workflowTask) {
+    public void processWorkflowCommand(WorkflowTask workflowTask) {
         workflowTask.complete(taskOutput);
-        return new HumanTaskResponse(this);
     }
 
     @Override

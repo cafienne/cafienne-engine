@@ -62,7 +62,8 @@ class BackOffice {
                 // First, simple, validation
                 command.validateCommand(actor);
                 // Then, do actual work of processing in the command itself.
-                stagingArea.setResponse(command.processCommand(actor));
+                command.processCommand(actor);
+                stagingArea.setResponse(command.getResponse());
             } catch (AuthorizationException e) {
                 stagingArea.reportFailure(e, new SecurityFailure(command, e), "");
             } catch (InvalidCommandException e) {

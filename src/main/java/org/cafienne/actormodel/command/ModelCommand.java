@@ -53,7 +53,9 @@ public interface ModelCommand extends IncomingActorMessage {
 
     void validateCommand(ModelActor actor);
 
-    ModelResponse processCommand(ModelActor actor);
+    void processCommand(ModelActor actor);
+
+    ModelResponse getResponse();
 
     String getCommandDescription();
 

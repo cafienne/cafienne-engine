@@ -21,13 +21,11 @@ import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.ConsentGroupMember;
 import org.cafienne.consentgroup.actorapi.ConsentGroupMessage;
 import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
+import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
 import org.cafienne.json.ValueMap;
-import scala.collection.Seq;
 
 /**
  * Consent Groups can be used to invite users from other tenants to join a case tam
@@ -83,4 +81,14 @@ public abstract class ConsentGroupCommand extends BaseModelCommand<ConsentGroupA
             throw new ConsentGroupException("Cannot remove group ownership of user " + userId + ". There must be at least one group owner.");
         }
     }
+
+    @Override
+    public void process(ConsentGroupActor group) {
+        processGroupCommand(group);
+        if (hasNoResponse()) { // Always return a response
+            setResponse(new ConsentGroupResponse(this));
+        }
+    }
+
+    protected abstract void processGroupCommand(ConsentGroupActor group);
 }

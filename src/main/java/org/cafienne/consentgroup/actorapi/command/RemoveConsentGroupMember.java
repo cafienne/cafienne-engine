@@ -20,9 +20,7 @@ package org.cafienne.consentgroup.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -51,9 +49,8 @@ public class RemoveConsentGroupMember extends ConsentGroupCommand {
     }
 
     @Override
-    public ConsentGroupResponse process(ConsentGroupActor group) {
+    public void processGroupCommand(ConsentGroupActor group) {
         group.removeMember(userId);
-        return new ConsentGroupResponse(this);
     }
 
     @Override

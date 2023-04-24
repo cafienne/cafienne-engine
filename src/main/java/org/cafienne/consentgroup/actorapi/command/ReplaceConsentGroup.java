@@ -18,10 +18,8 @@
 package org.cafienne.consentgroup.actorapi.command;
 
 import org.cafienne.actormodel.identity.ConsentGroupUser;
-import org.cafienne.actormodel.identity.TenantUser;
 import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroup;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -40,8 +38,7 @@ public class ReplaceConsentGroup extends CollectiveCommand {
     }
 
     @Override
-    public ConsentGroupResponse process(ConsentGroupActor group) {
+    public void processGroupCommand(ConsentGroupActor group) {
         group.replace(this);
-        return new ConsentGroupResponse(this);
     }
 }

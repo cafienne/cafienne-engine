@@ -23,7 +23,6 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.event.CaseDefinitionApplied;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.CaseStartedResponse;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
@@ -140,7 +139,7 @@ public class StartCase extends CaseCommand implements BootstrapMessage {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         caseInstance.upsertDebugMode(debugMode);
         if (debugMode) {
             caseInstance.addDebugInfo(() -> "Starting case "+ actorId +" of type "+ definition.getName()+" in debug mode");
@@ -168,7 +167,7 @@ public class StartCase extends CaseCommand implements BootstrapMessage {
         json.put("caseInstanceId", new StringValue(caseInstance.getId()));
         json.put("name", new StringValue(caseInstance.getDefinition().getName()));
 
-        return new CaseStartedResponse(this, json);
+        setResponse(new CaseStartedResponse(this, json));
     }
 
     @Override

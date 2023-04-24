@@ -20,7 +20,6 @@ package org.cafienne.cmmn.test;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
@@ -57,9 +56,8 @@ abstract class TestScriptCommand extends CaseCommand {
     }
 
     @Override
-    final public CaseResponse process(Case caseInstance) {
+    final public void processCaseCommand(Case caseInstance) {
         // No processing here required.
-        return new CaseResponse(this);
     }
 
     protected void waitSomeTime(long waitTime) {

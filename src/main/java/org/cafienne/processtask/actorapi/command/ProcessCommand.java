@@ -20,7 +20,6 @@ package org.cafienne.processtask.actorapi.command;
 import org.cafienne.actormodel.command.BaseModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.json.ValueMap;
 import org.cafienne.processtask.actorapi.ProcessActorMessage;
 import org.cafienne.processtask.actorapi.response.ProcessResponse;
@@ -47,9 +46,11 @@ public abstract class ProcessCommand extends BaseModelCommand<ProcessTaskActor, 
     }
 
     @Override
-    public ModelResponse process(ProcessTaskActor processTaskActor) {
+    public void process(ProcessTaskActor processTaskActor) {
         process(processTaskActor, processTaskActor.getImplementation());
-        return new ProcessResponse(this);
+        if (hasNoResponse()) { // Always return a response
+            setResponse(new ProcessResponse(this));
+        }
     }
 
     abstract protected void process(ProcessTaskActor processTaskActor, SubProcess<?> implementation);

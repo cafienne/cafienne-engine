@@ -21,12 +21,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
+import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
@@ -84,11 +84,15 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     public abstract void validate(HumanTask task) throws InvalidCommandException;
 
-    public ModelResponse process(Case caseInstance) {
-        return process(task.getImplementation());
+    @Override
+    public void processCaseCommand(Case caseInstance) {
+        processWorkflowCommand(task.getImplementation());
+        if (getResponse() == null) {
+            setResponse(new HumanTaskResponse(this));
+        }
     }
 
-    public abstract ModelResponse process(WorkflowTask task);
+    public abstract void processWorkflowCommand(WorkflowTask task);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
