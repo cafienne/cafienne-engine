@@ -32,7 +32,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class ProcessModified extends ActorModified implements ProcessInstanceEvent {
+public class ProcessModified extends ActorModified<ProcessTaskActor> implements ProcessInstanceEvent {
 
     public ProcessModified(ProcessTaskActor actor, IncomingActorMessage source) {
         super(actor, source);

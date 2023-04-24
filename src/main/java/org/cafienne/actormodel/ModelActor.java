@@ -24,6 +24,7 @@ import akka.persistence.SnapshotOffer;
 import akka.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
@@ -433,8 +434,8 @@ public abstract class ModelActor extends AbstractPersistentActor {
         transactionTimestamp = null;
     }
 
-    public void setLastModified(Instant lastModified) {
-        this.lastModified = lastModified;
+    public void updateState(ActorModified<?> event) {
+        this.lastModified = event.lastModified;
     }
 
     /**
