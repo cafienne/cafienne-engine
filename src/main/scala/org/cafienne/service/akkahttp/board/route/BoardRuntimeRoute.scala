@@ -116,10 +116,12 @@ class BoardRuntimeRoute(override val caseSystem: CaseSystem) extends BoardRoute 
               case value: GetBoardResponse => {
                 val definition = value.state.definition
                 val team = {
-                  val members = group.members.toSeq.map(BoardTeamAPI.TeamMemberFormat.fromMember)
-                  val roles = value.state.team.roles.toSet
+                  val boardManagers = value.state.boardManagers
+                  val members = group.members.toSeq.map(member => BoardTeamAPI.TeamMemberFormat.fromMember(member, boardManagers.contains(member.userId)))
+                  val roles = definition.roles.toSet
                   BoardTeamAPI.BoardTeamFormat(roles, members)
                 }
+
                 val columns: Seq[BoardAPI.Column] = definition.columns.toSeq.map(column => {
                   val columnTasks: Seq[BoardAPI.Task] = tasks.filter(_.isActive).filter(column.getTitle == _.taskName).map(task => {
                     val taskData = task.inputJson.merge(task.outputJson).asMap()

@@ -18,13 +18,14 @@
 package org.cafienne.board.actorapi.event.definition;
 
 import org.cafienne.board.BoardActor;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest
 public class RoleDefinitionRemoved extends RoleDefinitionEvent {
-    public RoleDefinitionRemoved(BoardActor board, String roleName) {
-        super(board, roleName);
+    public RoleDefinitionRemoved(BoardDefinition definition, String roleName) {
+        super(definition, roleName);
     }
 
     public RoleDefinitionRemoved(ValueMap json) {

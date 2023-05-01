@@ -38,9 +38,13 @@ public abstract class BoardDefinitionCommand extends BoardCommand {
 
     public void validate(BoardActor board) throws InvalidCommandException {
         super.validate(board);
-        if (! board.getDefinition().team().boardManagers().contains(getUser().id())) {
+        if (! board.state.boardManagers().contains(getUser().id())) {
             throw new AuthorizationException("Only bord managers can change board definitions");
         }
+        validate(board.state.definition());
+    }
+
+    public void validate(BoardDefinition definition) throws InvalidCommandException {
     }
 
     @Override

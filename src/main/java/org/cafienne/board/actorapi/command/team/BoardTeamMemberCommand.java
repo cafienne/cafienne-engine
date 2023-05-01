@@ -18,13 +18,13 @@
 package org.cafienne.board.actorapi.command.team;
 
 import org.cafienne.actormodel.identity.BoardUser;
-import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
-import org.cafienne.board.state.definition.BoardDefinition;
+import org.cafienne.board.BoardActor;
+import org.cafienne.board.actorapi.command.BoardCommand;
 
 /**
  * Base class for updating board teams
  */
-public abstract class BoardTeamMemberCommand extends BoardDefinitionCommand {
+public abstract class BoardTeamMemberCommand extends BoardCommand {
     /**
      * Create a new command that can be sent to the board.
      *
@@ -40,7 +40,7 @@ public abstract class BoardTeamMemberCommand extends BoardDefinitionCommand {
     }
 
     @Override
-    public void processBoardDefinitionCommand(BoardDefinition definition) {
-        definition.team().handle(this);
+    public void processBoardCommand(BoardActor board) {
+        board.state.team().handle(this);
     }
 }

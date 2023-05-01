@@ -3,7 +3,6 @@ package org.cafienne.board.actorapi.command.definition.column
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.BoardUser
-import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.{BoardDefinitionCommand, UpdateFormElement}
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionUpdated
 import org.cafienne.board.state.definition.{BoardDefinition, ColumnDefinition}
@@ -11,20 +10,16 @@ import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 
 @Manifest
-case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, override val title: Option[String], override val role: Option[String], override val form: Option[ValueMap]) extends BoardDefinitionCommand(user) with UpdateFormElement {
-  override def validate(board: BoardActor): Unit = {
-    super.validate(board)
-    if (!board.getDefinition.columns.exists(_.columnId == columnId)) {
+case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, override val title: Option[String], override val role: Option[String], override val form: Option[ValueMap])
+  extends BoardDefinitionCommand(user) with UpdateFormElement {
+
+  override def validate(definition: BoardDefinition): Unit = {
+    super.validate(definition)
+    if (!definition.columns.exists(_.columnId == columnId)) {
       throw new InvalidCommandException("Board does not have a column with id " + columnId)
     }
   }
 
-  /**
-    * Method to be implemented to handle the command.
-    *
-    * @param board
-    * @return
-    */
   override def processBoardDefinitionCommand(definition: BoardDefinition): Unit = {
     // TODO: Verify the column exists
 
@@ -36,7 +31,7 @@ case class UpdateColumnDefinition(val user: BoardUser, val columnId: String, ove
     })
 
     if (roleChanged(columnDefinition.getRole) && role.nonEmpty) {
-      definition.team.upsertTeamRole(role.get)
+      definition.upsertTeamRole(role.get)
     }
     runChangeDetector(columnDefinition, (newTitle, newForm, newRole) => new ColumnDefinitionUpdated(definition, columnId, newTitle, newRole, newForm))
   }

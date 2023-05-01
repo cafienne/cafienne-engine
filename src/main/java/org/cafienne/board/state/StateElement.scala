@@ -10,8 +10,9 @@ import scala.concurrent.{Future, Promise}
 import scala.util.Try
 
 trait StateElement {
-  val board: BoardActor
-  val boardId: String = board.getId
+  val state: BoardState
+  def board: BoardActor = state.board // Can be null
+  val boardId: String = state.boardId
 
   def addDebugInfo(appender: DebugInfoAppender): Unit = {
     board.addDebugInfo(appender)

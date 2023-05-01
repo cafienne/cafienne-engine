@@ -19,19 +19,14 @@ package org.cafienne.board.actorapi.event.team;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent;
-import org.cafienne.board.state.team.BoardTeam;
+import org.cafienne.board.actorapi.event.BoardBaseEvent;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public abstract class BoardTeamEvent extends BoardDefinitionEvent {
+public abstract class BoardTeamEvent extends BoardBaseEvent {
     protected BoardTeamEvent(BoardActor board) {
-        super(board.getDefinition());
-    }
-
-    protected BoardTeamEvent(BoardTeam team) {
-        super(team.definition());
+        super(board);
     }
 
     protected BoardTeamEvent(ValueMap json) {

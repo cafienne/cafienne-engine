@@ -4,13 +4,13 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.CaseUserIdentity
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
+import org.cafienne.board.BoardFields
 import org.cafienne.board.actorapi.command.flow._
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowActivated, FlowCanceled, FlowInitiated}
 import org.cafienne.board.actorapi.response.FlowStartedResponse
 import org.cafienne.board.actorapi.response.runtime.FlowResponse
-import org.cafienne.board.state.StateElement
+import org.cafienne.board.state.{BoardState, StateElement}
 import org.cafienne.board.state.definition.BoardDefinition
-import org.cafienne.board.{BoardActor, BoardFields}
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition
 import org.cafienne.cmmn.actorapi.command.{CaseCommand, StartCase}
 import org.cafienne.cmmn.instance.Transition
@@ -18,7 +18,7 @@ import org.cafienne.humantask.actorapi.command.{ClaimTask, CompleteHumanTask, Sa
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 
-class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElement with LazyLogging {
+class FlowState(val state: BoardState, event: FlowInitiated) extends StateElement with LazyLogging {
   val flowId: String = event.flowId
   private var activationEvent: Option[FlowActivated] = None
 
@@ -33,9 +33,9 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
   }
 
   def updateState(event: BoardFlowEvent): Unit = event match {
-    case event: FlowInitiated => // Handled already
+    case _: FlowInitiated => // Handled already
     case event: FlowActivated => activationEvent = Some(event)
-    case event: FlowCanceled => board.state.flows.remove(flowId)
+    case event: FlowCanceled => board.state.flows.remove(event.flowId)
     case other => logger.warn(s"Flow $flowId cannot handle event of type ${other.getClass.getName}")
   }
 
@@ -45,7 +45,7 @@ class FlowState(val board: BoardActor, event: FlowInitiated) extends StateElemen
     // Take the latest & greatest case definition from our board definition
     val caseDefinition = definition.caseDefinition
     // Compose the case team based on the definition
-    val caseTeam = definition.team.caseTeam
+    val caseTeam = state.team.caseTeam
     // Take the case input from the event
     val caseInput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, event.subject, BoardDefinition.BOARD_IDENTIFIER, board.getId), BoardFields.Data, event.input)
 

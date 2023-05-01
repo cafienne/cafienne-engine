@@ -20,8 +20,8 @@ package org.cafienne.querydb.materializer.board
 import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
-import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated
 import org.cafienne.board.actorapi.event.{BoardCreated, BoardEvent, BoardModified}
+import org.cafienne.board.actorapi.event.definition.BoardDefinitionUpdated
 import org.cafienne.board.state.team.BoardTeam
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord

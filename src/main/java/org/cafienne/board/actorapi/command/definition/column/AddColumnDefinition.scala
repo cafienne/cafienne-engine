@@ -3,7 +3,6 @@ package org.cafienne.board.actorapi.command.definition.column
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.BoardUser
-import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded
 import org.cafienne.board.actorapi.response.ColumnAddedResponse
@@ -13,16 +12,16 @@ import org.cafienne.json.ValueMap
 
 @Manifest
 case class AddColumnDefinition(val user: BoardUser, val columnId: String, val title: String, val role: Option[String], val form: Option[ValueMap]) extends BoardDefinitionCommand(user) {
-  override def validate(board: BoardActor): Unit = {
-    super.validate(board)
-    if (board.getDefinition.columns.exists(_.columnId == columnId)) {
+  override def validate(definition: BoardDefinition): Unit = {
+    super.validate(definition)
+    if (definition.columns.exists(_.columnId == columnId)) {
       throw new InvalidCommandException("A column with id " + columnId + " already exists")
     }
   }
 
   override def processBoardDefinitionCommand(definition: BoardDefinition): Unit = {
     if (role.nonEmpty) {
-      definition.team.upsertTeamRole(role.get)
+      definition.upsertTeamRole(role.get)
     }
     definition.addEvent(new ColumnDefinitionAdded(definition, columnId, title, role.getOrElse(""), form.getOrElse(new ValueMap())))
     setResponse(new ColumnAddedResponse(this, columnId))

@@ -1,10 +1,11 @@
 package org.cafienne.board.state.definition
 
 import org.cafienne.board.actorapi.event.definition.{ColumnDefinitionRemoved, WriteColumnDefinitionEvent}
+import org.cafienne.board.state.BoardState
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-class ColumnDefinition(val definition: BoardDefinition, val columnId: String) extends DefinitionElement with FormElement with CafienneJson {
+class ColumnDefinition(val state: BoardState, val columnId: String) extends DefinitionElement with FormElement with CafienneJson {
   def previous: Option[ColumnDefinition] = {
     if (this.position == 0) {
       None
@@ -84,7 +85,7 @@ class ColumnDefinition(val definition: BoardDefinition, val columnId: String) ex
 object ColumnDefinition {
   def deserialize(definition: BoardDefinition, json: ValueMap): ColumnDefinition = {
     val id = json.readString(Fields.columnId)
-    val column = new ColumnDefinition(definition, id)
+    val column = new ColumnDefinition(definition.state, id)
     column.title = json.readString(Fields.title)
     column.role = json.readString(Fields.role)
     column.form = json.readMap(Fields.form)

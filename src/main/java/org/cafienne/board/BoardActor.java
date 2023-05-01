@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class BoardActor extends ModelActor {
     private final static Logger logger = LoggerFactory.getLogger(BoardActor.class);
 
-    public final BoardState state = new BoardState(this);
+    public final BoardState state = new BoardState(this, getId(), scala.Option.apply(null));
 
     public BoardActor(CaseSystem caseSystem) {
         super(caseSystem);

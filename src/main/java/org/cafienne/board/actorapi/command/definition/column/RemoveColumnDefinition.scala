@@ -3,7 +3,6 @@ package org.cafienne.board.actorapi.command.definition.column
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.BoardUser
-import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionRemoved
 import org.cafienne.board.state.definition.BoardDefinition
@@ -12,15 +11,9 @@ import org.cafienne.json.ValueMap
 
 @Manifest
 case class RemoveColumnDefinition(val user: BoardUser, val columnId: String) extends BoardDefinitionCommand(user) {
-  /**
-    * Method to be implemented to handle the command.
-    *
-    * @param board
-    * @return
-    */
-  override def validate(board: BoardActor): Unit = {
-    // Check if title or form is to be updated and has actual changes
-    if (!board.state.definition.columns.exists(_.columnId == columnId)) {
+  override def validate(definition: BoardDefinition): Unit = {
+    super.validate(definition)
+    if (!definition.columns.exists(_.columnId == columnId)) {
       // Cannot find column definition, let's return an error
       throw new InvalidCommandException("Board does not have a column with id " + columnId)
     }

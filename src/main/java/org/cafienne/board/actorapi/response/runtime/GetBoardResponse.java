@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.board.actorapi.command.runtime.GetBoard;
 import org.cafienne.board.actorapi.response.BoardResponseWithContent;
 import org.cafienne.board.state.BoardState;
-import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.Value;

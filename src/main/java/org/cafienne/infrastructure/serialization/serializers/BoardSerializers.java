@@ -18,15 +18,15 @@
 package org.cafienne.infrastructure.serialization.serializers;
 
 import org.cafienne.board.actorapi.command.CreateBoard;
-import org.cafienne.board.actorapi.command.definition.column.RemoveColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.UpdateBoardDefinition;
 import org.cafienne.board.actorapi.command.definition.column.AddColumnDefinition;
+import org.cafienne.board.actorapi.command.definition.column.RemoveColumnDefinition;
 import org.cafienne.board.actorapi.command.definition.column.UpdateColumnDefinition;
+import org.cafienne.board.actorapi.command.definition.role.AddBoardRole;
+import org.cafienne.board.actorapi.command.definition.role.RemoveBoardRole;
 import org.cafienne.board.actorapi.command.flow.*;
 import org.cafienne.board.actorapi.command.runtime.GetBoard;
-import org.cafienne.board.actorapi.command.definition.role.AddBoardRole;
 import org.cafienne.board.actorapi.command.team.RemoveMember;
-import org.cafienne.board.actorapi.command.definition.role.RemoveBoardRole;
 import org.cafienne.board.actorapi.command.team.SetMember;
 import org.cafienne.board.actorapi.event.BoardCreated;
 import org.cafienne.board.actorapi.event.BoardModified;

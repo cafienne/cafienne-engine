@@ -18,19 +18,18 @@
 package org.cafienne.board.actorapi.event.definition;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.board.BoardActor;
-import org.cafienne.board.actorapi.event.team.BoardTeamEvent;
+import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
-public class RoleDefinitionEvent extends BoardTeamEvent {
+public class RoleDefinitionEvent extends BoardDefinitionEvent {
 
     public final String roleName;
 
-    protected RoleDefinitionEvent(BoardActor board, String roleName) {
-        super(board);
+    protected RoleDefinitionEvent(BoardDefinition definition, String roleName) {
+        super(definition);
         this.roleName = roleName;
     }
 
@@ -41,7 +40,7 @@ public class RoleDefinitionEvent extends BoardTeamEvent {
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
-        super.writeBoardTeamEvent(generator);
+        super.writeBoardEvent(generator);
         writeField(generator, Fields.role, roleName);
     }
 }
