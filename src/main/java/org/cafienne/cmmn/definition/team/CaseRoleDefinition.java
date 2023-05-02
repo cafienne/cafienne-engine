@@ -31,13 +31,16 @@ import org.w3c.dom.Element;
  * multiple tasks to be handled by the same person.
  */
 public class CaseRoleDefinition extends CMMNElementDefinition {
-    private final CaseTeamDefinition teamDefinition;
-
     public CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+        this(element, modelDefinition, parentElement, false);
+    }
+
+    private CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement, boolean isEmptyRole) {
         super(element, modelDefinition, parentElement);
-        this.teamDefinition = getParentElement();
-        if (getName() == null) {
-            modelDefinition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
+        if (getName() == null || getName().isBlank()) {
+            if (! isEmptyRole) {
+                modelDefinition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
+            }
         }
     }
 
@@ -46,7 +49,7 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
         emptyXMLRole.setAttribute("id", "all_across_empty_role");
         emptyXMLRole.setAttribute("name", "");
         emptyXMLRole.setAttribute("description", "");
-        return new CaseRoleDefinition(emptyXMLRole, definitionElement.getModelDefinition(), definitionElement);
+        return new CaseRoleDefinition(emptyXMLRole, definitionElement.getModelDefinition(), definitionElement, true);
     }
 
     @Override
