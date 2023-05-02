@@ -461,8 +461,8 @@ public class Case extends ModelActor {
     }
 
     @Override
-    protected void completeTransaction(IncomingActorMessage source) {
+    protected void addCommitEvent(IncomingActorMessage message) {
         int numFailedPlanItems = Long.valueOf(getPlanItems().stream().filter(p -> p.getState().isFailed()).count()).intValue();
-        this.addEvent(new CaseModified(this, source, numFailedPlanItems));
+        this.addEvent(new CaseModified(this, message, numFailedPlanItems));
     }
 }

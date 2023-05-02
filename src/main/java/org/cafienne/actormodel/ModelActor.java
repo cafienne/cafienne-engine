@@ -457,6 +457,27 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * resulting state changes are to be persisted in the event journal.
      * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
      */
-    protected void completeTransaction(IncomingActorMessage source) {
+    protected void completeMessageHandling(IncomingActorMessage source, StagingArea stagingArea) {
+        if (stagingArea.needsCommitEvent()) {
+            addCommitEvent(source);
+        } else {
+            notModified(source);
+        }
+    }
+
+
+    /**
+     * This method is invoked when handling of the source message completed and
+     * resulting state changes are to be persisted in the event journal.
+     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
+     */
+    protected void addCommitEvent(IncomingActorMessage message) {
+    }
+
+    /**
+     * This method is invoked if th source message completed without leading to additional events.
+     * It can typically be used to send "NotModified" responses
+     */
+    protected void notModified(IncomingActorMessage source) {
     }
 }

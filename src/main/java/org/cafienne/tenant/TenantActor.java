@@ -192,7 +192,7 @@ public class TenantActor extends ModelActor {
     }
 
     @Override
-    protected void completeTransaction(IncomingActorMessage source) {
-        addEvent(new TenantModified(this, source));
+    protected void addCommitEvent(IncomingActorMessage message) {
+        addEvent(new TenantModified(this, message));
     }
 }
