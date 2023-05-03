@@ -178,8 +178,8 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
     }
 
     @Override
-    public void migrateDefinition(T newDefinition) {
-        super.migrateDefinition(newDefinition);
+    public void migrateDefinition(T newDefinition, boolean skipLogic) {
+        super.migrateDefinition(newDefinition, skipLogic);
         Map<String, CaseFileItemDefinition> newItemsByName = newDefinition.getChildren().stream().collect(Collectors.toMap(CaseFileItemDefinition::getName, item -> item));
         Map<String, CaseFileItemDefinition> newItemsById = newDefinition.getChildren().stream().collect(Collectors.toMap(CaseFileItemDefinition::getId, item -> item));
         getItems().forEach(child -> {
@@ -188,15 +188,17 @@ public abstract class CaseFileItemCollection<T extends CaseFileItemCollectionDef
             CaseFileItemDefinition newChildDefinition = newItemsByName.get(childDefinition.getName());
             if (newChildDefinition != null) {
                 // Found the new definition for the child by it's existing name. Simply invoke "migrate" on it.
-                child.migrateDefinition(newChildDefinition);
+                child.migrateDefinition(newChildDefinition, skipLogic);
             } else {
+                if (skipLogic) return;
+
                 // Since we cannot find the child by name, let's try to find it by id.
                 newChildDefinition = newItemsById.get(childDefinition.getId());
                 if (newChildDefinition != null) {
                     // We found the child, migrate name first, and then the item itself and it's children.
                     String newName = newChildDefinition.getName();
                     addDebugInfo(() -> "Migrating child name '" + childDefinition.getName() + "' to '" + newName + "'");
-                    child.migrateDefinition(newChildDefinition);
+                    child.migrateDefinition(newChildDefinition, skipLogic);
                     child.migrateName(newChildDefinition);
                 } else {
                     // We can also not find the child by id. That means we can simply drop it.

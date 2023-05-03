@@ -444,9 +444,9 @@ public class Case extends ModelActor {
     public void migrateCaseDefinition(CaseDefinition newDefinition) {
         addDebugInfo(() -> "====== Migrating Case["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + newDefinition.getName() +"\n");
         setDefinition(newDefinition);
-        getCaseTeam().migrateDefinition(newDefinition.getCaseTeamModel());
-        getCaseFile().migrateDefinition(newDefinition.getCaseFileModel());
-        getCasePlan().migrateDefinition(newDefinition.getCasePlanModel());
+        getCaseTeam().migrateDefinition(newDefinition.getCaseTeamModel(), recoveryRunning());
+        getCaseFile().migrateDefinition(newDefinition.getCaseFileModel(), recoveryRunning());
+        getCasePlan().migrateDefinition(newDefinition.getCasePlanModel(), recoveryRunning());
     }
 
     public void removeDroppedPlanItem(PlanItem<?> item) {

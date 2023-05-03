@@ -314,8 +314,10 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
     }
 
     @Override
-    public void migrateDefinition(CaseTeamDefinition newDefinition) {
-        super.migrateDefinition(newDefinition);
+    public void migrateDefinition(CaseTeamDefinition newDefinition, boolean skipLogic) {
+        super.migrateDefinition(newDefinition, skipLogic);
+        if (skipLogic) return;
+
         Map<String, CaseRoleDefinition> newRoleNames = newDefinition.getCaseRoles().stream().collect(Collectors.toMap(CaseRoleDefinition::getName, role -> role));
         Map<String, CaseRoleDefinition> newRoleIds = newDefinition.getCaseRoles().stream().collect(Collectors.toMap(CaseRoleDefinition::getId, role -> role));
         Set<String> droppedRoles = new HashSet<>();

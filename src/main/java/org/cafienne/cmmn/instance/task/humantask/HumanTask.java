@@ -184,9 +184,9 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     @Override
-    public void migrateItemDefinition(ItemDefinition newItemDefinition, HumanTaskDefinition newDefinition) {
-        super.migrateItemDefinition(newItemDefinition, newDefinition);
-        getImplementation().migrateDefinition(newDefinition.getImplementationDefinition());
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, HumanTaskDefinition newDefinition, boolean skipLogic) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition, skipLogic);
+        getImplementation().migrateDefinition(newDefinition.getImplementationDefinition(), skipLogic);
     }
 
     @Override

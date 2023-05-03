@@ -80,9 +80,9 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
 
     public abstract void satisfy(Criterion<?> criterion);
 
-    protected abstract void migrateCriteria(ItemDefinition newItemDefinition);
+    protected abstract void migrateCriteria(ItemDefinition newItemDefinition, boolean skipLogic);
 
-    protected void migrateCriteria(Collection<T> newDefinitions) {
+    protected void migrateCriteria(Collection<T> newDefinitions, boolean skipLogic) {
         addDebugInfo(() -> {
             if (criteria.isEmpty() && newDefinitions.isEmpty()) {
                 return "";
@@ -93,7 +93,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
         });
         Collection<C> existingCriteria = new ArrayList<>(criteria);
 
-        existingCriteria.forEach(criterion -> migrateCriterion(criterion, newDefinitions));
+        existingCriteria.forEach(criterion -> migrateCriterion(criterion, newDefinitions, skipLogic));
         newDefinitions.stream().filter(this::hasCriterion).forEach(this::addCriterion);
     }
 
@@ -101,11 +101,11 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
         return this.criteria.stream().noneMatch(c -> c.getDefinition() == definition);
     }
 
-    private void migrateCriterion(C criterion, Collection<T> newDefinitions) {
+    private void migrateCriterion(C criterion, Collection<T> newDefinitions, boolean skipLogic) {
         T oldDefinition = criterion.getDefinition();
         T newDefinition = XMLElementDefinition.findDefinition(oldDefinition, newDefinitions);
         if (newDefinition != null) {
-            criterion.migrateDefinition(newDefinition);
+            criterion.migrateDefinition(newDefinition, skipLogic);
         } else {
             // Not sure what to do here. Remove the criterion?
             // Search for a 'nearby' alternative?
