@@ -31,7 +31,13 @@ object CaseTeamAPI {
   implicit val groupMemberReader: EntityReader[GroupFormat] = entityReader[GroupFormat]
   implicit val roleMemberReader: EntityReader[TenantRoleFormat] = entityReader[TenantRoleFormat]
 
-  case class TeamFormat(users: Array[CaseTeamUserFormat], groups: Array[GroupFormat], tenantRoles: Array[TenantRoleFormat])
+  case class TeamFormat(users: Array[CaseTeamUserFormat], groups: Array[GroupFormat], tenantRoles: Array[TenantRoleFormat]) {
+    ApiValidator.runDuplicatesDetector("Case team", "user", users.map(_.userId))
+    ApiValidator.runDuplicatesDetector("Case team", "group", groups.map(_.groupId))
+    ApiValidator.runDuplicatesDetector("Case team", "tenant role", tenantRoles.map(_.tenantRole))
+
+    def asTeam: CaseTeam = CaseTeam(users = users.map(_.asCaseTeamUser), groups = groups.map(_.asGroup), tenantRoles = tenantRoles.map(_.asTenantRole))
+  }
 
   case class CaseTeamUserFormat(
                                  @(Schema@field)(

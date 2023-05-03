@@ -18,13 +18,18 @@
 package org.cafienne.cmmn.actorapi.command.migration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.response.migration.MigrationStartedResponse;
 import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
+import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -32,6 +37,7 @@ import java.io.IOException;
 @Manifest
 public class MigrateDefinition extends CaseCommand {
     private final CaseDefinition newDefinition;
+    private final CaseTeam newCaseTeam;
 
     /**
      * Migrate the definition of a case.
@@ -40,13 +46,37 @@ public class MigrateDefinition extends CaseCommand {
      * @param newDefinition  The case definition (according to the CMMN xsd) to be updated to
      */
     public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition newDefinition) {
+        this(user, caseInstanceId, newDefinition, null);
+    }
+
+    /**
+     * Migrate the definition of a case.
+     *
+     * @param caseInstanceId The instance identifier of the case
+     * @param newDefinition  The case definition (according to the CMMN xsd) to be updated to
+     */
+    public MigrateDefinition(CaseUserIdentity user, String caseInstanceId, CaseDefinition newDefinition, CaseTeam newTeam) {
         super(user, caseInstanceId);
         this.newDefinition = newDefinition;
+        this.newCaseTeam = newTeam;
     }
 
     public MigrateDefinition(ValueMap json) {
         super(json);
         this.newDefinition = json.readDefinition(Fields.definition, CaseDefinition.class);
+        this.newCaseTeam = json.readObject(Fields.team, CaseTeam::deserialize);
+    }
+
+    @Override
+    public void validate(Case caseInstance) {
+        super.validate(caseInstance);
+        if (newCaseTeam != null) {
+            if (newCaseTeam.owners().isEmpty()) {
+                throw new CaseTeamError("The case team needs to have at least one owner");
+            }
+            // Validates the member and roles
+            newCaseTeam.validate(newDefinition.getCaseTeamModel());
+        }
     }
 
     @Override
@@ -62,6 +92,10 @@ public class MigrateDefinition extends CaseCommand {
         } else {
             caseInstance.migrate(newDefinition);
         }
+        // Set the new case team if one is provided given
+        if (newCaseTeam != null) {
+            caseInstance.getCaseTeam().replace(newCaseTeam);
+        }
         setResponse(new MigrationStartedResponse(this));
     }
 
@@ -69,5 +103,6 @@ public class MigrateDefinition extends CaseCommand {
     public void write(JsonGenerator generator) throws IOException {
         super.writeModelCommand(generator);
         writeField(generator, Fields.definition, newDefinition);
+        writeField(generator, Fields.team, newCaseTeam);
     }
 }
