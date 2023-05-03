@@ -38,6 +38,7 @@ object TenantAPI {
                          @(Schema @field)(example = "Option to change the user email", implementation = classOf[String]) email: String = "",
                          @(Schema @field)(example = "Option to indicate whether account must be enabled/disabled (defaults to true)", implementation = classOf[Boolean]) enabled: Boolean = true) {
     ApiValidator.required(userId, "Tenant users must have a userId")
+    ApiValidator.requireNonNullElements(roles.toSeq, "Roles cannot be null")
     def asTenantUser(tenant: String): TenantUser = {
       TenantUser(id = userId, tenant = tenant, roles = roles, isOwner = isOwner, name = name, email = email, enabled = enabled)
     }
