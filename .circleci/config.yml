@@ -432,6 +432,7 @@ workflows:
               only:
                 - main
                 - dependency-updates
+                - run-compatibility-tests
       - branch-build:
           context: automation-context
           filters:
@@ -439,6 +440,7 @@ workflows:
               ignore:
                 - main
                 - dependency-updates
+                - run-compatibility-tests
       - release-build:
           context: automation-context
           filters:
