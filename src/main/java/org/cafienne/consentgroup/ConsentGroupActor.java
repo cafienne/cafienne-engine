@@ -121,7 +121,7 @@ public class ConsentGroupActor extends ModelActor {
     }
 
     @Override
-    protected void completeTransaction(IncomingActorMessage source) {
-        addEvent(new ConsentGroupModified(this, source));
+    protected void addCommitEvent(IncomingActorMessage message) {
+        addEvent(new ConsentGroupModified(this, message));
     }
 }

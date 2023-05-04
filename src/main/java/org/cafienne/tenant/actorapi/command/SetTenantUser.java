@@ -20,12 +20,10 @@ package org.cafienne.tenant.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.TenantUser;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
-import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
 
@@ -53,9 +51,8 @@ public class SetTenantUser extends TenantCommand {
 
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
+    public void processTenantCommand(TenantActor tenant) {
         tenant.setUser(newUser);
-        return new TenantResponse(this);
     }
 
     @Override

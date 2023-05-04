@@ -29,9 +29,10 @@ import org.cafienne.cmmn.actorapi.response.CaseStartedResponse
 import org.cafienne.cmmn.definition.InvalidDefinitionException
 import org.cafienne.cmmn.repository.MissingDefinitionException
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
+import org.cafienne.infrastructure.akkahttp.route.{CaseTeamValidator, LastModifiedDirectives}
 import org.cafienne.infrastructure.config.api.AnonymousCaseDefinition
 import org.cafienne.querydb.query.exception.SearchFailure
+import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.anonymous.model.AnonymousAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
@@ -41,7 +42,7 @@ import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/request")
-class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator {
+class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator with LastModifiedDirectives {
 
   // Reading the definitions executes certain validations immediately
   val configuredCaseDefinitions: Map[String, AnonymousCaseDefinition] = Cafienne.config.api.anonymousConfig.definitions
@@ -76,7 +77,7 @@ class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRou
                   val debugMode = payload.debug.getOrElse(Cafienne.config.actor.debugEnabled)
                   val command = new StartCase(definitionConfig.tenant, definitionConfig.user, newCaseId, definitionConfig.definition, payload.inputs, team, debugMode)
                   sendCommand(command, classOf[CaseStartedResponse], (response: CaseStartedResponse) => {
-                    writeLastModifiedHeader(response) {
+                    writeLastModifiedHeader(response, Headers.CASE_LAST_MODIFIED) {
                       complete(StatusCodes.OK, s"""{\n  "caseInstanceId": "${response.getActorId}"\n}""")
                     }
                   })

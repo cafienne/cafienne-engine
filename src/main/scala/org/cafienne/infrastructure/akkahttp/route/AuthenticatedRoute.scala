@@ -21,11 +21,9 @@ import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.PlatformUser
-import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.authentication.{AuthenticatedUser, AuthenticationException, CannotReachIDPException}
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.{AuthenticationDirectives, IdentityProvider}
-import org.cafienne.querydb.materializer.tenant.TenantReader
 import org.cafienne.querydb.query.exception.SearchFailure
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.health.HealthMonitor
@@ -36,7 +34,7 @@ import scala.concurrent.ExecutionContext
 /**
   * Base for enabling authentication
   */
-trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives {
+trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives with LastModifiedDirectives {
 
   override val userCache: IdentityProvider = caseSystem.userCache
   override implicit val ex: ExecutionContext = caseSystem.system.dispatcher
@@ -105,21 +103,18 @@ trait AuthenticatedRoute extends CaseServiceRoute with AuthenticationDirectives 
   def authenticatedUser(subRoute: AuthenticatedUser => Route): Route = {
     authenticatedUser() { user => {
         caseSystemMustBeHealthy()
-        optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) {
-          case Some(s) =>
-            // Wait for the TenantReader to be informed about the tenant-last-modified timestamp
-            onComplete(TenantReader.lastModifiedRegistration.waitFor(new ActorLastModified(s)).future) {
-              _ => subRoute(user)
-            }
-          // Nothing to wait for, just continue and execute the query straight on
-          case None => subRoute(user)
+        readLastModifiedHeader(Headers.TENANT_LAST_MODIFIED) { header =>
+          // Wait for the TenantReader to be informed about the tenant-last-modified timestamp
+          onComplete(header.available) {
+            _ => subRoute(user)
+          }
         }
       }
     }
   }
 
   def validUser(subRoute: PlatformUser => Route): Route = {
-    optionalHeaderValueByName(Headers.TENANT_LAST_MODIFIED) { tlm =>
+    readLastModifiedHeader(Headers.TENANT_LAST_MODIFIED) { tlm =>
       platformUser(tlm) { platformUser =>
         caseSystemMustBeHealthy()
         subRoute(platformUser)

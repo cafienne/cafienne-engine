@@ -111,7 +111,7 @@ class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
         if (transition == null) {
           complete(StatusCodes.BadRequest, "Transition " + transition + " is not valid")
         } else {
-          askCase(user, caseInstanceId, tenantUser => new MakePlanItemTransition(tenantUser, caseInstanceId, planItemId, transition))
+          askCase(user, caseInstanceId, caseMember => new MakePlanItemTransition(caseMember, caseInstanceId, planItemId, transition))
         }
       }
     }

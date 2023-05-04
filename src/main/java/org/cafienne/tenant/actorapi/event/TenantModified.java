@@ -29,7 +29,7 @@ import org.cafienne.tenant.TenantActor;
  *
  */
 @Manifest
-public class TenantModified extends ActorModified implements TenantEvent {
+public class TenantModified extends ActorModified<TenantActor> implements TenantEvent {
     public TenantModified(TenantActor actor, IncomingActorMessage source) {
         super(actor, source);
     }

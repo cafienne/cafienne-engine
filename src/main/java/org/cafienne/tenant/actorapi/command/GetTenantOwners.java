@@ -23,7 +23,6 @@ import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.response.TenantOwnersResponse;
-import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.io.IOException;
 
@@ -38,8 +37,8 @@ public class GetTenantOwners extends TenantCommand {
     }
 
     @Override
-    public TenantResponse process(TenantActor tenant) {
-        return new TenantOwnersResponse(this, tenant.getId(), tenant.getOwnerList());
+    protected void processTenantCommand(TenantActor tenant) {
+        setResponse(new TenantOwnersResponse(this, tenant.getId(), tenant.getOwnerList()));
     }
 
     @Override

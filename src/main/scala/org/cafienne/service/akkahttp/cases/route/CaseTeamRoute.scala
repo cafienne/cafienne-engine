@@ -155,7 +155,7 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with
   def deleteUser: Route = delete {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / "users" / Segment) { userId =>
-        askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, userId))
+        askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamUser(caseMember, caseInstanceId, userId))
       }
     }
   }
@@ -181,7 +181,7 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with
       path("caseteam" / "groups") {
         entity(as[GroupFormat]) { input =>
           onComplete(validateConsentGroups(Seq(input.asGroup))) {
-            case Success(groups: Seq[CaseTeamGroup]) => askCase(user, caseInstanceId, user => new SetCaseTeamGroup(user, caseInstanceId, groups.head))
+            case Success(groups: Seq[CaseTeamGroup]) => askCase(user, caseInstanceId, caseMember => new SetCaseTeamGroup(caseMember, caseInstanceId, groups.head))
             case Failure(t: Throwable) => complete(StatusCodes.NotFound, t.getLocalizedMessage)
           }
         }
@@ -217,7 +217,7 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with
   def deleteGroup: Route = delete {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / "groups" / Segment) { groupId =>
-        askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamGroup(tenantUser, caseInstanceId, groupId))
+        askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamGroup(caseMember, caseInstanceId, groupId))
       }
     }
   }
@@ -242,7 +242,7 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with
     caseInstanceSubRoute { (user, caseInstanceId) => {
       path("caseteam" / "tenant-roles") {
         entity(as[TenantRoleFormat]) { input =>
-          askCase(user, caseInstanceId, user => new SetCaseTeamTenantRole(user, caseInstanceId, input.asTenantRole))
+          askCase(user, caseInstanceId, caseMember => new SetCaseTeamTenantRole(caseMember, caseInstanceId, input.asTenantRole))
         }
       }
     }
@@ -276,7 +276,7 @@ class CaseTeamRoute(override val caseSystem: CaseSystem) extends CasesRoute with
   def deleteTenantRole: Route = delete {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("caseteam" / "tenant-roles" / Segment) { tenantRoleName =>
-        askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, tenantRoleName))
+        askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamTenantRole(caseMember, caseInstanceId, tenantRoleName))
       }
     }
   }

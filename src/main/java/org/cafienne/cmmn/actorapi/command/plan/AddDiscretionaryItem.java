@@ -22,7 +22,6 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.response.AddDiscretionaryItemResponse;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
@@ -94,9 +93,9 @@ public class AddDiscretionaryItem extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         discretionaryItem.plan(planItemId);
-        return new AddDiscretionaryItemResponse(this, new ValueMap("planItemId", planItemId));
+        setResponse(new AddDiscretionaryItemResponse(this, new ValueMap("planItemId", planItemId)));
     }
 
     @Override

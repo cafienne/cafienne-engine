@@ -17,18 +17,14 @@
 
 package org.cafienne.querydb.query.filter
 
-case class TaskFilter(tenant: Option[String],
-                      identifiers: Option[String],
-                      caseName: Option[String],
-                      taskName: Option[String],
-                      taskState: Option[String],
-                      assignee: Option[String],
-                      owner: Option[String],
-                      dueOn: Option[String],
-                      dueBefore: Option[String],
-                      dueAfter: Option[String],
-                      timeZone: Option[String])
-
-object TaskFilter {
-  val Empty = TaskFilter(None, None, None, None, None, None, None, None, None, None, None)
-}
+case class TaskFilter(tenant: Option[String] = None,
+                      identifiers: Option[String] = None,
+                      caseName: Option[String] = None,
+                      taskName: Option[String] = None,
+                      taskState: Option[String] = None,
+                      assignee: Option[String] = None,
+                      owner: Option[String] = None,
+                      dueOn: Option[String] = None,
+                      dueBefore: Option[String] = None,
+                      dueAfter: Option[String] = None,
+                      timeZone: Option[String] = None)

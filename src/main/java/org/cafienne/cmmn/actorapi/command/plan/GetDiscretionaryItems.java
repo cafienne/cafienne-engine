@@ -19,17 +19,13 @@ package org.cafienne.cmmn.actorapi.command.plan;
 
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.actorapi.response.GetDiscretionaryItemsResponse;
-import org.cafienne.cmmn.definition.DiscretionaryItemDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
-
-import java.util.Collection;
 
 /**
  */
@@ -50,7 +46,7 @@ public class GetDiscretionaryItems extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         // Convert the response to JSON
         ValueMap node = new ValueMap();
         node.plus(Fields.caseInstanceId, getCaseInstanceId());
@@ -61,6 +57,6 @@ public class GetDiscretionaryItems extends CaseCommand {
             items.add(item.asJson());
         });
 
-        return new GetDiscretionaryItemsResponse(this, node);
+        setResponse(new GetDiscretionaryItemsResponse(this, node));
     }
 }

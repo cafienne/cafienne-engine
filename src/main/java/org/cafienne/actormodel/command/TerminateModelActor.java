@@ -21,8 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
-import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.infrastructure.serialization.CafienneSerializable;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -66,8 +64,7 @@ public class TerminateModelActor extends BaseModelCommand<ModelActor, UserIdenti
     }
 
     @Override
-    public ModelResponse process(ModelActor modelActor) {
-        return null;
+    public void process(ModelActor modelActor) {
     }
 
     @Override

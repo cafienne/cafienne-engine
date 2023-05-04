@@ -326,10 +326,11 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     @Override
-    public void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition) {
-        super.migrateItemDefinition(newItemDefinition, newDefinition);
+    public void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition, boolean skipLogic) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition, skipLogic);
         // Migrate existing children (potentially dropping and removing them)
-        new ArrayList<>(planItems).forEach(this::migrateChild);
+        new ArrayList<>(planItems).forEach(item -> migrateChild(item, skipLogic));
+        if (skipLogic) return;
 
         // When the Stage is in state Available, it is not yet active, and starting the Stage
         //  will make it active and then the new children will be instantiated automatically.
@@ -342,7 +343,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         }
     }
 
-    private void migrateChild(PlanItem<?> child) {
+    private void migrateChild(PlanItem<?> child, boolean skipLogic) {
         String childDefinitionId = child.getItemDefinition().getId();
         String childName = child.getItemDefinition().getName();
 
@@ -362,7 +363,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
         // If we found a new definition, let's migrate it; otherwise tell the child to get lost.
         if (newChildItemDefinition != null) {
-            migrateChild(child, newChildItemDefinition);
+            migrateChild(child, newChildItemDefinition, skipLogic);
         } else {
             dropChild(child);
         }
@@ -392,12 +393,12 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         super.lostDefinition();
     }
 
-    private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition) {
+    private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition, boolean skipLogic) {
         addDebugInfo(() -> this + ": migrating child " + child +" to a new definition");
         DefinitionElement currentChildDefinition = child.getDefinition();
         PlanItemDefinitionDefinition newChildDefinition = newChildItemDefinition.getPlanItemDefinition();
         if (currentChildDefinition.getClass().isAssignableFrom(newChildDefinition.getClass())) {
-            child.migrateItemDefinition(newChildItemDefinition, newChildDefinition);
+            child.migrateItemDefinition(newChildItemDefinition, newChildDefinition, skipLogic);
         } else {
             // Apparently what was once a Task is now a Stage or so?
             // Scenario not yet supported...

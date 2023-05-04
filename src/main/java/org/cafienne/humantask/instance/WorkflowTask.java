@@ -245,8 +245,10 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     @Override
-    public void migrateDefinition(WorkflowTaskDefinition newDefinition) {
-        super.migrateDefinition(newDefinition);
+    public void migrateDefinition(WorkflowTaskDefinition newDefinition, boolean skipLogic) {
+        super.migrateDefinition(newDefinition, skipLogic);
+        if (skipLogic) return;
+
         if (currentTaskState == TaskState.Null) {
             // Task has not yet been activated, and has not yet published any events. No need to do any migration.
             return;

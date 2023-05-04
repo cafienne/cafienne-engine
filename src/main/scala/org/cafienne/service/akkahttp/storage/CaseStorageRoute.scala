@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.service.akkahttp.LastModifiedHeader
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
@@ -64,7 +65,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
       path("case" / Segment / "archive") { caseInstanceId =>
         authorizeCaseAccess(user, caseInstanceId, { caseMember => {
           val tenant = caseMember.tenant
-          onComplete(getTenantUser(user, tenant, None)) {
+          onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
             case Success(tenantUser) =>
               if (tenantUser.enabled && tenantUser.isOwner) {
                 initiateDataArchival(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = tenant, actorId = caseInstanceId))
@@ -134,7 +135,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
       path("case" / Segment) { caseInstanceId =>
         authorizeCaseAccess(user, caseInstanceId, { caseMember => {
           val tenant = caseMember.tenant
-          onComplete(getTenantUser(user, tenant, None)) {
+          onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
             case Success(tenantUser) =>
               if (tenantUser.enabled && tenantUser.isOwner) {
                 initiateDataRemoval(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = tenant, actorId = caseInstanceId))

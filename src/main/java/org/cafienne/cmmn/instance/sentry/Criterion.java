@@ -207,34 +207,34 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
     }
 
     @Override
-    public void migrateDefinition(D newDefinition) {
-        super.migrateDefinition(newDefinition);
+    public void migrateDefinition(D newDefinition, boolean skipLogic) {
+        super.migrateDefinition(newDefinition, skipLogic);
         this.onParts.forEach(onPart -> {
             if (onPart instanceof CaseFileItemOnPart) {
-                migrateCaseFileItemOnPart((CaseFileItemOnPart) onPart, newDefinition);
+                migrateCaseFileItemOnPart((CaseFileItemOnPart) onPart, newDefinition, skipLogic);
             } else if (onPart instanceof PlanItemOnPart) {
-                migratePlanItemOnPart((PlanItemOnPart) onPart, newDefinition);
+                migratePlanItemOnPart((PlanItemOnPart) onPart, newDefinition, skipLogic);
             }
         });
         addDebugInfo(() -> "Migrated " + this);
     }
 
-    private void migrateCaseFileItemOnPart(CaseFileItemOnPart onPart, D newDefinition) {
+    private void migrateCaseFileItemOnPart(CaseFileItemOnPart onPart, D newDefinition, boolean skipLogic) {
         CaseFileItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
         CaseFileItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
         if (newOnPartDefinition != null) {
-            onPart.migrateDefinition(newOnPartDefinition);
+            onPart.migrateDefinition(newOnPartDefinition, skipLogic);
         } else {
             // perhaps search for a 'similar' on part, i.e. one with same source reference and potentially different standard event?
             // But then make sure that there is not another similar on part with the same source reference ;)
         }
     }
 
-    private void migratePlanItemOnPart(PlanItemOnPart onPart, D newDefinition) {
+    private void migratePlanItemOnPart(PlanItemOnPart onPart, D newDefinition, boolean skipLogic) {
         PlanItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
         PlanItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
         if (newOnPartDefinition != null) {
-            onPart.migrateDefinition(newOnPartDefinition);
+            onPart.migrateDefinition(newOnPartDefinition, skipLogic);
         }
     }
 }

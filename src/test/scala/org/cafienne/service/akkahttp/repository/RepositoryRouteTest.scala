@@ -5,7 +5,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
-import org.cafienne.infrastructure.akkahttp.ValueMarshallers
+import org.cafienne.infrastructure.akkahttp.HttpXmlReader
 import org.cafienne.system.CaseSystem
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
@@ -51,6 +51,6 @@ class RepositoryRouteTest extends AnyFlatSpec with Matchers with ScalatestRouteT
       throw new IllegalArgumentException("The file with name "+fileName+" cannot be loaded from the classpath")
     }
     val fileBytes = LazyList.continually(fileStream.read).takeWhile(b => b != -1).map(_.toByte).toArray
-    HttpEntity(ValueMarshallers.`application/xml`, fileBytes)
+    HttpEntity(HttpXmlReader.`application/xml`, fileBytes)
   }
 }

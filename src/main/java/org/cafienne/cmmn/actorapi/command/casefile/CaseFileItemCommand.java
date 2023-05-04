@@ -20,11 +20,10 @@ package org.cafienne.cmmn.actorapi.command.casefile;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.cmmn.instance.Path;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemCollection;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
-import org.cafienne.cmmn.instance.Path;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
@@ -73,9 +72,8 @@ abstract class CaseFileItemCommand extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         apply(caseInstance, caseFileItem, content);
-        return new CaseResponse(this);
     }
 
     abstract void apply(Case caseInstance, CaseFileItemCollection<?> caseFileItem, Value<?> content);

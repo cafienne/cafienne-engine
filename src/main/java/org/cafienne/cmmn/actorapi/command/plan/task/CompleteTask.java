@@ -22,7 +22,6 @@ import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Task;
@@ -89,13 +88,12 @@ public class CompleteTask extends CaseCommand {
         }
 
         // Set the task pointer.
-        task = (Task) planItem;
+        task = (Task<?>) planItem;
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         task.goComplete(taskOutput);
-        return new CaseResponse(this);
     }
 
     private PlanItem<?> getPlanItem(Case caseInstance) {

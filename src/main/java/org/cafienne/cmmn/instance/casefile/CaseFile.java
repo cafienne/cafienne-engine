@@ -108,9 +108,9 @@ public class CaseFile extends CaseFileItemCollection<CaseFileDefinition> {
     }
 
     @Override
-    public void migrateDefinition(CaseFileDefinition newDefinition) {
+    public void migrateDefinition(CaseFileDefinition newDefinition, boolean skipLogic) {
         addDebugInfo(() -> "\nMigrating Case File");
-        super.migrateDefinition(newDefinition);
+        super.migrateDefinition(newDefinition, skipLogic);
         addDebugInfo(() -> "Completed Case File migration\n");
     }
 

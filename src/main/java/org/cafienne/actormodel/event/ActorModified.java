@@ -19,7 +19,6 @@ package org.cafienne.actormodel.event;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.ModelActor;
-import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.json.ValueMap;
@@ -33,20 +32,23 @@ import java.time.Instant;
  *
  * @param <M>
  */
-public abstract class ActorModified extends BaseModelEvent<ModelActor> implements CommitEvent {
-    public final String source;
+public abstract class ActorModified<M extends ModelActor> extends BaseModelEvent<M> implements CommitEvent {
+    public final transient IncomingActorMessage source;
+    public final String sourceString;
     public final Instant lastModified;
 
-    protected ActorModified(ModelActor actor, IncomingActorMessage message) {
+    protected ActorModified(M actor, IncomingActorMessage source) {
         super(actor);
-        this.source = message.getClass().getName();
+        this.source = source;
+        this.sourceString = source.getClass().getName();
         this.lastModified = actor.getTransactionTimestamp();
     }
 
     protected ActorModified(ValueMap json) {
         super(json);
+        this.source = null;
         this.lastModified = json.readInstant(Fields.lastModified);
-        this.source = json.readString(Fields.source, "unknown message");
+        this.sourceString = json.readString(Fields.source, "unknown message");
     }
 
     public Instant lastModified() {
@@ -55,7 +57,7 @@ public abstract class ActorModified extends BaseModelEvent<ModelActor> implement
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + " upon " + source;
+        return getClass().getSimpleName() + " upon " + sourceString;
     }
 
     @Override
@@ -64,13 +66,13 @@ public abstract class ActorModified extends BaseModelEvent<ModelActor> implement
     }
 
     @Override
-    public void updateState(ModelActor actor) {
-        actor.setLastModified(lastModified());
+    public void updateState(M actor) {
+        actor.updateState(this);
     }
 
     public void writeActorModified(JsonGenerator generator) throws IOException {
         super.writeModelEvent(generator);
         writeField(generator, Fields.lastModified, lastModified);
-        writeField(generator, Fields.source, source);
+        writeField(generator, Fields.source, sourceString);
     }
 }

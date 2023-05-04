@@ -29,7 +29,7 @@ import org.cafienne.json.ValueMap;
  *
  */
 @Manifest
-public class ConsentGroupModified extends ActorModified implements ConsentGroupEvent  {
+public class ConsentGroupModified extends ActorModified<ConsentGroupActor> implements ConsentGroupEvent  {
     public ConsentGroupModified(ConsentGroupActor actor, IncomingActorMessage source) {
         super(actor, source);
     }

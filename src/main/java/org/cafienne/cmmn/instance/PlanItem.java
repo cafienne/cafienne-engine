@@ -598,11 +598,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     public void updateState(CaseAppliedPlatformUpdate event) {
     }
 
-    protected void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition) {
+    protected void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition, boolean skipLogic) {
         addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
-        super.migrateDefinition(newDefinition);
+        super.migrateDefinition(newDefinition, skipLogic);
         setItemDefinition(newItemDefinition);
-        if (getState().isCreated()) {
+        if (!skipLogic && getState().isCreated()) {
             if (hasNewNameOrId()) {
                 // Add a migration event if name or id has changed
                 addEvent(new PlanItemMigrated(this));
@@ -614,8 +614,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
                 }
             }
         }
-        getEntryCriteria().migrateCriteria(newItemDefinition);
-        getExitCriteria().migrateCriteria(newItemDefinition);
+        getEntryCriteria().migrateCriteria(newItemDefinition, skipLogic);
+        getExitCriteria().migrateCriteria(newItemDefinition, skipLogic);
         addDebugInfo(() -> "=== Completed migration of " + this + "\n");
     }
 

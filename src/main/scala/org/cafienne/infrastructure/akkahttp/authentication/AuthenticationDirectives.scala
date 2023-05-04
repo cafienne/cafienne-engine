@@ -21,6 +21,7 @@ import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.{Directive1, Directives}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.{AuthenticatedUser, JwtTokenVerifier, MissingTokenException}
+import org.cafienne.service.akkahttp.LastModifiedHeader
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +45,7 @@ trait AuthenticationDirectives extends Directives {
     authenticateOAuth2Async("service", verifyJWTToken)
   }
 
-  def platformUser(tlm: Option[String]): Directive1[PlatformUser] = {
+  def platformUser(tlm: LastModifiedHeader): Directive1[PlatformUser] = {
     authenticateOAuth2Async("service", c => {
       jwtToPlatformUser(c, tlm)
     })
@@ -57,7 +58,7 @@ trait AuthenticationDirectives extends Directives {
     }
   }
 
-  private def jwtToPlatformUser(credentials: Credentials, tlm: Option[String]): Future[Option[PlatformUser]] = {
+  private def jwtToPlatformUser(credentials: Credentials, tlm: LastModifiedHeader): Future[Option[PlatformUser]] = {
     credentials match {
       case Credentials.Provided(token) => {
         for {

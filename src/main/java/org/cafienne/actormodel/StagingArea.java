@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * an {@link IncomingActorMessage}
  * It also handles failures and sending responses to complete the lifecycle of the message.
  */
-class StagingArea {
+public class StagingArea {
     private final ModelActor actor;
     private final static int avgNumEvents = 30;
     private final List<ModelEvent> events = new ArrayList<>(avgNumEvents);
@@ -107,10 +107,8 @@ class StagingArea {
         } else {
             // If there are only debug events, first respond and then persist the events (for performance).
             // Otherwise, only send a response upon successful persisting the events.
+            actor.completeMessageHandling(message, this);
             if (hasStatefulEvents()) {
-                if (needsCommitEvent()) {
-                    actor.completeTransaction(message);
-                }
                 persistEventsAndThenReply(response);
             } else {
                 replyAndPersistDebugEvent(response);
@@ -144,11 +142,11 @@ class StagingArea {
         }
 
         // Apply tagging to the events
-        final List<Object> persistables = events.stream().map(this::tag).collect(Collectors.toList());
+        final List<Object> taggedEvents = events.stream().map(this::tag).collect(Collectors.toList());
         // When the last event is persisted, we can send a reply. Keep track of that last event here, so that we need not go through the list each time.
-        final Object lastPersistable = persistables.get(persistables.size() - 1);
+        final Object lastTaggedEvent = taggedEvents.get(taggedEvents.size() - 1);
 
-        actor.persistAll(persistables, persistedEvent -> {
+        actor.persistAll(taggedEvents, persistedEvent -> {
             HealthMonitor.writeJournal().isOK();
             if (getLogger().isDebugEnabled()) {
                 if (persistedEvent instanceof Tagged) {
@@ -158,7 +156,7 @@ class StagingArea {
                     getLogger().debug(actor + " - persisted event [" + actor.lastSequenceNr() + "] of type " + persistedEvent.getClass().getName());
                 }
             }
-            if (persistedEvent == lastPersistable) {
+            if (persistedEvent == lastTaggedEvent) {
                 actor.reply(response);
             }
         });
@@ -238,7 +236,7 @@ class StagingArea {
      * If the last event is not a CommitEvent we need one.
      * @return
      */
-    private boolean needsCommitEvent() {
+    boolean needsCommitEvent() {
         return events.size() > 0 && !(events.get(events.size() - 1) instanceof CommitEvent);
     }
 

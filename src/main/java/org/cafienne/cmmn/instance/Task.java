@@ -297,8 +297,8 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     }
 
     @Override
-    protected void migrateItemDefinition(ItemDefinition newItemDefinition, D newDefinition) {
-        super.migrateItemDefinition(newItemDefinition, newDefinition);
+    protected void migrateItemDefinition(ItemDefinition newItemDefinition, D newDefinition, boolean skipLogic) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition, skipLogic);
         if (hasNewMappings()) {
             if (getState().isAlive()) {
                 addDebugInfo(() -> "Found new mapping definitions in task " + this +", transforming input parameters");

@@ -19,7 +19,6 @@ package org.cafienne.humantask.actorapi.command;
 
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.response.CommandFailure;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.response.HumanTaskValidationResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
@@ -40,14 +39,14 @@ public class ValidateTaskOutput extends TaskOutputCommand {
 	}
 
 	@Override
-	public ModelResponse process(WorkflowTask workflowTask) {
+	public void processWorkflowCommand(WorkflowTask workflowTask) {
 		ValidationResponse response = workflowTask.getTask().validateOutput(taskOutput);
 		if (response.isValid()) {
-			return new HumanTaskValidationResponse(this, response.getContent());
+			setResponse(new HumanTaskValidationResponse(this, response.getContent()));
 		} else {
 			// HTD
 //        	return null;
-			return new CommandFailure(this, response.getException());
+			setResponse(new CommandFailure(this, response.getException()));
 		}
 	}
 }

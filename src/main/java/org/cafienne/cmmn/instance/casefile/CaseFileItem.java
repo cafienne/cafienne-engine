@@ -569,20 +569,22 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
     }
 
     @Override
-    public void migrateDefinition(CaseFileItemDefinition newDefinition) {
+    public void migrateDefinition(CaseFileItemDefinition newDefinition, boolean skipLogic) {
         addDebugInfo(() -> "=== Migrating CaseFileItem[" + getPath() + "] to a new definition");
-        super.migrateDefinition(newDefinition);
-        migrateIdentifiers(newDefinition);
+        super.migrateDefinition(newDefinition, skipLogic);
+        migrateIdentifiers(newDefinition, skipLogic);
         addDebugInfo(() -> "=== Completed migration of CaseFileItem[" + getPath() + "]\n");
     }
 
-    private void migrateIdentifiers(CaseFileItemDefinition newDefinition) {
+    private void migrateIdentifiers(CaseFileItemDefinition newDefinition, boolean skipLogic) {
         // All identifiers will be removed, unless ...
         Map<String, BusinessIdentifier> identifiersToRemove = new HashMap<>(businessIdentifiers);
         newDefinition.getBusinessIdentifiers().forEach(newPropertyDefinition -> {
             String name = newPropertyDefinition.getName();
             BusinessIdentifier identifier = businessIdentifiers.get(name);
             if (identifier == null) {
+                if (skipLogic) return;
+
                 // Let's add a new one
                 BusinessIdentifier newIdentifier = new BusinessIdentifier(this, newPropertyDefinition);
                 businessIdentifiers.put(name, newIdentifier);
@@ -591,11 +593,13 @@ public class CaseFileItem extends CaseFileItemCollection<CaseFileItemDefinition>
                 }
             } else {
                 // Migrate the identifier to the new definition
-                identifier.migrateDefinition(newPropertyDefinition);
+                identifier.migrateDefinition(newPropertyDefinition, skipLogic);
                 // Make sure this one will not be deleted.
                 identifiersToRemove.remove(name);
             }
         });
+
+        if (skipLogic) return;
 
         // Tell these identifiers to get lost.
         identifiersToRemove.values().forEach(BusinessIdentifier::lostDefinition);

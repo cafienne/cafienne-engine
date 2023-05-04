@@ -23,16 +23,15 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.actorapi.command._
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.querydb.materializer.cases.CaseReader
 import org.cafienne.querydb.query.exception.CaseSearchFailure
 import org.cafienne.querydb.query.{CaseMembership, CaseQueries, CaseQueriesImpl}
+import org.cafienne.service.akkahttp.Headers
 
 import scala.util.{Failure, Success}
 
 trait CasesRoute extends CommandRoute with QueryRoute {
-  override val lastModifiedRegistration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
   val caseQueries: CaseQueries = new CaseQueriesImpl
+  override val lastModifiedHeaderName: String = Headers.CASE_LAST_MODIFIED
 
   def caseUser(subRoute: AuthenticatedUser => Route): Route = {
     super.authenticatedUser(subRoute)

@@ -44,9 +44,9 @@ class DeprecatedCaseTeamRoute(override val caseSystem: CaseSystem) extends Cases
       path("caseteam" / Segment) { memberId =>
         parameters("type".?) { memberType =>
           if (memberType.nonEmpty && memberType.get == "role") {
-            askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamTenantRole(tenantUser, caseInstanceId, memberId))
+            askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamTenantRole(caseMember, caseInstanceId, memberId))
           } else {
-            askCase(user, caseInstanceId, tenantUser => new RemoveCaseTeamUser(tenantUser, caseInstanceId, memberId))
+            askCase(user, caseInstanceId, caseMember => new RemoveCaseTeamUser(caseMember, caseInstanceId, memberId))
           }
         }
       }

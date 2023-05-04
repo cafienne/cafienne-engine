@@ -18,6 +18,7 @@
 package org.cafienne.actormodel.command;
 
 import akka.actor.ActorPath;
+import akka.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -40,7 +41,9 @@ import java.io.StringWriter;
 public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdentity> implements ModelCommand {
     protected final String msgId;
     public final String actorId;
+    public ActorRef sender;
     protected transient T actor;
+    private ModelResponse response;
 
     /**
      * Store the user that issued the Command.
@@ -85,6 +88,17 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     @Override
     public final void setActor(ModelActor actor) {
         this.actor = (T) actor;
+        this.sender = actor.getSender();
+    }
+
+    /**
+     * Returns information about the sender of this command.
+     * Can be used to independently send replies.
+     * Independently means: independent of the command processing logic.
+     * Note: if the response field of the command is filled, the framework will also send a response to the sender.
+     */
+    public ActorRef getSender() {
+        return sender;
     }
 
     @Override
@@ -93,8 +107,26 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     }
 
     @Override
-    public final ModelResponse processCommand(ModelActor actor) {
-        return process((T) actor);
+    public final void processCommand(ModelActor actor) {
+        process((T) actor);
+    }
+
+    @Override
+    public ModelResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(ModelResponse response) {
+        this.response = response;
+    }
+
+    @Override
+    public boolean hasResponse() {
+        return response != null;
+    }
+
+    protected boolean hasNoResponse() {
+        return response == null;
     }
 
     /**
@@ -150,7 +182,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
      * @param modelActor
      * @return
      */
-    public abstract ModelResponse process(T modelActor);
+    public abstract void process(T modelActor);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {

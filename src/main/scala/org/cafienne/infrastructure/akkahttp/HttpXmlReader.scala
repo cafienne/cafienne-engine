@@ -17,18 +17,22 @@
 
 package org.cafienne.infrastructure.akkahttp
 
-import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model._
-import org.cafienne.actormodel.response.ModelResponse
+import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.cafienne.util.XMLHelper
 
 /**
-  * This file contains some marshallers and unmarshallers for responses from ModelActors
+  * This file contains an unmarshaller for XML documents
   */
-object ResponseMarshallers {
+object HttpXmlReader {
+
   /**
-    * Simple CaseResponse converter to JSON
+    * Application/xml is not a default in the {@link akka.http.scaladsl.model.ContentTypes}
     */
-  implicit val modelResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: ModelResponse =>
-    HttpEntity(ContentTypes.`application/json`, value.toJson.toString)
-  }
+  val `application/xml`: ContentType = MediaTypes.`application/xml` withCharset HttpCharsets.`UTF-8`
+
+  /**
+    * Reads an org.w3c.dom.Document from a http entity
+    */
+  implicit val DocumentUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(`application/xml`).map(XMLHelper.loadXML(_))
 }

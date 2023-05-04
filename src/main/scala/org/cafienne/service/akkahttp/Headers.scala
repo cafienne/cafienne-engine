@@ -17,6 +17,14 @@
 
 package org.cafienne.service.akkahttp
 
+import org.cafienne.actormodel.response.ActorLastModified
+import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.materializer.cases.CaseReader
+import org.cafienne.querydb.materializer.consentgroup.ConsentGroupReader
+import org.cafienne.querydb.materializer.tenant.TenantReader
+
+import scala.concurrent.Future
+
 object Headers {
 
 
@@ -25,4 +33,51 @@ object Headers {
   final val TENANT_LAST_MODIFIED = "Tenant-Last-Modified"
 
   final val CONSENT_GROUP_LAST_MODIFIED = "Consent-Group-Last-Modified"
+}
+
+trait LastModifiedHeader {
+  val name: String
+  val registration: LastModifiedRegistration
+  val value: Option[String] = None
+  val lastModified = value.map(new ActorLastModified(name, _))
+
+  override def toString: String = name + ": " + value
+
+  def available: Future[String] = {
+    if (lastModified.isDefined) {
+      //    println("Awaiting " + this)
+      registration.waitFor(lastModified.get).future
+    } else {
+      Future.successful("No header present")
+    }
+  }
+}
+
+case class CaseLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
+  override val name = Headers.CASE_LAST_MODIFIED
+  override val registration: LastModifiedRegistration = CaseReader.lastModifiedRegistration
+}
+
+case class TenantLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
+  override val name = Headers.TENANT_LAST_MODIFIED
+  override val registration: LastModifiedRegistration = TenantReader.lastModifiedRegistration
+}
+
+case class ConsentGroupLastModifiedHeader(override val value: Option[String]) extends LastModifiedHeader {
+  override val name = Headers.CONSENT_GROUP_LAST_MODIFIED
+  override val registration: LastModifiedRegistration = ConsentGroupReader.lastModifiedRegistration
+}
+
+
+object LastModifiedHeader {
+  val NONE = new LastModifiedHeader {
+    override val name: String = ""
+    override val registration: LastModifiedRegistration = null
+  }
+  def get(headerName: String, headerValue: Option[String] = None): LastModifiedHeader = headerName match {
+    case Headers.CASE_LAST_MODIFIED => CaseLastModifiedHeader(headerValue)
+    case Headers.TENANT_LAST_MODIFIED => TenantLastModifiedHeader(headerValue)
+    case Headers.CONSENT_GROUP_LAST_MODIFIED => ConsentGroupLastModifiedHeader(headerValue)
+    case _ => throw new Exception(s"Unrecognized last modified header $headerName")
+  }
 }

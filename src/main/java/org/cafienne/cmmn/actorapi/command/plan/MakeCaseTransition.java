@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Transition;
@@ -67,10 +66,9 @@ public class MakeCaseTransition extends CaseCommand {
     }
 
     @Override
-    public CaseResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         PlanItem<?> casePlan = caseInstance.getCasePlan();
         caseInstance.makePlanItemTransition(casePlan, transition);
-        return new CaseResponse(this);
     }
 
     @Override

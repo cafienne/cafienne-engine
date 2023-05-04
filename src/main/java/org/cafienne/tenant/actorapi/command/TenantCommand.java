@@ -25,6 +25,7 @@ import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
 import org.cafienne.tenant.actorapi.TenantMessage;
 import org.cafienne.tenant.actorapi.exception.TenantException;
+import org.cafienne.tenant.actorapi.response.TenantResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -91,4 +92,14 @@ public abstract class TenantCommand extends BaseModelCommand<TenantActor, Tenant
             throw new TenantException("Cannot remove tenant ownership or disable the account. There must be at least one tenant owner.");
         }
     }
+
+    @Override
+    public void process(TenantActor tenant) {
+        processTenantCommand(tenant);
+        if (hasNoResponse()) { // Always return a response
+            setResponse(new TenantResponse(this));
+        }
+    }
+
+    protected abstract void processTenantCommand(TenantActor tenant);
 }

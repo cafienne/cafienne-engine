@@ -83,4 +83,14 @@ public abstract class CaseCommand extends BaseModelCommand<Case, CaseUserIdentit
     protected void validateCaseTeamMembership(Case caseInstance) {
         caseInstance.getCaseTeam().validateMembership(getUser());
     }
+
+    @Override
+    public void process(Case caseInstance) {
+        processCaseCommand(caseInstance);
+        if (hasNoResponse()) { // Always return a response
+            setResponse(new CaseResponse(this));
+        }
+    }
+
+    public abstract void processCaseCommand(Case caseInstance);
 }

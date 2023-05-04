@@ -57,8 +57,8 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
     }
 
     @Override
-    protected void migrateItemDefinition(ItemDefinition newItemDefinition, ProcessTaskDefinition newDefinition) {
-        super.migrateItemDefinition(newItemDefinition, newDefinition);
+    protected void migrateItemDefinition(ItemDefinition newItemDefinition, ProcessTaskDefinition newDefinition, boolean skipLogic) {
+        super.migrateItemDefinition(newItemDefinition, newDefinition, skipLogic);
         if (getPreviousDefinition().getImplementationDefinition().sameProcessDefinition(newDefinition.getImplementationDefinition())) {
             addDebugInfo(() -> "No need to migrate implementation definition of process task " + getId() + " (proposed implementation equals the current implementation)");
         } else {

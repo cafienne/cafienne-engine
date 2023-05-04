@@ -20,9 +20,7 @@ package org.cafienne.cmmn.actorapi.command.team;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
-import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.actorapi.response.CaseResponse;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.team.Team;
 import org.cafienne.json.ValueMap;
@@ -51,9 +49,8 @@ public abstract class CaseTeamCommand extends CaseCommand {
     protected abstract void validate(Team team) throws InvalidCommandException;
 
     @Override
-    public ModelResponse process(Case caseInstance) {
+    public void processCaseCommand(Case caseInstance) {
         process(caseInstance.getCaseTeam());
-        return new CaseResponse(this);
     }
 
     protected abstract void process(Team team);

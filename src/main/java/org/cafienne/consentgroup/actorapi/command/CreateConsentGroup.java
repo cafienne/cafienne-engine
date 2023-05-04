@@ -24,7 +24,6 @@ import org.cafienne.consentgroup.ConsentGroupActor;
 import org.cafienne.consentgroup.actorapi.ConsentGroup;
 import org.cafienne.consentgroup.actorapi.exception.ConsentGroupException;
 import org.cafienne.consentgroup.actorapi.response.ConsentGroupCreatedResponse;
-import org.cafienne.consentgroup.actorapi.response.ConsentGroupResponse;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -46,9 +45,9 @@ public class CreateConsentGroup extends CollectiveCommand implements BootstrapMe
     }
 
     @Override
-    public ConsentGroupResponse process(ConsentGroupActor group) {
+    public void processGroupCommand(ConsentGroupActor group) {
         group.create(this);
-        return new ConsentGroupCreatedResponse(this);
+        setResponse(new ConsentGroupCreatedResponse(this));
     }
 
     @Override

@@ -187,16 +187,12 @@ public class TenantActor extends ModelActor {
         TenantUser.handleDeprecatedEvent(users, event);
     }
 
-    public void updateState(TenantModified event) {
-        setLastModified(event.lastModified());
-    }
-
     public void updatePlatformInformation(PlatformUpdate newUserInformation) {
         addEvent(new TenantAppliedPlatformUpdate(this, newUserInformation));
     }
 
     @Override
-    protected void completeTransaction(IncomingActorMessage source) {
-        addEvent(new TenantModified(this, source));
+    protected void addCommitEvent(IncomingActorMessage message) {
+        addEvent(new TenantModified(this, message));
     }
 }

@@ -20,6 +20,7 @@ package org.cafienne.system.router
 import akka.actor.{Actor, Terminated}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
+import org.cafienne.infrastructure.serialization.DeserializationFailure
 
 /**
   * Base class for routing model commands into the case system
@@ -31,6 +32,7 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
       terminateActor(kill)
     case m: ModelCommand => forwardMessage(m)
     case t: Terminated => removeActorRef(t)
+    case d: DeserializationFailure => handleDeserializationFailure(d)
     case other => handleUnknownMessage(other);
   }
 
@@ -39,6 +41,10 @@ abstract class CaseMessageRouter extends Actor with LazyLogging {
   def forwardMessage(m: ModelCommand): Unit
 
   def terminateActor(msg: TerminateModelActor): Unit
+
+  def handleDeserializationFailure(value: DeserializationFailure): Unit = {
+    logger.warn(s"The ${getClass.getSimpleName} received a ${value.getClass.getSimpleName} on manifest ${value.manifest}.", value.exception)
+  }
 
   def handleUnknownMessage(value: Any): Unit = {
     logger.warn("The " + getClass.getSimpleName + " received an unknown message of type " + value.getClass.getName + ". Enable debug logging to see the contents of the message")

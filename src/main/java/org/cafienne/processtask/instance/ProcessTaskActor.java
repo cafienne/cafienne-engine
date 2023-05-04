@@ -182,7 +182,7 @@ public class ProcessTaskActor extends ModelActor {
     }
 
     @Override
-    protected void completeTransaction(IncomingActorMessage source) {
-        addEvent(new ProcessModified(this, source));
+    protected void addCommitEvent(IncomingActorMessage message) {
+        addEvent(new ProcessModified(this, message));
     }
 }

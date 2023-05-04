@@ -126,7 +126,7 @@ class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
     pathPrefix("user") {
       pathEndOrSingleSlash {
         validUser { platformUser =>
-          completeJsonValue(platformUser.toValue)
+          completeJson(platformUser)
         }
       }
     }

@@ -114,8 +114,11 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
     }
 
     @Override
-    protected void migrateCriteria(ItemDefinition newItemDefinition) {
-        migrateCriteria(newItemDefinition.getEntryCriteria());
+    protected void migrateCriteria(ItemDefinition newItemDefinition, boolean skipLogic) {
+        migrateCriteria(newItemDefinition.getEntryCriteria(), skipLogic);
+        if (skipLogic) {
+            return;
+        }
         if (criteria.isEmpty()) {
             beginLifeCycle();
         }

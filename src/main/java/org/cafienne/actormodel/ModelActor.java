@@ -24,6 +24,7 @@ import akka.persistence.SnapshotOffer;
 import akka.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.command.ModelCommand;
+import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.CommandException;
 import org.cafienne.actormodel.identity.UserIdentity;
@@ -32,12 +33,10 @@ import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.CommandFailureListener;
 import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.actormodel.response.ModelResponse;
-import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.infrastructure.CafienneVersion;
 import org.cafienne.infrastructure.enginedeveloper.EngineDeveloperConsole;
-import org.cafienne.processtask.actorapi.command.ProcessCommand;
 import org.cafienne.system.CaseSystem;
 import org.cafienne.system.health.HealthMonitor;
 import org.slf4j.Logger;
@@ -308,20 +307,22 @@ public abstract class ModelActor extends AbstractPersistentActor {
     /**
      * Model actor can send a reply to a command with this method
      *
-     * @param response
+     * @param response - optional message to be told to the current sender
      */
     public void reply(ModelResponse response) {
         // Always reset the transaction timestamp before replying. Even if there is no reply.
         resetTransactionTimestamp();
+        // We should unlock if there is no response or the response is not a failure.
+        //  If there is no response, it means a command has been handled, but the response may be given asynchronously.
+        if (!(response instanceof CommandFailure)) {
+            // Having handled a ModelCommand and properly stored the events we can unlock the reception.
+            reception.unlock();
+        }
         if (response == null) {
             // Double check there is a response.
             return;
         }
 
-        if (!(response instanceof CommandFailure)) {
-            // Having handled a ModelCommand and properly stored the events we can unlock the reception.
-            reception.unlock();
-        }
         if (getLogger().isDebugEnabled() || EngineDeveloperConsole.enabled()) {
             String msg = "Sending response of type " + response.getClass().getSimpleName() + " from " + this;
             if (response instanceof CommandFailure) {
@@ -433,8 +434,8 @@ public abstract class ModelActor extends AbstractPersistentActor {
         transactionTimestamp = null;
     }
 
-    public void setLastModified(Instant lastModified) {
-        this.lastModified = lastModified;
+    public void updateState(ActorModified<?> event) {
+        this.lastModified = event.lastModified;
     }
 
     /**
@@ -456,6 +457,27 @@ public abstract class ModelActor extends AbstractPersistentActor {
      * resulting state changes are to be persisted in the event journal.
      * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
      */
-    protected void completeTransaction(IncomingActorMessage source) {
+    protected void completeMessageHandling(IncomingActorMessage source, StagingArea stagingArea) {
+        if (stagingArea.needsCommitEvent()) {
+            addCommitEvent(source);
+        } else {
+            notModified(source);
+        }
+    }
+
+
+    /**
+     * This method is invoked when handling of the source message completed and
+     * resulting state changes are to be persisted in the event journal.
+     * It can be used by e.g. ModelCommands and ModelResponses to add a {@link org.cafienne.actormodel.event.ActorModified} event.
+     */
+    protected void addCommitEvent(IncomingActorMessage message) {
+    }
+
+    /**
+     * This method is invoked if th source message completed without leading to additional events.
+     * It can typically be used to send "NotModified" responses
+     */
+    protected void notModified(IncomingActorMessage source) {
     }
 }

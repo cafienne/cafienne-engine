@@ -54,7 +54,7 @@ public class CMMNElement<T extends DefinitionElement> {
         return previousDefinition;
     }
 
-    public void migrateDefinition(T newDefinition) {
+    public void migrateDefinition(T newDefinition, boolean skipLogic) {
         this.previousDefinition = this.definition;
         this.definition = newDefinition;
     }

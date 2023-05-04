@@ -20,7 +20,6 @@ package org.cafienne.humantask.actorapi.command;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -50,9 +49,8 @@ public class FillTaskDueDate extends WorkflowCommand {
 	}
 
 	@Override
-	public HumanTaskResponse process(WorkflowTask workflowTask) {
+	public void processWorkflowCommand(WorkflowTask workflowTask) {
 		workflowTask.setDueDate(dueDate);
-		return new HumanTaskResponse(this);
 	}
 
 	@Override

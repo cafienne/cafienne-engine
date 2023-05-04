@@ -47,4 +47,12 @@ public interface IncomingActorMessage extends UserMessage {
     default ModelResponse asResponse() {
         return null;
     }
+
+    /**
+     * Indication whether a response to this message is available for returning or not.
+     * Defaults to false.
+     */
+    default boolean hasResponse() {
+        return false;
+    }
 }
