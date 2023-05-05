@@ -31,7 +31,7 @@ object CaseTeamAPI {
   implicit val groupMemberReader: EntityReader[GroupFormat] = entityReader[GroupFormat]
   implicit val roleMemberReader: EntityReader[TenantRoleFormat] = entityReader[TenantRoleFormat]
 
-  case class TeamFormat(users: Array[CaseTeamUserFormat], groups: Array[GroupFormat], tenantRoles: Array[TenantRoleFormat]) {
+  case class TeamFormat(users: Seq[CaseTeamUserFormat], groups: Seq[GroupFormat], tenantRoles: Seq[TenantRoleFormat]) {
     ApiValidator.runDuplicatesDetector("Case team", "user", users.map(_.userId))
     ApiValidator.runDuplicatesDetector("Case team", "group", groups.map(_.groupId))
     ApiValidator.runDuplicatesDetector("Case team", "tenant role", tenantRoles.map(_.tenantRole))
@@ -154,10 +154,10 @@ object CaseTeamAPI {
     implicit val userReader: EntityReader[BackwardCompatibleTeamMemberFormat] = entityReader[BackwardCompatibleTeamMemberFormat]
 
     case class TeamFormat(
-                                             users: Seq[CaseTeamAPI.CaseTeamUserFormat] = Seq(),
-                                             groups: Seq[CaseTeamAPI.GroupFormat] = Seq(),
-                                             tenantRoles: Seq[CaseTeamAPI.TenantRoleFormat] = Seq(),
-                                             members: Seq[BackwardCompatibleTeamMemberFormat] = Seq()) {
+                           users: Seq[CaseTeamAPI.CaseTeamUserFormat] = Seq(),
+                           groups: Seq[CaseTeamAPI.GroupFormat] = Seq(),
+                           tenantRoles: Seq[CaseTeamAPI.TenantRoleFormat] = Seq(),
+                           members: Seq[BackwardCompatibleTeamMemberFormat] = Seq()) {
       private lazy val getUsers: Seq[CaseTeamUser] = users.map(_.asCaseTeamUser) ++ members.filter(_.isUser).map(_.asUser)
       private lazy val getGroups: Seq[CaseTeamGroup] = groups.map(_.asGroup)
       private lazy val getRoles: Seq[CaseTeamTenantRole] = tenantRoles.map(_.asTenantRole) ++ members.filterNot(_.isUser).map(_.asTenantRole)
@@ -218,7 +218,7 @@ object CaseTeamAPI {
                                              description = "Zero or more case roles assigned to the user in this case. An empty set means that the member has no roles, but is still part of the team",
                                              example = "Zero or more case roles assigned to the user in this case. An empty set means that the member has no roles, but is still part of the team",
                                              implementation = classOf[CaseTeamUserCaseRolesFormat]))
-                                           caseRoles: Array[String],
+                                           caseRoles: Seq[String],
                                          )
 
     @Schema(description = "Example case team member")
@@ -237,7 +237,7 @@ object CaseTeamAPI {
                                                    description = "Zero or more case roles assigned to users with the tenant role in this case",
                                                    example = "Zero or more case roles assigned to users with the tenant role in this case",
                                                    implementation = classOf[CaseTeamTenantRoleCaseRolesFormat]))
-                                                 caseRoles: Array[String],
+                                                 caseRoles: Seq[String],
                                                )
 
     @Schema(description = "Example case team")
@@ -246,27 +246,27 @@ object CaseTeamAPI {
                                          description = "Names of roles as defined in the case definition",
                                          example = "Names of roles as defined in the case definition",
                                          implementation = classOf[CaseDefinedRolesFormat]))
-                                       caseRoles: Array[String],
+                                       caseRoles: Seq[String],
                                        @(ArraySchema@field)(schema = new Schema(
                                          description = "Case roles that are not assigned to any of the team members",
                                          example = "Case roles that are not assigned to any of the team members",
                                          implementation = classOf[UnassignedRolesFormat]))
-                                       unassignedRoles: Array[String],
+                                       unassignedRoles: Seq[String],
                                        @(ArraySchema@field)(schema = new Schema(
                                          description = "Users in the case team",
                                          required = true,
                                          implementation = classOf[CaseTeamUserResponseFormat]))
-                                       users: Array[CaseTeamAPI.CaseTeamUserFormat],
+                                       users: Seq[CaseTeamAPI.CaseTeamUserFormat],
                                        @(ArraySchema@field)(schema = new Schema(
                                          description = "Consent groups in the case team",
                                          required = true,
                                          implementation = classOf[CaseTeamAPI.GroupFormat]))
-                                       groups: Array[CaseTeamAPI.GroupFormat],
+                                       groups: Seq[CaseTeamAPI.GroupFormat],
                                        @(ArraySchema@field)(schema = new Schema(
                                          description = "List of tenant roles that have access to the case",
                                          required = true,
                                          implementation = classOf[CaseTeamTenantRoleResponseFormat]))
-                                       tenantRoles: Array[CaseTeamAPI.TenantRoleFormat])
+                                       tenantRoles: Seq[CaseTeamAPI.TenantRoleFormat])
 
     case class CaseDefinedRolesFormat()
 
