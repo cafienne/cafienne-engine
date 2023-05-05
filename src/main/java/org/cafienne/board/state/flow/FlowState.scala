@@ -5,12 +5,15 @@ import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.CaseUserIdentity
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.board.BoardFields
+import org.cafienne.board.actorapi.command.BoardCommand
+import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.command.flow._
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowActivated, FlowCanceled, FlowInitiated}
 import org.cafienne.board.actorapi.response.FlowStartedResponse
 import org.cafienne.board.actorapi.response.runtime.FlowResponse
-import org.cafienne.board.state.{BoardState, StateElement}
 import org.cafienne.board.state.definition.BoardDefinition
+import org.cafienne.board.state.{BoardState, StateElement}
+import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition
 import org.cafienne.cmmn.actorapi.command.{CaseCommand, StartCase}
 import org.cafienne.cmmn.instance.Transition
@@ -18,9 +21,11 @@ import org.cafienne.humantask.actorapi.command.{ClaimTask, CompleteHumanTask, Sa
 import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.ValueMap
 
+import scala.concurrent.Future
+
 class FlowState(val state: BoardState, event: FlowInitiated) extends StateElement with LazyLogging {
   val flowId: String = event.flowId
-  private var activationEvent: Option[FlowActivated] = None
+    private var activationEvent: Option[FlowActivated] = None
 
   def isActive: Boolean = activationEvent.nonEmpty
   def isCompleted: Boolean = false // Can we know this?
@@ -50,7 +55,7 @@ class FlowState(val state: BoardState, event: FlowInitiated) extends StateElemen
     val caseInput = new ValueMap(BoardFields.BoardMetadata, new ValueMap(Fields.subject, event.subject, BoardDefinition.BOARD_IDENTIFIER, board.getId), BoardFields.Data, event.input)
 
     val startCase = new StartCase(board.getTenant, event.getUser.asCaseUserIdentity(), flowId, caseDefinition, caseInput, caseTeam, true)
-    val sender = command.map(_ => board.sender())
+    val sender = command.map(_.sender)
     // TODO: somehow make delegate method more generic to handle this
     board.askModel(startCase, (failure: CommandFailure) => {
       logger.warn("Failure while starting flow ", failure.exception)
@@ -61,30 +66,31 @@ class FlowState(val state: BoardState, event: FlowInitiated) extends StateElemen
     })
   }
 
-  def cancel(command: CancelFlow): Unit = {
+  private def delegate(command: BoardCommand, caseCommand: CaseCommand, event: Option[BoardFlowEvent] = None): Unit = {
+    import scala.concurrent.ExecutionContext.Implicits.global
     val sender = board.sender()
-    board.askModel(new MakeCaseTransition(command.getUser.asCaseUserIdentity(), command.flowId, Transition.Terminate), (failure: CommandFailure) => {
-      sender ! failure // TODO: wrap it in a board failure or so
-    }, (success: ModelResponse) => {
-      addEvent(new FlowCanceled(board, command.flowId))
-      sender ! new FlowResponse(command, success.lastModifiedContent())
-    })
+    askModelActor(caseCommand).map {
+      case failure: CommandFailure =>
+        sender ! failure
+      case success: ModelResponse =>
+        event.foreach(addEvent)
+        sender ! new FlowResponse(command, success.lastModifiedContent())
+    }
   }
 
-  private def delegate(command: FlowTaskCommand, commandCreator: (CaseUserIdentity, String, String) => CaseCommand, errorMsg: String): Unit = {
-    val sender = board.sender()
-    board.askModel(commandCreator(command.getUser.asCaseUserIdentity(), command.flowId, command.taskId), (failure: CommandFailure) => {
-      sender ! failure // TODO: wrap it in a board failure or so
-    }, (success: ModelResponse) => {
-      sender ! new FlowResponse(command, success.lastModifiedContent())
-    })
+  private def delegateTaskCommand(command: FlowTaskCommand, commandCreator: (CaseUserIdentity, String, String) => CaseCommand): Unit = {
+    delegate(command, commandCreator(command.getUser.asCaseUserIdentity(), command.flowId, command.taskId))
   }
 
   def handle(command: BoardFlowCommand): Unit = command match {
-    case command: ClaimFlowTask => delegate(command, (u, f, t) => new ClaimTask(u, f, t), "claim task")
-    case command: SaveFlowTaskOutput => delegate(command, (u, f, t) => new SaveTaskOutput(u, f, t, command.output()), "save task output")
-    case command: CompleteFlowTask => delegate(command, (u, f, t) => new CompleteHumanTask(u, f, t, command.output()), "complete task")
-    case command: CancelFlow => cancel(command)
+    case command: ClaimFlowTask => delegateTaskCommand(command, (u, f, t) => new ClaimTask(u, f, t))
+    case command: SaveFlowTaskOutput => delegateTaskCommand(command, (u, f, t) => new SaveTaskOutput(u, f, t, command.output()))
+    case command: CompleteFlowTask => delegateTaskCommand(command, (u, f, t) => new CompleteHumanTask(u, f, t, command.output()))
+    case command: CancelFlow => delegate(command, new MakeCaseTransition(command.getUser.asCaseUserIdentity(), command.flowId, Transition.Terminate), Some(new FlowCanceled(board, command.flowId)))
     case other => throw new InvalidCommandException(s"Cannot handle commands of type ${other.getClass.getName}")
+  }
+
+  def migrateDefinition(command: BoardDefinitionCommand): Future[ModelResponse] = {
+    askModelActor(new MigrateDefinition(command.getUser.asCaseUserIdentity(), flowId, state.definition.caseDefinition, state.team.caseTeam))
   }
 }

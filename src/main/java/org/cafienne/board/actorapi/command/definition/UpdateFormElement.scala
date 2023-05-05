@@ -1,7 +1,6 @@
 package org.cafienne.board.actorapi.command.definition
 
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent
-import org.cafienne.board.actorapi.response.BoardResponse
 import org.cafienne.board.state.definition.FormElement
 import org.cafienne.json.ValueMap
 
@@ -25,8 +24,6 @@ trait UpdateFormElement extends BoardDefinitionCommand {
       val newRole = role.getOrElse(element.getRole)
       val event = eventCreator(newTitle, newForm, newRole)
       element.addEvent(event)
-    } else {
-      setResponse(new BoardResponse(this))
     }
   }
 

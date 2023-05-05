@@ -18,11 +18,16 @@
 package org.cafienne.board;
 
 import org.cafienne.actormodel.ModelActor;
+import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.message.IncomingActorMessage;
+import org.cafienne.actormodel.response.CommandFailureListener;
+import org.cafienne.actormodel.response.CommandResponseListener;
 import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand;
 import org.cafienne.board.actorapi.event.BoardEvent;
 import org.cafienne.board.actorapi.event.BoardModified;
+import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.board.state.BoardState;
 import org.cafienne.board.state.definition.BoardDefinition;
 import org.cafienne.system.CaseSystem;
@@ -68,6 +73,22 @@ public class BoardActor extends ModelActor {
 
     @Override
     protected void addCommitEvent(IncomingActorMessage source) {
+        if (source instanceof BoardDefinitionCommand) {
+            BoardDefinitionCommand command = (BoardDefinitionCommand) source;
+            state.potentiallyUpdateFlows(command);
+        }
         addEvent(new BoardModified(this, source));
+    }
+
+    @Override
+    protected void notModified(IncomingActorMessage source) {
+        // BoardDefinitionCommands are async, except when they do not lead to state changes.
+        //  In such a situation we need to send a response directly
+        if (source instanceof BoardDefinitionCommand) {
+            BoardDefinitionCommand command = (BoardDefinitionCommand) source;
+            if (! command.hasResponse()) {
+                command.sender.tell(command.createResponse(null), self());
+            }
+        }
     }
 }

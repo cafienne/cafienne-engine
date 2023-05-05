@@ -20,8 +20,10 @@ package org.cafienne.board.actorapi.command.definition;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.BoardUser;
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.board.BoardActor;
 import org.cafienne.board.actorapi.command.BoardCommand;
+import org.cafienne.board.actorapi.response.BoardResponse;
 import org.cafienne.board.state.definition.BoardDefinition;
 
 /**
@@ -34,6 +36,11 @@ public abstract class BoardDefinitionCommand extends BoardCommand {
      */
     protected BoardDefinitionCommand(BoardUser user) {
         super(user);
+    }
+
+    @Override
+    protected boolean isAsync() {
+        return true;
     }
 
     public void validate(BoardActor board) throws InvalidCommandException {
@@ -53,4 +60,8 @@ public abstract class BoardDefinitionCommand extends BoardCommand {
     }
 
     protected abstract void processBoardDefinitionCommand(BoardDefinition definition);
+
+    public BoardResponse createResponse(ActorLastModified lastModified) {
+        return new BoardResponse(this, lastModified);
+    }
 }

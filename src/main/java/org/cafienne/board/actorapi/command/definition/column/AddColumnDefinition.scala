@@ -3,9 +3,10 @@ package org.cafienne.board.actorapi.command.definition.column
 import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.actormodel.exception.InvalidCommandException
 import org.cafienne.actormodel.identity.BoardUser
+import org.cafienne.actormodel.response.ActorLastModified
 import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.event.definition.ColumnDefinitionAdded
-import org.cafienne.board.actorapi.response.ColumnAddedResponse
+import org.cafienne.board.actorapi.response.{BoardResponse, ColumnAddedResponse}
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
@@ -24,8 +25,9 @@ case class AddColumnDefinition(val user: BoardUser, val columnId: String, val ti
       definition.upsertTeamRole(role.get)
     }
     definition.addEvent(new ColumnDefinitionAdded(definition, columnId, title, role.getOrElse(""), form.getOrElse(new ValueMap())))
-    setResponse(new ColumnAddedResponse(this, columnId))
   }
+
+  override def createResponse(lastModified: ActorLastModified): BoardResponse = new ColumnAddedResponse(this, columnId, lastModified)
 
   override def write(generator: JsonGenerator): Unit = {
     super.writeModelCommand(generator)

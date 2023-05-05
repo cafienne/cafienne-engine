@@ -3,12 +3,13 @@ package org.cafienne.board.state
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.board.BoardActor
 import org.cafienne.board.actorapi.command.CreateBoard
+import org.cafienne.board.actorapi.command.definition.BoardDefinitionCommand
 import org.cafienne.board.actorapi.command.flow.StartFlow
 import org.cafienne.board.actorapi.command.team.{BoardTeamMemberCommand, RemoveMember, SetMember}
 import org.cafienne.board.actorapi.event.definition.BoardDefinitionEvent
 import org.cafienne.board.actorapi.event.flow.{BoardFlowEvent, FlowInitiated}
 import org.cafienne.board.actorapi.event.team.{BoardManagerAdded, BoardManagerRemoved, BoardTeamEvent}
-import org.cafienne.board.actorapi.event.{BoardCreated, BoardEvent, BoardModified}
+import org.cafienne.board.actorapi.event.{BoardCreated, BoardEvent}
 import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.board.state.flow.FlowState
 import org.cafienne.board.state.team.BoardTeam
@@ -17,6 +18,8 @@ import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class BoardState(val board: BoardActor, val boardId: String, val optionalJson: Option[ValueMap] = None) extends CafienneJson with LazyLogging {
   val definition: BoardDefinition = optionalJson.fold(new BoardDefinition(this))(BoardDefinition.deserialize(this, _))
@@ -66,6 +69,20 @@ class BoardState(val board: BoardActor, val boardId: String, val optionalJson: O
     case _ => // Ignore other commands
   }
 
+  def potentiallyUpdateFlows(command: BoardDefinitionCommand): Unit = {
+    if (flows.isEmpty) {
+      command.sender.tell(command.createResponse(null), board.self)
+    } else {
+      //        System.out.println("Update case definitions of currently active flows upon " + update.getClass.getSimpleName)
+      // Now take all flows and update their definitions ...
+      Future.sequence(flows.values.map(_.migrateDefinition(command))).map(done => {
+        //          println("Updated all flows: " + done.map(_.lastModifiedContent().actorId).mkString(", "))
+        val timestamps = done.map(_.lastModifiedContent()).toList.sortBy(_.lastModified)
+        command.sender.tell(command.createResponse(timestamps.last), board.self)
+      })
+    }
+  }
+
   def updateState(event: BoardEvent): Unit = event match {
     case event: BoardDefinitionEvent => handleDefinitionUpdate(event)
     case event: BoardTeamEvent => team.updateState(event)
@@ -73,7 +90,6 @@ class BoardState(val board: BoardActor, val boardId: String, val optionalJson: O
     case event: BoardFlowEvent => flows.get(event.flowId).fold({
       logger.error(s"Could not find flow with id ${event.flowId} for event of type ${event.getClass.getName}. This means that FlowInitiated event no longer exists for this flow?!")
     })(_.updateState(event))
-    case _: BoardModified => // BoardModified extends ActorModified which updates the state of the actor
     case other => logger.warn(s"Board Definition cannot handle event of type ${other.getClass.getName}")
   }
 

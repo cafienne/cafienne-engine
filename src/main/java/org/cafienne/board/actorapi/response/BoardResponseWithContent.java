@@ -17,12 +17,17 @@
 
 package org.cafienne.board.actorapi.response;
 
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.board.actorapi.command.BoardCommand;
 import org.cafienne.json.ValueMap;
 
 public abstract class BoardResponseWithContent extends BoardResponse {
     public BoardResponseWithContent(BoardCommand command) {
         super(command);
+    }
+
+    public BoardResponseWithContent(BoardCommand command, ActorLastModified lastModified) {
+        super(command, lastModified);
     }
 
     public BoardResponseWithContent(ValueMap json) {

@@ -18,6 +18,7 @@
 package org.cafienne.board.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.board.actorapi.command.definition.column.AddColumnDefinition;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
@@ -30,8 +31,8 @@ import java.io.IOException;
 public class ColumnAddedResponse extends BoardResponseWithContent {
     public final String columnId;
 
-    public ColumnAddedResponse(AddColumnDefinition command, String columnId) {
-        super(command);
+    public ColumnAddedResponse(AddColumnDefinition command, String columnId, ActorLastModified lastModified) {
+        super(command, lastModified);
         this.columnId = columnId;
     }
 

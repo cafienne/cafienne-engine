@@ -17,6 +17,7 @@
 
 package org.cafienne.board.actorapi.response;
 
+import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.actormodel.response.BaseModelResponse;
 import org.cafienne.board.actorapi.BoardMessage;
 import org.cafienne.board.actorapi.command.BoardCommand;
@@ -26,7 +27,14 @@ import org.cafienne.json.ValueMap;
 @Manifest
 public class BoardResponse extends BaseModelResponse implements BoardMessage {
     public BoardResponse(BoardCommand command) {
+        this(command, null);
+    }
+
+    public BoardResponse(BoardCommand command, ActorLastModified lastModified) {
         super(command);
+        if (lastModified != null) {
+            setLastModified(lastModified);
+        }
     }
 
     public BoardResponse(ValueMap json) {
