@@ -31,14 +31,25 @@ import org.w3c.dom.Element;
  * multiple tasks to be handled by the same person.
  */
 public class CaseRoleDefinition extends CMMNElementDefinition {
+    private static final String emptyRoleIdentifier = "all_across_empty_role";
+    private final boolean isEmptyRole;
+
     public CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         this(element, modelDefinition, parentElement, false);
     }
 
+    private boolean isDefaultEmptyRole() {
+        // The empty role is constructed "by code" in new cases and not serialized into the original source of the case definition.
+        //  However, in the past, the role did end up in serialized case definitions, and in order to remain compatible we also scan
+        //  explicitly on (id == "all_across_empty_role").
+        return isEmptyRole || getId().equals(emptyRoleIdentifier);
+    }
+
     private CaseRoleDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement, boolean isEmptyRole) {
         super(element, modelDefinition, parentElement);
+        this.isEmptyRole = isEmptyRole;
         if (getName() == null || getName().isBlank()) {
-            if (! isEmptyRole) {
+            if (! isDefaultEmptyRole()) {
                 modelDefinition.addDefinitionError("A role element without a name was encountered. Role is not added to the case definition. XML element:\n" + XMLHelper.printXMLNode(element));
             }
         }
@@ -46,7 +57,7 @@ public class CaseRoleDefinition extends CMMNElementDefinition {
 
     static CaseRoleDefinition createEmptyDefinition(CMMNElementDefinition definitionElement) {
         Element emptyXMLRole = definitionElement.getElement().getOwnerDocument().createElement("caseRole");
-        emptyXMLRole.setAttribute("id", "all_across_empty_role");
+        emptyXMLRole.setAttribute("id", emptyRoleIdentifier);
         emptyXMLRole.setAttribute("name", "");
         emptyXMLRole.setAttribute("description", "");
         return new CaseRoleDefinition(emptyXMLRole, definitionElement.getModelDefinition(), definitionElement, true);
