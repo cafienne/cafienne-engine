@@ -22,9 +22,10 @@ import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Parsed structure of a case team, i.e. the roles defined in a case definition
@@ -51,14 +52,34 @@ public class CaseTeamDefinition extends CMMNElementDefinition {
                 parse("caseRoles", CaseRoleDefinition.class, caseRoles); // CMMN 1.0
             }
         }
-        // We add an "Empty Role", such that even if a team member has "no role", they can still become member of the team.
-        caseRoles.add(CaseRoleDefinition.createEmptyDefinition(this));
+
+        // Add an empty role if needed.
+        List<String> roleNames = caseRoles.stream().map(CaseRoleDefinition::getName).collect(Collectors.toList());
+        if (!roleNames.contains("")) {
+            // We add an "Empty Role", such that even if a team member has "no role", they can still become member of the team.
+            caseRoles.add(CaseRoleDefinition.createEmptyDefinition(this));
+        }
+
+        // Raise an error on duplicate role names
+        List<String> duplicates = roleNames.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream().filter(count -> count.getValue() > 1)
+                .map(element -> {
+                    String name = element.getKey();
+                    Long value = element.getValue();
+                    return "'" + name + "' occurs " + value + " times";
+                })
+                .collect(Collectors.toList());
+
+        if (duplicates.size() > 0) {
+            getCaseDefinition().addDefinitionError("Cannot have duplicate case role names " + duplicates);
+        }
     }
 
     /**
      * Returns the collection of roles in the case definition, see {@link CaseRoleDefinition}.
      *
-     * @return
+     * @return Returns the collection of roles in the case definition, see {@link CaseRoleDefinition}.
      */
     public Collection<CaseRoleDefinition> getCaseRoles() {
         return caseRoles;
