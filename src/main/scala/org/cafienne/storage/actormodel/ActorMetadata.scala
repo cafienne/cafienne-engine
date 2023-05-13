@@ -19,14 +19,13 @@ package org.cafienne.storage.actormodel
 
 import org.cafienne.cmmn.instance.Case
 import org.cafienne.consentgroup.ConsentGroupActor
-import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 import org.cafienne.processtask.instance.ProcessTaskActor
 import org.cafienne.storage.StorageUser
-import org.cafienne.storage.actormodel.message.StorageSerializable
 import org.cafienne.tenant.TenantActor
 
-case class ActorMetadata(user: StorageUser, actorType: String, tenant: String, actorId: String, parent: ActorMetadata = null) extends StorageSerializable with CafienneJson {
+case class ActorMetadata(user: StorageUser, actorType: String, tenant: String, actorId: String, parent: ActorMetadata = null) extends JacksonSerializable with CafienneJson {
   override def toValue: Value[_] = new ValueMap(Fields.user, user, Fields.`type`, actorType, Fields.actorId, actorId, Fields.tenant, tenant, Fields.parent, parent)
 
   def path: String = {
