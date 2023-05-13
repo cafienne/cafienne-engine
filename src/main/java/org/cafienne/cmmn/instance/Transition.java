@@ -38,7 +38,7 @@ public enum Transition {
     Suspend("suspend"),
     Terminate("terminate");
 
-    private String value;
+    private final String value;
 
     Transition(String value) {
         this.value = value;
@@ -53,5 +53,81 @@ public enum Transition {
         for (Transition transition : values())
             if (transition.getValue().equalsIgnoreCase(value)) return transition;
         return null;
+    }
+
+    public boolean isClose() {
+        return this == Close;
+    }
+
+    public boolean isComplete() {
+        return this == Complete;
+    }
+
+    public boolean isCreate() {
+        return this == Create;
+    }
+
+    public boolean isDisable() {
+        return this == Disable;
+    }
+
+    public boolean isEnable() {
+        return this == Enable;
+    }
+
+    public boolean isExit() {
+        return this == Exit;
+    }
+
+    public boolean isFault() {
+        return this == Fault;
+    }
+
+    public boolean isManualStart() {
+        return this == ManualStart;
+    }
+
+    public boolean isNone() {
+        return this == None;
+    }
+
+    public boolean isOccur() {
+        return this == Occur;
+    }
+
+    public boolean isParentResume() {
+        return this == ParentResume;
+    }
+
+    public boolean isParentSuspend() {
+        return this == ParentSuspend;
+    }
+
+    public boolean isParentTerminate() {
+        return this == ParentTerminate;
+    }
+
+    public boolean isReactivate() {
+        return this == Reactivate;
+    }
+
+    public boolean isReenable() {
+        return this == Reenable;
+    }
+
+    public boolean isResume() {
+        return this == Resume;
+    }
+
+    public boolean isStart() {
+        return this == Start;
+    }
+
+    public boolean isSuspend() {
+        return this == Suspend;
+    }
+
+    public boolean isTerminate() {
+        return this == Terminate;
     }
 }

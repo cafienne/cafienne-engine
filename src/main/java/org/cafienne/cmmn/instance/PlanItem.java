@@ -21,7 +21,9 @@ import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemDropped;
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated;
-import org.cafienne.cmmn.actorapi.event.plan.*;
+import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
+import org.cafienne.cmmn.actorapi.event.plan.RepetitionRuleEvaluated;
+import org.cafienne.cmmn.actorapi.event.plan.RequiredRuleEvaluated;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanItemDefinitionDefinition;
@@ -125,6 +127,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     void create() {
+        addDebugInfo(() -> "Connecting plan item " + this + " with id " + id + " to the sentry network");
+
         // Link ourselves to any existing sentries in the case
         getCaseInstance().getSentryNetwork().connect(this);
 
@@ -154,7 +158,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
         if (getStage().getState() != State.Active) {
             // The stage that contains us is no longer active. So we will not prepare any repeat item.
-            // This code is typically invoked if the the stage terminates or completes, causing the repeating element to terminate.
+            // This code is typically invoked if the stage terminates or completes, causing the repeating element to terminate.
             addDebugInfo(() -> this + ": not repeating because stage is not active");
             return;
         }
@@ -166,13 +170,13 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             if (getItemDefinition().isDiscretionary()) {
                 // Means we are discretionary, and adding to the plan must be done manually
                 addDebugInfo(() -> this + ": not repeating because item is discretionary and needs to be planned explicitly");
-                return;
+            } else {
+                PlanItem<?> repeatedItem = stage.repeatChild(this);
+                // Also let it Start immediately (or Occur, or Enable)
+                Transition transition = getEntryTransition();
+                addDebugInfo(() -> this + ": triggering transition " + repeatedItem + "." + transition + " within repeat (because " + msg + ")");
+                repeatedItem.makeTransition(transition);
             }
-            PlanItem<?> repeatedItem = stage.repeatChild(this);
-            // Also let it Start immediately (or Occur, or Enable)
-            Transition transition = getEntryTransition();
-            addDebugInfo(() -> this + ": triggering transition " + repeatedItem + "." + transition + " within repeat (because " + msg + ")");
-            repeatedItem.makeTransition(transition);
         } else {
             addDebugInfo(() -> this + ": not or no longer repeating");
         }
@@ -219,8 +223,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Tries to make a transition
-     *
-     * @param transition
      */
     public boolean makeTransition(Transition transition) {
         if (!hasLock(transition)) { // First check to determine whether we are allowed to make this transition.
@@ -372,15 +374,11 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         getPublisher().informEntryCriteria(event);
     }
 
-    public void runStageCompletionCheck(PlanItemTransitioned event) {
-        Transition transition = event.getTransition();
-        State newState = event.getCurrentState();
-        State oldState = event.getHistoryState();
-        addDebugInfo(() -> this + ": handling transition '" + transition.getValue() + "' from " + oldState + " to " + newState);
-
-        // Check stage completion (only done for transitions into semi terminal state)
-        if (getStage() != null && newState.isSemiTerminal()) {
-            getStage().tryCompletion(event);
+    public void informParent(PlanItemTransitioned event) {
+        Stage<?> parent = getStage();
+        if (parent != null) {
+            addDebugInfo(() -> this + ": informing parent about our transition '" + event.getTransition().getValue() + "' from " + event.getHistoryState() + " to " + event.getCurrentState());
+            parent.childTransitioned(this, event);
         }
     }
 
@@ -393,8 +391,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the id of the instance (which is the plan item id).
-     *
-     * @return
      */
     public String getId() {
         return id;
@@ -402,8 +398,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the name of the instance (which is the plan item name).
-     *
-     * @return
      */
     public String getName() {
         return getItemDefinition().getName();
@@ -411,8 +405,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns getName() + dot + getIndex() in single quotes
-     *
-     * @return
      */
     @Override
     public Path getPath() {
@@ -421,8 +413,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the repetition index of this plan item
-     *
-     * @return
      */
     public int getIndex() {
         return index;
@@ -431,8 +421,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Returns the index of this plan item if it repeats, or else the plan item of the first surrounding stage that
      * repeats, or else 0.
-     *
-     * @return
      */
     public int getRepeatIndex() {
         return getRepeatIndex("");
@@ -454,8 +442,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the plan item type, e.g. CaseTask, Stage, UserEvent, etc.
-     *
-     * @return
      */
     public PlanItemType getType() {
         return getDefinition().getItemType();
@@ -463,8 +449,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the stage to which this plan item belongs.
-     *
-     * @return
      */
     public Stage<?> getStage() {
         return stage;
@@ -509,8 +493,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Returns true if the plan item's parent is in active state.
      * Returns always true for the case plan.
-     *
-     * @return
      */
     public boolean hasActiveParent() {
         return getStage() == null || getStage().getState().isActive();
@@ -520,8 +502,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Method that can be used by MakePlanItemTransition command to determine whether this plan item
      * can go through the suggested transition.
      * Checks whether the parent stage is in Active state.
-     *
-     * @param transition
      */
     public void validateTransition(Transition transition) {
         if (!hasActiveParent()) {
@@ -571,16 +551,12 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Returns the entry transition (trigger when EntryCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Start}, and
      * Milestone overrides this by returning {@link Transition#Occur}
-     *
-     * @return
      */
     abstract protected Transition getEntryTransition();
 
     /**
      * Returns the exit transition (trigger when ExitCriterion is satisfied) for this type of plan item. Returns default {@link Transition#Exit}, and
      * CasePlan overrides this by returning {@link Transition#Terminate}
-     *
-     * @return
      */
     final Transition getExitTransition() {
         return stateMachine.exitTransition;
@@ -588,8 +564,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Transition to be made when parent stage terminates
-     *
-     * @return
      */
     final Transition getTerminationTransition() {
         return stateMachine.terminationTransition;

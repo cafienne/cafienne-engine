@@ -80,12 +80,7 @@ class StateMachine {
     }
 
     private Map<Transition, Target> getTransitions(State state) {
-        Map<Transition, Target> stateTransitions = transitions.get(state);
-        if (stateTransitions == null) {
-            stateTransitions = new HashMap<>();
-            transitions.put(state, stateTransitions);
-        }
-        return stateTransitions;
+        return transitions.computeIfAbsent(state, k -> new HashMap<>());
     }
 
     /**
@@ -117,14 +112,14 @@ class StateMachine {
         return getTarget(state).action;
     }
 
-    private class Target {
+    private static class Target {
         private final State state;
         private Action action;
 
         private Target(State targetState) {
             this.state = targetState;
             this.action = (PlanItem<?> p, Transition t) -> {
-            }; // By default an empty action.
+            }; // By default, an empty action.
         }
     }
 

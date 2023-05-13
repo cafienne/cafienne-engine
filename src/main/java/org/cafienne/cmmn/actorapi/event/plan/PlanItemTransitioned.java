@@ -83,7 +83,7 @@ public class PlanItemTransitioned extends CasePlanEvent implements StandardEvent
     @Override
     public void runDelayedBehavior() {
         if (getPlanItem().getCaseInstance().recoveryFinished()) {
-            getPlanItem().runStageCompletionCheck(this);
+            getPlanItem().informParent(this);
             getPlanItem().informConnectedExitCriteria(this);
         } else {
             // In recovery only update the connected exit criteria

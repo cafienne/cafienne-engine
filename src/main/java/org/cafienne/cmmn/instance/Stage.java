@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends TaskStage<T> {
@@ -58,6 +59,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     /**
      * Adds an item to the stage, by adding a PlanItemCreated event for it.
      * Also starts the lifecycle of the new plan item if the Stage is currently active.
+     *
      * @param discretionaryItem
      * @param planItemId
      */
@@ -69,6 +71,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
     /**
      * Repeat one of our children.
+     *
      * @param child The child to be repeated.
      * @return
      */
@@ -100,7 +103,6 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
     /**
      * Creates the child, but without triggering the lifecycle.
-     * @param itemDefinition
      */
     private void instantiateChild(PlanItemDefinition itemDefinition) {
         addChild(itemDefinition, new Guid().toString(), 0, false);
@@ -109,29 +111,40 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     /**
      * If the Stage is not Active (either because it is in state Available, or Suspended or Fault)
      * new items may have been added from either planning discretionaries or migrating the case definition.
-     * This method iterates all items in State.Null and triggers a create transition for them.
-     *  These may have been created due to case definition migration while stage was in Fault state
+     * This method iterates all items in State.Null and triggers a 'create' transition for them.
+     * These may have been created due to case definition migration while stage was in Fault state
+     *
+     * @param reason The reason why this method is invoked is printed in the debug log event
      */
-    private void createNullItems() {
-        if (planItems.size() > 0) {
-            addDebugInfo(() -> "Stage[" + getName() + "]: instantiating " + planItems.size() + " children having Null state. These are probably discretionary items that have been planned before the stage became active");
-            planItems.forEach(item -> addDebugInfo(() -> "Item["+item.getName()+"."+item.getIndex() +"] in state "+ item.getState()));
+    private void invokeCreateOnNullItems(String reason) {
+        List<PlanItem<?>> nullItems = planItems.stream().filter(item -> item.getState().isNull()).collect(Collectors.toList());
+        if (!nullItems.isEmpty()) {
+            addDebugInfo(() -> "Stage[" + getName() + "] / " + reason + ": invoking transition 'create' on " + nullItems.size() + " items:");
+            nullItems.forEach(item -> addDebugInfo(() -> " - " + item));
         }
-        planItems.stream().filter(item -> item.getState().isNull()).forEach(PlanItem::create);
+        nullItems.forEach(PlanItem::create);
+    }
+
+    private boolean hasNullItems() {
+        return planItems.stream().anyMatch(item -> item.getState().isNull());
     }
 
     @Override
     protected void startInstance() {
-        // Create the child plan items and begin their life-cycle
+        // First trigger the 'create' transition on the already planned discretionary items
+        if (hasNullItems()) {
+            invokeCreateOnNullItems("creating planned discretionary items");
+        }
+
+        // Create the default child plan items
         getDefinition().getPlanItems().forEach(this::instantiateChild);
 
-        // Now trigger the Create transition on our children
-        createNullItems();
+        // Now trigger the 'create' transition on the newly created children
+        invokeCreateOnNullItems("creating default items");
 
-        // When a Stage becomes active and it has no children, it should immediately try to complete.
+        // When a Stage becomes active, and it has no children, it should immediately try to complete.
         if (getPlanItems().isEmpty()) {
-            // note ... we fake an event for logging purposes ...
-            tryCompletion(new PlanItemTransitioned(this, State.Completed, State.Active, Transition.Complete));
+            tryCompletion();
         }
     }
 
@@ -143,13 +156,13 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     @Override
     protected void resumeInstance() {
         propagateTransition(Transition.ParentResume);
-        createNullItems();
+        invokeCreateOnNullItems("resuming stage");
     }
 
     @Override
     protected void reactivateInstance() {
         super.reactivateInstance();
-        createNullItems();
+        invokeCreateOnNullItems("reactivating stage");
     }
 
     @Override
@@ -162,18 +175,23 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         disconnectChildren(false);
     }
 
+    protected void childTransitioned(PlanItem<?> child, PlanItemTransitioned event) {
+        if (child.getState().isSemiTerminal()) {
+            // Check stage completion (only done when the child transitioned into semi terminal state)
+            // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
+            if (this.getState().isSemiTerminal()) {
+                addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
+            } else {
+                addDebugInfo(() -> "*** " + this + ": trying to complete stage because of " + event);
+                tryCompletion();
+            }
+        }
+    }
+
     /**
      * If a child item of this stage has reached semi-terminal state, then it may try to auto complete the surrounding stage.
-     *
-     * @param event
      */
-    void tryCompletion(PlanItemTransitioned event) {
-        // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
-        if (this.getState().isSemiTerminal()) {
-            addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
-            return;
-        }
-        addDebugInfo(() -> "*** " + this + ": checking completion because of " + event);
+    void tryCompletion() {
         if (this.isCompletionAllowed(false)) {
             addDebugInfo(() -> "*** " + this + ": triggering stage completion");
             makeTransition(Transition.Complete);
@@ -181,7 +199,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private boolean isCompletionAllowed(boolean isManualCompletion) {
-        /**
+        /*
          * Quote from the spec chapter 7.6.1 (cmmn 1.1: chapter 8.6.1):
          *
          * When autocomplete is true:
@@ -339,7 +357,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         if (this.getState().isAlive()) {
             // Iterate for newly added children and create them.
             newDefinition.getPlanItems().stream().filter(this::doesNotHaveChild).forEach(this::instantiateChild);
-            createNullItems();
+            invokeCreateOnNullItems("migrating stage definition");
         }
     }
 
@@ -372,7 +390,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private boolean doesNotHaveChild(PlanItemDefinition newChildDefinition) {
         boolean notHasChild = this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().getId().equals(newChildDefinition.getId()) || item.getName().equals(newChildDefinition.getName()));
         if (notHasChild) {
-            addDebugInfo(() -> this + ": migration found a new child definition " + newChildDefinition.getName() +" of type " + newChildDefinition.getType());
+            addDebugInfo(() -> this + ": migration found a new child definition " + newChildDefinition.getName() + " of type " + newChildDefinition.getType());
         }
         return notHasChild;
     }
@@ -394,7 +412,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition, boolean skipLogic) {
-        addDebugInfo(() -> this + ": migrating child " + child +" to a new definition");
+        addDebugInfo(() -> this + ": migrating child " + child + " to a new definition");
         DefinitionElement currentChildDefinition = child.getDefinition();
         PlanItemDefinitionDefinition newChildDefinition = newChildItemDefinition.getPlanItemDefinition();
         if (currentChildDefinition.getClass().isAssignableFrom(newChildDefinition.getClass())) {
