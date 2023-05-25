@@ -26,7 +26,9 @@ import org.cafienne.actormodel.response._
 import org.cafienne.cmmn.actorapi.response.{CaseNotModifiedResponse, CaseResponse}
 import org.cafienne.consentgroup.actorapi.response.{ConsentGroupCreatedResponse, ConsentGroupResponse}
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse
+import org.cafienne.querydb.query.exception.{CaseSearchFailure, ConsentGroupSearchFailure, SearchFailure, TaskSearchFailure, TenantSearchFailure}
 import org.cafienne.service.akkahttp.Headers
+import org.cafienne.storage.actormodel.ActorType
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.response.{TenantOwnersResponse, TenantResponse}
 
@@ -44,6 +46,7 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
       case Success(value) =>
         value match {
           case s: SecurityFailure => complete(StatusCodes.Unauthorized, s.exception.getMessage)
+          case i: ActorInStorage => complete(StatusCodes.NotFound, readSearchFailure(i.actorType, i.getActorId).getLocalizedMessage)
           case _: EngineChokedFailure => complete(StatusCodes.InternalServerError, "An error happened in the server; check the server logs for more information")
           case e: ActorExistsFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
           case e: CommandFailure => complete(StatusCodes.BadRequest, e.exception.getMessage)
@@ -59,6 +62,18 @@ object CommandRouteExecutor extends LastModifiedDirectives with LazyLogging {
             complete(StatusCodes.OK)
         }
       case Failure(e) => complete(StatusCodes.InternalServerError, e.getMessage)
+    }
+  }
+
+  def readSearchFailure(actorType: String, actorId: String): SearchFailure = {
+    actorType match {
+      case ActorType.Case => CaseSearchFailure(actorId)
+      case ActorType.Tenant => TenantSearchFailure(actorId)
+      case ActorType.Process => TaskSearchFailure(actorId)
+      case ActorType.Group => ConsentGroupSearchFailure(actorId)
+      case _ =>
+        logger.warn(s"Received 'ActorInStorage' response with unknown actor type $actorType on actor $actorId")
+        CaseSearchFailure(actorId)
     }
   }
 }

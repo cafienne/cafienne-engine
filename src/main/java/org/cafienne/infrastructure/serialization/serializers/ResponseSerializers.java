@@ -62,6 +62,7 @@ public class ResponseSerializers {
         CafienneSerializer.addManifestWrapper(SecurityFailure.class, SecurityFailure::new);
         CafienneSerializer.addManifestWrapper(ActorChokedFailure.class, ActorChokedFailure::new);
         CafienneSerializer.addManifestWrapper(ActorExistsFailure.class, ActorExistsFailure::new);
+        CafienneSerializer.addManifestWrapper(ActorInStorage.class, ActorInStorage::new);
         CafienneSerializer.addManifestWrapper(EngineChokedFailure.class, EngineChokedFailure::new);
     }
 
