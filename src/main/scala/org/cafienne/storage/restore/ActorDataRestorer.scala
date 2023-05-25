@@ -22,9 +22,8 @@ import akka.persistence.DeleteMessagesSuccess
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}
 import org.cafienne.storage.archival.Archive
-import org.cafienne.storage.archival.command.RestoreActorData
 import org.cafienne.storage.archive.Storage
-import org.cafienne.storage.restore.command.RestoreArchive
+import org.cafienne.storage.restore.command.{RestoreActorData, RestoreArchive}
 import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored, RestoreInitiated}
 import org.cafienne.storage.restore.response.ArchiveNotFound
 import org.cafienne.system.CaseSystem
