@@ -57,10 +57,10 @@ class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef],
     val actorId = msg.actorId;
     // If the actor is not (or no longer) in memory, We can immediately inform the sender
     actors.get(actorId).fold({
-      if (msg.needsResponse) sender() ! ActorTerminated(actorId)
+      sender() ! ActorTerminated(actorId)
     })(actor => {
       // Otherwise, store the request, stop the actor and, when the Termination is received, we will inform the requester.
-      if (msg.needsResponse) terminationRequests.put(actorId, sender())
+      terminationRequests.put(actorId, sender())
       context.stop(actor)
     })
   }

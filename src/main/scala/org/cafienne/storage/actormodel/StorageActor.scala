@@ -17,19 +17,17 @@
 
 package org.cafienne.storage.actormodel
 
-import akka.actor.ActorRef
 import akka.persistence.journal.Tagged
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
 import org.cafienne.system.CaseSystem
 
-import scala.collection.mutable
-
-trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogging {
+trait StorageActor[S <: StorageActorState]
+  extends PersistentActor
+    with StorageActorSupervisor
+    with LazyLogging {
   val caseSystem: CaseSystem
   val metadata: ActorMetadata
 
@@ -44,7 +42,7 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
   /**
     * Invoked after the StorageActor has done it's job.
     * This can be used to clean the storage job state.
-    * @param toSequenceNr
+    * @param toSequenceNr Up to which event the journal must be cleared
     */
   def clearState(toSequenceNr: Long = Long.MaxValue): Unit = {
     deleteMessages(toSequenceNr)
@@ -55,40 +53,9 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
    */
   val state: S = createState()
 
-  /**
-   * List of all children that have been instantiated to also run the handler logic.
-   */
-  val children: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
-
   def printLogMessage(msg: String): Unit = {
     Printer.print(this.metadata, msg)
   }
-
-  /**
-    * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory
-    */
-  def informCafienneGateway(actorId: String, needsResponse: Boolean = false): Unit = {
-    printLogMessage("Telling Cafienne Gateway to terminate " + actorId)
-    caseSystem.gateway.inform(new TerminateModelActor(metadata.user, actorId, needsResponse), self)
-  }
-
-  private val followups = mutable.Map[String, () => Unit]()
-
-  /**
-   * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory.
-    * Upon successful termination, the followup action will be triggered.
-   */
-  def informCafienneGateway(actorId: String, followUpAction: => Unit): Unit = {
-    followups.put(actorId, () => followUpAction)
-    informCafienneGateway(actorId, true)
-  }
-
-  /**
-    * Trigger this method when ActorTerminated is received in the StorageActor.
-    * Note: this must be explicitly invoked.
-    * @param t
-    */
-  def actorTerminated(t: ActorTerminated): Unit = followups.remove(t.actorId).foreach(action => action())
 
   /**
    * Recovery is pretty simple. Simply add all events to our state.

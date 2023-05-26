@@ -59,17 +59,7 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
   }
 
   def getChildActorRef(child: ActorMetadata): ActorRef = {
-    children.getOrElseUpdate(child.actorId, {
-      // If the child does not yet exist, create it.
-      context.watch(context.actorOf(Props(classOf[EventsPersister], caseSystem, child), child.actorId))
-    })
-  }
-
-  def childActorTerminated(t: Terminated): Unit = {
-    val actorId = t.actor.path.name
-    if (children.remove(actorId).isEmpty) {
-      logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the RestoreCoordinator. Termination message is ignored")
-    }
+    getActorRef(child, Props(classOf[EventsPersister], caseSystem, child))
   }
 
   def initiateChildRestore(archive: Archive): Unit = {
@@ -90,7 +80,7 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
     case event: ArchiveRetrieved => storeEvent(event) // Archive available, store and spread.
     case event: ChildRestored => storeEvent(event) // One of our children restored itself, we can remove it from the list.
     case _: DeleteMessagesSuccess => restoreCompleted() // Event journal no longer contains our events, we can be deleted
-    case t: Terminated => childActorTerminated(t) // One of our children left memory. That's a good sign...
+    case t: Terminated => removeActorRef(t) // One of our children left memory. That's a good sign...
     case other => logger.warn(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
   }
 }

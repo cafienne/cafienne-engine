@@ -19,7 +19,6 @@ package org.cafienne.system.router
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.util.Timeout
-import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.infrastructure.Cafienne
@@ -39,14 +38,14 @@ class CafienneGateway(caseSystem: CaseSystem) {
   private val consentGroupService = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "consent-groups")
   private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-router")
 
-  def request(message: ModelCommand): Future[Any] = {
+  def request(message: Any): Future[Any] = {
     import akka.pattern.ask
     implicit val timeout: Timeout = Cafienne.config.actor.askTimout
 
     getRouter(message).ask(message)
   }
 
-  def inform(message: ModelCommand, sender: ActorRef = Actor.noSender): Unit = {
+  def inform(message: Any, sender: ActorRef = Actor.noSender): Unit = {
     getRouter(message).tell(message, sender)
   }
 

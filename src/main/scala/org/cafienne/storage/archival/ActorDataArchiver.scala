@@ -20,7 +20,6 @@ package org.cafienne.storage.archival
 import akka.actor.{ActorRef, Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.archival.command.ArchiveActorData
@@ -63,7 +62,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
 
     // First, tell the case system to remove the actual ModelActor (e.g. a Tenant or a Case) from memory
     //  This to avoid continued behavior of that specific actor.
-    informCafienneGateway(child.actorId, {
+    terminateModelActor(child, {
       // After successful termination create a child archiver and tell it to clean up itself.
       //  Keep watching the child to make sure we know that it is terminated and we need to remove it from the
       //  collection of child references.
@@ -74,23 +73,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
   }
 
   def getChildActorRef(child: ActorMetadata): ActorRef = {
-    children.getOrElseUpdate(child.actorId, {
-      // If the child does not yet exist, create it.
-      context.watch(context.actorOf(Props(classOf[ActorDataArchiver], caseSystem, child), child.actorId))
-    })
-  }
-
-  /**
-   * System message indicating that a ActorDataArchiver has been shutdown by Akka.
-   * Typically one of our children that completed ;)
-   * Again also tell Cafienne to remove the actual ModelActor from memory
-   */
-  def childActorTerminated(t: Terminated): Unit = {
-    val actorId = t.actor.path.name
-    if (children.remove(actorId).isEmpty) {
-      logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the LocalRoutingService. Termination message is ignored")
-    }
-    informCafienneGateway(actorId)
+    getActorRef(child, Props(classOf[ActorDataArchiver], caseSystem, child))
   }
 
   def archivalCompleted(): Unit = {
@@ -190,8 +173,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
     case event: ArchiveExported => storeEvent(event)
     case event: ArchivalInitiated => // Event comes when one of the children has started archival
     case _: DeleteMessagesSuccess => archivalCompleted() // Event journal no longer contains our events
-    case t: Terminated => childActorTerminated(t) // Akka has removed us from memory
-    case t: ActorTerminated => actorTerminated(t)
+    case t: Terminated => removeActorRef(t) // Akka has removed a child from memory
     case other => printLogMessage(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
   }
 }
