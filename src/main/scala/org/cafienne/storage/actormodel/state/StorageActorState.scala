@@ -15,22 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package org.cafienne.storage.actormodel.state
 
+import akka.Done
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageEvent}
+import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
+import org.cafienne.storage.querydb.QueryDBStorage
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait StorageActorState {
   val actor: StorageActor[_]
+
+  def dbStorage: QueryDBStorage = ???
+
+  implicit def dispatcher: ExecutionContext = dbStorage.dispatcher
+
   val metadata: ActorMetadata = actor.metadata
-  val actorId: String         = metadata.actorId
+  val actorId: String = metadata.actorId
   val events: ListBuffer[ModelEvent] = ListBuffer()
   val expectedEventClass: Class[_ <: ModelEvent] = metadata.actorType match {
     case ActorType.Tenant => classOf[TenantEvent]
@@ -42,7 +50,9 @@ trait StorageActorState {
 
   def originalModelActorEvents: Seq[ModelEvent] = events.filterNot(_.isInstanceOf[StorageEvent]).toSeq
 
-  def eventsOfType[T <: ModelEvent](clazz: Class[T]): Seq[T] = events.filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[T]).toSeq
+  def eventsOfType[ME <: StorageEvent](clazz: Class[ME]): Seq[ME] = events.filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[ME]).toSeq
+
+  def getEvent[ME <: StorageEvent](clazz: Class[ME]): ME = eventsOfType(clazz).head
 
   def printLogMessage(msg: String): Unit = actor.printLogMessage(msg)
 
@@ -74,8 +84,8 @@ trait StorageActorState {
   def handleStorageEvent(event: StorageEvent): Unit
 
   /**
-   * Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
-   */
+    * Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
+    */
   def handleRecoveryCompletion(): Unit = {
     printLogMessage(s"Recovery completed with ${events.size} events")
     if (hasInitiationEvent) {
@@ -83,6 +93,11 @@ trait StorageActorState {
       continueStorageProcess()
     }
   }
+
+  /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
+    * events of this specific ModelActor.
+    */
+  def clearQueryData(): Future[Done]
 
   /**
     * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,
@@ -93,8 +108,8 @@ trait StorageActorState {
   def findCascadingChildren(): Future[Seq[ActorMetadata]]
 
   /**
-   * Check if we have recovered events of the expected type of ModelActor
-   * (to e.g. avoid deleting a case if we're expecting to delete a tenant)
-   */
+    * Check if we have recovered events of the expected type of ModelActor
+    * (to e.g. avoid deleting a case if we're expecting to delete a tenant)
+    */
   def hasExpectedEvents: Boolean = events.exists(event => expectedEventClass.isAssignableFrom(event.getClass))
 }

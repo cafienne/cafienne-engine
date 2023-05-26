@@ -17,20 +17,10 @@
 
 package org.cafienne.storage.archival.state
 
-import akka.Done
-import org.cafienne.storage.actormodel.CaseChildrenFinder
+import org.cafienne.storage.actormodel.state.CaseState
 import org.cafienne.storage.archival.ActorDataArchiver
 import org.cafienne.storage.archival.event.{CaseArchived, ModelActorArchived}
-import org.cafienne.storage.querydb.CaseStorage
 
-import scala.concurrent.Future
-
-class CaseArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with CaseChildrenFinder {
-  override val dbStorage: CaseStorage = new CaseStorage
-
-  override def archiveQueryData(): Future[Done] = {
-    dbStorage.archiveCase(metadata.actorId)
-  }
-
-  override def createModelActorEvent: ModelActorArchived = new CaseArchived(metadata)
+class CaseArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with CaseState {
+  override def createModelActorStorageEvent: ModelActorArchived = new CaseArchived(metadata)
 }

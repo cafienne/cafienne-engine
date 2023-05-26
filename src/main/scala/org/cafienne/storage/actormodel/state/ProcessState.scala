@@ -15,12 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.state
+package org.cafienne.storage.actormodel.state
 
-import org.cafienne.storage.actormodel.state.ProcessState
-import org.cafienne.storage.archival.ActorDataArchiver
-import org.cafienne.storage.archival.event.{ModelActorArchived, ProcessArchived}
+import akka.Done
+import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.querydb.ProcessStorage
 
-class ProcessArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with ProcessState {
-  override def createModelActorStorageEvent: ModelActorArchived = new ProcessArchived(metadata)
+import scala.concurrent.Future
+
+trait ProcessState extends StorageActorState {
+  override val dbStorage: ProcessStorage = new ProcessStorage
+
+  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
+
+  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
 }

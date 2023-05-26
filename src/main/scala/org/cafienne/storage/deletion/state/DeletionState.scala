@@ -17,19 +17,14 @@
 
 package org.cafienne.storage.deletion.state
 
-import akka.Done
+import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, StorageActorState}
+import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.deletion.ActorDataRemover
 import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalInitiated}
-import org.cafienne.storage.querydb.QueryDBStorage
-
-import scala.concurrent.{ExecutionContext, Future}
 
 trait DeletionState extends StorageActorState {
   override val actor: ActorDataRemover
-  def dbStorage: QueryDBStorage
-  implicit def dispatcher: ExecutionContext = dbStorage.dispatcher
 
   override def handleStorageEvent(event: StorageEvent): Unit = event match {
     case event: RemovalInitiated =>
@@ -49,11 +44,6 @@ trait DeletionState extends StorageActorState {
         s"Encountered unexpected storage event ${event.getClass.getName} on Actor [${event.actorId}] data on behalf of user ${event.user}"
       )
   }
-
-  /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
-    * events of this specific ModelActor.
-    */
-  def clearQueryData(): Future[Done]
 
   /** The removal process is idempotent (i.e., it can be triggered multiple times without ado).
     * It is typically triggered when recovery is done or after the first incoming RemoveActorData command is received.

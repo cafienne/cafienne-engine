@@ -22,6 +22,7 @@ import akka.persistence.{PersistentActor, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
+import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.system.CaseSystem
 
 trait StorageActor[S <: StorageActorState]

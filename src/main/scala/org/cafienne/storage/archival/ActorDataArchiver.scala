@@ -92,7 +92,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
 
   def afterArchiveExported(): Unit = {
     printLogMessage("Found acknowledgement that our archive has been exported")
-    storeEvent(state.createModelActorEvent)
+    storeEvent(state.createModelActorStorageEvent)
   }
 
   def afterArchiveCreated(event: ArchiveCreated): Unit = {
