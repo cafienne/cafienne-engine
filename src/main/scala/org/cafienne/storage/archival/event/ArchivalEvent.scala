@@ -15,17 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.restore.event
+package org.cafienne.storage.archival.event
 
-import org.cafienne.infrastructure.serialization.Manifest
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.message.StorageEvent
 
-@Manifest
-case class ChildRestored(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends RestoreEvent
-
-object ChildRestored {
-  def deserialize(json: ValueMap): ChildRestored = {
-    ChildRestored(ActorMetadata.deserializeMetadata(json), Some(json))
-  }
-}
+trait ArchivalEvent extends StorageEvent

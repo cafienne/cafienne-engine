@@ -15,25 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package org.cafienne.storage.archival.event.cmmn
 
-import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
+import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.archival.Archive
 
 @Manifest
-case class RootArchived(metadata: ActorMetadata, archive: Archive, override val optionalJson: Option[ValueMap] = None) extends StorageEvent {
-  override def write(generator: JsonGenerator): Unit = {
-    super.writeStorageEvent(generator)
-    writeField(generator, Fields.archive, archive)
-  }
-}
+case class ProcessArchived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ModelActorArchived
 
-object RootArchived {
-  def deserialize(json: ValueMap): RootArchived = {
-    RootArchived(ActorMetadata.deserializeMetadata(json), Archive.deserialize(json.readMap(Fields.archive)), Some(json))
-  }
+object ProcessArchived {
+  def deserialize(json: ValueMap): ProcessArchived = ProcessArchived(ActorMetadata.deserializeMetadata(json), Some(json))
 }

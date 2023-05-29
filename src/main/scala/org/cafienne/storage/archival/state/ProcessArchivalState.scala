@@ -19,7 +19,7 @@ package org.cafienne.storage.archival.state
 
 import org.cafienne.storage.actormodel.state.ProcessState
 import org.cafienne.storage.archival.ActorDataArchiver
-import org.cafienne.storage.archival.event.{ModelActorArchived, ProcessArchived}
+import org.cafienne.storage.archival.event.cmmn.{ModelActorArchived, ProcessArchived}
 
 class ProcessArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with ProcessState {
   override def createModelActorStorageEvent: ModelActorArchived = new ProcessArchived(metadata)

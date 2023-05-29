@@ -15,18 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.event
+package org.cafienne.storage.archival.event.cmmn
 
-import org.cafienne.infrastructure.serialization.Manifest
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageActionInitiated
+import org.cafienne.storage.archival.event.ArchivalEvent
 
-@Manifest
-case class RemovalInitiated(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionInitiated
+trait ModelActorArchived extends ArchivalEvent
 
-object RemovalInitiated {
-  def deserialize(json: ValueMap): RemovalInitiated = {
-    RemovalInitiated(ActorMetadata.deserializeMetadata(json), Some(json))
-  }
-}

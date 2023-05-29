@@ -20,13 +20,13 @@ package org.cafienne.storage.restore.event
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageActionInitiated
+import org.cafienne.storage.actormodel.message.StorageActionStarted
 
 @Manifest
-case class RestoreInitiated(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionInitiated
+case class RestoreStarted(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends RestoreEvent with StorageActionStarted
 
-object RestoreInitiated {
-  def deserialize(json: ValueMap): RestoreInitiated = {
-    RestoreInitiated(ActorMetadata.deserializeMetadata(json), Some(json))
+object RestoreStarted {
+  def deserialize(json: ValueMap): RestoreStarted = {
+    RestoreStarted(ActorMetadata.deserializeMetadata(json), Some(json))
   }
 }

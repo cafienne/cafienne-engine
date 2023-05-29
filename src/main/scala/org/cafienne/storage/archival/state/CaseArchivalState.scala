@@ -19,7 +19,7 @@ package org.cafienne.storage.archival.state
 
 import org.cafienne.storage.actormodel.state.CaseState
 import org.cafienne.storage.archival.ActorDataArchiver
-import org.cafienne.storage.archival.event.{CaseArchived, ModelActorArchived}
+import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ModelActorArchived}
 
 class CaseArchivalState(override val actor: ActorDataArchiver) extends ArchivalState with CaseState {
   override def createModelActorStorageEvent: ModelActorArchived = new CaseArchived(metadata)

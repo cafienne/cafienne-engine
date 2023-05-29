@@ -21,7 +21,7 @@ import akka.persistence.journal.Tagged
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
+import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageCommand, StorageEvent}
 import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.system.CaseSystem
 
@@ -84,8 +84,8 @@ trait StorageActor[S <: StorageActorState]
     * which triggers the storage process in the state.
     * @param event The initiation event to store if one is not yet available
     */
-  def triggerStorageProcess(command: StorageCommand, event: StorageActionInitiated): Unit = {
-    if (state.hasInitiationEvent) {
+  def startStorageProcess(command: StorageCommand, event: StorageActionStarted): Unit = {
+    if (state.hasStartEvent) {
       state.continueStorageProcess()
     } else {
       state.addEvent(event)

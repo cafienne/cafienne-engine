@@ -20,12 +20,13 @@ package org.cafienne.storage.restore.event
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.message.StorageActionCompleted
 
 @Manifest
-case class ChildRestored(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends RestoreEvent
+case class RestoreCompleted(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends RestoreEvent with StorageActionCompleted
 
-object ChildRestored {
-  def deserialize(json: ValueMap): ChildRestored = {
-    ChildRestored(ActorMetadata.deserializeMetadata(json), Some(json))
+object RestoreCompleted {
+  def deserialize(json: ValueMap): RestoreCompleted = {
+    RestoreCompleted(ActorMetadata.deserializeMetadata(json), Some(json))
   }
 }

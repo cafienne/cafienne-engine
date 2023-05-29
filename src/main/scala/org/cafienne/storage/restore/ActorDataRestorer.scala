@@ -25,7 +25,7 @@ import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}
 import org.cafienne.storage.archival.Archive
 import org.cafienne.storage.archive.Storage
 import org.cafienne.storage.restore.command.{RestoreActorData, RestoreArchive}
-import org.cafienne.storage.restore.event.{ArchiveRetrieved, RestoreInitiated}
+import org.cafienne.storage.restore.event.{ArchiveRetrieved, RestoreCompleted, RestoreStarted}
 import org.cafienne.storage.restore.response.ArchiveNotFound
 import org.cafienne.system.CaseSystem
 
@@ -51,7 +51,7 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
       storage.retrieve(command.metadata).onComplete {
         case Success(archive) =>
           self ! ArchiveRetrieved(command.metadata, archive)
-          senderRef ! RestoreInitiated(metadata)
+          senderRef ! RestoreStarted(metadata)
         case Failure(throwable) => raiseFailure(throwable)
       }
     } catch {
@@ -74,6 +74,7 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
 
   def afterStorageProcessCompleted(): Unit = {
     context.stop(self)
+    context.parent ! RestoreCompleted(metadata)
   }
 
   override def receiveCommand: Receive = {

@@ -25,14 +25,14 @@ import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
+import org.cafienne.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageCommand, StorageEvent}
 import org.cafienne.storage.actormodel.{ActorMetadata, StorageActorSupervisor}
 import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.archival.event.ArchivalInitiated
+import org.cafienne.storage.archival.event.ArchivalStarted
 import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.deletion.event.RemovalStarted
 import org.cafienne.storage.restore.command.RestoreActorData
-import org.cafienne.storage.restore.event.RestoreInitiated
+import org.cafienne.storage.restore.event.RestoreStarted
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
@@ -77,7 +77,7 @@ class StorageCoordinator(val caseSystem: CaseSystem)
     envelope match {
       // Trigger deletion process on actors that still have a StorageEvent (the first one is always RemovalInitiated).
       //  But only trigger it on top level removals, as they will themselves instantiate their children that have not yet been deleted.
-      case EventEnvelope(_, _, _, event: StorageActionInitiated) =>
+      case EventEnvelope(_, _, _, event: StorageActionStarted) =>
         if (event.metadata.isRoot) {
           def restart(commandMaker: ActorMetadata => StorageCommand): Unit = {
             val command = commandMaker(event.metadata)
@@ -86,9 +86,9 @@ class StorageCoordinator(val caseSystem: CaseSystem)
           }
 
           event match {
-            case _: RemovalInitiated => restart(RemoveActorData)
-            case _: ArchivalInitiated => restart(ArchiveActorData)
-            case _: RestoreInitiated => restart(RestoreActorData)
+            case _: RemovalStarted => restart(RemoveActorData)
+            case _: ArchivalStarted => restart(ArchiveActorData)
+            case _: RestoreStarted => restart(RestoreActorData)
             case other => logger.warn(s"Cannot recover a storage process, because of unrecognized initiation event of type ${other.getClass.getName}")
           }
         }
@@ -108,9 +108,9 @@ class StorageCoordinator(val caseSystem: CaseSystem)
         logger.whenDebugEnabled(logger.debug(s"Actor ${command.metadata.actorId} terminated, triggering follow up: $command"))
         getActor(command).tell(command, originalSender)
       })
-    case event: RemovalCompleted =>
+    case event: StorageActionCompleted =>
       // Nothing needs to be done, as the actor will stop itself and below we handle the resulting Termination message.
-      logger.whenDebugEnabled(logger.debug(s"Completed removal for ${event.metadata}"))
+      logger.whenDebugEnabled(logger.debug(s"Completed storage action for ${event.metadata}"))
     case t: Terminated => removeActorRef(t)
   }
 }

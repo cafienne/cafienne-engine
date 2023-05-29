@@ -15,18 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package org.cafienne.storage.archival.event.cmmn
 
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageActionInitiated
 
 @Manifest
-case class ArchivalInitiated(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionInitiated
+case class CaseArchived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ModelActorArchived
 
-object ArchivalInitiated {
-  def deserialize(json: ValueMap): ArchivalInitiated = {
-    ArchivalInitiated(ActorMetadata.deserializeMetadata(json), Some(json))
-  }
+object CaseArchived {
+  def deserialize(json: ValueMap): CaseArchived = CaseArchived(ActorMetadata.deserializeMetadata(json), Some(json))
 }
+

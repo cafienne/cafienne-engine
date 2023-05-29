@@ -23,7 +23,7 @@ import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageEvent}
+import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.querydb.QueryDBStorage
 import org.cafienne.tenant.actorapi.event.TenantEvent
@@ -68,7 +68,7 @@ trait StorageActorState extends LazyLogging {
     .headOption // Take the actor class of the bootstrap message found, or else just give a message with the event types that are found.
     .getOrElse(s"Bootstrap message is missing; found ${events.length} events of types: [${events.map(_.getClass.getName).toSet.mkString(",")}]")
 
-  def hasInitiationEvent: Boolean = events.exists(_.isInstanceOf[StorageActionInitiated])
+  def hasStartEvent: Boolean = events.exists(_.isInstanceOf[StorageActionStarted])
 
   /**
     * Continues the storage process.
@@ -93,7 +93,7 @@ trait StorageActorState extends LazyLogging {
     */
   def handleRecoveryCompletion(): Unit = {
     printLogMessage(s"Recovery completed with ${events.size} events")
-    if (hasInitiationEvent) {
+    if (hasStartEvent) {
       printLogMessage("Triggering storage process upon recovery")
       continueStorageProcess()
     }

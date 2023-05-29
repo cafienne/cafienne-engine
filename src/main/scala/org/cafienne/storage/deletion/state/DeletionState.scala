@@ -21,13 +21,13 @@ import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalStarted}
 
 trait DeletionState extends StorageActorState {
   override val actor: ActorDataRemover
 
   override def handleStorageEvent(event: StorageEvent): Unit = event match {
-    case event: RemovalInitiated =>
+    case event: RemovalStarted =>
       if (event.actorId == actorId) {
         printLogMessage(s"Starting removal for ${event.metadata}")
         continueStorageProcess()

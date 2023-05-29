@@ -23,6 +23,8 @@ import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.archival.event._
+import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
+import org.cafienne.storage.archival.response.ArchivalCompleted
 import org.cafienne.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
 
 trait ArchivalState extends StorageActorState {
@@ -30,7 +32,7 @@ trait ArchivalState extends StorageActorState {
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
     event match {
-      case event: ArchivalInitiated =>
+      case event: ArchivalStarted =>
         if (event.actorId == actorId) {
           printLogMessage(s"Starting archival for ${event.metadata}")
           continueStorageProcess()
@@ -42,6 +44,7 @@ trait ArchivalState extends StorageActorState {
       case event: ChildArchived =>
         actor.confirmChildArchived(event)
         checkArchivingDone()
+      case _: ArchivalCompleted => // One of the children is done.
       case event: ArchiveCreated => actor.afterArchiveCreated(event)
       case _: ArchiveExported => actor.afterArchiveExported()
       case _: ModelActorArchived => actor.completeStorageProcess()

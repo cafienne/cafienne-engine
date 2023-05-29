@@ -21,11 +21,10 @@ import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.archival.Archive
 
 @Manifest
-case class ChildArchived(metadata: ActorMetadata, archive: Archive, override val optionalJson: Option[ValueMap] = None) extends StorageEvent {
+case class ChildArchived(metadata: ActorMetadata, archive: Archive, override val optionalJson: Option[ValueMap] = None) extends ArchivalEvent {
   override def write(generator: JsonGenerator): Unit = {
     super.writeStorageEvent(generator)
     writeField(generator, Fields.archive, archive)

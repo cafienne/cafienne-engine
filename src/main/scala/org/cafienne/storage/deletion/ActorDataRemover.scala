@@ -23,7 +23,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalStarted}
 import org.cafienne.storage.deletion.response.RemovalRejected
 import org.cafienne.storage.deletion.state._
 import org.cafienne.system.CaseSystem
@@ -124,7 +124,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
         printLogMessage("Event count is 0")
         afterStorageProcessCompleted("because there are no events")
       } else {
-        triggerStorageProcess(command, RemovalInitiated(command.metadata))
+        startStorageProcess(command, RemovalStarted(command.metadata))
       }
     }
   }

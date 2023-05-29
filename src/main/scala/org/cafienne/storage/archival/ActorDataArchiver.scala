@@ -25,7 +25,8 @@ import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.archival.event._
-import org.cafienne.storage.archival.response.ArchivalRejected
+import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
+import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
 import org.cafienne.storage.archival.state.{ArchivalState, CaseArchivalState, ProcessArchivalState}
 import org.cafienne.storage.archive.Storage
 import org.cafienne.system.CaseSystem
@@ -79,6 +80,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
 
   def afterStorageProcessCompleted(): Unit = {
     context.stop(self)
+    context.parent ! ArchivalCompleted(metadata)
   }
 
   /**
@@ -151,7 +153,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
       } else if (state.isCreated) {
         afterArchiveCreated(state.archive)
       } else {
-        triggerStorageProcess(command, ArchivalInitiated(command.metadata))
+        startStorageProcess(command, ArchivalStarted(command.metadata))
       }
     }
   }
