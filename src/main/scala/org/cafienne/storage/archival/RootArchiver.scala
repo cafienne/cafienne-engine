@@ -28,5 +28,11 @@ class RootArchiver(caseSystem: CaseSystem, metadata: ActorMetadata) extends Root
 
   override def storageActorType: Class[_ <: Actor] = classOf[ActorDataArchiver]
 
-  override def createOffspringNode(metadata: ActorMetadata): ArchiveNode = new ArchiveNode(metadata, this)
+  override def createOffspringNode(nodeMetadata: ActorMetadata): ArchiveNode = {
+    if (nodeMetadata == metadata) {
+      new RootArchiveNode(nodeMetadata, this)
+    } else {
+      new ArchiveNode(nodeMetadata, this)
+    }
+  }
 }

@@ -20,12 +20,13 @@ package org.cafienne.storage.archival.event
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.message.StorageEvent
 
 @Manifest
-case class ArchiveExported(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ArchivalEvent
+case class ArchiveStored(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageEvent
 
-object ArchiveExported {
-  def deserialize(json: ValueMap): ArchiveExported = {
-    ArchiveExported(ActorMetadata.deserializeMetadata(json), Some(json))
+object ArchiveStored {
+  def deserialize(json: ValueMap): ArchiveStored = {
+    ArchiveStored(ActorMetadata.deserializeMetadata(json), Some(json))
   }
 }

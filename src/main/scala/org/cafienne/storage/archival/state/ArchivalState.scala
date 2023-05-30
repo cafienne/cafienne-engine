@@ -19,12 +19,11 @@ package org.cafienne.storage.archival.state
 
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.json.{ValueList, ValueMap}
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.QueryDBState
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
-import org.cafienne.storage.archival.response.ArchivalCompleted
 import org.cafienne.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
 
 trait ArchivalState extends QueryDBState {
@@ -33,20 +32,16 @@ trait ArchivalState extends QueryDBState {
   override def handleStorageEvent(event: StorageEvent): Unit = {
     event match {
       case event: ArchivalStarted =>
-        if (event.actorId == actorId) {
-          printLogMessage(s"Starting archival for ${event.metadata}")
-          continueStorageProcess()
-        }
-      case _: ChildrenArchivalInitiated => triggerChildArchivalProcess()
-      case _: QueryDataArchived =>
+        printLogMessage(s"Starting archival for ${event.metadata}")
+        continueStorageProcess()
+      case _: ChildrenReceived =>
+        printLogMessage(s"Stored children information")
+        continueStorageProcess()
+      case _: QueryDataCleared =>
         printLogMessage(s"QueryDB has been archived")
-        checkArchivingDone()
-      case event: ChildArchived =>
-        actor.confirmChildArchived(event)
-        checkArchivingDone()
-      case _: ArchivalCompleted => // One of the children is done.
+        continueStorageProcess()
       case event: ArchiveCreated => actor.afterArchiveCreated(event)
-      case _: ArchiveExported => actor.afterArchiveExported()
+      case _: ArchiveReceived => actor.afterArchiveExported()
       case _: ModelActorArchived => actor.completeStorageProcess()
       case _ => reportUnknownEvent(event)
     }
@@ -54,7 +49,7 @@ trait ArchivalState extends QueryDBState {
 
   def isCreated: Boolean = events.exists(_.isInstanceOf[ArchiveCreated])
 
-  def isExported: Boolean = events.exists(_.isInstanceOf[ArchiveExported])
+  def parentReceivedArchive: Boolean = events.exists(_.isInstanceOf[ArchiveReceived])
 
   def isCleared: Boolean = events.exists(_.isInstanceOf[ModelActorArchived])
 
@@ -70,109 +65,55 @@ trait ArchivalState extends QueryDBState {
     * It triggers both child archival and cleaning query data.
     */
   override def continueStorageProcess(): Unit = {
-    triggerChildArchivalProcess()
-    triggerQueryDBCleanupProcess()
-  }
-
-  /** Child archival process consists of 2 steps:
-    * 1. Determine what the children are, this is done by the ModelActor specific state (e.g., a Tenant needs QueryDB info,
-    * cases can do it with PlanItemCreated events).
-    * When the info is found, it is sent to self as a command, such that we can store the event from it
-    * 2. When the event with the children metadata is available, we can trigger each of those children
-    * to archive themselves. When the child is fully cleaned (including it's own children), it reports back to us.
-    */
-  def triggerChildArchivalProcess(): Unit = {
-    if (!childrenMetadataAvailable) {
-      // Use the db storage connection pool to provide threads.
-      //  The reason is that only the query db relevant futures will need to do an actual logic
-      findCascadingChildren().map { children =>
-        printLogMessage(s"Found ${children.length} children to be archived: ${children.mkString("\n--- ", s"\n--- ", "")}")
-        actor.self ! ChildrenArchivalInitiated(actor.metadata, children)
-      }
+    if (!parentReceivedChildrenInformation) {
+      printLogMessage("Initiating storage process")
+      startStorageProcess()
     } else {
-      if (pendingChildArchivals.nonEmpty) {
-        printLogMessage(s"Found ${pendingChildArchivals.size} out of ${children.size} children with pending archival")
-        pendingChildArchivals.foreach(actor.archiveChildActorData)
-      } else {
-        printLogMessage(s"No children found that have pending archival")
-        checkArchivingDone()
+      if (!queryDataCleared) {
+        printLogMessage("Archiving query data")
+        // Note: instead of removing the info from the QueryDB we could also
+        // set the state in the QueryDB to Archived. Requests to getCase could then return "Case is archived" or so.
+        //  However, then we still would also have to keep authorization information, as that is required
+        //  per individual case instance. But then ... the case would not really be archived?!
+        //  Therefore, it is up to the invoker of the archiving logic to handle such a situation.
+        clearQueryData().map(_ => actor.self ! QueryDataArchived(metadata))
       }
-    }
-  }
-
-  /** Let the ModelActor specific state clean up the QueryDB unless it is already done
-    */
-  def triggerQueryDBCleanupProcess(): Unit = {
-    if (!queryDataCleared) {
-      printLogMessage("Archiving query data")
-      clearQueryData().map(_ => actor.self ! QueryDataArchived(metadata))
     }
     checkArchivingDone()
   }
-
-  /** Determine if we have an event with the metadata of all our children
-    */
-  def childrenMetadataAvailable: Boolean = events.exists(_.isInstanceOf[ChildrenArchivalInitiated])
-
-  /** Retrieve metadata of all our children. Only makes sense if the children metadata is available...
-    */
-  def children: Seq[ActorMetadata] = eventsOfType(classOf[ChildrenArchivalInitiated]).flatMap(_.members)
-
-  /** Determine which children have not yet reported back that their data is archived
-    */
-  def pendingChildArchivals: Seq[ActorMetadata] = children.filterNot(isAlreadyArchived)
-
-  /** Returns true if there is a ArchivalCompleted event for this child metadata
-    */
-  def isAlreadyArchived(child: ActorMetadata): Boolean = eventsOfType(classOf[ChildArchived]).exists(_.metadata == child)
 
   /** Determine if all data is archived from children and also from QueryDB.
     * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
     */
   def checkArchivingDone(): Unit = {
-    printLogMessage(
-      s"Running completion check: [queryDataCleared=$queryDataCleared; childrenMetadataAvailable=$childrenMetadataAvailable; children archived=${children.size - pendingChildArchivals.size}, pending=${pendingChildArchivals.size}]"
-    )
-    if (childArchivesAvailable && queryDataCleared) {
+    printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared;]")
+    if (queryDataCleared) {
       if (!isCreated) {
         actor.createArchive()
       }
     }
   }
 
-  def childArchivesAvailable: Boolean = childrenMetadataAvailable && pendingChildArchivals.isEmpty
-
-  /**
-    * Returns the archives of our children
-    *
-    * @return
-    */
-  def childArchives: Seq[Archive] = eventsOfType(classOf[ChildArchived]).map(_.archive)
-
   def createArchiveEvent: ArchiveCreated = {
     printLogMessage(s"Starting final step to delete ourselves from event journal")
 
     // Create the archive
-    val archive = createArchive
+    def serializeEventToJson(element: (ModelEvent, Int)): ValueMap = {
+      //  Note: we're setting sequence_number of the event, starting with 1 instead of 0;
+      //  This makes it sort of compliant with how it is done by Akka in event journal. Helps relating events properly.
+      ModelEventSerializer.serializeEventToJson(element._1, element._2 + 1)
+    }
+
+    val list: ValueList = new ValueList()
+    // Convert the events to JSON.
+    originalModelActorEvents.zipWithIndex.map(serializeEventToJson).foreach(list.add)
+    val archive = Archive(metadata, list, children = Seq())
     ArchiveCreated(metadata, archive)
   }
 
   def archive: ArchiveCreated = {
     // Note: invoking this method when isCreated returns false ... throws something on None
     events.find(_.isInstanceOf[ArchiveCreated]).get.asInstanceOf[ArchiveCreated]
-  }
-
-  def createArchive: Archive = {
-    val list: ValueList = new ValueList()
-    // Convert the events to JSON.
-    originalModelActorEvents.zipWithIndex.map(serializeEventToJson).foreach(list.add)
-    Archive(metadata, list, children = childArchives)
-  }
-
-  def serializeEventToJson(element: (ModelEvent, Int)): ValueMap = {
-    //  Note: we're setting sequence_number of the event, starting with 1 instead of 0;
-    //  This makes it sort of compliant with how it is done by Akka in event journal. Helps relating events properly.
-    ModelEventSerializer.serializeEventToJson(element._1, element._2 + 1)
   }
 
   /**
