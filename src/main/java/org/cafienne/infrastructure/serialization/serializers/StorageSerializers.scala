@@ -53,8 +53,6 @@ object StorageSerializers {
     CafienneSerializer.addManifestWrapper(classOf[ArchivalStarted], ArchivalStarted.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ArchivalRequested], ArchivalRequested.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[QueryDataArchived], QueryDataArchived.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ChildrenArchivalInitiated], ChildrenArchivalInitiated.deserialize)
-    CafienneSerializer.addManifestWrapper(classOf[ChildArchived], ChildArchived.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ArchiveCreated], ArchiveCreated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ArchiveReceived], ArchiveReceived.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ArchivalCompleted], ArchivalCompleted.deserialize)
