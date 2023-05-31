@@ -19,6 +19,7 @@ package org.cafienne.storage.actormodel.state
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
+import akka.actor.ActorRef
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
@@ -28,6 +29,7 @@ import org.cafienne.tenant.actorapi.event.TenantEvent
 
 trait StorageActorState extends ModelEventCollection with LazyLogging {
   val actor: BaseStorageActor
+  val rootStorageActor: ActorRef = actor.context.parent
 
   val metadata: ActorMetadata = actor.metadata
   val actorId: String = metadata.actorId
@@ -56,6 +58,10 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
 
   def hasStartEvent: Boolean = events.exists(_.isInstanceOf[StorageActionStarted])
 
+  def storageStartedEvent: StorageActionStarted = getEvent(classOf[StorageActionStarted])
+
+  def startStorageProcess(): Unit
+
   /**
     * Continues the storage process.
     * Note, this method must be idempotent as it can be invoked multiple times.
@@ -74,14 +80,19 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
 
   def handleStorageEvent(event: StorageEvent): Unit
 
+  def informOwner(msg: Any): Unit = {
+    rootStorageActor ! msg
+  }
+
   /**
     * Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
     */
   def handleRecoveryCompletion(): Unit = {
     printLogMessage(s"Recovery completed with ${events.size} events")
     if (hasStartEvent) {
+      println(s"$metadata: Skipping continuation after recovery")
       printLogMessage("Triggering storage process upon recovery")
-      continueStorageProcess()
+//      continueStorageProcess()
     }
   }
 

@@ -21,12 +21,15 @@ import akka.actor.{Actor, ActorRef, Props, Terminated}
 import akka.persistence.journal.Tagged
 import akka.persistence.{DeleteMessagesSuccess, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
+import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.storage.actormodel.event.StorageRequestReceived
 import org.cafienne.storage.actormodel.message._
 import org.cafienne.system.CaseSystem
 
-abstract class RootStorageActor(val caseSystem: CaseSystem, val metadata: ActorMetadata) extends BaseStorageActor with ModelEventCollection with LazyLogging {
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
+abstract class RootStorageActor[O <: OffspringNode](val caseSystem: CaseSystem, val metadata: ActorMetadata) extends BaseStorageActor with LazyLogging {
   /**
     * By choosing the same persistence id, the events of the model actor will also be fed to our recovery protocol,
     * and we are able to delete those events and add our own as well, to keep track of deletion state.
@@ -40,22 +43,41 @@ abstract class RootStorageActor(val caseSystem: CaseSystem, val metadata: ActorM
     */
   def createInitialEvent: StorageRequestReceived
 
-  def storageCommand: StorageCommand
-
   /**
     * The type of actor class that must be instantiated on offspring
     */
   def storageActorType: Class[_ <: Actor]
 
-  def initialEvent: StorageRequestReceived = getEvent(classOf[StorageRequestReceived])
+  val events: ListBuffer[StorageEvent] = ListBuffer()
+  var initialEvent: StorageRequestReceived = _
 
-  private def hasRequest: Boolean = optionalEvent(classOf[StorageRequestReceived]).nonEmpty
+  val nodes: mutable.Map[String, O] = mutable.HashMap[String, O]()
+  val rootNode: O = getNode(metadata)
 
-  private def hasStarted: Boolean = optionalEvent(classOf[StorageActionStarted]).nonEmpty
+  def getParent(node: O): Option[O] = {
+    val parent = node.metadata.parent
+    if (parent != null) {
+      nodes.get(parent.actorId)
+    } else {
+      None
+    }
+  }
 
-  private def hasCompletionEvent: Boolean = optionalEvent(classOf[StorageActionCompleted]).nonEmpty
+  def getNode(metadata: ActorMetadata): O = nodes.getOrElseUpdate(metadata.actorId, createOffspringNode(metadata))
 
-  def addEvent(event: StorageEvent): Unit = events += event
+  def getChildren(parent: O): Seq[O] = nodes.values.filter(child => child.metadata.parent != null && child.metadata.parent.actorId == parent.metadata.actorId).toSeq
+
+  def createOffspringNode(metadata: ActorMetadata): O
+
+  private def hasRequest: Boolean = initialEvent != null
+
+  def addEvent(event: StorageEvent): Unit = {
+    events += event
+    event match {
+      case event: StorageRequestReceived => initialEvent = event
+      case other => getNode(event.metadata).addEvent(other)
+    }
+  }
 
   /**
     * Invoked after the StorageRequest has been fulfilled.
@@ -90,24 +112,23 @@ abstract class RootStorageActor(val caseSystem: CaseSystem, val metadata: ActorM
     })
   }
 
-  var hasTriggeredStorageActor = false
-
   def continueStorageProcess(): Unit = {
-    if (hasCompletionEvent) {
+    val incompleteNodes = nodes.values.filterNot(_.hasCompleted).toSeq
+    if (incompleteNodes.nonEmpty) {
+//      println(s"$this: found ${incompleteNodes.size} incomplete nodes out of total ${nodes.size} nodes")
+      incompleteNodes.foreach(_.continueStorageProcess())
+    } else {
+      // We've completed the storage request!
+      printLogMessage(s"Completed storage process on $rootNode")
       completeStorageProcess()
-    } else if (hasRequest) {
-      if (!hasTriggeredStorageActor) {
-        getStorageActorRef(metadata).tell(storageCommand, self)
-        hasTriggeredStorageActor = true
-      }
     }
   }
 
   def completeStorageProcess(): Unit = {
     printLogMessage(s"\n\tSTORAGE REQUEST COMPLETED ON $metadata from [$persistenceId]; next step is to clear the state")
-    //    println(s"\n\tSTORAGE REQUEST COMPLETED ON $metadata from [$persistenceId]; next step is to clear the state")
+//    println(s"\n\tSTORAGE REQUEST COMPLETED ON $metadata from [$persistenceId]; next step is to clear the state")
     clearState()
-  }
+   }
 
   /**
     * When all our events are also removed from the journal we can tell our parent we're done.

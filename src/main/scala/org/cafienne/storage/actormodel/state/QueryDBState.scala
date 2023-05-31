@@ -2,7 +2,7 @@ package org.cafienne.storage.actormodel.state
 
 import akka.Done
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.event.QueryDataCleared
+import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.querydb.QueryDBStorage
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -11,6 +11,10 @@ trait QueryDBState extends StorageActorState {
   def dbStorage: QueryDBStorage
 
   implicit def dispatcher: ExecutionContext = dbStorage.dispatcher
+
+  /** Returns true if the RootStorageActor knows about our children
+    */
+  def parentReceivedChildrenInformation: Boolean = events.exists(_.isInstanceOf[ChildrenReceived])
 
   /** Returns true if the query database has been cleaned for the ModelActor
     */

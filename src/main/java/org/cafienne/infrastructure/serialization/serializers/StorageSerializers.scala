@@ -18,6 +18,7 @@
 package org.cafienne.infrastructure.serialization.serializers
 
 import org.cafienne.infrastructure.serialization.CafienneSerializer
+import org.cafienne.storage.actormodel.event.ChildrenReceived
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
 import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
@@ -35,6 +36,7 @@ object StorageSerializers {
     registerDeletionMessages()
     registerArchivalMessages()
     registerRestoreMessages()
+    CafienneSerializer.addManifestWrapper(classOf[ChildrenReceived], ChildrenReceived.deserialize)
   }
 
   def registerDeletionMessages(): Unit = {

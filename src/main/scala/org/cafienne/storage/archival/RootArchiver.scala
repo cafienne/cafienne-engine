@@ -19,16 +19,14 @@ package org.cafienne.storage.archival
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.message.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.archival.event.ArchivalRequested
 import org.cafienne.system.CaseSystem
 
-class RootArchiver(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor(caseSystem, metadata) with LazyLogging {
+class RootArchiver(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor[ArchiveNode](caseSystem, metadata) with LazyLogging {
   override def createInitialEvent: ArchivalRequested = ArchivalRequested(metadata)
 
-  override def storageCommand: StorageCommand = ArchiveActorData(metadata)
-
   override def storageActorType: Class[_ <: Actor] = classOf[ActorDataArchiver]
+
+  override def createOffspringNode(metadata: ActorMetadata): ArchiveNode = new ArchiveNode(metadata, this)
 }

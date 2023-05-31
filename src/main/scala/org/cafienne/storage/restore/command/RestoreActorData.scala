@@ -24,5 +24,5 @@ import org.cafienne.storage.restore.RootRestorer
 case class RestoreActorData(metadata: ActorMetadata) extends StorageCommand {
   override def toString: String = s"Restore command for $metadata"
 
-  override val RootStorageActorClass: Class[_ <: RootStorageActor] = classOf[RootRestorer]
+  override val RootStorageActorClass: Class[_ <: RootStorageActor[_]] = classOf[RootRestorer]
 }

@@ -47,6 +47,10 @@ class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with 
     list.toSeq
   }
 
+  override def startStorageProcess(): Unit = {
+    // Actually never invoked
+  }
+
   override def continueStorageProcess(): Unit = {
     val archivesRestored = archives.filter(archive => eventsOfType(classOf[ChildRestored]).exists(_.metadata.actorId == archive.metadata.actorId))
     val archivesPending = archives.filterNot(archive => eventsOfType(classOf[ChildRestored]).exists(_.metadata.actorId == archive.metadata.actorId))

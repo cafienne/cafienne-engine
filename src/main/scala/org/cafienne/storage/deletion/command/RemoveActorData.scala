@@ -29,5 +29,5 @@ import org.cafienne.storage.deletion.RootRemover
 case class RemoveActorData(metadata: ActorMetadata) extends StorageCommand {
   override def toString: String = s"RemovalCommand for $metadata"
 
-  override val RootStorageActorClass: Class[_ <: RootStorageActor] = classOf[RootRemover]
+  override val RootStorageActorClass: Class[_ <: RootStorageActor[_]] = classOf[RootRemover]
 }

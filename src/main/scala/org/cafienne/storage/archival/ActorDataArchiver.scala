@@ -153,7 +153,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
       } else if (state.isCreated) {
         afterArchiveCreated(state.archive)
       } else {
-        startStorageProcess(command, ArchivalStarted(command.metadata))
+        startStorageProcess()
       }
     }
   }

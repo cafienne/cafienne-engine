@@ -19,16 +19,14 @@ package org.cafienne.storage.deletion
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.message.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.RemovalRequested
 import org.cafienne.system.CaseSystem
 
-class RootRemover(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor(caseSystem, metadata) with LazyLogging {
+class RootRemover(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor[RemoveNode](caseSystem, metadata) with LazyLogging {
   override def createInitialEvent: RemovalRequested = RemovalRequested(metadata)
 
-  override def storageCommand: StorageCommand = RemoveActorData(metadata)
-
   override def storageActorType: Class[_ <: Actor] = classOf[ActorDataRemover]
+
+  override def createOffspringNode(metadata: ActorMetadata): RemoveNode = new RemoveNode(metadata, this)
 }

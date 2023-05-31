@@ -58,6 +58,13 @@ trait ArchivalState extends QueryDBState {
 
   def isCleared: Boolean = events.exists(_.isInstanceOf[ModelActorArchived])
 
+  override def startStorageProcess(): Unit = {
+    findCascadingChildren().map { children =>
+      printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
+      informOwner(ArchivalStarted(metadata, children))
+    }
+  }
+
   /** The archival process is idempotent (i.e., it can be triggered multiple times without ado).
     * It is typically triggered when recovery is done or after the first incoming ArchiveActorData command is received.
     * It triggers both child archival and cleaning query data.

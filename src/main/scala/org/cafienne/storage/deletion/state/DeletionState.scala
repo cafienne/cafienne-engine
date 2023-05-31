@@ -18,6 +18,7 @@
 package org.cafienne.storage.deletion.state
 
 import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.event.ChildrenReceived
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.QueryDBState
 import org.cafienne.storage.deletion.ActorDataRemover
@@ -27,6 +28,9 @@ trait DeletionState extends QueryDBState {
   override val actor: ActorDataRemover
 
   override def handleStorageEvent(event: StorageEvent): Unit = event match {
+    case _: ChildrenReceived =>
+      printLogMessage(s"Stored children information")
+      continueStorageProcess()
     case event: RemovalStarted =>
       if (event.actorId == actorId) {
         printLogMessage(s"Starting removal for ${event.metadata}")
@@ -42,6 +46,21 @@ trait DeletionState extends QueryDBState {
       printLogMessage(s"Child ${event.metadata} reported completion")
       checkDeletionProcessCompletion()
     case _ => reportUnknownEvent(event)
+  }
+
+  var hasStarted: Boolean = false
+
+  override def startStorageProcess(): Unit = {
+    if (hasStarted) {
+      println(s"$metadata: Starting storage process again, but already reading children and informing owner")
+      return
+    }
+    hasStarted = true
+    // No classic event found, using new storage processing
+    findCascadingChildren().map { children =>
+      printLogMessage(s"Found ${children.length} children: ${children.mkString("\n--- ", s"\n--- ", "")}")
+      informOwner(RemovalStarted(metadata, children))
+    }
   }
 
   /** The removal process is idempotent (i.e., it can be triggered multiple times without ado).

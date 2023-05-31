@@ -24,5 +24,5 @@ import org.cafienne.storage.archival.RootArchiver
 case class ArchiveActorData(metadata: ActorMetadata) extends StorageCommand {
   override def toString: String = s"Archive command for $metadata"
 
-  override val RootStorageActorClass: Class[_ <: RootStorageActor] = classOf[RootArchiver]
+  override val RootStorageActorClass: Class[_ <: RootStorageActor[_]] = classOf[RootArchiver]
 }

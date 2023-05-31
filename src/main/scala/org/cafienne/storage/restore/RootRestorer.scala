@@ -19,16 +19,14 @@ package org.cafienne.storage.restore
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.message.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
-import org.cafienne.storage.restore.command.RestoreActorData
 import org.cafienne.storage.restore.event.RestoreRequested
 import org.cafienne.system.CaseSystem
 
-class RootRestorer(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor(caseSystem, metadata) with LazyLogging {
+class RootRestorer(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor[RestoreNode](caseSystem, metadata) with LazyLogging {
   override def createInitialEvent: RestoreRequested = new RestoreRequested(metadata)
 
-  override def storageCommand: StorageCommand = RestoreActorData(metadata)
-
   override def storageActorType: Class[_ <: Actor] = classOf[ActorDataRestorer]
+
+  override def createOffspringNode(metadata: ActorMetadata): RestoreNode = new RestoreNode(metadata, this)
 }

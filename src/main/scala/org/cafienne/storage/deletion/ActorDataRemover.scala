@@ -129,7 +129,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
         printLogMessage("Event count is 0")
         afterStorageProcessCompleted("because there are no events")
       } else {
-        startStorageProcess(command, RemovalStarted(command.metadata))
+        startStorageProcess()
       }
     }
   }
