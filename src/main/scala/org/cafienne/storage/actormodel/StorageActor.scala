@@ -17,17 +17,16 @@
 
 package org.cafienne.storage.actormodel
 
+import akka.persistence.RecoveryCompleted
 import akka.persistence.journal.Tagged
-import akka.persistence.{PersistentActor, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageCommand, StorageEvent}
-import org.cafienne.storage.actormodel.state.StorageActorState
+import org.cafienne.storage.actormodel.state.{QueryDBState, StorageActorState}
 import org.cafienne.system.CaseSystem
 
 trait StorageActor[S <: StorageActorState]
-  extends PersistentActor
-    with StorageActorSupervisor
+  extends BaseStorageActor
     with LazyLogging {
   val caseSystem: CaseSystem
   val metadata: ActorMetadata
@@ -53,14 +52,6 @@ trait StorageActor[S <: StorageActorState]
    * Every type of ModelActor that we operate on has a specific state.
    */
   val state: S = createState()
-
-  def printLogMessage(msg: String): Unit = {
-    Printer.print(this.metadata, msg)
-  }
-
-  def reportUnknownMessage(msg: Any): Unit = {
-    logger.warn(s"$metadata: Received message with unknown type. Ignoring it. Message is of type ${msg.getClass.getName}")
-  }
 
   /**
    * Recovery is pretty simple. Simply add all events to our state.
@@ -95,29 +86,4 @@ trait StorageActor[S <: StorageActorState]
   }
 }
 
-/**
- * Simplistic console printer. To be replaced with proper log infrastructure (whenDebugEnabled and such)
- */
-object Printer extends LazyLogging {
-  var previousActor: ActorMetadata = _
-
-  def out(msg: String): Unit = {
-    logger.whenDebugEnabled(logger.debug(msg))
-  }
-
-  def print(metadata: ActorMetadata, msg: String): Unit = {
-    val path = if (metadata == previousActor) "- " else {
-      val root = if (metadata.isRoot) "ROOT " else ""
-      "\n" + root + metadata.path + ":\n- "
-    }
-
-    if (msg.startsWith("\n====") || msg.startsWith("====")) {
-      out(msg)
-    } else if (msg.startsWith("\n")) {
-      out(s"\n$path${msg.substring(1)}")
-    } else {
-      out(s"$path$msg")
-    }
-    previousActor = metadata
-  }
-}
+trait QueryDBStorageActor[S <: QueryDBState] extends StorageActor[S]

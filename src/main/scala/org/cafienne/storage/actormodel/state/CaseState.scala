@@ -25,7 +25,7 @@ import org.cafienne.storage.querydb.CaseStorage
 
 import scala.concurrent.Future
 
-trait CaseState extends StorageActorState {
+trait CaseState extends QueryDBState {
   override val dbStorage: CaseStorage = new CaseStorage
 
   override def findCascadingChildren(): Future[Seq[ActorMetadata]] = {

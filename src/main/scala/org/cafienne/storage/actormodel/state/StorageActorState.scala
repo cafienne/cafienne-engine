@@ -17,26 +17,19 @@
 
 package org.cafienne.storage.actormodel.state
 
-import akka.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
 import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
-import org.cafienne.storage.querydb.QueryDBStorage
+import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.{ExecutionContext, Future}
 
 trait StorageActorState extends LazyLogging {
-  val actor: StorageActor[_]
-
-  def dbStorage: QueryDBStorage = ???
-
-  implicit def dispatcher: ExecutionContext = dbStorage.dispatcher
+  val actor: BaseStorageActor
 
   val metadata: ActorMetadata = actor.metadata
   val actorId: String = metadata.actorId
@@ -98,19 +91,6 @@ trait StorageActorState extends LazyLogging {
       continueStorageProcess()
     }
   }
-
-  /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
-    * events of this specific ModelActor.
-    */
-  def clearQueryData(): Future[Done]
-
-  /**
-    * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,
-    * and a Case can determine it based on the PlanItemCreated events it has.
-    *
-    * @return
-    */
-  def findCascadingChildren(): Future[Seq[ActorMetadata]]
 
   /**
     * Check if we have recovered events of the expected type of ModelActor

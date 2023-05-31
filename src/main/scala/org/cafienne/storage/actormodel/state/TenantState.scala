@@ -23,7 +23,7 @@ import org.cafienne.storage.querydb.TenantStorage
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait TenantState extends StorageActorState {
+trait TenantState extends QueryDBState {
   override val dbStorage: TenantStorage = new TenantStorage
 
   override def findCascadingChildren(): Future[Seq[ActorMetadata]] = {

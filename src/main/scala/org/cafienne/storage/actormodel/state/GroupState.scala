@@ -23,7 +23,7 @@ import org.cafienne.storage.querydb.ConsentGroupStorage
 
 import scala.concurrent.Future
 
-trait GroupState extends StorageActorState {
+trait GroupState extends QueryDBState {
   override val dbStorage: ConsentGroupStorage = new ConsentGroupStorage
 
   override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())

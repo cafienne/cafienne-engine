@@ -15,18 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.state
+package org.cafienne.storage.actormodel.event
 
-import akka.Done
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.querydb.ProcessStorage
+import org.cafienne.storage.actormodel.message.StorageEvent
 
-import scala.concurrent.Future
+trait QueryDataCleared extends StorageEvent
 
-trait ProcessState extends QueryDBState {
-  override val dbStorage: ProcessStorage = new ProcessStorage
-
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
-
-  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
-}

@@ -21,13 +21,13 @@ import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.json.{ValueList, ValueMap}
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.StorageActorState
+import org.cafienne.storage.actormodel.state.QueryDBState
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
 import org.cafienne.storage.archival.response.ArchivalCompleted
 import org.cafienne.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
 
-trait ArchivalState extends StorageActorState {
+trait ArchivalState extends QueryDBState {
   override val actor: ActorDataArchiver
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
@@ -96,7 +96,7 @@ trait ArchivalState extends StorageActorState {
   /** Let the ModelActor specific state clean up the QueryDB unless it is already done
     */
   def triggerQueryDBCleanupProcess(): Unit = {
-    if (!queryDataArchived) {
+    if (!queryDataCleared) {
       printLogMessage("Archiving query data")
       clearQueryData().map(_ => actor.self ! QueryDataArchived(metadata))
     }
@@ -119,18 +119,14 @@ trait ArchivalState extends StorageActorState {
     */
   def isAlreadyArchived(child: ActorMetadata): Boolean = eventsOfType(classOf[ChildArchived]).exists(_.metadata == child)
 
-  /** Returns true if the query database has been cleaned for the ModelActor
-    */
-  def queryDataArchived: Boolean = events.exists(_.isInstanceOf[QueryDataArchived])
-
   /** Determine if all data is archived from children and also from QueryDB.
     * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
     */
   def checkArchivingDone(): Unit = {
     printLogMessage(
-      s"Running completion check: [queryDataCleared=$queryDataArchived; childrenMetadataAvailable=$childrenMetadataAvailable; children archived=${children.size - pendingChildArchivals.size}, pending=${pendingChildArchivals.size}]"
+      s"Running completion check: [queryDataCleared=$queryDataCleared; childrenMetadataAvailable=$childrenMetadataAvailable; children archived=${children.size - pendingChildArchivals.size}, pending=${pendingChildArchivals.size}]"
     )
-    if (childArchivesAvailable && queryDataArchived) {
+    if (childArchivesAvailable && queryDataCleared) {
       if (!isCreated) {
         actor.createArchive()
       }

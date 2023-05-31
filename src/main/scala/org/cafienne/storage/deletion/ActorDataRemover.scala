@@ -21,14 +21,14 @@ import akka.actor.{Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
+import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalStarted}
 import org.cafienne.storage.deletion.response.RemovalRejected
 import org.cafienne.storage.deletion.state._
 import org.cafienne.system.CaseSystem
 
-class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) extends StorageActor[DeletionState] with LazyLogging {
+class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) extends QueryDBStorageActor[DeletionState] with LazyLogging {
   printLogMessage(s"\n========== Launching Storage Deletion Service ${metadata.path}")
 
   /**

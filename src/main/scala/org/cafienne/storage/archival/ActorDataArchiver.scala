@@ -22,7 +22,7 @@ import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
+import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.ModelActorArchived
@@ -33,7 +33,7 @@ import org.cafienne.system.CaseSystem
 
 import scala.concurrent.ExecutionContext
 
-class ActorDataArchiver(override val caseSystem: CaseSystem, override val metadata: ActorMetadata) extends StorageActor[ArchivalState] with LazyLogging {
+class ActorDataArchiver(override val caseSystem: CaseSystem, override val metadata: ActorMetadata) extends QueryDBStorageActor[ArchivalState] with LazyLogging {
 
   printLogMessage(s"\n========== Launching Storage Archival Service ${metadata.path}")
 

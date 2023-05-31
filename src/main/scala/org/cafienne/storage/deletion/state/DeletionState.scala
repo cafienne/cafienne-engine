@@ -19,11 +19,11 @@ package org.cafienne.storage.deletion.state
 
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.actormodel.state.StorageActorState
+import org.cafienne.storage.actormodel.state.QueryDBState
 import org.cafienne.storage.deletion.ActorDataRemover
 import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalStarted}
 
-trait DeletionState extends StorageActorState {
+trait DeletionState extends QueryDBState {
   override val actor: ActorDataRemover
 
   override def handleStorageEvent(event: StorageEvent): Unit = event match {
@@ -106,10 +106,6 @@ trait DeletionState extends StorageActorState {
     */
   def isAlreadyDeleted(child: ActorMetadata): Boolean =
     events.filter(_.isInstanceOf[RemovalCompleted]).map(_.asInstanceOf[RemovalCompleted]).exists(_.metadata == child)
-
-  /** Returns true if the query database has been cleaned for the ModelActor
-    */
-  def queryDataCleared: Boolean = events.exists(_.isInstanceOf[QueryDataRemoved])
 
   /** Determine if all data is removed from children and also from QueryDB.
     * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process

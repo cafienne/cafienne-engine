@@ -17,16 +17,13 @@
 
 package org.cafienne.storage.restore
 
-import akka.Done
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.archival.Archive
 import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored}
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
 
 class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with LazyLogging {
 
@@ -37,10 +34,6 @@ class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with 
       case _ => reportUnknownEvent(event)
     }
   }
-
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
-
-  override def clearQueryData(): Future[Done] = Future.successful(Done)
 
   def hasArchive: Boolean = events.exists(_.isInstanceOf[ArchiveRetrieved])
   lazy val archive: Archive = eventsOfType(classOf[ArchiveRetrieved]).head.archive
