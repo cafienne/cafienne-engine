@@ -204,7 +204,7 @@ public abstract class Value<T> implements Serializable {
             map.foreach(entry -> valueMap.put(String.valueOf(entry._1()), convert(entry._2())));
             return valueMap;
         } else if (object instanceof scala.Option) {
-            scala.Option option = (scala.Option) object;
+            scala.Option<?> option = (scala.Option<?>) object;
             if (option.isEmpty()) {
                 return Value.NULL;
             } else {
