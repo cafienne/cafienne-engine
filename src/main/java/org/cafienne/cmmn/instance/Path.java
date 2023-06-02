@@ -474,7 +474,7 @@ public class Path implements Serializable {
      * @return
      * @throws InvalidPathException
      */
-    private static String[] convertRawPath(String rawPath, boolean trim) throws InvalidPathException {
+    public static String[] convertRawPath(String rawPath, boolean trim) throws InvalidPathException {
         if (rawPath == null) {
             throw new InvalidPathException("Missing path parameter");
         }

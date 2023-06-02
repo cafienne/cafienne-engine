@@ -21,10 +21,13 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
 import org.cafienne.json.ValueMap
 
-case class StorageUser(id: String) extends UserIdentity with JacksonSerializable
+case class StorageUser(id: String, tenant: String) extends UserIdentity with JacksonSerializable
 
 object StorageUser {
-  def deserialize(json: ValueMap): StorageUser = {
-    StorageUser(json.readString(Fields.userId))
+  /**
+    * Deserialize the user from the "modelEvent" : { ... } json structure
+    */
+  def deserialize(modelEventJson: ValueMap): StorageUser = {
+    StorageUser(modelEventJson.readMap(Fields.user).readString(Fields.userId), modelEventJson.readString(Fields.tenant))
   }
 }

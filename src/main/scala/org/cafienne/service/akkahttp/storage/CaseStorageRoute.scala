@@ -68,7 +68,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
           onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
             case Success(tenantUser) =>
               if (tenantUser.enabled && tenantUser.isOwner) {
-                initiateDataArchival(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = tenant, actorId = caseInstanceId))
+                initiateDataArchival(ActorMetadata(user = StorageUser(user.id, tenant), actorType = ActorType.Case, actorId = caseInstanceId))
               } else {
                 complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
               }
@@ -104,7 +104,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   def restoreCaseInstance: Route = put {
     caseUser { user =>
       path("case" / Segment / "restore") { caseInstanceId =>
-        restoreActorData(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = "tenant", actorId = caseInstanceId))
+        restoreActorData(ActorMetadata(user = StorageUser(user.id, ""), actorType = ActorType.Case, actorId = caseInstanceId))
       }
     }
   }
@@ -138,7 +138,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
           onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
             case Success(tenantUser) =>
               if (tenantUser.enabled && tenantUser.isOwner) {
-                initiateDataRemoval(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Case, tenant = tenant, actorId = caseInstanceId))
+                initiateDataRemoval(ActorMetadata(user = StorageUser(user.id, tenant), actorType = ActorType.Case, actorId = caseInstanceId))
               } else {
                 complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
               }
