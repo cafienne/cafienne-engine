@@ -17,36 +17,34 @@
 
 package org.cafienne.storage.deletion.state
 
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.event.ChildrenReceived
+import akka.Done
+import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.QueryDBState
 import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalStarted}
+import org.cafienne.storage.deletion.event.{QueryDataRemoved, RemovalStarted}
+
+import scala.concurrent.Future
 
 trait DeletionState extends QueryDBState {
   override val actor: ActorDataRemover
 
-  override def handleStorageEvent(event: StorageEvent): Unit = event match {
-    case _: ChildrenReceived =>
-      printLogMessage(s"Stored children information")
-      continueStorageProcess()
-    case event: RemovalStarted =>
-      if (event.actorId == actorId) {
-        printLogMessage(s"Starting removal for ${event.metadata}")
+  override def handleStorageEvent(event: StorageEvent): Unit = {
+    event match {
+      case _: ChildrenReceived =>
+        printLogMessage(s"Stored children information")
         continueStorageProcess()
-      }
-    case event: ChildrenRemovalInitiated =>
-      printLogMessage(s"Initiating deletion of ${event.members.size} children")
-      triggerChildRemovalProcess()
-    case event: QueryDataRemoved =>
-      printLogMessage(s"QueryDB has been cleaned")
-      checkDeletionProcessCompletion()
-    case event: RemovalCompleted =>
-      printLogMessage(s"Child ${event.metadata} reported completion")
-      checkDeletionProcessCompletion()
-    case _ => reportUnknownEvent(event)
+      case _: QueryDataCleared =>
+        printLogMessage(s"QueryDB has been cleaned")
+        continueStorageProcess()
+      case _ => reportUnknownEvent(event)
+    }
   }
+
+  /** ModelActor specific implementation to clean up the data generated into the QueryDB based on the
+    * events of this specific ModelActor.
+    */
+  def clearQueryData(): Future[Done]
 
   var hasStarted: Boolean = false
 
@@ -68,71 +66,23 @@ trait DeletionState extends QueryDBState {
     * It triggers both child removal and cleaning query data.
     */
   override def continueStorageProcess(): Unit = {
-    triggerChildRemovalProcess()
-    triggerQueryDBCleanupProcess()
-  }
-
-  /** Child removal process consists of 2 steps:
-    * 1. Determine what the children are, this is done by the ModelActor specific state (e.g., a Tenant needs QueryDB info,
-    * cases can do it with PlanItemCreated events).
-    * When the info is found, it is sent to self as a command, such that we can store the event from it
-    * 2. When the event with the children metadata is available, we can trigger each of those children
-    * to delete themselves. When the child is fully cleaned (including it's own children), it reports back to us.
-    */
-  def triggerChildRemovalProcess(): Unit = {
-    if (!childrenMetadataAvailable) {
-      // Use the db storage connection pool to provide threads.
-      //  The reason is that only the query db relevant futures will need to do an actual logic
-      findCascadingChildren().map { children =>
-        printLogMessage(s"Found ${children.length} children to be removed: ${children.mkString("\n--- ", s"\n--- ", "")}")
-        actor.self ! ChildrenRemovalInitiated(actor.metadata, children)
-      }
+    if (!parentReceivedChildrenInformation) {
+      printLogMessage("Triggering storage process, because parent has not replied that children are received")
+      startStorageProcess()
     } else {
-      if (pendingChildRemovals.nonEmpty) {
-        printLogMessage(s"Found ${pendingChildRemovals.size} out of ${children.size} children with pending removal")
-        pendingChildRemovals.foreach(actor.deleteChildActorData)
-      } else {
-        printLogMessage(s"No children found that have pending removal")
+      if (!queryDataCleared) {
+        printLogMessage("Deleting query data")
+        clearQueryData().map(_ => actor.self ! QueryDataRemoved(metadata))
+      } else { // Children found and query data cleared
+        if (completing) {
+          println(s"$metadata: Already completing upon ${events.last.getClass.getSimpleName}")
+          return
+        }
+        completing = true
+        actor.completeStorageProcess()
       }
-      checkDeletionProcessCompletion()
     }
   }
 
-  /** Let the ModelActor specific state clean up the QueryDB unless it is already done
-    */
-  def triggerQueryDBCleanupProcess(): Unit = {
-    if (!queryDataCleared) {
-      printLogMessage("Deleting query data")
-      clearQueryData().map(_ => actor.self ! QueryDataRemoved(metadata))
-    }
-    checkDeletionProcessCompletion()
-  }
-
-  /** Determine if we have an event with the metadata of all our children
-    */
-  def childrenMetadataAvailable: Boolean = events.exists(_.isInstanceOf[ChildrenRemovalInitiated])
-
-  /** Retrieve metadata of all our children. Only makes sense if the children metadata is available...
-    */
-  def children: Seq[ActorMetadata] =
-    events.filter(_.isInstanceOf[ChildrenRemovalInitiated]).map(_.asInstanceOf[ChildrenRemovalInitiated]).flatMap(_.members).toSeq
-
-  /** Determine which children have not yet reported back that their data is removed
-    */
-  def pendingChildRemovals: Seq[ActorMetadata] = children.filterNot(isAlreadyDeleted)
-
-  /** Returns true if there is a ChildRemovalCompleted event for this child metadata
-    */
-  def isAlreadyDeleted(child: ActorMetadata): Boolean =
-    events.filter(_.isInstanceOf[RemovalCompleted]).map(_.asInstanceOf[RemovalCompleted]).exists(_.metadata == child)
-
-  /** Determine if all data is removed from children and also from QueryDB.
-    * If so, then invoke the final deletion of all actor events, including the StorageEvents that have been created during the deletion process
-    */
-  def checkDeletionProcessCompletion(): Unit = {
-    printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared; childrenMetadataAvailable=$childrenMetadataAvailable; children removed=${children.size - pendingChildRemovals.size}, pending=${pendingChildRemovals.size}]")
-    if (childrenMetadataAvailable && pendingChildRemovals.isEmpty && queryDataCleared) {
-      actor.completeStorageProcess()
-    }
-  }
+  private var completing: Boolean = false
 }
