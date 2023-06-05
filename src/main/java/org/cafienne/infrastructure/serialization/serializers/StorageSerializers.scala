@@ -21,10 +21,10 @@ import org.cafienne.infrastructure.serialization.CafienneSerializer
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.event.cmmn.{CaseArchived, ProcessArchived}
 import org.cafienne.storage.archival.response.{ArchivalCompleted, ArchivalRejected}
-import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalStarted}
+import org.cafienne.storage.deletion.event._
 import org.cafienne.storage.deletion.response.RemovalRejected
 import org.cafienne.storage.restore.command.RestoreArchive
-import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored, RestoreCompleted, RestoreStarted}
+import org.cafienne.storage.restore.event._
 
 object StorageSerializers {
   def register(): Unit = {
@@ -39,6 +39,7 @@ object StorageSerializers {
 
   def registerDeletionMessages(): Unit = {
     CafienneSerializer.addManifestWrapper(classOf[RemovalStarted], RemovalStarted.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[RemovalRequested], RemovalRequested.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[QueryDataRemoved], QueryDataRemoved.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildrenRemovalInitiated], ChildrenRemovalInitiated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RemovalCompleted], RemovalCompleted.deserialize)
@@ -48,6 +49,7 @@ object StorageSerializers {
   def registerArchivalMessages(): Unit = {
     // Archival process related events
     CafienneSerializer.addManifestWrapper(classOf[ArchivalStarted], ArchivalStarted.deserialize)
+    CafienneSerializer.addManifestWrapper(classOf[ArchivalRequested], ArchivalRequested.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[QueryDataArchived], QueryDataArchived.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildrenArchivalInitiated], ChildrenArchivalInitiated.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ChildArchived], ChildArchived.deserialize)
@@ -62,6 +64,7 @@ object StorageSerializers {
   }
 
   def registerRestoreMessages(): Unit = {
+    CafienneSerializer.addManifestWrapper(classOf[RestoreRequested], RestoreRequested.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RestoreArchive], RestoreArchive.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[RestoreStarted], RestoreStarted.deserialize)
     CafienneSerializer.addManifestWrapper(classOf[ArchiveRetrieved], ArchiveRetrieved.deserialize)

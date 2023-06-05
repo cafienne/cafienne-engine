@@ -27,7 +27,8 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.storage.StorageCoordinator
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageActionRejected, StorageCommand, StorageFailure}
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
+import org.cafienne.storage.actormodel.message.{StorageActionRejected, StorageActionStarted, StorageCommand, StorageFailure}
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.RemovalCompleted
@@ -72,6 +73,8 @@ object StorageRoute extends LazyLogging {
     onComplete(storageCoordinator.ask(command)) {
       case Success(value) =>
         value match {
+          case _: StorageRequestReceived =>
+            complete(StatusCodes.Accepted)
           case _: StorageActionStarted =>
             complete(StatusCodes.Accepted)
           case rejection: StorageActionRejected =>

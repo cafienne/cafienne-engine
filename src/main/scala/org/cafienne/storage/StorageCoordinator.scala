@@ -25,6 +25,7 @@ import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
 import org.cafienne.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageCommand, StorageEvent}
 import org.cafienne.storage.actormodel.{ActorMetadata, StorageActorSupervisor}
 import org.cafienne.storage.archival.command.ArchiveActorData
@@ -55,7 +56,7 @@ class StorageCoordinator(val caseSystem: CaseSystem)
     start()
   }
 
-  private def getActor(command: StorageCommand): ActorRef = getActorRef(command.metadata, Props(command.actorClass, caseSystem, command.metadata))
+  private def getActor(command: StorageCommand): ActorRef = getActorRef(s"root_${command.metadata.actorId}", Props(command.RootStorageActorClass, caseSystem, command.metadata))
 
   def start(): Unit = {
     runStream() onComplete {
@@ -108,9 +109,12 @@ class StorageCoordinator(val caseSystem: CaseSystem)
         logger.whenDebugEnabled(logger.debug(s"Actor ${command.metadata.actorId} terminated, triggering follow up: $command"))
         getActor(command).tell(command, originalSender)
       })
+    case event: StorageRequestReceived =>
+      logger.whenDebugEnabled(logger.debug(s"Started storage request on ${event.metadata}"))
     case event: StorageActionCompleted =>
       // Nothing needs to be done, as the actor will stop itself and below we handle the resulting Termination message.
       logger.whenDebugEnabled(logger.debug(s"Completed storage action for ${event.metadata}"))
     case t: Terminated => removeActorRef(t)
+    case other => logger.warn(s"StorageCoordinator received an unknown message of type ${other.getClass.getName}")
   }
 }

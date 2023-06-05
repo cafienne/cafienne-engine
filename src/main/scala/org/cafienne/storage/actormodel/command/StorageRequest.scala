@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.storage.actormodel.command
 
 import org.cafienne.infrastructure.serialization.JacksonSerializable
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.storage.actormodel.ActorMetadata
 
-trait StorageCommand extends JacksonSerializable {
+trait StorageRequest extends JacksonSerializable {
   val metadata: ActorMetadata
-  val RootStorageActorClass: Class[_ <: RootStorageActor]
+  override def toString: String = s"${getClass.getSimpleName} for $metadata"
 }

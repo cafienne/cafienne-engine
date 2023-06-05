@@ -15,12 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.storage.restore.event
 
-import org.cafienne.infrastructure.serialization.JacksonSerializable
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.infrastructure.serialization.Manifest
+import org.cafienne.json.ValueMap
+import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
 
-trait StorageCommand extends JacksonSerializable {
-  val metadata: ActorMetadata
-  val RootStorageActorClass: Class[_ <: RootStorageActor]
+@Manifest
+case class RestoreRequested(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageRequestReceived
+
+object RestoreRequested {
+  def deserialize(json: ValueMap): RestoreRequested = {
+    RestoreRequested(ActorMetadata.deserializeMetadata(json), Some(json))
+  }
 }

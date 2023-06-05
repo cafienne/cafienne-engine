@@ -15,12 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.storage.deletion
 
-import org.cafienne.infrastructure.serialization.JacksonSerializable
+import akka.actor.Actor
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.storage.actormodel.message.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.storage.deletion.command.RemoveActorData
+import org.cafienne.storage.deletion.event.RemovalRequested
+import org.cafienne.system.CaseSystem
 
-trait StorageCommand extends JacksonSerializable {
-  val metadata: ActorMetadata
-  val RootStorageActorClass: Class[_ <: RootStorageActor]
+class RootRemover(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor(caseSystem, metadata) with LazyLogging {
+  override def createInitialEvent: RemovalRequested = RemovalRequested(metadata)
+
+  override def storageCommand: StorageCommand = RemoveActorData(metadata)
+
+  override def storageActorType: Class[_ <: Actor] = classOf[ActorDataRemover]
 }

@@ -59,6 +59,11 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
   def deleteChildActorData(child: ActorMetadata): Unit = {
     printLogMessage(s"Initiating deletion for child actor $child")
 
+    if (child.actorId == null) {
+      println(s"$metadata: Cannot delete child actor data for empty child actor?!")
+      return
+    }
+
     // First, tell the case system to remove the actual ModelActor (e.g. a Tenant or a Case) from memory
     //  This to avoid continued behavior of that specific actor.
     terminateModelActor(child, {

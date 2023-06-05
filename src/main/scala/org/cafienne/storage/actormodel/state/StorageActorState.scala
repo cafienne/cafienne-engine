@@ -18,7 +18,7 @@
 package org.cafienne.storage.actormodel.state
 
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.event.ModelEvent
+import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
@@ -26,14 +26,11 @@ import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEve
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
-import scala.collection.mutable.ListBuffer
-
-trait StorageActorState extends LazyLogging {
+trait StorageActorState extends ModelEventCollection with LazyLogging {
   val actor: BaseStorageActor
 
   val metadata: ActorMetadata = actor.metadata
   val actorId: String = metadata.actorId
-  val events: ListBuffer[ModelEvent] = ListBuffer()
   val expectedEventClass: Class[_ <: ModelEvent] = metadata.actorType match {
     case ActorType.Tenant => classOf[TenantEvent]
     case ActorType.Case => classOf[CaseEvent]
@@ -43,10 +40,6 @@ trait StorageActorState extends LazyLogging {
   }
 
   def originalModelActorEvents: Seq[ModelEvent] = events.filterNot(_.isInstanceOf[StorageEvent]).toSeq
-
-  def eventsOfType[ME <: StorageEvent](clazz: Class[ME]): Seq[ME] = events.filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[ME]).toSeq
-
-  def getEvent[ME <: StorageEvent](clazz: Class[ME]): ME = eventsOfType(clazz).head
 
   def printLogMessage(msg: String): Unit = actor.printLogMessage(msg)
 

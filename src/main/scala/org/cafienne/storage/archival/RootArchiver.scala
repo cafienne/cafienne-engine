@@ -15,12 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.storage.archival
 
-import org.cafienne.infrastructure.serialization.JacksonSerializable
+import akka.actor.Actor
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.storage.actormodel.message.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.storage.archival.command.ArchiveActorData
+import org.cafienne.storage.archival.event.ArchivalRequested
+import org.cafienne.system.CaseSystem
 
-trait StorageCommand extends JacksonSerializable {
-  val metadata: ActorMetadata
-  val RootStorageActorClass: Class[_ <: RootStorageActor]
+class RootArchiver(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor(caseSystem, metadata) with LazyLogging {
+  override def createInitialEvent: ArchivalRequested = ArchivalRequested(metadata)
+
+  override def storageCommand: StorageCommand = ArchiveActorData(metadata)
+
+  override def storageActorType: Class[_ <: Actor] = classOf[ActorDataArchiver]
 }

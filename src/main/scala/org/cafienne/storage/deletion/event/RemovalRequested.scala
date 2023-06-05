@@ -15,12 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.storage.deletion.event
 
-import org.cafienne.infrastructure.serialization.JacksonSerializable
-import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.infrastructure.serialization.Manifest
+import org.cafienne.json.ValueMap
+import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
 
-trait StorageCommand extends JacksonSerializable {
-  val metadata: ActorMetadata
-  val RootStorageActorClass: Class[_ <: RootStorageActor]
+@Manifest
+case class RemovalRequested(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageRequestReceived
+
+object RemovalRequested {
+  def deserialize(json: ValueMap): RemovalRequested = {
+    RemovalRequested(ActorMetadata.deserializeMetadata(json), Some(json))
+  }
 }
