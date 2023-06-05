@@ -34,8 +34,7 @@ class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with 
     event match {
       case _: ArchiveRetrieved => continueStorageProcess()
       case _: ChildRestored => continueStorageProcess()
-      case event =>
-        logger.error(s"Cannot handle event of type ${event.getClass.getName} in ${actor.getClass.getSimpleName}[${event.actorId}]")
+      case _ => reportUnknownEvent(event)
     }
   }
 
@@ -64,7 +63,7 @@ class RestoreState(val actor: ActorDataRestorer) extends StorageActorState with 
     })
     if (archivesToRestore.isEmpty) {
       // We're done!!!
-      actor.completeRestoreProcess()
+      actor.completeStorageProcess()
     } else {
       printLogMessage(s"Restoring ${archivesToRestore.size} children that have no pending parent")
       archivesToRestore.foreach(actor.initiateChildRestore)

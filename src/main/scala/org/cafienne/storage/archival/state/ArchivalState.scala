@@ -17,7 +17,6 @@
 
 package org.cafienne.storage.archival.state
 
-import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.json.{ValueList, ValueMap}
 import org.cafienne.storage.actormodel.ActorMetadata
@@ -26,14 +25,16 @@ import org.cafienne.storage.actormodel.state.StorageActorState
 import org.cafienne.storage.archival.event._
 import org.cafienne.storage.archival.{ActorDataArchiver, Archive, ModelEventSerializer}
 
-trait ArchivalState extends StorageActorState with LazyLogging {
+trait ArchivalState extends StorageActorState {
   override val actor: ActorDataArchiver
 
   override def handleStorageEvent(event: StorageEvent): Unit = {
     event match {
       case event: ArchivalInitiated =>
-        printLogMessage(s"Starting archival for ${event.metadata}")
-        continueStorageProcess()
+        if (event.actorId == actorId) {
+          printLogMessage(s"Starting archival for ${event.metadata}")
+          continueStorageProcess()
+        }
       case _: ChildrenArchivalInitiated => triggerChildArchivalProcess()
       case _: QueryDataArchived =>
         printLogMessage(s"QueryDB has been archived")
@@ -43,9 +44,8 @@ trait ArchivalState extends StorageActorState with LazyLogging {
         checkArchivingDone()
       case event: ArchiveCreated => actor.afterArchiveCreated(event)
       case _: ArchiveExported => actor.afterArchiveExported()
-      case _: ModelActorArchived => actor.afterModelActorEventStored()
-      case event =>
-        logger.error(s"Cannot handle event of type ${event.getClass.getName} in ${actor.getClass.getSimpleName}[${event.actorId}]")
+      case _: ModelActorArchived => actor.completeStorageProcess()
+      case _ => reportUnknownEvent(event)
     }
   }
 

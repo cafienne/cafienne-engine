@@ -28,8 +28,10 @@ trait DeletionState extends StorageActorState {
 
   override def handleStorageEvent(event: StorageEvent): Unit = event match {
     case event: RemovalInitiated =>
-      printLogMessage(s"Starting removal for ${event.metadata}")
-      continueStorageProcess()
+      if (event.actorId == actorId) {
+        printLogMessage(s"Starting removal for ${event.metadata}")
+        continueStorageProcess()
+      }
     case event: ChildrenRemovalInitiated =>
       printLogMessage(s"Initiating deletion of ${event.members.size} children")
       triggerChildRemovalProcess()
@@ -39,10 +41,7 @@ trait DeletionState extends StorageActorState {
     case event: RemovalCompleted =>
       printLogMessage(s"Child ${event.metadata} reported completion")
       checkDeletionProcessCompletion()
-    case event =>
-      printLogMessage(
-        s"Encountered unexpected storage event ${event.getClass.getName} on Actor [${event.actorId}] data on behalf of user ${event.user}"
-      )
+    case _ => reportUnknownEvent(event)
   }
 
   /** The removal process is idempotent (i.e., it can be triggered multiple times without ado).
@@ -118,7 +117,7 @@ trait DeletionState extends StorageActorState {
   def checkDeletionProcessCompletion(): Unit = {
     printLogMessage(s"Running completion check: [queryDataCleared=$queryDataCleared; childrenMetadataAvailable=$childrenMetadataAvailable; children removed=${children.size - pendingChildRemovals.size}, pending=${pendingChildRemovals.size}]")
     if (childrenMetadataAvailable && pendingChildRemovals.isEmpty && queryDataCleared) {
-      actor.completeDeletionProcess()
+      actor.completeStorageProcess()
     }
   }
 }

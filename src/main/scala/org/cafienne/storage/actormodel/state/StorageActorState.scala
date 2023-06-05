@@ -18,6 +18,7 @@
 package org.cafienne.storage.actormodel.state
 
 import akka.Done
+import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
@@ -30,7 +31,7 @@ import org.cafienne.tenant.actorapi.event.TenantEvent
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
-trait StorageActorState {
+trait StorageActorState extends LazyLogging {
   val actor: StorageActor[_]
 
   def dbStorage: QueryDBStorage = ???
@@ -55,6 +56,10 @@ trait StorageActorState {
   def getEvent[ME <: StorageEvent](clazz: Class[ME]): ME = eventsOfType(clazz).head
 
   def printLogMessage(msg: String): Unit = actor.printLogMessage(msg)
+
+  def reportUnknownEvent(event: StorageEvent): Unit = {
+    logger.error(s"${actor.getClass.getSimpleName}[$metadata]: Cannot handle event of type ${event.getClass.getName} from ${event.metadata}")
+  }
 
   def actualModelActorType: String = events
     .filter(_.isBootstrapMessage)

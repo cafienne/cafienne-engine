@@ -21,6 +21,7 @@ import akka.actor.{ActorRef, Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.archival.event._
@@ -76,14 +77,14 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
     getActorRef(child, Props(classOf[ActorDataArchiver], caseSystem, child))
   }
 
-  def archivalCompleted(): Unit = {
+  def afterStorageProcessCompleted(): Unit = {
     context.stop(self)
   }
 
   /**
    * Invoked when e.g. CaseArchived or ProcessArchived is stored
    */
-  def afterModelActorEventStored(): Unit = {
+  def completeStorageProcess(): Unit = {
     // Archival completed; make sure "CaseArchived", etc. exist, and if so, delete the other messages.
     if (state.events.exists(_.isInstanceOf[ModelActorArchived])) {
       clearState(lastSequenceNr - 1)
@@ -133,7 +134,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
    * - Archival is done ==> then return ArchivalCompleted.
    *
    */
-  def validateArchival(command: ArchiveActorData): Unit = {
+  def startStorageProcess(command: ArchiveActorData): Unit = {
     if (lastSequenceNr == 0) {
       printLogMessage("Actor has not recovered any events. Probably does not exist at all")
       sender() ! ArchivalRejected(command.metadata, "Actor does not exist in the event journal")
@@ -143,7 +144,7 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
     } else {
       if (state.isCleared) {
         // No need to do anything, as our parent is informed and we can simply go offline again
-        afterModelActorEventStored()
+        completeStorageProcess()
       } else if (state.isExported) {
         printLogMessage("Our parent is aware that we are archived, but we have not yet cleaned up ourself, doing that now")
         afterArchiveExported()
@@ -166,14 +167,10 @@ class ActorDataArchiver(override val caseSystem: CaseSystem, override val metada
    * store to keep track of the deletion state
    */
   override def receiveCommand: Receive = {
-    case command: ArchiveActorData => validateArchival(command) // Initial command. Validate and reply.
-    case event: ChildrenArchivalInitiated => storeEvent(event) // We now know which children to archive
-    case event: QueryDataArchived => storeEvent(event) // Our state is archived from QueryDB
-    case event: ChildArchived => storeEvent(event) // One of our children completed
-    case event: ArchiveExported => storeEvent(event)
-    case event: ArchivalInitiated => // Event comes when one of the children has started archival
-    case _: DeleteMessagesSuccess => archivalCompleted() // Event journal no longer contains our events
+    case command: ArchiveActorData => startStorageProcess(command) // Initial command. Validate and reply.
+    case event: StorageEvent => storeEvent(event) // We now know which children to remove
+    case _: DeleteMessagesSuccess => afterStorageProcessCompleted() // Event journal no longer contains our events
     case t: Terminated => removeActorRef(t) // Akka has removed a child from memory
-    case other => printLogMessage(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
+    case other => reportUnknownMessage(other)
   }
 }

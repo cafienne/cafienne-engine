@@ -20,11 +20,12 @@ package org.cafienne.storage.restore
 import akka.actor.{ActorRef, Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}
 import org.cafienne.storage.archival.Archive
 import org.cafienne.storage.archive.Storage
 import org.cafienne.storage.restore.command.{RestoreActorData, RestoreArchive}
-import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored, RestoreInitiated}
+import org.cafienne.storage.restore.event.{ArchiveRetrieved, RestoreInitiated}
 import org.cafienne.storage.restore.response.ArchiveNotFound
 import org.cafienne.system.CaseSystem
 
@@ -35,7 +36,7 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
   override def persistenceId: String = s"RESTORE_ACTOR_FOR_${metadata.actorType.toUpperCase}_${metadata.actorId}"
   override def createState(): RestoreState = new RestoreState(this)
 
-  def initiateRestore(command: RestoreActorData): Unit = {
+  def startStorageProcess(command: RestoreActorData): Unit = {
     //  Use the system dispatcher for handling the export success
     implicit val ec: ExecutionContext = caseSystem.system.dispatcher
 
@@ -66,21 +67,20 @@ class ActorDataRestorer(override val caseSystem: CaseSystem, override val metada
     getChildActorRef(archive.metadata).tell(RestoreArchive(archive.metadata, archive), self)
   }
 
-  def completeRestoreProcess(): Unit = {
+  def completeStorageProcess(): Unit = {
     printLogMessage("Completed restore process. Deleting ActorDataRestorer state messages for \\\" + self.path\"")
     clearState()
   }
 
-  def restoreCompleted(): Unit = {
+  def afterStorageProcessCompleted(): Unit = {
     context.stop(self)
   }
 
   override def receiveCommand: Receive = {
-    case command: RestoreActorData => initiateRestore(command) // Initial command. Validate and reply.
-    case event: ArchiveRetrieved => storeEvent(event) // Archive available, store and spread.
-    case event: ChildRestored => storeEvent(event) // One of our children restored itself, we can remove it from the list.
-    case _: DeleteMessagesSuccess => restoreCompleted() // Event journal no longer contains our events, we can be deleted
+    case command: RestoreActorData => startStorageProcess(command) // Initial command. Validate and reply.
+    case event: StorageEvent => storeEvent(event) // We now know which children to remove
+    case _: DeleteMessagesSuccess => afterStorageProcessCompleted() // Event journal no longer contains our events, we can be deleted
     case t: Terminated => removeActorRef(t) // One of our children left memory. That's a good sign...
-    case other => logger.warn(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
+    case other => reportUnknownMessage(other)
   }
 }

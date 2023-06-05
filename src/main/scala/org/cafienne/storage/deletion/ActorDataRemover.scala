@@ -20,9 +20,10 @@ package org.cafienne.storage.deletion
 import akka.actor.{Props, Terminated}
 import akka.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, StorageActor}
 import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.{ChildrenRemovalInitiated, QueryDataRemoved, RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
 import org.cafienne.storage.deletion.response.RemovalRejected
 import org.cafienne.storage.deletion.state._
 import org.cafienne.system.CaseSystem
@@ -77,7 +78,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
    * The akka system will generate a DeleteMessageSuccess, and the receiveCommand method
    * will listen to that and call deletionCompleted() method.
    */
-  def completeDeletionProcess(): Unit = {
+  def completeStorageProcess(): Unit = {
     printLogMessage(s"Starting final step to delete ourselves from event journal: let akka [delete from journal where persistence_id = '$persistenceId']")
     clearState()
   }
@@ -86,7 +87,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
    * When all our events are also removed from the journal we can tell our parent we're done.
    * Also we'll then remove ourselves from memory.
    */
-  def deletionCompleted(msg: String = ""): Unit = {
+  def afterStorageProcessCompleted(msg: String = ""): Unit = {
     if (metadata.hasParent) {
       printLogMessage(s"Completed clearing event journal $msg; informing parent ${metadata.parent} with ref ${context.parent.path} and stopping ActorDataRemover on $metadata")
     } else {
@@ -111,7 +112,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
    * We could extend the "RemovalInitiated" command with additional progress information (e.g., how many children
    * need to be deleted, etc.)
    */
-  def validateRemoval(command: RemoveActorData): Unit = {
+  def startStorageProcess(command: RemoveActorData): Unit = {
     if (lastSequenceNr == 0) {
       printLogMessage("Actor has not recovered any events. Probably does not exist at all")
       sender() ! RemovalRejected(command.metadata, "Actor does not exist in the event journal")
@@ -121,7 +122,7 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
     } else {
       if (state.events.isEmpty) {
         printLogMessage("Event count is 0")
-        deletionCompleted("because there are no events")
+        afterStorageProcessCompleted("because there are no events")
       } else {
         triggerStorageProcess(command, RemovalInitiated(command.metadata))
       }
@@ -133,14 +134,10 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
    * store to keep track of the deletion state
    */
   override def receiveCommand: Receive = {
-    case command: RemoveActorData => validateRemoval(command) // Initial command. Validate and reply.
-    case event: ChildrenRemovalInitiated => storeEvent(event) // We now know which children to remove
-    case event: RemovalCompleted => storeEvent(event) // One of our children completed
-    case event: QueryDataRemoved => storeEvent(event) // Our state is removed from QueryDB
-    case _: DeleteMessagesSuccess => deletionCompleted("because events have been deleted from the journal") // Event journal no longer contains our persistence id
+    case command: RemoveActorData => startStorageProcess(command) // Initial command. Validate and reply.
+    case event: StorageEvent => storeEvent(event) // We now know which children to remove
+    case _: DeleteMessagesSuccess => afterStorageProcessCompleted("because events have been deleted from the journal") // Event journal no longer contains our persistence id
     case t: Terminated => removeActorRef(t) // Akka has removed one of our children from memory
-    case _: RemovalInitiated => // Less relevant, unless we use this to retrieve and expose state information
-    //      printLogMessage(s"CHILD STARTED! ${childStarted.actorType}[${childStarted.actorId}]")
-    case other => printLogMessage(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
+    case other => reportUnknownMessage(other)
   }
 }

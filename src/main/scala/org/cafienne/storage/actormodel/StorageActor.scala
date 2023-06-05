@@ -58,6 +58,10 @@ trait StorageActor[S <: StorageActorState]
     Printer.print(this.metadata, msg)
   }
 
+  def reportUnknownMessage(msg: Any): Unit = {
+    logger.warn(s"$metadata: Received message with unknown type. Ignoring it. Message is of type ${msg.getClass.getName}")
+  }
+
   /**
    * Recovery is pretty simple. Simply add all events to our state.
    * This may include StorageEvents, that give information on our current removal state.
