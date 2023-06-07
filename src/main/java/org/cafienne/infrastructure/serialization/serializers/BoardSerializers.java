@@ -61,6 +61,7 @@ public class BoardSerializers {
         CafienneSerializer.addManifestWrapper(ClaimFlowTask.class, ClaimFlowTask::new);
         CafienneSerializer.addManifestWrapper(SaveFlowTaskOutput.class, SaveFlowTaskOutput::new);
         CafienneSerializer.addManifestWrapper(CompleteFlowTask.class, CompleteFlowTask::new);
+        CafienneSerializer.addManifestWrapper(CancelFlowTask.class, CancelFlowTask::new);
         CafienneSerializer.addManifestWrapper(CancelFlow.class, CancelFlow::deserialize);
         CafienneSerializer.addManifestWrapper(SetMember.class, SetMember::deserialize);
         CafienneSerializer.addManifestWrapper(RemoveMember.class, RemoveMember::deserialize);

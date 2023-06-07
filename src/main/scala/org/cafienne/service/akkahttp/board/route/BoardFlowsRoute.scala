@@ -25,7 +25,7 @@ import javax.ws.rs._
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/boards")
 class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
-  override def routes: Route = concat(startFlow, cancelFlow, completeFlowTask, claimFlowTask, saveFlowTask)
+  override def routes: Route = concat(startFlow, cancelFlow, cancelFlowTask, completeFlowTask, claimFlowTask, saveFlowTask)
 
   @Path("{boardId}/flows")
   @POST
@@ -151,6 +151,32 @@ class BoardFlowsRoute(override val caseSystem: CaseSystem) extends BoardRoute {
           entity(as[FlowTaskOutputFormat]) { output =>
             askFlow(new CompleteFlowTask(user, flowId, taskId, output.subject, asJson(output.data)))
           }
+        }
+      }
+    }
+  }
+
+  @Path("{boardId}/flows/{flowId}/tasks/{taskId}")
+  @DELETE
+  @Operation(
+    summary = "Cancel a task in a flow on the board",
+    description = "Cancel a task in a flow on the board and go back to the previous task",
+    tags = Array("board"),
+    parameters = Array(
+      new Parameter(name = "boardId", description = "The id of the board", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "flowId", description = "The id of the flow containing the task", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "taskId", description = "The id of the task to abort", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "202", description = "Task cancellation initiated"),
+    )
+  )
+  @RequestBody(description = "Task to cancel", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[FlowTaskOutputFormat]))))
+  def cancelFlowTask: Route = delete {
+    boardUser { user =>
+      path("flows" / Segment / "tasks" / Segment) { (flowId, taskId) =>
+        pathEndOrSingleSlash {
+          askFlow(new CancelFlowTask(user, flowId, taskId))
         }
       }
     }

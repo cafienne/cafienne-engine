@@ -57,6 +57,8 @@ class BoardDefinition(val state: BoardState) extends FormElement with CafienneJs
     columns.remove(column.position, 0)
   }
 
+  def casePlanIdentifier: String = s"cm__${boardId}_0"
+
   def caseDefinition: CaseDefinition = {
     val string =
       s"""<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
@@ -73,21 +75,21 @@ class BoardDefinition(val state: BoardState) extends FormElement with CafienneJs
          |        </property>
          |    </caseFileItemDefinition>
          |    <caseFileItemDefinition name="ttpdata" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="ttpdata.cfid"/>
-         |    <case id="${title}.case" name="${title}" expressionLanguage="spel">
+         |    <case id="$title.case" name="$title" expressionLanguage="spel">
          |        <caseFileModel>
-         |            <caseFileItem id="${boardFileIdentifier}" name="BoardMetadata" multiplicity="ExactlyOne" definitionRef="ttpboard.cfid"/>
-         |            <caseFileItem id="${dataFileIdentifier}" name="Data" multiplicity="ExactlyOne" definitionRef="ttpdata.cfid"/>
+         |            <caseFileItem id="$boardFileIdentifier" name="BoardMetadata" multiplicity="ExactlyOne" definitionRef="ttpboard.cfid"/>
+         |            <caseFileItem id="$dataFileIdentifier" name="Data" multiplicity="ExactlyOne" definitionRef="ttpdata.cfid"/>
          |        </caseFileModel>
-         |        <casePlanModel id="cm__${boardId}_0" name="${title}" autoComplete="true">
-         |            ${columns.map(_.planItemXML).mkString("\n")}
-         |            ${columns.map(_.humanTaskXML).mkString("\n")}
-         |
+         |        <casePlanModel id="$casePlanIdentifier" name="$title" autoComplete="true">
+         |            ${columns.map(_.columnPlanItemXML).mkString("\n")}
+         |            ${columns.map(_.columnSentryXML).mkString("\n")}
+         |            ${columns.map(_.columnPlanItemDefinitionXML).mkString("\n")}
          |        </casePlanModel>
          |        <caseRoles>
          |          ${roles.filterNot(_.isBlank).map(role => s"""<role id="${role}" name="${role}" />""").mkString("", "\n          ", "\n")}
          |        </caseRoles>
-         |        <input id="_in_case_${boardFileIdentifier}" name="BoardMetadata" bindingRef="${boardFileIdentifier}"/>
-         |        <input id="_in_case_${dataFileIdentifier}" name="Data" bindingRef="${dataFileIdentifier}"/>
+         |        <input id="_in_case_$boardFileIdentifier" name="BoardMetadata" bindingRef="$boardFileIdentifier"/>
+         |        <input id="_in_case_$dataFileIdentifier" name="Data" bindingRef="$dataFileIdentifier"/>
          |        <extensionElements mustUnderstand="false">
          |          <cafienne:start-case-model xmlns:cafienne="org.cafienne">
          |            <![CDATA[${form.toString}]]>
@@ -96,6 +98,7 @@ class BoardDefinition(val state: BoardState) extends FormElement with CafienneJs
          |    </case>
          |</definitions>""".stripMargin
     val xml: Document = XMLHelper.loadXML(string)
+    println(s"\n\n${XMLHelper.printXMLNode(xml)}\n\n")
     val definitions = new DefinitionsDocument(xml)
     definitions.getFirstCase
   }

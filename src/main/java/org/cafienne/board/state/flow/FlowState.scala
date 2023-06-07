@@ -15,6 +15,7 @@ import org.cafienne.board.state.definition.BoardDefinition
 import org.cafienne.board.state.{BoardState, StateElement}
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition
+import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent
 import org.cafienne.cmmn.actorapi.command.{CaseCommand, StartCase}
 import org.cafienne.cmmn.instance.Transition
 import org.cafienne.humantask.actorapi.command.{ClaimTask, CompleteHumanTask, SaveTaskOutput}
@@ -86,6 +87,7 @@ class FlowState(val state: BoardState, event: FlowInitiated) extends StateElemen
     case command: ClaimFlowTask => delegateTaskCommand(command, (u, f, t) => new ClaimTask(u, f, t))
     case command: SaveFlowTaskOutput => delegateTaskCommand(command, (u, f, t) => new SaveTaskOutput(u, f, t, command.output()))
     case command: CompleteFlowTask => delegateTaskCommand(command, (u, f, t) => new CompleteHumanTask(u, f, t, command.output()))
+    case command: CancelFlowTask => delegateTaskCommand(command, (u, f, t) => new RaiseEvent(u, f, "cancel_"+t))
     case command: CancelFlow => delegate(command, new MakeCaseTransition(command.getUser.asCaseUserIdentity(), command.flowId, Transition.Terminate), Some(new FlowCanceled(board, command.flowId)))
     case other => throw new InvalidCommandException(s"Cannot handle commands of type ${other.getClass.getName}")
   }
