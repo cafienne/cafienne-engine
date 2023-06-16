@@ -46,7 +46,7 @@ Docker / publish / skip := true
 /**
   * Compiler settings
   */
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.11"
 Compile / doc / sources := List()
 Compile / mainClass := Some("org.cafienne.service.Main")
 // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
@@ -197,7 +197,7 @@ libraryDependencies ++= Seq(
 
   // Persistence support
   , "com.h2database"          %  "h2"                                   % "2.1.214"
-  , "org.hsqldb"              %  "hsqldb"                               % "2.7.1"
+  , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
   , "org.postgresql"          %  "postgresql"                           % "42.5.0"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"

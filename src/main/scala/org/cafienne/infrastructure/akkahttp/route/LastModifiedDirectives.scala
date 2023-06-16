@@ -30,7 +30,7 @@ trait LastModifiedDirectives extends LazyLogging {
   /**
     * Simple CaseResponse converter to JSON
     */
-  implicit val modelResponseMarshaller = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: ModelResponse =>
+  implicit val modelResponseMarshaller: Marshaller[ModelResponse, HttpEntity.Strict] = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: ModelResponse =>
     HttpEntity(ContentTypes.`application/json`, value.toJson.toString)
   }
 

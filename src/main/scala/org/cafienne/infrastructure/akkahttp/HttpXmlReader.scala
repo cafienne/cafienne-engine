@@ -20,6 +20,7 @@ package org.cafienne.infrastructure.akkahttp
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshaller
 import org.cafienne.util.XMLHelper
+import org.w3c.dom.Document
 
 /**
   * This file contains an unmarshaller for XML documents
@@ -34,5 +35,5 @@ object HttpXmlReader {
   /**
     * Reads an org.w3c.dom.Document from a http entity
     */
-  implicit val DocumentUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(`application/xml`).map(XMLHelper.loadXML(_))
+  implicit val DocumentUnmarshaller: Unmarshaller[HttpEntity, Document] = Unmarshaller.stringUnmarshaller.forContentTypes(`application/xml`).map(XMLHelper.loadXML)
 }
