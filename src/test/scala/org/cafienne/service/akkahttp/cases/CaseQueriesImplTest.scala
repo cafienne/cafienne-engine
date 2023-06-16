@@ -16,12 +16,12 @@ import org.scalatest.matchers.must.Matchers
 
 import java.time.Instant
 import java.util.UUID
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 
 class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.config)) with AnyFlatSpecLike with Matchers with BeforeAndAfterAll with QueryDBSchema {
 
-  implicit val executionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   val caseQueries = new CaseQueriesImpl
   val caseUpdater = SlickQueryDB.createCaseTransaction(null)

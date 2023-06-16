@@ -1,5 +1,5 @@
 package org.cafienne.actormodel.response
 
-import org.cafienne.storage.actormodel.message.StorageSerializable
+import org.cafienne.infrastructure.serialization.JacksonSerializable
 
-case class ActorTerminated(actorId: String) extends StorageSerializable
+case class ActorTerminated(actorId: String) extends JacksonSerializable

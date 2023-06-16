@@ -18,11 +18,10 @@
 package org.cafienne.storage
 
 import org.cafienne.actormodel.identity.UserIdentity
-import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
 import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.message.StorageSerializable
 
-case class StorageUser(id: String) extends UserIdentity with StorageSerializable
+case class StorageUser(id: String) extends UserIdentity with JacksonSerializable
 
 object StorageUser {
   def deserialize(json: ValueMap): StorageUser = {

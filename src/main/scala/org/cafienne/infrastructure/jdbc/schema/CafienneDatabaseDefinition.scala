@@ -19,6 +19,7 @@ package org.cafienne.infrastructure.jdbc.schema
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig
+import org.flywaydb.core.api.output.MigrateResult
 import slick.migration.api.Migration
 import slick.migration.api.flyway.{MigrationInfo, SlickFlyway}
 
@@ -34,7 +35,7 @@ trait CafienneDatabaseDefinition extends CafienneJDBCConfig with LazyLogging {
   import scala.concurrent.duration._
   implicit val infoProvider: MigrationInfo.Provider[Migration] = CustomMigrationInfo.provider
 
-  def useSchema(schemas: Seq[DbSchemaVersion]) = {
+  def useSchema(schemas: Seq[DbSchemaVersion]): MigrateResult = {
     try {
       val flyway = SlickFlyway(db)(schemas.flatMap(schema => schema.getScript)).load()
       flyway.migrate()
@@ -43,10 +44,9 @@ trait CafienneDatabaseDefinition extends CafienneJDBCConfig with LazyLogging {
         logger.error("An issue with migration happened", e)
         val my = sql"""select description from flyway_schema_history""".as[String]
         val res = db.stream(my)
-        val bla = res.foreach { r => logger.debug("Migration: {}", r)}
-        val answer = Await.result(bla, 5.seconds)
-        //val answer = Await.result(res, 5.seconds)
-        logger.debug("Migration contents: {}",answer)
+        logger.debug(s"Migration contents:")
+        // Wait 5 seconds to print the resulting errors before throwing the exception
+        Await.result(res.foreach { r => logger.debug("Migration: {}", r)}, 5.seconds)
         throw e
       }
     }

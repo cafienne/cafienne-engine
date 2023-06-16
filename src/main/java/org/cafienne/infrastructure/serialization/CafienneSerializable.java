@@ -82,6 +82,10 @@ public interface CafienneSerializable {
         generator.writeEndArray();
     }
 
+    default void writeField(JsonGenerator generator, Object fieldName, scala.collection.Iterable<String> list) throws IOException {
+        writeField(generator, fieldName, scala.jdk.CollectionConverters.IterableHasAsJava(list).asJavaCollection());
+    }
+
     default void writeField(JsonGenerator generator, Object fieldName, Collection<String> stringList) throws IOException {
         generator.writeArrayFieldStart(String.valueOf(fieldName));
         for (String string : stringList) {
@@ -140,7 +144,7 @@ public interface CafienneSerializable {
         }
     }
 
-    default void writeField(JsonGenerator generator, Object fieldName, Enum value) throws IOException {
+    default void writeField(JsonGenerator generator, Object fieldName, Enum<?> value) throws IOException {
         if (value == null) {
             generator.writeNullField(String.valueOf(fieldName));
         } else {

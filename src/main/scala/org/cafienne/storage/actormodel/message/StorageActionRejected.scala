@@ -1,5 +1,7 @@
 package org.cafienne.storage.actormodel.message
 
-trait StorageActionRejected extends StorageSerializable {
+import org.cafienne.infrastructure.serialization.JacksonSerializable
+
+trait StorageActionRejected extends JacksonSerializable {
   val msg: String
 }

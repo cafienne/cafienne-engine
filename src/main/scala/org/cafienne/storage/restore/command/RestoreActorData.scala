@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.command
+package org.cafienne.storage.restore.command
 
 import org.cafienne.storage.actormodel.message.StorageCommand
 import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}

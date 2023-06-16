@@ -21,7 +21,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.querydb.schema.table.{CaseTables, TaskTables, TenantTables}
 
 import scala.collection.mutable.{Map, Set}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 trait PlatformQueries {
@@ -38,7 +38,7 @@ class PlatformQueriesImpl extends PlatformQueries with LazyLogging
 
   import dbConfig.profile.api._
 
-  implicit val ec = db.ioExecutionContext
+  implicit val ec: ExecutionContext = db.ioExecutionContext
 
   override def hasExistingUserIds(newUserIds: Seq[String], tenants: Option[Seq[String]]): Future[Seq[String]] = {
     val query = for {

@@ -17,17 +17,16 @@
 
 package org.cafienne.storage.archival
 
-import org.cafienne.infrastructure.serialization.Fields
+import org.cafienne.infrastructure.serialization.{Fields, JacksonSerializable}
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageSerializable
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-case class Archive(metadata: ActorMetadata, events: ValueList, children: Seq[Archive] = Seq()) extends StorageSerializable with CafienneJson {
+case class Archive(metadata: ActorMetadata, events: ValueList, children: Seq[Archive] = Seq()) extends JacksonSerializable with CafienneJson {
   override def toValue: Value[_] = new ValueMap(Fields.metadata, metadata, Fields.events, events, Fields.children, children)
 
-  override def toString(): String = toValue.toString
+  override def toString: String = toValue.toString
 }
 
 object Archive {

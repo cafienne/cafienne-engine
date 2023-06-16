@@ -29,10 +29,11 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
-import org.cafienne.storage.archival.command.{ArchiveActorData, RestoreActorData}
+import org.cafienne.storage.archival.command.ArchiveActorData
 import org.cafienne.storage.archival.event.ArchivalInitiated
 import org.cafienne.storage.deletion.command.RemoveActorData
 import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.restore.command.RestoreActorData
 import org.cafienne.storage.restore.event.RestoreInitiated
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor

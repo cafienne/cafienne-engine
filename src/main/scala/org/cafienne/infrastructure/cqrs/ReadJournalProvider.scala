@@ -28,7 +28,7 @@ import org.cafienne.infrastructure.Cafienne
   */
 trait ReadJournalProvider extends LazyLogging {
   def system: ActorSystem
-  implicit def actorSystem = system
+  implicit def actorSystem: ActorSystem = system
 
   lazy val configuredJournal: String = system.settings.config.getString("akka.persistence.journal.plugin")
   lazy val readJournalSetting: String = findReadJournalSetting()

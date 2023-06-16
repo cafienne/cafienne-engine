@@ -26,9 +26,9 @@ import org.cafienne.json.{JSONReader, Value, ValueList, ValueMap}
   */
 object HttpJsonReader {
 
-  implicit val ValueUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(JSONReader.parse(_).asInstanceOf[Value[_]])
+  implicit val ValueUnmarshaller: Unmarshaller[HttpEntity, Value[_]] = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(JSONReader.parse(_).asInstanceOf[Value[_]])
 
-  implicit val ValueMapUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(JSONReader.parse(_).asInstanceOf[ValueMap])
+  implicit val ValueMapUnmarshaller: Unmarshaller[HttpEntity, ValueMap] = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(JSONReader.parse(_).asInstanceOf[ValueMap])
 
-  implicit val ValueListUnmarshaller = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(JSONReader.parse(_).asInstanceOf[ValueList])
+  implicit val ValueListUnmarshaller: Unmarshaller[HttpEntity, ValueList] = Unmarshaller.stringUnmarshaller.forContentTypes(ContentTypes.`application/json`).map(JSONReader.parse(_).asInstanceOf[ValueList])
 }

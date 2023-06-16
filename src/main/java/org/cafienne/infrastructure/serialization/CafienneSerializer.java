@@ -56,7 +56,7 @@ public class CafienneSerializer extends SerializerWithStringManifest {
         return manifests.get(manifestString);
     }
 
-    public static void addManifestWrapper(Class<?> eventClass, ValueMapDeserializer<?> deserializer) {
+    public static <CS extends CafienneSerializable>void addManifestWrapper(Class<CS> eventClass, ValueMapDeserializer<CS> deserializer) {
         ManifestWrapper manifest = new ManifestWrapper(eventClass, deserializer);
         manifestsByClass.put(manifest.eventClass, manifest);
         // Now register manifest strings of all versions, starting from the current
