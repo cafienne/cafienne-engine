@@ -17,12 +17,17 @@
 
 package org.cafienne.board.actorapi.event;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.board.BoardActor;
+import org.cafienne.cmmn.definition.CaseDefinition;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 import org.cafienne.tenant.TenantActor;
+
+import java.io.IOException;
 
 /**
  * Event that is published after an {@link org.cafienne.tenant.actorapi.command.TenantCommand} has been fully handled by a {@link TenantActor} instance.
@@ -31,11 +36,21 @@ import org.cafienne.tenant.TenantActor;
  */
 @Manifest
 public class BoardModified extends ActorModified<BoardActor> implements BoardEvent {
+    protected final CaseDefinition definition;
+
     public BoardModified(BoardActor actor, IncomingActorMessage source) {
         super(actor, source);
+        this.definition = actor.getDefinition().caseDefinition();
     }
 
     public BoardModified(ValueMap json) {
         super(json);
+        this.definition = json.readDefinition(Fields.definition, CaseDefinition.class);
+    }
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        super.write(generator);
+        writeField(generator, Fields.definition, definition);
     }
 }
