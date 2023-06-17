@@ -96,6 +96,15 @@ class BoardDefinition(val state: BoardState) extends FormElement with CafienneJs
          |          </cafienne:start-case-model>
          |        </extensionElements>
          |    </case>
+         |    <CMMNDI>
+         |        <CMMNDiagram>
+         |            <CMMNShape cmmnElementRef="$casePlanIdentifier">
+         |                <Bounds x="20" y="20" width="${320 * columns.size}" height="500"/>
+         |            </CMMNShape>
+         |            ${columns.map(_.shapesXML).mkString("\n")}
+         |            ${columns.map(_.edgesXML).mkString("\n")}
+         |        </CMMNDiagram>
+         |    </CMMNDI>
          |</definitions>""".stripMargin
     val xml: Document = XMLHelper.loadXML(string)
     println(s"\n\n${XMLHelper.printXMLNode(xml)}\n\n")

@@ -35,12 +35,18 @@ class ColumnDefinition(val state: BoardState, val columnId: String) extends Defi
   private def taskName = s"$title"
   private def taskIdentifier = s"ht__$columnIdentifier"
   private def taskPlanItemIdentifier: String = s"pi_$taskIdentifier"
-  private def eventName = s"cancel_$taskName"
+  private def eventName = previous.fold(s"cancel_$taskName")(previous => s"back_to_${previous.taskName}")
   private def eventIdentifier: String = s"ue__cancel_$columnIdentifier"
   private def eventPlanItemIdentifier: String = s"pi_$eventIdentifier"
-  private def stageName = s"stage_$taskName"
+  private def stageName = s"${taskName}_stage"
   private def stageIdentifier = s"st__$columnIdentifier"
   private def stagePlanItemIdentifier = s"pi_$stageIdentifier"
+  private def enterStageCriterionIdentifier = s"_enter__$taskName"
+  private def exitStageCriterionIdentifier = s"_exit__$taskName"
+  private def returnToStageCriterionIdentifier = next.fold(s"_enter__${definition.boardId}_$position")(next => s"_return_from__${next.taskName}")
+  private val columnDistance: Int = 60
+  private def stageWidth = 240
+  private def x: Int = columnDistance + position * (stageWidth + columnDistance)
 
   def updateState(event: WriteColumnDefinitionEvent): Unit = {
     this.title = event.title
@@ -104,6 +110,20 @@ class ColumnDefinition(val state: BoardState, val columnId: String) extends Defi
        |$returnToStageSentryXML
        |""".stripMargin
 
+  def stageXML: String = {
+    s"""<stage id="$stageIdentifier" name="$stageName" autoComplete="true">
+       |    $humanTaskPlanItemXML
+       |    $eventPlanItemXML
+       |</stage>
+       |""".stripMargin
+  }
+
+  def stageShape: String =
+    s"""<CMMNShape cmmnElementRef="$stagePlanItemIdentifier">
+       |    <Bounds x="$x" y="90" width="$stageWidth" height="290"/>
+       |</CMMNShape>
+       |""".stripMargin
+
   def humanTaskXML: String = {
     val metadata = s"${columnIdentifier}_BoardMetadata"
     val data = s"${columnIdentifier}_Data"
@@ -141,23 +161,59 @@ class ColumnDefinition(val state: BoardState, val columnId: String) extends Defi
        |""".stripMargin
   }
 
-  def eventXML: String = s"""<userEvent id="$eventIdentifier" name="$eventName"/>""".stripMargin
-
-  def eventPlanItemXML: String = s"""<planItem id="$eventPlanItemIdentifier" name="$eventName" definitionRef="$eventIdentifier"/>"""
-
-  def stageXML: String = {
-    s"""<stage id="$stageIdentifier" name="$stageName" autoComplete="true">
-       |    $humanTaskPlanItemXML
-       |    $eventPlanItemXML
-       |</stage>
+  def humanTaskShape: String =
+    s"""<CMMNShape cmmnElementRef="$taskPlanItemIdentifier">
+       |    <Bounds x="${x + 50}" y="130" width="140" height="80"/>
+       |</CMMNShape>
        |""".stripMargin
+
+  def eventXML: String = previous.fold("")(_ => s"""<userEvent id="$eventIdentifier" name="$eventName"/>""".stripMargin)
+
+  def eventPlanItemXML: String = previous.fold("")(_ => s"""<planItem id="$eventPlanItemIdentifier" name="$eventName" definitionRef="$eventIdentifier"/>""")
+
+  def eventShape: String = previous.fold("")(_ =>
+    s"""<CMMNShape cmmnElementRef="$eventPlanItemIdentifier">
+       |    <Bounds x="${x + 104}" y="290" width="32" height="32"/>
+       |</CMMNShape>
+       |""".stripMargin)
+
+  private def enterStageCriterionXML: String = s"""<entryCriterion id="$enterStageCriterionIdentifier" name="EntryCriterion_$position" sentryRef="$enterStageSentryIdentifier"/>"""
+
+  private def enterStageCriterionShape: String = {
+    previous.fold({
+      s"""<CMMNShape cmmnElementRef="$enterStageCriterionIdentifier">
+         |    <Bounds x="${x - 6}" y="158" width="12" height="20"/>
+         |</CMMNShape>
+         |""".stripMargin
+    })(_ =>
+      s"""<CMMNShape cmmnElementRef="$enterStageCriterionIdentifier">
+         |    <Bounds x="${x - 6}" y="158" width="12" height="20"/>
+         |</CMMNShape>
+         |""".stripMargin
+    )
   }
 
-  private def enterStageCriterionXML: String = s"""<entryCriterion id="_enter__$taskName" name="EntryCriterion_$position" sentryRef="$enterStageSentryIdentifier"/>"""
+  private def exitStageCriterionXML: String = previous.fold("")(_ => s"""<exitCriterion id="$exitStageCriterionIdentifier" name="ExitCriterion_$position" sentryRef="$exitStageSentryIdentifier"/>""")
 
-  private def exitStageCriterionXML: String = previous.fold("")(_ => s"""<exitCriterion id="_exit__$taskName" name="ExitCriterion_$position" sentryRef="$exitStageSentryIdentifier"/>""")
+  private def exitStageCriterionShape: String = {
+    previous.fold("")(_ =>
+      s"""<CMMNShape cmmnElementRef="$exitStageCriterionIdentifier">
+         |    <Bounds x="${x - 6}" y="250" width="12" height="20"/>
+         |</CMMNShape>
+         |""".stripMargin
+    )
+  }
 
-  private def returnToStageCriterionXML: String = next.fold("")(_ => s"""<entryCriterion id="_entry_${definition.boardId}_$position" name="ReturnToCriterion_$position" sentryRef="$returnToStageSentryIdentifier"/>""")
+  private def returnToStageCriterionXML: String = next.fold("")(_ => s"""<entryCriterion id="$returnToStageCriterionIdentifier" name="ReturnToCriterion_$position" sentryRef="$returnToStageSentryIdentifier"/>""")
+
+  private def returnToStageCriterionShape: String = {
+    next.fold("")(_ =>
+      s"""<CMMNShape cmmnElementRef="$returnToStageCriterionIdentifier">
+         |    <Bounds x="${x + stageWidth - 6}" y="296" width="12" height="20"/>
+         |</CMMNShape>
+         |""".stripMargin
+    )
+  }
 
   def stagePlanItemXML: String =
     s"""<planItem id="$stagePlanItemIdentifier" name="$stageName" definitionRef="$stageIdentifier">
@@ -176,6 +232,44 @@ class ColumnDefinition(val state: BoardState, val columnId: String) extends Defi
        |</planItem>
        |""".stripMargin
 
+  private def criteriaShapes: String =
+    s"""$enterStageCriterionShape
+       |$exitStageCriterionShape
+       |$returnToStageCriterionShape
+       |""".stripMargin
+
+  def caseFileShapeXML: String =
+    s"""<CMMNShape cmmnElementRef="$definition.boardFileIdentifier">
+       |    <Bounds x="${x + 100}" y="430" width="25" height="40"/>
+       |</CMMNShape>
+       |""".stripMargin
+
+  def shapesXML: String = {
+    s"""$stageShape
+       |$humanTaskShape
+       |$eventShape
+       |$criteriaShapes
+       |""".stripMargin
+  }
+
+  private def enterStageEdge: String = previous.fold("")(previous => {
+    s"""<CMMNEdge sourceCMMNElementRef="${enterStageCriterionIdentifier}" targetCMMNElementRef="${previous.taskPlanItemIdentifier}"/>"""
+  })
+
+  private def returnToPreviousEdge: String = next.fold("")(next => {
+    s"""<CMMNEdge sourceCMMNElementRef="$returnToStageCriterionIdentifier" targetCMMNElementRef="${next.eventPlanItemIdentifier}"/>"""
+  })
+
+  private def exitStageEdge: String = previous.fold("")(_ => {
+    s"""<CMMNEdge sourceCMMNElementRef="${exitStageCriterionIdentifier}" targetCMMNElementRef="$eventPlanItemIdentifier"/>"""
+  })
+
+
+  def edgesXML: String =
+    s"""$enterStageEdge
+       |$exitStageEdge
+       |$returnToPreviousEdge
+       |""".stripMargin
 
   override def toValue: Value[_] = new ValueMap(Fields.columnId, columnId, Fields.position, position, Fields.title, title, Fields.role, role, Fields.form, form)
 }
