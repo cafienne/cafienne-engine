@@ -26,7 +26,7 @@ import scala.concurrent.Future
 
 class FlowState(val state: BoardState, event: FlowInitiated) extends StateElement with LazyLogging {
   val flowId: String = event.flowId
-    private var activationEvent: Option[FlowActivated] = None
+  private var activationEvent: Option[FlowActivated] = None
 
   def isActive: Boolean = activationEvent.nonEmpty
   def isCompleted: Boolean = false // Can we know this?
@@ -80,14 +80,22 @@ class FlowState(val state: BoardState, event: FlowInitiated) extends StateElemen
   }
 
   private def delegateTaskCommand(command: FlowTaskCommand, commandCreator: (CaseUserIdentity, String, String) => CaseCommand): Unit = {
-    delegate(command, commandCreator(command.getUser.asCaseUserIdentity(), command.flowId, command.taskId))
+    val caseCommand = commandCreator(command.getUser.asCaseUserIdentity(), command.flowId, command.taskId)
+    if (caseCommand != null) {
+      delegate(command, caseCommand)
+    }
   }
 
   def handle(command: BoardFlowCommand): Unit = command match {
     case command: ClaimFlowTask => delegateTaskCommand(command, (u, f, t) => new ClaimTask(u, f, t))
     case command: SaveFlowTaskOutput => delegateTaskCommand(command, (u, f, t) => new SaveTaskOutput(u, f, t, command.output()))
     case command: CompleteFlowTask => delegateTaskCommand(command, (u, f, t) => new CompleteHumanTask(u, f, t, command.output()))
-    case command: CancelFlowTask => delegateTaskCommand(command, (u, f, t) => new RaiseEvent(u, f, "cancel_"+t))
+    case command: CancelFlowTask =>
+      // We can only cancel a task if it is not in the first column
+      val cancelEventName = state.definition.columns.find(_.getTitle == command.taskId).map(_.eventName).filter(_.nonEmpty)
+      cancelEventName.fold(throw new InvalidCommandException(s"Cannot handle cancel task '${command.taskId}' as there is no previous task that would become active"))(cancelEventName => {
+        delegateTaskCommand(command, (u, f, _) => new RaiseEvent(u, f, cancelEventName))
+      })
     case command: CancelFlow => delegate(command, new MakeCaseTransition(command.getUser.asCaseUserIdentity(), command.flowId, Transition.Terminate), Some(new FlowCanceled(board, command.flowId)))
     case other => throw new InvalidCommandException(s"Cannot handle commands of type ${other.getClass.getName}")
   }

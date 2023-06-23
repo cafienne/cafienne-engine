@@ -107,7 +107,6 @@ class BoardDefinition(val state: BoardState) extends FormElement with CafienneJs
          |    </CMMNDI>
          |</definitions>""".stripMargin
     val xml: Document = XMLHelper.loadXML(string)
-    println(s"\n\n${XMLHelper.printXMLNode(xml)}\n\n")
     val definitions = new DefinitionsDocument(xml)
     definitions.getFirstCase
   }

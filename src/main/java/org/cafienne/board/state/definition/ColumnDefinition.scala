@@ -15,38 +15,36 @@ class ColumnDefinition(val state: BoardState, val columnId: String) extends Defi
   }
 
   def next: Option[ColumnDefinition] = {
-    println(s"Getting next for position ${position}")
     val n = if (this.position == definition.columns.size - 1) {
       None
     } else {
       Some(definition.columns(this.position + 1))
     }
-    println(s"Found n: ${n}")
     n
   }
 
   def position: Int = definition.columns.indexOf(this)
   definition.columns += this // This implicitly increases count of next column
 
-  private def columnIdentifier = s"${definition.boardId}_$position"
-  private def enterStageSentryIdentifier = s"crit__enter_$columnIdentifier"
-  private def exitStageSentryIdentifier = previous.fold("")(_ => s"crit__exit_$columnIdentifier")
-  private def returnToStageSentryIdentifier = next.fold("")(_ => s"crit__return_$columnIdentifier")
-  private def taskName = s"$title"
-  private def taskIdentifier = s"ht__$columnIdentifier"
-  private def taskPlanItemIdentifier: String = s"pi_$taskIdentifier"
-  private def eventName = previous.fold(s"cancel_$taskName")(previous => s"back_to_${previous.taskName}")
-  private def eventIdentifier: String = s"ue__cancel_$columnIdentifier"
-  private def eventPlanItemIdentifier: String = s"pi_$eventIdentifier"
-  private def stageName = s"${taskName}_stage"
-  private def stageIdentifier = s"st__$columnIdentifier"
-  private def stagePlanItemIdentifier = s"pi_$stageIdentifier"
-  private def enterStageCriterionIdentifier = s"_enter__$taskName"
-  private def exitStageCriterionIdentifier = s"_exit__$taskName"
-  private def returnToStageCriterionIdentifier = next.fold(s"_enter__${definition.boardId}_$position")(next => s"_return_from__${next.taskName}")
-  private val columnDistance: Int = 60
-  private def stageWidth = 240
-  private def x: Int = columnDistance + position * (stageWidth + columnDistance)
+  def columnIdentifier: String = s"${definition.boardId}_$position"
+  def enterStageSentryIdentifier: String = s"crit__enter_$columnIdentifier"
+  def exitStageSentryIdentifier: String = previous.fold("")(_ => s"crit__exit_$columnIdentifier")
+  def returnToStageSentryIdentifier: String = next.fold("")(_ => s"crit__return_$columnIdentifier")
+  def taskName: String = s"$title"
+  def taskIdentifier: String = s"ht__$columnIdentifier"
+  def taskPlanItemIdentifier: String = s"pi_$taskIdentifier"
+  def eventName: String = previous.fold(s"")(previous => s"back_to_${previous.taskName}")
+  def eventIdentifier: String = s"ue__cancel_$columnIdentifier"
+  def eventPlanItemIdentifier: String = s"pi_$eventIdentifier"
+  def stageName: String = s"${taskName}_stage"
+  def stageIdentifier: String = s"st__$columnIdentifier"
+  def stagePlanItemIdentifier: String = s"pi_$stageIdentifier"
+  def enterStageCriterionIdentifier: String = s"_enter__$taskName"
+  def exitStageCriterionIdentifier: String = s"_exit__$taskName"
+  def returnToStageCriterionIdentifier: String = next.fold(s"_enter__${definition.boardId}_$position")(next => s"_return_from__${next.taskName}")
+  val columnDistance: Int = 60
+  def stageWidth: Int = 240
+  def x: Int = columnDistance + position * (stageWidth + columnDistance)
 
   def updateState(event: WriteColumnDefinitionEvent): Unit = {
     this.title = event.title
