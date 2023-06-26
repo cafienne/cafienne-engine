@@ -125,9 +125,9 @@ configs(MultiJvm) // Not sure what this adds, actually
   * Dependencies
   */
 val akkaHttpVersion    = "10.2.10"
-val akkaVersion        = "2.6.20"
+val akkaVersion        = "2.6.21"
 val jacksonVersion     = "2.13.4"
-val enumeratumVersion  = "1.7.0"
+val enumeratumVersion  = "1.7.2"
 val swaggerVersion     = "2.2.4"
 val slickVersion       = "3.3.3"
 val jasperVersion      = "6.20.0"
@@ -156,17 +156,17 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
   , "com.typesafe"            %  "config"                               % "1.4.2"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.4"
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.8"
   , "org.apache.commons"      %  "commons-text"                         % "1.10.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
-  , "ch.megard"               %% "akka-http-cors"                       % "1.1.3"
+  , "ch.megard"               %% "akka-http-cors"                       % "1.2.0"
 
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.25.6"
-  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "10.0"
+  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.31"
+  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "10.9.2"
 
   // DB Schema
   , "org.flywaydb"            %  "flyway-core"                           % "7.2.1"
