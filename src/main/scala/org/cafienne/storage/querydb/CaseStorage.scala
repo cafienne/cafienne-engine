@@ -38,23 +38,4 @@ class CaseStorage extends QueryDBStorage {
     addStatement(TableQuery[CaseInstanceTable].filter(_.id === caseId).delete)
     commit()
   }
-
-  def archiveCase(caseId: String): Future[Done] = {
-    // Just delete the case from QueryDB
-    deleteCase(caseId)
-
-    // Below an alternative scenario that keeps some info in the QueryDB.
-/*/
-    // Delete stuff other than case and case team and set case state to "Archived"
-    addStatement(TableQuery[CaseInstanceDefinitionTable].filter(_.caseInstanceId === caseId).delete)
-    addStatement(TableQuery[PlanItemTable].filter(_.caseInstanceId === caseId).delete)
-    addStatement(TableQuery[PlanItemHistoryTable].filter(_.caseInstanceId === caseId).delete)
-    addStatement(TableQuery[CaseFileTable].filter(_.caseInstanceId === caseId).delete)
-    addStatement(TableQuery[CaseBusinessIdentifierTable].filter(_.caseInstanceId === caseId).delete)
-    addStatement(TableQuery[TaskTable].filter(_.caseInstanceId === caseId).delete)
-    addStatement(TableQuery[CaseInstanceTable].filter(_.id === caseId).map(_.state).update("Archived"))
-    commit()
-*/
-
-  }
 }

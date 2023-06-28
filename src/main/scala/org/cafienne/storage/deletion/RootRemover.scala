@@ -15,16 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package org.cafienne.storage.deletion
 
-import org.cafienne.infrastructure.serialization.Manifest
-import org.cafienne.json.ValueMap
-import org.cafienne.storage.actormodel.ActorMetadata
+import akka.actor.Actor
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.storage.deletion.event.RemovalRequested
+import org.cafienne.system.CaseSystem
 
-@Manifest
-case class CaseArchived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ModelActorArchived
+class RootRemover(caseSystem: CaseSystem, metadata: ActorMetadata) extends RootStorageActor[RemoveNode](caseSystem, metadata) with LazyLogging {
+  override def createInitialEvent: RemovalRequested = RemovalRequested(metadata)
 
-object CaseArchived {
-  def deserialize(json: ValueMap): CaseArchived = CaseArchived(ActorMetadata.deserializeMetadata(json), Some(json))
+  override def storageActorType: Class[_ <: Actor] = classOf[ActorDataRemover]
+
+  override def createOffspringNode(metadata: ActorMetadata): RemoveNode = new RemoveNode(metadata, this)
 }
-

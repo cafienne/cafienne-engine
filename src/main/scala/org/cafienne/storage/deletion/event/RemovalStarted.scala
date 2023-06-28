@@ -15,27 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package org.cafienne.storage.deletion.event
 
-import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
-
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, SeqHasAsJava}
+import org.cafienne.storage.actormodel.message.StorageActionStarted
 
 @Manifest
-case class ChildrenArchivalInitiated(metadata: ActorMetadata, members: Seq[ActorMetadata], override val optionalJson: Option[ValueMap] = None) extends StorageEvent {
-  override def write(generator: JsonGenerator): Unit = {
-    super.writeStorageEvent(generator)
-    writeListField(generator, Fields.members, members.asJava)
-  }
-}
+case class RemovalStarted(metadata: ActorMetadata, children: Seq[ActorMetadata], override val optionalJson: Option[ValueMap] = None) extends RemovalEvent with StorageActionStarted
 
-object ChildrenArchivalInitiated {
-  def deserialize(json: ValueMap): ChildrenArchivalInitiated = {
-    val members = json.withArray(Fields.members).getValue.asScala.map(_.asMap).map(ActorMetadata.deserialize).toSeq
-    ChildrenArchivalInitiated(ActorMetadata.deserializeMetadata(json), members, Some(json))
+object RemovalStarted {
+  def deserialize(json: ValueMap): RemovalStarted = {
+    val metadata = ActorMetadata.deserializeMetadata(json)
+    val children = ActorMetadata.deserializeChildren(metadata, json.withArray(Fields.children))
+    RemovalStarted(metadata, children, Some(json))
   }
 }

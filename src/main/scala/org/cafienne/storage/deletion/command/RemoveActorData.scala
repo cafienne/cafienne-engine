@@ -17,9 +17,9 @@
 
 package org.cafienne.storage.deletion.command
 
-import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}
 import org.cafienne.storage.actormodel.message.StorageCommand
-import org.cafienne.storage.deletion.ActorDataRemover
+import org.cafienne.storage.actormodel.{ActorMetadata, RootStorageActor}
+import org.cafienne.storage.deletion.RootRemover
 
 /** @param user User initiating the removal process
   * @param tenant Tenant to which the ModelActor belongs
@@ -28,5 +28,6 @@ import org.cafienne.storage.deletion.ActorDataRemover
   */
 case class RemoveActorData(metadata: ActorMetadata) extends StorageCommand {
   override def toString: String = s"RemovalCommand for $metadata"
-  val actorClass: Class[_ <: StorageActor[_]] = classOf[ActorDataRemover]
+
+  override val RootStorageActorClass: Class[_ <: RootStorageActor[_]] = classOf[RootRemover]
 }

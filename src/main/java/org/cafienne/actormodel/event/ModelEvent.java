@@ -35,10 +35,6 @@ public interface ModelEvent extends UserMessage {
 
     void updateActorState(ModelActor actor);
 
-    default String getTenant() {
-        return tenant();
-    }
-
     String tenant();
 
     String getActorId();

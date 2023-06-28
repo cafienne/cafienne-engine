@@ -23,30 +23,31 @@ import akka.persistence.query.{EventEnvelope, Offset}
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.TerminateModelActor
-import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
-import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
+import org.cafienne.storage.actormodel.message.{StorageActionCompleted, StorageActionStarted, StorageCommand, StorageEvent}
+import org.cafienne.storage.actormodel.{ActorMetadata, StorageActorSupervisor}
 import org.cafienne.storage.archival.command.ArchiveActorData
-import org.cafienne.storage.archival.event.ArchivalInitiated
+import org.cafienne.storage.archival.event.ArchivalStarted
 import org.cafienne.storage.deletion.command.RemoveActorData
-import org.cafienne.storage.deletion.event.{RemovalCompleted, RemovalInitiated}
+import org.cafienne.storage.deletion.event.RemovalStarted
 import org.cafienne.storage.restore.command.RestoreActorData
-import org.cafienne.storage.restore.event.RestoreInitiated
+import org.cafienne.storage.restore.event.RestoreStarted
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
-import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogging with ReadJournalProvider {
+class StorageCoordinator(val caseSystem: CaseSystem)
+  extends Actor
+    with StorageActorSupervisor
+    with ReadJournalProvider
+    with LazyLogging {
+
   override val system: ActorSystem = caseSystem.system
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher
-
-  private val refs: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
 
   if (Cafienne.config.engine.storage.recoveryDisabled) {
     logger.warn("WARNING: Storage Coordination Service does not recover any existing unfinished storage processes; set 'engine.storage-service.auto-start = true' to enable recovery ")
@@ -55,15 +56,7 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
     start()
   }
 
-  private def getActorRef(command: StorageCommand): ActorRef = {
-    refs.getOrElseUpdate(command.metadata.actorId, {
-      // Note: we create the ModelActor as a child to our context
-      val ref = context.actorOf(Props(command.actorClass, caseSystem, command.metadata), command.metadata.actorId)
-      // Also start watching the lifecycle of the model actor
-      context.watch(ref)
-      ref
-    })
-  }
+  private def getActor(command: StorageCommand): ActorRef = getActorRef(s"root_${command.metadata.actorId}", Props(command.RootStorageActorClass, caseSystem, command.metadata))
 
   def start(): Unit = {
     runStream() onComplete {
@@ -85,18 +78,18 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
     envelope match {
       // Trigger deletion process on actors that still have a StorageEvent (the first one is always RemovalInitiated).
       //  But only trigger it on top level removals, as they will themselves instantiate their children that have not yet been deleted.
-      case EventEnvelope(_, _, _, event: StorageActionInitiated) =>
+      case EventEnvelope(_, _, _, event: StorageActionStarted) =>
         if (event.metadata.isRoot) {
           def restart(commandMaker: ActorMetadata => StorageCommand): Unit = {
             val command = commandMaker(event.metadata)
             logger.info(s"Recovering storage process '${command.getClass.getSimpleName}' on actor ${event.metadata}")
-            getActorRef(command).tell(command, self)
+            getActor(command).tell(command, self)
           }
 
           event match {
-            case _: RemovalInitiated => restart(RemoveActorData)
-            case _: ArchivalInitiated => restart(ArchiveActorData)
-            case _: RestoreInitiated => restart(RestoreActorData)
+            case _: RemovalStarted => restart(RemoveActorData)
+            case _: ArchivalStarted => restart(ArchiveActorData)
+            case _: RestoreStarted => restart(RestoreActorData)
             case other => logger.warn(s"Cannot recover a storage process, because of unrecognized initiation event of type ${other.getClass.getName}")
           }
         }
@@ -106,35 +99,22 @@ class StorageCoordinator(val caseSystem: CaseSystem) extends Actor with LazyLogg
     Future.successful(Done)
   }
 
-  private val followups = mutable.Map[String, (StorageCommand, ActorRef)]()
-  private def registerFollowup(command: StorageCommand, originalSender: ActorRef): Unit = {
-    followups.put(command.metadata.actorId, (command, originalSender))
-  }
-
-  private def handleFollowup(message: ActorTerminated): Unit = {
-    followups.remove(message.actorId).foreach(request => {
-      val command = request._1
-      val originalSender = request._2
-      logger.whenDebugEnabled(logger.debug(s"Actor ${message.actorId} terminated, triggering follow up: $command"))
-      getActorRef(command).tell(command, originalSender)
-    })
-  }
-
   override def receive: Receive = {
     case command: StorageCommand =>
       logger.whenDebugEnabled(logger.debug(s"Received $command"))
-      registerFollowup(command, sender())
-      // Tell Cafienne Engine to remove this model actor from memory
-      caseSystem.gateway.inform(new TerminateModelActor(command.metadata.user, command.metadata.actorId), self)
-    case message: ActorTerminated => handleFollowup(message)
-    case event: RemovalCompleted =>
+      val originalSender = sender()
+      // Tell Cafienne Engine to remove this model actor from memory,
+      //  and then forward the command to the appropriate StorageActor, on behalf of the sender()
+      terminateModelActor(command.metadata, {
+        logger.whenDebugEnabled(logger.debug(s"Actor ${command.metadata.actorId} terminated, triggering follow up: $command"))
+        getActor(command).tell(command, originalSender)
+      })
+    case event: StorageRequestReceived =>
+      logger.whenDebugEnabled(logger.debug(s"Started storage request on ${event.metadata}"))
+    case event: StorageActionCompleted =>
       // Nothing needs to be done, as the actor will stop itself and below we handle the resulting Termination message.
-      logger.whenDebugEnabled(logger.debug(s"Completed removal for ${event.metadata}"))
-    case t: Terminated =>
-      val actorId = t.actor.path.name
-      if (refs.remove(actorId).isEmpty) {
-        logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the LocalRoutingService. Termination message is ignored")
-      }
-      logger.whenDebugEnabled(logger.debug(s"Actor $actorId is removed from memory"))
+      logger.whenDebugEnabled(logger.debug(s"Completed storage action for ${event.metadata}"))
+    case t: Terminated => removeActorRef(t)
+    case other => logger.warn(s"StorageCoordinator received an unknown message of type ${other.getClass.getName}")
   }
 }

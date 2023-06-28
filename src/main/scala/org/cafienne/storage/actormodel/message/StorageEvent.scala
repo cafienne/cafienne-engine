@@ -34,10 +34,10 @@ import java.time.Instant
 trait StorageEvent extends CafienneJson with ModelEvent {
   val metadata: ActorMetadata
   val user: StorageUser = metadata.user
+  val tenant: String = user.tenant
   val actorId: String = metadata.actorId
   val actorType: String = metadata.actorType
   val parentActorId: ActorMetadata = metadata.parent
-  val tenant: String = metadata.tenant
   val optionalJson: Option[ValueMap] = None
 
   private val json = optionalJson.getOrElse(

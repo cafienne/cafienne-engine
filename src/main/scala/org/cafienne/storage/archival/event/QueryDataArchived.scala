@@ -20,10 +20,10 @@ package org.cafienne.storage.archival.event
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.event.QueryDataCleared
 
 @Manifest
-case class QueryDataArchived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageEvent
+case class QueryDataArchived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ArchivalEvent with QueryDataCleared
 
 object QueryDataArchived {
   def deserialize(json: ValueMap): QueryDataArchived = {

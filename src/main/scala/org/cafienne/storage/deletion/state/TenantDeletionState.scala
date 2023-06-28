@@ -17,32 +17,7 @@
 
 package org.cafienne.storage.deletion.state
 
-import akka.Done
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.state.TenantState
 import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.querydb.TenantStorage
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class TenantDeletionState(override val actor: ActorDataRemover) extends DeletionState {
-  override val dbStorage: TenantStorage = new TenantStorage
-
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = {
-    printLogMessage("Running tenant query on cases and groups")
-    implicit val dispatcher: ExecutionContext = dbStorage.dispatcher
-    val childActors = for {
-      cases <- dbStorage.readCases(metadata.actorId)
-      groups <- dbStorage.readGroups(metadata.actorId)
-    } yield (cases, groups)
-    childActors.map(children => {
-      val cases = children._1.map(id => metadata.caseMember(id))
-      val groups = children._2.map(id => metadata.groupMember(id))
-      printLogMessage(s"Found ${cases.length} cases and ${groups.length} groups")
-      cases ++ groups
-    })
-  }
-
-  override def clearQueryData(): Future[Done] = {
-    dbStorage.deleteTenant(actorId)
-  }
-}
+class TenantDeletionState(override val actor: ActorDataRemover) extends DeletionState with TenantState

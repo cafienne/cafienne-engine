@@ -17,80 +17,106 @@
 
 package org.cafienne.storage.restore
 
-import akka.actor.{ActorRef, Props, Terminated}
-import akka.persistence.DeleteMessagesSuccess
-import org.cafienne.infrastructure.Cafienne
-import org.cafienne.storage.actormodel.{ActorMetadata, StorageActor}
-import org.cafienne.storage.archival.Archive
-import org.cafienne.storage.archive.Storage
-import org.cafienne.storage.restore.command.{RestoreActorData, RestoreArchive}
-import org.cafienne.storage.restore.event.{ArchiveRetrieved, ChildRestored, RestoreInitiated}
-import org.cafienne.storage.restore.response.ArchiveNotFound
+import akka.persistence.journal.Tagged
+import akka.persistence.{DeleteMessagesSuccess, RecoveryCompleted}
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.event.ModelEvent
+import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.{ActorMetadata, BaseStorageActor}
+import org.cafienne.storage.archival.{Archive, ModelEventSerializer}
+import org.cafienne.storage.restore.command.RestoreArchive
+import org.cafienne.storage.restore.event.RestoreCompleted
 import org.cafienne.system.CaseSystem
 
-import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
+import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-class ActorDataRestorer(override val caseSystem: CaseSystem, override val metadata: ActorMetadata) extends StorageActor[RestoreState] {
-  override def persistenceId: String = s"RESTORE_ACTOR_FOR_${metadata.actorType.toUpperCase}_${metadata.actorId}"
-  override def createState(): RestoreState = new RestoreState(this)
+class ActorDataRestorer(val caseSystem: CaseSystem, val metadata: ActorMetadata) extends BaseStorageActor with LazyLogging {
+  val storageEvents: ListBuffer[StorageEvent] = ListBuffer()
+  val events: ListBuffer[ModelEvent] = ListBuffer()
 
-  def initiateRestore(command: RestoreActorData): Unit = {
-    //  Use the system dispatcher for handling the export success
-    implicit val ec: ExecutionContext = caseSystem.system.dispatcher
+  override def receiveRecover: Receive = {
+    case event: StorageEvent =>
+      // This one must be cleared at some point
+      storageEvents += event
+    case event: ModelEvent =>
+      // This means we have already restored, right?
+      events += event
+    case _: RecoveryCompleted => recoveryCompleted()
+  }
 
-    val storage: Storage = Cafienne.config.engine.storage.archive.plugin
-    val senderRef = sender()
-
-    def raiseFailure(throwable: Throwable): Unit = {
-      logger.warn(s"Cannot find archive ${command.metadata}", throwable)
-      senderRef ! ArchiveNotFound(command.metadata)
-    }
-    try {
-      storage.retrieve(command.metadata).onComplete {
-        case Success(archive) =>
-          self ! ArchiveRetrieved(command.metadata, archive)
-          senderRef ! RestoreInitiated(metadata)
-        case Failure(throwable) => raiseFailure(throwable)
-      }
-    } catch {
-      case throwable: Throwable => raiseFailure(throwable)
+  def recoveryCompleted(): Unit = {
+    if (hasArchive && hasModelEvents) {
+      // Then ... why are we recovering?
     }
   }
 
-  def getChildActorRef(child: ActorMetadata): ActorRef = {
-    children.getOrElseUpdate(child.actorId, {
-      // If the child does not yet exist, create it.
-      context.watch(context.actorOf(Props(classOf[EventsPersister], caseSystem, child), child.actorId))
+  def afterStorageProcessCompleted(): Unit = {
+    context.parent ! RestoreCompleted(metadata)
+    context.stop(self) // Event journal no longer contains our events, we can be deleted
+  }
+
+  private var startedClearing = false;
+
+  def clearStorageEvents(): Unit = {
+    if (! startedClearing) {
+      printLogMessage(s"Stored ${events.size} actor events; deleting events up to $lastSequenceNr - ${events.size} ==> ${lastSequenceNr - events.size}")
+      deleteMessages(lastSequenceNr - events.size)
+      startedClearing = true // Avoid clearing twice, as that results in dead letter messages (DeleteMessagesSuccess comes then multiple times)
+    }
+  }
+
+  def restoreEvents(): Unit = {
+    val jsonEvents = archive.events
+    val taggedModelEvents = jsonEvents.asScala.toSeq
+      .map(_.asMap) // Make it a ValueMap
+      .map(ModelEventSerializer.deserializeEvent) // Recover it as ModelEvent instances
+      .filter(_.isInstanceOf[ModelEvent])
+      .map(_.asInstanceOf[ModelEvent])
+      .map(event => Tagged(event, event.tags().asScala.toSet))
+
+    printLogMessage(s"\nPERSISTING ${taggedModelEvents.size} MODEL EVENTS")
+
+    persistAll(taggedModelEvents)(e => {
+      events += e.payload.asInstanceOf[ModelEvent]
+      if (e == taggedModelEvents.last) {
+        printLogMessage(s"\nPERSISTED all MODEL EVENTS (last one is ${e.payload.getClass.getSimpleName}), now clearing storage evetns")
+        // Events got persisted, now we can remove our progress state events.
+        clearStorageEvents()
+      }
     })
   }
 
-  def childActorTerminated(t: Terminated): Unit = {
-    val actorId = t.actor.path.name
-    if (children.remove(actorId).isEmpty) {
-      logger.warn("Received a Termination message for actor " + actorId + ", but it was not registered in the RestoreCoordinator. Termination message is ignored")
+  def hasModelEvents: Boolean = events.nonEmpty
+  def hasArchive: Boolean = storageEvents.exists(_.isInstanceOf[RestoreArchive])
+  lazy val archive: Archive = storageEvents.filter(_.isInstanceOf[RestoreArchive]).map(_.asInstanceOf[RestoreArchive]).head.archive
+
+  def startStorageProcess(command: RestoreArchive): Unit = {
+    if (hasModelEvents && hasArchive) {
+      // probably already restored ... but not yet cleansed our restore events
+      clearStorageEvents()
+    } else if (hasModelEvents) {
+      // Restored properly, let's tell and stop ourselves immediately
+      afterStorageProcessCompleted()
+    } else if (hasArchive) {
+      // Apparently not yet restored the archive, let's trigger that process again
+      restoreEvents()
+    } else {
+      // TODO: must we check that we are actually something in "archived" state?
+      //if (storageEvents.exists(_.isInstanceOf[ModelActorArchived])) {
+      persist(command)(_ => {
+        printLogMessage("\nPERSISTED ARCHIVE, NOW ABOUT TO RESTORE EVENTS")
+        storageEvents += command
+        restoreEvents()
+      })
     }
   }
 
-  def initiateChildRestore(archive: Archive): Unit = {
-    getChildActorRef(archive.metadata).tell(RestoreArchive(archive.metadata, archive), self)
-  }
-
-  def completeRestoreProcess(): Unit = {
-    printLogMessage("Completed restore process. Deleting ActorDataRestorer state messages for \\\" + self.path\"")
-    clearState()
-  }
-
-  def restoreCompleted(): Unit = {
-    context.stop(self)
-  }
-
   override def receiveCommand: Receive = {
-    case command: RestoreActorData => initiateRestore(command) // Initial command. Validate and reply.
-    case event: ArchiveRetrieved => storeEvent(event) // Archive available, store and spread.
-    case event: ChildRestored => storeEvent(event) // One of our children restored itself, we can remove it from the list.
-    case _: DeleteMessagesSuccess => restoreCompleted() // Event journal no longer contains our events, we can be deleted
-    case t: Terminated => childActorTerminated(t) // One of our children left memory. That's a good sign...
-    case other => logger.warn(s"Received message with unknown type. Ignoring it. Message is of type ${other.getClass.getName}")
+    case command: RestoreArchive => startStorageProcess(command)
+    case _: DeleteMessagesSuccess => afterStorageProcessCompleted()
+    case other => reportUnknownMessage(other)
   }
+
+  override def persistenceId: String = metadata.actorId
 }

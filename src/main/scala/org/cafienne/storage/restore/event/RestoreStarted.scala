@@ -15,18 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.deletion.event
+package org.cafienne.storage.restore.event
 
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageActionInitiated
+import org.cafienne.storage.actormodel.message.StorageActionStarted
 
 @Manifest
-case class RemovalInitiated(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionInitiated
+case class RestoreStarted(metadata: ActorMetadata, children: Seq[ActorMetadata] = Seq(), override val optionalJson: Option[ValueMap] = None) extends RestoreEvent with StorageActionStarted
 
-object RemovalInitiated {
-  def deserialize(json: ValueMap): RemovalInitiated = {
-    RemovalInitiated(ActorMetadata.deserializeMetadata(json), Some(json))
-  }
+object RestoreStarted {
+  def deserialize(json: ValueMap): RestoreStarted = RestoreStarted(ActorMetadata.deserializeMetadata(json), Seq(), Some(json))
 }

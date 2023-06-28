@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package org.cafienne.storage.actormodel.state
 
-import org.cafienne.infrastructure.serialization.Manifest
-import org.cafienne.json.ValueMap
+import akka.Done
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageActionInitiated
+import org.cafienne.storage.querydb.ProcessStorage
 
-@Manifest
-case class ArchivalInitiated(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageActionInitiated
+import scala.concurrent.Future
 
-object ArchivalInitiated {
-  def deserialize(json: ValueMap): ArchivalInitiated = {
-    ArchivalInitiated(ActorMetadata.deserializeMetadata(json), Some(json))
-  }
+trait ProcessState extends QueryDBState {
+  override val dbStorage: ProcessStorage = new ProcessStorage
+
+  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
+
+  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
 }

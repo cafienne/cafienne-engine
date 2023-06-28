@@ -47,7 +47,7 @@ public class ForceRecoveryCommand extends TestScriptCommand {
 
     @Override
     public void beforeSendCommand(TestScript testScript) {
-        testScript.getCaseSystem().gateway().inform(new TerminateModelActor(getUser(), getActorId()), ActorRef.noSender());
+        testScript.getCaseSystem().gateway().inform(new TerminateModelActor(getActorId()), ActorRef.noSender());
         // Give the system 500 ms to clean up the actor and the references
         waitSomeTime(500);
     }

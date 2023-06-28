@@ -17,17 +17,7 @@
 
 package org.cafienne.storage.deletion.state
 
-import akka.Done
-import org.cafienne.storage.actormodel.CaseChildrenFinder
+import org.cafienne.storage.actormodel.state.CaseState
 import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.querydb.CaseStorage
 
-import scala.concurrent.Future
-
-class CaseDeletionState(override val actor: ActorDataRemover) extends DeletionState with CaseChildrenFinder {
-  override val dbStorage: CaseStorage = new CaseStorage
-
-  override def clearQueryData(): Future[Done] = {
-    dbStorage.deleteCase(metadata.actorId)
-  }
-}
+class CaseDeletionState(override val actor: ActorDataRemover) extends DeletionState with CaseState

@@ -23,10 +23,9 @@ import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.message.IncomingActorMessage;
-import org.cafienne.actormodel.response.ActorChokedFailure;
-import org.cafienne.actormodel.response.ActorExistsFailure;
-import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.actormodel.response.*;
 import org.cafienne.infrastructure.serialization.DeserializationFailure;
+import org.cafienne.storage.actormodel.message.StorageEvent;
 
 /**
  * All akka incoming traffic (either during recovery or upon receiving incoming messages)
@@ -38,6 +37,9 @@ class Reception {
     private boolean bootstrapPending = true;
     private final ModelActor actor;
     private boolean isBroken = false;
+    private String recoveryFailureInformation = "";
+    private boolean isInStorageProcess = false;
+    private String actorType = "";
     private final RecoveryRoom recoveryRoom;
     private final BackOffice backoffice;
     final Warehouse warehouse;
@@ -114,7 +116,7 @@ class Reception {
 
     private void hideFrontdoor(String msg) {
         isBroken = true;
-        actor.getLogger().warn("Aborting recovery of " + actor + ". " + msg);
+        recoveryFailureInformation = msg;
     }
 
     private boolean isBroken() {
@@ -122,10 +124,13 @@ class Reception {
     }
 
     private boolean informAboutRecoveryFailure(IncomingActorMessage msg) {
+        actor.getLogger().warn("Aborting recovery of " + actor + " upon request of type "+msg.getClass().getSimpleName() + " from user " + msg.getUser().id() + ". " + recoveryFailureInformation);
         if (msg.isCommand()) {
             if (msg.isBootstrapMessage()) {
                 // Trying to do e.g. StartCase in e.g. a TenantActor
                 handleAlreadyCreated(msg);
+            } else if (isInStorageProcess) {
+                actor.reply(new ActorInStorage(msg.asCommand(), actorType));
             } else {
                 String error = actor + " cannot handle message '" + msg.getClass().getSimpleName() + "' because it has not recovered properly. Check the server logs for more details.";
                 actor.reply(new ActorChokedFailure(msg.asCommand(), new InvalidCommandException(error)));
@@ -153,6 +158,11 @@ class Reception {
         if (event.isBootstrapMessage()) {
             // Wrong type of ModelActor. Probably someone tries to re-use the same actor id for another type of ModelActor.
             hideFrontdoor("Recovery event " + event.getClass().getSimpleName() + " requires an actor of type " + event.actorClass().getSimpleName());
+        } else if (event instanceof StorageEvent) {
+            // Someone is archiving or deleting this actor
+            hideFrontdoor("Actor is in storage processing");
+            isInStorageProcess = true;
+            actorType = ((StorageEvent) event).metadata().actorType();
         } else {
             // Pretty weird if it happens ...
             hideFrontdoor("Received unexpected recovery event of type " + event.getClass().getName());

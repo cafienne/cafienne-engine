@@ -17,23 +17,16 @@
 
 package org.cafienne.storage.archival.event
 
-import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.{Fields, Manifest}
+import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
-import org.cafienne.storage.archival.Archive
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
 
 @Manifest
-case class RootArchived(metadata: ActorMetadata, archive: Archive, override val optionalJson: Option[ValueMap] = None) extends StorageEvent {
-  override def write(generator: JsonGenerator): Unit = {
-    super.writeStorageEvent(generator)
-    writeField(generator, Fields.archive, archive)
-  }
-}
+case class ArchivalRequested(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageRequestReceived
 
-object RootArchived {
-  def deserialize(json: ValueMap): RootArchived = {
-    RootArchived(ActorMetadata.deserializeMetadata(json), Archive.deserialize(json.readMap(Fields.archive)), Some(json))
+object ArchivalRequested {
+  def deserialize(json: ValueMap): ArchivalRequested = {
+    ArchivalRequested(ActorMetadata.deserializeMetadata(json), Some(json))
   }
 }

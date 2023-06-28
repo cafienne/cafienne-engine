@@ -17,19 +17,17 @@
 
 package org.cafienne.storage.actormodel
 
-import akka.actor.ActorRef
+import akka.persistence.RecoveryCompleted
 import akka.persistence.journal.Tagged
-import akka.persistence.{PersistentActor, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
-import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.actormodel.event.ModelEvent
-import org.cafienne.actormodel.response.ActorTerminated
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageCommand, StorageEvent}
+import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.state.{QueryDBState, StorageActorState}
 import org.cafienne.system.CaseSystem
 
-import scala.collection.mutable
-
-trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogging {
+trait StorageActor[S <: StorageActorState]
+  extends BaseStorageActor
+    with LazyLogging {
   val caseSystem: CaseSystem
   val metadata: ActorMetadata
 
@@ -44,7 +42,7 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
   /**
     * Invoked after the StorageActor has done it's job.
     * This can be used to clean the storage job state.
-    * @param toSequenceNr
+    * @param toSequenceNr Up to which event the journal must be cleared
     */
   def clearState(toSequenceNr: Long = Long.MaxValue): Unit = {
     deleteMessages(toSequenceNr)
@@ -54,41 +52,6 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
    * Every type of ModelActor that we operate on has a specific state.
    */
   val state: S = createState()
-
-  /**
-   * List of all children that have been instantiated to also run the handler logic.
-   */
-  val children: mutable.Map[String, ActorRef] = new mutable.HashMap[String, ActorRef]()
-
-  def printLogMessage(msg: String): Unit = {
-    Printer.print(this.metadata, msg)
-  }
-
-  /**
-    * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory
-    */
-  def informCafienneGateway(actorId: String, needsResponse: Boolean = false): Unit = {
-    printLogMessage("Telling Cafienne Gateway to terminate " + actorId)
-    caseSystem.gateway.inform(new TerminateModelActor(metadata.user, actorId, needsResponse), self)
-  }
-
-  private val followups = mutable.Map[String, () => Unit]()
-
-  /**
-   * Tell Cafienne Gateway to remove the actual ModelActor with the same actor id from memory.
-    * Upon successful termination, the followup action will be triggered.
-   */
-  def informCafienneGateway(actorId: String, followUpAction: => Unit): Unit = {
-    followups.put(actorId, () => followUpAction)
-    informCafienneGateway(actorId, true)
-  }
-
-  /**
-    * Trigger this method when ActorTerminated is received in the StorageActor.
-    * Note: this must be explicitly invoked.
-    * @param t
-    */
-  def actorTerminated(t: ActorTerminated): Unit = followups.remove(t.actorId).foreach(action => action())
 
   /**
    * Recovery is pretty simple. Simply add all events to our state.
@@ -110,42 +73,15 @@ trait StorageActor[S <: StorageActorState] extends PersistentActor with LazyLogg
     * Triggers the storage process on the state directly if the state already
     * has an initiation event, else if will simply add the given event
     * which triggers the storage process in the state.
-    * @param event The initiation event to store if one is not yet available
     */
-  def triggerStorageProcess(command: StorageCommand, event: StorageActionInitiated): Unit = {
-    if (state.hasInitiationEvent) {
+  def startStorageProcess(): Unit = {
+    if (state.hasStartEvent) {
       state.continueStorageProcess()
+      sender() ! state.storageStartedEvent
     } else {
-      state.addEvent(event)
+      state.startStorageProcess()
     }
-    // Inform the sender of the command about the event
-    sender() ! event
   }
 }
 
-/**
- * Simplistic console printer. To be replaced with proper log infrastructure (whenDebugEnabled and such)
- */
-object Printer extends LazyLogging {
-  var previousActor: ActorMetadata = _
-
-  def out(msg: String): Unit = {
-    logger.whenDebugEnabled(logger.debug(msg))
-  }
-
-  def print(metadata: ActorMetadata, msg: String): Unit = {
-    val path = if (metadata == previousActor) "- " else {
-      val root = if (metadata.isRoot) "ROOT " else ""
-      "\n" + root + metadata.path + ":\n- "
-    }
-
-    if (msg.startsWith("\n====") || msg.startsWith("====")) {
-      out(msg)
-    } else if (msg.startsWith("\n")) {
-      out(s"\n$path${msg.substring(1)}")
-    } else {
-      out(s"$path$msg")
-    }
-    previousActor = metadata
-  }
-}
+trait QueryDBStorageActor[S <: QueryDBState] extends StorageActor[S]

@@ -63,7 +63,7 @@ class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRout
         if (!user.isOwner) {
           complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
         } else {
-          initiateDataRemoval(ActorMetadata(user = StorageUser(user.id), actorType = ActorType.Tenant, tenant = user.tenant, actorId = user.tenant))
+          initiateDataRemoval(ActorMetadata(user = StorageUser(user.id, user.tenant), actorType = ActorType.Tenant, actorId = user.tenant))
         }
       }
     }

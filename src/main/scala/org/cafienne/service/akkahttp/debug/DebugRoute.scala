@@ -98,7 +98,7 @@ class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
         if (!Cafienne.config.developerRouteOpen) {
           complete(StatusCodes.NotFound)
         } else {
-          onComplete(caseSystem.gateway.request(new TerminateModelActor(user, modelId))) {
+          onComplete(caseSystem.gateway.request(TerminateModelActor(modelId))) {
             case Success(value) => complete(StatusCodes.OK, s"Forced recovery of $modelId")
             case Failure(err) => throw err;
           }

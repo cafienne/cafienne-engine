@@ -15,23 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel
+package org.cafienne.storage.actormodel.state
 
-import org.cafienne.actormodel.event.ModelEvent
+import com.typesafe.scalalogging.LazyLogging
+import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
+import akka.actor.ActorRef
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
-import org.cafienne.storage.actormodel.message.{StorageActionInitiated, StorageEvent}
+import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
+import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
 import org.cafienne.tenant.actorapi.event.TenantEvent
 
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
+trait StorageActorState extends ModelEventCollection with LazyLogging {
+  val actor: BaseStorageActor
+  val rootStorageActor: ActorRef = actor.context.parent
 
-trait StorageActorState {
-  val actor: StorageActor[_]
   val metadata: ActorMetadata = actor.metadata
-  val actorId: String         = metadata.actorId
-  val events: ListBuffer[ModelEvent] = ListBuffer()
+  val actorId: String = metadata.actorId
   val expectedEventClass: Class[_ <: ModelEvent] = metadata.actorType match {
     case ActorType.Tenant => classOf[TenantEvent]
     case ActorType.Case => classOf[CaseEvent]
@@ -42,9 +43,11 @@ trait StorageActorState {
 
   def originalModelActorEvents: Seq[ModelEvent] = events.filterNot(_.isInstanceOf[StorageEvent]).toSeq
 
-  def eventsOfType[T <: ModelEvent](clazz: Class[T]): Seq[T] = events.filter(event => clazz.isAssignableFrom(event.getClass)).map(_.asInstanceOf[T]).toSeq
-
   def printLogMessage(msg: String): Unit = actor.printLogMessage(msg)
+
+  def reportUnknownEvent(event: StorageEvent): Unit = {
+    logger.error(s"${actor.getClass.getSimpleName}[$metadata]: Cannot handle event of type ${event.getClass.getName} from ${event.metadata}")
+  }
 
   def actualModelActorType: String = events
     .filter(_.isBootstrapMessage)
@@ -53,7 +56,11 @@ trait StorageActorState {
     .headOption // Take the actor class of the bootstrap message found, or else just give a message with the event types that are found.
     .getOrElse(s"Bootstrap message is missing; found ${events.length} events of types: [${events.map(_.getClass.getName).toSet.mkString(",")}]")
 
-  def hasInitiationEvent: Boolean = events.exists(_.isInstanceOf[StorageActionInitiated])
+  def hasStartEvent: Boolean = events.exists(_.isInstanceOf[StorageActionStarted])
+
+  def storageStartedEvent: StorageActionStarted = getEvent(classOf[StorageActionStarted])
+
+  def startStorageProcess(): Unit
 
   /**
     * Continues the storage process.
@@ -73,28 +80,25 @@ trait StorageActorState {
 
   def handleStorageEvent(event: StorageEvent): Unit
 
+  def informOwner(msg: Any): Unit = {
+    rootStorageActor ! msg
+  }
+
   /**
-   * Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
-   */
+    * Triggers the removal process upon recovery completion. But only if the RemovalInitiated event is found.
+    */
   def handleRecoveryCompletion(): Unit = {
     printLogMessage(s"Recovery completed with ${events.size} events")
-    if (hasInitiationEvent) {
+    if (hasStartEvent) {
+      println(s"$metadata: Skipping continuation after recovery")
       printLogMessage("Triggering storage process upon recovery")
-      continueStorageProcess()
+//      continueStorageProcess()
     }
   }
 
   /**
-    * ModelActor specific implementation. E.g., a Tenant retrieves it's children from the QueryDB,
-    * and a Case can determine it based on the PlanItemCreated events it has.
-    *
-    * @return
+    * Check if we have recovered events of the expected type of ModelActor
+    * (to e.g. avoid deleting a case if we're expecting to delete a tenant)
     */
-  def findCascadingChildren(): Future[Seq[ActorMetadata]]
-
-  /**
-   * Check if we have recovered events of the expected type of ModelActor
-   * (to e.g. avoid deleting a case if we're expecting to delete a tenant)
-   */
   def hasExpectedEvents: Boolean = events.exists(event => expectedEventClass.isAssignableFrom(event.getClass))
 }

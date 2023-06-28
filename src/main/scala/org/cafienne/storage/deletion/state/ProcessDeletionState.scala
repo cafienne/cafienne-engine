@@ -17,17 +17,7 @@
 
 package org.cafienne.storage.deletion.state
 
-import akka.Done
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.state.ProcessState
 import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.querydb.ProcessStorage
 
-import scala.concurrent.Future
-
-class ProcessDeletionState(override val actor: ActorDataRemover) extends DeletionState {
-  override val dbStorage: ProcessStorage = new ProcessStorage
-
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
-
-  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
-}
+class ProcessDeletionState(override val actor: ActorDataRemover) extends DeletionState with ProcessState

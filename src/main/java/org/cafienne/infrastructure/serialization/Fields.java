@@ -22,6 +22,7 @@ package org.cafienne.infrastructure.serialization;
  */
 public enum Fields {
     messageId,
+    actor,
     actorId,
     user,
 

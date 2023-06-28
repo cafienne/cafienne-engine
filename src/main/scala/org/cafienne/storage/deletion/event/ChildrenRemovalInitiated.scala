@@ -21,12 +21,11 @@ import com.fasterxml.jackson.core.JsonGenerator
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
 
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, SeqHasAsJava}
+import scala.jdk.CollectionConverters.SeqHasAsJava
 
 @Manifest
-case class ChildrenRemovalInitiated(metadata: ActorMetadata, members: Seq[ActorMetadata], override val optionalJson: Option[ValueMap] = None) extends StorageEvent {
+case class ChildrenRemovalInitiated(metadata: ActorMetadata, members: Seq[ActorMetadata], override val optionalJson: Option[ValueMap] = None) extends RemovalEvent {
   override def write(generator: JsonGenerator): Unit = {
     super.writeStorageEvent(generator)
     writeListField(generator, Fields.members, members.asJava)
@@ -35,7 +34,8 @@ case class ChildrenRemovalInitiated(metadata: ActorMetadata, members: Seq[ActorM
 
 object ChildrenRemovalInitiated {
   def deserialize(json: ValueMap): ChildrenRemovalInitiated = {
-    val members = json.withArray(Fields.members).getValue.asScala.map(_.asMap).map(ActorMetadata.deserialize).toSeq
-    ChildrenRemovalInitiated(ActorMetadata.deserializeMetadata(json), members, Some(json))
+    val metadata = ActorMetadata.deserializeMetadata(json)
+    val members = ActorMetadata.deserializeChildrenStructure(metadata, json.withArray(Fields.members))
+    ChildrenRemovalInitiated(metadata, members, Some(json))
   }
 }

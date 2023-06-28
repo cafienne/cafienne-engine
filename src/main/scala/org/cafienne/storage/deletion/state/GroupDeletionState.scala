@@ -17,17 +17,7 @@
 
 package org.cafienne.storage.deletion.state
 
-import akka.Done
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.storage.actormodel.state.GroupState
 import org.cafienne.storage.deletion.ActorDataRemover
-import org.cafienne.storage.querydb.ConsentGroupStorage
 
-import scala.concurrent.Future
-
-class GroupDeletionState(override val actor: ActorDataRemover) extends DeletionState {
-  override val dbStorage: ConsentGroupStorage = new ConsentGroupStorage
-
-  override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
-
-  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
-}
+class GroupDeletionState(override val actor: ActorDataRemover) extends DeletionState with GroupState

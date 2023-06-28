@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.archival.event
+package org.cafienne.storage.restore.event
 
 import org.cafienne.infrastructure.serialization.Manifest
 import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
-import org.cafienne.storage.actormodel.message.StorageEvent
+import org.cafienne.storage.actormodel.event.StorageRequestReceived
 
 @Manifest
-case class ArchiveExported(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageEvent
+case class RestoreRequested(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends StorageRequestReceived
 
-object ArchiveExported {
-  def deserialize(json: ValueMap): ArchiveExported = {
-    ArchiveExported(ActorMetadata.deserializeMetadata(json), Some(json))
+object RestoreRequested {
+  def deserialize(json: ValueMap): RestoreRequested = {
+    RestoreRequested(ActorMetadata.deserializeMetadata(json), Some(json))
   }
 }

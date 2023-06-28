@@ -22,8 +22,10 @@ import org.cafienne.json.ValueMap
 import org.cafienne.storage.actormodel.ActorMetadata
 
 @Manifest
-case class ProcessArchived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ModelActorArchived
+case class ArchiveReceived(metadata: ActorMetadata, override val optionalJson: Option[ValueMap] = None) extends ArchivalEvent
 
-object ProcessArchived {
-  def deserialize(json: ValueMap): ProcessArchived = ProcessArchived(ActorMetadata.deserializeMetadata(json), Some(json))
+object ArchiveReceived {
+  def deserialize(json: ValueMap): ArchiveReceived = {
+    ArchiveReceived(ActorMetadata.deserializeMetadata(json), Some(json))
+  }
 }
