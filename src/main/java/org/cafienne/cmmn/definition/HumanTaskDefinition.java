@@ -58,12 +58,9 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     }
 
     private WorkflowTaskDefinition parseWorkflowTaskDefinition() {
-        WorkflowTaskDefinition def = getExtension("implementation", WorkflowTaskDefinition.class, false);
-        if (def == null) {
-            // If we cannot find the extension, we'll create an empty one.
-            def = WorkflowTaskDefinition.createEmptyDefinition(this);
-        }
-        return def;
+        WorkflowTaskDefinition def = parseExtension(CAFIENNE_IMPLEMENTATION, WorkflowTaskDefinition.class);
+        // If we cannot find the extension, we'll create an empty one.
+        return def != null ? def : WorkflowTaskDefinition.createEmptyDefinition(this);
     }
 
     @Override

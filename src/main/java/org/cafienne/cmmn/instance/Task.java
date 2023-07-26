@@ -41,7 +41,6 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     private ValueMap taskInput = new ValueMap();
     private ValueMap implementationInput = new ValueMap();
 
-    private ValueMap givenOutput = new ValueMap();
     private ValueMap taskOutput = new ValueMap();
 
     private final TaskImplementationActorState implementationState = new TaskImplementationActorState(this);
@@ -282,7 +281,6 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     }
 
     public void updateState(TaskOutputFilled event) {
-        this.givenOutput = event.getRawOutputParameters();
         this.taskOutput = event.getTaskOutputParameters();
         if (getCaseInstance().recoveryRunning()) {
             // No need to bind task output to the case file, as case file events will take care of setting right values

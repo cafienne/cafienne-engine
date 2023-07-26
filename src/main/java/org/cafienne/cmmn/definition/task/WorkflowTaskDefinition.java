@@ -105,7 +105,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
     }
 
     public static WorkflowTaskDefinition createEmptyDefinition(HumanTaskDefinition taskDefinition) {
-        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(NAMESPACE_URI, "implementation");
+        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(CAFIENNE_NAMESPACE, "implementation");
         return new WorkflowTaskDefinition(customTag, taskDefinition.getModelDefinition(), taskDefinition);
     }
 

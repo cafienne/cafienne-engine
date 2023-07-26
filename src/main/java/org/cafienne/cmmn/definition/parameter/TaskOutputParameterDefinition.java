@@ -41,20 +41,7 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
      * @return
      */
     private boolean getMandatoryValue() {
-        Element extension = getExtension("implementation", false);
-        if (extension == null) {
-            return false;
-        }
-        String isRequired = extension.getAttribute("required");
-        if (isRequired.equalsIgnoreCase("true")) {
-            return true;
-        } else if (isRequired.isEmpty() || isRequired.equalsIgnoreCase("false")) {
-            return false;
-        } else {
-            TaskDefinition<?> task = getParentElement();
-            getModelDefinition().addDefinitionError("Output parameter " + getName() + " in task " + task.getName() + " has an invalid value for the required attribute: '" + isRequired + "'");
-            return false;
-        }
+        return getImplementationAttribute("required");
     }
 
     /**

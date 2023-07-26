@@ -32,7 +32,7 @@ public class ProcessDefinition extends ModelDefinition implements TaskImplementa
 
     public ProcessDefinition(Element element, DefinitionsDocument document) {
         super(element, document);
-        this.subProcessDefinition = getExtension("implementation", SubProcessDefinition.class, true);
+        this.subProcessDefinition = getCustomImplementation(SubProcessDefinition.class, true);
     }
 
     /**
