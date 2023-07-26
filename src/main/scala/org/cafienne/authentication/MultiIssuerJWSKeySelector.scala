@@ -18,7 +18,7 @@
 package org.cafienne.authentication
 
 import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.jwk.source.{JWKSource, RemoteJWKSet}
+import com.nimbusds.jose.jwk.source.{JWKSource, JWKSourceBuilder}
 import com.nimbusds.jose.proc.{JWSKeySelector, JWSVerificationKeySelector, SecurityContext}
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.proc.JWTClaimsSetAwareJWSKeySelector
@@ -45,7 +45,7 @@ object MultiIssuerJWSKeySelector extends LazyLogging {
 
   def readIssuersConfiguration(): Map[String, JWSKeySelector[SecurityContext]] = {
     val issuers = Cafienne.config.OIDC.issuers.map(metadata => {
-      val keySource: JWKSource[SecurityContext] = new RemoteJWKSet(metadata.getJWKSetURI.toURL)
+      val keySource: JWKSource[SecurityContext] = JWKSourceBuilder.create(metadata.getJWKSetURI.toURL).build()
       val issuer: String = metadata.getIssuer.getValue
       val algorithms = new java.util.HashSet(metadata.getIDTokenJWSAlgs)
       // Configure the JWT processor with a key selector to feed matching public

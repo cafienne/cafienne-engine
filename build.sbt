@@ -13,9 +13,8 @@ startYear := Some(2014)
 resolvers ++= Seq(
   Resolver.jcenterRepo,
   Resolver.DefaultMavenRepository,
-  Resolver.sonatypeRepo("releases"),
   "typesafe releases" at "https://repo.typesafe.com/typesafe/releases",
-)
+) ++ Resolver.sonatypeOssRepos("releases")
 
 /**
   * Plugins used
@@ -55,7 +54,7 @@ javacOptions ++= Seq("-source", "11", "-target", "11")
 scalacOptions := Seq(
   "-encoding", "UTF-8",
   "-unchecked",
-  "-target:jvm-11",
+  "-release:11",
   "-deprecation",
   "-Xlint", "deprecation",
   "-Xlint", "unchecked",
@@ -92,7 +91,7 @@ pomIncludeRepository := { _ => false }
 // other versions publish to sonatype staging repository
 publishTo := Some(
   if (isSnapshot.value)
-    Opts.resolver.sonatypeSnapshots
+    Opts.resolver.sonatypeOssSnapshots.head
   else
     Opts.resolver.sonatypeStaging
 )
