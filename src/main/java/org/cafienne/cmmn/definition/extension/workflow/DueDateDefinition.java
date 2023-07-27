@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.task;
+package org.cafienne.cmmn.definition.extension.workflow;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ConstraintDefinition;
@@ -23,8 +23,10 @@ import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.w3c.dom.Element;
 
-public class AssignmentDefinition extends ConstraintDefinition {
-    public AssignmentDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
+import java.time.Instant;
+
+public class DueDateDefinition extends ConstraintDefinition {
+    public DueDateDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
     }
 
@@ -36,8 +38,8 @@ public class AssignmentDefinition extends ConstraintDefinition {
         return "The " + getType() + " in " + parentType + " '" + parentId + "'";
     }
 
-    public String evaluate(HumanTask task) {
-        return getExpressionDefinition().getEvaluator().evaluateAssignee(task, this);
+    public Instant evaluate(HumanTask task) {
+        return getExpressionDefinition().getEvaluator().evaluateDueDate(task, this);
     }
 
     /**
@@ -46,6 +48,6 @@ public class AssignmentDefinition extends ConstraintDefinition {
      * @return
      */
     public String getType() {
-        return "assignment";
+        return "Due date expression";
     }
 }

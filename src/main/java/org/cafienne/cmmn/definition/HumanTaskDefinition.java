@@ -17,8 +17,8 @@
 
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
-import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItemType;

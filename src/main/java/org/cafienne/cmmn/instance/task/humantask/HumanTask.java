@@ -21,7 +21,7 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.PlanningTableDefinition;
-import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.*;
 import org.cafienne.cmmn.instance.Task;

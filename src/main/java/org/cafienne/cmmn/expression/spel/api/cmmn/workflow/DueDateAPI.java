@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.expression.spel.api.cmmn.workflow;
 
-import org.cafienne.cmmn.definition.task.DueDateDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.DueDateDefinition;
 import org.cafienne.cmmn.expression.spel.api.cmmn.constraint.PlanItemRootAPI;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 

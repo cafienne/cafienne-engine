@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.task.validation;
+package org.cafienne.cmmn.definition.extension.workflow.validation;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
