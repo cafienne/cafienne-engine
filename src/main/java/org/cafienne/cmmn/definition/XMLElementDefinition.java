@@ -19,7 +19,6 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -334,14 +333,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         }
 
         return value;
-    }
-
-    protected StringTemplate parseTemplate(String childTagName, boolean presenceRequired) {
-        String string = parseString(childTagName, presenceRequired);
-        if (string == null) {
-            return null;
-        }
-        return new StringTemplate(string);
     }
 
     protected String printElement() {

@@ -8,7 +8,6 @@
 package org.cafienne.cmmn.test;
 
 import org.cafienne.cmmn.instance.TestValueClasses;
-import org.cafienne.cmmn.instance.process.TestStringTemplate;
 import org.cafienne.cmmn.test.basic.BasicTests;
 import org.cafienne.cmmn.test.casefile.CaseFileTests;
 import org.cafienne.cmmn.test.expression.ExpressionTests;
@@ -30,7 +29,6 @@ import org.junit.runners.Suite.SuiteClasses;
         TaskTests.class,
         TeamTests.class,
         TestValueClasses.class,
-        TestStringTemplate.class
 })
 public class AllTests {
 
