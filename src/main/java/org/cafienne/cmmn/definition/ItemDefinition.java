@@ -17,6 +17,7 @@
 
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItemType;
@@ -37,6 +38,12 @@ public interface ItemDefinition extends DefinitionElement {
     }
 
     Collection<ExitCriterionDefinition> getExitCriteria();
+
+    FourEyesDefinition getFourEyesDefinition();
+
+    default boolean hasFourEyes() {
+        return getFourEyesDefinition() != null && !getFourEyesDefinition().getOthers().isEmpty();
+    }
 
     default boolean isDiscretionary() {
         return false;

@@ -17,6 +17,7 @@
 
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.CasePlan;
@@ -63,6 +64,11 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
     @Override
     public Collection<ExitCriterionDefinition> getExitCriteria() {
         return exitCriteria;
+    }
+
+    @Override
+    public FourEyesDefinition getFourEyesDefinition() {
+        return null; // Should not exist
     }
 
     @Override

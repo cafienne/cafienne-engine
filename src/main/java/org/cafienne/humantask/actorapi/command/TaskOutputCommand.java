@@ -51,6 +51,7 @@ public abstract class TaskOutputCommand extends WorkflowCommand {
 	public void validate(HumanTask task) {
 		super.validateTaskOwnership(task);
 		super.mustBeActive(task);
+		super.validateFourEyes(task);
 	}
 
 	@Override

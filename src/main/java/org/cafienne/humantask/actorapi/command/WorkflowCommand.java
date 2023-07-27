@@ -22,6 +22,9 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.definition.ItemDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.ItemDefinitionReference;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
@@ -34,6 +37,8 @@ import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class WorkflowCommand extends CaseCommand {
     private final String taskId;
@@ -125,9 +130,28 @@ public abstract class WorkflowCommand extends CaseCommand {
         }
     }
 
+    protected void validateFourEyes(HumanTask task) {
+        validateFourEyes(task, getUser());
+    }
+
+    protected void validateFourEyes(HumanTask task, CaseUserIdentity user) {
+        if (task.getItemDefinition().hasFourEyes()) {
+            FourEyesDefinition definition = task.getItemDefinition().getFourEyesDefinition();
+            List<ItemDefinition> opposites = definition.getOthers().stream().map(ItemDefinitionReference::getItemDefinition).collect(Collectors.toList());
+            List<HumanTask> items = task.getCaseInstance().getPlanItems().stream().filter(item -> item instanceof HumanTask && item.getState().isInitiated() && opposites.contains(item.getItemDefinition())).map(item -> (HumanTask) item).collect(Collectors.toList());
+            task.getCaseInstance().addDebugInfo(() -> "Checking four eyes on task " + task.getName() +" against " + (items.stream().map(PlanItem::getName)).collect(Collectors.toList()));
+            items.forEach(item -> {
+                if (item.getImplementation().getAssignee().equals(user.id())) {
+                    raiseAuthorizationException("Since you have worked on " + item.getName() +" you cannot also work on this task");
+                }
+            });
+        } else {
+            task.getCaseInstance().addDebugInfo(() -> "No need to run four eyes check on task " + task.getName());
+        }
+    }
+
     /**
      * Validate that the current user is owner to the case
-     * @param task
      */
     protected void validateCaseOwnership(HumanTask task) {
         if (! task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
@@ -137,7 +161,6 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     /**
      * Validate that the current user has the proper role in the case team to perform the task
-     * @param task
      */
     protected void validateProperCaseRole(HumanTask task) {
         if (!task.currentUserIsAuthorized()) {
@@ -147,7 +170,6 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     /**
      * Tasks are "owned" by the assignee and by the case owners
-     * @param task
      */
     protected void validateTaskOwnership(HumanTask task) {
         if (task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
