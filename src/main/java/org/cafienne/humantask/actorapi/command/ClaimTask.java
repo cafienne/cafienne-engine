@@ -38,7 +38,7 @@ public class ClaimTask extends WorkflowCommand {
     public void validate(HumanTask task) {
         super.validateProperCaseRole(task);
         super.validateState(task, TaskState.Unassigned);
-        super.validateFourEyes(task);
+        super.verifyTaskPairRestrictions(task);
     }
 
     @Override

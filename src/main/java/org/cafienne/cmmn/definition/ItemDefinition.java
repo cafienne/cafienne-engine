@@ -18,6 +18,7 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItemType;
@@ -41,8 +42,14 @@ public interface ItemDefinition extends DefinitionElement {
 
     FourEyesDefinition getFourEyesDefinition();
 
+    RendezVousDefinition getRendezVousDefinition();
+
     default boolean hasFourEyes() {
         return getFourEyesDefinition() != null && !getFourEyesDefinition().getOthers().isEmpty();
+    }
+
+    default boolean hasRendezVous() {
+        return getRendezVousDefinition() != null && !getRendezVousDefinition().getOthers().isEmpty();
     }
 
     default boolean isDiscretionary() {

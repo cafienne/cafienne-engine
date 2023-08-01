@@ -22,9 +22,7 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
-import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.ItemDefinitionReference;
+import org.cafienne.cmmn.definition.extension.workflow.TaskPairingDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
@@ -130,23 +128,52 @@ public abstract class WorkflowCommand extends CaseCommand {
         }
     }
 
-    protected void validateFourEyes(HumanTask task) {
-        validateFourEyes(task, getUser());
+    protected void verifyTaskPairRestrictions(HumanTask task) {
+        verifyTaskPairRestrictions(task, getUser());
     }
 
-    protected void validateFourEyes(HumanTask task, CaseUserIdentity user) {
+    private List<HumanTask> getReferencedTasks(TaskPairingDefinition taskPairingDefinition) {
+        // Build up the list of all HumanTasks that have been worked on by a user
+        //  and that is referenced within the TaskPairingDefinition (either "rendez-vous" or "four-eyes").
+        //  NOTE (!): the list contains ALL plan items, including repetitive ones.
+        //  But, since the order of that list is by creation, the last one that was acted upon for a repetitive one is taken into account, not all of them.
+        //  We'd have to check if that really works - most probably it means that after you've completed an "approve task",
+        //   the next "submit task" cannot be picked up by the same user.
+        //  We may find a solution around this by checking for repetitive items whether they're in the same stage instance or not. That sounds sort of logical.
+        //  But, before coding all of that, let's await a use case were someone actually bumps into this...
+        // So for now we keep it kinda simple.
+        return task.getCaseInstance().getPlanItems().stream()
+                .filter(item -> taskPairingDefinition.references(item.getItemDefinition())) // whether we reference them from our task
+                .filter(item -> item instanceof HumanTask).map(item -> (HumanTask) item) // and only HumanTasks as of now
+                .filter(item -> item.getState().isInitiated()) // only tasks that have been activated ...
+                .filter(item -> item.getImplementation().getCurrentState().isWorkedOn()) // ... and that have been worked on
+                .collect(Collectors.toList());
+    }
+
+    protected void verifyTaskPairRestrictions(HumanTask task, CaseUserIdentity user) {
         if (task.getItemDefinition().hasFourEyes()) {
-            FourEyesDefinition definition = task.getItemDefinition().getFourEyesDefinition();
-            List<ItemDefinition> opposites = definition.getOthers().stream().map(ItemDefinitionReference::getItemDefinition).collect(Collectors.toList());
-            List<HumanTask> items = task.getCaseInstance().getPlanItems().stream().filter(item -> item instanceof HumanTask && item.getState().isInitiated() && opposites.contains(item.getItemDefinition())).map(item -> (HumanTask) item).collect(Collectors.toList());
-            task.getCaseInstance().addDebugInfo(() -> "Checking four eyes on task " + task.getName() +" against " + (items.stream().map(PlanItem::getName)).collect(Collectors.toList()));
+            List<HumanTask> items = getReferencedTasks(task.getItemDefinition().getFourEyesDefinition());
+            task.getCaseInstance().addDebugInfo(() -> "Checking four eyes on task " + task.getName() + " against " + (items.stream().map(PlanItem::getName)).collect(Collectors.toList()));
             items.forEach(item -> {
                 if (item.getImplementation().getAssignee().equals(user.id())) {
-                    raiseAuthorizationException("Since you have worked on " + item.getName() +" you cannot also work on this task");
+                    raiseAuthorizationException("Since you have worked on " + item.getName() + " you cannot also work on " + task.getName());
                 }
             });
         } else {
             task.getCaseInstance().addDebugInfo(() -> "No need to run four eyes check on task " + task.getName());
+        }
+
+        if (task.getItemDefinition().hasRendezVous()) {
+            List<HumanTask> items = getReferencedTasks(task.getItemDefinition().getRendezVousDefinition());
+            task.getCaseInstance().addDebugInfo(() -> "Checking rendez vous on task " + task.getName() + " against " + (items.stream().map(PlanItem::getName)).collect(Collectors.toList()));
+            items.forEach(item -> {
+                if (!item.getImplementation().getAssignee().equals(user.id())) {
+                    raiseAuthorizationException("Since you have not worked on " + item.getName() + " you cannot work on " + task.getName());
+                }
+            });
+        } else {
+            task.getCaseInstance().addDebugInfo(() -> "No need to run rendez vous check on task " + task.getName());
+
         }
     }
 
@@ -154,7 +181,7 @@ public abstract class WorkflowCommand extends CaseCommand {
      * Validate that the current user is owner to the case
      */
     protected void validateCaseOwnership(HumanTask task) {
-        if (! task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
+        if (!task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
             raiseAuthorizationException("You must be case owner to perform this operation");
         }
     }
@@ -189,10 +216,10 @@ public abstract class WorkflowCommand extends CaseCommand {
     }
 
     protected void raiseAuthorizationException(String msg) {
-        throw new AuthorizationException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
+        throw new AuthorizationException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: " + msg);
     }
 
     protected void raiseException(String msg) {
-        throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
+        throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: " + msg);
     }
 }
