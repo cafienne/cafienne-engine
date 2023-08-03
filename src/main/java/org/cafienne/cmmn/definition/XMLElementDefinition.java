@@ -91,14 +91,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
-     * Returns a description of the context this element provides to it's children. Can be used e.g. in expressions or on parts
-     * to get the description of the parent element when encountering validation errors.
-     */
-    public String getContextDescription() {
-        return "";
-    }
-
-    /**
      * Returns the top level element within the &lt;definitions&gt; to which this element belongs. This is typically
      * the {@link CaseDefinition}, {@link ProcessDefinition} or {@link CaseFileItemDefinitionDefinition}.
      */
@@ -106,18 +98,10 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         return modelDefinition;
     }
 
-    public CaseDefinition getCaseDefinition() {
-        return (CaseDefinition) getModelDefinition();
-    }
-
-    public ProcessDefinition getProcessDefinition() {
-        return (ProcessDefinition) getModelDefinition();
-    }
-
     /**
      * Casts the parent element to the expected type for convenience.
      */
-    public <T extends CMMNElementDefinition> T getParentElement() {
+    public <T extends XMLElementDefinition> T getParentElement() {
         @SuppressWarnings("unchecked")
         T typedParent = (T) parentElement;
         return typedParent;
@@ -125,15 +109,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     public Element getElement() {
         return element;
-    }
-
-    public String getType() {
-        String simpleName = getClass().getSimpleName();
-        if (simpleName.endsWith("Definition")) {
-            return simpleName.substring(0, simpleName.length() - "Definition".length());
-        } else {
-            return simpleName;
-        }
     }
 
     /**
