@@ -18,6 +18,7 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.ItemDefinitionReference;
 import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.*;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
@@ -117,7 +118,6 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
             if (!((TaskDefinition<?>) getPlanItemDefinition()).isBlocking()) {
                 if (!this.exitCriteria.isEmpty()) {
                     getCaseDefinition().addDefinitionError(getContextDescription() + " has exit sentries, but these are not allowed for a non blocking task");
-                    return;
                 }
             }
         }
@@ -138,6 +138,8 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
                 }
             }
         }
+
+        checkTaskPairingConstraints();
     }
 
     private PlanItemStarter starter = null;

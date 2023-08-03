@@ -113,10 +113,17 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
         if (getName().isEmpty()) {
             setName(definition.getName());
         }
-        if (planItemControl == null && this.definition != null) {
+    }
+
+    @Override
+    protected void validateElement() {
+        super.validateElement();
+        if (planItemControl == null) {
             // Create a default ItemControl
             planItemControl = this.definition.getDefaultControl();
         }
+
+        checkTaskPairingConstraints();
     }
 
     /**

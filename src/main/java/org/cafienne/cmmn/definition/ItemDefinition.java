@@ -45,11 +45,24 @@ public interface ItemDefinition extends DefinitionElement {
     RendezVousDefinition getRendezVousDefinition();
 
     default boolean hasFourEyes() {
-        return getFourEyesDefinition() != null && !getFourEyesDefinition().getOthers().isEmpty();
+        return getFourEyesDefinition() != null && getFourEyesDefinition().hasReferences();
     }
 
     default boolean hasRendezVous() {
-        return getRendezVousDefinition() != null && !getRendezVousDefinition().getOthers().isEmpty();
+        return getRendezVousDefinition() != null && getRendezVousDefinition().hasReferences();
+    }
+
+    default void checkTaskPairingConstraints() {
+        if (this.hasRendezVous() && this.hasFourEyes()) {
+            Collection<ItemDefinition> counterparts = this.getRendezVousDefinition().getAllReferences();
+            Collection<ItemDefinition> opposites = this.getFourEyesDefinition().getAllReferences();
+            // Verify that we cannot have "rendez-vous" with items that we also have "4-eyes" with.
+            opposites.forEach(item -> {
+                if (counterparts.contains(item)) {
+                    getModelDefinition().addDefinitionError(getContextDescription() + " has a 4-eyes defined with " + item.getName() +", but also rendez-vous (either directly or indirectly). This is not valid.");
+                }
+            });
+        }
     }
 
     default boolean isDiscretionary() {
@@ -69,6 +82,6 @@ public interface ItemDefinition extends DefinitionElement {
      * @return
      */
     default boolean hasExits() {
-        return getExitCriteria().size() > 0;
+        return !getExitCriteria().isEmpty();
     }
 }
