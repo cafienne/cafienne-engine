@@ -216,6 +216,14 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
             }
         }
 
+        // If there is no assignee, or the assignee is someone else than the user completing the task,
+        //  then the task is claimed implicitly by the current user.
+        CaseUserIdentity user = getCaseInstance().getCurrentUser();
+        if (isNewAssignee(user)){
+            addEvent(new HumanTaskClaimed(task, user.id()));
+            checkOwnershipChange(user.id());
+        }
+
         addEvent(new HumanTaskCompleted(task, taskOutput));
         // This will generate PlanItemTransitioned and CaseFileItem events
         return task.goComplete(taskOutput);
