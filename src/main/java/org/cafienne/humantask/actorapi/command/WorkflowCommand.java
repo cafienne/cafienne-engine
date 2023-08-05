@@ -22,6 +22,8 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.TaskPairingDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -31,6 +33,8 @@ import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -105,9 +109,6 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     /**
      * Helper method that validates whether a task is in one of the expected states.
-     *
-     * @param task
-     * @param expectedStates
      */
     protected void validateState(HumanTask task, TaskState... expectedStates) {
         TaskState currentTaskState = task.getImplementation().getCurrentState();
@@ -152,28 +153,69 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     protected void verifyTaskPairRestrictions(HumanTask task, CaseUserIdentity user) {
         if (task.getItemDefinition().hasFourEyes()) {
-            List<HumanTask> items = getReferencedTasks(task.getItemDefinition().getFourEyesDefinition());
-            task.getCaseInstance().addDebugInfo(() -> "Checking four eyes on task " + task.getName() + " against " + (items.stream().map(PlanItem::getName)).collect(Collectors.toList()));
+            FourEyesDefinition verificationRules = task.getItemDefinition().getFourEyesDefinition();
+            List<HumanTask> items = getReferencedTasks(verificationRules);
+            task.getCaseInstance().addDebugInfo(() -> {
+                ValueMap logs = new ValueMap("FourEyes Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + user.id());
+                logs.plus(" Related tasks", "Four eyes has been defined for " + verificationRules.getAllReferredItemNames());
+                String resultTag = " Verification result";
+                ValueMap details = logs.with(resultTag);
+                if (items.isEmpty()) {
+                    details.plus("ok", "none of the defined elements has been assigned yet, so no need for four eyes check");
+                } else {
+                    // Log for each item it's comparison
+                    items.forEach(item -> {
+                        String result = item.getImplementation().getAssignee().equals(user.id()) ? "check fails   " : "check succeeds";
+                        details.plus(item.getName(), result + " - task is assigned to " + item.getImplementation().getAssignee());
+                    });
+                    // Log items that have not been selected for comparison as well, as they are probably not yet assigned
+                    verificationRules.getAllReferences().forEach(item -> {
+                        if (items.stream().map(HumanTask::getItemDefinition).noneMatch(any -> any.equals(item))) {
+                            details.plus(item.getName(), "check succeeds - task has not yet been assigned");
+                        }
+                    });
+                }
+                return logs;
+            });
             items.forEach(item -> {
                 if (item.getImplementation().getAssignee().equals(user.id())) {
                     raiseAuthorizationException("Since you have worked on " + item.getName() + " you cannot also work on " + task.getName());
                 }
             });
         } else {
-            task.getCaseInstance().addDebugInfo(() -> "No need to run four eyes check on task " + task.getName());
+            task.getCaseInstance().addDebugInfo(() -> "FourEyes Verification is not defined for task " + task.getName());
         }
 
         if (task.getItemDefinition().hasRendezVous()) {
-            List<HumanTask> items = getReferencedTasks(task.getItemDefinition().getRendezVousDefinition());
-            task.getCaseInstance().addDebugInfo(() -> "Checking rendez vous on task " + task.getName() + " against " + (items.stream().map(PlanItem::getName)).collect(Collectors.toList()));
+            RendezVousDefinition verificationRules = task.getItemDefinition().getRendezVousDefinition();
+            List<HumanTask> items = getReferencedTasks(verificationRules);
+            task.getCaseInstance().addDebugInfo(() -> {
+                ValueMap logs = new ValueMap("RendezVous Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + user.id());
+                logs.plus(" Related tasks", "Rendez-vous has been defined on " + verificationRules.getAllReferredItemNames());
+                String resultTag = " Verification result";
+                ValueMap details = logs.with(resultTag);
+                if (items.isEmpty()) {
+                    details.plus("ok", "none of the defined elements has been assigned yet, so no need for rendez vous check");
+                } else {
+                    items.forEach(item -> {
+                        String result = item.getImplementation().getAssignee().equals(user.id()) ? "check succeeds" : "check fails   ";
+                        details.plus(item.getName(), result + " - task is assigned to " + item.getImplementation().getAssignee());
+                    });
+                    verificationRules.getAllReferences().forEach(item -> {
+                        if (items.stream().map(HumanTask::getItemDefinition).noneMatch(any -> any.equals(item))) {
+                            details.plus(item.getName(), "check succeeds - task has not yet been assigned");
+                        }
+                    });
+                }
+                return logs;
+            });
             items.forEach(item -> {
                 if (!item.getImplementation().getAssignee().equals(user.id())) {
                     raiseAuthorizationException("Since you have not worked on " + item.getName() + " you cannot work on " + task.getName());
                 }
             });
         } else {
-            task.getCaseInstance().addDebugInfo(() -> "No need to run rendez vous check on task " + task.getName());
-
+            task.getCaseInstance().addDebugInfo(() -> "RendezVous Verification is not defined for task " + task.getName());
         }
     }
 
