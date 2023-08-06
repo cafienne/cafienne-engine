@@ -22,6 +22,9 @@ import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.TaskPairingDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.State;
@@ -30,10 +33,14 @@ import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.StringValue;
+import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class WorkflowCommand extends CaseCommand {
     private final String taskId;
@@ -102,9 +109,6 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     /**
      * Helper method that validates whether a task is in one of the expected states.
-     *
-     * @param task
-     * @param expectedStates
      */
     protected void validateState(HumanTask task, TaskState... expectedStates) {
         TaskState currentTaskState = task.getImplementation().getCurrentState();
@@ -125,19 +129,107 @@ public abstract class WorkflowCommand extends CaseCommand {
         }
     }
 
+    protected void verifyTaskPairRestrictions(HumanTask task) {
+        verifyTaskPairRestrictions(task, getUser());
+    }
+
+    private List<HumanTask> getReferencedTasks(TaskPairingDefinition taskPairingDefinition) {
+        // Build up the list of all HumanTasks that have been worked on by a user
+        //  and that is referenced within the TaskPairingDefinition (either "rendez-vous" or "four-eyes").
+        //  NOTE (!): the list contains ALL plan items, including repetitive ones.
+        //  But, since the order of that list is by creation, the last one that was acted upon for a repetitive one is taken into account, not all of them.
+        //  We'd have to check if that really works - most probably it means that after you've completed an "approve task",
+        //   the next "submit task" cannot be picked up by the same user.
+        //  We may find a solution around this by checking for repetitive items whether they're in the same stage instance or not. That sounds sort of logical.
+        //  But, before coding all of that, let's await a use case were someone actually bumps into this...
+        // So for now we keep it kinda simple.
+        return task.getCaseInstance().getPlanItems().stream()
+                .filter(item -> taskPairingDefinition.references(item.getItemDefinition())) // whether we reference them from our task
+                .filter(item -> item instanceof HumanTask).map(item -> (HumanTask) item) // and only HumanTasks as of now
+                .filter(item -> item.getState().isInitiated()) // only tasks that have been activated ...
+                .filter(item -> item.getImplementation().getCurrentState().isWorkedOn()) // ... and that have been worked on
+                .collect(Collectors.toList());
+    }
+
+    protected void verifyTaskPairRestrictions(HumanTask task, CaseUserIdentity user) {
+        if (task.getItemDefinition().hasFourEyes()) {
+            FourEyesDefinition verificationRules = task.getItemDefinition().getFourEyesDefinition();
+            List<HumanTask> items = getReferencedTasks(verificationRules);
+            task.getCaseInstance().addDebugInfo(() -> {
+                ValueMap logs = new ValueMap("FourEyes Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + user.id());
+                logs.plus(" Related tasks", "Four eyes has been defined for " + verificationRules.getAllReferredItemNames());
+                String resultTag = " Verification result";
+                ValueMap details = logs.with(resultTag);
+                if (items.isEmpty()) {
+                    details.plus("ok", "none of the defined elements has been assigned yet, so no need for four eyes check");
+                } else {
+                    // Log for each item it's comparison
+                    items.forEach(item -> {
+                        String result = item.getImplementation().getAssignee().equals(user.id()) ? "check fails   " : "check succeeds";
+                        details.plus(item.getName(), result + " - task is assigned to " + item.getImplementation().getAssignee());
+                    });
+                    // Log items that have not been selected for comparison as well, as they are probably not yet assigned
+                    verificationRules.getAllReferences().forEach(item -> {
+                        if (items.stream().map(HumanTask::getItemDefinition).noneMatch(any -> any.equals(item))) {
+                            details.plus(item.getName(), "check succeeds - task has not yet been assigned");
+                        }
+                    });
+                }
+                return logs;
+            });
+            items.forEach(item -> {
+                if (item.getImplementation().getAssignee().equals(user.id())) {
+                    raiseAuthorizationException("Since you have worked on " + item.getName() + " you cannot also work on " + task.getName());
+                }
+            });
+        } else {
+            task.getCaseInstance().addDebugInfo(() -> "FourEyes Verification is not defined for task " + task.getName());
+        }
+
+        if (task.getItemDefinition().hasRendezVous()) {
+            RendezVousDefinition verificationRules = task.getItemDefinition().getRendezVousDefinition();
+            List<HumanTask> items = getReferencedTasks(verificationRules);
+            task.getCaseInstance().addDebugInfo(() -> {
+                ValueMap logs = new ValueMap("RendezVous Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + user.id());
+                logs.plus(" Related tasks", "Rendez-vous has been defined on " + verificationRules.getAllReferredItemNames());
+                String resultTag = " Verification result";
+                ValueMap details = logs.with(resultTag);
+                if (items.isEmpty()) {
+                    details.plus("ok", "none of the defined elements has been assigned yet, so no need for rendez vous check");
+                } else {
+                    items.forEach(item -> {
+                        String result = item.getImplementation().getAssignee().equals(user.id()) ? "check succeeds" : "check fails   ";
+                        details.plus(item.getName(), result + " - task is assigned to " + item.getImplementation().getAssignee());
+                    });
+                    verificationRules.getAllReferences().forEach(item -> {
+                        if (items.stream().map(HumanTask::getItemDefinition).noneMatch(any -> any.equals(item))) {
+                            details.plus(item.getName(), "check succeeds - task has not yet been assigned");
+                        }
+                    });
+                }
+                return logs;
+            });
+            items.forEach(item -> {
+                if (!item.getImplementation().getAssignee().equals(user.id())) {
+                    raiseAuthorizationException("Since you have not worked on " + item.getName() + " you cannot work on " + task.getName());
+                }
+            });
+        } else {
+            task.getCaseInstance().addDebugInfo(() -> "RendezVous Verification is not defined for task " + task.getName());
+        }
+    }
+
     /**
      * Validate that the current user is owner to the case
-     * @param task
      */
     protected void validateCaseOwnership(HumanTask task) {
-        if (! task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
+        if (!task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
             raiseAuthorizationException("You must be case owner to perform this operation");
         }
     }
 
     /**
      * Validate that the current user has the proper role in the case team to perform the task
-     * @param task
      */
     protected void validateProperCaseRole(HumanTask task) {
         if (!task.currentUserIsAuthorized()) {
@@ -147,7 +239,6 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     /**
      * Tasks are "owned" by the assignee and by the case owners
-     * @param task
      */
     protected void validateTaskOwnership(HumanTask task) {
         if (task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
@@ -167,10 +258,10 @@ public abstract class WorkflowCommand extends CaseCommand {
     }
 
     protected void raiseAuthorizationException(String msg) {
-        throw new AuthorizationException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
+        throw new AuthorizationException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: " + msg);
     }
 
     protected void raiseException(String msg) {
-        throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: "+msg);
+        throw new InvalidCommandException(this.getClass().getSimpleName() + "[" + getTaskId() + "]: " + msg);
     }
 }

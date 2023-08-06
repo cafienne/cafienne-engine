@@ -29,11 +29,15 @@ public enum TaskState {
         return this == Assigned || this == Delegated;
     }
 
+    public boolean isWorkedOn() {
+        return inUse() || isSemiTerminal();
+    }
+
     public boolean isActive() {
         return this == Unassigned || this == Assigned || this == Delegated;
     }
 
-    boolean isSemiTerminal() {
+    public boolean isSemiTerminal() {
         return this == Completed || this == Terminated || this == Suspended;
     }
 }

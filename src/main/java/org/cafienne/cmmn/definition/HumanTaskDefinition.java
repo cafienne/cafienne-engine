@@ -17,8 +17,8 @@
 
 package org.cafienne.cmmn.definition;
 
-import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
-import org.cafienne.cmmn.definition.task.validation.TaskOutputValidatorDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.validation.TaskOutputValidatorDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItemType;
@@ -58,12 +58,9 @@ public class HumanTaskDefinition extends TaskDefinition<WorkflowTaskDefinition> 
     }
 
     private WorkflowTaskDefinition parseWorkflowTaskDefinition() {
-        WorkflowTaskDefinition def = getExtension("implementation", WorkflowTaskDefinition.class, false);
-        if (def == null) {
-            // If we cannot find the extension, we'll create an empty one.
-            def = WorkflowTaskDefinition.createEmptyDefinition(this);
-        }
-        return def;
+        WorkflowTaskDefinition def = parseExtension(CAFIENNE_IMPLEMENTATION, WorkflowTaskDefinition.class);
+        // If we cannot find the extension, we'll create an empty one.
+        return def != null ? def : WorkflowTaskDefinition.createEmptyDefinition(this);
     }
 
     @Override

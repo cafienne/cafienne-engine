@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.definition.task;
+package org.cafienne.cmmn.definition.extension.workflow;
 
 import org.cafienne.cmmn.definition.*;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
+import org.cafienne.cmmn.definition.task.TaskImplementationContract;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.json.JSONParseFailure;
@@ -105,7 +106,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
     }
 
     public static WorkflowTaskDefinition createEmptyDefinition(HumanTaskDefinition taskDefinition) {
-        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(NAMESPACE_URI, "implementation");
+        Element customTag = taskDefinition.getElement().getOwnerDocument().createElementNS(CAFIENNE_NAMESPACE, "implementation");
         return new WorkflowTaskDefinition(customTag, taskDefinition.getModelDefinition(), taskDefinition);
     }
 

@@ -23,9 +23,9 @@ import org.cafienne.actormodel.identity.Origin;
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation;
 import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
-import org.cafienne.cmmn.definition.task.AssignmentDefinition;
-import org.cafienne.cmmn.definition.task.DueDateDefinition;
-import org.cafienne.cmmn.definition.task.WorkflowTaskDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.AssignmentDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.DueDateDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
@@ -214,6 +214,14 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
             if (!validate.getContent().getValue().isEmpty()) {
                 throw new InvalidCommandException("Output for task " + task.getName() + " is invalid\n" + validate.getContent());
             }
+        }
+
+        // If there is no assignee, or the assignee is someone else than the user completing the task,
+        //  then the task is claimed implicitly by the current user.
+        CaseUserIdentity user = getCaseInstance().getCurrentUser();
+        if (isNewAssignee(user)){
+            addEvent(new HumanTaskClaimed(task, user.id()));
+            checkOwnershipChange(user.id());
         }
 
         addEvent(new HumanTaskCompleted(task, taskOutput));

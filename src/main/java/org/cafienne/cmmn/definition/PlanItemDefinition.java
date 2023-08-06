@@ -17,6 +17,9 @@
 
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.ItemDefinitionReference;
+import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.*;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
 import org.w3c.dom.Element;
@@ -32,6 +35,8 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>();
     private final String planItemDefinitionRefValue;
+    private final FourEyesDefinition fourEyesDefinition;
+    private final RendezVousDefinition rendezVousDefinition;
 
     public PlanItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
@@ -40,6 +45,8 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);
         parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
         planItemControl = parse("itemControl", ItemControlDefinition.class, false);
+        fourEyesDefinition = parseExtension("four_eyes", FourEyesDefinition.class);
+        rendezVousDefinition = parseExtension("rendez_vous", RendezVousDefinition.class);
     }
 
     @Override
@@ -75,6 +82,15 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
         return exitCriteria;
     }
 
+    public FourEyesDefinition getFourEyesDefinition() {
+        return fourEyesDefinition;
+    }
+
+    @Override
+    public RendezVousDefinition getRendezVousDefinition() {
+        return rendezVousDefinition;
+    }
+
     @Override
     protected void resolveReferences() {
         super.resolveReferences();
@@ -102,7 +118,6 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
             if (!((TaskDefinition<?>) getPlanItemDefinition()).isBlocking()) {
                 if (!this.exitCriteria.isEmpty()) {
                     getCaseDefinition().addDefinitionError(getContextDescription() + " has exit sentries, but these are not allowed for a non blocking task");
-                    return;
                 }
             }
         }
@@ -123,6 +138,8 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
                 }
             }
         }
+
+        checkTaskPairingConstraints();
     }
 
     private PlanItemStarter starter = null;

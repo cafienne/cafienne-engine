@@ -63,7 +63,7 @@ public class Case extends ModelActor {
     /**
      * List of plan items in the case.
      */
-    private Collection<PlanItem<?>> planItems = new ArrayList<>();
+    private final Collection<PlanItem<?>> planItems = new ArrayList<>();
     /**
      * Pointer to the case file instance of the case.
      */

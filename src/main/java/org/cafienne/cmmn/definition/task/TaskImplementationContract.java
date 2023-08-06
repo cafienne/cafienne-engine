@@ -17,6 +17,7 @@
 
 package org.cafienne.cmmn.definition.task;
 
+import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
 import org.cafienne.cmmn.definition.parameter.InputParameterDefinition;
 import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.instance.Task;

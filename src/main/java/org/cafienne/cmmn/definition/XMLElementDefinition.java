@@ -19,7 +19,6 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.casefile.CaseFileItemDefinitionDefinition;
 import org.cafienne.processtask.definition.ProcessDefinition;
-import org.cafienne.util.StringTemplate;
 import org.cafienne.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,10 @@ import java.util.Objects;
 public abstract class XMLElementDefinition implements DefinitionElement {
     private static final Logger logger = LoggerFactory.getLogger(XMLElementDefinition.class);
 
-    protected final static String NAMESPACE_URI = "org.cafienne";
+    public static final String EXTENSION_ELEMENTS = "extensionElements";
+    public static final String CAFIENNE_NAMESPACE = "org.cafienne";
+    public static final String CAFIENNE_IMPLEMENTATION = "implementation";
+
     private final String id;
     private String name;
 
@@ -45,7 +47,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     private final XMLElementDefinition parentElement;
     private final Element element;
 
-    private static final String EXTENSIONELEMENTS = "extensionElements";
 
     protected XMLElementDefinition(Element element, ModelDefinition modelDefinition, XMLElementDefinition parentElement, boolean... identifierRequired) {
         this.element = element;
@@ -53,7 +54,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         this.parentElement = parentElement;
         this.id = parseAttribute("id", false);
         this.name = parseAttribute("name", false);
-        if (identifierRequired.length > 0 && identifierRequired[0] == true) {
+        if (identifierRequired.length > 0 && identifierRequired[0]) {
             if (this.getName().isEmpty() && this.getId().isEmpty()) {
                 getModelDefinition().addDefinitionError("An element of type '" + printElement() + "' does not have an identifier " + XMLHelper.printXMLNode(element));
             }
@@ -63,7 +64,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     /**
      * Returns the name of the element. Can be used in combination with the id of the element to resolve an XSD IDREF to this element.
      *
-     * @return
      */
     @Override
     public String getName() {
@@ -81,8 +81,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Returns the identifier of the element. Can be used in combination with the name of the element to resolve an XSD IDREF to this element.
-     *
-     * @return
      */
     public String getId() {
         if (this.id == null || this.id.isEmpty()) {
@@ -93,39 +91,17 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
-     * Returns a description of the context this element provides to it's children. Can be used e.g. in expressions or on parts
-     * to get the description of the parent element when encountering validation errors.
-     *
-     * @return
-     */
-    public String getContextDescription() {
-        return "";
-    }
-
-    /**
      * Returns the top level element within the &lt;definitions&gt; to which this element belongs. This is typically
      * the {@link CaseDefinition}, {@link ProcessDefinition} or {@link CaseFileItemDefinitionDefinition}.
-     *
-     * @return
      */
     public ModelDefinition getModelDefinition() {
         return modelDefinition;
     }
 
-    public CaseDefinition getCaseDefinition() {
-        return (CaseDefinition) getModelDefinition();
-    }
-
-    public ProcessDefinition getProcessDefinition() {
-        return (ProcessDefinition) getModelDefinition();
-    }
-
     /**
      * Casts the parent element to the expected type for convenience.
-     *
-     * @return
      */
-    public <T extends CMMNElementDefinition> T getParentElement() {
+    public <T extends XMLElementDefinition> T getParentElement() {
         @SuppressWarnings("unchecked")
         T typedParent = (T) parentElement;
         return typedParent;
@@ -133,14 +109,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     public Element getElement() {
         return element;
-    }
-
-    public String getType() {
-        String simpleName = getClass().getSimpleName();
-        if (simpleName.endsWith("Definition")) {
-            simpleName = simpleName.substring(0, simpleName.length() - "Definition".length());
-        }
-        return simpleName;
     }
 
     /**
@@ -163,11 +131,11 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Creates a new instance of class T based on the XML element. If T is of type {@link String}, then it will simply return the text content of the
-     * XML element. Otherwise T is expected to have a constructor with {@link Element}, {@link ModelDefinition} and {@link XMLElementDefinition}.
+     * XML element. Otherwise, T is expected to have a constructor with {@link Element}, {@link ModelDefinition} and {@link XMLElementDefinition}.
      *
-     * @param xmlElement
-     * @param typeClass
-     * @return
+     * @param xmlElement The element to use in the constructor of the typeClass to do parsing
+     * @param typeClass  The class to instantiate when the element is found
+     * @return The instance of the typeClass
      */
     private <T> T instantiateT(Element xmlElement, Class<T> typeClass) {
         try {
@@ -179,8 +147,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
             }
 
             Constructor<T> tConstructor = typeClass.getConstructor(Element.class, ModelDefinition.class, CMMNElementDefinition.class);
-            T childDefinition = tConstructor.newInstance(xmlElement, getModelDefinition(), this);
-            return childDefinition;
+            return tConstructor.newInstance(xmlElement, getModelDefinition(), this);
         } catch (InstantiationException | InvocationTargetException | IllegalArgumentException e) {
             String msg = "The class " + typeClass.getName() + " cannot be instantiated";
             getModelDefinition().fatalError(msg, e);
@@ -201,10 +168,9 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      * Simple helper function that parses all children of the element that have the specified tag name into an instance of the specified generic T. Additionally adds them to the Collection. In case the
      * generic T is String.class, it will simply add the text content of the specified tag to the list
      *
-     * @param childTagName
-     * @param typeClass
-     * @param tCollection
-     * @return
+     * @param childTagName The name of the child element to search for
+     * @param typeClass    The class to instantiate when the element is found
+     * @param tCollection  The collection to add the instantiated object to
      */
     protected <T> void parse(String childTagName, Class<? extends T> typeClass, Collection<T> tCollection) {
         Collection<Element> namedChildren = XMLHelper.getChildrenWithTagName(element, childTagName);
@@ -215,84 +181,23 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
-     * Parses all elements within the extension element that have the specified name, and adds them to the collection.
-     *
-     * @param childTagName
-     * @param typeClass
-     * @param tCollection
-     */
-    protected <T> void parseExtension(String childTagName, Class<? extends T> typeClass, Collection<T> tCollection) {
-        parseGrandChildren(EXTENSIONELEMENTS, childTagName, typeClass, tCollection);
-    }
-
-    /**
-     * Parses the first child element within the extension element that has the specified tagname, and tries to instantiate it into the typeClass.
-     *
-     * @param childTagName
-     * @param typeClass
-     * @return
-     */
-    protected <T> T parseExtension(String childTagName, Class<? extends T> typeClass) {
-        return parseGrandChild(EXTENSIONELEMENTS, childTagName, typeClass);
-    }
-
-    /**
-     * Simple helper function that searches for the child element with the specified tagname, and then finds the first
-     * grand child inside that element, and instantiates it into the specified type class
-     *
-     * @param childTagName
-     * @param grandChildName
-     * @param typeClass
-     */
-    private <T> T parseGrandChild(String childTagName, String grandChildName, Class<? extends T> typeClass) {
-        Element child = XMLHelper.findElement(element, childTagName);
-        if (child != null) {
-            Element grandChild = XMLHelper.findElement(element, grandChildName);
-            if (grandChild != null) {
-                T t = instantiateT(grandChild, typeClass);
-                return t;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Simple helper function that searches for the child element with the specified tagname, and then parses it's children into the specified type class
-     * and adds them to the collection
-     *
-     * @param childTagName
-     * @param grandChildName
-     * @param typeClass
-     * @param tCollection
-     */
-    protected <T> void parseGrandChildren(String childTagName, String grandChildName, Class<? extends T> typeClass, Collection<T> tCollection) {
-        Element child = XMLHelper.findElement(element, childTagName);
-        if (child != null) {
-            Collection<Element> namedGrandChildren = XMLHelper.getChildrenWithTagName(child, grandChildName);
-            for (Element grandChild : namedGrandChildren) {
-                T t = instantiateT(grandChild, typeClass);
-                tCollection.add(t);
-            }
-        }
-    }
-
-    /**
      * Simple helper function that parses all children of the element that have the specified tag name into an instance of the specified generic T. Additionally puts them in the Map, based on the
      * &lt;name&gt; element inside the child. E.g., Multiple Task definitions within the case plan, each having their own name, will be put in the Dictionary for easy lookup later.
      *
-     * @param childTagName
-     * @param typeClass
-     * @param tMap
-     * @return
+     * @param childTagName The name of the child element to search for
+     * @param typeClass    The class to instantiate when the element is found
+     * @param tMap         The map to put the instantiated object in with it's name
      */
     protected <T extends XMLElementDefinition> void parse(String childTagName, Class<? extends T> typeClass, Map<String, T> tMap) {
         Collection<Element> namedChildren = XMLHelper.getChildrenWithTagName(element, childTagName);
         for (Element child : namedChildren) {
             T t = instantiateT(child, typeClass);
-            if (t.getName().isEmpty()) {
-                getModelDefinition().addDefinitionError("The element does not have a name, but it is required in order to be able to look it up\n" + XMLHelper.printXMLNode(child));
+            if (t != null) {
+                if (t.getName().isEmpty()) {
+                    getModelDefinition().addDefinitionError("The element does not have a name, but it is required in order to be able to look it up\n" + XMLHelper.printXMLNode(child));
+                }
+                tMap.put(t.getName(), t);
             }
-            tMap.put(t.getName(), t);
         }
     }
 
@@ -300,10 +205,10 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      * Simple helper function that parses the first child of element that has the specified tag name into an instance of the specified generic T. Throws an exception if the tag is required, but cannot
      * be found. In case the generic T is String.class, it will simply return the text content of the specified tag.
      *
-     * @param childTagName
-     * @param typeClass
-     * @param presenceRequired
-     * @return
+     * @param childTagName     The name of the child element to search for
+     * @param typeClass        The class to instantiate when the element is found
+     * @param presenceRequired If true, and the child element is not found, a validation error is added to the model definition
+     * @return The parsed instance of the typeClass
      */
     protected <T> T parse(String childTagName, Class<? extends T> typeClass, boolean presenceRequired) {
         if (element == null) {
@@ -336,31 +241,55 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         return value;
     }
 
-    protected StringTemplate parseTemplate(String childTagName, boolean presenceRequired) {
-        String string = parseString(childTagName, presenceRequired);
-        if (string == null) {
-            return null;
+    /**
+     * Parses the first child element within the extension element that has the specified tagname, and tries to instantiate it into the typeClass.
+     *
+     * @param childTagName The name of the child element to search for
+     * @param typeClass    The class to instantiate when the element is found
+     * @return The parsed instance of the typeClass
+     */
+    protected <T> T parseExtension(String childTagName, Class<? extends T> typeClass) {
+        Element extensionElement = XMLHelper.getElement(element, EXTENSION_ELEMENTS);
+        if (extensionElement != null) {
+            Element grandChild = XMLHelper.getElementNS(extensionElement, CAFIENNE_NAMESPACE, childTagName);
+            if (grandChild != null) {
+                return instantiateT(grandChild, typeClass);
+            }
         }
-        return new StringTemplate(string);
-    }
-
-    protected String printElement() {
-        String xml = XMLHelper.printXMLNode(element.cloneNode(false));
-        xml = xml.replace("\n", "");
-        xml = xml.replace("\r", "");
-        return xml;
+        return null;
     }
 
     /**
-     * Searches for the extension with the specified name, and parse the extension definition tag <code>&lt;extensionDefinition&gt;<code>.
+     * Simple helper function that searches for the child element with the specified tagname, and then parses it's children into the specified type class
+     * and adds them to the collection
      *
-     * @param elementName
-     * @param typeClass
-     * @param presenceRequired
-     * @return
+     * @param childTagName   The name of the child element to search for
+     * @param grandChildName The name of the grand child element to search for
+     * @param typeClass      The class to instantiate when the element is found
+     * @param tCollection    The collection to add the instantiated object to
      */
-    public <T> T getExtension(String elementName, Class<? extends T> typeClass, boolean presenceRequired) {
-        Element implementationElement = getExtension(elementName, presenceRequired);
+    protected <T> void parseGrandChildren(String childTagName, String grandChildName, Class<? extends T> typeClass, Collection<T> tCollection) {
+        Element child = XMLHelper.findElement(element, childTagName);
+        if (child != null) {
+            Collection<Element> namedGrandChildren = XMLHelper.getChildrenWithTagName(child, grandChildName);
+            for (Element grandChild : namedGrandChildren) {
+                T t = instantiateT(grandChild, typeClass);
+                tCollection.add(t);
+            }
+        }
+    }
+
+    /**
+     * Searches for the extensionsElement, and within that for a tag implementation element;
+     * If this element is found, it looks up the value of the attribute named 'class', and then tries to instantiate that
+     * class. The typeClass must be assignable from the instantiated class.
+     *
+     * @param typeClass        The class to instantiate when the element is found
+     * @param presenceRequired If true, and the child element is not found, a validation error is added to the model definition
+     * @return The parsed instance of the typeClass
+     */
+    protected <T> T getCustomImplementation(Class<? extends T> typeClass, boolean presenceRequired) {
+        Element implementationElement = getImplementationElement(presenceRequired);
         if (implementationElement == null) {
             return null;
         }
@@ -368,7 +297,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         String implementationClassName = implementationElement.getAttribute("class");
         if (implementationClassName.isEmpty()) {
             if (presenceRequired) {
-                getModelDefinition().addDefinitionError("A custom " + elementName + " tag does not contain the class attribute in " + printElement() + ", but it is required");
+                getModelDefinition().addDefinitionError("A custom " + CAFIENNE_IMPLEMENTATION + " tag does not contain the class attribute in " + printElement() + ", but it is required");
                 return null;
             }
             return null;
@@ -382,7 +311,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
             T implementationObject = (T) instantiateT(implementationElement, implementationClass);
             return implementationObject;
         } catch (ClassNotFoundException e) {
-            String msg = "Cannot find class to parse the custom " + elementName + " - " + implementationClassName;
+            String msg = "Cannot find class to parse the custom " + CAFIENNE_IMPLEMENTATION + " - " + implementationClassName;
             getModelDefinition().fatalError(msg, e);
         } catch (SecurityException e) {
             String msg = "The class " + implementationClassName + " cannot be accessed due to a security exception";
@@ -393,44 +322,45 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
-     * Returns the content of an extension element that has the specified name and namespace.
-     * If namespaceURI is null, then the full tagname will be searched for.
+     * Returns the content of an extension element that has the name "implementation" in the cafienne namespace.
      *
-     * @param elementName
      * @param presenceRequired If presence is required, and the extensionElements tag is not available or the
-     *                         specific tag is not found under it, then an error will be added to the definitions document.
-     * @return
+     *                         implementation element is not found under it, then an error will be added to the definitions document.
      */
-    public Element getExtension(String elementName, boolean presenceRequired) {
-        Element extensionsElement = XMLHelper.getElement(element, EXTENSIONELEMENTS);
-
+    protected Element getImplementationElement(boolean presenceRequired) {
+        Element extensionsElement = XMLHelper.getElement(element, EXTENSION_ELEMENTS);
         if (extensionsElement == null) {
             if (presenceRequired) {
-                getModelDefinition().addDefinitionError("'" + EXTENSIONELEMENTS + "' tag is not found in " + printElement() + ", but it is required");
+                getModelDefinition().addDefinitionError("'" + EXTENSION_ELEMENTS + "' tag is not found in " + printElement() + ", but it is required");
                 return null;
             }
             return null;
         }
 
-        Element implementationElement = null;
-        if (elementName != null && !elementName.isEmpty()) {
-            implementationElement = XMLHelper.getElementNS(extensionsElement, NAMESPACE_URI, elementName);
-        }
-
+        Element implementationElement = XMLHelper.getElementNS(extensionsElement, CAFIENNE_NAMESPACE, CAFIENNE_IMPLEMENTATION);
         if (implementationElement == null && presenceRequired) {
-            getModelDefinition().addDefinitionError("A custom " + elementName + " tag is not found in " + printElement() + "/" + EXTENSIONELEMENTS + " in " + NAMESPACE_URI + " namespace, but it is required");
+            getModelDefinition().addDefinitionError("A custom " + CAFIENNE_IMPLEMENTATION + " tag is not found in " + printElement() + "/" + EXTENSION_ELEMENTS + " in " + CAFIENNE_NAMESPACE + " namespace, but it is required");
         }
 
         return implementationElement;
     }
 
     /**
+     * Parses a custom attribute on the implementation element and returns true if its value equals to "true" (case insensitive).
+     * Otherwise, i.e. when the implementation element is not present or the attribute has a different value than true, return false.
+     */
+    protected boolean getImplementationAttribute(String attributeName) {
+        Element cafienneImplementation = getImplementationElement(false);
+        if (cafienneImplementation == null) {
+            return false;
+        }
+        String value = cafienneImplementation.getAttribute(attributeName);
+        return value.equalsIgnoreCase("true");
+    }
+
+    /**
      * Parses the attribute name into a string, or provides the default value if the attribute is not found.
      *
-     * @param attributeName
-     * @param presenceRequired
-     * @param defaultValue
-     * @return
      */
     protected String parseAttribute(String attributeName, boolean presenceRequired, String... defaultValue) {
         if (element != null && element.hasAttribute(attributeName)) {
@@ -454,6 +384,13 @@ public abstract class XMLElementDefinition implements DefinitionElement {
         }
     }
 
+    protected String printElement() {
+        String xml = XMLHelper.printXMLNode(element.cloneNode(false));
+        xml = xml.replace("\n", "");
+        xml = xml.replace("\r", "");
+        return xml;
+    }
+
     protected boolean sameClass(Object object) {
         return object != null && this.getClass().equals(object.getClass());
     }
@@ -468,6 +405,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Check whether name and id match on the other element.
+     *
      * @param other
      * @return
      */
@@ -484,6 +422,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     /**
      * Custom compare method. Comparable to Object.equals(), but elements are expected
      * to implement a semantic comparison.
+     *
      * @param object
      * @return
      */
@@ -516,10 +455,11 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Find an equal definition in the collection, using the equalsWith method.
-     * @param mine The element that we want to find an alternative for
+     *
+     * @param mine   The element that we want to find an alternative for
      * @param theirs The collection to search the element
-     * @param <T> Target type to cast to
-     * @param <Z> Base type to compare on, to help also search in generics based collections (e.g. Collection[OnPartDefinition])
+     * @param <T>    Target type to cast to
+     * @param <Z>    Base type to compare on, to help also search in generics based collections (e.g. Collection[OnPartDefinition])
      * @return Null if the element was not found in the collection
      */
     public static <T extends Z, Z extends XMLElementDefinition> T findDefinition(T mine, Collection<Z> theirs) {
@@ -533,9 +473,10 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Check equality of both collections
-     * @param ours Source to compare
+     *
+     * @param ours   Source to compare
      * @param theirs Target to compare against
-     * @param <X> Type to compare about
+     * @param <X>    Type to compare about
      * @return false if sizes differ or at leas one element differs.
      */
     protected <X extends XMLElementDefinition> boolean same(Collection<X> ours, Collection<X> theirs) {

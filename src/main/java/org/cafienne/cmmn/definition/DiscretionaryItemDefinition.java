@@ -17,6 +17,8 @@
 
 package org.cafienne.cmmn.definition;
 
+import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
@@ -32,6 +34,8 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     private PlanItemDefinitionDefinition definition;
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>();
+    private final FourEyesDefinition fourEyesDefinition;
+    private final RendezVousDefinition rendezVousDefinition;
     private final String planItemDefinitionRefValue;
 
     public DiscretionaryItemDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
@@ -42,6 +46,8 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
         parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
 
         planItemControl = parse("itemControl", ItemControlDefinition.class, false);
+        fourEyesDefinition = parseExtension("four_eyes", FourEyesDefinition.class);
+        rendezVousDefinition = parseExtension("rendez_vous", RendezVousDefinition.class);
 
         // CMMN 1.0 spec page 32:
         // A DiscretionaryItem that is defined by a Task that is non-blocking (isBlocking set to "false") MUST NOT have exitCreteriaRefs.
@@ -81,6 +87,16 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     }
 
     @Override
+    public FourEyesDefinition getFourEyesDefinition() {
+        return fourEyesDefinition;
+    }
+
+    @Override
+    public RendezVousDefinition getRendezVousDefinition() {
+        return rendezVousDefinition;
+    }
+
+    @Override
     public boolean isDiscretionary() {
         return true;
     }
@@ -97,10 +113,17 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
         if (getName().isEmpty()) {
             setName(definition.getName());
         }
-        if (planItemControl == null && this.definition != null) {
+    }
+
+    @Override
+    protected void validateElement() {
+        super.validateElement();
+        if (planItemControl == null) {
             // Create a default ItemControl
             planItemControl = this.definition.getDefaultControl();
         }
+
+        checkTaskPairingConstraints();
     }
 
     /**

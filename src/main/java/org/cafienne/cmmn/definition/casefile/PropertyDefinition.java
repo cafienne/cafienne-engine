@@ -81,12 +81,7 @@ public class PropertyDefinition extends CMMNElementDefinition {
     }
 
     private boolean readBusinessIdentifiership() {
-        Element cafienneImplementation = getExtension("implementation", false);
-        if (cafienneImplementation == null) {
-            return false;
-        }
-        String value = cafienneImplementation.getAttribute("isBusinessIdentifier");
-        return value.equalsIgnoreCase("true");
+        return getImplementationAttribute("isBusinessIdentifier");
     }
 
     public boolean isBusinessIdentifier() {

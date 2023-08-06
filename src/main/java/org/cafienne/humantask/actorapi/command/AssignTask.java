@@ -52,6 +52,7 @@ public class AssignTask extends WorkflowCommand {
             raiseException("Cannot be done because the task is in " + currentTaskState + " state, but must be in an active state (Unassigned or Assigned)");
         }
         validateCaseTeamMembership(task, assignee);
+        super.verifyTaskPairRestrictions(task, assignee);
     }
 
     protected void validateCaseTeamMembership(HumanTask task, CaseUserIdentity assignee) {
