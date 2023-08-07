@@ -21,6 +21,7 @@ import akka.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.cqrs.batch.EventBatch
+import org.cafienne.infrastructure.cqrs.batch.public_events.migration.{CaseMigrated, HumanTaskDropped, HumanTaskMigrated, MilestoneDropped, MilestoneMigrated, StageDropped, StageMigrated}
 
 import java.time.Instant
 
@@ -36,6 +37,13 @@ class PublicCaseEventBatch(val persistenceId: String) extends EventBatch with La
       ++ HumanTaskStarted.from(this)
       ++ MilestonePending.from(this)
       ++ UserEventCreated.from(this)
+      ++ CaseMigrated.from(this)
+      ++ HumanTaskMigrated.from(this)
+      ++ HumanTaskDropped.from(this)
+      ++ StageMigrated.from(this)
+      ++ StageDropped.from(this)
+      ++ MilestoneMigrated.from(this)
+      ++ MilestoneDropped.from(this)
       ++ CaseCompleted.from(this))
       .sortBy(_.sequenceNr)
   }

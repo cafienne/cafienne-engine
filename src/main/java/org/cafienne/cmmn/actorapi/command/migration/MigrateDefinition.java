@@ -90,11 +90,7 @@ public class MigrateDefinition extends CaseCommand {
             // ??? why again???? ;)
             caseInstance.addDebugInfo(() -> "No need to migrate definition of case " + caseInstance.getId() + " (proposed definition already in use by the case instance)");
         } else {
-            caseInstance.migrate(newDefinition);
-        }
-        // Set the new case team if one is provided given
-        if (newCaseTeam != null) {
-            caseInstance.getCaseTeam().replace(newCaseTeam);
+            caseInstance.migrate(newDefinition, newCaseTeam);
         }
         setResponse(new MigrationStartedResponse(this));
     }

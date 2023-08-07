@@ -18,9 +18,11 @@
 package org.cafienne.cmmn.actorapi.event.migration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.instance.Case;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
@@ -28,20 +30,26 @@ import java.io.IOException;
 
 @Manifest
 public class CaseDefinitionMigrated extends CaseDefinitionEvent {
-    public CaseDefinitionMigrated(Case caseInstance, CaseDefinition definition) {
+    public final CaseTeam newCaseTeam;
+
+    public CaseDefinitionMigrated(Case caseInstance, CaseDefinition definition, CaseTeam newTeam) {
         super(caseInstance, definition);
+        this.newCaseTeam = newTeam;
+
     }
 
     public CaseDefinitionMigrated(ValueMap json) {
         super(json);
+        this.newCaseTeam = json.readObject(Fields.team, CaseTeam::deserialize);
     }
 
     public void updateState(Case caseInstance) {
-        caseInstance.migrateCaseDefinition(this.definition);
+        caseInstance.migrateCaseDefinition(this);
     }
 
     @Override
     public void write(JsonGenerator generator) throws IOException {
         super.writeCaseDefinitionEvent(generator);
+        writeField(generator, Fields.team, newCaseTeam);
     }
 }

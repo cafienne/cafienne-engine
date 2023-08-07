@@ -23,6 +23,7 @@ import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.platform.PlatformUpdate;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.CurrentMember;
 import org.cafienne.cmmn.actorapi.event.*;
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated;
@@ -437,14 +438,15 @@ public class Case extends ModelActor {
         getCasePlan().updateState(event);
     }
 
-    public void migrate(CaseDefinition definition) {
-        addEvent(new CaseDefinitionMigrated(this, definition));
+    public void migrate(CaseDefinition definition, CaseTeam newTeam) {
+        addEvent(new CaseDefinitionMigrated(this, definition, newTeam));
     }
 
-    public void migrateCaseDefinition(CaseDefinition newDefinition) {
+    public void migrateCaseDefinition(CaseDefinitionMigrated event) {
+        CaseDefinition newDefinition = event.getDefinition();
         addDebugInfo(() -> "====== Migrating Case["+getId()+"] with name " + getDefinition().getName() + " to a new definition with name " + newDefinition.getName() +"\n");
         setDefinition(newDefinition);
-        getCaseTeam().migrateDefinition(newDefinition.getCaseTeamModel(), recoveryRunning());
+        getCaseTeam().migrateDefinition(newDefinition.getCaseTeamModel(), event.newCaseTeam, recoveryRunning());
         getCaseFile().migrateDefinition(newDefinition.getCaseFileModel(), recoveryRunning());
         getCasePlan().migrateDefinition(newDefinition.getCasePlanModel(), recoveryRunning());
     }

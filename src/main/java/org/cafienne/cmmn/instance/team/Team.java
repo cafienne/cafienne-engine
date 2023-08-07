@@ -272,7 +272,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
      */
     public void validateMembership(CaseUserIdentity user) {
         CurrentMember member = new CurrentMember(this, user);
-        if (! member.isValid()) {
+        if (!member.isValid()) {
             throw new AuthorizationException("User " + user.id() + " is not part of the case team");
         }
     }
@@ -285,7 +285,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
      * Adds a member to the case team upon request of a Task that has dynamic assignment.
      *
      * @param user The tenant user id; note that assignment cannot be done on roles, only on users
-     * @param role   The (optional) role that the team member must have for executing the task leading to this call
+     * @param role The (optional) role that the team member must have for executing the task leading to this call
      */
     public void upsertCaseTeamUser(CaseUserIdentity user, CaseRoleDefinition role) {
         CaseTeamUser existingMember = users.get(user.id());
@@ -313,8 +313,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
         });
     }
 
-    @Override
-    public void migrateDefinition(CaseTeamDefinition newDefinition, boolean skipLogic) {
+    public void migrateDefinition(CaseTeamDefinition newDefinition, CaseTeam newCaseTeam, boolean skipLogic) {
         super.migrateDefinition(newDefinition, skipLogic);
         if (skipLogic) return;
 
@@ -331,7 +330,7 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
             CaseRoleDefinition roleWithMatchingId = newRoleIds.get(id);
 
             if (roleWithMatchingName != null) {
-                if (! name.isBlank()) { // There are always "no changes" on blank roles, no need to log it.
+                if (!name.isBlank()) { // There are always "no changes" on blank roles, no need to log it.
                     addDebugInfo(() -> "- role '" + name + "' is not changed");
                 }
             } else if (roleWithMatchingId != null) {
@@ -344,12 +343,27 @@ public class Team extends CMMNElement<CaseTeamDefinition> {
             }
         });
 
-        // Inform each member about member-specific changes
-        getMembers().forEach(member -> {
-            addDebugInfo(() -> "=== Migrating Case Team " + member.memberType() + " '" + member.memberId() + "'");
-            member.migrateRoles(this, changedRoleNames, droppedRoles);
-        });
-        addDebugInfo(() -> "Completed Case Team migration\n");
+        if (newCaseTeam != null) {
+            addDebugInfo(() -> "Migrating Case Team Role Assignments and updating members with the new Case Team");
+            addDebugInfo(() -> "Removing existing Case Team Members that are not in the new team");
+            users.keySet().stream().filter(newCaseTeam::notHasUser).collect(Collectors.toList()).forEach(this::removeUser);
+            groups.keySet().stream().filter(newCaseTeam::notHasGroup).collect(Collectors.toList()).forEach(this::removeGroup);
+            tenantRoles.keySet().stream().filter(newCaseTeam::notHasTenantRole).collect(Collectors.toList()).forEach(this::removeTenantRole);
+
+            newCaseTeam.getUsers().forEach(member -> migrateMemberRoles(member, changedRoleNames, droppedRoles));
+            newCaseTeam.getGroups().forEach(member -> migrateMemberRoles(member, changedRoleNames, droppedRoles));
+            newCaseTeam.getTenantRoles().forEach(member -> migrateMemberRoles(member, changedRoleNames, droppedRoles));
+        } else {
+            addDebugInfo(() -> "Migrating Case Team Role Assignments");
+            // Inform each member about member-specific changes
+            getMembers().forEach(member -> migrateMemberRoles(member, changedRoleNames, droppedRoles));
+        }
+        addDebugInfo(() -> "Completed Case Team migration\n" + this);
+    }
+
+    private void migrateMemberRoles(CaseTeamMember member, Map<String, String> changedRoleNames, Set<String> droppedRoles) {
+        addDebugInfo(() -> "=== Migrating Case Team " + member.memberType() + " '" + member.memberId() + "'");
+        member.migrateRoles(this, changedRoleNames, droppedRoles);
     }
 
     @Override
