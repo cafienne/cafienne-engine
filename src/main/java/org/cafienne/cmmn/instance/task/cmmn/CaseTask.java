@@ -97,7 +97,10 @@ public class CaseTask extends Task<CaseTaskDefinition> {
         super.migrateItemDefinition(newItemDefinition, newDefinition, skipLogic);
         if (skipLogic) return;
 
-        giveNewDefinition(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), newDefinition.getImplementationDefinition()));
+        CaseDefinition newImplementation = newDefinition.getImplementationDefinition();
+        CaseTeam newSubCaseTeam = mainCase.getCaseTeam().createSubCaseTeam(newImplementation);
+
+        giveNewDefinition(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), newImplementation, newSubCaseTeam));
     }
 
     @Override
