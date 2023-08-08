@@ -23,6 +23,7 @@ import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.ReplaceCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.UpdateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.debug.SwitchDebugMode;
+import org.cafienne.cmmn.actorapi.command.migration.MigrateCaseDefinition;
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.AddDiscretionaryItem;
 import org.cafienne.cmmn.actorapi.command.plan.GetDiscretionaryItems;
@@ -46,7 +47,10 @@ import org.cafienne.consentgroup.actorapi.command.SetConsentGroupMember;
 import org.cafienne.humantask.actorapi.command.*;
 import org.cafienne.infrastructure.serialization.CafienneSerializer;
 import org.cafienne.processtask.actorapi.command.*;
-import org.cafienne.tenant.actorapi.command.*;
+import org.cafienne.tenant.actorapi.command.GetTenantOwners;
+import org.cafienne.tenant.actorapi.command.RemoveTenantUser;
+import org.cafienne.tenant.actorapi.command.ReplaceTenant;
+import org.cafienne.tenant.actorapi.command.SetTenantUser;
 import org.cafienne.tenant.actorapi.command.platform.CreateTenant;
 import org.cafienne.tenant.actorapi.command.platform.DisableTenant;
 import org.cafienne.tenant.actorapi.command.platform.EnableTenant;
@@ -63,6 +67,7 @@ public class CommandSerializers {
     private static void addCaseCommands() {
         CafienneSerializer.addManifestWrapper(StartCase.class, StartCase::new);
         CafienneSerializer.addManifestWrapper(MigrateDefinition.class, MigrateDefinition::new);
+        CafienneSerializer.addManifestWrapper(MigrateCaseDefinition.class, MigrateCaseDefinition::new);
         CafienneSerializer.addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
         addCasePlanCommands();
         addCaseFileCommands();

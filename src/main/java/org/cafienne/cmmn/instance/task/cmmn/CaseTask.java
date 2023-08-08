@@ -18,14 +18,13 @@
 package org.cafienne.cmmn.instance.task.cmmn;
 
 import org.cafienne.cmmn.actorapi.command.StartCase;
-import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition;
+import org.cafienne.cmmn.actorapi.command.migration.MigrateCaseDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeam;
 import org.cafienne.cmmn.definition.CaseDefinition;
 import org.cafienne.cmmn.definition.CaseTaskDefinition;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.instance.*;
-import org.cafienne.cmmn.instance.Task;
 import org.cafienne.json.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +99,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
         CaseDefinition newImplementation = newDefinition.getImplementationDefinition();
         CaseTeam newSubCaseTeam = mainCase.getCaseTeam().createSubCaseTeam(newImplementation);
 
-        giveNewDefinition(new MigrateDefinition(getCaseInstance().getCurrentUser(), getId(), newImplementation, newSubCaseTeam));
+        giveNewDefinition(new MigrateCaseDefinition(getCaseInstance().getCurrentUser(), getId(), newImplementation, newSubCaseTeam));
     }
 
     @Override
