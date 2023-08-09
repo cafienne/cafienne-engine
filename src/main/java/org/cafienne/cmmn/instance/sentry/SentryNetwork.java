@@ -18,7 +18,6 @@
 package org.cafienne.cmmn.instance.sentry;
 
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
-import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.casefile.CaseFileItem;
 
@@ -29,16 +28,11 @@ import java.util.Collection;
  * Wrapper class for the collection of all sentries inside the case instance.
  */
 public class SentryNetwork {
-    private final Case caseInstance;
     private final TransitionCallStack callStack = new TransitionCallStack(this);
     /**
      * List of sentries active within the case.
      */
     private final Collection<Criterion<?>> criteria = new ArrayList<>();
-
-    public SentryNetwork(Case caseInstance) {
-        this.caseInstance = caseInstance;
-    }
 
     /**
      * Connect a new {@link CaseFileItem} to the network
@@ -117,10 +111,7 @@ public class SentryNetwork {
         return null;
     }
 
-    public void handleTransition(StandardEvent event, TransitionPublisher publisher) {
-        if (caseInstance.recoveryRunning()) {
-            return;
-        }
+    public void handleTransition(StandardEvent<?,?> event, TransitionPublisher<?,?,?> publisher) {
         callStack.pushEvent(event);
     }
 }
