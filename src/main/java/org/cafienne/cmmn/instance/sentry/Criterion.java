@@ -92,8 +92,10 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         }
         if (isSatisfied()) {
             isActive = true;
-            listener.satisfy(this);
-            // isActive = false;
+            if (getCaseInstance().recoveryFinished()) {
+                // Only invoke transitions when recovery finished - this to avoid downstream behavior during recovery.
+                listener.satisfy(this);
+            }
         }
     }
 

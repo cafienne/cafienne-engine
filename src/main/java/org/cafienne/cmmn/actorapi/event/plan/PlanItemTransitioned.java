@@ -71,14 +71,24 @@ public class PlanItemTransitioned extends CasePlanEvent implements StandardEvent
 
     @Override
     public void runImmediateBehavior() {
-        getPlanItem().runStateMachineAction(this);
-        getPlanItem().informConnectedEntryCriteria(this);
+        if (getPlanItem().getCaseInstance().recoveryFinished()) {
+            getPlanItem().runStateMachineAction(this);
+            getPlanItem().informConnectedEntryCriteria(this);
+        } else {
+            // In recovery only update the connected entry criteria
+            getPlanItem().informConnectedEntryCriteria(this);
+        }
     }
 
     @Override
     public void runDelayedBehavior() {
-        getPlanItem().runStageCompletionCheck(this);
-        getPlanItem().informConnectedExitCriteria(this);
+        if (getPlanItem().getCaseInstance().recoveryFinished()) {
+            getPlanItem().runStageCompletionCheck(this);
+            getPlanItem().informConnectedExitCriteria(this);
+        } else {
+            // In recovery only update the connected exit criteria
+            getPlanItem().informConnectedExitCriteria(this);
+        }
     }
 
     public Transition getTransition() {

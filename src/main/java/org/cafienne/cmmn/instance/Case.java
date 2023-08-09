@@ -72,7 +72,7 @@ public class Case extends ModelActor {
     /**
      * List of sentries active within the case.
      */
-    private final SentryNetwork sentryNetwork;
+    private final SentryNetwork sentryNetwork = new SentryNetwork();
     /**
      * Case model that is interpreted for this case
      */
@@ -100,7 +100,6 @@ public class Case extends ModelActor {
     public Case(CaseSystem caseSystem) {
         super(caseSystem);
         this.createdOn = getTransactionTimestamp();
-        this.sentryNetwork = new SentryNetwork(this);
 
         logger.info("Recovering/creating case " + this.getId() + " with path " + self().path());
     }

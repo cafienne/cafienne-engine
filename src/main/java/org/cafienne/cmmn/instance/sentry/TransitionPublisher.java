@@ -75,18 +75,21 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
             insertOnPart(onPart, connectedExitCriteria);
         }
 
-        // We only inform the first item of a transition that happened "in the past".
-        //  Repetition items only need to react to new events. This check avoids potential endless recursion.
-        if (onPart.getCriterion().getTarget().getIndex() == 0 && !transitions.isEmpty()) {
-            onPart.inform(item, transitions.get(0));
+        if (onPart.getCaseInstance().recoveryFinished()) {
+            // We only inform the first item of a transition that happened "in the past".
+            //  Repetition items only need to react to new events. This check avoids potential endless recursion.
+            if (onPart.getCriterion().getTarget().getIndex() == 0 && !transitions.isEmpty()) {
+                onPart.inform(item, transitions.get(0));
+            }
+        } else {
+            // During recovery we inform all on parts about our most recent event,
+            // so that the sentry network is in the right state after recovery.
+            transitions.forEach(event -> onPart.inform(item, event));
         }
     }
 
     /**
      * Inserts the onPart in the right location of the plan item hierarchy
-     *
-     * @param onPart
-     * @param list
      */
     private void insertOnPart(P onPart, List<P> list) {
         if (list.contains(onPart)) {
