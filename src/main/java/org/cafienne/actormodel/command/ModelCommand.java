@@ -59,11 +59,6 @@ public interface ModelCommand extends IncomingActorMessage {
 
     String getCommandDescription();
 
-    /**
-     * Return a ValueMap serialization of the command
-     */
-    ValueMap rawJson();
-
     @Override
     default boolean isCommand() {
         return true;

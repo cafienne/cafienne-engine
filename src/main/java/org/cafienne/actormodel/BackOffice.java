@@ -92,6 +92,7 @@ class BackOffice {
             // which is strange.
             actor.getLogger().warn(actor + " received a response to a message that was not sent through it. Sender: " + actor.sender() + ", response: " + msg);
         } else {
+            actor.addDebugInfo(() -> actor + " received response to command of type " + handler.command.getCommandDescription(), msg.rawJson());
             if (msg instanceof CommandFailure) {
                 handler.left.handleFailure((CommandFailure) msg);
             } else {
