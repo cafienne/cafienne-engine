@@ -101,7 +101,9 @@ public class HumanTask extends Task<HumanTaskDefinition> {
 
     @Override
     protected void suspendImplementation() {
-        addEvent(new HumanTaskSuspended(this));
+        if (getHistoryState().isAlive()) {
+            addEvent(new HumanTaskSuspended(this));
+        }
     }
 
     @Override
