@@ -31,7 +31,7 @@ class ProcessTaskInlineInformer extends ProcessInformer {
     }
 
     @Override
-    protected void terminateInstance() {
+    protected void terminateImplementation() {
         implementation.terminate();
     }
 
@@ -41,12 +41,12 @@ class ProcessTaskInlineInformer extends ProcessInformer {
     }
 
     @Override
-    protected void suspendInstance() {
+    protected void suspendImplementation() {
         implementation.suspend();
     }
 
     @Override
-    protected void resumeInstance() {
+    protected void resumeImplementation() {
         implementation.resume();
     }
 

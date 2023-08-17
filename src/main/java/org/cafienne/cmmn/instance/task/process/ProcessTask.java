@@ -37,18 +37,18 @@ public class ProcessTask extends Task<ProcessTaskDefinition> {
     }
 
     @Override
-    protected void suspendInstance() {
-        informer.suspendInstance();
+    protected void suspendImplementation() {
+        informer.suspendImplementation();
     }
 
     @Override
-    protected void resumeInstance() {
-        informer.resumeInstance();
+    protected void resumeImplementation() {
+        informer.resumeImplementation();
     }
 
     @Override
-    protected void terminateInstance() {
-        informer.terminateInstance();
+    protected void terminateImplementation() {
+        informer.terminateImplementation();
     }
 
     @Override

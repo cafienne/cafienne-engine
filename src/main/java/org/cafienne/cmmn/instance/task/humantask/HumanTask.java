@@ -91,7 +91,7 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     @Override
-    protected void terminateInstance() {
+    protected void terminateImplementation() {
         if (getHistoryState() == State.Available) {
             addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
@@ -100,12 +100,12 @@ public class HumanTask extends Task<HumanTaskDefinition> {
     }
 
     @Override
-    protected void suspendInstance() {
+    protected void suspendImplementation() {
         addEvent(new HumanTaskSuspended(this));
     }
 
     @Override
-    protected void resumeInstance() {
+    protected void resumeImplementation() {
         addEvent(new HumanTaskResumed(this));
     }
 

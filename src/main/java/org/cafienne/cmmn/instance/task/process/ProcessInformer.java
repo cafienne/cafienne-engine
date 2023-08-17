@@ -40,13 +40,13 @@ abstract class ProcessInformer {
         return task.getCaseInstance();
     }
 
-    abstract protected void terminateInstance();
-
     abstract protected void startImplementation(ValueMap inputParameters);
 
-    abstract protected void suspendInstance();
+    abstract protected void terminateImplementation();
 
-    abstract protected void resumeInstance();
+    abstract protected void suspendImplementation();
+
+    abstract protected void resumeImplementation();
 
     abstract protected void reactivateImplementation(ValueMap inputParameters);
 

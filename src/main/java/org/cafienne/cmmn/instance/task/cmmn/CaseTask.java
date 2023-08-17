@@ -41,7 +41,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     }
 
     @Override
-    protected void terminateInstance() {
+    protected void terminateImplementation() {
         if (getHistoryState() == State.Available) {
             addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
@@ -50,12 +50,12 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     }
 
     @Override
-    protected void suspendInstance() {
+    protected void suspendImplementation() {
         tell(Transition.Suspend);
     }
 
     @Override
-    protected void resumeInstance() {
+    protected void resumeImplementation() {
         tell(Transition.Reactivate);
     }
 
