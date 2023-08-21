@@ -216,7 +216,13 @@ public class StateMachine {
                 // Create plan items
                 p.startInstance();
             } else {
-                p.resumeInstance();
+                // Only when the case was suspended we resume it.
+                // From Failed, Completed and Terminated we reactivate.
+                if (p.getHistoryState().isSuspended()) {
+                    p.resumeInstance();
+                } else {
+                    p.reactivateInstance();
+                }
             }
         });
     }

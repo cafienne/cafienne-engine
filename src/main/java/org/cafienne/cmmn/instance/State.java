@@ -108,6 +108,14 @@ public enum State {
     }
 
     /**
+     * Returns true if the lifecycle of the task or stage is active or failed
+     * This means that in such a Stage, a task can be reactivated or started.
+     */
+    public boolean allowsActivity() {
+        return isActive() || isFailed();
+    }
+
+    /**
      * Returns true if the lifecycle of the task is initiated and not yet done.
      */
     public boolean isAlive() {

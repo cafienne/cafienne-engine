@@ -166,10 +166,10 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     void repeat(String msg) {
         addDebugInfo(() -> this + ": initiating repeat logic because " + msg);
         // Repeat the plan item when it is in Completed or Terminated state - Or if it has entry criteria being met
-        if (getStage().getState() != State.Active) {
+        if (!stageAllowsActivity()) {
             // The stage that contains us is no longer active. So we will not prepare any repeat item.
             // This code is typically invoked if the stage terminates or completes, causing the repeating element to terminate.
-            addDebugInfo(() -> this + ": not repeating because stage is not active");
+            addDebugInfo(() -> this + ": not repeating because stage is not active, but " + getStage().getState());
             return;
         }
 
@@ -501,20 +501,20 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Returns true if the plan item's parent is in active state.
+     * Returns true if stage in which the plan item resides is in active or failed state.
      * Returns always true for the case plan.
      */
-    public boolean hasActiveParent() {
-        return getStage() == null || getStage().getState().isActive();
+    public boolean stageAllowsActivity() {
+        return getStage() == null || getStage().getState().allowsActivity();
     }
 
     /**
      * Method that can be used by MakePlanItemTransition command to determine whether this plan item
      * can go through the suggested transition.
-     * Checks whether the parent stage is in Active state.
+     * Checks whether the parent stage allows it.
      */
     public void validateTransition(Transition transition) {
-        if (!hasActiveParent()) {
+        if (!stageAllowsActivity()) {
             throw new InvalidCommandException("Cannot perform action '" + transition + "' on '" + getName() + "', since the surrounding stage is not active");
         }
     }

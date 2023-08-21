@@ -22,16 +22,19 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.*;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
+    private final static boolean usePureCHMMFaultHandling = Cafienne.config().engine().interpreter().usePureCMMNFaultHandling();
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
         this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);
@@ -88,7 +91,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             return null;
         }
         PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, planItemId, index));
-        if (triggerCreateTransition && this.getState().isActive()) {
+        if (triggerCreateTransition && this.getState().allowsActivity()) {
             // Only generate a start transition for the new discretionary item if this stage is active.
             //  Otherwise, the start transition will be generated when this stage becomes active.
             pic.getCreatedPlanItem().create();
@@ -157,6 +160,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     @Override
     protected void reactivateInstance() {
         super.reactivateInstance();
+        propagateTransition(Transition.Reactivate);
         invokeCreateOnNullItems("reactivating stage");
     }
 
@@ -171,14 +175,50 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     protected void childTransitioned(PlanItem<?> child, PlanItemTransitioned event) {
-        if (child.getState().isSemiTerminal()) {
-            // Check stage completion (only done when the child transitioned into semi terminal state)
-            // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
-            if (this.getState().isSemiTerminal()) {
-                addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
-            } else {
-                addDebugInfo(() -> "*** " + this + ": trying to complete stage because of " + event);
-                tryCompletion();
+        if (usePureCHMMFaultHandling) {
+            if (child.getState().isSemiTerminal()) {
+                // Check stage completion (only done when the child transitioned into semi terminal state)
+                // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
+                if (this.getState().isSemiTerminal()) {
+                    addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
+                } else {
+                    addDebugInfo(() -> "*** " + this + ": trying to complete stage because of " + event);
+                    tryCompletion();
+                }
+            }
+        } else {
+            if (child.getHistoryState().isFailed()) {
+                if (this.getState().isFailed()) {
+                    Predicate<PlanItem<?>> isFailedSibling = item -> item != child && item.getState().isFailed();
+                    if (getPlanItems().stream().noneMatch(isFailedSibling)) {
+                        addDebugInfo(() -> "Reactivating stage " + getName() + " as we no longer have children in Fault state");
+                        makeTransition(Transition.Reactivate);
+                    } else {
+                        addDebugInfo(() -> {
+                            String msg = getPlanItems().stream().filter(isFailedSibling).map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
+                            return "Cannot reactivate stage " + getName() + " because " + getPlanItems().stream().filter(item -> item.getState().isFailed() && item != child).count() + " plan items are still in Fault state:" + msg;
+                        });
+                    }
+                } else {
+                    // This probably will not occur
+                    addDebugInfo(() -> "No need to reactivate stage " + getName() + " upon " + child.getName() + "." + event.getTransition() + " as the stage is in state " + getState());
+                }
+            } else if (event.getTransition().isFault()) {
+                if (getState().isFailed()) {
+                    addDebugInfo(() -> "No need to trigger failure in stage " + getName() + " as the stage is already in Fault state");
+                } else {
+                    addDebugInfo(() -> "*** " + this + ": triggering stage failure because " + child.getName() + " ran into failure");
+                    makeTransition(Transition.Fault);
+                }
+            } else if (child.getState().isSemiTerminal()) {
+                // Check stage completion (only done when the child transitioned into semi terminal state)
+                // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
+                if (this.getState().isSemiTerminal()) {
+                    addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
+                } else {
+                    addDebugInfo(() -> "*** " + this + ": trying to complete stage because of " + event);
+                    tryCompletion();
+                }
             }
         }
     }
