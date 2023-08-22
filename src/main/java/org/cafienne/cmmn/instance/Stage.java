@@ -193,6 +193,11 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
                     if (getPlanItems().stream().noneMatch(isFailedSibling)) {
                         addDebugInfo(() -> "Reactivating stage " + getName() + " as we no longer have children in Fault state");
                         makeTransition(Transition.Reactivate);
+                        // It is possible that the child was not reactivated, but terminated (through Exit)
+                        //  In that case we also have to check for stage completion.
+                        if (child.getHistoryState().isFailed()) {
+                            tryCompletion();
+                        }
                     } else {
                         addDebugInfo(() -> {
                             String msg = getPlanItems().stream().filter(isFailedSibling).map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
