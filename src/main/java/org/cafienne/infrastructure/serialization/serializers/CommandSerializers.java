@@ -17,6 +17,7 @@
 
 package org.cafienne.infrastructure.serialization.serializers;
 
+import org.cafienne.cmmn.actorapi.command.ReactivateCase;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
@@ -67,6 +68,7 @@ public class CommandSerializers {
 
     private static void addCaseCommands() {
         CafienneSerializer.addManifestWrapper(StartCase.class, StartCase::new);
+        CafienneSerializer.addManifestWrapper(ReactivateCase.class, ReactivateCase::new);
         CafienneSerializer.addManifestWrapper(MigrateDefinition.class, MigrateDefinition::new);
         CafienneSerializer.addManifestWrapper(MigrateCaseDefinition.class, MigrateCaseDefinition::new);
         CafienneSerializer.addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);

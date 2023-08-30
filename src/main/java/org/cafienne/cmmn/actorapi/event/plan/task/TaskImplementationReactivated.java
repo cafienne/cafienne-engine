@@ -17,48 +17,23 @@
 
 package org.cafienne.cmmn.actorapi.event.plan.task;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.cmmn.instance.Task;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
-import java.io.IOException;
-
 @Manifest
-public class TaskCommandRejected extends TaskEvent<Task<?>> {
-    protected final ValueMap command;
-    protected final ValueMap failure;
-
-    public TaskCommandRejected(Task<?> task, ModelCommand command, ValueMap failure) {
+public class TaskImplementationReactivated extends TaskEvent<Task<?>> {
+    public TaskImplementationReactivated(Task<?> task) {
         super(task);
-        this.command = command.rawJson();
-        this.failure = failure;
     }
 
-    public TaskCommandRejected(ValueMap json) {
+    public TaskImplementationReactivated(ValueMap json) {
         super(json);
-        this.command = json.readMap(Fields.command);
-        this.failure = json.readMap(Fields.failure);
     }
 
     @Override
     public void updateState(Task<?> task) {
         // Just for logging purposes, no actual state change
         task.updateState(this);
-        task.goFault(new ValueMap("exception", failure));
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeTaskEvent(generator);
-        writeField(generator, Fields.command, command);
-        writeField(generator, Fields.failure, failure);
-    }
-
-    @Override
-    public String toString() {
-        return "Task " + getTaskId() + " has output:\n" + command;
     }
 }
