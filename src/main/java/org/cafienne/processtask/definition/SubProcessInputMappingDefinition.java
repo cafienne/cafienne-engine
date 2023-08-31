@@ -19,6 +19,7 @@ package org.cafienne.processtask.definition;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
+import org.cafienne.cmmn.expression.spel.Resolver;
 import org.cafienne.cmmn.expression.spel.api.APIRootObject;
 import org.cafienne.cmmn.expression.spel.api.process.InputMappingRoot;
 import org.cafienne.processtask.instance.ProcessTaskActor;
@@ -31,11 +32,7 @@ public class SubProcessInputMappingDefinition extends CMMNElementDefinition {
     private final Resolver resolver;
 
     protected SubProcessInputMappingDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
-        this(element, modelDefinition, parentElement, false);
-    }
-
-    protected SubProcessInputMappingDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement, boolean identifierRequired) {
-        super(element, modelDefinition, parentElement, identifierRequired);
+        super(element, modelDefinition, parentElement);
         String source = parseString(null, false, "");
         this.resolver = createResolver(source);
     }
@@ -60,12 +57,7 @@ public class SubProcessInputMappingDefinition extends CMMNElementDefinition {
 
     @Override
     public String getContextDescription() {
-        String className = this.getClass().getSimpleName();
-        if (className.endsWith("Definition")) {
-            return className.substring(0, className.length() - "Definition".length());
-        } else {
-            return className;
-        }
+        return getType();
     }
 
     /**

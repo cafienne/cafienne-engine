@@ -20,7 +20,7 @@ package org.cafienne.processtask.implementation.mail.definition;
 import jakarta.mail.internet.InternetAddress;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.processtask.definition.Resolver;
+import org.cafienne.cmmn.expression.spel.Resolver;
 import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
 import org.cafienne.processtask.implementation.mail.InvalidMailAddressException;
 import org.cafienne.processtask.instance.ProcessTaskActor;
