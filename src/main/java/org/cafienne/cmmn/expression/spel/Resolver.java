@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.definition;
+package org.cafienne.cmmn.expression.spel;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
+import org.cafienne.cmmn.definition.expression.ResolverDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
-import org.cafienne.cmmn.expression.spel.Evaluator;
 import org.cafienne.cmmn.expression.spel.api.APIRootObject;
 import org.cafienne.cmmn.expression.spel.api.process.InputMappingRoot;
 import org.cafienne.processtask.instance.ProcessTaskActor;
@@ -28,20 +28,20 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 import java.util.LinkedHashMap;
 
 /**
- * Enables multi-expression evaluation of process input parameters,
+ * Enables multi-expression evaluation of task input parameters on string content,
  * based on the apache commons text {@link StringSubstitutor}.
  */
 public class Resolver extends CMMNElementDefinition {
     private final Action action;
     private final String source;
-    private final SubProcessInputMappingDefinition definition;
+    private final ResolverDefinition definition;
 
     @FunctionalInterface
     private interface Action {
         Object evaluate(APIRootObject<?> rootObject);
     }
 
-    public Resolver(SubProcessInputMappingDefinition definition, String source) {
+    public Resolver(ResolverDefinition definition, String source) {
         super(definition.getElement(), definition.getModelDefinition(), definition);
         this.definition = definition;
         this.source = source;
@@ -59,7 +59,7 @@ public class Resolver extends CMMNElementDefinition {
         //    In that case, the outcome of evaluation is always concatenated to a string.
         final LinkedHashMap<String, Evaluator> parsedExpressions = new LinkedHashMap<>();
         new StringSubstitutor(expression -> {
-            if (getProcessDefinition().getInputParameters().containsKey(expression)) {
+            if (definition.getInputParameters().containsKey(expression)) {
                 parsedExpressions.put(expression, new ParameterEvaluator(definition, expression));
                 return expression;
             } else {

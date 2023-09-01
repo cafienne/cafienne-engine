@@ -25,6 +25,7 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.definition.HumanTaskDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.AssignmentDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.DueDateDefinition;
+import org.cafienne.cmmn.definition.extension.workflow.TaskModelDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.WorkflowTaskDefinition;
 import org.cafienne.cmmn.definition.team.CaseRoleDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
@@ -33,6 +34,7 @@ import org.cafienne.cmmn.instance.task.validation.ValidationError;
 import org.cafienne.cmmn.instance.task.validation.ValidationResponse;
 import org.cafienne.humantask.actorapi.event.*;
 import org.cafienne.humantask.actorapi.event.migration.HumanTaskMigrated;
+import org.cafienne.json.StringValue;
 import org.cafienne.json.Value;
 import org.cafienne.json.ValueMap;
 
@@ -48,7 +50,6 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
 
     private TaskState currentTaskState = TaskState.Null;
     private TaskState historyTaskState = TaskState.Null;
-    private TaskAction lastAction = TaskAction.Null;
 
     public WorkflowTask(WorkflowTaskDefinition workflowTaskDefinition, HumanTask humanTask) {
         super(humanTask, workflowTaskDefinition);
@@ -60,7 +61,14 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     private Value<?> getTaskModel() {
-        return getDefinition().getTaskModel();
+        // If the task model is defined, then bind it to the task input parameters.
+        // If the task model is not defined, just return an empty json string.
+        TaskModelDefinition definition = getDefinition().getTaskModel();
+        if (definition != null) {
+            return getDefinition().getTaskModel().getValue(task);
+        } else {
+            return new StringValue("");
+        }
     }
 
     private String getPerformerRole() {
@@ -69,13 +77,14 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     public void beginLifeCycle() {
+        ValueMap inputParameters = task.getMappedInputParameters();
         // Inform that we have become active
         addEvent(new HumanTaskActivated(task, getPerformerRole(), getTaskModel()));
         // Try to assign and fill due date based on custom definition fields
         calculateOptionalAssignment();
         calculateOptionalDueDate();
         // Inform about task input
-        addEvent(new HumanTaskInputSaved(task, task.getMappedInputParameters()));
+        addEvent(new HumanTaskInputSaved(task, inputParameters));
     }
 
     private void calculateOptionalAssignment() {
@@ -121,7 +130,6 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     public void updateState(HumanTaskTransitioned event) {
         this.historyTaskState = event.getHistoryState();
         this.currentTaskState = event.getCurrentState();
-        this.lastAction = event.getTransition();
     }
 
     public void updateState(HumanTaskDueDateFilled event) {
@@ -287,6 +295,6 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     private boolean hasNewTaskModel() {
-        return !getPreviousDefinition().getTaskModel().equals(getDefinition().getTaskModel());
+        return !Objects.equals(getPreviousDefinition().getTaskModel(), getDefinition().getTaskModel());
     }
 }

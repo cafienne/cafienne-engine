@@ -15,15 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.processtask.implementation.http.definition;
+package org.cafienne.cmmn.expression.spel.api.cmmn.mapping;
 
-import org.cafienne.cmmn.definition.CMMNElementDefinition;
-import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.processtask.definition.ProcessInputResolver;
-import org.w3c.dom.Element;
+import org.cafienne.cmmn.expression.spel.api.CaseRootObject;
+import org.cafienne.cmmn.instance.Task;
 
-public class ContentDefinition extends ProcessInputResolver {
-    public ContentDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
-        super(element, modelDefinition, parentElement);
+public class TaskInputRoot extends CaseRootObject {
+    public TaskInputRoot(Task<?> task) {
+        super(task.getCaseInstance());
+        task.getMappedInputParameters().getValue().forEach(this::addProperty);
+        registerPlanItem(task);
+    }
+
+    @Override
+    public String getDescription() {
+        return "task input";
     }
 }

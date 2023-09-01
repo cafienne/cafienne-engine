@@ -17,7 +17,6 @@
 
 package org.cafienne.cmmn.expression.spel;
 
-import org.cafienne.actormodel.ModelActor;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.expression.InvalidExpressionException;
 import org.cafienne.cmmn.expression.spel.api.APIRootObject;

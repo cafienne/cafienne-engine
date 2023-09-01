@@ -19,19 +19,19 @@ package org.cafienne.processtask.implementation.mail.definition;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.processtask.definition.Resolver;
-import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
+import org.cafienne.cmmn.expression.spel.Resolver;
+import org.cafienne.processtask.definition.ProcessInputResolver;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
-public class BodyDefinition extends SubProcessInputMappingDefinition {
+public class BodyDefinition extends ProcessInputResolver {
     private final Resolver bodyResolver;
     private final Resolver bodyTypeResolver;
 
     public BodyDefinition(Element element, ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
         this.bodyResolver = this.getResolver();
-        this.bodyTypeResolver = parseResolver("type", false, "text/html");
+        this.bodyTypeResolver = parseAttributeResolver("type", "text/html");
     }
 
     public String getBody(ProcessTaskActor task) {
@@ -48,7 +48,7 @@ public class BodyDefinition extends SubProcessInputMappingDefinition {
     }
 
     private boolean sameBodyDefinition(BodyDefinition other) {
-        return super.sameMappingDefinition(other)
+        return super.sameResolverDefinition(other)
                 && same(bodyResolver, other.bodyResolver)
                 && same(bodyTypeResolver, other.bodyTypeResolver);
     }

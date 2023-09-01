@@ -20,18 +20,18 @@ package org.cafienne.processtask.implementation.http.definition;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.expression.spel.api.APIRootObject;
-import org.cafienne.processtask.definition.Resolver;
-import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
+import org.cafienne.cmmn.expression.spel.Resolver;
+import org.cafienne.processtask.definition.ProcessInputResolver;
 import org.cafienne.processtask.implementation.http.Header;
 import org.w3c.dom.Element;
 
-public class HeaderDefinition extends SubProcessInputMappingDefinition {
+public class HeaderDefinition extends ProcessInputResolver {
     private final Resolver nameResolver;
     private final Resolver valueResolver;
 
     public HeaderDefinition(Element element, ModelDefinition modelDefinition, CMMNElementDefinition parentElement) {
         super(element, modelDefinition, parentElement);
-        this.nameResolver = parseResolver("name", false, "");
+        this.nameResolver = parseAttributeResolver("name", "");
         this.valueResolver = this.getResolver();
     }
 
@@ -47,7 +47,7 @@ public class HeaderDefinition extends SubProcessInputMappingDefinition {
     }
 
     private boolean sameAttachmentDefinition(HeaderDefinition other) {
-        return super.sameMappingDefinition(other)
+        return super.sameResolverDefinition(other)
                 && same(nameResolver, other.nameResolver)
                 && same(valueResolver, other.valueResolver);
     }
