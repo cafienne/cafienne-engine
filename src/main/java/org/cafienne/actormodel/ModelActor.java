@@ -290,8 +290,10 @@ public abstract class ModelActor extends AbstractPersistentActor {
             return;
         }
         synchronized (responseListeners) {
-            responseListeners.put(command.getMessageId(), new Responder(left, right));
+            responseListeners.put(command.getMessageId(), new Responder(command, left, right));
         }
+        addDebugInfo(() -> "----------" + this + " sends command " + command.getCommandDescription() , command.rawJson());
+
         caseSystem.gateway().inform(command, self());
     }
 
@@ -464,7 +466,6 @@ public abstract class ModelActor extends AbstractPersistentActor {
             notModified(source);
         }
     }
-
 
     /**
      * This method is invoked when handling of the source message completed and

@@ -17,10 +17,22 @@
 
 package org.cafienne.actormodel.message;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.identity.UserIdentity;
 import org.cafienne.infrastructure.serialization.CafienneSerializable;
+import org.cafienne.infrastructure.serialization.CafienneSerializer;
+import org.cafienne.infrastructure.serialization.Fields;
+import org.cafienne.json.JSONParseFailure;
+import org.cafienne.json.JSONReader;
+import org.cafienne.json.Value;
+import org.cafienne.json.ValueMap;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * A UserMessage carries user information
@@ -32,6 +44,7 @@ public interface UserMessage extends CafienneSerializable {
     /**
      * Explicit method to be implemented returning the type of the ModelActor handling this message.
      * This is required for the message routing within the CaseSystem
+     *
      * @return
      */
     default Class<?> actorClass() {
@@ -44,5 +57,23 @@ public interface UserMessage extends CafienneSerializable {
 
     default BootstrapMessage asBootstrapMessage() {
         return (BootstrapMessage) this;
+    }
+
+    /**
+     * Return a ValueMap serialization of the message
+     */
+    default ValueMap rawJson() {
+        JsonFactory factory = new JsonFactory();
+        StringWriter sw = new StringWriter();
+        try {
+            JsonGenerator generator = factory.createGenerator(sw);
+            generator.setPrettyPrinter(new DefaultPrettyPrinter());
+            writeThisObject(generator);
+            generator.close();
+            Value<?> json = JSONReader.parse(sw.toString());
+            return new ValueMap(Fields.type, CafienneSerializer.getManifestString(this), Fields.content, json);
+        } catch (IOException | JSONParseFailure e) {
+            return new ValueMap("message", "Could not make JSON out of " + getClass().getName(), "exception", Value.convertThrowable(e));
+        }
     }
 }

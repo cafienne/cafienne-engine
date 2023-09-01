@@ -35,8 +35,14 @@ public class CaseInputParameter extends Parameter<InputParameterDefinition> {
             // Validate proper types
             item.getDefinition().validatePropertyTypes(value);
 
-            addDebugInfo(() -> "Binding parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "] (transition -> Create)");
-            item.createContent(value);
+            if (item.getState().isNull()) {
+                addDebugInfo(() -> "Binding parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "] (transition -> Create)");
+                item.createContent(value);
+            } else {
+                addDebugInfo(() -> "Binding parameter '" + getDefinition().getName() + "' to CaseFileItem[" + item.getPath() + "] (transition -> Replace) - This typically happens during reactivation of the case");
+                item.replaceContent(value);
+            }
+
         }
     }
 }

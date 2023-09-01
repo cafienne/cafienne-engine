@@ -44,17 +44,17 @@ class ProcessTaskActorInformer extends ProcessInformer {
     }
 
     @Override
-    protected void suspendInstance() {
+    protected void suspendImplementation() {
         task.tellTaskImplementation(new SuspendProcess(getCaseInstance().getCurrentUser(), task.getId()));
     }
 
     @Override
-    protected void resumeInstance() {
+    protected void resumeImplementation() {
         task.tellTaskImplementation(new ResumeProcess(getCaseInstance().getCurrentUser(), task.getId()));
     }
 
     @Override
-    protected void terminateInstance() {
+    protected void terminateImplementation() {
         if (task.getHistoryState() == State.Available) {
             getCaseInstance().addDebugInfo(() -> "Terminating process task '" + task.getName() + "' without it being started; no need to inform the task actor");
         } else {

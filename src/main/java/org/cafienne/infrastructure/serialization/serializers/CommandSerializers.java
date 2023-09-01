@@ -17,6 +17,7 @@
 
 package org.cafienne.infrastructure.serialization.serializers;
 
+import org.cafienne.cmmn.actorapi.command.ReactivateCase;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.casefile.CreateCaseFileItem;
 import org.cafienne.cmmn.actorapi.command.casefile.DeleteCaseFileItem;
@@ -32,6 +33,7 @@ import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
+import org.cafienne.cmmn.actorapi.command.plan.task.HandleTaskImplementationTransition;
 import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert;
 import org.cafienne.cmmn.actorapi.command.team.SetCaseTeam;
 import org.cafienne.cmmn.actorapi.command.team.removemember.RemoveCaseTeamGroup;
@@ -66,6 +68,7 @@ public class CommandSerializers {
 
     private static void addCaseCommands() {
         CafienneSerializer.addManifestWrapper(StartCase.class, StartCase::new);
+        CafienneSerializer.addManifestWrapper(ReactivateCase.class, ReactivateCase::new);
         CafienneSerializer.addManifestWrapper(MigrateDefinition.class, MigrateDefinition::new);
         CafienneSerializer.addManifestWrapper(MigrateCaseDefinition.class, MigrateCaseDefinition::new);
         CafienneSerializer.addManifestWrapper(SwitchDebugMode.class, SwitchDebugMode::new);
@@ -80,6 +83,7 @@ public class CommandSerializers {
         CafienneSerializer.addManifestWrapper(GetDiscretionaryItems.class, GetDiscretionaryItems::new);
         CafienneSerializer.addManifestWrapper(MakeCaseTransition.class, MakeCaseTransition::new);
         CafienneSerializer.addManifestWrapper(MakePlanItemTransition.class, MakePlanItemTransition::new);
+        CafienneSerializer.addManifestWrapper(HandleTaskImplementationTransition.class, HandleTaskImplementationTransition::new);
         CafienneSerializer.addManifestWrapper(CompleteTask.class, CompleteTask::new);
         CafienneSerializer.addManifestWrapper(FailTask.class, FailTask::new);
         CafienneSerializer.addManifestWrapper(RaiseEvent.class, RaiseEvent::new);

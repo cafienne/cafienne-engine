@@ -27,20 +27,13 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class TaskCommandRejected extends TaskEvent<Task<?>> {
-    protected final ValueMap command;
-    protected final ValueMap failure;
-
-    public TaskCommandRejected(Task<?> task, ModelCommand command, ValueMap failure) {
-        super(task);
-        this.command = command.rawJson();
-        this.failure = failure;
+public class TaskImplementationNotStarted extends TaskCommandRejected {
+    public TaskImplementationNotStarted(Task<?> task, ModelCommand command, ValueMap failure) {
+        super(task, command, failure);
     }
 
-    public TaskCommandRejected(ValueMap json) {
+    public TaskImplementationNotStarted(ValueMap json) {
         super(json);
-        this.command = json.readMap(Fields.command);
-        this.failure = json.readMap(Fields.failure);
     }
 
     @Override
@@ -48,17 +41,5 @@ public class TaskCommandRejected extends TaskEvent<Task<?>> {
         // Just for logging purposes, no actual state change
         task.updateState(this);
         task.goFault(new ValueMap("exception", failure));
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeTaskEvent(generator);
-        writeField(generator, Fields.command, command);
-        writeField(generator, Fields.failure, failure);
-    }
-
-    @Override
-    public String toString() {
-        return "Task " + getTaskId() + " has output:\n" + command;
     }
 }

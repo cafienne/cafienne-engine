@@ -22,6 +22,7 @@ import org.cafienne.cmmn.actorapi.command.CaseCommand;
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition;
 import org.cafienne.cmmn.actorapi.command.plan.task.CompleteTask;
 import org.cafienne.cmmn.actorapi.command.plan.task.FailTask;
+import org.cafienne.cmmn.actorapi.command.plan.task.HandleTaskImplementationTransition;
 import org.cafienne.cmmn.actorapi.event.CaseOutputFilled;
 import org.cafienne.cmmn.definition.CasePlanDefinition;
 import org.slf4j.Logger;
@@ -60,10 +61,7 @@ public class CasePlan extends Stage<CasePlanDefinition> {
     }
 
     private void informParent(Transition transition) {
-        String parentCaseTaskId = getCaseInstance().getId(); // Our Id within our parent
-        String parentCaseId = getCaseInstance().getParentCaseId(); // Id of our parent
-        CaseUserIdentity user = getCaseInstance().getCurrentUser();
-        informParent(() -> new MakePlanItemTransition(user, parentCaseId, parentCaseTaskId, transition));
+        informParent(() -> new HandleTaskImplementationTransition(getCaseInstance(), transition));
     }
 
     private void informParent(CommandCreator createIfParent) {

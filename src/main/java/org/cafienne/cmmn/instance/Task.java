@@ -20,6 +20,7 @@ package org.cafienne.cmmn.instance;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.InvalidCommandException;
 import org.cafienne.actormodel.response.CommandFailure;
+import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.event.plan.task.*;
 import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.ParameterMappingDefinition;
@@ -49,13 +50,23 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
         super(id, index, itemDefinition, definition, stage.getCaseInstance(), stage);
     }
 
+    @FunctionalInterface
+    interface TransitionHandler {
+        void handle();
+    }
+
     @Override
     final protected void completeInstance() {
         // Hmmm... can only be invoked by the implementation.
     }
 
-    @Override
-    abstract protected void terminateInstance();
+    public final void handleImplementationTransition(Transition transition) {
+        handlingChildTransition = true;
+        makeTransition(transition);
+        handlingChildTransition = false;
+    }
+
+    private boolean handlingChildTransition = false;
 
     @Override
     final protected void startInstance() {
@@ -65,19 +76,49 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
 
     abstract protected void startImplementation(ValueMap inputParameters);
 
-    @Override
-    abstract protected void suspendInstance();
+    private void handleTransition(TransitionHandler handler, Transition transition) {
+        if (handlingChildTransition) {
+            addDebugInfo(() -> "Updated " + this + " on transition " + transition + " that happened in the implementation");
+        } else {
+            handler.handle();
+        }
+    }
 
     @Override
-    abstract protected void resumeInstance();
+    final protected void suspendInstance() {
+        handleTransition(this::suspendImplementation, Transition.Suspend);
+    }
+
+    abstract protected void suspendImplementation();
 
     @Override
-    protected void reactivateInstance() {
-        transformInputParameters();
-        reactivateImplementation(getMappedInputParameters());
+    final protected void resumeInstance() {
+        handleTransition(this::resumeImplementation, Transition.Resume);
+    }
+
+    abstract protected void resumeImplementation();
+
+    @Override
+    protected final void reactivateInstance() {
+        handleTransition(() -> {
+            if (implementationState.isStarted()) {
+                transformInputParameters();
+                reactivateImplementation(getMappedInputParameters());
+            } else {
+                addDebugInfo(() -> "Implementation of task " + this + " was not started yet, probably due to failures. Starting again");
+                startInstance();
+            }
+        }, Transition.Reactivate);
     }
 
     abstract protected void reactivateImplementation(ValueMap inputParameters);
+
+    @Override
+    final protected void terminateInstance() {
+        handleTransition(this::terminateImplementation, Transition.Terminate);
+    }
+
+    abstract protected void terminateImplementation();
 
     @Override
     final protected void failInstance() {
@@ -119,7 +160,6 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
 
     /**
      * This method is called to complete a task
-     * @param rawOutputParameters
      */
     public boolean goComplete(ValueMap rawOutputParameters) {
         return makeTransitionWithOutput(Transition.Complete, rawOutputParameters);
@@ -127,7 +167,6 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
 
     /**
      * This method is called when a task fails
-     * @param rawOutputParameters
      */
     public void goFault(ValueMap rawOutputParameters) {
         makeTransitionWithOutput(Transition.Fault, rawOutputParameters);
@@ -144,7 +183,6 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
      * Fill the output parameters of the task, based on the output parameters of the implementation
      * of the task (i.e., based on the output of the sub process or sub case that was invoked).
      *
-     * @param output
      * @param validateOutput Indicates whether a check on mandatory parameter values must be done
      */
     protected ValueMap transformOutputParameters(ValueMap output, boolean validateOutput) {
@@ -159,11 +197,11 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
             if (missingParameters.isEmpty()) {
                 return "";
             } else if (missingParameters.size() == 1) {
-                return "Task Output: parameter " + missingParameters.get(0).getTarget().getName() +" has no value, because raw parameter " + missingParameters.get(0).getSource().getName() + " is missing";
+                return "Task Output: parameter " + missingParameters.get(0).getTarget().getName() + " has no value, because raw parameter " + missingParameters.get(0).getSource().getName() + " is missing";
             } else {
                 List<String> missingRawParameters = missingParameters.stream().map(m -> m.getSource().getName()).collect(Collectors.toList());
                 List<String> missingTaskParameters = missingParameters.stream().map(m -> m.getTarget().getName()).collect(Collectors.toList());
-                return "Task Output: parameters " + missingTaskParameters +" have no value - missing raw output parameters " + missingRawParameters;
+                return "Task Output: parameters " + missingTaskParameters + " have no value - missing raw output parameters " + missingRawParameters;
             }
         });
         // Check on raw parameters that have no matching definition
@@ -172,7 +210,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
             if (undefinedParameters.isEmpty()) {
                 return "";
             } else if (undefinedParameters.size() == 1) {
-                return "Task Output: found parameter " + undefinedParameters.get(0) +", but it is not defined";
+                return "Task Output: found parameter " + undefinedParameters.get(0) + ", but it is not defined";
             } else {
                 return "Task Output: found parameters " + undefinedParameters + ", but they are not defined";
             }
@@ -200,7 +238,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
                     // an outcome different than Value.NULL may come. In such cases, we will also create the output
                     // parameter with that new value.
                     Value<?> taskOutputParameterValue = mapping.transformOutput(this, Value.NULL);
-                    if (! Value.NULL.equals(taskOutputParameterValue)) {
+                    if (!Value.NULL.equals(taskOutputParameterValue)) {
                         newTaskOutput.put(taskOutputParameterName, taskOutputParameterValue);
                     }
                 } else {
@@ -220,7 +258,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
                 if (parameterDefinition.isMandatory()) {
 //                    System.out.println("Validating mandatory output parameter "+name);
                     if (parameterValue.equals(Value.NULL)) {
-                        validationErrors.add("Task output parameter "+ name+" does not have a value, but that is required in order to complete the task");
+                        validationErrors.add("Task output parameter " + name + " does not have a value, but that is required in order to complete the task");
                     }
                 }
 
@@ -232,7 +270,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
                 }
             });
 
-            if (validationErrors.size() > 0) {
+            if (!validationErrors.isEmpty()) {
                 throw new InvalidCommandException(validationErrors.toString());
             }
         }
@@ -246,6 +284,7 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
 
     /**
      * Returns the mapped input parameters for task
+     *
      * @return mapped input parameters for task
      */
     public ValueMap getMappedInputParameters() {
@@ -268,6 +307,14 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
     }
 
     public void updateState(TaskImplementationStarted event) {
+        getImplementationState().updateState(event);
+    }
+
+    public void updateState(TaskImplementationNotStarted event) {
+        getImplementationState().updateState(event);
+    }
+
+    public void updateState(TaskImplementationReactivated event) {
         getImplementationState().updateState(event);
     }
 
@@ -299,36 +346,42 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
         super.migrateItemDefinition(newItemDefinition, newDefinition, skipLogic);
         if (hasNewMappings()) {
             if (getState().isAlive()) {
-                addDebugInfo(() -> "Found new mapping definitions in task " + this +", transforming input parameters");
+                addDebugInfo(() -> "Found new mapping definitions in task " + this + ", transforming input parameters");
                 transformInputParameters();
             }
         }
     }
 
     private boolean hasNewMappings() {
-        return ! getPreviousDefinition().sameMappings(getDefinition());
+        return !getPreviousDefinition().sameMappings(getDefinition());
     }
 
     public void startTaskImplementation(ModelCommand command) {
-        getCaseInstance().informImplementation(command, left -> handleRejection(command, left), right -> handleTaskStarted());
+        getCaseInstance().informImplementation(command, failure -> {
+            getCaseInstance().addEvent(new TaskImplementationNotStarted(this, command, failure.toJson()));
+        }, success -> {
+            getCaseInstance().addEvent(new TaskImplementationStarted(this));
+            if (!getDefinition().isBlocking()) {
+                goComplete(new ValueMap());
+            }
+        });
     }
 
-    void handleTaskStarted() {
-        getCaseInstance().addEvent(new TaskImplementationStarted(this));
-        if (!getDefinition().isBlocking()) {
-            goComplete(new ValueMap());
-        }
-    }
-
-    void handleRejection(ModelCommand command, CommandFailure failure) {
-        getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
+    public void reactivateTaskImplementation(ModelCommand command) {
+        getCaseInstance().informImplementation(command, failure -> {
+            getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
+        }, success -> {
+            getCaseInstance().addEvent(new TaskImplementationReactivated(this));
+        });
     }
 
     public void tellTaskImplementation(ModelCommand command) {
         if (!getDefinition().isBlocking()) {
             return;
         }
-        getCaseInstance().informImplementation(command, left -> handleRejection(command, left));
+        getCaseInstance().informImplementation(command, failure -> {
+            getCaseInstance().addEvent(new TaskCommandRejected(this, command, failure.toJson()));
+        });
     }
 
     public void giveNewDefinition(ModelCommand command) {
@@ -348,48 +401,4 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
         return implementationState;
     }
 
-    public static class TaskImplementationActorState {
-        private final Task<?> task;
-        private boolean isStarted = false;
-        private boolean foundFailure = false;
-
-        TaskImplementationActorState(Task task) {
-            this.task = task;
-        }
-
-        public boolean isStarted() {
-            // For backwards compatibility:
-            //  If a task is successfully started in older versions of Cafienne, it will be in state Active;
-            //  However, if the task , but in older cases
-            //  the state of the task interaction is not stored.
-            //  In
-
-            return isStarted || (!foundFailure && task.getState().isAlive() );
-        }
-
-        public boolean foundFailures() {
-            return foundFailure;
-        }
-
-        void updateState(TaskImplementationStarted event) {
-            task.addDebugInfo(() -> "Task " + task +" confirmed a successful start.");
-            isStarted = true;
-        }
-
-        void updateState(TaskCommandRejected event) {
-            task.addDebugInfo(() -> "Task " + task +" reported a command rejection.", event.rawJson());
-            foundFailure = true;
-        }
-
-        @Override
-        public String toString() {
-            return "TaskImplementationActorState{" +
-                    "task=" + task +
-                    ", task.state=" + task.getState() +
-                    ", isStarted=" + isStarted +
-                    ", foundFailure=" + foundFailure +
-                    ", isStarted()=" + isStarted() +
-                    '}';
-        }
-    }
 }

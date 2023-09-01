@@ -37,13 +37,13 @@ import java.io.IOException;
 
 @Manifest
 public class StartCase extends CaseCommand implements BootstrapMessage {
-    private final String tenant;
-    private final String rootCaseId;
-    private final String parentCaseId;
-    private final ValueMap inputParameters;
-    private final CaseDefinition definition;
-    private CaseTeam caseTeam;
-    private final boolean debugMode;
+    protected final String tenant;
+    protected final String rootCaseId;
+    protected final String parentCaseId;
+    protected final ValueMap inputParameters;
+    protected final CaseDefinition definition;
+    protected CaseTeam caseTeam;
+    protected final boolean debugMode;
 
     /**
      * Starts a new case with the specified case definition

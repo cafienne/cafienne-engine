@@ -17,12 +17,9 @@
 
 package org.cafienne.cmmn.actorapi.event.plan.task;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.instance.Task;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-
-import java.io.IOException;
 
 @Manifest
 public class TaskImplementationStarted extends TaskEvent<Task<?>> {
@@ -38,10 +35,5 @@ public class TaskImplementationStarted extends TaskEvent<Task<?>> {
     public void updateState(Task<?> task) {
         // Just for logging purposes, no actual state change
         task.updateState(this);
-    }
-
-    @Override
-    public void write(JsonGenerator generator) throws IOException {
-        super.writeTaskEvent(generator);
     }
 }

@@ -17,6 +17,7 @@
 
 package org.cafienne.cmmn.instance.task.cmmn;
 
+import org.cafienne.cmmn.actorapi.command.ReactivateCase;
 import org.cafienne.cmmn.actorapi.command.StartCase;
 import org.cafienne.cmmn.actorapi.command.migration.MigrateCaseDefinition;
 import org.cafienne.cmmn.actorapi.command.plan.MakeCaseTransition;
@@ -41,7 +42,29 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     }
 
     @Override
-    protected void terminateInstance() {
+    protected void startImplementation(ValueMap inputParameters) {
+        // Only instantiate the subcase if our plan item has been started, not when it is being resumed
+        CaseDefinition subCaseDefinition = getDefinition().getImplementationDefinition();
+        String parentCaseId = mainCase.getId();
+        String rootCaseId = mainCase.getRootCaseId();
+        CaseTeam caseTeam = mainCase.getCaseTeam().createSubCaseTeam(subCaseDefinition);
+
+        StartCase command = new StartCase(getCaseInstance().getTenant(), getCaseInstance().getCurrentUser(), subCaseId, subCaseDefinition, inputParameters, caseTeam, getCaseInstance().debugMode(), parentCaseId, rootCaseId);
+        startTaskImplementation(command);
+    }
+
+    @Override
+    protected void suspendImplementation() {
+        tell(Transition.Suspend);
+    }
+
+    @Override
+    protected void resumeImplementation() {
+        tell(Transition.Reactivate);
+    }
+
+    @Override
+    protected void terminateImplementation() {
         if (getHistoryState() == State.Available) {
             addDebugInfo(() -> "Terminating human task '" + getName() + "' without it being started; no need to inform the task actor");
         } else {
@@ -50,35 +73,15 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     }
 
     @Override
-    protected void suspendInstance() {
-        tell(Transition.Suspend);
-    }
-
-    @Override
-    protected void resumeInstance() {
-        tell(Transition.Reactivate);
-    }
-
-    @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
-        // TODO: this must be done with a new command, to reactive a case.
-        //  Case Reactivation should reset the input parameters as well...
-        //  NOT SURE what this actually means in practice...
-        //  For now, we'll just try to start. This will probably run into failures as well. But that's ok for now.
-        startImplementation(inputParameters);
-    }
-
-    @Override
-    protected void startImplementation(ValueMap inputParameters) {
         // Only instantiate the subcase if our plan item has been started, not when it is being resumed
         CaseDefinition subCaseDefinition = getDefinition().getImplementationDefinition();
         String parentCaseId = mainCase.getId();
         String rootCaseId = mainCase.getRootCaseId();
-        ValueMap caseInputParameters = getMappedInputParameters();
         CaseTeam caseTeam = mainCase.getCaseTeam().createSubCaseTeam(subCaseDefinition);
 
-        StartCase startCaseCommand = new StartCase(getCaseInstance().getTenant(), getCaseInstance().getCurrentUser(), subCaseId, subCaseDefinition, caseInputParameters, caseTeam, getCaseInstance().debugMode(), parentCaseId, rootCaseId);
-        startTaskImplementation(startCaseCommand);
+        ReactivateCase command = new ReactivateCase(getCaseInstance().getTenant(), getCaseInstance().getCurrentUser(), subCaseId, subCaseDefinition, inputParameters, caseTeam, getCaseInstance().debugMode(), parentCaseId, rootCaseId);
+        reactivateTaskImplementation(command);
     }
 
     /**
