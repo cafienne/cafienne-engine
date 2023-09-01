@@ -21,21 +21,21 @@ import jakarta.mail.internet.InternetAddress;
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
 import org.cafienne.cmmn.expression.spel.Resolver;
-import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
+import org.cafienne.processtask.definition.ProcessInputResolver;
 import org.cafienne.processtask.implementation.mail.InvalidMailAddressException;
 import org.cafienne.processtask.instance.ProcessTaskActor;
 import org.w3c.dom.Element;
 
 import java.io.UnsupportedEncodingException;
 
-public class AddressDefinition extends SubProcessInputMappingDefinition {
+public class AddressDefinition extends ProcessInputResolver {
     private final Resolver emailResolver;
     private final Resolver nameResolver;
 
     public AddressDefinition(Element element, ModelDefinition definition, CMMNElementDefinition parentElement) {
         super(element, definition, parentElement);
         this.emailResolver = this.getResolver();
-        this.nameResolver = parseResolver("name", false, "");
+        this.nameResolver = parseAttributeResolver("name", "");
     }
 
     public Resolver getEmailResolver() {
@@ -62,7 +62,7 @@ public class AddressDefinition extends SubProcessInputMappingDefinition {
     }
 
     private boolean sameAddressDefinition(AddressDefinition other) {
-        return super.sameMappingDefinition(other)
+        return super.sameResolverDefinition(other)
                 && same(emailResolver, other.emailResolver)
                 && same(nameResolver, other.nameResolver);
     }

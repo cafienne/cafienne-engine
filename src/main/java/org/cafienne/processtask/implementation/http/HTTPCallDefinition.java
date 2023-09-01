@@ -23,18 +23,17 @@ import org.cafienne.cmmn.expression.spel.api.APIRootObject;
 import org.cafienne.cmmn.expression.spel.api.process.InputMappingRoot;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.cmmn.instance.task.validation.TaskOutputValidator;
-import org.cafienne.cmmn.instance.task.validation.TaskValidatorRootAPI;
-import org.cafienne.processtask.definition.SubProcessInputMappingDefinition;
 import org.cafienne.processtask.definition.SubProcessDefinition;
 import org.cafienne.processtask.implementation.http.definition.ContentDefinition;
 import org.cafienne.processtask.implementation.http.definition.HeaderDefinition;
 import org.cafienne.processtask.implementation.http.definition.MethodDefinition;
 import org.cafienne.processtask.implementation.http.definition.URLDefinition;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-import org.cafienne.util.XMLHelper;
 import org.w3c.dom.Element;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class HTTPCallDefinition extends SubProcessDefinition {
