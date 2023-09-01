@@ -36,7 +36,7 @@ import java.util.Map;
 public class WorkflowTaskDefinition extends CMMNElementDefinition implements TaskImplementationContract {
     private final Map<String, InputParameterDefinition> inputParameters = new LinkedHashMap<>();
     private final Map<String, OutputParameterDefinition> outputParameters = new LinkedHashMap<>();
-    private final Value<?> taskModel;
+    private final TaskModelDefinition taskModel;
     private final DueDateDefinition dueDate;
     private final AssignmentDefinition assignment;
 
@@ -48,8 +48,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
 
         this.assignment = parse("assignment", AssignmentDefinition.class, false);
         this.dueDate = parse("duedate", DueDateDefinition.class, false);
-
-        taskModel = parseTaskModel();
+        this.taskModel = parse("task-model", TaskModelDefinition.class, false);
 
         // Parse custom parameter mappings into the (human) task definition
         final TaskDefinition<?> task = getParentElement();
@@ -62,8 +61,6 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
 
     /**
      * Returns the map with input parameters for this task.
-     *
-     * @return
      */
     public Map<String, InputParameterDefinition> getInputParameters() {
         return inputParameters;
@@ -71,8 +68,6 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
 
     /**
      * Returns the map with output parameters for this task.
-     *
-     * @return
      */
     public Map<String, OutputParameterDefinition> getOutputParameters() {
         return outputParameters;
@@ -83,18 +78,8 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
      *
      * @return task-model / Json schema for the task
      */
-    public Value<?> getTaskModel() {
+    public TaskModelDefinition getTaskModel() {
         return taskModel;
-    }
-
-    private Value<?> parseTaskModel() {
-        String taskModelStr = parseString("task-model", false, "");
-
-        try {
-            return JSONReader.parse(taskModelStr);
-        } catch (IOException | JSONParseFailure e) {
-            return new StringValue(taskModelStr);
-        }
     }
 
     public AssignmentDefinition getAssignmentExpression() {
