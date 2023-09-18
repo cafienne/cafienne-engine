@@ -17,25 +17,31 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
+import org.cafienne.cmmn.actorapi.event.plan.task.TaskOutputFilled
 import org.cafienne.cmmn.instance.Path
 import org.cafienne.infrastructure.serialization.{Fields, Manifest}
 import org.cafienne.json.{Value, ValueMap}
 
 @Manifest
-case class HumanTaskCompleted(taskId: String, path: Path, taskName: String, caseInstanceId: String) extends CafiennePublicEventContent {
-  override def toValue: Value[_] = new ValueMap(Fields.taskId, taskId, Fields.path, path, Fields.taskName, taskName, Fields.caseInstanceId, caseInstanceId)
+case class HumanTaskCompleted(taskId: String, path: Path, taskName: String, caseInstanceId: String, output: ValueMap) extends CafiennePublicEventContent {
+  override def toValue: Value[_] = new ValueMap(Fields.taskId, taskId, Fields.path, path, Fields.taskName, taskName, Fields.caseInstanceId, caseInstanceId, Fields.output, output)
+
   override def toString: String = getClass.getSimpleName + "[" + path + "]"
 }
 
 object HumanTaskCompleted {
   def from(batch: PublicCaseEventBatch): Seq[PublicEventWrapper] = batch
     .filterMap(classOf[org.cafienne.humantask.actorapi.event.HumanTaskCompleted])
-    .map(event => PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskCompleted(event.getTaskId, event.path, event.getTaskName, event.getCaseInstanceId)))
+    .map(event => {
+      val output = batch.filterMap(classOf[TaskOutputFilled]).filter(_.getTaskId == event.getTaskId).head.getTaskOutputParameters
+      PublicEventWrapper(batch.timestamp, batch.getSequenceNr(event), HumanTaskCompleted(event.getTaskId, event.path, event.getTaskName, event.getCaseInstanceId, output))
+    })
 
   def deserialize(json: ValueMap): HumanTaskCompleted = HumanTaskCompleted(
     taskId = json.readString(Fields.taskId),
     path = json.readPath(Fields.path),
     taskName = json.readString(Fields.taskName),
-    caseInstanceId = json.readString(Fields.caseInstanceId)
+    caseInstanceId = json.readString(Fields.caseInstanceId),
+    output = json.readMap(Fields.output)
   )
 }
