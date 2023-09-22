@@ -95,8 +95,30 @@ commands:
             cd ..
             cd ./cmmn-test-framework
             npm install
-            
-
+            sudo chmod -R 777 ./
+            echo
+            echo ==== listing files
+            ls
+            echo
+            echo ==== listing ./dist folder
+            if [[ -d dist ]]; then 
+              ls ./dist
+              echo
+              echo ==== removing ./dist
+              sudo rm -rf ./dist
+            else 
+              echo -- dist folder is not present --
+            fi
+            echo
+            echo ==== listing files
+            ls
+            echo
+            echo ==== compiling
+            npm run build
+            echo
+            echo ==== listing ./dist folder
+            ls ./dist
+            echo
 
   build-docker-image:
     steps:
@@ -156,7 +178,9 @@ commands:
         command: |
           cd ..
           cd ./cmmn-test-framework
-          npm run prod PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
+          echo ==== starting tests
+          echo
+          npm run test PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
     - run:
         name: Docker logs of engine after the test
         command: docker logs cafienne
@@ -180,7 +204,7 @@ commands:
         command: |
           cd ..
           cd ./cmmn-test-framework
-          npm run prod PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
+          npm run test PingTokenService PingTestEnvironment TestSwagger TestDefinitionInStartCase
     - run:
         name: Docker logs of engine after the test
         command: docker logs cafienne
@@ -204,13 +228,13 @@ commands:
         command: |
           cd ..
           cd ./cmmn-test-framework
-          npm run prod
+          npm run test
     - run:
         name: Test archival & deletion
         command: |
           cd ..
           cd ./cmmn-test-framework
-          npm run prod TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+          npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
     - run:
         name: Docker logs of engine after the test
         command: docker logs cafienne
@@ -238,13 +262,13 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod
+            npm run test
       - run:
           name: Test archival & deletion
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
@@ -281,13 +305,13 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod
+            npm run test
       - run:
           name: Test archival & deletion
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
@@ -322,7 +346,7 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod
+            npm run test
       - run:
           name: Stop and remove the Cafienne container
           command: |
@@ -348,13 +372,13 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod
+            npm run test
       - run:
           name: Test archival & deletion
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
@@ -387,13 +411,13 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod
+            npm run test
       - run:
           name: Test archival & deletion
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run prod TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
