@@ -59,9 +59,6 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     /**
      * Adds an item to the stage, by adding a PlanItemCreated event for it.
      * Also starts the lifecycle of the new plan item if the Stage is currently active.
-     *
-     * @param discretionaryItem
-     * @param planItemId
      */
     void planChild(DiscretionaryItem discretionaryItem, String planItemId) {
         // Determine index by iterating sibling plan items (i.e., those that have the same item definition).
@@ -73,7 +70,6 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
      * Repeat one of our children.
      *
      * @param child The child to be repeated.
-     * @return
      */
     PlanItem<?> repeatChild(PlanItem<?> child) {
         // Generate an id for the repeat item
@@ -95,7 +91,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, planItemId, index));
         if (triggerCreateTransition && this.getState().isActive()) {
             // Only generate a start transition for the new discretionary item if this stage is active.
-            //  Otherwise the start transition will be generated when this stage becomes active.
+            //  Otherwise, the start transition will be generated when this stage becomes active.
             pic.getCreatedPlanItem().create();
         }
         return pic.getCreatedPlanItem();
@@ -211,7 +207,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
          *
          * In other words, a Stage instance SHOULD complete if a user has no option to do further planning or work with the Stage instance.
          */
-        // BOTTOMLINE interpretation: the stage will try to complete each time a child reaches semiterminal state, or if the transition to complete is manually invoked
+        // BOTTOM-LINE interpretation: the stage will try to complete each time a child reaches semi-terminal state, or if the transition to complete is manually invoked
         // Here we check both.
         addDebugInfo(() -> {
             String msg = getPlanItems().stream().map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
@@ -296,8 +292,6 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
     /**
      * Invoked if the stage arrives in a certain state. Based on the transition we will get particular transitions on the children.
-     *
-     * @param transition
      */
     private void propagateTransition(Transition transition) {
         for (PlanItem<?> child : planItems) {
@@ -319,10 +313,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     /**
-     * Determines whether the plan item is contained within this stage or one of it's child stages.
-     *
-     * @param planItem
-     * @return
+     * Determines whether the plan item is contained within this stage or one of its child stages.
      */
     public boolean contains(PlanItem<?> planItem) {
         if (planItem == null) {

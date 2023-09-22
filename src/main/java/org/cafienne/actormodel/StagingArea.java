@@ -229,7 +229,7 @@ public class StagingArea {
      * @return
      */
     private boolean hasStatefulEvents() {
-        return events.size() > 0;
+        return !events.isEmpty();
     }
 
     /**
@@ -237,7 +237,7 @@ public class StagingArea {
      * @return
      */
     boolean needsCommitEvent() {
-        return events.size() > 0 && !(events.get(events.size() - 1) instanceof CommitEvent);
+        return hasStatefulEvents() && !(events.get(events.size() - 1) instanceof CommitEvent);
     }
 
     /**
