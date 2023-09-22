@@ -121,19 +121,29 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         // Upon recovery, the create() method is not invoked, and subsequently we would not be
         //  connected to the sentry network. Hence, checking that and adding ourselves if needed.
         if (getCaseInstance().recoveryRunning()) {
-            // Link ourselves to any existing sentries in the case
-            getCaseInstance().getSentryNetwork().connect(this);
+            startListening();
         }
     }
 
     void create() {
         addDebugInfo(() -> "Connecting plan item " + this + " with id " + id + " to the sentry network");
-
-        // Link ourselves to any existing sentries in the case
-        getCaseInstance().getSentryNetwork().connect(this);
+        startListening();
 
         // Trigger the Create transition.
         makeTransition(Transition.Create);
+    }
+
+    private void startListening() {
+        // Link ourselves to any existing sentries in the case
+        getCaseInstance().getSentryNetwork().connect(this);
+        // Now register our criteria with the sentry network so that they get informed about transitions.
+        entryCriteria.startListening();
+        exitCriteria.startListening();
+    }
+
+    protected void stopListening() {
+        entryCriteria.stopListening();
+        exitCriteria.stopListening();
     }
 
     @Override
@@ -621,8 +631,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     public void updateState(PlanItemDropped event) {
-        getEntryCriteria().release();
-        getExitCriteria().release();
+        stopListening();
         getStage().removeDroppedPlanItem(this);
         getCaseInstance().removeDroppedPlanItem(this);
     }

@@ -33,9 +33,4 @@ public class ExitCriterionDefinition extends CriterionDefinition {
     public Transition getTransition() {
         return Transition.Exit;
     }
-
-    @Override
-    public ExitCriterion createInstance(CriteriaListener listener) {
-        return new ExitCriterion(listener, this);
-    }
 }

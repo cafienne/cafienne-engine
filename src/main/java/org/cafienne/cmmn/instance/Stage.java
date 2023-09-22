@@ -44,9 +44,8 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     void register(PlanItem<?> child) {
         if (getCaseInstance().recoveryRunning() && child.getIndex() > 0) {
             planItems.stream().filter(p -> p.getDefinition().equals(child.getDefinition()) && p.getIndex() + 1 == child.getIndex()).forEach(leftSibling -> {
-//                System.out.println("!!!Releasing already repeated plan item " + leftSibling);
-                // Recovering repeated plan items should no longer inform the sentry network
-                leftSibling.getEntryCriteria().release();
+                // Recovering repeated plan items should no longer connect their entry criteria to the sentry network
+                leftSibling.getEntryCriteria().stopListening();
             });
         }
         planItems.add(child);
@@ -285,8 +284,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             if (makeTerminationTransition) {
                 child.makeTransition(child.getTerminationTransition());
             }
-            child.getEntryCriteria().release();
-            child.getExitCriteria().release();
+            child.stopListening();
         }
     }
 

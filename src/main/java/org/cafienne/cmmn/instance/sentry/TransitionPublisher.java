@@ -23,7 +23,7 @@ import org.cafienne.cmmn.instance.debug.DebugInfoAppender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransitionPublisher<E extends StandardEvent<?,?>, I extends TransitionGenerator<E>, P extends OnPart<?, E, I>> {
+public class TransitionPublisher<E extends StandardEvent<?, ?>, I extends TransitionGenerator<E>, P extends OnPart<?, E, I>> {
     protected final I item;
     private final List<E> transitions = new ArrayList<>();
     private final List<P> connectedEntryCriteria = new ArrayList<>();
@@ -36,7 +36,6 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
     /**
      * Special constructor to be invoked from Bootstrap publisher.
      * It inherits the already bound entry and exit criteria.
-     * @param bootstrapPublisher
      */
     protected TransitionPublisher(TransitionPublisher<E, I, P> bootstrapPublisher) {
         // Release bootstrap publishers' events. This potentially releases some of the entry and exit criteria
@@ -58,8 +57,8 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
     }
 
     protected void informSentryNetwork(E event) {
-        addDebugInfo(() -> "Informing sentry network about " + event.getTransition() +" in " + item.getDescription());
-        item.getCaseInstance().getSentryNetwork().handleTransition(event, this);
+        addDebugInfo(() -> "Informing sentry network about " + event.getTransition() + " in " + item.getDescription());
+        item.getCaseInstance().getSentryNetwork().handleTransition(event);
     }
 
     /**
@@ -82,7 +81,7 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
                 onPart.inform(item, transitions.get(0));
             }
         } else {
-            // During recovery we inform all on parts about our most recent event,
+            // During recovery, we inform all on parts about our most recent event,
             // so that the sentry network is in the right state after recovery.
             transitions.forEach(event -> onPart.inform(item, event));
         }
@@ -105,16 +104,16 @@ public class TransitionPublisher<E extends StandardEvent<?,?>, I extends Transit
     }
 
     public void informEntryCriteria(E transition) {
-        if (! connectedEntryCriteria.isEmpty()) {
-            addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() +" entry criteria that listen to item " + item.getDescription());
+        if (!connectedEntryCriteria.isEmpty()) {
+            addDebugInfo(() -> "Informing " + connectedEntryCriteria.size() + " entry criteria that listen to item " + item.getDescription());
         }
         // Then inform the activating sentries
         new ArrayList<>(connectedEntryCriteria).forEach(onPart -> onPart.inform(item, transition));
     }
 
     public void informExitCriteria(E transition) {
-        if (! connectedExitCriteria.isEmpty()) {
-            addDebugInfo(() -> "Informing " + connectedExitCriteria.size() +" exit criteria that listen to item " + item.getDescription());
+        if (!connectedExitCriteria.isEmpty()) {
+            addDebugInfo(() -> "Informing " + connectedExitCriteria.size() + " exit criteria that listen to item " + item.getDescription());
         }
         // Then inform the activating sentries
         new ArrayList<>(connectedExitCriteria).forEach(onPart -> onPart.inform(item, transition));

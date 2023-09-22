@@ -44,7 +44,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     /**
      * Start listening to the sentry network
      */
-    public void connect() {
+    public void startListening() {
         this.definitions.forEach(this::addCriterion);
         if (!criteria.isEmpty()) {
             item.getCaseInstance().addDebugInfo(() -> "Connected " + item + " to " + criteria.size() + " " + logDescription + " criteria");
@@ -61,7 +61,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     /**
      * Stop listening to the sentry network, typically when the criterion is satisfied.
      */
-    public void release() {
+    public void stopListening() {
         if (!criteria.isEmpty()) {
             addDebugInfo(() -> "Disconnecting " + item + " from " + criteria.size() + " " + logDescription + " criteria");
         }

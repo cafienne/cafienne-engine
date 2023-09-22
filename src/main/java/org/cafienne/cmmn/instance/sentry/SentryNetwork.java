@@ -28,7 +28,7 @@ import java.util.Collection;
  * Wrapper class for the collection of all sentries inside the case instance.
  */
 public class SentryNetwork {
-    private final TransitionCallStack callStack = new TransitionCallStack(this);
+    private final TransitionCallStack callStack = new TransitionCallStack();
     /**
      * List of sentries active within the case.
      */
@@ -54,11 +54,10 @@ public class SentryNetwork {
      * Connect a new {@link PlanItem} to the network
      */
     public void connect(PlanItem<?> item) {
+        // Visit each existing criterion in the network and inform them about the new plan item.
         for (Criterion<?> criterion : criteria) {
             criterion.establishPotentialConnection(item);
         }
-        item.getEntryCriteria().connect();
-        item.getExitCriteria().connect();
     }
 
 
@@ -71,7 +70,6 @@ public class SentryNetwork {
 
     /**
      * Add a criterion to the network
-     * @param criterion
      */
     void add(Criterion<?> criterion) {
         criteria.add(criterion);
@@ -79,7 +77,6 @@ public class SentryNetwork {
 
     /**
      * Remove a criterion from the network
-     * @param criterion
      */
     void remove(Criterion<?> criterion) {
         this.criteria.remove(criterion);
@@ -87,16 +84,15 @@ public class SentryNetwork {
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder("SentryNetwork has " + criteria.size()+ " criteria:");
-        criteria.forEach(c -> string.append("\n\t- "+c));
-        return string.toString() + "\n";
+        StringBuilder string = new StringBuilder("SentryNetwork has " + criteria.size()+ " criteria: ");
+        criteria.forEach(c -> string.append("\n\t- ").append(c));
+        return string + "\n";
     }
 
     /**
      * Some entry criteria may listen not only to plan items, but also to a specific exit criterion of a plan item.
      * They can retrieve it through this method. Note this method will not create the criterion...
-     * @param definition
-     * @return
+     * @return The related criterion, or null if it is not found.
      */
     Criterion<?> findRelatedExitCriterion(PlanItem<?> item, ExitCriterionDefinition definition) {
        for (Criterion<?> criterion : criteria) {
@@ -111,7 +107,7 @@ public class SentryNetwork {
         return null;
     }
 
-    public void handleTransition(StandardEvent<?,?> event, TransitionPublisher<?,?,?> publisher) {
+    public void handleTransition(StandardEvent<?,?> event) {
         callStack.pushEvent(event);
     }
 }
