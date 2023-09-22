@@ -12,7 +12,7 @@ import org.cafienne.cmmn.test.TestScript
 import org.cafienne.cmmn.test.TestScript.{loadCaseDefinition, testUser}
 import org.cafienne.humantask.actorapi.command.CompleteHumanTask
 import org.cafienne.infrastructure.config.TestConfig
-import org.cafienne.infrastructure.cqrs.batch.public_events.{CaseCompleted, HumanTaskStarted, PublicCaseEventBatch}
+import org.cafienne.infrastructure.cqrs.batch.public_events.{CaseCompleted, HumanTaskCompleted, HumanTaskStarted, PublicCaseEventBatch}
 import org.cafienne.json.ValueMap
 import org.cafienne.util.Guid
 import org.scalatest.BeforeAndAfterAll
@@ -57,20 +57,31 @@ class TestPublicCaseOutputEvents
       println(s"Sending ${commands.size} commands: [${commands.map(_.getClass.getSimpleName).mkString(", ")}]")
       whenReady(caseSystem.sendCommand(startCaseCommand))(response => {
         println(s"Received $response response: [${response.getClass.getSimpleName}]")
-        whenReady(startCaseReader) { batch =>
+        whenReady(startCaseReader) { firstBatch: Seq[PublicCaseEventBatch] =>
           println("Public event batches have been received; checking each of them")
           val taskReader: Future[Seq[PublicCaseEventBatch]] = source.publicEvents.take(2).runWith(Sink.seq)
 
-          val humanTaskId = batch.head.publicEvents.map(_.content).filter(_.isInstanceOf[HumanTaskStarted]).map(_.asInstanceOf[HumanTaskStarted]).map(_.taskId).head
+          val humanTaskId = firstBatch.head.publicEvents.map(_.content).filter(_.isInstanceOf[HumanTaskStarted]).map(_.asInstanceOf[HumanTaskStarted]).map(_.taskId).head
           val taskOutput = new ValueMap("Output", "Output can be anything")
           val completeLaterTask = new CompleteHumanTask(testUser, caseInstanceId, humanTaskId, new ValueMap("Result", taskOutput))
 
           whenReady(caseSystem.sendCommand(completeLaterTask))(_ => {
-            whenReady(taskReader) { secondBatch => {
+            whenReady(taskReader) { secondBatch: Seq[PublicCaseEventBatch] => {
               println("Received second batch: " + secondBatch.last)
-              val batch = secondBatch.last
+              val batch: PublicCaseEventBatch = secondBatch.last
               println(s"Batch[2] has ${batch.publicEvents.size} events:\n- ${batch.publicEvents.map(_.content.toValue).mkString("\n- ")}\n")
-              val caseCompletedEvents = batch.publicEvents(classOf[CaseCompleted])
+              val taskCompletedEvents: Seq[HumanTaskCompleted] = batch.publicEvents(classOf[HumanTaskCompleted])
+              if (taskCompletedEvents.isEmpty || taskCompletedEvents.size > 1) {
+                throw new Error("Expecting only 1 task completed event in this batch")
+              }
+              val taskCompleted: HumanTaskCompleted = taskCompletedEvents.head
+              val expectedTaskOutput = new ValueMap("CaseOutput", taskOutput)
+              if (! taskCompleted.output.equals(expectedTaskOutput)) {
+                System.err.println(s"Case output mismatch!!!\nFound json ${taskCompleted.output}\n\nExpected json: $taskOutput")
+                throw new Error("Expecting a different task output")
+              }
+
+              val caseCompletedEvents: Seq[CaseCompleted] = batch.publicEvents(classOf[CaseCompleted])
               if (caseCompletedEvents.isEmpty || caseCompletedEvents.size > 1) {
                 throw new Error("Expecting only 1 case completed event in this batch")
               }
