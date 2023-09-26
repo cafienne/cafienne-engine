@@ -21,6 +21,7 @@ import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
+import org.cafienne.cmmn.definition.sentry.ReactivateCriterionDefinition;
 import org.cafienne.cmmn.instance.PlanItemType;
 
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public interface ItemDefinition extends DefinitionElement {
     PlanItemDefinitionDefinition getPlanItemDefinition();
 
     default Collection<EntryCriterionDefinition> getEntryCriteria() {
+        return new ArrayList<>();
+    }
+
+    default Collection<ReactivateCriterionDefinition> getReactivatingCriteria() {
         return new ArrayList<>();
     }
 
