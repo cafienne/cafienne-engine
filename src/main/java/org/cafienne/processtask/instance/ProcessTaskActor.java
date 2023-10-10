@@ -53,7 +53,7 @@ public class ProcessTaskActor extends ModelActor {
 
     @Override
     protected boolean supportsEvent(ModelEvent msg) {
-        return msg instanceof ProcessInstanceEvent;
+        return msg instanceof ProcessEvent;
     }
 
     public ProcessDefinition getDefinition() {

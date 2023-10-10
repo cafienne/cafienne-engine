@@ -22,7 +22,7 @@ import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
 import akka.actor.ActorRef
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.processtask.actorapi.event.ProcessInstanceEvent
+import org.cafienne.processtask.actorapi.event.ProcessEvent
 import org.cafienne.storage.actormodel.message.{StorageActionStarted, StorageEvent}
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, BaseStorageActor}
 import org.cafienne.tenant.actorapi.event.TenantEvent
@@ -36,7 +36,7 @@ trait StorageActorState extends ModelEventCollection with LazyLogging {
   val expectedEventClass: Class[_ <: ModelEvent] = metadata.actorType match {
     case ActorType.Tenant => classOf[TenantEvent]
     case ActorType.Case => classOf[CaseEvent]
-    case ActorType.Process => classOf[ProcessInstanceEvent]
+    case ActorType.Process => classOf[ProcessEvent]
     case ActorType.Group => classOf[ConsentGroupEvent]
     case _ => throw new RuntimeException(s"Cannot handle actions on events of unknown actor type $metadata")
   }
