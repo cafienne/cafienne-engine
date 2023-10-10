@@ -22,8 +22,10 @@ import org.cafienne.actormodel.identity._
 import org.cafienne.consentgroup.actorapi.{ConsentGroup, ConsentGroupMember}
 import org.cafienne.querydb.query.exception._
 import org.cafienne.querydb.record.{ConsentGroupMemberRecord, TenantRecord, UserRoleRecord}
-import org.cafienne.querydb.schema.table.{ConsentGroupTables, TenantTables}
+import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TenantTables}
 
+import scala.collection.mutable
+import scala.collection.mutable.{HashMap, ListBuffer}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserQueries {
@@ -48,12 +50,15 @@ trait UserQueries {
   def getConsentGroupMember(user: UserIdentity, groupId: String, userId: String): Future[ConsentGroupMember] = ???
 
   def getConsentGroupUser(user: UserIdentity, groupId: String): Future[ConsentGroupUser] = ???
+
+  def getTenantGroupsUsage(user: TenantUser, tenant: String): Future[Map[String, mutable.HashMap[String, ListBuffer[String]]]] = ???
 }
 
 
 class TenantQueriesImpl extends UserQueries with LazyLogging
   with TenantTables
-  with ConsentGroupTables {
+  with ConsentGroupTables
+  with CaseTables {
 
   import dbConfig.profile.api._
 
@@ -135,8 +140,8 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
   }
 
   private def readAllTenantUsers(user: TenantUser): Future[Seq[TenantUser]] = {
-//    // First a security check
-//    platformUser.shouldBelongTo(tenant)
+    //    // First a security check
+    //    platformUser.shouldBelongTo(tenant)
 
     val users = TableQuery[UserRoleTable].filter(_.tenant === user.tenant)
     db.run(users.result).map(records => {
@@ -261,5 +266,42 @@ class TenantQueriesImpl extends UserQueries with LazyLogging
       case Some(group) => ConsentGroupUser(id = user.id, groupId = group.id, tenant = group.tenant)
       case None => throw ConsentGroupSearchFailure(groupId)
     }
+  }
+
+  override def getTenantGroupsUsage(user: TenantUser, tenant: String): Future[Map[String, mutable.HashMap[String, ListBuffer[String]]]] = {
+    val query = for {
+      tenantGroups <- TableQuery[ConsentGroupTable].filter(_.tenant === tenant)
+      tenantsUsingGroup <- TableQuery[CaseInstanceTeamGroupTable]
+        .filter(_.tenant =!= tenant)
+        .filter(_.groupId === tenantGroups.id)
+    } yield (tenantsUsingGroup)
+
+    db.run(query.result).map(records => {
+      val groups: mutable.HashMap[String, mutable.HashMap[String, ListBuffer[String]]] = mutable.HashMap[String, mutable.HashMap[String, ListBuffer[String]]]()
+      records.foreach(record => {
+        val group: mutable.HashMap[String, ListBuffer[String]] = groups.getOrElseUpdate(record.groupId, mutable.HashMap[String, ListBuffer[String]]())
+        val tenant: ListBuffer[String] = group.getOrElseUpdate(record.tenant, ListBuffer[String]())
+        tenant += record.caseInstanceId
+      })
+      groups.toMap
+
+    })
+
+    /*
+    override def getTenantGroupsUsage(user: TenantUser, tenant: String): Future[Map[String, mutable.Seq[String]]] = {
+      val query = TableQuery[ConsentGroupTable].filter(_.tenant === tenant)
+          .join(TableQuery[CaseInstanceTeamGroupTable].filter(_.tenant =!= tenant)).on(_.id === _.groupId)
+
+      db.run(query.result).map(records => {
+        println(s"Found ${records.size} records: ")
+        val groups = mutable.Map[String, mutable.Seq[String]]()
+        records.foreach(record => groups.getOrElseUpdate(record._1.id, mutable.Seq[String]()) ++ record._2.tenant)
+        groups
+      })
+    }
+
+      *
+      */
+
   }
 }

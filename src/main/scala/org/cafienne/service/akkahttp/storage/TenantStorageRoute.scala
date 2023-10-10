@@ -24,12 +24,14 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
+import org.cafienne.json.Value
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.{DELETE, Path, Produces}
+import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "openId", scopes = Array("openid"))
 @Path("/storage")
@@ -63,7 +65,45 @@ class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRout
         if (!user.isOwner) {
           complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
         } else {
-          initiateDataRemoval(ActorMetadata(user = StorageUser(user.id, user.tenant), actorType = ActorType.Tenant, actorId = user.tenant))
+          onComplete(userQueries.getTenantGroupsUsage(user, user.tenant)) {
+            case Success(usageResult) =>
+              usageResult.size match {
+                case 0 => initiateDataRemoval(ActorMetadata(user = StorageUser(user.id, user.tenant), actorType = ActorType.Tenant, actorId = user.tenant))
+                case _ =>
+//                  val json = Value.convert(usageResult)
+//                  println("Found groups in use somewhere else: " + json)
+
+                  val cases = usageResult.values.flatMap(_.values).flatten.toSet
+                  val numCasesUsingGroups = cases.size
+//                  println("NUmCases: " + numCasesUsingGroups)
+                  val numTenantsUsingGroups = usageResult.flatMap(_._2.keys).toSet.size
+//                  println("NumTenants: " + numTenantsUsingGroups)
+                  val groups = usageResult.keys.mkString("\n- ", "\n- ", "")
+                  val errorPostfix = {
+                    (numCasesUsingGroups, numTenantsUsingGroups) match {
+                      case (1, 1) => s"a case in another tenant:$groups"
+                      case (_, 1) => s"$numCasesUsingGroups cases in another tenant:$groups"
+                      case _ => s"$numCasesUsingGroups cases across $numTenantsUsingGroups tenants:$groups"
+                    }
+                  }
+                  usageResult.size match {
+                    case 1 => complete(StatusCodes.BadRequest, s"Tenant has a group that is used in $errorPostfix")
+                    case moreThanOne => complete(StatusCodes.BadRequest, s"Tenant has $moreThanOne groups that are used in $errorPostfix")
+                  }
+
+                  // ALTERNATE Implementation that gives tenant and case details back to the user
+//                  val json = Value.convert(usageResult)
+//                  println("Found groups in use somewhere else: " + json)
+//                  import akka.http.scaladsl.marshalling.Marshaller
+//                  import akka.http.scaladsl.model.HttpEntity
+//                  import akka.http.scaladsl.model.ContentTypes
+//                  implicit val valueMarshaller: Marshaller[Value[_], HttpEntity.Strict] = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: Value[_] =>
+//                    HttpEntity(ContentTypes.`application/json`, value.toString)
+//                  }
+//                  complete(StatusCodes.BadRequest, json)
+              }
+            case Failure(exception) => throw exception // will be caught by default exception handler
+          }
         }
       }
     }

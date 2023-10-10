@@ -17,5 +17,17 @@
 
 package org.cafienne.storage.querydb
 
+import akka.Done
+
+import scala.concurrent.Future
+
 class ConsentGroupStorage extends QueryDBStorage {
+
+  import dbConfig.profile.api._
+
+  def deleteGroup(groupId: String): Future[Done] = {
+    addStatement(TableQuery[ConsentGroupTable].filter(_.id === groupId).delete)
+    addStatement(TableQuery[ConsentGroupMemberTable].filter(_.group === groupId).delete)
+    commit()
+  }
 }

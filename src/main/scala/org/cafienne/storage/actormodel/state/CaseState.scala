@@ -52,7 +52,5 @@ trait CaseState extends QueryDBState {
     })
   }
 
-  override def clearQueryData(): Future[Done] = {
-    dbStorage.deleteCase(metadata.actorId)
-  }
+  override def clearQueryData(): Future[Done] = dbStorage.deleteCase(metadata.actorId)
 }
