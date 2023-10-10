@@ -45,7 +45,11 @@ class CurrentMember(team: Team, user: CaseUserIdentity) extends CaseTeamUser {
       }
     }).toSet
   }
-  private lazy val groupsOwnedByThisUser: Seq[CaseTeamGroup] = user.groups.filter(_.isOwner).map(_.groupId).map(team.getGroup)
+  // Note!!! at the end of next line we have filter on not null.
+  //  There is a particular reason for this: the current member retrieves its groups from the query db, and that db may be
+  //  out of sync with the current status of the case team (e.g. because of parallel removal of a group)
+  //  The query db then thinks the group still belongs to the case team, causing null-pointers when "groupsOwnedByThisUser".[something] is accessed
+  private lazy val groupsOwnedByThisUser: Seq[CaseTeamGroup] = user.groups.filter(_.isOwner).map(_.groupId).map(team.getGroup).filter(_ != null)
   override val userId: String = user.id
   override val origin: Origin = user.origin
   override val caseRoles: Set[String] = getRoles.map(_.getName)
