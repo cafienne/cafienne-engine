@@ -41,7 +41,5 @@ trait TenantState extends QueryDBState {
     })
   }
 
-  override def clearQueryData(): Future[Done] = {
-    dbStorage.deleteTenant(actorId)
-  }
+  override def clearQueryData(): Future[Done] = dbStorage.deleteTenant(actorId)
 }

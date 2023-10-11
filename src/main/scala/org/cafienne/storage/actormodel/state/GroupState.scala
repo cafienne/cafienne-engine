@@ -28,5 +28,5 @@ trait GroupState extends QueryDBState {
 
   override def findCascadingChildren(): Future[Seq[ActorMetadata]] = Future.successful(Seq())
 
-  override def clearQueryData(): Future[Done] = Future.successful(Done) // Nothing to delete here, just tell our actor we're done.
+  override def clearQueryData(): Future[Done] = dbStorage.deleteGroup(metadata.actorId)
 }

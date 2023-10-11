@@ -24,7 +24,7 @@ import org.cafienne.processtask.instance.ProcessTaskActor;
 
 import java.io.IOException;
 
-public abstract class BaseProcessEvent extends BaseModelEvent<ProcessTaskActor> implements ProcessInstanceEvent {
+public abstract class BaseProcessEvent extends BaseModelEvent<ProcessTaskActor> implements ProcessEvent {
     protected BaseProcessEvent(ProcessTaskActor processInstance) {
         super(processInstance);
     }

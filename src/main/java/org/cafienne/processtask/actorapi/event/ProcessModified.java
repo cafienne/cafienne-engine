@@ -21,10 +21,7 @@ import org.cafienne.actormodel.event.ActorModified;
 import org.cafienne.actormodel.message.IncomingActorMessage;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
-import org.cafienne.processtask.actorapi.command.ProcessCommand;
 import org.cafienne.processtask.instance.ProcessTaskActor;
-
-import java.time.Instant;
 
 /**
  * Event that is published after an {@link org.cafienne.processtask.actorapi.command.ProcessCommand} has been fully handled by a {@link ProcessTaskActor} instance.
@@ -32,7 +29,7 @@ import java.time.Instant;
  *
  */
 @Manifest
-public class ProcessModified extends ActorModified<ProcessTaskActor> implements ProcessInstanceEvent {
+public class ProcessModified extends ActorModified<ProcessTaskActor> implements ProcessEvent {
 
     public ProcessModified(ProcessTaskActor actor, IncomingActorMessage source) {
         super(actor, source);
