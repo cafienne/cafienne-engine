@@ -23,7 +23,7 @@ enablePlugins(BuildInfoPlugin)
 enablePlugins(GitPlugin)
 enablePlugins(GitVersioning, GitBranchPrompt)
 enablePlugins(JavaAppPackaging)
-enablePlugins(UniversalPlugin)
+enablePlugins(AshScriptPlugin)
 enablePlugins(DockerPlugin)
 enablePlugins(ClasspathJarPlugin)
 
@@ -34,7 +34,7 @@ Docker / packageName := "cafienne/engine"
 Docker / version := "latest"
 Docker / maintainer := """Cafienne <info@cafienne.io>"""
 Docker / defaultLinuxInstallLocation := "/opt/cafienne"
-dockerBaseImage := "eclipse-temurin:17.0.4.1_1-jre-jammy"
+dockerBaseImage := "eclipse-temurin:17.0.9_9-jre"
 dockerExposedPorts := Seq(2027, 9999)
 bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value
 bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
@@ -198,7 +198,7 @@ libraryDependencies ++= Seq(
   , "com.h2database"          %  "h2"                                   % "2.1.214"
   , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "org.postgresql"          %  "postgresql"                           % "42.5.0"
+  , "org.postgresql"          %  "postgresql"                           % "42.5.4"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
   // Swagger support
@@ -209,6 +209,11 @@ libraryDependencies ++= Seq(
   , "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.5.2"
   , "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-akka-http :(
   , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-akka-http :(
+
+  //security overrides
+  , "com.fasterxml.woodstox"  % "woodstox-core"                         % "6.4.0"
+  ,"net.minidev"              % "json-smart"                            % "2.4.10"
+  ,"org.yaml"                 %"snakeyaml"                              % "2.0"
 )
 
 /**
