@@ -29,7 +29,7 @@ import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("consent-group")
 class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends ConsentGroupRoute {
   override val userQueries: UserQueries = new TenantQueriesImpl

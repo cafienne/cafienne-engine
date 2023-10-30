@@ -34,7 +34,7 @@ import org.cafienne.tenant.actorapi.command.platform.{CreateTenant, DisableTenan
 
 import javax.ws.rs._
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/platform")
 class PlatformRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 

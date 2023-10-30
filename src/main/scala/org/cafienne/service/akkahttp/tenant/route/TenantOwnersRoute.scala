@@ -35,7 +35,7 @@ import org.cafienne.tenant.actorapi.command._
 import javax.ws.rs._
 import scala.jdk.CollectionConverters._
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tenant")
 class TenantOwnersRoute(override val caseSystem: CaseSystem) extends TenantRoute {
 

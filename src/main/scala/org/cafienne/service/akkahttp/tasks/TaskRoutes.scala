@@ -23,7 +23,7 @@ import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.Path
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
 class TaskRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
   override val prefix = "tasks"

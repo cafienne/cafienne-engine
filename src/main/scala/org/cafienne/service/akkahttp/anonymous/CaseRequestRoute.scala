@@ -40,7 +40,7 @@ import org.cafienne.util.Guid
 import javax.ws.rs._
 import scala.concurrent.ExecutionContext
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/request")
 class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRoute with CaseTeamValidator with LastModifiedDirectives {
 

@@ -40,7 +40,7 @@ import javax.ws.rs._
 import scala.util.{Failure, Success}
 
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tenant")
 class TenantUsersRoute(override val caseSystem: CaseSystem) extends TenantRoute {
   override def routes: Route = concat(getTenantUsers, getTenantUser)

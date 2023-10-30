@@ -19,12 +19,13 @@ package org.cafienne.service.akkahttp.swagger
 
 import com.github.swagger.akka._
 import com.github.swagger.akka.model.Info
-import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
+import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityRequirement, SecurityScheme}
 import org.cafienne.infrastructure.Cafienne
 
 class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
 
-  // override val host = s"$configuredHost:$configuredPort" //the url of your api, not swagger's json endpoint
+   //override val host = s"$configuredHost:$configuredPort" //the url of your api, not swagger's json endpoint
+  override val host = s"${Cafienne.config.api.bindHost}:${Cafienne.config.api.bindPort}"
   override val basePath = "/" //the basePath for the API you are exposing
   override val apiDocsPath = "api-docs" //where you want the swagger-json endpoint exposed
   override val info = Info(description =
@@ -47,7 +48,6 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
    */
   val oauth2ForOpenIdConnectHack = new SecurityScheme()
     .`type`(SecurityScheme.Type.OAUTH2)
-    .name("openId")
     .flows(
       new OAuthFlows().`implicit`(
         new OAuthFlow()
@@ -62,6 +62,7 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
 
   override def securitySchemes: Map[String, SecurityScheme] = Map(SecurityScheme.Type.OAUTH2.toString -> oauth2ForOpenIdConnectHack)
 
+  //override def security: List[SecurityRequirement] = List(new SecurityRequirement().addList("openId"))
   def route = get {
     routes ~
       pathPrefix("") {

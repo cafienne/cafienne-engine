@@ -39,7 +39,7 @@ import org.w3c.dom.Document
 import javax.ws.rs._
 import scala.concurrent.ExecutionContext
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/repository")
 class RepositoryRoute(override val caseSystem: CaseSystem) extends AuthenticatedRoute with TenantValidator {
   implicit val ec: ExecutionContext = caseSystem.system.dispatcher

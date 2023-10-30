@@ -33,7 +33,7 @@ import org.cafienne.system.CaseSystem
 import javax.ws.rs.{DELETE, Path, Produces}
 import scala.util.{Failure, Success}
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/storage")
 class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRoute with StorageRoute {
   override def routes: Route = concat(deleteTenant)
