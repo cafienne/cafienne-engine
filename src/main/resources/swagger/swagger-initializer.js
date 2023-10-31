@@ -17,6 +17,9 @@ window.onload = function() {
   })
   // End Swagger UI call region
 
+  //NOTE that the token response type changed from token to id_token for 'implicit' flow.
+  //This is patched in the generic compiled js files. Search for: "case"implicit":u.push("response_type="
+  //to see that these are set to "id_token" instead of "token".
   ui.initOAuth({
     clientId: "swagger-ui",
     realm: "service",
