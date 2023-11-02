@@ -19,7 +19,7 @@ package org.cafienne.service.akkahttp.swagger
 
 import com.github.swagger.akka._
 import com.github.swagger.akka.model.Info
-import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityRequirement, SecurityScheme}
+import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
 import org.cafienne.infrastructure.Cafienne
 
 class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
