@@ -32,7 +32,7 @@ import org.cafienne.system.CaseSystem
 import javax.ws.rs.{GET, PATCH, Path, Produces}
 import scala.util.{Failure, Success}
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/debug")
 class DebugRoute(override val caseSystem: CaseSystem) extends CommandRoute {
 

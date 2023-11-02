@@ -25,7 +25,7 @@ import org.cafienne.querydb.record.{ConsentGroupMemberRecord, TenantRecord, User
 import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TenantTables}
 
 import scala.collection.mutable
-import scala.collection.mutable.{HashMap, ListBuffer}
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserQueries {

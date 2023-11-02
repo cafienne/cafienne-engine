@@ -32,7 +32,7 @@ import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/identifiers")
 class IdentifiersRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   val identifierQueries = new IdentifierQueriesImpl

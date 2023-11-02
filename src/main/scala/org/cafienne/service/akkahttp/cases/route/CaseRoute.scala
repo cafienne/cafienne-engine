@@ -41,7 +41,7 @@ import org.cafienne.system.CaseSystem
 import java.util.UUID
 import javax.ws.rs._
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
 class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with CaseTeamValidator {
   override def routes: Route = concat(getCases, /*stats,*/ getCase, getCaseDefinition, startCase, debugCase)

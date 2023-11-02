@@ -32,7 +32,7 @@ import org.cafienne.system.CaseSystem
 import javax.ws.rs._
 import scala.util.{Failure, Success}
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
 class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBaseRoute {
   override def routes: Route = concat(getCaseEvents, getPlanHistory, getPlanItemHistory)

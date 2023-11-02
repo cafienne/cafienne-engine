@@ -32,7 +32,7 @@ import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/tasks")
 class TaskActionRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
   override def routes: Route = concat(validateTaskOutput, saveTaskOutput, claimTaskRoute, revokeTaskRoute, assignTaskRoute, delegateTaskRoute, completeTaskRoute)

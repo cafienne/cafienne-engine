@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.json.Value
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
@@ -33,7 +32,7 @@ import org.cafienne.system.CaseSystem
 import javax.ws.rs.{DELETE, Path, Produces}
 import scala.util.{Failure, Success}
 
-@SecurityRequirement(name = "openId", scopes = Array("openid"))
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/storage")
 class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRoute with StorageRoute {
   override def routes: Route = concat(deleteTenant)
