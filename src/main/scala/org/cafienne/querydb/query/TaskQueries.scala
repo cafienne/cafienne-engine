@@ -52,8 +52,6 @@ class TaskQueriesImpl extends TaskQueries
 
   import dbConfig.profile.api._
 
-  val tasksQuery = TableQuery[TaskTable]
-
   override def getCaseMembership(taskId: String, user: UserIdentity): Future[CaseMembership] = {
     val result = for {
       caseId <- {

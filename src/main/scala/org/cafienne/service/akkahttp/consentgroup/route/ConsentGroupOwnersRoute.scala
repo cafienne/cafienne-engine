@@ -68,7 +68,7 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
     description = "Replaces the roles and ownership if the member is already in the consent group, otherwise creates a new member.",
     tags = Array("consent-group"),
     parameters = Array(
-      new Parameter(name = "group", description = "The consent group in which to add/update the member", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "groupId", description = "The consent group in which to add/update the member", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
       new ApiResponse(description = "Member registered successfully", responseCode = "204"),
@@ -94,8 +94,7 @@ class ConsentGroupOwnersRoute(override val caseSystem: CaseSystem) extends Conse
     description = "Removes the member with the specified user id from the consent group; checks that at least one consent group owner remains",
     tags = Array("consent-group"),
     parameters = Array(
-      new Parameter(name = "tenant", description = "Tenant to which the consent group belongs", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
-      new Parameter(name = "group", description = "The consent group in which to add/update the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "groupId", description = "The consent group in which to add/update the user", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "userId", description = "Identifier of the user to remove from the consent group", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
