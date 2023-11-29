@@ -35,11 +35,12 @@ import javax.ws.rs.{DELETE, PUT, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
-@Path("/storage")
+@Path("/storage/case/{caseInstanceId}")
 class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with TenantRoute with StorageRoute {
+  override val prefix = "case"
   override def routes: Route = concat(archiveCaseInstance, restoreCaseInstance, deleteCaseInstance)
 
-  @Path("/case/{caseInstanceId}/archive")
+  @Path("/archive")
   @PUT
   @Operation(
     summary = "Archive the case instance",
@@ -62,7 +63,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   @Produces(Array("application/json"))
   def archiveCaseInstance: Route = put {
     caseUser { user =>
-      path("case" / Segment / "archive") { caseInstanceId =>
+      path(Segment / "archive") { caseInstanceId =>
         authorizeCaseAccess(user, caseInstanceId, { caseMember => {
           val tenant = caseMember.tenant
           onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
@@ -80,7 +81,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
     }
   }
 
-  @Path("/case/{caseInstanceId}/restore")
+  @Path("/restore")
   @PUT
   @Operation(
     summary = "Restore an archived case instance",
@@ -103,13 +104,13 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   @Produces(Array("application/json"))
   def restoreCaseInstance: Route = put {
     caseUser { user =>
-      path("case" / Segment / "restore") { caseInstanceId =>
+      path(Segment / "restore") { caseInstanceId =>
         restoreActorData(ActorMetadata(user = StorageUser(user.id, ""), actorType = ActorType.Case, actorId = caseInstanceId))
       }
     }
   }
 
-  @Path("/case/{caseInstanceId}")
+  @Path("")
   @DELETE
   @Operation(
     summary = "Remove the case instance from the system",
@@ -132,7 +133,7 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   @Produces(Array("application/json"))
   def deleteCaseInstance: Route = delete {
     caseUser { user =>
-      path("case" / Segment) { caseInstanceId =>
+      path(Segment) { caseInstanceId =>
         authorizeCaseAccess(user, caseInstanceId, { caseMember => {
           val tenant = caseMember.tenant
           onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {

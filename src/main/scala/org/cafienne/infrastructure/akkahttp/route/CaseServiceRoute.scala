@@ -120,17 +120,25 @@ trait CaseServiceRoute extends LazyLogging {
   private var concatenatedSubRoutes: Option[Route] = None
 
   /**
-    * Register a sub route; note: this requires an override of the prefix value as well,
-    * and additionally the routes method should not be overridden
-    *
-    * @param subRoute
+    * Register a sub route; note: this supports an optional override of the prefix value as well.
     */
   def addSubRoute(subRoute: CaseServiceRoute): Unit = {
+    def subRouteCollection: Route = {
+      // If the sub route has a non-standard prefix defined, let's add it
+      if (subRoute.prefix != DEFAULT_PREFIX) {
+        pathPrefix(subRoute.prefix)(subRoute.routes)
+      } else {
+        subRoute.routes
+      }
+    }
+
     registerAPIRoute(subRoute)
-    concatenatedSubRoutes = concatenatedSubRoutes.fold(Some(subRoute.routes))(route => Some(concat(route, subRoute.routes)))
+    concatenatedSubRoutes = concatenatedSubRoutes.fold(Some(subRouteCollection))(route => Some(concat(route, subRouteCollection)))
   }
 
-  val prefix: String = "/"
+  private val DEFAULT_PREFIX = "/"
+
+  val prefix: String = DEFAULT_PREFIX
 
   def routes: Route = {
     pathPrefix(prefix) {

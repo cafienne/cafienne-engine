@@ -33,11 +33,12 @@ import javax.ws.rs.{DELETE, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
-@Path("/storage")
+@Path("/storage/tenant/{tenant}")
 class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRoute with StorageRoute {
+  override val prefix = "tenant"
   override def routes: Route = concat(deleteTenant)
 
-  @Path("/tenant/{tenant}")
+  @Path("")
   @DELETE
   @Operation(
     summary = "Remove the tenant from the system",
@@ -59,7 +60,6 @@ class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRout
   )
   @Produces(Array("application/json"))
   def deleteTenant: Route = delete {
-    pathPrefix("tenant") {
       tenantUser { user =>
         if (!user.isOwner) {
           complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
@@ -105,6 +105,5 @@ class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRout
           }
         }
       }
-    }
   }
 }
