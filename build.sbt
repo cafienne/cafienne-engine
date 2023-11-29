@@ -155,7 +155,7 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
   , "com.typesafe"            %  "config"                               % "1.4.2"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.8"
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.11"
   , "org.apache.commons"      %  "commons-text"                         % "1.10.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
