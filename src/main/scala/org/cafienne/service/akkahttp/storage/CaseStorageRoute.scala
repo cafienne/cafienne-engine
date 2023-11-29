@@ -18,13 +18,13 @@
 package org.cafienne.service.akkahttp.storage
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directive, Route}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.service.akkahttp.LastModifiedHeader
+import org.cafienne.querydb.query.CaseMembership
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
@@ -32,14 +32,35 @@ import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.{DELETE, PUT, Path, Produces}
-import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
-@Path("/storage")
+@Path("/storage/case/{caseInstanceId}")
 class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with TenantRoute with StorageRoute {
+  override val prefix = "case"
   override def routes: Route = concat(archiveCaseInstance, restoreCaseInstance, deleteCaseInstance)
 
-  @Path("/case/{caseInstanceId}/archive")
+  private def pathMatcher(prefix: String): Directive[Tuple1[String]] = {
+    if (prefix.isBlank) pathPrefix(Segment)
+    else pathPrefix(Segment / prefix)
+  }
+
+  /**
+    * Run the sub route with a valid platform user and case instance id
+    */
+  def caseOwner(subRoute: CaseMembership => Route): Route = caseOwner("")(subRoute)
+
+  def caseOwner(prefix: String)(subRoute: CaseMembership => Route, failureMessage: String = "You must be case owner to perform this operation"): Route = {
+    authenticatedUser { user =>
+      pathMatcher(prefix) { caseInstanceId =>
+        authorizeCaseAccess(user, caseInstanceId, caseMember => {
+          if (caseMember.isOwner) subRoute(caseMember)
+          else complete(StatusCodes.Unauthorized, failureMessage)
+        })
+      }
+    }
+  }
+
+  @Path("/archive")
   @PUT
   @Operation(
     summary = "Archive the case instance",
@@ -61,26 +82,12 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   )
   @Produces(Array("application/json"))
   def archiveCaseInstance: Route = put {
-    caseUser { user =>
-      path("case" / Segment / "archive") { caseInstanceId =>
-        authorizeCaseAccess(user, caseInstanceId, { caseMember => {
-          val tenant = caseMember.tenant
-          onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
-            case Success(tenantUser) =>
-              if (tenantUser.enabled && tenantUser.isOwner) {
-                initiateDataArchival(ActorMetadata(user = StorageUser(user.id, tenant), actorType = ActorType.Case, actorId = caseInstanceId))
-              } else {
-                complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
-              }
-            case Failure(t) => throw t
-          }
-        }}
-        )
-      }
+    caseOwner("archive") { owner =>
+      initiateDataArchival(ActorMetadata(user = StorageUser(owner.id, owner.tenant), actorType = ActorType.Case, actorId = owner.caseInstanceId))
     }
   }
 
-  @Path("/case/{caseInstanceId}/restore")
+  @Path("/restore")
   @PUT
   @Operation(
     summary = "Restore an archived case instance",
@@ -102,14 +109,12 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   )
   @Produces(Array("application/json"))
   def restoreCaseInstance: Route = put {
-    caseUser { user =>
-      path("case" / Segment / "restore") { caseInstanceId =>
-        restoreActorData(ActorMetadata(user = StorageUser(user.id, ""), actorType = ActorType.Case, actorId = caseInstanceId))
-      }
+    caseInstanceSubRoute("restore") { (user, caseInstanceId) =>
+      restoreActorData(ActorMetadata(user = StorageUser(user.id, ""), actorType = ActorType.Case, actorId = caseInstanceId))
     }
   }
 
-  @Path("/case/{caseInstanceId}")
+  @Path("")
   @DELETE
   @Operation(
     summary = "Remove the case instance from the system",
@@ -131,22 +136,8 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   )
   @Produces(Array("application/json"))
   def deleteCaseInstance: Route = delete {
-    caseUser { user =>
-      path("case" / Segment) { caseInstanceId =>
-        authorizeCaseAccess(user, caseInstanceId, { caseMember => {
-          val tenant = caseMember.tenant
-          onComplete(getTenantUser(user, tenant, LastModifiedHeader.NONE)) {
-            case Success(tenantUser) =>
-              if (tenantUser.enabled && tenantUser.isOwner) {
-                initiateDataRemoval(ActorMetadata(user = StorageUser(user.id, tenant), actorType = ActorType.Case, actorId = caseInstanceId))
-              } else {
-                complete(StatusCodes.Unauthorized, "Only tenant owners can perform this operation")
-              }
-            case Failure(t) => throw t
-          }
-        }}
-        )
-      }
+    caseOwner { owner =>
+      initiateDataRemoval(ActorMetadata(user = StorageUser(owner.id, owner.tenant), actorType = ActorType.Case, actorId = owner.caseInstanceId))
     }
   }
 }

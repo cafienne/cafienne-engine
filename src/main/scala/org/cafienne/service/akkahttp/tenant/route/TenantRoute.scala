@@ -36,9 +36,9 @@ trait TenantRoute extends CommandRoute with QueryRoute {
 
   def tenantUser(subRoute: TenantUser => Route): Route = {
     authenticatedUser { user =>
-      pathPrefix(Segment) { group =>
+      pathPrefix(Segment) { tenant =>
         readLastModifiedHeader(Headers.TENANT_LAST_MODIFIED) { lastModified =>
-          onComplete(getTenantUser(user, group, lastModified)) {
+          onComplete(getTenantUser(user, tenant, lastModified)) {
             case Success(tenantUser) =>
               if (tenantUser.enabled) {
                 subRoute(tenantUser)

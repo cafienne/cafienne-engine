@@ -76,7 +76,7 @@ class CaseTeamMemberProjection(dBTransaction: CaseStorageTransaction)(implicit v
   }
 
   def handleGroupEvent(event: CaseTeamMemberEvent[_], group: CaseTeamGroup): Unit = {
-    def asRecords(mapping: GroupRoleMapping): Set[CaseTeamGroupRecord] = mapping.caseRoles.map(asRecord(mapping, _))
+    def asRecords(mapping: GroupRoleMapping): Set[CaseTeamGroupRecord] = (mapping.caseRoles ++ Set("")).map(asRecord(mapping, _))
     def asRecord(mapping: GroupRoleMapping, caseRole: String): CaseTeamGroupRecord = CaseTeamGroupRecord(caseInstanceId = event.getActorId, tenant = event.tenant, groupId = group.groupId, caseRole = caseRole, groupRole = mapping.groupRole, isOwner = mapping.isOwner)
 
     event match {

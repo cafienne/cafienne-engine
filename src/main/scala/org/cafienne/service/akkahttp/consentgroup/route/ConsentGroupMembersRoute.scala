@@ -66,7 +66,7 @@ class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends Cons
     description = "Get information about the consent group member with the specified user id. Can only be retrieved by group members.",
     tags = Array("consent-group"),
     parameters = Array(
-      new Parameter(name = "group", description = "The consent group to retrieve the member from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
+      new Parameter(name = "groupId", description = "The id of the consent group to retrieve the member from", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
