@@ -234,7 +234,7 @@ commands:
         command: |
           cd ..
           cd ./cmmn-test-framework
-          npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+          npm run test storage
     - run:
         name: Docker logs of engine after the test
         command: docker logs cafienne
@@ -268,7 +268,7 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test storage
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
@@ -311,7 +311,7 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test storage
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
@@ -378,7 +378,7 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test storage
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
@@ -417,7 +417,7 @@ commands:
           command: |
             cd ..
             cd ./cmmn-test-framework
-            npm run test TestArchiveHelloWorld TestArchiveCase TestDeleteHelloWorld TestDeleteCase TestDeleteTenant TestDeleteTenantWithContent
+            npm run test storage
       - run:
           name: Docker logs of engine after the test
           command: docker logs cafienne
