@@ -24,7 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
-import org.cafienne.querydb.query.CaseMembership
+import org.cafienne.querydb.query.exception.CaseSearchFailure
+import org.cafienne.querydb.query.{CaseMembership, CaseOwnership}
 import org.cafienne.service.akkahttp.cases.route.CasesRoute
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
@@ -32,6 +33,7 @@ import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs.{DELETE, PUT, Path, Produces}
+import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/storage/case/{caseInstanceId}")
@@ -47,15 +49,23 @@ class CaseStorageRoute(val caseSystem: CaseSystem) extends CasesRoute with Tenan
   /**
     * Run the sub route with a valid platform user and case instance id
     */
-  def caseOwner(subRoute: CaseMembership => Route): Route = caseOwner("")(subRoute)
+  def caseOwner(subRoute: CaseOwnership => Route): Route = caseOwner("")(subRoute)
 
-  def caseOwner(prefix: String)(subRoute: CaseMembership => Route, failureMessage: String = "You must be case owner to perform this operation"): Route = {
+  def caseOwner(prefix: String)(subRoute: CaseOwnership => Route, failureMessage: String = "You must be case owner to perform this operation"): Route = {
     authenticatedUser { user =>
       pathMatcher(prefix) { caseInstanceId =>
-        authorizeCaseAccess(user, caseInstanceId, caseMember => {
-          if (caseMember.isOwner) subRoute(caseMember)
-          else complete(StatusCodes.Unauthorized, failureMessage)
-        })
+        readLastModifiedHeader() { caseLastModified =>
+          onComplete(runSyncedQuery(caseQueries.getCaseOwnership(caseInstanceId, user), caseLastModified)) {
+            case Success(caseMember) =>
+              if (caseMember.isOwner) subRoute(caseMember)
+              else complete(StatusCodes.Unauthorized, failureMessage)
+            case Failure(error) =>
+              error match {
+                case t: CaseSearchFailure => complete(StatusCodes.NotFound, t.getLocalizedMessage)
+                case _ => throw error
+              }
+          }
+        }
       }
     }
   }

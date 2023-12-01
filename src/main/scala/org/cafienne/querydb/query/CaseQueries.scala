@@ -31,6 +31,8 @@ import scala.concurrent.Future
 trait CaseQueries {
   def getCaseMembership(caseInstanceId: String, user: UserIdentity): Future[CaseMembership] = ???
 
+  def getCaseOwnership(caseInstanceId: String, user: UserIdentity): Future[CaseOwnership] = ???
+
   def getFullCaseInstance(caseInstanceId: String, user: UserIdentity): Future[FullCase] = ???
 
   def getCaseDefinition(caseInstanceId: String, user: UserIdentity): Future[CaseDefinitionDocument] = ???
@@ -64,6 +66,41 @@ class CaseQueriesImpl
 
   override def getCaseMembership(caseInstanceId: String, user: UserIdentity): Future[CaseMembership] = {
     super.getCaseMembership(caseInstanceId, user, CaseSearchFailure, caseInstanceId)
+  }
+
+  override def getCaseOwnership(caseInstanceId: String, user: UserIdentity): Future[CaseOwnership] = {
+    val groupMembership = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
+      .join(TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id))
+      .on((casegroup, group) => casegroup.groupId === group.group && (casegroup.groupRole === group.role || group.isOwner))
+      .map(_._1)
+
+    val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
+      .join(TableQuery[UserRoleTable].filter(_.userId === user.id))
+      .on((left, right) => left.tenantRole === right.role_name && left.tenant === right.tenant)
+      .map(_._1)
+
+    val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.userId === user.id)
+      .filter(_.caseInstanceId === caseInstanceId)
+
+    val query = for {
+      groups <- db.run(groupMembership.result)
+      roles <- db.run(tenantRoleBasedMembership.result)
+      users <- db.run(userIdBasedMembership.result)
+    } yield (groups, roles, users)
+
+    query.map(result => {
+      val groups = result._1
+      val roles = result._2
+      val users = result._3
+      if (groups.isEmpty && roles.isEmpty && users.isEmpty) {
+        throw CaseSearchFailure(caseInstanceId)
+      }
+
+      val isOwner = groups.exists(_.isOwner) || roles.exists(_.isOwner) || users.exists(_.isOwner)
+      val tenant = (groups.map(_.tenant) ++ roles.map(_.tenant) ++ users.map(_.tenant)).toSet.head
+      CaseOwnership(user.id, caseInstanceId, tenant, isOwner)
+    })
   }
 
   override def getFullCaseInstance(caseInstanceId: String, user: UserIdentity): Future[FullCase] = {
