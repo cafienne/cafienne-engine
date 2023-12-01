@@ -68,22 +68,17 @@ trait BaseQueryImpl
     val groupMembership = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
       .join(TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id))
       .on((casegroup, group) => casegroup.groupId === group.group && (casegroup.groupRole === group.role || group.isOwner))
-      .map(row => {
-        val membership = row._1
-        val group = row._2
-        val isCaseOwner = membership.isOwner
-        (isCaseOwner, group.group, group.isOwner, group.role)
-      })
+      .map(_._2).map(group => (group.group, group.isOwner, group.role)) // Note: we need GROUP ownership, not case team ownership!!!
 
     val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
       .join(TableQuery[UserRoleTable].filter(_.userId === user.id))
       .on((left, right) => left.tenantRole === right.role_name && left.tenant === right.tenant)
-      .map(row => (row._1.isOwner, row._1.tenantRole))
+      .map(_._1.tenantRole)
 
     val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
       .filter(_.userId === user.id)
       .filter(_.caseInstanceId === caseInstanceId)
-      .map(row => (row.isOwner, row.userId))
+      .map(_.userId)
 
     val query =
       originQuery.joinLeft(
@@ -123,22 +118,15 @@ trait BaseQueryImpl
 
 
 
-      val membershipRecords: Seq[(Option[(Boolean, String, Boolean, String)], Option[(Option[(Boolean, String)], Option[(Boolean, String)])])] = x.map(_._2).filter(_.isDefined).map(_.get)
-//      println(s"""Found ${membershipRecords.size} membership records:\n${membershipRecords.mkString(",")}""")
-
-      val userAndRoleRecords: Seq[(Option[(Boolean, String)], Option[(Boolean, String)])] = membershipRecords.map(_._2).filter(_.isDefined).map(_.get)
-      val userIdBasedMembership: Seq[(Boolean, String)] = userAndRoleRecords.map(_._2).filter(_.isDefined).map(_.get)
+      val membershipRecords: Seq[(Option[(String, Boolean, String)], Option[(Option[String], Option[String])])] = x.map(_._2).filter(_.isDefined).map(_.get)
+      val userAndRoleRecords = membershipRecords.map(_._2).filter(_.isDefined).map(_.get)
+      val userIdBasedMembership: Set[String] = userAndRoleRecords.map(_._2).filter(_.isDefined).map(_.get).toSet
 //      println(s"Found ${userRecords.size} user records")
 
-      val userTenantRoles: Set[String] = userAndRoleRecords.map(_._1).filter(_.isDefined).map(_.get._2).toSet
+      val userTenantRoles: Set[String] = userAndRoleRecords.map(_._1).filter(_.isDefined).map(_.get).toSet
 //      println(s"Found ${tenantRoleRecords.size} tenant role records")
-      val groupRecords: Set[ConsentGroupMemberRecord] = membershipRecords.map(_._1).filter(_.isDefined).map(_.get).map(group => ConsentGroupMemberRecord(group = group._2, userId = user.id, isOwner = group._3, role = group._4)).toSet
+      val groupRecords: Set[ConsentGroupMemberRecord] = membershipRecords.map(_._1).filter(_.isDefined).map(_.get).map(group => ConsentGroupMemberRecord(group = group._1, userId = user.id, isOwner = group._2, role = group._3)).toSet
 //      println(s"Found ${groupRecords.size} group records")
-
-      val groupMembershipBasedCaseOwnership = membershipRecords.map(_._1).filter(_.isDefined).map(_.get).exists(_._1)
-      val tenantRoleBasedCaseOwnership = userAndRoleRecords.map(_._1).filter(_.isDefined).map(_.get).exists(_._1)
-      val userIdBasedCaseOwnership = userIdBasedMembership.exists(_._1)
-      val isCaseOwner = groupMembershipBasedCaseOwnership || tenantRoleBasedCaseOwnership || userIdBasedCaseOwnership
 
       val groups = groupRecords.map(_.group)
       val groupBasedMembership: Seq[ConsentGroupMembership] = groups.map(groupId => {
@@ -155,7 +143,7 @@ trait BaseQueryImpl
         fail
       }
 
-      new CaseMembership(id = user.id, isOwner = isCaseOwner, origin = origin, tenantRoles = userTenantRoles, groups = groupBasedMembership, caseInstanceId = caseId, tenant = tenantId)
+      new CaseMembership(id = user.id, origin = origin, tenantRoles = userTenantRoles, groups = groupBasedMembership, caseInstanceId = caseId, tenant = tenantId)
 
     })
   }
@@ -163,6 +151,10 @@ trait BaseQueryImpl
   /**
     * Query that validates that the user belongs to the team of the specified case, either by explicit
     * membership of the user id, or by one of the tenant roles of the user that are bound to the team of the case
+    * @param user
+    * @param caseInstanceId
+    * @param tenant
+    * @return
     */
   def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
     val groupMembership = TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id)
@@ -253,6 +245,8 @@ trait BaseQueryImpl
                     } yield f3
                 } yield f2
             } yield f1      *
+      * @param current
+      * @param caseInstanceId
       * @return
       */
     def createCompositeQuery(current: Int, caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {

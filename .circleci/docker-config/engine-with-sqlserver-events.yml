@@ -15,7 +15,7 @@ services:
       EVENT_DB_DRIVER: ${EVENT_DB_DRIVER:-com.microsoft.sqlserver.jdbc.SQLServerDriver}
       EVENT_DB_USER: ${EVENT_DB_USER:-SA}
       EVENT_DB_PASSWORD: ${EVENT_DB_PASSWORD:-Abc_123456}
-      EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:sqlserver://localhost:1433;DatabaseName=cafienneEventstore;}
+      EVENT_DB_URL: ${EVENT_DB_URL:-jdbc:sqlserver://localhost:1433;DatabaseName=cafienneEventstore;sendStringParametersAsUnicode=false;}
       QUERY_DB_PROFILE: ${QUERY_DB_PROFILE:-slick.jdbc.SQLServerProfile$$}
       QUERY_DB_DRIVER: ${QUERY_DB_DRIVER:-com.microsoft.sqlserver.jdbc.SQLServerDriver}
       QUERY_DB_USER: ${QUERY_DB_USER:-SA}
