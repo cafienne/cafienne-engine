@@ -260,6 +260,24 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     }
 
     /**
+     * Simple helper function that parses all children inside the CMMN extension element.
+     *
+     * @param childTagName The name of the child element to search for within the extension element
+     * @param typeClass    The class to instantiate when elements are found
+     * @param tCollection  The collection to add the instantiated objects to
+     */
+    protected <T> void parseExtension(String childTagName, Class<? extends T> typeClass, Collection<T> tCollection) {
+        Element extensionElement = XMLHelper.getElement(element, EXTENSION_ELEMENTS);
+        if (extensionElement != null) {
+            Collection<Element> namedChildren = XMLHelper.getElementsNS(extensionElement, CAFIENNE_NAMESPACE, childTagName);
+            for (Element child : namedChildren) {
+                T t = instantiateT(child, typeClass);
+                tCollection.add(t);
+            }
+        }
+    }
+
+    /**
      * Simple helper function that searches for the child element with the specified tagname, and then parses it's children into the specified type class
      * and adds them to the collection
      *

@@ -25,14 +25,13 @@ import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.w3c.dom.Element;
 
 public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, EntryCriterion> {
-
     PlanItemEntry(PlanItem<?> item) {
         super(item, item.getItemDefinition().getEntryCriteria());
     }
 
     @Override
     protected EntryCriterion createCriterion(EntryCriterionDefinition definition) {
-        return definition.createInstance(this);
+        return new EntryCriterion(this, definition);
     }
 
     /**
@@ -82,18 +81,18 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
     private void handleCriterionSatisfied(Criterion<?> criterion) {
         if (item.getIndex() == 0 && item.getState().isAvailable()) {
             // In this scenario, the entry criterion is triggered on the very first instance of the plan item,
-            //  and also for the very first time. Therefore we should not yet repeat, but only make the
-            //  entry transition.
+            //  and also for the very first time. Therefore, we should not yet repeat, but only make the
+            //  entry transition. If the item will not repeat though, we should release from the network.
             item.addDebugInfo(() -> criterion + " is satisfied and will trigger " + item.getEntryTransition());
             if (this.willNotRepeat()) {
-                release();
+                stopListening();
             }
             item.makeTransition(item.getEntryTransition());
         } else {
-            // In all other cases we have to check whether or not to create a repeat item, and, if so,
+            // In all other cases we have to check whether to create a repeat item, and, if so,
             //  initiate that with the entry transition
             item.addDebugInfo(() -> criterion + " is satisfied and will repeat " + item);
-            release();
+            stopListening();
             item.repeat("an entry criterion was satisfied");
         }
     }

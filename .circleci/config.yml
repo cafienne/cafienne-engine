@@ -182,6 +182,14 @@ commands:
           echo
           npm run test PingTokenService PingTestEnvironment TestSwagger TestAnonymousStartCase
     - run:
+        name: Test pure CMMN Fault Handling
+        command: |
+          cd ..
+          cd ./cmmn-test-framework
+          echo ==== starting tests
+          echo
+          npm run test TestNoFaultBubbling
+    - run:
         name: Docker logs of engine after the test
         command: docker logs cafienne
     - run:

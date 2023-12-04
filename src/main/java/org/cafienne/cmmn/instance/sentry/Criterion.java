@@ -38,7 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class Criterion<D extends CriterionDefinition> extends CMMNElement<D> {
-    private final CriteriaListener listener;
+    private final CriteriaListener<D, ?> listener;
     private final Collection<OnPart<?,?,?>> onParts = new ArrayList<>();
     /**
      * Simple set to be able to quickly check whether the criterion may become active
@@ -50,7 +50,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
      */
     private boolean isActive;
 
-    protected Criterion(CriteriaListener listener, D definition) {
+    protected Criterion(CriteriaListener<D, ?> listener, D definition) {
         super(listener.item, definition);
         this.listener = listener;
         for (OnPartDefinition onPartDefinition : getDefinition().getSentryDefinition().getOnParts()) {

@@ -21,6 +21,7 @@ import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ExitCriterionDefinition;
+import org.cafienne.cmmn.definition.sentry.ReactivateCriterionDefinition;
 import org.cafienne.cmmn.instance.DiscretionaryItem;
 import org.cafienne.cmmn.instance.PlanItem;
 import org.cafienne.cmmn.instance.Stage;
@@ -33,6 +34,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
+    private final Collection<ReactivateCriterionDefinition> reactivationCriteria = new ArrayList<>();
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>();
     private final FourEyesDefinition fourEyesDefinition;
     private final RendezVousDefinition rendezVousDefinition;
@@ -44,6 +46,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
 
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);
         parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
+        parseExtension("reactivateCriterion", ReactivateCriterionDefinition.class, this.reactivationCriteria);
 
         planItemControl = parse("itemControl", ItemControlDefinition.class, false);
         fourEyesDefinition = parseExtension("four_eyes", FourEyesDefinition.class);
@@ -79,6 +82,11 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     @Override
     public Collection<EntryCriterionDefinition> getEntryCriteria() {
         return entryCriteria;
+    }
+
+    @Override
+    public Collection<ReactivateCriterionDefinition> getReactivatingCriteria() {
+        return reactivationCriteria;
     }
 
     @Override

@@ -15,25 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.infrastructure.config.engine
+package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.infrastructure.config.CafienneConfig
+import org.cafienne.cmmn.definition.sentry.ReactivateCriterionDefinition;
 
-class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
-  def path = "engine"
+public class ReactivatingCriterion extends Criterion<ReactivateCriterionDefinition> {
+    public ReactivatingCriterion(CriteriaListener<ReactivateCriterionDefinition, ?> listener, ReactivateCriterionDefinition definition) {
+        super(listener, definition);
+    }
 
-  /**
-    * Returns configuration options for the Timer Service
-    */
-  val timerService = new TimerServiceConfig(this)
-
-  /**
-    * Config property for settings of the mail service to use
-    */
-  lazy val mailService = new MailServiceConfig(this)
-
-  lazy val storage: StorageConfig = new StorageConfig(this)
-
-  val interpreter = new CMMNInterpreterConfig(this)
+    @Override
+    public boolean isEntryCriterion() {
+        return true;
+    }
 }

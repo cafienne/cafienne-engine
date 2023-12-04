@@ -31,13 +31,13 @@ public class PlanItemExit extends CriteriaListener<ExitCriterionDefinition, Exit
 
     @Override
     protected ExitCriterion createCriterion(ExitCriterionDefinition definition) {
-        return definition.createInstance(this);
+        return new ExitCriterion(this, definition);
     }
 
     @Override
     public void satisfy(Criterion<?> criterion) {
         item.addDebugInfo(() -> criterion + " is satisfied, triggering exit on " + item);
-        release();
+        stopListening();
         item.makeTransition(item.getExitTransition());
     }
 

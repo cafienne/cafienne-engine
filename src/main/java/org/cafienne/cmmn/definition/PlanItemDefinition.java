@@ -18,7 +18,6 @@
 package org.cafienne.cmmn.definition;
 
 import org.cafienne.cmmn.definition.extension.workflow.FourEyesDefinition;
-import org.cafienne.cmmn.definition.extension.workflow.ItemDefinitionReference;
 import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.sentry.*;
 import org.cafienne.cmmn.instance.casefile.CaseFileItemTransition;
@@ -33,6 +32,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
     private ItemControlDefinition planItemControl;
     private PlanItemDefinitionDefinition definition;
     private final Collection<EntryCriterionDefinition> entryCriteria = new ArrayList<>();
+    private final Collection<ReactivateCriterionDefinition> reactivationCriteria = new ArrayList<>();
     private final Collection<ExitCriterionDefinition> exitCriteria = new ArrayList<>();
     private final String planItemDefinitionRefValue;
     private final FourEyesDefinition fourEyesDefinition;
@@ -44,6 +44,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
 
         parse("entryCriterion", EntryCriterionDefinition.class, this.entryCriteria);
         parse("exitCriterion", ExitCriterionDefinition.class, this.exitCriteria);
+        parseExtension("reactivateCriterion", ReactivateCriterionDefinition.class, this.reactivationCriteria);
         planItemControl = parse("itemControl", ItemControlDefinition.class, false);
         fourEyesDefinition = parseExtension("four_eyes", FourEyesDefinition.class);
         rendezVousDefinition = parseExtension("rendez_vous", RendezVousDefinition.class);
@@ -75,6 +76,11 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
     @Override
     public Collection<EntryCriterionDefinition> getEntryCriteria() {
         return entryCriteria;
+    }
+
+    @Override
+    public Collection<ReactivateCriterionDefinition> getReactivatingCriteria() {
+        return reactivationCriteria;
     }
 
     @Override

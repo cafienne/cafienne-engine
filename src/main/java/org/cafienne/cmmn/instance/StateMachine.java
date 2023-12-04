@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Simple state machine logic, with an indirection to figure out where we are and where we go
  */
-class StateMachine {
+public class StateMachine {
     private final Map<State, Map<Transition, Target>> transitions = new HashMap<>();
     private final Map<State, Target> states = new HashMap<>();
     final Transition exitTransition;
@@ -43,9 +43,6 @@ class StateMachine {
 
     /**
      * Configures a possible transition from a set of states to a target state.
-     *  @param transition
-     * @param targetState
-     * @param fromStates
      */
     private void addTransition(Transition transition, State targetState, State... fromStates) {
         for (State fromState : fromStates) {
@@ -56,9 +53,6 @@ class StateMachine {
 
     /**
      * Configures the action that will be executed if an instance of type T enters the given state
-     *
-     * @param state
-     * @param action
      */
     private void setAction(State state, Action action) {
         getTarget(state).action = action;
@@ -66,9 +60,6 @@ class StateMachine {
 
     /**
      * Target state wrapper
-     *
-     * @param state
-     * @return
      */
     private Target getTarget(State state) {
         Target target = states.get(state);
@@ -80,21 +71,12 @@ class StateMachine {
     }
 
     private Map<Transition, Target> getTransitions(State state) {
-        Map<Transition, Target> stateTransitions = transitions.get(state);
-        if (stateTransitions == null) {
-            stateTransitions = new HashMap<>();
-            transitions.put(state, stateTransitions);
-        }
-        return stateTransitions;
+        return transitions.computeIfAbsent(state, k -> new HashMap<>());
     }
 
     /**
      * Make a transition on the instance.
-     * Returns true if the transition resulted in a state change, false if the state remained the same.
-     *
-     * @param planItem
-     * @param transition
-     * @return
+     * Returns an event with the transition if the item was actually changed by the transition, or null otherwise.
      */
     PlanItemTransitioned transition(PlanItem<?> planItem, Transition transition) {
         State currentState = planItem.getState();
@@ -117,14 +99,14 @@ class StateMachine {
         return getTarget(state).action;
     }
 
-    private class Target {
+    private static class Target {
         private final State state;
         private Action action;
 
         private Target(State targetState) {
             this.state = targetState;
             this.action = (PlanItem<?> p, Transition t) -> {
-            }; // By default an empty action.
+            }; // By default, an empty action.
         }
     }
 
@@ -186,9 +168,7 @@ class StateMachine {
         TaskStage.addTransition(Transition.ParentSuspend, State.Suspended, new State[] { State.Available, State.Active, State.Enabled, State.Disabled });
         TaskStage.addTransition(Transition.ParentResume, null, State.Suspended);
 
-        TaskStage.setAction(State.Available, (PlanItem<?> p, Transition t) -> {
-            p.createInstance();
-        });
+        TaskStage.setAction(State.Available, (PlanItem<?> p, Transition t) -> p.createInstance());
         TaskStage.setAction(State.Active, (PlanItem<?> p, Transition t) -> {
             if (t == Transition.Start || t == Transition.ManualStart) {
                 p.startInstance();
@@ -236,7 +216,13 @@ class StateMachine {
                 // Create plan items
                 p.startInstance();
             } else {
-                p.resumeInstance();
+                // Only when the case was suspended we resume it.
+                // From Failed, Completed and Terminated we reactivate.
+                if (p.getHistoryState().isSuspended()) {
+                    p.resumeInstance();
+                } else {
+                    p.reactivateInstance();
+                }
             }
         });
     }

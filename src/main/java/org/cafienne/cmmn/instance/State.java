@@ -37,8 +37,6 @@ public enum State {
 
     /**
      * As per the spec
-     *
-     * @return
      */
     public boolean isSemiTerminal() {
         return this == Closed || this == Completed || this == Disabled || this == Failed || this == Terminated;
@@ -90,35 +88,37 @@ public enum State {
 
     /**
      * Returns true if the state is beyond Null.
-     *
-     * @return
      */
     public boolean isCreated() {
-        return this != Null;
+        return !isNull();
     }
 
     /**
      * Returns true if the task is beyond creation (i.e., state is not null and not available)
-     *
-     * @return
      */
     public boolean isInitiated() {
-        return this != Null && this != Available;
+        return !isNull() && !isAvailable();
     }
 
     /**
      * Returns true if the lifecycle of the task is done (i.e., state is Completed or state is Terminated)
-     *
-     * @return
      */
     public boolean isDone() {
-        return this == Completed || this == Terminated;
+        return isCompleted() || isTerminated();
+    }
+
+    /**
+     * Returns true if the lifecycle of the task or stage is active or failed
+     * This means that in such a Stage, a task can be reactivated or started.
+     */
+    public boolean allowsActivity() {
+        return isActive() || isFailed();
     }
 
     /**
      * Returns true if the lifecycle of the task is initiated and not yet done.
      */
     public boolean isAlive() {
-        return this == Active || this == Suspended || this == Failed || this == Enabled || this == Disabled;
+        return isActive() || isSuspended() || isFailed() || isEnabled() || isDisabled();
     }
 }

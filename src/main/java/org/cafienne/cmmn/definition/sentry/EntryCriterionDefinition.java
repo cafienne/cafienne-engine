@@ -56,8 +56,6 @@ public class EntryCriterionDefinition extends CriterionDefinition {
 
     /**
      * Returns true if there is at least one on part in this definition
-     *
-     * @return
      */
     public boolean hasOnParts() {
         // Check whether sentry definition exists at all, and if so, check whether it has on parts.
@@ -67,10 +65,5 @@ public class EntryCriterionDefinition extends CriterionDefinition {
     @Override
     public Transition getTransition() {
         return entryTransition;
-    }
-
-    @Override
-    public EntryCriterion createInstance(CriteriaListener listener) {
-        return new EntryCriterion(listener, this);
     }
 }

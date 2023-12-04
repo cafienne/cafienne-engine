@@ -66,29 +66,23 @@ public class XMLHelper {
     }
 
     private static String removeEmptyLines(String text) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         String[] lines = text.split("\n");
         for (String string : lines) {
             if (string.trim().isEmpty()) {
                 continue;
             }
-            // Dunno why this is needed, but sometimes we see this strange character appearing. Perhaps we need to revisit the settings of the Transformer above
+            // Don't know why this is needed, but sometimes we see this strange character appearing. Perhaps we need to revisit the settings of the Transformer above
             if (string.contains("&#13;")) {
                 string = string.replace("&#13;", "");
             }
-            buffer.append(string + "\n");
+            buffer.append(string).append("\n");
         }
         return buffer.toString();
     }
 
     /**
      * Parses the input stream into a namespace aware XMLDocument
-     *
-     * @param inputStream
-     * @return
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
     public static Document getXMLDocument(InputStream inputStream) throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -107,12 +101,6 @@ public class XMLHelper {
     /**
      * Parses a string into an XMLDocument. Internally invokes the {@link XMLHelper#loadXML(byte[])} method, and converts the string to bytes
      * by invoking String.getBytes().
-     *
-     * @param xmlString
-     * @return
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
     public static Document loadXML(String xmlString) throws IOException, ParserConfigurationException, SAXException {
         return loadXML(xmlString.getBytes());
@@ -122,10 +110,6 @@ public class XMLHelper {
      * Parses a byte[] into an XMLDocument; internally invokes {@link XMLHelper#getXMLDocument(InputStream)} method.
      *
      * @param xmlBytes the bytes to parse.
-     * @return
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
     public static Document loadXML(byte[] xmlBytes) throws ParserConfigurationException, SAXException, IOException {
         InputStream inputStream = new ByteArrayInputStream(xmlBytes);
@@ -133,11 +117,7 @@ public class XMLHelper {
     }
 
     /**
-     * Returns all elements under the element with the specified tagname.
-     *
-     * @param element
-     * @param tagName
-     * @return
+     * Returns all elements under the element with the specified tagName.
      */
     public static List<Element> getChildrenWithTagName(Element element, String tagName) {
         NodeList nList = element.getElementsByTagName(tagName);
@@ -153,11 +133,23 @@ public class XMLHelper {
     }
 
     /**
+     * Returns all direct child elements under the element with the specified tag and namespace.
+     */
+    public static List<Element> getElementsNS(Element element, String elementNS, String localName) {
+        NodeList nList = element.getElementsByTagNameNS(elementNS, localName);
+        List<Element> list = new ArrayList<>();
+        int listLength = nList.getLength();
+        for (int i = 0; i < listLength; i++) {
+            Element listElement = (Element) nList.item(i);
+            if (listElement.getParentNode() == element) {
+                list.add(listElement);
+            }
+        }
+        return list;
+    }
+
+    /**
      * Get a child element with the specified localName. Assumption is that it is in the same namespace as the specified element.
-     *
-     * @param element
-     * @param localName
-     * @return
      */
     public static Element getElement(Element element, String localName) {
         Collection<Element> elements = getChildrenWithTagName(element, localName);
@@ -171,13 +163,13 @@ public class XMLHelper {
     /**
      * Get a child element with the specified localName. Assumption is that it is in the same namespace as the specified element.
      *
-     * @param element Starting point from where to start the search
-     * @param elementName The name of the element to find
+     * @param element   Starting point from where to start the search
+     * @param localName The name of the element to find
      * @param elementNS The namespace in which to search for the element
-     * @return
+     * @return The first element found, or null.
      */
-    public static Element getElementNS(Element element, String elementNS, String elementName) {
-        NodeList nList = element.getElementsByTagNameNS(elementNS, elementName);
+    public static Element getElementNS(Element element, String elementNS, String localName) {
+        NodeList nList = element.getElementsByTagNameNS(elementNS, localName);
         int listLength = nList.getLength();
         for (int i = 0; i < listLength; i++) {
             Element listElement = (Element) nList.item(i);
@@ -191,10 +183,6 @@ public class XMLHelper {
 
     /**
      * Searches for the element with the specified name in the whole subtree of element.
-     *
-     * @param element
-     * @param localName
-     * @return
      */
     public static Element findElement(Element element, String localName) {
         NodeList nList = element.getElementsByTagName(localName);
@@ -205,18 +193,16 @@ public class XMLHelper {
     }
 
     /**
-     * Returns the text content of the child element with the specified tag name, and the default value if no such element exists or the element does not have any text content.
-     * If the tag name is not specified, the text content of the element itself will be taken.
+     * Returns the text content of the child element with the specified tagName, and the default value if no such element exists or the element does not have any text content.
+     * If the tagName is not specified, the text content of the element itself will be taken.
      *
-     * @param element
      * @param localName If localName is null, then the text content of the element itself will be taken.
-     * @return
      */
     public static String getContent(Element element, String localName, String defaultValue) {
         Element child = localName == null ? element : getElement(element, localName);
         if (child != null) {
             String value = getTextOfChildren(child);
-            if (! value.isBlank()) {
+            if (!value.isBlank()) {
                 return value;
             }
         }
@@ -226,12 +212,10 @@ public class XMLHelper {
     /**
      * Recursive alternative to Element.getTextContent();
      * Ignores whitespace around CDATASections
-     *
+     * <p>
      * 1. Append CDATASections in their entirety.
-     * 2. Append TextNodes only if non blank.
+     * 2. Append TextNodes only if non-blank.
      * 3. Recurse into Element type of children
-     * @param element
-     * @return
      */
     private static String getTextOfChildren(Element element) {
         StringBuilder sb = new StringBuilder();
@@ -243,9 +227,9 @@ public class XMLHelper {
                 sb.append(node.getNodeValue());
             } else if (node instanceof Text) {
                 String value = node.getNodeValue();
-                if (! value.isBlank()) sb.append(value);
+                if (!value.isBlank()) sb.append(value);
             } else if (node instanceof Element) {
-                sb.append(getTextOfChildren((Element)node));
+                sb.append(getTextOfChildren((Element) node));
             }
         }
         return sb.toString();

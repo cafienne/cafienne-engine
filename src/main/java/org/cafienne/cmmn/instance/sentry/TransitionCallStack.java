@@ -23,14 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class TransitionCallStack {
-    private final SentryNetwork handler;
     private Frame currentFrame = null;
 
-    TransitionCallStack(SentryNetwork handler) {
-        this.handler = handler;
-    }
-
-    void pushEvent(StandardEvent event) {
+    void pushEvent(StandardEvent<?, ?> event) {
         if (event.hasBehavior()) {
             Frame frame = new Frame(event, currentFrame);
             frame.invokeImmediateBehavior();
@@ -39,19 +34,17 @@ class TransitionCallStack {
     }
 
     private class Frame {
-        private final StandardEvent event;
-        private final Frame parent;
+        private final StandardEvent<?, ?> event;
         private final List<Frame> children = new ArrayList<>();
         private final int depth;
 
-        Frame(StandardEvent event, Frame parent) {
+        Frame(StandardEvent<?, ?> event, Frame parent) {
             this.event = event;
-            this.parent = parent;
             this.depth = parent == null ? 1 : parent.depth + 1;
         }
 
         private String print(String msg) {
-            return msg +" for " + event.getSource().getDescription() +"." + event.getTransition();
+            return msg + " for " + event.getSource().getDescription() + "." + event.getTransition();
         }
 
         private void postponeDelayedBehavior() {
@@ -64,9 +57,7 @@ class TransitionCallStack {
                 if (EngineDeveloperConsole.enabled()) {
                     EngineDeveloperConsole.debugIndentedConsoleLogging(print("* postponing delayed behavior"));
                     EngineDeveloperConsole.indent(2);
-                    currentFrame.children.forEach(frame -> {
-                        EngineDeveloperConsole.debugIndentedConsoleLogging("- " + frame.event.getDescription());
-                    });
+                    currentFrame.children.forEach(frame -> EngineDeveloperConsole.debugIndentedConsoleLogging("- " + frame.event.getDescription()));
                     EngineDeveloperConsole.outdent(2);
                 }
             }
@@ -77,13 +68,13 @@ class TransitionCallStack {
             Frame next = currentFrame;
             currentFrame = this;
             if (EngineDeveloperConsole.enabled()) {
-                EngineDeveloperConsole.debugIndentedConsoleLogging("\n-------- " + this + print("Running immmediate behavior"));
+                EngineDeveloperConsole.debugIndentedConsoleLogging("\n-------- " + this + print("Running immediate behavior"));
             }
             EngineDeveloperConsole.indent(1);
             this.event.runImmediateBehavior();
             EngineDeveloperConsole.outdent(1);
             if (EngineDeveloperConsole.enabled()) {
-                EngineDeveloperConsole.debugIndentedConsoleLogging("-------- " + this + print("Finished immmediate behavior") + "\n");
+                EngineDeveloperConsole.debugIndentedConsoleLogging("-------- " + this + print("Finished immediate behavior") + "\n");
             }
             EngineDeveloperConsole.outdent(2);
             currentFrame = next;
@@ -98,12 +89,12 @@ class TransitionCallStack {
             }
             EngineDeveloperConsole.indent(1);
             event.runDelayedBehavior();
-            if (children.size() > 0) {
+            if (!children.isEmpty()) {
                 if (EngineDeveloperConsole.enabled()) {
                     EngineDeveloperConsole.debugIndentedConsoleLogging(this + "Loading " + children.size() + " nested frames at level [" + (depth + 1) + "] as a consequence of " + event.getDescription());
                 }
             }
-            children.forEach(frame -> frame.invokeDelayedBehavior());
+            children.forEach(Frame::invokeDelayedBehavior);
             EngineDeveloperConsole.outdent(1);
             if (EngineDeveloperConsole.enabled()) {
                 EngineDeveloperConsole.debugIndentedConsoleLogging("******** " + this + print("Completed delayed behavior"));

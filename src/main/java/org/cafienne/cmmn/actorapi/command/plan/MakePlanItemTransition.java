@@ -101,7 +101,7 @@ public class MakePlanItemTransition extends CaseCommand {
                 // Trying to find plan items with a matching name; but only those in Active stages.
                 caseInstance.getPlanItems()
                         .stream()
-                        .filter(item -> item.getName().equals(identifier) && item.hasActiveParent())
+                        .filter(item -> item.getName().equals(identifier) && item.stageAllowsActivity())
                         .forEach(targets::add);
             }
         }

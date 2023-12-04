@@ -42,6 +42,12 @@ public class CasePlan extends Stage<CasePlanDefinition> {
     }
 
     @Override
+    protected void reactivateInstance() {
+        super.reactivateInstance();
+        informParent(Transition.Reactivate);
+    }
+
+    @Override
     protected void completeInstance() {
         super.completeInstance();
         addEvent(new CaseOutputFilled(getCaseInstance(), getCaseInstance().getOutputParameters()));

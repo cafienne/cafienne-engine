@@ -18,22 +18,16 @@
 package org.cafienne.infrastructure.config.engine
 
 import org.cafienne.infrastructure.config.util.ChildConfigReader
-import org.cafienne.infrastructure.config.CafienneConfig
 
-class EngineConfig(val parent: CafienneConfig) extends ChildConfigReader {
-  def path = "engine"
+class CMMNInterpreterConfig(val parent: EngineConfig) extends ChildConfigReader {
+  def path = "interpreter"
 
-  /**
-    * Returns configuration options for the Timer Service
-    */
-  val timerService = new TimerServiceConfig(this)
+  val usePureCMMNFaultHandling: Boolean = {
+    val setting = readBoolean("cmmn-fault-handling", default = false)
+    if (setting) {
+      logger.warn("Engine runs in pure CMMN fault handling mode. Note that CMMN fault handling must be explicitly modeled in your case definitions")
+    }
 
-  /**
-    * Config property for settings of the mail service to use
-    */
-  lazy val mailService = new MailServiceConfig(this)
-
-  lazy val storage: StorageConfig = new StorageConfig(this)
-
-  val interpreter = new CMMNInterpreterConfig(this)
+    setting
+  }
 }

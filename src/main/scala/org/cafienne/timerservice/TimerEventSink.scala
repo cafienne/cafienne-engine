@@ -18,6 +18,7 @@
 package org.cafienne.timerservice
 
 import akka.Done
+import akka.actor.ActorSystem
 import akka.persistence.query.Offset
 import akka.stream.scaladsl.Sink
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
@@ -30,7 +31,7 @@ import scala.util.{Failure, Success}
 
 class TimerEventSink(val timerService: TimerService) extends TaggedEventSource {
   val caseSystem: CaseSystem = timerService.caseSystem
-  override val system = caseSystem.system
+  override val system: ActorSystem = caseSystem.system
 
   override def getOffset: Future[Offset] = timerService.storage.getOffset
   override val tag: String = TimerBaseEvent.TAG

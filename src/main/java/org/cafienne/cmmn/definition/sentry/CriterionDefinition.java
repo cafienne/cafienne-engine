@@ -53,8 +53,6 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
 
     /**
      * Returns the name of the plan item on which a transition has to be invoked when the criterion is satisfied
-     *
-     * @return
      */
     public String getTarget() {
         return this.getPlanItemName();
@@ -82,6 +80,4 @@ public abstract class CriterionDefinition extends CMMNElementDefinition {
         return same(sentry, other.sentry)
                 && same(this.getTransition(), other.getTransition());
     }
-
-    public abstract Criterion<?> createInstance(CriteriaListener<?,?> listener);
 }

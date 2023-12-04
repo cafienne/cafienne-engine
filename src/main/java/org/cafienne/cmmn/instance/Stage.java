@@ -22,15 +22,19 @@ import org.cafienne.cmmn.actorapi.event.CaseAppliedPlatformUpdate;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemCreated;
 import org.cafienne.cmmn.actorapi.event.plan.PlanItemTransitioned;
 import org.cafienne.cmmn.definition.*;
+import org.cafienne.infrastructure.Cafienne;
 import org.cafienne.util.Guid;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private final Collection<PlanItem<?>> planItems = new ArrayList<>();
+    private final static boolean usePureCHMMFaultHandling = Cafienne.config().engine().interpreter().usePureCMMNFaultHandling();
 
     public Stage(String id, int index, ItemDefinition itemDefinition, T definition, Stage<?> parent, Case caseInstance) {
         this(id, index, itemDefinition, definition, parent, caseInstance, StateMachine.TaskStage);
@@ -43,9 +47,8 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     void register(PlanItem<?> child) {
         if (getCaseInstance().recoveryRunning() && child.getIndex() > 0) {
             planItems.stream().filter(p -> p.getDefinition().equals(child.getDefinition()) && p.getIndex() + 1 == child.getIndex()).forEach(leftSibling -> {
-//                System.out.println("!!!Releasing already repeated plan item " + leftSibling);
-                // Recovering repeated plan items should no longer inform the sentry network
-                leftSibling.getEntryCriteria().release();
+                // Recovering repeated plan items should no longer connect their entry criteria to the sentry network
+                leftSibling.getEntryCriteria().stopListening();
             });
         }
         planItems.add(child);
@@ -58,8 +61,6 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     /**
      * Adds an item to the stage, by adding a PlanItemCreated event for it.
      * Also starts the lifecycle of the new plan item if the Stage is currently active.
-     * @param discretionaryItem
-     * @param planItemId
      */
     void planChild(DiscretionaryItem discretionaryItem, String planItemId) {
         // Determine index by iterating sibling plan items (i.e., those that have the same item definition).
@@ -69,8 +70,8 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
     /**
      * Repeat one of our children.
+     *
      * @param child The child to be repeated.
-     * @return
      */
     PlanItem<?> repeatChild(PlanItem<?> child) {
         // Generate an id for the repeat item
@@ -90,9 +91,9 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             return null;
         }
         PlanItemCreated pic = addEvent(new PlanItemCreated(this, itemDefinition, planItemId, index));
-        if (triggerCreateTransition && this.getState().isActive()) {
+        if (triggerCreateTransition && this.getState().allowsActivity()) {
             // Only generate a start transition for the new discretionary item if this stage is active.
-            //  Otherwise the start transition will be generated when this stage becomes active.
+            //  Otherwise, the start transition will be generated when this stage becomes active.
             pic.getCreatedPlanItem().create();
         }
         return pic.getCreatedPlanItem();
@@ -100,7 +101,6 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
 
     /**
      * Creates the child, but without triggering the lifecycle.
-     * @param itemDefinition
      */
     private void instantiateChild(PlanItemDefinition itemDefinition) {
         addChild(itemDefinition, new Guid().toString(), 0, false);
@@ -109,29 +109,40 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     /**
      * If the Stage is not Active (either because it is in state Available, or Suspended or Fault)
      * new items may have been added from either planning discretionaries or migrating the case definition.
-     * This method iterates all items in State.Null and triggers a create transition for them.
-     *  These may have been created due to case definition migration while stage was in Fault state
+     * This method iterates all items in State.Null and triggers a 'create' transition for them.
+     * These may have been created due to case definition migration while stage was in Fault state
+     *
+     * @param reason The reason why this method is invoked is printed in the debug log event
      */
-    private void createNullItems() {
-        if (planItems.size() > 0) {
-            addDebugInfo(() -> "Stage[" + getName() + "]: instantiating " + planItems.size() + " children having Null state. These are probably discretionary items that have been planned before the stage became active");
-            planItems.forEach(item -> addDebugInfo(() -> "Item["+item.getName()+"."+item.getIndex() +"] in state "+ item.getState()));
+    private void invokeCreateOnNullItems(String reason) {
+        List<PlanItem<?>> nullItems = planItems.stream().filter(item -> item.getState().isNull()).collect(Collectors.toList());
+        if (!nullItems.isEmpty()) {
+            addDebugInfo(() -> "Stage[" + getName() + "] / " + reason + ": invoking transition 'create' on " + nullItems.size() + " items:");
+            nullItems.forEach(item -> addDebugInfo(() -> " - " + item));
         }
-        planItems.stream().filter(item -> item.getState().isNull()).forEach(PlanItem::create);
+        nullItems.forEach(PlanItem::create);
+    }
+
+    private boolean hasNullItems() {
+        return planItems.stream().anyMatch(item -> item.getState().isNull());
     }
 
     @Override
     protected void startInstance() {
-        // Create the child plan items and begin their life-cycle
+        // First trigger the 'create' transition on the already planned discretionary items
+        if (hasNullItems()) {
+            invokeCreateOnNullItems("creating planned discretionary items");
+        }
+
+        // Create the default child plan items
         getDefinition().getPlanItems().forEach(this::instantiateChild);
 
-        // Now trigger the Create transition on our children
-        createNullItems();
+        // Now trigger the 'create' transition on the newly created children
+        invokeCreateOnNullItems("creating default items");
 
-        // When a Stage becomes active and it has no children, it should immediately try to complete.
+        // When a Stage becomes active, and it has no children, it should immediately try to complete.
         if (getPlanItems().isEmpty()) {
-            // note ... we fake an event for logging purposes ...
-            tryCompletion(new PlanItemTransitioned(this, State.Completed, State.Active, Transition.Complete));
+            tryCompletion();
         }
     }
 
@@ -143,13 +154,14 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     @Override
     protected void resumeInstance() {
         propagateTransition(Transition.ParentResume);
-        createNullItems();
+        invokeCreateOnNullItems("resuming stage");
     }
 
     @Override
     protected void reactivateInstance() {
         super.reactivateInstance();
-        createNullItems();
+        propagateTransition(Transition.Reactivate);
+        invokeCreateOnNullItems("reactivating stage");
     }
 
     @Override
@@ -162,18 +174,64 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         disconnectChildren(false);
     }
 
+    protected void childTransitioned(PlanItem<?> child, PlanItemTransitioned event) {
+        if (usePureCHMMFaultHandling) {
+            if (child.getState().isSemiTerminal()) {
+                // Check stage completion (only done when the child transitioned into semi terminal state)
+                // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
+                if (this.getState().isSemiTerminal()) {
+                    addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
+                } else {
+                    addDebugInfo(() -> "*** " + this + ": trying to complete stage because of " + event);
+                    tryCompletion();
+                }
+            }
+        } else {
+            if (child.getHistoryState().isFailed()) {
+                if (this.getState().isFailed()) {
+                    Predicate<PlanItem<?>> isFailedSibling = item -> item != child && item.getState().isFailed();
+                    if (getPlanItems().stream().noneMatch(isFailedSibling)) {
+                        addDebugInfo(() -> "Reactivating stage " + getName() + " as we no longer have children in Fault state");
+                        makeTransition(Transition.Reactivate);
+                        // It is possible that the child was not reactivated, but terminated (through Exit)
+                        //  In that case we also have to check for stage completion.
+                        if (child.getHistoryState().isFailed()) {
+                            tryCompletion();
+                        }
+                    } else {
+                        addDebugInfo(() -> {
+                            String msg = getPlanItems().stream().filter(isFailedSibling).map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
+                            return "Cannot reactivate stage " + getName() + " because " + getPlanItems().stream().filter(item -> item.getState().isFailed() && item != child).count() + " plan items are still in Fault state:" + msg;
+                        });
+                    }
+                } else {
+                    // This probably will not occur
+                    addDebugInfo(() -> "No need to reactivate stage " + getName() + " upon " + child.getName() + "." + event.getTransition() + " as the stage is in state " + getState());
+                }
+            } else if (event.getTransition().isFault()) {
+                if (getState().isFailed()) {
+                    addDebugInfo(() -> "No need to trigger failure in stage " + getName() + " as the stage is already in Fault state");
+                } else {
+                    addDebugInfo(() -> "*** " + this + ": triggering stage failure because " + child.getName() + " ran into failure");
+                    makeTransition(Transition.Fault);
+                }
+            } else if (child.getState().isSemiTerminal()) {
+                // Check stage completion (only done when the child transitioned into semi terminal state)
+                // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
+                if (this.getState().isSemiTerminal()) {
+                    addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
+                } else {
+                    addDebugInfo(() -> "*** " + this + ": trying to complete stage because of " + event);
+                    tryCompletion();
+                }
+            }
+        }
+    }
+
     /**
      * If a child item of this stage has reached semi-terminal state, then it may try to auto complete the surrounding stage.
-     *
-     * @param event
      */
-    void tryCompletion(PlanItemTransitioned event) {
-        // Stage completion is also only relevant if we are still Active, not when we have already been terminated or completed
-        if (this.getState().isSemiTerminal()) {
-            addDebugInfo(() -> "---- " + this + " is in state " + getState() + ", hence skipping completion check for event " + event);
-            return;
-        }
-        addDebugInfo(() -> "*** " + this + ": checking completion because of " + event);
+    void tryCompletion() {
         if (this.isCompletionAllowed(false)) {
             addDebugInfo(() -> "*** " + this + ": triggering stage completion");
             makeTransition(Transition.Complete);
@@ -181,7 +239,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private boolean isCompletionAllowed(boolean isManualCompletion) {
-        /**
+        /*
          * Quote from the spec chapter 7.6.1 (cmmn 1.1: chapter 8.6.1):
          *
          * When autocomplete is true:
@@ -193,7 +251,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
          *
          * In other words, a Stage instance SHOULD complete if a user has no option to do further planning or work with the Stage instance.
          */
-        // BOTTOMLINE interpretation: the stage will try to complete each time a child reaches semiterminal state, or if the transition to complete is manually invoked
+        // BOTTOM-LINE interpretation: the stage will try to complete each time a child reaches semi-terminal state, or if the transition to complete is manually invoked
         // Here we check both.
         addDebugInfo(() -> {
             String msg = getPlanItems().stream().map(p -> "\n*   - " + p.toDescription()).collect(Collectors.toList()).toString();
@@ -271,15 +329,12 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
             if (makeTerminationTransition) {
                 child.makeTransition(child.getTerminationTransition());
             }
-            child.getEntryCriteria().release();
-            child.getExitCriteria().release();
+            child.stopListening();
         }
     }
 
     /**
      * Invoked if the stage arrives in a certain state. Based on the transition we will get particular transitions on the children.
-     *
-     * @param transition
      */
     private void propagateTransition(Transition transition) {
         for (PlanItem<?> child : planItems) {
@@ -301,10 +356,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     /**
-     * Determines whether the plan item is contained within this stage or one of it's child stages.
-     *
-     * @param planItem
-     * @return
+     * Determines whether the plan item is contained within this stage or one of its child stages.
      */
     public boolean contains(PlanItem<?> planItem) {
         if (planItem == null) {
@@ -339,7 +391,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
         if (this.getState().isAlive()) {
             // Iterate for newly added children and create them.
             newDefinition.getPlanItems().stream().filter(this::doesNotHaveChild).forEach(this::instantiateChild);
-            createNullItems();
+            invokeCreateOnNullItems("migrating stage definition");
         }
     }
 
@@ -372,7 +424,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     private boolean doesNotHaveChild(PlanItemDefinition newChildDefinition) {
         boolean notHasChild = this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().getId().equals(newChildDefinition.getId()) || item.getName().equals(newChildDefinition.getName()));
         if (notHasChild) {
-            addDebugInfo(() -> this + ": migration found a new child definition " + newChildDefinition.getName() +" of type " + newChildDefinition.getType());
+            addDebugInfo(() -> this + ": migration found a new child definition " + newChildDefinition.getName() + " of type " + newChildDefinition.getType());
         }
         return notHasChild;
     }
@@ -394,7 +446,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition, boolean skipLogic) {
-        addDebugInfo(() -> this + ": migrating child " + child +" to a new definition");
+        addDebugInfo(() -> this + ": migrating child " + child + " to a new definition");
         DefinitionElement currentChildDefinition = child.getDefinition();
         PlanItemDefinitionDefinition newChildDefinition = newChildItemDefinition.getPlanItemDefinition();
         if (currentChildDefinition.getClass().isAssignableFrom(newChildDefinition.getClass())) {

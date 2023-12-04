@@ -29,7 +29,6 @@ import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
   */
 class CafienneConfig extends ConfigReader with LazyLogging {
   val systemConfig: Config = SystemConfig.load()
-
   val path = "cafienne"
   override lazy val config: Config = {
     if (systemConfig.hasPath(path)) {
@@ -37,6 +36,19 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     } else {
       fail("Cafienne System is not configured. Check local.conf for 'cafienne' settings")
     }
+  }
+
+
+  /**
+    * Returns true of the debug route is open (for developers using IDE to do debugging)
+    */
+  val developerRouteOpen: Boolean = {
+    val debugRouteOpenOption = "api.security.debug.events.open"
+    val open = readBoolean(debugRouteOpenOption, default = false)
+    if (open) {
+      SystemConfig.printWarning("Case Service runs in developer mode (the debug route to get all events is open for anyone!)")
+    }
+    open
   }
 
   /**
@@ -84,17 +96,5 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     * Returns configuration options for the engine and it's internal services
     */
   val engine: EngineConfig = new EngineConfig(this)
-
-  /**
-    * Returns true of the debug route is open (for developers using IDE to do debugging)
-    */
-  val developerRouteOpen: Boolean = {
-    val debugRouteOpenOption = "api.security.debug.events.open"
-    val open = readBoolean(debugRouteOpenOption, default = false)
-    if (open) {
-      SystemConfig.printWarning("Case Service runs in developer mode (the debug route to get all events is open for anyone!)")
-    }
-    open
-  }
 }
 
