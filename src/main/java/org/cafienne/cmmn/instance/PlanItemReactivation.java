@@ -18,16 +18,14 @@
 package org.cafienne.cmmn.instance;
 
 import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.sentry.EntryCriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.ReactivateCriterionDefinition;
 import org.cafienne.cmmn.instance.sentry.CriteriaListener;
 import org.cafienne.cmmn.instance.sentry.Criterion;
-import org.cafienne.cmmn.instance.sentry.EntryCriterion;
 import org.cafienne.cmmn.instance.sentry.ReactivatingCriterion;
 import org.w3c.dom.Element;
 
-public class PlanItemReactivator extends CriteriaListener<ReactivateCriterionDefinition, ReactivatingCriterion> {
-    PlanItemReactivator(PlanItem<?> item) {
+public class PlanItemReactivation extends CriteriaListener<ReactivateCriterionDefinition, ReactivatingCriterion> {
+    PlanItemReactivation(PlanItem<?> item) {
         super(item, item.getItemDefinition().getReactivatingCriteria());
     }
 

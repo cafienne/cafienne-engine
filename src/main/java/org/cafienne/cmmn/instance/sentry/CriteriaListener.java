@@ -22,7 +22,6 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.PlanItemEntry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +37,8 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
         super(item, item.getItemDefinition());
         this.item = item;
         this.definitions = definitions;
-        this.logDescription = getClass().getSimpleName().substring(8).toLowerCase(Locale.ROOT);
+        // LogDescription basically contains 'entry criteria', 'exit criteria', or 'reactivation criteria'
+        this.logDescription = getClass().getSimpleName().substring(8).toLowerCase(Locale.ROOT) + " criteria";
     }
 
     /**
@@ -47,11 +47,12 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     public void startListening() {
         this.definitions.forEach(this::addCriterion);
         if (!criteria.isEmpty()) {
-            item.getCaseInstance().addDebugInfo(() -> "Connected " + item + " to " + criteria.size() + " " + logDescription + " criteria");
+            item.getCaseInstance().addDebugInfo(() -> "Connected " + item + " to " + criteria.size() + " " + logDescription);
         }
     }
 
     private void addCriterion(T definition) {
+        addDebugInfo(() -> " - creating " + definition.toString());
         C criterion = createCriterion(definition);
         criteria.add(criterion);
     }
@@ -63,7 +64,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
      */
     public void stopListening() {
         if (!criteria.isEmpty()) {
-            addDebugInfo(() -> "Disconnecting " + item + " from " + criteria.size() + " " + logDescription + " criteria");
+            addDebugInfo(() -> "Disconnecting " + item + " from " + criteria.size() + " " + logDescription);
         }
         new ArrayList<>(criteria).forEach(this::release);
     }
@@ -87,17 +88,16 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
             if (criteria.isEmpty() && newDefinitions.isEmpty()) {
                 return "";
             } else {
-                String criteriaType = this instanceof PlanItemEntry ? "entry" : "exit";
-                return "Migrating " + criteriaType + " criteria of " + item;
+                return "Migrating " + logDescription + " of " + item;
             }
         });
         Collection<C> existingCriteria = new ArrayList<>(criteria);
 
         existingCriteria.forEach(criterion -> migrateCriterion(criterion, newDefinitions, skipLogic));
-        newDefinitions.stream().filter(this::hasCriterion).forEach(this::addCriterion);
+        newDefinitions.stream().filter(this::notYetHasCriterion).forEach(this::addCriterion);
     }
 
-    private boolean hasCriterion(T definition) {
+    private boolean notYetHasCriterion(T definition) {
         return this.criteria.stream().noneMatch(c -> c.getDefinition() == definition);
     }
 
@@ -109,7 +109,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
         } else {
             // Not sure what to do here. Remove the criterion?
             // Search for a 'nearby' alternative?
-            addDebugInfo(() -> "Dropping criterion " + criterion);
+            addDebugInfo(() -> " - dropping " + criterion);
             this.release(criterion);
         }
     }

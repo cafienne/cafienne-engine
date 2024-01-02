@@ -64,7 +64,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Our entry and exit and reactivating criteria (i.e., to plan items and case file items of interest to us)
      */
     private final PlanItemEntry entryCriteria;
-    private final PlanItemReactivator reactivators;
+    private final PlanItemReactivation reactivationCriteria;
     private final PlanItemExit exitCriteria;
     /**
      * Whether we repeat or not
@@ -106,7 +106,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.path = new Path(this);
         this.stateMachine = stateMachine;
         this.entryCriteria = new PlanItemEntry(this);
-        this.reactivators = new PlanItemReactivator(this);
+        this.reactivationCriteria = new PlanItemReactivation(this);
         this.exitCriteria = new PlanItemExit(this);
 
         addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (getStage() == null ? " in case" : " in " + getStage()));
@@ -140,13 +140,13 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         getCaseInstance().getSentryNetwork().connect(this);
         // Now register our criteria with the sentry network so that they get informed about transitions.
         entryCriteria.startListening();
-        reactivators.startListening();
+        reactivationCriteria.startListening();
         exitCriteria.startListening();
     }
 
     protected void stopListening() {
         entryCriteria.stopListening();
-        reactivators.stopListening();
+        reactivationCriteria.stopListening();
         exitCriteria.stopListening();
     }
 
@@ -587,7 +587,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition, boolean skipLogic) {
-        addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
+        addDebugInfo(() -> "=== Migrating definition of " + this.toDescription());
         super.migrateDefinition(newDefinition, skipLogic);
         setItemDefinition(newItemDefinition);
         // Also update the path during migration
@@ -620,14 +620,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     private boolean hasNewRequiredRule() {
         ConstraintDefinition oldRequiredRule = getPreviousItemDefinition().getPlanItemControl().getRequiredRule();
         return getItemDefinition().getPlanItemControl().getRequiredRule().differs(oldRequiredRule);
-    }
-
-    @Override
-    protected boolean hasNewDefinition() {
-        // Note: We're overriding hasNewDefinition, since itemDefinition determines everything of a plan item
-        //  This includes the reference to the actual definition like TaskDefinition or StageDefinition
-        //  because these are referenced from the itemDefinition and included in the comparison
-        return previousItemDefinition != null && itemDefinition.differs(previousItemDefinition);
     }
 
     protected void lostDefinition() {

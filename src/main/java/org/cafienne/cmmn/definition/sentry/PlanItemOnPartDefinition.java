@@ -78,7 +78,7 @@ public class PlanItemOnPartDefinition extends OnPartDefinition {
 
     @Override
     public String getContextDescription() {
-        return source.getType() + "[" + source.getName() + "]." + standardEvent;
+        return source.getPlanItemDefinition().getType() + "[" + source.getName() + "]." + standardEvent;
     }
 
     public Transition getStandardEvent() {

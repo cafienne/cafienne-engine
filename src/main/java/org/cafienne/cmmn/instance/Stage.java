@@ -446,7 +446,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private void migrateChild(PlanItem child, ItemDefinition newChildItemDefinition, boolean skipLogic) {
-        addDebugInfo(() -> this + ": migrating child " + child + " to a new definition");
+        addDebugInfo(() -> this + ": migrating child " + child);
         DefinitionElement currentChildDefinition = child.getDefinition();
         PlanItemDefinitionDefinition newChildDefinition = newChildItemDefinition.getPlanItemDefinition();
         if (currentChildDefinition.getClass().isAssignableFrom(newChildDefinition.getClass())) {

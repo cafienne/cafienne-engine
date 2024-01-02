@@ -45,7 +45,7 @@ public class PlanItemMigrated extends CasePlanEvent {
 
     @Override
     public String getDescription() {
-        return "PlanItemCreated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]";
+        return "PlanItemMigrated [" + getType() + "-" + getPlanItemName() + "." + getIndex() + "/" + getPlanItemId() + "]";
     }
 
     public String getPlanItemName() {

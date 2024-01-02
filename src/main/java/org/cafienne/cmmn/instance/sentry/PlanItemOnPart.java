@@ -36,6 +36,11 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
     }
 
     @Override
+    protected String getSourceType() {
+        return getDefinition().getSourceDefinition().getPlanItemDefinition().getType();
+    }
+
+    @Override
     Transition getStandardEvent() {
         return getDefinition().getStandardEvent();
     }
@@ -80,7 +85,7 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
         }
 
         // Only connect if the plan item has the same definition as our source definition.
-        if (! getDefinition().getSourceDefinition().equals(potentialNewSource.getItemDefinition())) {
+        if (!getDefinition().getSourceDefinition().equals(potentialNewSource.getItemDefinition())) {
             return;
         }
 
@@ -130,9 +135,9 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
     @Override
     ValueMap toJson() {
         return new ValueMap("planitem", getSourceName(),
-            "active", isActive,
-            "awaiting-transition", getStandardEvent(),
-            "last-found-transition", "" + lastEvent
+                "active", isActive,
+                "awaiting-transition", getStandardEvent(),
+                "last-found-transition", "" + lastEvent
         );
     }
 
