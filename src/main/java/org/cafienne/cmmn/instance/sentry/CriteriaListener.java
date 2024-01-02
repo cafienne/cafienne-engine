@@ -32,6 +32,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     protected final Collection<C> criteria = new ArrayList<>();
     protected final Collection<T> definitions;
     private final String logDescription;
+    private boolean isConnected = false;
 
     protected CriteriaListener(PlanItem<?> item, Collection<T> definitions) {
         super(item, item.getItemDefinition());
@@ -45,10 +46,18 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
      * Start listening to the sentry network
      */
     public void startListening() {
+        this.isConnected = true;
         this.definitions.forEach(this::addCriterion);
         if (!criteria.isEmpty()) {
             item.getCaseInstance().addDebugInfo(() -> "Connected " + item + " to " + criteria.size() + " " + logDescription);
         }
+    }
+
+    /**
+     * Indicates whether the PlanItem is no longer awaiting events on any of the criteria.
+     */
+    protected boolean isDisconnected() {
+        return !isConnected;
     }
 
     private void addCriterion(T definition) {
@@ -63,6 +72,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
      * Stop listening to the sentry network, typically when the criterion is satisfied.
      */
     public void stopListening() {
+        this.isConnected = false;
         if (!criteria.isEmpty()) {
             addDebugInfo(() -> "Disconnecting " + item + " from " + criteria.size() + " " + logDescription);
         }
@@ -71,8 +81,6 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
 
     /**
      * Removes the criterion from our collection and tells the criterion to disconnect from the network.
-     *
-     * @param criterion
      */
     private void release(C criterion) {
         criteria.remove(criterion);
@@ -84,6 +92,10 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     protected abstract void migrateCriteria(ItemDefinition newItemDefinition, boolean skipLogic);
 
     protected void migrateCriteria(Collection<T> newDefinitions, boolean skipLogic) {
+        if (isDisconnected()) {
+            addDebugInfo(() -> "Skipping " + logDescription + " criteria migration of " + item + " as they are disconnected");
+            return;
+        }
         addDebugInfo(() -> {
             if (criteria.isEmpty() && newDefinitions.isEmpty()) {
                 return "";
