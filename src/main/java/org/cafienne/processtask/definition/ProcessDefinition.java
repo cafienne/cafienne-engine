@@ -49,7 +49,7 @@ public class ProcessDefinition extends ModelDefinition implements TaskImplementa
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameProcessDefinition);
     }
 

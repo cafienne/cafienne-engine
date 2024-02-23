@@ -83,7 +83,7 @@ public class CaseFileItemDefinitionDefinition extends ModelDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameCaseFileItemDefinitionDefinition);
     }
 

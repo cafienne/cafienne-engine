@@ -103,7 +103,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::samePlanningTable);
     }
 

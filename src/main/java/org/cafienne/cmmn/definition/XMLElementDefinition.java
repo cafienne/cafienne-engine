@@ -444,7 +444,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      * @param object
      * @return
      */
-    protected abstract boolean equalsWith(Object object);
+    public abstract boolean equalsWith(Object object);
 
     /**
      * This checks that other has Class[E] and invokes the matcher on it

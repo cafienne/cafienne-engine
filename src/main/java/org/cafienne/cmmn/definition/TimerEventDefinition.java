@@ -70,7 +70,7 @@ public class TimerEventDefinition extends EventListenerDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameTimerEvent);
     }
 

@@ -229,7 +229,7 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::samePlanItem);
     }
 

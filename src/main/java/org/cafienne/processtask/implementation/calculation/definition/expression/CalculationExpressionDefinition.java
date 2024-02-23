@@ -57,7 +57,7 @@ public class CalculationExpressionDefinition extends CMMNElementDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return notYetImplemented();
     }
 }

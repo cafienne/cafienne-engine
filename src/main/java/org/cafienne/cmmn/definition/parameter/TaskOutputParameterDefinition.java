@@ -19,7 +19,6 @@ package org.cafienne.cmmn.definition.parameter;
 
 import org.cafienne.cmmn.definition.CMMNElementDefinition;
 import org.cafienne.cmmn.definition.ModelDefinition;
-import org.cafienne.cmmn.definition.TaskDefinition;
 import org.w3c.dom.Element;
 
 public class TaskOutputParameterDefinition extends OutputParameterDefinition {
@@ -55,7 +54,7 @@ public class TaskOutputParameterDefinition extends OutputParameterDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameTaskParameter);
     }
 
