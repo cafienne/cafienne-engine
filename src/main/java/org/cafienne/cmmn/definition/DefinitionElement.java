@@ -19,6 +19,8 @@ package org.cafienne.cmmn.definition;
 
 import org.cafienne.processtask.definition.ProcessDefinition;
 
+import java.util.Collection;
+
 /**
  * Basic element for definitions
  */
@@ -26,6 +28,15 @@ public interface DefinitionElement {
     String getId();
 
     String getName();
+
+    /**
+     * Returns whether the parent of this Element can have only one occurrence of this type of DefinitionElement.
+     *
+     * @return Defaults to false, override it by implementing SingletonDefinitionElement interface.
+     */
+    default boolean isSingletonElement() {
+        return false;
+    }
 
     /**
      * Returns the "type" of the element, which can be using in context descriptions.
@@ -68,8 +79,40 @@ public interface DefinitionElement {
     }
 
     /**
-     * Indication that this definition element differs from another element.
-     * Used during migration of definitions of an instance of that definition.
+     * Custom compare method. Comparable to Object.equals(), but elements are expected
+     * to implement a semantic comparison.
      */
-    boolean differs(Object object);
+    boolean differs(DefinitionElement object);
+
+    /**
+     * Returns true if this element has the identifier in its name or id attribute.
+     */
+    default boolean hasIdentifier(String identifier) {
+        return this.getId().equals(identifier) || this.getName().equals(identifier);
+    }
+
+    /**
+     * Returns true if the other DefinitionElement has the same name or the same id.
+     */
+    default boolean hasMatchingIdentifier(DefinitionElement other) {
+        return this.getId().equals(other.getId()) || this.getName().equals(other.getName());
+    }
+
+    /**
+     * Find an equal definition in the collection, using the equalsWith method.
+     *
+     * @param mine   The element that we want to find an alternative for
+     * @param theirs The collection to search the element
+     * @param <T>    Target type to cast to
+     * @param <Z>    Base type to compare on, to help also search in generics based collections (e.g. Collection[OnPartDefinition])
+     * @return null if the element was not found in the collection
+     */
+    static <T extends Z, Z extends DefinitionElement> T findDefinition(T mine, Collection<Z> theirs) {
+        for (Z his : theirs) {
+            if (mine.hasMatchingIdentifier(his)) {
+                return (T) his; // Cast is ok, because it is checked inside the similarDefinition method to be the same class.
+            }
+        }
+        return null;
+    }
 }

@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.instance.sentry;
 
-import org.cafienne.cmmn.definition.XMLElementDefinition;
+import org.cafienne.cmmn.definition.DefinitionElement;
 import org.cafienne.cmmn.definition.sentry.CaseFileItemOnPartDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.definition.sentry.OnPartDefinition;
@@ -223,7 +223,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
 
     private void migrateCaseFileItemOnPart(CaseFileItemOnPart onPart, D newDefinition, boolean skipLogic) {
         CaseFileItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
-        CaseFileItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
+        CaseFileItemOnPartDefinition newOnPartDefinition = DefinitionElement.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
         if (newOnPartDefinition != null) {
             onPart.migrateDefinition(newOnPartDefinition, skipLogic);
         } else {
@@ -234,7 +234,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
 
     private void migratePlanItemOnPart(PlanItemOnPart onPart, D newDefinition, boolean skipLogic) {
         PlanItemOnPartDefinition existingOnPartDefinition = onPart.getDefinition();
-        PlanItemOnPartDefinition newOnPartDefinition = XMLElementDefinition.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
+        PlanItemOnPartDefinition newOnPartDefinition = DefinitionElement.findDefinition(existingOnPartDefinition, newDefinition.getSentryDefinition().getOnParts());
         if (newOnPartDefinition != null) {
             onPart.migrateDefinition(newOnPartDefinition, skipLogic);
         }

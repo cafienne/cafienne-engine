@@ -63,7 +63,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Returns the name of the element. Can be used in combination with the id of the element to resolve an XSD IDREF to this element.
-     *
      */
     @Override
     public String getName() {
@@ -378,7 +377,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
 
     /**
      * Parses the attribute name into a string, or provides the default value if the attribute is not found.
-     *
      */
     protected String parseAttribute(String attributeName, boolean presenceRequired, String... defaultValue) {
         if (element != null && element.hasAttribute(attributeName)) {
@@ -428,31 +426,26 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      * @return
      */
     public boolean sameIdentifiers(XMLElementDefinition other) {
-        return sameName(other)
-                && sameId(other);
+        return sameName(other) && sameId(other);
+    }
+
+    public boolean similarIdentifiers(XMLElementDefinition other) {
+        return sameId(other) || sameName(other);
     }
 
     @Override
-    public boolean differs(Object object) {
+    public final boolean differs(DefinitionElement object) {
         return !equalsWith(object);
     }
 
     /**
      * Custom compare method. Comparable to Object.equals(), but elements are expected
      * to implement a semantic comparison.
-     *
-     * @param object
-     * @return
      */
     public abstract boolean equalsWith(Object object);
 
     /**
      * This checks that other has Class[E] and invokes the matcher on it
-     *
-     * @param object
-     * @param matcher
-     * @param <E>
-     * @return
      */
     protected <E extends XMLElementDefinition> boolean equalsWith(Object object, DefinitionComparer<E> matcher) {
 //        System.out.println("Running EW WIHT MATCHER ON A " + this.getClass().getSimpleName() +" with name " + getName());
@@ -472,24 +465,6 @@ public abstract class XMLElementDefinition implements DefinitionElement {
     private static String indent = "";
 
     /**
-     * Find an equal definition in the collection, using the equalsWith method.
-     *
-     * @param mine   The element that we want to find an alternative for
-     * @param theirs The collection to search the element
-     * @param <T>    Target type to cast to
-     * @param <Z>    Base type to compare on, to help also search in generics based collections (e.g. Collection[OnPartDefinition])
-     * @return Null if the element was not found in the collection
-     */
-    public static <T extends Z, Z extends XMLElementDefinition> T findDefinition(T mine, Collection<Z> theirs) {
-        for (Z his : theirs) {
-            if (mine.equalsWith(his)) {
-                return (T) his; // Cast is ok, because it is checked inside the equalsWith method to be the same class.
-            }
-        }
-        return null;
-    }
-
-    /**
      * Check equality of both collections
      *
      * @param ours   Source to compare
@@ -502,7 +477,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
             return false;
         }
         for (X mine : ours) { // Iterate all our elements, and check if there is one that does not match any of theirs. If so, return false.
-            if (findDefinition(mine, theirs) == null) {
+            if (DefinitionElement.findDefinition(mine, theirs) == null) {
                 return false;
             }
         }
@@ -514,6 +489,7 @@ public abstract class XMLElementDefinition implements DefinitionElement {
      * Done through regular null check and then invoking the equalsWith method.
      */
     protected <X extends XMLElementDefinition> boolean same(X obj1, X obj2) {
+//        if (obj1 != null) System.out.println("Calling s on " + obj1.getClass().getSimpleName());
         return obj1 == null && obj2 == null || obj1 != null && obj2 != null && obj1.equalsWith(obj2);
     }
 

@@ -46,7 +46,7 @@ public abstract class PlanFragmentDefinition extends PlanItemDefinitionDefinitio
     }
 
     public SentryDefinition getSentry(String identifier) {
-        return sentries.stream().filter(s -> s.getName().equals(identifier) || s.getId().equals(identifier)).findFirst().orElse(null);
+        return sentries.stream().filter(s -> s.hasIdentifier(identifier)).findFirst().orElse(null);
     }
 
     public Collection<PlanItemDefinition> getPlanItems() {
@@ -60,7 +60,7 @@ public abstract class PlanFragmentDefinition extends PlanItemDefinitionDefinitio
      * @return
      */
     public PlanItemDefinition getPlanItem(String identifier) {
-        return planItems.stream().filter(p -> p.getId().equals(identifier) || p.getName().equals(identifier)).findFirst().orElse(null);
+        return planItems.stream().filter(p -> p.hasIdentifier(identifier)).findFirst().orElse(null);
     }
 
     /**

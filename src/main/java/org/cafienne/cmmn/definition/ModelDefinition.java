@@ -106,7 +106,7 @@ public abstract class ModelDefinition extends CMMNElementDefinition {
      * @return
      */
     public <T extends CMMNElementDefinition> T getElement(String identifier) {
-        return findElement(element -> element.getName().equals(identifier) || element.getId().equals(identifier));
+        return findElement(element -> element.hasIdentifier(identifier));
     }
 
     @Override

@@ -91,7 +91,7 @@ public class CaseTeamDefinition extends CMMNElementDefinition {
      * @return
      */
     public CaseRoleDefinition getCaseRole(String roleName) {
-        return caseRoles.stream().filter(r -> r.getName().equals(roleName) || r.getId().equals(roleName)).findFirst().orElse(null);
+        return caseRoles.stream().filter(r -> r.hasIdentifier(roleName)).findFirst().orElse(null);
     }
 
     /**

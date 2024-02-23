@@ -422,7 +422,7 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private boolean doesNotHaveChild(PlanItemDefinition newChildDefinition) {
-        boolean notHasChild = this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().getId().equals(newChildDefinition.getId()) || item.getName().equals(newChildDefinition.getName()));
+        boolean notHasChild = this.getPlanItems().stream().noneMatch(item -> item.getItemDefinition().hasMatchingIdentifier(newChildDefinition));
         if (notHasChild) {
             addDebugInfo(() -> this + ": migration found a new child definition " + newChildDefinition.getName() + " of type " + newChildDefinition.getType());
         }
