@@ -85,6 +85,11 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
      */
     void activate(OnPart<?, ?, ?> activator) {
         inactiveOnParts.remove(activator);
+        if (getCaseInstance().recoveryRunning()) {
+            // Only invoke the logic below when recovery finished - this to avoid downstream behavior during recovery.
+            // For example ifPart evaluation, or creation of repeated items (that have already been created ...)
+            return;
+        }
         if (inactiveOnParts.isEmpty()) {
             addDebugInfo(() -> this + " has become active", this.toJson());
         } else {
@@ -92,10 +97,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         }
         if (isSatisfied()) {
             isActive = true;
-            if (getCaseInstance().recoveryFinished()) {
-                // Only invoke transitions when recovery finished - this to avoid downstream behavior during recovery.
-                listener.satisfy(this);
-            }
+            listener.satisfy(this);
         }
     }
 
