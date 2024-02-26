@@ -90,7 +90,7 @@ public class CaseDefinition extends ModelDefinition implements TaskImplementatio
 
     PlanItemDefinitionDefinition findPlanItemDefinition(String identifier) {
         Collection<PlanItemDefinitionDefinition> planItemDefinitions = getCasePlanModel().getPlanItemDefinitions();
-        return planItemDefinitions.stream().filter(p -> p.getId().equals(identifier) || p.getName().equals(identifier)).findFirst().orElse(null);
+        return planItemDefinitions.stream().filter(p -> p.hasIdentifier(identifier)).findFirst().orElse(null);
     }
 
     /**
@@ -104,7 +104,7 @@ public class CaseDefinition extends ModelDefinition implements TaskImplementatio
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameCaseDefinition);
     }
 

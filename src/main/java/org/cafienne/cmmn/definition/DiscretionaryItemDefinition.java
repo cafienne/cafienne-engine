@@ -216,7 +216,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
 
     @Override
     protected DiscretionaryItemDefinition getDiscretionaryItem(String identifier) {
-        if (getName().equals(identifier) || getId().equals(identifier)) {
+        if (this.hasIdentifier(identifier)) {
             return this; // We're the one.
         }
         return null;
@@ -229,7 +229,7 @@ public class DiscretionaryItemDefinition extends TableItemDefinition implements 
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameDiscretionaryItem);
     }
 

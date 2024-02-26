@@ -36,7 +36,7 @@ public class CaseFileItemCollectionDefinition extends CMMNElementDefinition {
     }
 
     public CaseFileItemDefinition getChild(String identifier) {
-        return getChildren().stream().filter(i -> i.getName().equals(identifier) || i.getId().equals(identifier)).findFirst().orElse(null);
+        return getChildren().stream().filter(i -> i.hasIdentifier(identifier)).findFirst().orElse(null);
     }
 
     /**
@@ -80,7 +80,7 @@ public class CaseFileItemCollectionDefinition extends CMMNElementDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameCollection);
     }
 

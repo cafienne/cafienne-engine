@@ -43,7 +43,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
      * @return
      */
     ApplicabilityRuleDefinition getApplicabilityRule(String identifier) {
-        return ruleDefinitions.stream().filter(s -> s.getName().equals(identifier) || s.getId().equals(identifier)).findFirst().orElse(null);
+        return ruleDefinitions.stream().filter(s -> s.hasIdentifier(identifier)).findFirst().orElse(null);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class PlanningTableDefinition extends TableItemDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::samePlanningTable);
     }
 

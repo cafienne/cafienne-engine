@@ -78,7 +78,7 @@ public class CasePlanDefinition extends StageDefinition implements ItemDefinitio
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameCasePlan);
     }
 

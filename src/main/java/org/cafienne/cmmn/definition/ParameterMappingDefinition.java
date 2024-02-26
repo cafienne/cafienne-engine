@@ -158,12 +158,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
      * @return
      */
     private <T extends ParameterDefinition> ParameterDefinition findParameter(Map<String, T> definitions, String identifier) {
-        ParameterDefinition p = definitions.values().stream().filter(i -> {
-            String name = i.getName();
-            String id = i.getId();
-            return name.equals(identifier) || id.equals(identifier);
-        }).findFirst().orElse(null);
-        return p;
+        return definitions.values().stream().filter(i -> i.hasIdentifier(identifier)).findFirst().orElse(null);
     }
 
     /**
@@ -244,7 +239,7 @@ public class ParameterMappingDefinition extends CMMNElementDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameMapping);
     }
 

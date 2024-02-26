@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Parsed structure of a case team, i.e. the roles defined in a case definition
@@ -92,7 +91,7 @@ public class CaseTeamDefinition extends CMMNElementDefinition {
      * @return
      */
     public CaseRoleDefinition getCaseRole(String roleName) {
-        return caseRoles.stream().filter(r -> r.getName().equals(roleName) || r.getId().equals(roleName)).findFirst().orElse(null);
+        return caseRoles.stream().filter(r -> r.hasIdentifier(roleName)).findFirst().orElse(null);
     }
 
     /**
@@ -131,7 +130,7 @@ public class CaseTeamDefinition extends CMMNElementDefinition {
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameTeam);
     }
 

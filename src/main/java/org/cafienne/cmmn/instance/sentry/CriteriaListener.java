@@ -17,8 +17,8 @@
 
 package org.cafienne.cmmn.instance.sentry;
 
+import org.cafienne.cmmn.definition.DefinitionElement;
 import org.cafienne.cmmn.definition.ItemDefinition;
-import org.cafienne.cmmn.definition.XMLElementDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.PlanItem;
@@ -103,7 +103,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
 
     private void migrateCriterion(C criterion, Collection<T> newDefinitions, boolean skipLogic) {
         T oldDefinition = criterion.getDefinition();
-        T newDefinition = XMLElementDefinition.findDefinition(oldDefinition, newDefinitions);
+        T newDefinition = DefinitionElement.findDefinition(oldDefinition, newDefinitions);
         if (newDefinition != null) {
             criterion.migrateDefinition(newDefinition, skipLogic);
         } else {

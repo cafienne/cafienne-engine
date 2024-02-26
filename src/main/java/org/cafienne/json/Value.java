@@ -32,7 +32,7 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.time.Instant;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -225,8 +225,8 @@ public abstract class Value<T> implements Serializable {
             return valueList;
         } else if (object instanceof CafienneJson) {
             return ((CafienneJson) object).toValue();
-        } else if (object instanceof List) {
-            List<?> list = (List<?>) object;
+        } else if (object instanceof Collection) {
+            Collection<?> list = (Collection<?>) object;
             ValueList valueList = new ValueList();
             for (Object element : list) {
                 valueList.add(convert(element));

@@ -23,13 +23,8 @@ import org.cafienne.cmmn.definition.parameter.OutputParameterDefinition;
 import org.cafienne.cmmn.definition.task.TaskImplementationContract;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.instance.WorkflowTask;
-import org.cafienne.json.JSONParseFailure;
-import org.cafienne.json.JSONReader;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.Value;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -96,7 +91,7 @@ public class WorkflowTaskDefinition extends CMMNElementDefinition implements Tas
     }
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameWorkflow);
     }
 

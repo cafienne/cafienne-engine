@@ -110,7 +110,7 @@ public abstract class TaskDefinition<T extends TaskImplementationContract> exten
     abstract T getImplementationDefinition();
 
     @Override
-    protected boolean equalsWith(Object object) {
+    public boolean equalsWith(Object object) {
         return equalsWith(object, this::sameTask);
     }
 

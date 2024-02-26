@@ -42,7 +42,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * If the plan item repeats, each item has 1 higher index (0, 1, 2, ...)
      */
     private final int index;
-    private final Path path;
+    private Path path;
     /**
      * Stage to which this plan item belongs (null for CasePlan)
      */
@@ -590,6 +590,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
         super.migrateDefinition(newDefinition, skipLogic);
         setItemDefinition(newItemDefinition);
+        // Also update the path during migration
+        this.path = new Path(this);
         if (!skipLogic && getState().isCreated()) {
             if (hasNewNameOrId()) {
                 // Add a migration event if name or id has changed

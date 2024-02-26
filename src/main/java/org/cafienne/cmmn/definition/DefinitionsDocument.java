@@ -269,7 +269,7 @@ public class DefinitionsDocument implements Serializable {
      * @return
      */
     public <T extends CMMNElementDefinition> T getElement(String guid, Class<T> tClass) {
-        return findElement(e -> (e.getId().equals(guid) || e.getName().equals(guid)) && tClass.isAssignableFrom(e.getClass()));
+        return findElement(e -> e.hasIdentifier(guid) && tClass.isAssignableFrom(e.getClass()));
     }
 
     private Collection<String> getDefinitionErrors() {
@@ -290,7 +290,7 @@ public class DefinitionsDocument implements Serializable {
 
     private <T extends ModelDefinition> T getDefinition(Class<T> typeClass, String identifier) {
         for (ModelDefinition definition : getDefinitions()) {
-            if (definition.getName().equals(identifier) || definition.getId().equals(identifier)) {
+            if (definition.hasIdentifier(identifier)) {
                 if (typeClass.isAssignableFrom(definition.getClass())) {
                     @SuppressWarnings("unchecked") // We just did the checking, right?!
                     T typedDefinition = (T) definition;
