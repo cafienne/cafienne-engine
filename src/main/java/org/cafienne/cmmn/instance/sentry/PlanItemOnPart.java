@@ -85,7 +85,9 @@ public class PlanItemOnPart extends OnPart<PlanItemOnPartDefinition, PlanItemTra
         }
 
         // Only connect if the plan item has the same definition as our source definition.
-        if (!getDefinition().getSourceDefinition().equals(potentialNewSource.getItemDefinition())) {
+        //  NOTE: due to migration, it can be that the definition of the potential new source is already a new one.
+        //   Therefore, we no longer compare with Object.equals, but with DefinitionElement.differs (semantic comparison).
+        if (!getDefinition().getSourceDefinition().samePath(potentialNewSource.getItemDefinition())) {
             return;
         }
 
