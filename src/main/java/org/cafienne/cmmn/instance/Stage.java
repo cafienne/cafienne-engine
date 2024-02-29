@@ -396,26 +396,10 @@ public class Stage<T extends StageDefinition> extends TaskStage<T> {
     }
 
     private void migrateChild(PlanItem<?> child, boolean skipLogic) {
-        String childDefinitionId = child.getItemDefinition().getId();
-        String childName = child.getItemDefinition().getName();
-
-        // Figure out if we can find a new definition for the child
-        ItemDefinition newChildItemDefinition = getDefinition().getPlanItem(childDefinitionId);
-        if (newChildItemDefinition == null) {
-            // Perhaps get by name?
-            newChildItemDefinition = getDefinition().getPlanItem(childName);
-            if (newChildItemDefinition == null) {
-                // Perhaps it is a discretionary item?
-                newChildItemDefinition = getDefinition().getDiscretionaryItem(childDefinitionId);
-                if (newChildItemDefinition == null) {
-                    newChildItemDefinition = getDefinition().getDiscretionaryItem(childName);
-                }
-            }
-        }
-
-        // If we found a new definition, let's migrate it; otherwise tell the child to get lost.
-        if (newChildItemDefinition != null) {
-            migrateChild(child, newChildItemDefinition, skipLogic);
+        ItemDefinition childDefinition = child.getItemDefinition();
+        ItemDefinition newDefinition = DefinitionElement.findDefinition(childDefinition, getDefinition().getItemDefinitions());
+        if (newDefinition != null) {
+            migrateChild(child, newDefinition, skipLogic);
         } else {
             dropChild(child);
         }
