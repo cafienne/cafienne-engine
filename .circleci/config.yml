@@ -3,7 +3,7 @@ jobs:
   branch-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-2204:2022.04.1
+      image: ubuntu-2204:2023.04.2
     resource_class: large
     steps:
       - build-preparation
@@ -16,7 +16,7 @@ jobs:
   main-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-2204:2022.04.1
+      image: ubuntu-2204:2023.04.2
     resource_class: large
     steps:
       - build-preparation
@@ -47,7 +47,7 @@ jobs:
   release-build:
     working_directory: ~/cafienne-engine
     machine:
-      image: ubuntu-2204:2022.04.1
+      image: ubuntu-2204:2023.04.2
     resource_class: large
     steps:
       - build-preparation
