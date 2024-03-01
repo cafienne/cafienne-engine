@@ -118,6 +118,11 @@ public class PlanItemEntry extends CriteriaListener<EntryCriterionDefinition, En
         if (skipLogic) {
             return;
         }
+        // If we're already disconnected we should not try to begin our lifecycle
+        //  (in that situation our criteria are always empty)
+        if (isDisconnected()) {
+            return;
+        }
         if (criteria.isEmpty()) {
             beginLifeCycle();
         }

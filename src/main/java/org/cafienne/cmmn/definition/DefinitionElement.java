@@ -91,36 +91,33 @@ public interface DefinitionElement {
      */
     boolean equalsWith(Object object);
 
-    default boolean sameName(XMLElementDefinition other) {
+    default boolean sameName(DefinitionElement other) {
         return same(getName(), other.getName());
     }
 
-    default boolean sameId(XMLElementDefinition other) {
+    default boolean sameId(DefinitionElement other) {
         return same(this.getId(), other.getId());
     }
 
     /**
-     * Check whether name and id match on the other element.
+     * Check whether both name and id match on the other element.
      */
-    default boolean sameIdentifiers(XMLElementDefinition other) {
+    default boolean sameIdentifiers(DefinitionElement other) {
         return sameName(other) && sameId(other);
     }
 
-    default boolean similarIdentifiers(XMLElementDefinition other) {
+    /**
+     * Check whether either name or id matches the other element.
+     */
+    default boolean hasMatchingIdentifier(DefinitionElement other) {
         return sameId(other) || sameName(other);
     }
+
     /**
      * Returns true if this element has the identifier in its name or id attribute.
      */
     default boolean hasIdentifier(String identifier) {
         return this.getId().equals(identifier) || this.getName().equals(identifier);
-    }
-
-    /**
-     * Returns true if the other DefinitionElement has the same name or the same id.
-     */
-    default boolean hasMatchingIdentifier(DefinitionElement other) {
-        return this.getId().equals(other.getId()) || this.getName().equals(other.getName());
     }
 
     /**

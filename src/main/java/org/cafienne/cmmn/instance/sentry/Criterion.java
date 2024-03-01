@@ -60,7 +60,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
         }
         // Add ourselves to the sentry network
         getCaseInstance().getSentryNetwork().add(this);
-        // Tell our onparts to connect to the case network
+        // Tell our on parts to connect to the case network
         onParts.forEach(OnPart::connectToCase);
     }
 
@@ -220,7 +220,7 @@ public abstract class Criterion<D extends CriterionDefinition> extends CMMNEleme
                 migratePlanItemOnPart((PlanItemOnPart) onPart, newDefinition, skipLogic);
             }
         });
-        addDebugInfo(() -> "Migrated " + this);
+        addDebugInfo(() -> " - migrated " + this);
     }
 
     private void migrateCaseFileItemOnPart(CaseFileItemOnPart onPart, D newDefinition, boolean skipLogic) {

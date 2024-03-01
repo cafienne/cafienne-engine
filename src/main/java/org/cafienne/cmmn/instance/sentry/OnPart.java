@@ -43,16 +43,19 @@ public abstract class OnPart<T extends OnPartDefinition, E extends StandardEvent
 
     @Override
     public String toString() {
-        String printedItems = connectedItems.isEmpty() ? "No items '" + getSourceName() + "' connected" : connectedItems.stream().map(item -> item.getPath().toString()).collect(Collectors.joining(","));
-        return getStandardEvent() + " of " + printedItems;
+        String printedItems = connectedItems.isEmpty() ? "" : ": [" + connectedItems.stream().map(item -> item.getPath().getPart()).collect(Collectors.joining(",")) + "]";
+        return getStandardEvent() + " of " + getSourceType() + "[" + getSourceName() + "] - connected to " + connectedItems.size() + " items" + printedItems;
     }
 
     /**
      * Used for logging.
-     * @return
      */
     protected String getSourceName() {
         return getDefinition().getSourceDefinition().getName();
+    }
+
+    protected String getSourceType() {
+        return getDefinition().getSourceDefinition().getType();
     }
 
     abstract Enum<?> getStandardEvent();
@@ -69,6 +72,7 @@ public abstract class OnPart<T extends OnPartDefinition, E extends StandardEvent
 
     /**
      * Determine whether this on part wants to listen to transitions in the case file item, and if so, connect to it.
+     *
      * @param caseFileItem Item to potentially connect to
      */
     protected void establishPotentialConnection(CaseFileItem caseFileItem) {
@@ -83,6 +87,7 @@ public abstract class OnPart<T extends OnPartDefinition, E extends StandardEvent
 
     /**
      * Determine whether this on part wants to listen to transitions in the plan item, and if so, connect to it.
+     *
      * @param planItem Item to potentially connect to
      */
     protected void establishPotentialConnection(PlanItem<?> planItem) {

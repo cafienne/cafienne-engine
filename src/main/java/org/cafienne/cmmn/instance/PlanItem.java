@@ -48,7 +48,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      */
     private final Stage<?> stage;
     /**
-     * The actual plan item definition (or discretionary item definition, or caseplan definition).
+     * The actual plan item definition (or discretionary item definition, or case plan definition).
      */
     private ItemDefinition itemDefinition;
     /**
@@ -64,7 +64,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
      * Our entry and exit and reactivating criteria (i.e., to plan items and case file items of interest to us)
      */
     private final PlanItemEntry entryCriteria;
-    private final PlanItemReactivator reactivators;
+    private final PlanItemReactivation reactivationCriteria;
     private final PlanItemExit exitCriteria;
     /**
      * Whether we repeat or not
@@ -88,14 +88,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Constructor for CasePlan (and Stages also use it)
-     *
-     * @param id
-     * @param index
-     * @param itemDefinition
-     * @param definition
-     * @param caseInstance
-     * @param parent
-     * @param stateMachine
      */
     protected PlanItem(String id, int index, ItemDefinition itemDefinition, T definition, Case caseInstance, Stage<?> parent, StateMachine stateMachine) {
         super(caseInstance, definition);
@@ -106,7 +98,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         this.path = new Path(this);
         this.stateMachine = stateMachine;
         this.entryCriteria = new PlanItemEntry(this);
-        this.reactivators = new PlanItemReactivator(this);
+        this.reactivationCriteria = new PlanItemReactivation(this);
         this.exitCriteria = new PlanItemExit(this);
 
         addDebugInfo(() -> "Constructing plan item " + this + " with id " + id + (getStage() == null ? " in case" : " in " + getStage()));
@@ -131,7 +123,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         addDebugInfo(() -> "Connecting plan item " + this + " with id " + id + " to the sentry network");
         startListening();
 
-        // Trigger the Create transition.
+        // Trigger the "Create" transition.
         makeTransition(Transition.Create);
     }
 
@@ -140,13 +132,13 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         getCaseInstance().getSentryNetwork().connect(this);
         // Now register our criteria with the sentry network so that they get informed about transitions.
         entryCriteria.startListening();
-        reactivators.startListening();
+        reactivationCriteria.startListening();
         exitCriteria.startListening();
     }
 
     protected void stopListening() {
         entryCriteria.stopListening();
-        reactivators.stopListening();
+        reactivationCriteria.stopListening();
         exitCriteria.stopListening();
     }
 
@@ -164,8 +156,8 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Repeats the plan item upon it's Completion or Termination, and only if there are no entry criteria.
-     * Additionally checks that the containing stage is still active.
+     * Repeats the plan item upon its Completion or Termination, and only if there are no entry criteria.
+     * Additionally, checks that the containing stage is still active.
      */
     void repeat(String msg) {
         addDebugInfo(() -> this + ": initiating repeat logic because " + msg);
@@ -198,9 +190,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Tries to set a lock for the next transition
-     *
-     * @param transition
-     * @return
      */
     protected boolean prepareTransition(Transition transition) {
         if (nextTransition != Transition.None) {
@@ -215,15 +204,12 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Determine whether the transition is allowed;
      * Typically: when a task completes with output parameters,
-     * these get reflected back into the casefile. This in itself may trigger
+     * these get reflected back into the case file. This in itself may trigger
      * a criterion, which may e.g. invoke a Terminate transition on the completing task, which then
      * coincides with the Complete transition. First the output parameter is set in the case file,
-     * then the Task.complete transition is invoked. Completion of the task now invokes prepareTransition,
+     * then the "Task.complete" transition is invoked. Completion of the task now invokes prepareTransition,
      * and thereby acquires a "transition lock", which then makes the terminating criterion on that task
      * await the completion. Or better: it does not await completion, but is simply ignored.
-     *
-     * @param transition
-     * @return
      */
     private boolean hasLock(Transition transition) {
         if (nextTransition != Transition.None && !nextTransition.equals(transition)) {
@@ -269,8 +255,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the current state of the item
-     *
-     * @return
      */
     public State getState() {
         return state;
@@ -278,8 +262,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the previous state this item was in.
-     *
-     * @return
      */
     public State getHistoryState() {
         return historyState;
@@ -287,8 +269,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the last transition that this plan item went through
-     *
-     * @return
      */
     public Transition getLastTransition() {
         return lastTransition;
@@ -300,24 +280,27 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Returns the collection of entry criteria for this plan item
-     *
-     * @return
      */
     public PlanItemEntry getEntryCriteria() {
         return entryCriteria;
     }
 
     /**
+     * Returns the collection of reactivation criteria for this plan item
+     */
+    public PlanItemReactivation getReactivationCriteria() {
+        return reactivationCriteria;
+    }
+
+    /**
      * Returns the collection of exit criteria for this plan item
-     *
-     * @return
      */
     public PlanItemExit getExitCriteria() {
         return exitCriteria;
     }
 
     /**
-     * Evaluates the repetition rule on the plan item. Typically done when the plan item goes into Active state
+     * Evaluates the repetition rule on the plan item. Typically, done when the plan item goes into Active state
      */
     void evaluateRepetitionRule(boolean firstEvaluation) {
         boolean newRuleOutcome = getItemDefinition().getPlanItemControl().getRepetitionRule().evaluate(this);
@@ -329,7 +312,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Evaluates the required rule on the plan item. Typically done when the plan item goes into Active state
+     * Evaluates the required rule on the plan item. Typically, done when the plan item goes into Active state
      */
     void evaluateRequiredRule() {
         boolean required = getItemDefinition().getPlanItemControl().getRequiredRule().evaluate(this);
@@ -337,7 +320,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     /**
-     * Evaluates the manual activation rule on the plan item. Typically done when the plan item is created. Returns the required transition to be executed on the plan item: Enable if manual activation
+     * Evaluates the manual activation rule on the plan item. Typically, done when the plan item is created. Returns the required transition to be executed on the plan item: Enable if manual activation
      * resulted in true, Start when it resulted in false.
      */
     Transition evaluateManualActivationRule() {
@@ -347,8 +330,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
 
     /**
      * Determines whether this plan item is required or not. Influences stage completion rules
-     *
-     * @return
      */
     public boolean isRequired() {
         return requiredRuleOutcome == true;
@@ -497,7 +478,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
         planItemXML.setAttribute("transition", "" + this.getLastTransition());
         planItemXML.setAttribute("history", "" + this.getHistoryState());
 
-        // Let instance append it's information.
+        // Let instance append its information.
         dumpImplementationToXML(planItemXML);
 
         entryCriteria.dumpMemoryStateToXML(planItemXML);
@@ -556,7 +537,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     /**
      * Indicates whether discretionary items are available for planning (applicable only for Stages and HumanTasks)
      *
-     * @return false if it is a milestone or eventlistener
+     * @return false if it is a milestone or event listener
      */
     protected boolean hasDiscretionaryItems() {
         return false;
@@ -587,7 +568,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     }
 
     protected void migrateItemDefinition(ItemDefinition newItemDefinition, T newDefinition, boolean skipLogic) {
-        addDebugInfo(() -> "=== Migrating " + this + " to a new definition");
+        addDebugInfo(() -> "=== Migrating definition of " + this.toDescription());
         super.migrateDefinition(newDefinition, skipLogic);
         setItemDefinition(newItemDefinition);
         // Also update the path during migration
@@ -605,6 +586,7 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
             }
         }
         getEntryCriteria().migrateCriteria(newItemDefinition, skipLogic);
+        getReactivationCriteria().migrateCriteria(newItemDefinition, skipLogic);
         getExitCriteria().migrateCriteria(newItemDefinition, skipLogic);
         addDebugInfo(() -> "=== Completed migration of " + this + "\n");
     }
@@ -620,14 +602,6 @@ public abstract class PlanItem<T extends PlanItemDefinitionDefinition> extends C
     private boolean hasNewRequiredRule() {
         ConstraintDefinition oldRequiredRule = getPreviousItemDefinition().getPlanItemControl().getRequiredRule();
         return getItemDefinition().getPlanItemControl().getRequiredRule().differs(oldRequiredRule);
-    }
-
-    @Override
-    protected boolean hasNewDefinition() {
-        // Note: We're overriding hasNewDefinition, since itemDefinition determines everything of a plan item
-        //  This includes the reference to the actual definition like TaskDefinition or StageDefinition
-        //  because these are referenced from the itemDefinition and included in the comparison
-        return previousItemDefinition != null && itemDefinition.differs(previousItemDefinition);
     }
 
     protected void lostDefinition() {

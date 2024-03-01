@@ -89,6 +89,29 @@ public class StageDefinition extends PlanFragmentDefinition {
         return diDefinition;
     }
 
+    public Collection<DiscretionaryItemDefinition> getDiscretionaryItemDefinitions() {
+        ArrayList<DiscretionaryItemDefinition> list = new ArrayList<>();
+        if (planningTable != null) {
+            list.addAll(planningTable.getDiscretionaryItemDefinitions());
+        }
+        for (PlanItemDefinition planItem : getPlanItems()) {
+            if (planItem.getPlanItemDefinition() instanceof HumanTaskDefinition) {
+                HumanTaskDefinition task = (HumanTaskDefinition) planItem.getPlanItemDefinition();
+                PlanningTableDefinition taskTable = task.getPlanningTable();
+                if (taskTable != null) {
+                    list.addAll(taskTable.getDiscretionaryItemDefinitions());
+                }
+            }
+        }
+        return list;
+    }
+
+    public Collection<ItemDefinition> getItemDefinitions() {
+        Collection<ItemDefinition> items = new ArrayList<>(getPlanItems());
+        items.addAll(getDiscretionaryItemDefinitions());
+        return items;
+    }
+
     public Collection<PlanItemDefinitionDefinition> getPlanItemDefinitions() {
         return planItemDefinitions;
     }

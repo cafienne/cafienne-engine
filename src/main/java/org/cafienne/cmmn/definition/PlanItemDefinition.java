@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -239,5 +240,60 @@ public class PlanItemDefinition extends CMMNElementDefinition implements ItemDef
                 && same(this.definition, other.definition)
                 && same(this.entryCriteria, other.entryCriteria)
                 && same(this.exitCriteria, other.exitCriteria);
+    }
+
+    /**
+     * Compare method that determines whether the ItemDefinition has the same path as this PlanItemDefinition.
+     * <p>
+     * The path matches if an element has either the same name or the same id and has the same class,
+     * and is at the same depth inside the ModelDefinition, and the parent elements match as well.
+     * Note that for some elements, name and id are irrelevant, as there can be only one instance (e.g, PlanItemControl or CaseFileDefinition).
+     */
+    public boolean samePath(ItemDefinition other) {
+        if (this == other) {
+//            System.out.println("Comparing ourselves on similarity in " + this.getClass().getSimpleName());
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+
+        if (!other.getPlanItemDefinition().getClass().equals(this.getPlanItemDefinition().getClass())) {
+            // Both must have same type (like both must be HumanTask or CaseTask or Milestone, etc.)
+            // Note: therefore this does NOT compare whether both are PlanItem or one is Discretionary and the other not.
+            return false;
+        }
+        if (!hasMatchingIdentifier(other)) {
+            return false;
+        }
+
+//        System.out.println("Determining similarity of " + this.getClass().getSimpleName());
+
+        // Now iterate the stages that we and the other belong to, and check whether they have same identifiers.
+        List<StageDefinition> ourStageChain = getStageChain(this);
+        List<StageDefinition> otherStageChain = getStageChain(other);
+        if (ourStageChain.size() != otherStageChain.size()) {
+            return false;
+        }
+        for (int i = 0; i < ourStageChain.size(); i++) {
+            StageDefinition leftStage = ourStageChain.get(i);
+            StageDefinition rightStage = otherStageChain.get(i);
+            if (!leftStage.hasMatchingIdentifier(rightStage)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<StageDefinition> getStageChain(ItemDefinition item) {
+        List<StageDefinition> chain = new ArrayList<>();
+        XMLElementDefinition parent = ((XMLElementDefinition) item).getParentElement();
+        while (parent != null && !(parent instanceof CasePlanDefinition)) {
+            if (parent instanceof StageDefinition) {
+                chain.add((StageDefinition) parent);
+            }
+            parent = parent.getParentElement();
+        }
+        return chain;
     }
 }

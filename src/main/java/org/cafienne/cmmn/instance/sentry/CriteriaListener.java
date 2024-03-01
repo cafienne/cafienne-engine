@@ -22,7 +22,6 @@ import org.cafienne.cmmn.definition.ItemDefinition;
 import org.cafienne.cmmn.definition.sentry.CriterionDefinition;
 import org.cafienne.cmmn.instance.CMMNElement;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.PlanItemEntry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,25 +32,36 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     protected final Collection<C> criteria = new ArrayList<>();
     protected final Collection<T> definitions;
     private final String logDescription;
+    private boolean isConnected = false;
 
     protected CriteriaListener(PlanItem<?> item, Collection<T> definitions) {
         super(item, item.getItemDefinition());
         this.item = item;
         this.definitions = definitions;
-        this.logDescription = getClass().getSimpleName().substring(8).toLowerCase(Locale.ROOT);
+        // LogDescription basically contains 'entry criteria', 'exit criteria', or 'reactivation criteria'
+        this.logDescription = getClass().getSimpleName().substring(8).toLowerCase(Locale.ROOT) + " criteria";
     }
 
     /**
      * Start listening to the sentry network
      */
     public void startListening() {
+        this.isConnected = true;
         this.definitions.forEach(this::addCriterion);
         if (!criteria.isEmpty()) {
-            item.getCaseInstance().addDebugInfo(() -> "Connected " + item + " to " + criteria.size() + " " + logDescription + " criteria");
+            item.getCaseInstance().addDebugInfo(() -> "Connected " + item + " to " + criteria.size() + " " + logDescription);
         }
     }
 
+    /**
+     * Indicates whether the PlanItem is no longer awaiting events on any of the criteria.
+     */
+    protected boolean isDisconnected() {
+        return !isConnected;
+    }
+
     private void addCriterion(T definition) {
+        addDebugInfo(() -> " - creating " + definition.toString());
         C criterion = createCriterion(definition);
         criteria.add(criterion);
     }
@@ -62,16 +72,15 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
      * Stop listening to the sentry network, typically when the criterion is satisfied.
      */
     public void stopListening() {
+        this.isConnected = false;
         if (!criteria.isEmpty()) {
-            addDebugInfo(() -> "Disconnecting " + item + " from " + criteria.size() + " " + logDescription + " criteria");
+            addDebugInfo(() -> "Disconnecting " + item + " from " + criteria.size() + " " + logDescription);
         }
         new ArrayList<>(criteria).forEach(this::release);
     }
 
     /**
      * Removes the criterion from our collection and tells the criterion to disconnect from the network.
-     *
-     * @param criterion
      */
     private void release(C criterion) {
         criteria.remove(criterion);
@@ -83,21 +92,24 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
     protected abstract void migrateCriteria(ItemDefinition newItemDefinition, boolean skipLogic);
 
     protected void migrateCriteria(Collection<T> newDefinitions, boolean skipLogic) {
+        if (isDisconnected()) {
+            addDebugInfo(() -> "Skipping " + logDescription + " criteria migration of " + item + " as they are disconnected");
+            return;
+        }
         addDebugInfo(() -> {
             if (criteria.isEmpty() && newDefinitions.isEmpty()) {
                 return "";
             } else {
-                String criteriaType = this instanceof PlanItemEntry ? "entry" : "exit";
-                return "Migrating " + criteriaType + " criteria of " + item;
+                return "Migrating " + logDescription + " of " + item;
             }
         });
         Collection<C> existingCriteria = new ArrayList<>(criteria);
 
         existingCriteria.forEach(criterion -> migrateCriterion(criterion, newDefinitions, skipLogic));
-        newDefinitions.stream().filter(this::hasCriterion).forEach(this::addCriterion);
+        newDefinitions.stream().filter(this::notYetHasCriterion).forEach(this::addCriterion);
     }
 
-    private boolean hasCriterion(T definition) {
+    private boolean notYetHasCriterion(T definition) {
         return this.criteria.stream().noneMatch(c -> c.getDefinition() == definition);
     }
 
@@ -109,7 +121,7 @@ public abstract class CriteriaListener<T extends CriterionDefinition, C extends 
         } else {
             // Not sure what to do here. Remove the criterion?
             // Search for a 'nearby' alternative?
-            addDebugInfo(() -> "Dropping criterion " + criterion);
+            addDebugInfo(() -> " - dropping " + criterion);
             this.release(criterion);
         }
     }

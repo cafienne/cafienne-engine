@@ -90,6 +90,17 @@ public class PlanningTableDefinition extends TableItemDefinition {
             tableItems.forEach(t -> t.evaluate(containingPlanItem, items));
         }
     }
+    public Collection<DiscretionaryItemDefinition> getDiscretionaryItemDefinitions() {
+        ArrayList<DiscretionaryItemDefinition> list = new ArrayList<>();
+        tableItems.forEach(item -> {
+            if (item instanceof PlanningTableDefinition) {
+                list.addAll(((PlanningTableDefinition) item).getDiscretionaryItemDefinitions());
+            } else {
+                list.add((DiscretionaryItemDefinition) item);
+            }
+        });
+        return list;
+    }
 
     @Override
     protected DiscretionaryItemDefinition getDiscretionaryItem(String identifier) {

@@ -59,10 +59,6 @@ public class CMMNElement<T extends DefinitionElement> {
         this.definition = newDefinition;
     }
 
-    protected boolean hasNewDefinition() {
-        return this.previousDefinition != null && this.definition.differs(previousDefinition);
-    }
-
     public Case getCaseInstance() {
         return caseInstance;
     }
