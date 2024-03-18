@@ -247,8 +247,12 @@ class TaskQueriesImpl extends TaskQueries
   }
 
   private def tenantRoleCoupledCaseRoles(user: UserIdentity): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
-    TableQuery[UserRoleTable].filter(_.userId === user.id)
-      .join(TableQuery[CaseInstanceTeamTenantRoleTable]).on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant).map(_._2)
+    tenantRoleQuery(user)
+      .join(TableQuery[CaseInstanceTeamTenantRoleTable])
+      .on((tenantRoles, caseMembership) =>
+        // Either
+        (tenantRoles._1 === caseMembership.tenantRole)
+          && tenantRoles._2 === caseMembership.tenant).map(_._2)
       .map(tenantRole => (tenantRole.caseInstanceId, tenantRole.caseRole))
   }
 
