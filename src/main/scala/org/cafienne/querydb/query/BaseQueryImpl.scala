@@ -67,7 +67,7 @@ trait BaseQueryImpl
 
     val groupMembership = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
       .join(TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id))
-      .on((casegroup, group) => casegroup.groupId === group.group && (casegroup.groupRole === group.role || group.isOwner))
+      .on((caseGroup, group) => caseGroup.groupId === group.group && (caseGroup.groupRole === group.role || group.isOwner))
       .map(_._2).map(group => (group.group, group.isOwner, group.role)) // Note: we need GROUP ownership, not case team ownership!!!
 
     val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
@@ -151,10 +151,6 @@ trait BaseQueryImpl
   /**
     * Query that validates that the user belongs to the team of the specified case, either by explicit
     * membership of the user id, or by one of the tenant roles of the user that are bound to the team of the case
-    * @param user
-    * @param caseInstanceId
-    * @param tenant
-    * @return
     */
   def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
     val groupMembership = TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id)
@@ -187,10 +183,6 @@ trait BaseQueryImpl
   /**
     * Query that validates that the user belongs to the team of the specified case,
     * and adds an optional business identifiers filter to the query.
-    * @param user
-    * @param caseInstanceId
-    * @param identifiers
-    * @return
     */
   def membershipQuery(user: UserIdentity, caseInstanceId: Rep[String], identifiers: Option[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
     if (identifiers.isEmpty) membershipQuery(user, caseInstanceId)
@@ -244,12 +236,10 @@ trait BaseQueryImpl
                         } yield f4
                     } yield f3
                 } yield f2
-            } yield f1      *
-      * @param current
-      * @param caseInstanceId
-      * @return
+            } yield f1
+      *
       */
-    def createCompositeQuery(current: Int, caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {
+    private def createCompositeQuery(current: Int, caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {
       val next = current + 1
       if (filters.size <= next) {
         for {
@@ -263,11 +253,9 @@ trait BaseQueryImpl
       }
     }
 
-    override def toString: String = {
-      s"====================== Filter[${string}]\n${filters.map(filter => s"Filter[${filter.field}]: $filter").mkString("\n")}\n========================"
-    }
+    override def toString: String = s"====================== Filter[$string]\n${filters.map(filter => s"Filter[${filter.field}]: $filter").mkString("\n")}\n========================"
 
-    def parseFilters(query: String): Seq[ParsedFilter] = {
+    private def parseFilters(query: String): Seq[ParsedFilter] = {
       // First, create a raw list of all filters given.
       val rawFilters: Seq[RawFilter] = query.split(',').toSeq.map(rawFilter => {
         if (rawFilter.isBlank) NoFilter()
@@ -311,12 +299,12 @@ trait BaseQueryImpl
     }
   }
 
-  trait RawFilter {
+  private trait RawFilter {
     protected val rawFieldName: String // Raw field name should NOT be used, only the trimmed version should be used.
     lazy val field: String = rawFieldName.trim() // Always trim field names.
   }
 
-  trait BasicValueFilter extends RawFilter {
+  private trait BasicValueFilter extends RawFilter {
     private lazy val splittedRawFilter = rawFilter.split(splitter)
     val splitter: String
     val rawFilter: String
@@ -329,19 +317,19 @@ trait BaseQueryImpl
     }
   }
 
-  case class NotValueFilter(rawFilter: String, splitter: String = "!=") extends BasicValueFilter
+  private case class NotValueFilter(rawFilter: String, splitter: String = "!=") extends BasicValueFilter
 
-  case class ValueFilter(rawFilter: String, splitter: String = "=") extends BasicValueFilter
+  private case class ValueFilter(rawFilter: String, splitter: String = "=") extends BasicValueFilter
 
-  trait ParsedFilter extends RawFilter {
+  private trait ParsedFilter extends RawFilter {
     def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq]
   }
 
-  case class NoFilter(rawFieldName: String = "") extends ParsedFilter {
-    override def toQuery(caseInstanceId: Rep[String]) = TableQuery[CaseBusinessIdentifierTable].filter(_.caseInstanceId === caseInstanceId)
+  private case class NoFilter(rawFieldName: String = "") extends ParsedFilter {
+    override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = TableQuery[CaseBusinessIdentifierTable].filter(_.caseInstanceId === caseInstanceId)
   }
 
-  case class NotFieldFilter(rawFieldName: String) extends ParsedFilter {
+  private case class NotFieldFilter(rawFieldName: String) extends ParsedFilter {
     override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {
       logger.warn(s"OPERATION NOT YET SUPPORTED: 'Field-must-NOT-be-set' filter for field $field")
       logger.whenDebugEnabled{logger.debug(s"Adding 'Field-must-NOT-be-set' filter for field $field")}
@@ -356,38 +344,34 @@ trait BaseQueryImpl
     }
   }
 
-  case class FieldFilter(rawFieldName: String) extends ParsedFilter {
+  private case class FieldFilter(rawFieldName: String) extends ParsedFilter {
     override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {
       logger.whenDebugEnabled{logger.debug(s"Adding 'Field-must-be-set' filter for field $field")}
       TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field && identifier.value.nonEmpty)
     }
   }
 
-  case class JoinedNotFilter(rawFieldName: String, values: Seq[String]) extends ParsedFilter {
+  private case class JoinedNotFilter(rawFieldName: String, values: Seq[String]) extends ParsedFilter {
     override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = values.length match {
-      case 1 => {
-        logger.whenDebugEnabled{logger.debug(s"Adding 'Field-does-not-have-value' filter $field == ${values(0)}")}
+      case 1 =>
+        logger.whenDebugEnabled{logger.debug(s"Adding 'Field-does-not-have-value' filter $field == ${values.head}")}
         TableQuery[CaseBusinessIdentifierTable]
           .filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field)
-          .filterNot(_.value === values(0))
-      }
-      case _ => {
+          .filterNot(_.value === values.head)
+      case _ =>
         logger.whenDebugEnabled{logger.debug(s"Adding 'Value-NOT-in-set' filter for field $field on values $values")}
         TableQuery[CaseBusinessIdentifierTable].filterNot(record => record.caseInstanceId === caseInstanceId && record.active === true && record.name === field && record.value.inSet(values))
-      }
     }
   }
 
-  case class OrFilter(rawFieldName: String, values: Seq[String]) extends ParsedFilter {
+  private case class OrFilter(rawFieldName: String, values: Seq[String]) extends ParsedFilter {
     override def toQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = values.length match {
-      case 1 => {
-        logger.whenDebugEnabled{logger.debug(s"Adding 'Field-has-value' filter $field == ${values(0)}")}
-        TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field && identifier.value === values(0))
-      }
-      case _ => {
+      case 1 =>
+        logger.whenDebugEnabled{logger.debug(s"Adding 'Field-has-value' filter $field == ${values.head}")}
+        TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field && identifier.value === values.head)
+      case _ =>
         logger.whenDebugEnabled{logger.debug(s"Adding 'Value-in-set' filter for field $field on values $values")}
         TableQuery[CaseBusinessIdentifierTable].filter(identifier => identifier.caseInstanceId === caseInstanceId && identifier.active === true && identifier.name === field && identifier.value.inSet(values))
-      }
     }
   }
 

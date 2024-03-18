@@ -71,7 +71,7 @@ class CaseQueriesImpl
   override def getCaseOwnership(caseInstanceId: String, user: UserIdentity): Future[CaseOwnership] = {
     val groupMembership = TableQuery[CaseInstanceTeamGroupTable].filter(_.caseInstanceId === caseInstanceId)
       .join(TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id))
-      .on((casegroup, group) => casegroup.groupId === group.group && (casegroup.groupRole === group.role || group.isOwner))
+      .on((caseGroup, group) => caseGroup.groupId === group.group && (caseGroup.groupRole === group.role || group.isOwner))
       .map(_._1)
 
     val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
@@ -90,15 +90,15 @@ class CaseQueriesImpl
     } yield (groups, roles, users)
 
     query.map(result => {
-      val groups = result._1
-      val roles = result._2
-      val users = result._3
-      if (groups.isEmpty && roles.isEmpty && users.isEmpty) {
+      val groupMemberships = result._1
+      val roleMemberships = result._2
+      val userMembership = result._3
+      if (groupMemberships.isEmpty && roleMemberships.isEmpty && userMembership.isEmpty) {
         throw CaseSearchFailure(caseInstanceId)
       }
 
-      val isOwner = groups.exists(_.isOwner) || roles.exists(_.isOwner) || users.exists(_.isOwner)
-      val tenant = (groups.map(_.tenant) ++ roles.map(_.tenant) ++ users.map(_.tenant)).toSet.head
+      val isOwner = groupMemberships.exists(_.isOwner) || roleMemberships.exists(_.isOwner) || userMembership.exists(_.isOwner)
+      val tenant = (groupMemberships.map(_.tenant) ++ roleMemberships.map(_.tenant) ++ userMembership.map(_.tenant)).toSet.head
       CaseOwnership(user.id, caseInstanceId, tenant, isOwner)
     })
   }
@@ -225,7 +225,7 @@ class CaseQueriesImpl
       baseQuery <- caseDefinitionQuery.filter(_.caseInstanceId === caseInstanceId)
       // Validate team membership
       _ <- membershipQuery(user, caseInstanceId)
-    } yield (baseQuery)
+    } yield baseQuery
 
     db.run(query.result.headOption).map {
       case Some(result) => CaseFileDocumentation(result)
@@ -272,7 +272,7 @@ class CaseQueriesImpl
 
     db.run(query.result.headOption).map {
       case None => throw PlanItemSearchFailure(planItemId)
-      case Some(record) => {
+      case Some(record) =>
         val definitionId = record._1.definitionId
         val definitionDocument = record._2.definitions
         val element: CMMNElementDefinition = definitionDocument.findElement(element => definitionId.equals(element.getId))
@@ -280,7 +280,6 @@ class CaseQueriesImpl
           case true => Documentation("")
           case _ => Documentation(element.documentation.text, element.documentation.textFormat)
         }
-      }
     }
   }
 
@@ -367,7 +366,7 @@ class CaseQueriesImpl
     })
   }
 
-  def statusFilter(status: Option[String]) = {
+  def statusFilter(status: Option[String]): Query[CaseInstanceTable, CaseRecord, Seq] = {
     // Depending on the value of the "status" filter, we have 3 different filters.
     // Reason is that admin-ui uses status=Failed for both Failed and "cases with Failures"
     //  Better approach is to simply add a failure count to the case instance and align the UI for that.
