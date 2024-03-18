@@ -74,14 +74,10 @@ class CaseQueriesImpl
       .on((caseGroup, group) => caseGroup.groupId === group.group && (caseGroup.groupRole === group.role || group.isOwner))
       .map(_._1)
 
-    val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
-      .join(TableQuery[UserRoleTable].filter(_.userId === user.id))
-      .on((left, right) => left.tenantRole === right.role_name && left.tenant === right.tenant)
-      .map(_._1)
-
+    val tenantRoleBasedMembership = tenantRoleBasedMembershipQuery(caseInstanceId, user)
     val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
+      .filter(_.caseInstanceId === caseInstanceId) // First filter on case id (probably faster than first on user id)
       .filter(_.userId === user.id)
-      .filter(_.caseInstanceId === caseInstanceId)
 
     val query = for {
       groups <- db.run(groupMembership.result)
@@ -120,13 +116,14 @@ class CaseQueriesImpl
   }
 
   override def getCaseInstance(caseInstanceId: String, user: UserIdentity): Future[Option[CaseRecord]] = {
-    //    println(s"Getting case $caseInstanceId for user ${user.id}")
+//    println(s"Getting case $caseInstanceId for user ${user.id}")
     val query = for {
       // Get the case
       baseQuery <- caseInstanceQuery.filter(_.id === caseInstanceId)
       // Access control query
       _ <- membershipQuery(user, caseInstanceId)
     } yield baseQuery
+//        println("QUERY:\n\n" + query.result.statements.mkString("\n")+"\n\n")
 
     db.run(query.result.headOption)
   }

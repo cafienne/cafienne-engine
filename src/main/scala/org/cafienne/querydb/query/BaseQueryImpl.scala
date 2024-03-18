@@ -19,7 +19,7 @@ package org.cafienne.querydb.query
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.{ConsentGroupMembership, Origin, UserIdentity}
-import org.cafienne.querydb.record.{CaseBusinessIdentifierRecord, CaseRecord, ConsentGroupMemberRecord}
+import org.cafienne.querydb.record._
 import org.cafienne.querydb.schema.table.{CaseTables, ConsentGroupTables, TaskTables, TenantTables}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -70,10 +70,7 @@ trait BaseQueryImpl
       .on((caseGroup, group) => caseGroup.groupId === group.group && (caseGroup.groupRole === group.role || group.isOwner))
       .map(_._2).map(group => (group.group, group.isOwner, group.role)) // Note: we need GROUP ownership, not case team ownership!!!
 
-    val tenantRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId)
-      .join(TableQuery[UserRoleTable].filter(_.userId === user.id))
-      .on((left, right) => left.tenantRole === right.role_name && left.tenant === right.tenant)
-      .map(_._1.tenantRole)
+    val tenantRoleBasedMembership = tenantRoleBasedMembershipQuery(caseInstanceId, user).map(_.tenantRole)
 
     val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
       .filter(_.userId === user.id)
@@ -85,6 +82,8 @@ trait BaseQueryImpl
         // Note: order matters. Putting group membership at the end generates an invalid SQL statement
         //  guess that's some kind of issue in Slick
         groupMembership.joinFull(tenantRoleBasedMembership.joinFull(userIdBasedMembership)))
+
+//    println("CASE MEMBERSHIP QUERY:\n\n" + query.result.statements.mkString("\n")+"\n\n")
     val records = db.run(query.distinct.result)
 
     records.map(x => {
@@ -148,6 +147,24 @@ trait BaseQueryImpl
     })
   }
 
+  def tenantRoleBasedMembershipQuery(caseInstanceId: Rep[String], user: UserIdentity): Query[CaseInstanceTeamTenantRoleTable, CaseTeamTenantRoleRecord, Seq] = {
+    tenantRoleQuery(user)
+      .join(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId))
+      // The tenant role must be in the case team, and also the user must have the role in the same tenant
+      .on((left, right) => (left._1 === right.tenantRole) && left._2 === right.tenant)
+      .map(_._2)
+  }
+
+  def tenantRoleQuery(user: UserIdentity): Query[(Rep[String], Rep[String]), (String, String), Seq] = {
+    val groupMemberships = TableQuery[ConsentGroupMemberTable].filter(_.userId === user.id)
+      .join(TableQuery[ConsentGroupTable])
+      .on(_.group === _.id)
+      .map(record => (record._1.role, record._2.tenant))
+    val tenantMemberships = TableQuery[UserRoleTable].filter(_.userId === user.id).map(record => (record.role_name, record.tenant))
+
+    tenantMemberships.union(groupMemberships)
+  }
+
   /**
     * Query that validates that the user belongs to the team of the specified case, either by explicit
     * membership of the user id, or by one of the tenant roles of the user that are bound to the team of the case
@@ -163,11 +180,7 @@ trait BaseQueryImpl
       })
       .map(_._2.caseInstanceId)
 
-    val tenantRoleBasedMembership = TableQuery[UserRoleTable].filter(_.userId === user.id)
-      .join(TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId))
-      // The tenant role must be in the case team, and also the user must have the role in the same tenant
-      .on((left, right) => left.role_name === right.tenantRole && left.tenant === right.tenant)
-      .map(_._2.caseInstanceId)
+    val tenantRoleBasedMembership = tenantRoleBasedMembershipQuery(caseInstanceId, user).map(_.caseInstanceId)
 
     val userIdBasedMembership = TableQuery[CaseInstanceTeamUserTable]
       .filter(_.caseInstanceId === caseInstanceId)
