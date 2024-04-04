@@ -107,12 +107,9 @@ class CaseFileProjection(batch: CaseEventBatch)(implicit val executionContext: E
 
   /**
     * Depending on the presence of CaseFileEvents this will add a new CaseFileRecord
-    *
-    * @param caseFileInProgress
-    * @return
     */
   private def getUpdatedCaseFile(caseFileInProgress: ValueMap): CaseFileRecord = {
-    bufferedCaseFileEvents.events.forEach(event => CaseFileMerger.merge(event, caseFileInProgress))
+    bufferedCaseFileEvents.update(caseFileInProgress)
     CaseFileRecord(caseInstanceId, tenant, caseFileInProgress.toString)
   }
 }
