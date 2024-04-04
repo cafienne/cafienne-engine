@@ -20,21 +20,16 @@ package org.cafienne.querydb.materializer.cases.file;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemChildRemoved;
 import org.cafienne.cmmn.actorapi.event.file.CaseFileItemTransitioned;
 import org.cafienne.cmmn.instance.Path;
+import org.cafienne.json.ValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class CaseFileEventBuffer {
-    private List<CaseFileItemTransitioned> events = new ArrayList<>();
-    private List<CaseFileItemTransitioned> removedChildren = new ArrayList<>();
+    private final List<CaseFileItemTransitioned> events = new ArrayList<>();
 
-    /**
-     * Return the list of events to be handled in the current transaction
-     * @return
-     */
-    public List<CaseFileItemTransitioned> events() {
-        events.addAll(removedChildren);
-        return events;
+    public void update(ValueMap caseFileInProgress) {
+        events.forEach(event -> CaseFileMerger.merge(event, caseFileInProgress));
     }
 
     @Override
@@ -55,16 +50,18 @@ class CaseFileEventBuffer {
      * @param newEvent
      */
     void addEvent(CaseFileItemTransitioned newEvent) {
-        // Store RemoveChild events separately
+        Path newPath = newEvent.getPath();
+
+        // New path is different for RemoveChild events
         if (newEvent instanceof CaseFileItemChildRemoved) {
-            removedChildren.add(newEvent);
-            return;
+            newPath = ((CaseFileItemChildRemoved) newEvent).getChildPath();
         }
+
         // First check to see if any of the existing events overrides our event; if so, just ignore the event.
         for (int i = 0; i < events.size(); i++) {
             CaseFileItemTransitioned current = events.get(i);
             Path currentPath = current.getPath();
-            if (currentPath.hasChild(newEvent.getPath())) {
+            if (currentPath.hasChild(newPath)) {
 //                System.out.println("Event[" + i + "] on path " + currentPath + " overrides new event on path " + newPath);
                 return;
             }
@@ -74,7 +71,6 @@ class CaseFileEventBuffer {
         for (int i = events.size() - 1 ; i >= 0 ; i--) {
             CaseFileItemTransitioned current = events.get(i);
             Path currentPath = current.getPath();
-            Path newPath = newEvent.getPath();
             if (newPath.hasChild(currentPath)) {
 //                System.out.println("Event[" + i + "] on path " + currentPath + " is overridden with new event on path " + newPath);
                 events.remove(i);
