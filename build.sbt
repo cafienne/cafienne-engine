@@ -195,7 +195,7 @@ libraryDependencies ++= Seq(
   , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
-  , "com.h2database"          %  "h2"                                   % "2.1.214"
+  , "com.h2database"          %  "h2"                                   % "2.2.220"
   , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
   , "org.postgresql"          %  "postgresql"                           % "42.5.5"
