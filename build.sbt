@@ -155,7 +155,7 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
   , "com.typesafe"            %  "config"                               % "1.4.2"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.11"
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.12"
   , "org.apache.commons"      %  "commons-text"                         % "1.10.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
@@ -195,10 +195,10 @@ libraryDependencies ++= Seq(
   , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
-  , "com.h2database"          %  "h2"                                   % "2.1.214"
+  , "com.h2database"          %  "h2"                                   % "2.2.220"
   , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "org.postgresql"          %  "postgresql"                           % "42.5.4"
+  , "org.postgresql"          %  "postgresql"                           % "42.5.5"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
   // Swagger support
