@@ -73,6 +73,12 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     }
 
     @Override
+    public void goFault(ValueMap rawOutputParameters) {
+        // Ensure faults are not accidentally invoking transformations
+        super.goFault(new ValueMap());
+    }
+
+    @Override
     protected void reactivateImplementation(ValueMap inputParameters) {
         // Only instantiate the subcase if our plan item has been started, not when it is being resumed
         CaseDefinition subCaseDefinition = getDefinition().getImplementationDefinition();
