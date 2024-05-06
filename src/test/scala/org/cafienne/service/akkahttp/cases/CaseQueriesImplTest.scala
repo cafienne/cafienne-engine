@@ -142,12 +142,12 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
 
   it should "retrieve all planItems" in {
     val res = Await.result(caseQueries.getPlanItems(planItem1_1.caseInstanceId, user), 1.second)
-    res.items.size must be (1)
-    res.items.head must be(planItem1_1)
+    res.size must be (1)
+    res.head must be(planItem1_1)
   }
 
   it should "retrieve a planItem" in {
     val res = Await.result(caseQueries.getPlanItem(planItem2_1.id, user), 1.second)
-    res.record must be(planItem2_1)
+    res must be(planItem2_1)
   }
 }

@@ -67,11 +67,13 @@ final case class CaseDefinitionRecord(caseInstanceId: String, name: String, desc
   lazy val caseDefinition: CaseDefinition = definitions.getCaseDefinition(elementId)
 }
 
-final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: String) {
-  def toValueMap: ValueMap = JSONReader.parse(data)
+final case class CaseFileRecord(caseInstanceId: String, tenant: String, data: String) extends CafienneJson {
+  override def toValue: ValueMap = JSONReader.parse(data)
 }
 
-final case class CaseBusinessIdentifierRecord(caseInstanceId: String, tenant: String, name: String, value: Option[String], active: Boolean, path: String)
+final case class CaseBusinessIdentifierRecord(caseInstanceId: String, tenant: String, name: String, value: Option[String], active: Boolean, path: String) extends CafienneJson {
+  override def toValue: Value[_] = new ValueMap("name", name, "value", value.orNull)
+}
 
 final case class CaseRoleRecord(caseInstanceId: String, tenant: String, roleName: String, assigned: Boolean = true)
 
@@ -101,9 +103,9 @@ final case class PlanItemRecord(id: String,
                                 taskInput: String = "",
                                 taskOutput: String = "",
                                 mappedInput: String = "",
-                                rawOutput: String = "") {
+                                rawOutput: String = "") extends CafienneJson {
 
-  def toValueMap: ValueMap = {
+  def toValue: ValueMap = {
     val v = new ValueMap
     v.plus("id", id)
     v.plus("caseInstanceId", caseInstanceId)

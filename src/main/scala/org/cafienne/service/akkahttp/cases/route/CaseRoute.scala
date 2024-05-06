@@ -17,7 +17,7 @@
 
 package org.cafienne.service.akkahttp.cases.route
 
-import _root_.akka.http.scaladsl.model.StatusCodes
+import _root_.akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
@@ -40,6 +40,7 @@ import org.cafienne.system.CaseSystem
 
 import java.util.UUID
 import javax.ws.rs._
+import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
@@ -153,7 +154,12 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
   @Produces(Array("application/json"))
   def getCaseDefinition: Route = get {
     caseInstanceSubRoute("definition") { (user, caseInstanceId) =>
-      runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, user))
+      readLastModifiedHeader() { lastModified =>
+        onComplete(runSyncedQuery(caseQueries.getCaseDefinition(caseInstanceId, user), lastModified)) {
+          case Success(record) => complete(StatusCodes.OK, HttpEntity(ContentTypes.`text/xml(UTF-8)`, record.content))
+          case Failure(t) => handleFailure(t)
+        }
+      }
     }
   }
 

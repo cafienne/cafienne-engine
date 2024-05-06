@@ -56,7 +56,6 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBa
   )
   @Produces(Array("application/json"))
   def getCaseEvents: Route = get {
-
     caseEventsSubRoute { caseEvents =>
       path("history" / "events") {
         onComplete(caseEvents.eventList()) {

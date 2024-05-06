@@ -55,7 +55,7 @@ class PlanItemRoute(override val caseSystem: CaseSystem) extends CasesRoute {
   def getPlanItems: Route = get {
     caseInstanceSubRoute { (user, caseInstanceId) =>
       path("planitems") {
-        runQuery(caseQueries.getPlanItems(caseInstanceId, user))
+        runListQuery(caseQueries.getPlanItems(caseInstanceId, user))
       }
     }
   }
