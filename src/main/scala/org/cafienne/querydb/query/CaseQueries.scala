@@ -23,8 +23,8 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
 import org.cafienne.querydb.query.filter.CaseFilter
+import org.cafienne.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
 import org.cafienne.querydb.record._
-import org.cafienne.service.akkahttp.cases._
 
 import scala.concurrent.Future
 

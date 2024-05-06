@@ -24,7 +24,7 @@ import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
 import org.cafienne.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
 import org.cafienne.querydb.query.exception.PlanItemSearchFailure
 import org.cafienne.querydb.record.PlanItemHistoryRecord
-import org.cafienne.service.akkahttp.cases.{CasesRoute, PlanItemHistory}
+import org.cafienne.service.akkahttp.cases.CasesRoute
 
 import scala.concurrent.Future
 

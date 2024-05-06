@@ -15,31 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases
+package org.cafienne.querydb.query.result
 
-import org.cafienne.cmmn.actorapi.command.team.CaseTeam
 import org.cafienne.cmmn.definition.casefile.{CaseFileItemCollectionDefinition, CaseFileItemDefinition}
-import org.cafienne.infrastructure.serialization.Fields
 import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
-import org.cafienne.querydb.record._
-
-final case class FullCase(caseInstance: CaseRecord, file: Option[CaseFileRecord], team: CaseTeamResponse, planitems: Seq[PlanItemRecord], identifiers: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
-  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team, "file", file.getOrElse(new ValueMap()), "planitems", planitems, "identifiers", identifiers))
-}
-
-final case class CaseTeamResponse(team: CaseTeam, caseRoles: Seq[String] = Seq(),
-                                  unassignedRoles: Seq[String] = Seq()) extends CafienneJson {
-  override def toValue: Value[_] = team.toValue.asMap.plus(Fields.caseRoles, caseRoles, Fields.unassignedRoles, unassignedRoles)
-}
-
-
+import org.cafienne.querydb.record.CaseDefinitionRecord
 
 final case class CaseFileDocumentation(record: CaseDefinitionRecord) extends CafienneJson {
   private def docs = (item: CaseFileItemDefinition) => Documentation(item.documentation.text, item.documentation.textFormat).toValue
 
   def extendList(list: ValueList, collection: CaseFileItemCollectionDefinition): ValueList = {
     collection.getChildren.forEach(item => {
-      if (! item.documentation.text.isBlank) {
+      if (!item.documentation.text.isBlank) {
         list.add(new ValueMap("path", item.getPath, "documentation", docs(item)))
       }
       extendList(list, item)
@@ -51,17 +38,4 @@ final case class CaseFileDocumentation(record: CaseDefinitionRecord) extends Caf
     val list = new ValueList
     extendList(list, record.caseDefinition.getCaseFileModel)
   }
-}
-
-final case class Documentation(text: String, textFormat: String = "text/plain") extends CafienneJson {
-  override def toValue: Value[_] = {
-    text.isBlank match {
-      case true => Value.NULL
-      case false => new ValueMap("textFormat", textFormat, "text", text)
-    }
-  }
-}
-
-final case class PlanItemHistory(records: Seq[PlanItemHistoryRecord]) extends CafienneJson {
-  override def toValue: Value[_] = Value.convert(records.map(item => item.toValue))
 }

@@ -8,6 +8,7 @@ import org.cafienne.infrastructure.config.TestConfig
 import org.cafienne.querydb.materializer.slick.SlickQueryDB
 import org.cafienne.querydb.query.CaseQueriesImpl
 import org.cafienne.querydb.query.filter.CaseFilter
+import org.cafienne.querydb.query.result.CaseList
 import org.cafienne.querydb.record.{CaseRecord, PlanItemRecord}
 import org.cafienne.querydb.schema.{QueryDB, QueryDBSchema}
 import org.scalatest.BeforeAndAfterAll
