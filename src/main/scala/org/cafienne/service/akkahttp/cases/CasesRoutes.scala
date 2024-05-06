@@ -15,11 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
-import org.cafienne.service.akkahttp.cases.route.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
+import org.cafienne.service.akkahttp.cases.deprecated.{DeprecatedCaseTeamRoute, DeprecatedPlanItemHistoryRoute}
+import org.cafienne.service.akkahttp.cases.documentation.CaseDocumentationRoute
+import org.cafienne.service.akkahttp.cases.file.CaseFileRoute
+import org.cafienne.service.akkahttp.cases.history.CaseHistoryRoute
+import org.cafienne.service.akkahttp.cases.migration.CaseMigrationRoute
+import org.cafienne.service.akkahttp.cases.plan.{DiscretionaryRoute, PlanItemRoute}
+import org.cafienne.service.akkahttp.cases.team.CaseTeamRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

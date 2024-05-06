@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases
 
 import _root_.akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
@@ -35,7 +35,7 @@ import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.cases.model.CaseAPI._
+import CaseAPIFormat._
 import org.cafienne.system.CaseSystem
 
 import java.util.UUID
@@ -169,7 +169,7 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
     description = "Returns the caseInstanceId of the started case",
     tags = Array("case"),
     responses = Array(
-      new ApiResponse(description = "Case is created and started", responseCode = "201"),
+      new ApiResponse(description = "Case is created and started", responseCode = "201", content = Array(new Content(schema = new Schema(implementation = classOf[StartCaseResponse])))),
       new ApiResponse(description = "Case definition not available", responseCode = "400"),
     )
   )

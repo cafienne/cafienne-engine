@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.model
+package org.cafienne.service.akkahttp.cases.migration
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
+import org.cafienne.service.akkahttp.cases.team.CaseTeamAPI
 
 import scala.annotation.meta.field
 

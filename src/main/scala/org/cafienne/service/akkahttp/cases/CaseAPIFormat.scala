@@ -15,15 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.model
+package org.cafienne.service.akkahttp.cases
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.infrastructure.akkahttp.EntityReader._
 import org.cafienne.json.ValueMap
+import org.cafienne.service.akkahttp.cases.team.CaseTeamAPI
 
 import scala.annotation.meta.field
 
-object CaseAPI {
+object CaseAPIFormat {
   implicit val startCaseReader: EntityReader[StartCaseFormat] = entityReader[StartCaseFormat]
 
   @Schema(description = "Start the execution of a new case")
@@ -51,6 +52,18 @@ object CaseAPI {
                               @(Schema@field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
                               debug: Option[Boolean])
 
+  @Schema(description = "Response upon successful case creation")
+  case class StartCaseResponse(
+                                @(Schema@field)(
+                                  description = "Identifier of the case that was created (this may have been generated)",
+                                  example = "3e074f00_bb0d_4858_af0f_2424f8a2043a",
+                                  implementation = classOf[String])
+                                caseInstanceId: String,
+                                @(Schema@field)(
+                                  description = "Name of the case (taken from inside the definition)",
+                                  example = "HelloWorld",
+                                  implementation = classOf[String])
+                                name: String)
 
   object Examples {
     @Schema(description = "Input parameters example json")

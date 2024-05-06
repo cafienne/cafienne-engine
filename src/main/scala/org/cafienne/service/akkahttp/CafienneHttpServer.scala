@@ -25,7 +25,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.service.akkahttp.anonymous.AnonymousRequestRoutes
-import org.cafienne.service.akkahttp.cases.route.CasesRoutes
+import org.cafienne.service.akkahttp.cases.CasesRoutes
 import org.cafienne.service.akkahttp.consentgroup.route.ConsentGroupRoutes
 import org.cafienne.service.akkahttp.debug.DebugRoute
 import org.cafienne.service.akkahttp.identifiers.route.IdentifierRoutes

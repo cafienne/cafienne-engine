@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.model
+package org.cafienne.service.akkahttp.cases.team
 
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Schema}
 import org.cafienne.actormodel.identity.Origin
-import org.cafienne.cmmn.actorapi.command.team.{CaseTeam, CaseTeamGroup, CaseTeamTenantRole, CaseTeamUser, GroupRoleMapping, UpsertMemberData}
+import org.cafienne.cmmn.actorapi.command.team._
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 import org.cafienne.service.akkahttp.ApiValidator
 

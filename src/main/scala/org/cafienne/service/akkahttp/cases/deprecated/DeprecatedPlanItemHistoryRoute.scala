@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route.deprecated
+package org.cafienne.service.akkahttp.cases.deprecated
 
 import akka.http.scaladsl.server.Route
-import org.cafienne.service.akkahttp.cases.route.CaseEventsBaseRoute
+import org.cafienne.service.akkahttp.cases.history.CaseEventsBaseRoute
 import org.cafienne.system.CaseSystem
 
 import scala.util.{Failure, Success}

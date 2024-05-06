@@ -15,16 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.model
+package org.cafienne.service.akkahttp.cases.plan
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.cafienne.infrastructure.akkahttp.EntityReader.{EntityReader, entityReader}
 
 import scala.annotation.meta.field
 
-object CasePlanAPI {
+object DiscretionaryAPIFormat {
   implicit val discretionaryItemReader: EntityReader[PlanDiscretionaryItem] = entityReader[PlanDiscretionaryItem]
-  implicit val assigneeReader: EntityReader[Assignee] = entityReader[Assignee]
 
   @Schema(description = "Add a discretionary item to the plan")
   case class PlanDiscretionaryItem(
@@ -54,6 +53,9 @@ object CasePlanAPI {
                                     planItemId: Option[String]
                                   )
 
-  @Schema(description = "Assign a task to someone")
-  case class Assignee(@(Schema @field)(description = "Assignee", required = true, implementation = classOf[String]) assignee: String)
+  case class DiscretionaryItem(name: String, definitionId: String, `type`: String, parentName: String, parentType: String, parentId: String)
+
+  case class DiscretionaryItemsList(caseInstanceId: String, discretionaryItems: Seq[DiscretionaryItem])
+
+  case class PlannedDiscretionaryItem(planItemId: String)
 }

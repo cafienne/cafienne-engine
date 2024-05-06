@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.file
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -30,6 +30,7 @@ import org.cafienne.cmmn.instance
 import org.cafienne.infrastructure.akkahttp.HttpJsonReader._
 import org.cafienne.json.Value
 import org.cafienne.service.akkahttp.Headers
+import org.cafienne.service.akkahttp.cases.CasesRoute
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

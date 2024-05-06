@@ -24,7 +24,7 @@ import org.cafienne.humantask.actorapi.command.WorkflowCommand
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.querydb.query._
 import org.cafienne.querydb.query.exception.TaskSearchFailure
-import org.cafienne.service.akkahttp.cases.route.CasesRoute
+import org.cafienne.service.akkahttp.cases.CasesRoute
 
 import scala.util.{Failure, Success}
 
