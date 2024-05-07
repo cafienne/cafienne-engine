@@ -59,7 +59,7 @@ class CaseRequestRoute(override val caseSystem: CaseSystem) extends AnonymousRou
     description = "Returns the caseInstanceId of the started case",
     tags = Array("request"),
     responses = Array(
-      new ApiResponse(description = "Case is created and started", responseCode = "201"),
+      new ApiResponse(description = "Case is created and started", responseCode = "201", content = Array(new Content(schema = new Schema(implementation = classOf[AnonymousStartCaseResponseFormat])))),
       new ApiResponse(description = "Case definition not available", responseCode = "400"),
     )
   )
