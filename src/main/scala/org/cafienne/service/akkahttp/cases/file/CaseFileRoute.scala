@@ -31,6 +31,7 @@ import org.cafienne.infrastructure.akkahttp.HttpJsonReader._
 import org.cafienne.json.Value
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.cases.CasesRoute
+import org.cafienne.service.akkahttp.cases.file.CaseFileAPIFormat.CaseFileJsonExampleFormat
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -51,7 +52,7 @@ class CaseFileRoute(override val caseSystem: CaseSystem) extends CasesRoute {
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Case file found", responseCode = "200"),
+      new ApiResponse(description = "Case file found", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseFileJsonExampleFormat])))),
       new ApiResponse(description = "No case file found for the case instance", responseCode = "404")
     )
   )
