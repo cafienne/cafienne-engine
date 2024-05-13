@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.ConsentGroupUserFormat
+import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.{ConsentGroupFormat, ConsentGroupResponseFormat, ConsentGroupUserFormat}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -46,7 +46,7 @@ class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends Cons
       new Parameter(name = "groupId", description = "The consent group to retrieve", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Consent group information", responseCode = "200"),
+      new ApiResponse(description = "Consent group information", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupResponseFormat])))),
       new ApiResponse(description = "Consent group not found", responseCode = "404"),
     )
   )
@@ -70,7 +70,7 @@ class ConsentGroupMembersRoute(override val caseSystem: CaseSystem) extends Cons
       new Parameter(name = "userId", description = "The user id to read", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "Consent group member information", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[ConsentGroupUserFormat]))))),
+      new ApiResponse(responseCode = "200", description = "Consent group member information", content = Array(new Content(schema = new Schema(implementation = classOf[ConsentGroupUserFormat])))),
       new ApiResponse(responseCode = "404", description = "Member not found"),
     )
   )
