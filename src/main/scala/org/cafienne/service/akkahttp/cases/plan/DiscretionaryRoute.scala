@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.plan
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -25,8 +25,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.plan.{AddDiscretionaryItem, GetDiscretionaryItems}
-import org.cafienne.cmmn.actorapi.response.CaseResponseModels
-import org.cafienne.service.akkahttp.cases.model.CasePlanAPI._
+import org.cafienne.service.akkahttp.cases.CasesRoute
+import org.cafienne.service.akkahttp.cases.plan.DiscretionaryAPIFormat._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -46,7 +46,7 @@ class DiscretionaryRoute(override val caseSystem: CaseSystem) extends CasesRoute
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String])),
     ),
     responses = Array(
-      new ApiResponse(description = "Items found and returned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.DiscretionaryItemsList])))),
+      new ApiResponse(description = "Items found and returned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[DiscretionaryItemsList])))),
       new ApiResponse(description = "No items found", responseCode = "404")
     )
   )
@@ -69,11 +69,11 @@ class DiscretionaryRoute(override val caseSystem: CaseSystem) extends CasesRoute
       new Parameter(name = "caseInstanceId", description = "Unique id of the case instance", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Item is planned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem])))),
+      new ApiResponse(description = "Item is planned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[PlannedDiscretionaryItem])))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
-  @RequestBody(description = "Item to be planned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseModels.PlannedDiscretionaryItem]))))
+  @RequestBody(description = "Item to be planned", required = true, content = Array(new Content(schema = new Schema(implementation = classOf[PlannedDiscretionaryItem]))))
   @Consumes(Array("application/json"))
   @Produces(Array("application/json"))
   def planDiscretionaryItem: Route = post {

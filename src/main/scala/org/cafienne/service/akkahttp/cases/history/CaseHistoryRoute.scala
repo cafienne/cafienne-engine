@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.history
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
@@ -56,7 +56,6 @@ class CaseHistoryRoute(override val caseSystem: CaseSystem) extends CaseEventsBa
   )
   @Produces(Array("application/json"))
   def getCaseEvents: Route = get {
-
     caseEventsSubRoute { caseEvents =>
       path("history" / "events") {
         onComplete(caseEvents.eventList()) {

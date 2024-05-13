@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases
+package org.cafienne.querydb.query.result
 
 import org.cafienne.json.{CafienneJson, Value, ValueMap}
 

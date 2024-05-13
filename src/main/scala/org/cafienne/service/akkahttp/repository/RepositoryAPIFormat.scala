@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.service.akkahttp.repository
 
-import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.storage.actormodel.ActorMetadata
+import io.swagger.v3.oas.annotations.media.Schema
 
-trait StorageActionStarted extends StorageEvent {
-  val children: Seq[ActorMetadata]
+import scala.annotation.meta.field
 
-  override def write(generator: JsonGenerator): Unit = {
-    super.writeStorageEvent(generator)
-    writeField(generator, Fields.children, children.map(_.toString))
-  }
+object RepositoryAPIFormat {
+  @Schema(description = "List of models in the repository of the engine")
+  case class ModelListResponseFormat(@(Schema @field)(description = "List of case models") models: Seq[ModelResponseFormat])
+
+  case class ModelResponseFormat(@(Schema @field)(description = "Name of the case model", example = "helloworld.xml") definitions: String,
+                                 @(Schema @field)(description = "Description of the case definition", example = "Greetings to the world") description: String)
+
 }

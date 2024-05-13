@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.migration
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -27,7 +27,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.cmmn.actorapi.command.migration.MigrateDefinition
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.cases.model.CaseMigrationAPI._
+import org.cafienne.service.akkahttp.cases.CasesRoute
+import CaseMigrationAPI._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

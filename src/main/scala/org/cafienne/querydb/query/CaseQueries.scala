@@ -23,8 +23,8 @@ import org.cafienne.cmmn.definition.CMMNElementDefinition
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.exception.{CaseSearchFailure, PlanItemSearchFailure}
 import org.cafienne.querydb.query.filter.CaseFilter
-import org.cafienne.querydb.record.{CaseRecord, CaseTeamGroupRecord, CaseTeamTenantRoleRecord, CaseTeamUserRecord}
-import org.cafienne.service.akkahttp.cases._
+import org.cafienne.querydb.query.result.{CaseFileDocumentation, CaseTeamResponse, Documentation, FullCase}
+import org.cafienne.querydb.record._
 
 import scala.concurrent.Future
 
@@ -35,19 +35,19 @@ trait CaseQueries {
 
   def getFullCaseInstance(caseInstanceId: String, user: UserIdentity): Future[FullCase] = ???
 
-  def getCaseDefinition(caseInstanceId: String, user: UserIdentity): Future[CaseDefinitionDocument] = ???
+  def getCaseDefinition(caseInstanceId: String, user: UserIdentity): Future[CaseDefinitionRecord] = ???
 
   def getCaseInstance(caseInstanceId: String, user: UserIdentity): Future[Option[CaseRecord]] = ???
 
-  def getCaseFile(caseInstanceId: String, user: UserIdentity): Future[CaseFile] = ???
+  def getCaseFile(caseInstanceId: String, user: UserIdentity): Future[CaseFileRecord] = ???
 
   def getCaseFileDocumentation(caseInstanceId: String, user: UserIdentity): Future[CaseFileDocumentation] = ???
 
   def getCaseTeam(caseInstanceId: String, user: UserIdentity): Future[CaseTeamResponse] = ???
 
-  def getPlanItems(caseInstanceId: String, user: UserIdentity): Future[CasePlan] = ???
+  def getPlanItems(caseInstanceId: String, user: UserIdentity): Future[Seq[PlanItemRecord]] = ???
 
-  def getPlanItem(planItemId: String, user: UserIdentity): Future[PlanItem] = ???
+  def getPlanItem(planItemId: String, user: UserIdentity): Future[PlanItemRecord] = ???
 
   def getPlanItemDocumentation(planItemId: String, user: UserIdentity): Future[Documentation] = ???
 
@@ -103,13 +103,9 @@ class CaseQueriesImpl
     val result = for {
       caseInstance <- getCaseInstance(caseInstanceId, user)
       caseTeam <- getCaseTeam(caseInstanceId, user)
-      caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption).map(f => CaseFile(f.orNull))
-      casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result).map {
-        CasePlan
-      }
-      identifiers <- db.run(caseIdentifiersQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result).map {
-        CaseIdentifiers
-      }
+      caseFile <- db.run(caseFileQuery.filter(_.caseInstanceId === caseInstanceId).result.headOption)
+      casePlan <- db.run(planItemTableQuery.filter(_.caseInstanceId === caseInstanceId).result)
+      identifiers <- db.run(caseIdentifiersQuery.filter(_.caseInstanceId === caseInstanceId).filter(_.active === true).result)
     } yield (caseInstance, caseTeam, caseFile, casePlan, identifiers)
 
     result.map(x => x._1.fold(throw CaseSearchFailure(caseInstanceId))(caseRecord => FullCase(caseRecord, file = x._3, team = x._2, planitems = x._4, identifiers = x._5)))
@@ -188,7 +184,7 @@ class CaseQueriesImpl
     records.map(tRole => CaseTeamTenantRole(tenantRoleName = tRole.tenantRole, isOwner = tRole.isOwner, caseRoles = caseRoles.filter(role => role.tenantRole == tRole.tenantRole).map(_.caseRole).toSet))
   }
 
-  override def getCaseDefinition(caseInstanceId: String, user: UserIdentity): Future[CaseDefinitionDocument] = {
+  override def getCaseDefinition(caseInstanceId: String, user: UserIdentity): Future[CaseDefinitionRecord] = {
     val query = for {
       // Get the case file
       baseQuery <- caseDefinitionQuery.filter(_.caseInstanceId === caseInstanceId)
@@ -197,12 +193,12 @@ class CaseQueriesImpl
     } yield baseQuery
 
     db.run(query.result.headOption).map {
-      case Some(result) => CaseDefinitionDocument(result)
+      case Some(result) => result
       case None => throw CaseSearchFailure(caseInstanceId)
     }
   }
 
-  override def getCaseFile(caseInstanceId: String, user: UserIdentity): Future[CaseFile] = {
+  override def getCaseFile(caseInstanceId: String, user: UserIdentity): Future[CaseFileRecord] = {
     val query = for {
       // Get the case file
       baseQuery <- caseFileQuery.filter(_.caseInstanceId === caseInstanceId)
@@ -211,7 +207,7 @@ class CaseQueriesImpl
     } yield baseQuery
 
     db.run(query.result.headOption).map {
-      case Some(result) => CaseFile(result)
+      case Some(result) => result
       case None => throw CaseSearchFailure(caseInstanceId)
     }
   }
@@ -230,7 +226,7 @@ class CaseQueriesImpl
     }
   }
 
-  override def getPlanItems(caseInstanceId: String, user: UserIdentity): Future[CasePlan] = {
+  override def getPlanItems(caseInstanceId: String, user: UserIdentity): Future[Seq[PlanItemRecord]] = {
     val query = for {
       // Get the items in the case plan
       baseQuery <- planItemTableQuery.filter(_.caseInstanceId === caseInstanceId)
@@ -240,11 +236,11 @@ class CaseQueriesImpl
 
     db.run(query.distinct.result).map(records => {
       if (records.isEmpty) throw CaseSearchFailure(caseInstanceId)
-      CasePlan(records)
+      records
     })
   }
 
-  override def getPlanItem(planItemId: String, user: UserIdentity): Future[PlanItem] = {
+  override def getPlanItem(planItemId: String, user: UserIdentity): Future[PlanItemRecord] = {
     val query = for {
       // Get the item
       baseQuery <- planItemTableQuery.filter(_.id === planItemId)
@@ -254,7 +250,7 @@ class CaseQueriesImpl
 
     db.run(query.result.headOption).map {
       case None => throw PlanItemSearchFailure(planItemId)
-      case Some(record) => PlanItem(record)
+      case Some(record) => record
     }
   }
 

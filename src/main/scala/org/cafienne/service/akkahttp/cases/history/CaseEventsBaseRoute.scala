@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.history
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
@@ -24,7 +24,7 @@ import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
 import org.cafienne.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
 import org.cafienne.querydb.query.exception.PlanItemSearchFailure
 import org.cafienne.querydb.record.PlanItemHistoryRecord
-import org.cafienne.service.akkahttp.cases.PlanItemHistory
+import org.cafienne.service.akkahttp.cases.CasesRoute
 
 import scala.concurrent.Future
 

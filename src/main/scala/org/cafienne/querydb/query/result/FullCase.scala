@@ -15,17 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.storage.actormodel.message
+package org.cafienne.querydb.query.result
 
-import com.fasterxml.jackson.core.JsonGenerator
-import org.cafienne.infrastructure.serialization.Fields
-import org.cafienne.storage.actormodel.ActorMetadata
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
+import org.cafienne.querydb.record._
 
-trait StorageActionStarted extends StorageEvent {
-  val children: Seq[ActorMetadata]
-
-  override def write(generator: JsonGenerator): Unit = {
-    super.writeStorageEvent(generator)
-    writeField(generator, Fields.children, children.map(_.toString))
-  }
+final case class FullCase(caseInstance: CaseRecord, file: Option[CaseFileRecord], team: CaseTeamResponse, planitems: Seq[PlanItemRecord], identifiers: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
+  override def toValue: Value[_] = caseInstance.toValue.merge(new ValueMap("team", team, "file", file.getOrElse(new ValueMap()), "planitems", planitems, "identifiers", identifiers))
 }

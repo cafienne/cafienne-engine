@@ -43,4 +43,12 @@ object AnonymousAPI {
                                        @(Schema@field)(description = "Indicator to start the case in debug mode", required = false, implementation = classOf[Boolean], example = "false")
                                        debug: Option[Boolean])
 
+  @Schema(description = "Response upon successful case creation")
+  case class AnonymousStartCaseResponseFormat(
+                                @(Schema@field)(
+                                  description = "Identifier of the case that was created (this may have been generated)",
+                                  example = "3e074f00_bb0d_4858_af0f_2424f8a2043a",
+                                  implementation = classOf[String])
+                                caseInstanceId: String)
+
 }

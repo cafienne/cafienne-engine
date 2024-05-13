@@ -64,14 +64,16 @@ object ConsentGroupAPI {
   case class ReplaceConsentGroupFormat(members: Seq[ConsentGroupUserFormat])
 
   case class ConsentGroupUserFormat(
-                   @(Schema @field)(implementation = classOf[String], example = "User id of the consent group member")
-                   userId: String,
-                   @(Schema @field)(description = "Optional list of roles the user has within the consent group", example = "groupRole1, groupRole2")
-                   roles: Set[String] = Set[String](),
-                   @(Schema @field)(example = "Optional indicate of consent group ownership (defaults to false)", implementation = classOf[Boolean])
-                   isOwner: Boolean = false) {
+                   @(Schema @field)(implementation = classOf[String], example = "User id of the consent group member") userId: String,
+                   @(Schema @field)(description = "Optional list of roles the user has within the consent group", example = "[groupRole1, groupRole2]") roles: Set[String] = Set[String](),
+                   @(Schema @field)(description = "Optional indicate of consent group ownership (defaults to false)", example = "false", implementation = classOf[Boolean]) isOwner: Boolean = false) {
     ApiValidator.required(userId, "Consent group users must have a userId")
     ApiValidator.requireNonNullElements(roles.toSeq, "Roles cannot be null")
     def asMember: ConsentGroupMember = ConsentGroupMember(userId, roles = roles, isOwner = isOwner)
   }
+
+  @Schema(description = "Consent Group response format")
+  case class ConsentGroupResponseFormat(@(Schema @field)(description = "Id of the group", example = "groupId") id: String,
+                                        @(Schema @field)(description = "Id of the tenant to which the group belongs", example = "tenant to which the group belongs") tenant: String,
+                                        @(Schema @field)(description = "Members of the group") members: Seq[ConsentGroupUserFormat])
 }

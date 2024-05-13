@@ -15,15 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.documentation
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.service.akkahttp.Headers
+import org.cafienne.service.akkahttp.cases.CasesRoute
+import org.cafienne.service.akkahttp.cases.documentation.DocumentationAPIFormat.{CaseFileDocumentationFormat, DocumentationResponseFormat}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -45,7 +47,7 @@ class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesR
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Plan item documentation found", responseCode = "200"),
+      new ApiResponse(description = "Plan item documentation found", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[DocumentationResponseFormat])))),
       new ApiResponse(description = "Plan item not found", responseCode = "404")
     )
   )
@@ -69,7 +71,7 @@ class CaseDocumentationRoute(override val caseSystem: CaseSystem) extends CasesR
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Case file documentation", responseCode = "200"),
+      new ApiResponse(description = "Case file documentation", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseFileDocumentationFormat]))))),
       new ApiResponse(description = "No case file found for the case instance", responseCode = "404")
     )
   )

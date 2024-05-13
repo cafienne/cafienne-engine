@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases
 
-import _root_.akka.http.scaladsl.model.StatusCodes
+import _root_.akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{Content, Schema}
+import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -35,11 +35,12 @@ import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.filter.CaseFilter
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.cases.model.CaseAPI._
+import org.cafienne.service.akkahttp.cases.CaseAPIFormat._
 import org.cafienne.system.CaseSystem
 
 import java.util.UUID
 import javax.ws.rs._
+import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")
@@ -62,7 +63,7 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
       new Parameter(name = "sortOrder", description = "Sort direction ('asc' or 'desc')", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Cases found", responseCode = "200"),
+      new ApiResponse(description = "Cases found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[CaseSummaryResponseFormat]))))),
       new ApiResponse(description = "No cases found based on query params", responseCode = "404")
     )
   )
@@ -122,7 +123,7 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
-      new ApiResponse(description = "Case found and returned", responseCode = "200"),
+      new ApiResponse(description = "Case found and returned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[CaseResponseFormat])))),
       new ApiResponse(description = "Case not found", responseCode = "404")
     )
   )
@@ -146,14 +147,19 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false)
     ),
     responses = Array(
-      new ApiResponse(description = "Case definition found and returned", responseCode = "200"),
+      new ApiResponse(description = "Case definition found and returned",  responseCode = "200", content = Array(new Content(mediaType = "text/xml", schema = new Schema(implementation = classOf[CaseDefinitionFormat])))),
       new ApiResponse(description = "Case not found", responseCode = "404")
     )
   )
-  @Produces(Array("application/json"))
+  @Produces(Array("text/xml"))
   def getCaseDefinition: Route = get {
     caseInstanceSubRoute("definition") { (user, caseInstanceId) =>
-      runXMLQuery(caseQueries.getCaseDefinition(caseInstanceId, user))
+      readLastModifiedHeader() { lastModified =>
+        onComplete(runSyncedQuery(caseQueries.getCaseDefinition(caseInstanceId, user), lastModified)) {
+          case Success(record) => complete(StatusCodes.OK, HttpEntity(ContentTypes.`text/xml(UTF-8)`, record.content))
+          case Failure(t) => handleFailure(t)
+        }
+      }
     }
   }
 
@@ -163,7 +169,7 @@ class CaseRoute(override val caseSystem: CaseSystem) extends CasesRoute with Cas
     description = "Returns the caseInstanceId of the started case",
     tags = Array("case"),
     responses = Array(
-      new ApiResponse(description = "Case is created and started", responseCode = "201"),
+      new ApiResponse(description = "Case is created and started", responseCode = "201", content = Array(new Content(schema = new Schema(implementation = classOf[StartCaseResponse])))),
       new ApiResponse(description = "Case definition not available", responseCode = "400"),
     )
   )

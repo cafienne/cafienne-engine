@@ -15,17 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.cmmn.actorapi.response
+package org.cafienne.querydb.query.result
 
-/**
-  * Case classes for response payloads of CaseCommands
-  */
-object CaseResponseModels {
-  case class StartCaseResponse(caseInstanceId: String, name: String)
+import org.cafienne.json.{CafienneJson, Value, ValueMap}
 
-  case class DiscretionaryItem(name: String, definitionId: String, `type`: String, parentName: String, parentType: String, parentId: String)
-
-  case class DiscretionaryItemsList(caseInstanceId: String, discretionaryItems: Seq[DiscretionaryItem])
-
-  case class PlannedDiscretionaryItem(planItemId: String)
+final case class Documentation(text: String, textFormat: String = "text/plain") extends CafienneJson {
+  override def toValue: Value[_] = {
+    text.isBlank match {
+      case true => Value.NULL
+      case false => new ValueMap("textFormat", textFormat, "text", text)
+    }
+  }
 }

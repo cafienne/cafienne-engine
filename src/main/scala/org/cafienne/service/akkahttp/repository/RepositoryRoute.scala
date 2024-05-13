@@ -33,6 +33,9 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.HttpXmlReader._
 import org.cafienne.infrastructure.akkahttp.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
+import org.cafienne.service.akkahttp.cases.CaseAPIFormat.CaseDefinitionFormat
+import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.ConsentGroupResponseFormat
+import org.cafienne.service.akkahttp.repository.RepositoryAPIFormat.ModelListResponseFormat
 import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
 
@@ -59,7 +62,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
       new Parameter(name = "fileName", description = "File name of the model", in = ParameterIn.PATH, schema = new Schema(implementation = classOf[String]), required = true),
     ),
     responses = Array(
-      new ApiResponse(description = "Model found and returned", responseCode = "200"),
+      new ApiResponse(description = "Model found and returned", responseCode = "200", content = Array(new Content(mediaType = "text/xml", schema = new Schema(implementation = classOf[CaseDefinitionFormat])))),
       new ApiResponse(description = "Model not found", responseCode = "404"),
     )
   )
@@ -96,7 +99,7 @@ class RepositoryRoute(override val caseSystem: CaseSystem) extends Authenticated
       new Parameter(name = "tenant", description = "Optional tenant in which to search for models", in = ParameterIn.QUERY, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "List of models returned", responseCode = "200"),
+      new ApiResponse(description = "List of models returned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[ModelListResponseFormat])))),
     )
   )
   @Consumes(Array("application/json"))

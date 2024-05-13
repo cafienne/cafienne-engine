@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.querydb.query.CaseOwnership
 import org.cafienne.querydb.query.exception.CaseSearchFailure
-import org.cafienne.service.akkahttp.cases.route.CasesRoute
+import org.cafienne.service.akkahttp.cases.CasesRoute
 import org.cafienne.service.akkahttp.tenant.route.TenantRoute
 import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}

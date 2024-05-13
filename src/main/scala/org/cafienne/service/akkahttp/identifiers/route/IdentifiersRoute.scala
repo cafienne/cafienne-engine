@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.IdentifierQueriesImpl
 import org.cafienne.querydb.query.filter.IdentifierFilter
-import org.cafienne.service.akkahttp.cases.route.CasesRoute
+import org.cafienne.service.akkahttp.cases.CasesRoute
 import org.cafienne.service.akkahttp.identifiers.model.BusinessIdentifierFormat
 import org.cafienne.system.CaseSystem
 

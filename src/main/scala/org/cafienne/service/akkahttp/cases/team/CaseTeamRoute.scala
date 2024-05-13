@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.team
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
@@ -30,7 +30,8 @@ import org.cafienne.cmmn.actorapi.command.team.removemember._
 import org.cafienne.cmmn.actorapi.command.team.setmember.{SetCaseTeamGroup, SetCaseTeamTenantRole, SetCaseTeamUser}
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.service.akkahttp.Headers
-import org.cafienne.service.akkahttp.cases.model.CaseTeamAPI._
+import org.cafienne.service.akkahttp.cases.CasesRoute
+import CaseTeamAPI._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

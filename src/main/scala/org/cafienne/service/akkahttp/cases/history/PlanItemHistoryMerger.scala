@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.service.akkahttp.cases.route
+package org.cafienne.service.akkahttp.cases.history
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.migration.PlanItemMigrated
