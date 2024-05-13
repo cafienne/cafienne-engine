@@ -19,7 +19,7 @@ package org.cafienne.service.akkahttp.tasks
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{Content, Schema}
+import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
@@ -27,6 +27,7 @@ import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.querydb.query.TaskCount
 import org.cafienne.querydb.query.filter.TaskFilter
 import org.cafienne.service.akkahttp.Headers
+import org.cafienne.service.akkahttp.tasks.TaskAPIFormat.TaskResponseFormat
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
@@ -59,7 +60,7 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Tasks found", responseCode = "200"),
+      new ApiResponse(description = "Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TaskResponseFormat]))))),
       new ApiResponse(description = "No tasks found based on query params", responseCode = "404")
     )
   )
@@ -91,7 +92,7 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Tasks found and returned", responseCode = "200"),
+      new ApiResponse(description = "Case Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TaskResponseFormat]))))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
     )
   )
@@ -115,7 +116,7 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Get after events have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String], example = "timestamp;caseInstanceId"), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Task found and returned", responseCode = "200"),
+      new ApiResponse(description = "Task found and returned", responseCode = "200", content = Array(new Content(schema = new Schema(implementation = classOf[TaskResponseFormat])))),
       new ApiResponse(description = "Task not found", responseCode = "404"),
       new ApiResponse(description = "Some processing error occurred", responseCode = "505")
     )
@@ -165,7 +166,7 @@ class TaskQueryRoutes(override val caseSystem: CaseSystem) extends TaskRoute {
       new Parameter(name = Headers.CASE_LAST_MODIFIED, description = "Only get tasks after events of this timestamp have been processed", in = ParameterIn.HEADER, schema = new Schema(implementation = classOf[String]), required = false),
     ),
     responses = Array(
-      new ApiResponse(description = "Tasks found and returned", responseCode = "200"),
+      new ApiResponse(description = "Tasks found", responseCode = "200", content = Array(new Content(array = new ArraySchema(schema = new Schema(implementation = classOf[TaskResponseFormat]))))),
       new ApiResponse(description = "Case not found", responseCode = "404"),
       new ApiResponse(description = "Some processing error occurred", responseCode = "505")
     )

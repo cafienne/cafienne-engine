@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.humantask.actorapi.command._
 import org.cafienne.infrastructure.akkahttp.HttpJsonReader._
 import org.cafienne.json.ValueMap
-import org.cafienne.service.akkahttp.tasks.model.TaskAPI._
+import org.cafienne.service.akkahttp.tasks.TaskAPIFormat._
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._
