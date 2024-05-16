@@ -19,12 +19,12 @@ package org.cafienne.service.akkahttp.consentgroup.route
 
 import akka.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
+import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
-import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.{ConsentGroupFormat, ConsentGroupResponseFormat, ConsentGroupUserFormat}
+import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.{ConsentGroupResponseFormat, ConsentGroupUserFormat}
 import org.cafienne.system.CaseSystem
 
 import javax.ws.rs._

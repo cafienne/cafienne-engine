@@ -75,7 +75,7 @@ public class CaseTask extends Task<CaseTaskDefinition> {
     @Override
     public void goFault(ValueMap rawOutputParameters) {
         // Ensure faults are not accidentally invoking transformations
-        super.goFault(new ValueMap());
+        super.goFault(null);
     }
 
     @Override

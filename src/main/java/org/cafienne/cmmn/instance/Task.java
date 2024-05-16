@@ -174,8 +174,10 @@ public abstract class Task<D extends TaskDefinition<?>> extends TaskStage<D> {
 
     private boolean makeTransitionWithOutput(Transition transition, ValueMap rawOutputParameters) {
         prepareTransition(transition);
-        ValueMap newTaskOutput = transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
-        addEvent(new TaskOutputFilled(this, newTaskOutput, rawOutputParameters));
+        if (rawOutputParameters != null) {
+            ValueMap newTaskOutput = transformOutputParameters(rawOutputParameters, transition == Transition.Complete);
+            addEvent(new TaskOutputFilled(this, newTaskOutput, rawOutputParameters));
+        }
         return super.makeTransition(transition);
     }
 
