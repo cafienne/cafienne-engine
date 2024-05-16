@@ -34,7 +34,6 @@ import org.cafienne.infrastructure.akkahttp.HttpXmlReader._
 import org.cafienne.infrastructure.akkahttp.route.{AuthenticatedRoute, TenantValidator}
 import org.cafienne.json.ValueMap
 import org.cafienne.service.akkahttp.cases.CaseAPIFormat.CaseDefinitionFormat
-import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.ConsentGroupResponseFormat
 import org.cafienne.service.akkahttp.repository.RepositoryAPIFormat.ModelListResponseFormat
 import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
