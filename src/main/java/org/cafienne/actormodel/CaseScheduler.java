@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel;
 
-import akka.actor.Cancellable;
+import org.apache.pekko.actor.Cancellable;
 import org.cafienne.util.Guid;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class CaseScheduler {
     private final ModelActor actor;
-    private final akka.actor.Scheduler akkaScheduler;
+    private final org.apache.pekko.actor.Scheduler systemScheduler;
     private final Map<String, Cancellable> jobs = new HashMap<>();
 
     /**
@@ -41,7 +41,7 @@ public class CaseScheduler {
      */
     CaseScheduler(ModelActor actor) {
         this.actor = actor;
-        this.akkaScheduler = actor.getContext().system().scheduler();
+        this.systemScheduler = actor.getContext().system().scheduler();
     }
 
     /**
@@ -66,8 +66,8 @@ public class CaseScheduler {
             job.run();
         };
 
-        // Use akka's scheduler to get an actual thread to do the job.
-        Cancellable worker = akkaScheduler.scheduleOnce(duration, jobWrapper, actor.context().system().dispatcher());
+        // Use system scheduler to get an actual thread to do the job.
+        Cancellable worker = systemScheduler.scheduleOnce(duration, jobWrapper, actor.context().system().dispatcher());
 
         // Store the job such that we can remove it upon case crashes...
         this.jobs.put(jobId, worker);

@@ -37,11 +37,9 @@ public abstract class InlineSubProcessDefinition extends SubProcessDefinition {
 
     /**
      * If the SubProcessDefinition can be run _within_ the Case, then override this method to return true.
-     * Note, and inline SubProcessDefinition is ran within the thread of the creation of the task in the case.
+     * Note, and inline SubProcessDefinition is run within the thread of the creation of the task in the case.
      * Also, the createInstance() method will be invoked with the Task as parameter, instead of the ProcessTaskActor.
-     * This method returns false by default - every process runs within it's own Akka Actor context.
-     *
-     * @return
+     * This method returns false by default - every process runs within its own actor context.
      */
     public final boolean isInline() {
         return true;

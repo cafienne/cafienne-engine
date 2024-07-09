@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Route
 
 import scala.util.{Failure, Success}
 

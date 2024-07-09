@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.consentgroup
 
-import akka.persistence.query.Offset
+import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}

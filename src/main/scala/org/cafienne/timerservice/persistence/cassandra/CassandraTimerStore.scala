@@ -17,10 +17,10 @@
 
 package org.cafienne.timerservice.persistence.cassandra
 
-import akka.Done
-import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
-import akka.persistence.query.{Offset, TimeBasedUUID}
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
+import org.apache.pekko.persistence.query.{Offset, TimeBasedUUID}
+import org.apache.pekko.util.Timeout
 import com.datastax.oss.driver.api.core.`type`.DataTypes
 import com.datastax.oss.driver.api.core.cql._
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal

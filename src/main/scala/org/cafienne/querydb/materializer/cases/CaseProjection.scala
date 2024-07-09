@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.cases
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.definition.CaseDefinitionEvent
 import org.cafienne.cmmn.actorapi.event.migration.CaseDefinitionMigrated

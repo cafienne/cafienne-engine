@@ -17,9 +17,9 @@
 
 package org.cafienne.infrastructure.cqrs
 
-import akka.NotUsed
-import akka.persistence.query.EventEnvelope
-import akka.stream.scaladsl.Source
+import org.apache.pekko.NotUsed
+import org.apache.pekko.persistence.query.EventEnvelope
+import org.apache.pekko.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 
 /**

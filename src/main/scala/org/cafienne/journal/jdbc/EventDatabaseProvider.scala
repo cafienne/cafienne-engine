@@ -17,8 +17,8 @@
 
 package org.cafienne.journal.jdbc
 
-import akka.actor.ActorSystem
-import akka.persistence.jdbc.db.{DefaultSlickDatabaseProvider, SlickDatabase}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.persistence.jdbc.db.{DefaultSlickDatabaseProvider, SlickDatabase}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import org.flywaydb.core.Flyway

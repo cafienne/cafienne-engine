@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.cases
 
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.cmmn.actorapi.command._

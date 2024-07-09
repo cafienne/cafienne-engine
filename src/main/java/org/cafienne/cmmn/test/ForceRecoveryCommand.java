@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.test;
 
-import akka.actor.ActorRef;
+import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.command.TerminateModelActor;
 import org.cafienne.actormodel.identity.CaseUserIdentity;

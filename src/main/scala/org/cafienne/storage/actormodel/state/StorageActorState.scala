@@ -19,7 +19,7 @@ package org.cafienne.storage.actormodel.state
 
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.{ModelEvent, ModelEventCollection}
-import akka.actor.ActorRef
+import org.apache.pekko.actor.ActorRef
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.processtask.actorapi.event.ProcessEvent

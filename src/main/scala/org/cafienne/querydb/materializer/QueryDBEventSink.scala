@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer
 
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.cqrs.batch.EventBatchSource
 import org.cafienne.system.health.HealthMonitor

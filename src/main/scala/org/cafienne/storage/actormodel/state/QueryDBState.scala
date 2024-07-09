@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.actormodel.state
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.querydb.QueryDBStorage

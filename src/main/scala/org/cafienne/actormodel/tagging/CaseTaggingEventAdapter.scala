@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel.tagging
 
-import akka.persistence.journal.{Tagged, WriteEventAdapter}
+import org.apache.pekko.persistence.journal.{Tagged, WriteEventAdapter}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 

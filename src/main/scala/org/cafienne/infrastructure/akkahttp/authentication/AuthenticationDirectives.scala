@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp.authentication
 
-import akka.http.scaladsl.server.directives.Credentials
-import akka.http.scaladsl.server.{Directive1, Directives}
+import org.apache.pekko.http.scaladsl.server.directives.Credentials
+import org.apache.pekko.http.scaladsl.server.{Directive1, Directives}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.{AuthenticatedUser, JwtTokenVerifier, MissingTokenException}
 import org.cafienne.service.akkahttp.LastModifiedHeader

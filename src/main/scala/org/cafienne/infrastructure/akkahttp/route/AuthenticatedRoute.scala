@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import org.apache.pekko.http.scaladsl.model.{HttpResponse, StatusCodes}
+import org.apache.pekko.http.scaladsl.server.{ExceptionHandler, Route}
 import org.cafienne.actormodel.exception.{AuthorizationException, InvalidCommandException}
 import org.cafienne.actormodel.identity.PlatformUser
 import org.cafienne.authentication.{AuthenticatedUser, AuthenticationException, CannotReachIDPException}

@@ -17,22 +17,17 @@
 
 package org.cafienne.infrastructure.cqrs.offset
 
-import akka.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
+import org.apache.pekko.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
 
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 
 /**
-  * Simple and serializable wrapper to keep track of an Akka Persistence Offset by name.
-  * Each Projection reading Akka Persistence events can keep track of "latest handled event"
-  * using the projection name to uniquely identify the Projection.
+  * Simple and serializable wrapper to keep track of an journal offset by name.
+  * Each projection that reads journal events can keep track of "latest handled event"
+  * using the projection name to uniquely identify the projection.
   * Underneath the NamedOffset persists itself inside a JDBC table (through Slick)
-  *
-  * @param name
-  * @param offsetType
-  * @param offsetValue
-  * @param timestamp
   */
 case class OffsetRecord(name: String, offsetType: String, offsetValue: String, timestamp: Timestamp = Timestamp.from(Instant.now)) {
   def asOffset(): Offset = {
@@ -68,10 +63,6 @@ case class OffsetRecord(name: String, offsetType: String, offsetValue: String, t
 object OffsetRecord {
   /**
     * Creates a new record for storage of offset
-    *
-    * @param offsetName
-    * @param offset
-    * @return
     */
   def apply(offsetName: String, offset: Offset): OffsetRecord = {
     offset match {

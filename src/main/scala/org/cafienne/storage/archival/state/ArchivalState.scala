@@ -100,7 +100,7 @@ trait ArchivalState extends QueryDBState {
     // Create the archive
     def serializeEventToJson(element: (ModelEvent, Int)): ValueMap = {
       //  Note: we're setting sequence_number of the event, starting with 1 instead of 0;
-      //  This makes it sort of compliant with how it is done by Akka in event journal. Helps relating events properly.
+      //  This makes it sort of compliant with how it is done in the underlying event journal. Helps relating events properly.
       ModelEventSerializer.serializeEventToJson(element._1, element._2 + 1)
     }
 

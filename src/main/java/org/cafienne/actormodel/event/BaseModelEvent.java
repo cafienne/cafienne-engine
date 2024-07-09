@@ -60,8 +60,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     /**
      * Returns the raw json used to (de)serialize this event
      * This method cannot be invoked upon first event creation.
-     *
-     * @return
      */
     public final ValueMap rawJson() {
         return this.json;
@@ -69,9 +67,7 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
 
     /**
      * Returns the identifier of the ModelActor that generated this event.
-     * Is the same as the persistence id of the underlying Akka Actor.
-     *
-     * @return
+     * Is the same as the persistence id of the underlying Actor.
      */
     public final String getActorId() {
         return this.actorId;
@@ -79,8 +75,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
 
     /**
      * Returns the complete context of the user that caused the event to happen
-     *
-     * @return
      */
     public final UserIdentity getUser() {
         return user;
@@ -88,7 +82,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
 
     /**
      * Returns the event timestamp
-     * @return
      */
     public final Instant getTimestamp() {
         return timestamp;
@@ -96,8 +89,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
 
     /**
      * UpdateState will be invoked when an event is added or recovered.
-     *
-     * @param actor
      */
     public abstract void updateState(M actor);
 
@@ -120,8 +111,6 @@ public abstract class BaseModelEvent<M extends ModelActor> implements ModelEvent
     /**
      * Override this method to make a description of the event that is based on it's content.
      * This method is invoked from toString().
-     *
-     * @return
      */
     public String getDescription() {
         return getClass().getSimpleName();

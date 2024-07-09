@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.config
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import org.cafienne.infrastructure.config.util.ChildConfigReader
 
 import scala.concurrent.duration.SECONDS
@@ -35,7 +35,7 @@ class ModelActorConfig(val parent: CafienneConfig) extends ChildConfigReader {
   lazy val idlePeriod: Long = {
     val default = 60 * 10
     val period = readLong("idle-period", default)
-    logger.info("Individual Case instances will be removed from Akka memory after they have been idle for " + period + " seconds")
+    logger.info("Individual Case instances will be removed from memory after they have been idle for " + period + " seconds")
     period * 1000
   }
 

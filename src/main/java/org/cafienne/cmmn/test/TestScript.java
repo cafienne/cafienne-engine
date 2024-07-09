@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.test;
 
-import akka.actor.ActorSystem;
+import org.apache.pekko.actor.ActorSystem;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;
@@ -55,14 +55,14 @@ import java.util.List;
  * Note, in the validation of the response, new commands can be added to the test script (e.g. to complete a task based
  * on it's plan item id, rather than by name).
  * Note that commands need to hold the identifier of the case. The test script is agnostic of this identifier, and therefore
- * it is possible to add commands that communicate with multiple case instances (typically usefull when a case has one or more
- * sub cases).
+ * it is possible to add commands that communicate with multiple case instances (typically useful when a case has one or more
+ * sub-cases).
  * When the test script completes or aborts, a corresponding method can be invoked. Subclasses of TestScript can implement these to
  * do custom handling of script completion.
- * Because of the asynchronous nature of the underlying Akka framework, the {@link TestScript#runTest()} method may not get
- * feedback from the case actor (due to some error). Therefore this method internally blocks a specified duration and then closes down
+ * Because of the asynchronous nature of the underlying actor framework, the {@link TestScript#runTest()} method may not get
+ * feedback from the case actor (due to some error). Therefore, this method internally blocks a specified duration and then closes down
  * the actor system.
- * The TestScript uses an in-memory configuration for the Akka system. It assumes that all case instances run within the same JVM, and
+ * The TestScript uses an in-memory configuration for the actor system. It assumes that all case instances run within the same JVM, and
  * it therefore also relies internally on passing the Case object itself. This object can be used in the response validation.
  */
 public class TestScript {
@@ -79,7 +79,7 @@ public class TestScript {
     private static final String defaultTenant = "hard-coded-test-tenant";
 
     /**
-     * Listener for CaseInstanceEvent that ought to be published by the Akka system
+     * Listener for CaseInstanceEvent that ought to be published by the actor system
      */
     private final CaseEventListener eventListener;
 
@@ -87,7 +87,6 @@ public class TestScript {
      * Simple helper to retrieve and parse a definitions file containing one or more case definitions
      *
      * @param fileName The name of the file to be read (e.g., testdefinition/basic.case)
-     * @return
      */
     public static DefinitionsDocument getDefinitions(String fileName) {
         try {
@@ -99,9 +98,6 @@ public class TestScript {
 
     /**
      * Returns the first case definition in the definitions file
-     *
-     * @param fileName
-     * @return
      */
     public static CaseDefinition loadCaseDefinition(String fileName) throws MissingDefinitionException {
         return getDefinitions(fileName).getFirstCase();
@@ -110,8 +106,6 @@ public class TestScript {
     /**
      * Helper method to retrieve an invalid definitions document.
      * Throws an assertion if the Definition is missing instead of invalid.
-     *
-     * @param fileName
      */
     public static void getInvalidDefinition(String fileName) throws InvalidDefinitionException {
         try {
@@ -124,10 +118,6 @@ public class TestScript {
 
     /**
      * Returns a user context for the specified user name and optional roles
-     *
-     * @param user
-     * @param roles
-     * @return
      */
     public static TestUser createTestUser(final String user, final String... roles) {
         return new TestUser(user, roles);
@@ -143,7 +133,6 @@ public class TestScript {
      *
      * @param users The users array can hold case team members, tenant users. Tenant users will be become
      *              members, with the tenant roles that they have passed to them
-     * @return
      */
     public static CaseTeam createCaseTeam(Object... users) {
         List<CaseTeamUser> members = new ArrayList<>();
@@ -161,9 +150,6 @@ public class TestScript {
 
     /**
      * Create a case owner with roles, copies tenant roles, adds additional roles
-     *
-     * @param user
-     * @return
      */
     public static CaseTeamUser createOwner(TestUser user) {
         return user.asCaseOwner();
@@ -171,9 +157,6 @@ public class TestScript {
 
     /**
      * Create a simple member with roles, copies tenant roles, adds additional roles
-     *
-     * @param user
-     * @return
      */
     public static CaseTeamUser createMember(TestUser user) {
         return user.asCaseMember();
@@ -181,7 +164,6 @@ public class TestScript {
 
     /**
      * Create a new {@link TestScript} with the specified name
-     *
      */
     public TestScript(String testName) {
         this(testName, new CaseSystem(ActorSystem.create(testName)));
@@ -189,7 +171,6 @@ public class TestScript {
 
     /**
      * Create a new {@link TestScript} with the specified name and the case system
-     *
      */
     public TestScript(String testName, CaseSystem caseSystem) {
         logger.info("\n\n\t\t============ Creating new test '" + testName + "' ========================\n\n");
@@ -239,8 +220,6 @@ public class TestScript {
 
     /**
      * Prints a log message to the debug logger
-     *
-     * @param msg
      */
     public static void debugMessage(Object msg) {
         logger.debug(String.valueOf(msg));
@@ -249,9 +228,6 @@ public class TestScript {
     /**
      * Adds a command to the test script, along with an optional list of validators. The validators will be invoked when the command has been handled by
      * the case, and the test script has received a response back from the case.
-     *
-     * @param command
-     * @param validator
      */
     private void addTestStep(CaseCommand command, CaseResponseValidator validator) {
         commands.addLast(new CaseTestCommand(this, command, validator));
@@ -260,9 +236,6 @@ public class TestScript {
     /**
      * Insert a new test command right after the current test step. Can be used inside validators to
      * add new commands when a response to the command is received.
-     *
-     * @param command
-     * @param validators
      */
     private void insertTestStep(CaseCommand command, CaseResponseValidator validators) {
         commands.addFirst(new CaseTestCommand(this, command, validators));
@@ -271,9 +244,6 @@ public class TestScript {
     /**
      * Add a command that is expected to fail, and then invoke the validator with the failure to
      * do more assertions.
-     *
-     * @param command
-     * @param validator
      */
     public void assertStepFails(CaseCommand command, FailureValidator validator, String errorMessage) {
         addTestStep(command, e -> validator.validate(new FailureAssertion(e, errorMessage)));
@@ -282,9 +252,6 @@ public class TestScript {
     /**
      * Add a command that is expected to fail, and then invoke the validator with the failure to
      * do more assertions.
-     *
-     * @param command
-     * @param validator
      */
     public void assertStepFails(CaseCommand command, FailureValidator validator) {
         addTestStep(command, e -> validator.validate(new FailureAssertion(e)));
@@ -303,8 +270,6 @@ public class TestScript {
 
     /**
      * Check that command fails, without any further validations.
-     *
-     * @param command
      */
     public void assertStepFails(CaseCommand command) {
         addTestStep(command, FailureAssertion::new);
@@ -312,8 +277,6 @@ public class TestScript {
 
     /**
      * Check that command fails, without any further validations.
-     *
-     * @param command
      */
     public void insertStepFails(CaseCommand command, FailureValidator validator) {
         insertTestStep(command, e -> validator.validate(new FailureAssertion(e)));
@@ -322,9 +285,6 @@ public class TestScript {
     /**
      * Add a command, and use the validator to check the result.
      * Command is expected to succeed (should not return with CommandFailure)
-     *
-     * @param command
-     * @param validator
      */
     public void addStep(CaseCommand command, CaseValidator validator) {
         addTestStep(command, e -> validator.validate(new CaseAssertion(e)));
@@ -332,8 +292,6 @@ public class TestScript {
 
     /**
      * Add a command that should return without failure.
-     *
-     * @param command
      */
     public void addStep(CaseCommand command) {
         addTestStep(command, CaseAssertion::new);
@@ -390,8 +348,6 @@ public class TestScript {
 
     /**
      * Override this method to have a callback upon error of the test script
-     *
-     * @param t
      */
     public void abort(Throwable t) {
     }
@@ -506,8 +462,6 @@ public class TestScript {
 
     /**
      * Returns the event listener for this TestScript.
-     *
-     * @return
      */
     public CaseEventListener getEventListener() {
         return eventListener;
@@ -516,8 +470,6 @@ public class TestScript {
     /**
      * Method used by {@link ResponseHandlingActor} to notify incoming messages from the case system (i.e., response to
      * the commands sent by the test script to the case instances).
-     *
-     * @param response
      */
     void handleResponse(Object response) {
         if (!(response instanceof ModelResponse)) {

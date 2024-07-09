@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.swagger
 
-import com.github.swagger.akka._
-import com.github.swagger.akka.model.Info
+import com.github.swagger.pekko._
+import com.github.swagger.pekko.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
 import org.cafienne.infrastructure.Cafienne
 
@@ -65,11 +65,11 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
   //override def security: List[SecurityRequirement] = List(new SecurityRequirement().addList("openId"))
   def route = get {
     routes ~
-      pathPrefix("") {
+        pathPrefix("") {
         pathEndOrSingleSlash {
           getFromResource("swagger/index.html")
         }
       } ~ getFromResourceDirectory("swagger")
-  }
+    }
 
 }

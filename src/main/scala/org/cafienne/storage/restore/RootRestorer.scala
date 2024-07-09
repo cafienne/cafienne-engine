@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.restore
 
-import akka.actor.Actor
+import org.apache.pekko.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.storage.actormodel.message.StorageEvent

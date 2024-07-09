@@ -17,18 +17,18 @@
 
 package org.cafienne.infrastructure.akkahttp
 
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Document
 
 /**
-  * This file contains an unmarshaller for XML documents
+  * This file contains an un-marshaller for XML documents
   */
 object HttpXmlReader {
 
   /**
-    * Application/xml is not a default in the {@link akka.http.scaladsl.model.ContentTypes}
+    * Application/xml is not a default in the [[pekko.http.scaladsl.model.ContentTypes]]
     */
   val `application/xml`: ContentType = MediaTypes.`application/xml` withCharset HttpCharsets.`UTF-8`
 

@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.deletion
 
-import akka.persistence.DeleteMessagesSuccess
+import org.apache.pekko.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}
@@ -57,11 +57,11 @@ class ActorDataRemover(val caseSystem: CaseSystem, val metadata: ActorMetadata) 
     * When all children and also all QueryDB data is removed, the state object will
     * invoke this method.
     * It simply deletes all events (including StorageEvents!) from the event journal.
-    * The akka system will generate a DeleteMessageSuccess, and the receiveCommand method
+    * The actor system will generate a DeleteMessageSuccess, and the receiveCommand method
     * will listen to that and call deletionCompleted() method.
     */
   def completeStorageProcess(): Unit = {
-    printLogMessage(s"Starting final step to delete ${state.events.length} events from event journal: let akka [delete from journal where persistence_id = '$persistenceId']")
+    printLogMessage(s"Starting final step to delete ${state.events.length} events from event journal: let pekko [delete from journal where persistence_id = '$persistenceId']")
     clearState()
   }
 
