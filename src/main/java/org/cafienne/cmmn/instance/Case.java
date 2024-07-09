@@ -337,7 +337,7 @@ public class Case extends ModelActor {
     }
 
     /**
-     * Internal framework method to support Akka command handling and recovery
+     * Internal framework method
      */
     public void applyCaseDefinition(CaseDefinition definition, String parentCaseId, String rootCaseId) {
         // Set the definition and tenant.
@@ -384,7 +384,7 @@ public class Case extends ModelActor {
     }
 
     /**
-     * Internal framework method to support Akka command handling and recovery
+     * Internal framework method
      */
     public boolean makePlanItemTransition(PlanItem<?> planItem, Transition transition) {
         return planItem.makeTransition(transition);

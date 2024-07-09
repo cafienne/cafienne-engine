@@ -17,8 +17,8 @@
 
 package org.cafienne.timerservice.persistence
 
-import akka.Done
-import akka.persistence.query.Offset
+import org.apache.pekko.Done
+import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.timerservice.Timer
 

@@ -17,9 +17,9 @@
 
 package org.cafienne.cmmn.test;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Props;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.cmmn.actorapi.event.CaseModified;
@@ -63,7 +63,7 @@ public class CaseEventListener {
         final ActorSystem system = testScript.getCaseSystem().system();
         // Now create the callback mechanism for the case system
         this.responseHandlingActor = system.actorOf(Props.create(ResponseHandlingActor.class, this.testScript));
-        // And create a connection with the Akka Event database to receive events from the case system
+        // And create a connection with the journal database to receive events from the case system
         this.readJournal = new CaseEventPublisher(this, testScript.getCaseSystem().system());
     }
 

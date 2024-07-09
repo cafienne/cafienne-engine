@@ -22,7 +22,7 @@ import org.cafienne.cmmn.test.CaseEventListener;
 
 /**
  * An EventFilter can be used to wait until a certain event (or combination of events)
- * has been published on the event stream that comes out of Akka and is captured in
+ * has been published on the event stream that comes out of the actor system and is captured in
  * the {@link CaseEventListener}. See also {@link CaseEventListener#waitUntil(String, Class, EventFilter, long...)}
  */
 @FunctionalInterface

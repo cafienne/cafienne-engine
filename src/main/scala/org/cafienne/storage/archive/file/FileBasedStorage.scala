@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.archive.file
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.config.engine.FileStorageConfig
 import org.cafienne.storage.actormodel.ActorMetadata

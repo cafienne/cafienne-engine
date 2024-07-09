@@ -1,11 +1,11 @@
 package org.cafienne.infrastructure.cqrs.batch
 
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.persistence.query.{EventEnvelope, Offset}
-import akka.stream.scaladsl.{Sink, Source}
-import akka.testkit.TestKit
+import org.apache.pekko.NotUsed
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.event.{Logging, LoggingAdapter}
+import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.testkit.TestKit
 import org.cafienne.cmmn.actorapi.command.StartCase
 import org.cafienne.cmmn.actorapi.command.plan.MakePlanItemTransition
 import org.cafienne.cmmn.definition.CaseDefinition

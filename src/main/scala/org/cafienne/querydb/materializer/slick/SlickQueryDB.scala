@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.slick
 
-import akka.persistence.query.Offset
+import org.apache.pekko.persistence.query.Offset
 import org.cafienne.infrastructure.jdbc.cqrs.JDBCOffsetStorage
 import org.cafienne.querydb.materializer.QueryDBStorage
 import org.cafienne.querydb.materializer.cases.CaseStorageTransaction

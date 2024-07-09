@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.anonymous
 
-import _root_.akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -37,7 +37,7 @@ import org.cafienne.service.akkahttp.anonymous.model.AnonymousAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.util.Guid
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple wrapper class for AkkaCaseCommands. It tells the engine to execute the command, and also captures the response. It only works if there is a
+ * Simple wrapper class for CaseCommands. It tells the engine to execute the command, and also captures the response. It only works if there is a
  * single JVM executing the case instance, as it holds a direct reference to the case instance that can be used for assertions.
  */
 @Manifest

@@ -26,7 +26,7 @@ import java.io.IOException;
 
 /**
  * Wrapper class around Exception that can be serialized
- * and used to read the content of the exception across the akka network.
+ * and used to read the content of the exception across the actor network.
  */
 public class SerializedException implements CafienneSerializable {
     private final String className;

@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * Base class for all TimerEventListener based akka events.
+ * Base class for all TimerEventListener based events.
  * These events are tagged so that a projection can handle them and safely set timers.
  */
 public abstract class TimerBaseEvent extends CasePlanEvent {

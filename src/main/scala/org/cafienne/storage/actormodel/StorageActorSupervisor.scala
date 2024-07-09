@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.actormodel
 
-import akka.actor.{Actor, ActorRef, Props, Terminated}
+import org.apache.pekko.actor.{Actor, ActorRef, Props, Terminated}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.TerminateModelActor
 import org.cafienne.system.CaseSystem

@@ -22,7 +22,7 @@ import org.cafienne.infrastructure.serialization.CafienneSerializable
 
 /**
   * Simple trait that case classes can implement if they can convert themselves into Value[_] objects.
-  * This can be used to make a case class json serializable (for now - better is to use default json serializers of akka http).
+  * This can be used to make a case class json serializable (for now - better is to use default json serializers of http libraries).
   */
 trait CafienneJson extends CafienneSerializable {
   def toValue: Value[_]

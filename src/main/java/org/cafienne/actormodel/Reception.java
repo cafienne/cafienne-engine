@@ -17,8 +17,8 @@
 
 package org.cafienne.actormodel;
 
-import akka.persistence.JournalProtocol;
-import akka.persistence.SnapshotProtocol;
+import org.apache.pekko.persistence.JournalProtocol;
+import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;
@@ -28,7 +28,7 @@ import org.cafienne.infrastructure.serialization.DeserializationFailure;
 import org.cafienne.storage.actormodel.message.StorageEvent;
 
 /**
- * All akka incoming traffic (either during recovery or upon receiving incoming messages)
+ * All actor system incoming traffic (either during recovery or upon receiving incoming messages)
  * is passed through the Reception.
  * The reception knows whether the ModelActor is capable of handling the incoming traffic,
  * and when applicable passes it on to the {@link BackOffice}.

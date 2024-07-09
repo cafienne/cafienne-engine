@@ -17,11 +17,11 @@
 
 package org.cafienne.actormodel;
 
-import akka.actor.PoisonPill;
-import akka.persistence.AbstractPersistentActor;
-import akka.persistence.JournalProtocol;
-import akka.persistence.SnapshotOffer;
-import akka.persistence.SnapshotProtocol;
+import org.apache.pekko.actor.PoisonPill;
+import org.apache.pekko.persistence.AbstractPersistentActor;
+import org.apache.pekko.persistence.JournalProtocol;
+import org.apache.pekko.persistence.SnapshotOffer;
+import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ActorModified;
@@ -94,7 +94,7 @@ public abstract class ModelActor extends AbstractPersistentActor {
 
     /**
      * The version of the engine that this case currently uses; this defaults to what comes from the BuildInfo.
-     * If a ModelActor is recovered by Akka, then the version will be overwritten in {@link ModelActor#setEngineVersion(CafienneVersion)}.
+     * If a ModelActor is recovered by the actor system, then the version will be overwritten in {@link ModelActor#setEngineVersion(CafienneVersion)}.
      * Whenever then a new incoming message is handled by the Case actor - one leading to events, i.e., state changes, then
      * the actor will insert a new event EngineVersionChanged.
      * For new Cases, the CaseDefinitionApplied event will generate the current version

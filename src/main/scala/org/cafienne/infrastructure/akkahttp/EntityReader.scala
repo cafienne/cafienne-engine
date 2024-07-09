@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.{ClassTagExtensions, DefaultScalaModule}
@@ -26,7 +26,7 @@ import org.cafienne.infrastructure.serialization.{ValueMapJacksonDeserializer, V
 import org.cafienne.json.ValueMap
 
 /**
-  * Helper classes to read akka http entity as an expected type
+  * Helper classes to read http entity as an expected type
   */
 object EntityReader {
   type EntityReader[T] = Unmarshaller[HttpEntity, T]

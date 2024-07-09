@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.cqrs.offset
 
-import akka.persistence.query.Offset
+import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future

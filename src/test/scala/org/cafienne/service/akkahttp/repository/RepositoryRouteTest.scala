@@ -1,10 +1,10 @@
 package org.cafienne.service.akkahttp.repository
 
-import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.event.{Logging, LoggingAdapter}
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import org.cafienne.infrastructure.akkahttp.HttpXmlReader
 import org.cafienne.system.CaseSystem
 import org.scalatest.flatspec.AnyFlatSpec

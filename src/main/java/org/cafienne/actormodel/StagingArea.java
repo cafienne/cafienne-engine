@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel;
 
-import akka.persistence.journal.Tagged;
+import org.apache.pekko.persistence.journal.Tagged;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.CommitEvent;
 import org.cafienne.actormodel.event.DebugEvent;

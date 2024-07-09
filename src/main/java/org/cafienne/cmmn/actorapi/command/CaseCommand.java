@@ -28,7 +28,7 @@ import org.cafienne.cmmn.instance.Case;
 import org.cafienne.json.ValueMap;
 
 /**
- * A {@link Case} instance is designed to handle various AkkaCaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
+ * A {@link Case} instance is designed to handle various CaseCommands, such as {@link StartCase}, {@link MakePlanItemTransition}, etc.
  * Each CaseCommand must implement it's own logic within the case, through the optional {@link BaseModelCommand#validate} and the mandatory {@link CaseCommand#process} methods.
  * When the case has succesfully handled the command, it will persist the resulting {@link CaseEvent}s, and send a reply back, see {@link CaseResponse}.
  */

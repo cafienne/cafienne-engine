@@ -1,8 +1,8 @@
 package org.cafienne.infrastructure.akkahttp.authentication
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.testkit.ScalatestRouteTest
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.source.{ImmutableJWKSet, JWKSource}
 import com.nimbusds.jose.jwk.{JWKSet, RSAKey}

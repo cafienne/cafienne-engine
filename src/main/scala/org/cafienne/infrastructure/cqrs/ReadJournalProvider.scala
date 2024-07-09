@@ -17,10 +17,10 @@
 
 package org.cafienne.infrastructure.cqrs
 
-import akka.actor.ActorSystem
-import akka.persistence.query.PersistenceQuery
-import akka.persistence.query.scaladsl._
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.persistence.query.PersistenceQuery
+import org.apache.pekko.persistence.query.scaladsl._
 import org.cafienne.infrastructure.Cafienne
 
 /**
@@ -30,7 +30,7 @@ trait ReadJournalProvider extends LazyLogging {
   def system: ActorSystem
   implicit def actorSystem: ActorSystem = system
 
-  lazy val configuredJournal: String = system.settings.config.getString("akka.persistence.journal.plugin")
+  lazy val configuredJournal: String = system.settings.config.getString("pekko.persistence.journal.plugin")
   lazy val readJournalSetting: String = findReadJournalSetting()
 
   /**
@@ -44,14 +44,15 @@ trait ReadJournalProvider extends LazyLogging {
 
   private def findReadJournalSetting(): String = {
 
-    val explicitReadJournal = Cafienne.config.readJournal
+    val explicitReadJournal = Cafienne.config.persistence.readJournal
     if (explicitReadJournal.nonEmpty) {
       return explicitReadJournal
     }
 
-    import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
-    import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal
-    import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
+    import io.github.alstanchev.pekko.persistence.inmemory.query.scaladsl.InMemoryReadJournal
+    import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
+    import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
+    import org.apache.pekko.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 
     logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
     if (configuredJournal.contains("jdbc")) {
@@ -62,7 +63,7 @@ trait ReadJournalProvider extends LazyLogging {
       logger.warn("Found Level DB based configurations. This has proven to be unreliable. Do not use it in Production systems.")
       return LeveldbReadJournal.Identifier
     } else if (configuredJournal.contains("memory")) {
-      return "inmemory-read-journal"
+      return InMemoryReadJournal.Identifier
     }
     throw new RuntimeException(s"Cannot find read journal for $configuredJournal, please use Cassandra or JDBC read journal settings")
   }
