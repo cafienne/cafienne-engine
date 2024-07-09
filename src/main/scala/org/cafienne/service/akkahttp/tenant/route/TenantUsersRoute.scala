@@ -24,8 +24,8 @@
  */
 package org.cafienne.service.akkahttp.tenant.route
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{ArraySchema, Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -36,7 +36,7 @@ import org.cafienne.querydb.query.exception.UserSearchFailure
 import org.cafienne.service.akkahttp.tenant.model.TenantAPI.TenantUserResponseFormat
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 import scala.util.{Failure, Success}
 
 

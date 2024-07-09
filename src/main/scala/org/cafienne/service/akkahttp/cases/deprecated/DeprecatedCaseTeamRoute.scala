@@ -17,7 +17,7 @@
 
 package org.cafienne.service.akkahttp.cases.deprecated
 
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.cmmn.actorapi.command.team.DeprecatedUpsert
 import org.cafienne.cmmn.actorapi.command.team.removemember.{RemoveCaseTeamTenantRole, RemoveCaseTeamUser}
 import org.cafienne.service.akkahttp.cases.CasesRoute

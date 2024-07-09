@@ -17,9 +17,9 @@
 
 package org.cafienne.service.akkahttp.cases.history
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.server.Route
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.stream.scaladsl.Sink
 import org.cafienne.cmmn.actorapi.event.plan.CasePlanEvent
 import org.cafienne.infrastructure.cqrs.{InstanceEventSource, ModelEventEnvelope}
 import org.cafienne.querydb.query.exception.PlanItemSearchFailure

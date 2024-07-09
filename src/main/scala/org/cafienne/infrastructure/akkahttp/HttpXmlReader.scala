@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp
 
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import org.cafienne.util.XMLHelper
 import org.w3c.dom.Document
 

@@ -17,9 +17,9 @@
 
 package org.cafienne.infrastructure.cqrs
 
-import akka.actor.ActorSystem
-import akka.persistence.query.PersistenceQuery
-import akka.persistence.query.scaladsl._
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.persistence.query.PersistenceQuery
+import org.apache.pekko.persistence.query.scaladsl._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 
@@ -49,9 +49,9 @@ trait ReadJournalProvider extends LazyLogging {
       return explicitReadJournal
     }
 
-    import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
-    import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal
-    import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
+    import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
+    import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
+    import org.apache.pekko.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
 
     logger.warn("Missing conf 'cafienne.read-journal'. Trying to determine read journal settings by guessing based on the name of the journal plugin \"" + configuredJournal + "\"")
     if (configuredJournal.contains("jdbc")) {

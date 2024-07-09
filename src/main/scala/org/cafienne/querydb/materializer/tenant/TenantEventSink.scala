@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.tenant
 
-import akka.persistence.query.Offset
+import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
 import org.cafienne.system.CaseSystem

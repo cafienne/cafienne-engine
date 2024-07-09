@@ -28,7 +28,7 @@ import org.cafienne.service.akkahttp.cases.plan.{DiscretionaryRoute, PlanItemRou
 import org.cafienne.service.akkahttp.cases.team.CaseTeamRoute
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/cases")

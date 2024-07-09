@@ -38,10 +38,10 @@ class ValueMapJacksonDeserializer(c: Class[_]) extends StdDeserializer[ValueMap]
 
   override def deserialize(p: JsonParser, ctxt: DeserializationContext): ValueMap = {
     val parsed = JSONReader.read(p, null)
-    if (parsed.isInstanceOf[ValueMap]) {
-      parsed.asInstanceOf[ValueMap]
+    if (parsed.isMap) {
+      parsed.asMap
     } else {
-      new ValueMap(p.getCurrentName, parsed)
+      new ValueMap(p.currentName, parsed)
     }
   }
 }

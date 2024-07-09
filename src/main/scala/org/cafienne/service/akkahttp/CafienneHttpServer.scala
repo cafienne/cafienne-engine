@@ -17,10 +17,10 @@
 
 package org.cafienne.service.akkahttp
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives.concat
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.server.Directives.concat
+import org.apache.pekko.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
@@ -80,10 +80,10 @@ class CafienneHttpServer(val caseSystem: CaseSystem) extends LazyLogging {
 
     val apiHost = Cafienne.config.api.bindHost
     val apiPort = Cafienne.config.api.bindPort
-    logger.info(s"Starting Cafienne HTTP Server - starting akka http on $apiHost:$apiPort")
+    logger.info(s"Starting Cafienne HTTP Server - starting on $apiHost:$apiPort")
     implicit val system: ActorSystem = caseSystem.system
 
-    val akkaHttp = Http().newServerAt(apiHost, apiPort)
-    akkaHttp.bindFlow(apiRoutes)
+    val httpServer = Http().newServerAt(apiHost, apiPort)
+    httpServer.bindFlow(apiRoutes)
   }
 }

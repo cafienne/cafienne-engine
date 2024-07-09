@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.tenant.route
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.infrastructure.akkahttp.route.{CommandRoute, QueryRoute}

@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.tenant
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord

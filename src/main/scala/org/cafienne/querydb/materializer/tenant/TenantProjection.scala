@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.tenant
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.querydb.record.TenantRecord
 import org.cafienne.tenant.actorapi.event.platform.{PlatformEvent, TenantCreated, TenantDisabled, TenantEnabled}

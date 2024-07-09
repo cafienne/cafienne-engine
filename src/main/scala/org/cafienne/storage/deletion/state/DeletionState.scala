@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.deletion.state
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.event.{ChildrenReceived, QueryDataCleared}
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.state.QueryDBState

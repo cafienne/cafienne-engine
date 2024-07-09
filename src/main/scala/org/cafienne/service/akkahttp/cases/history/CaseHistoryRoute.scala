@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.cases.history
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -29,7 +29,7 @@ import org.cafienne.service.akkahttp.Headers
 import org.cafienne.service.akkahttp.debug.ModelEventsReader
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))

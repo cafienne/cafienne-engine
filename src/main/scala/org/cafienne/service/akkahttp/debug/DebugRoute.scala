@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.debug
 
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -29,7 +29,7 @@ import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.CommandRoute
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs.{GET, PATCH, Path, Produces}
+import jakarta.ws.rs.{GET, PATCH, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))

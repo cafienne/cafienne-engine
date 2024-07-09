@@ -123,43 +123,44 @@ configs(MultiJvm) // Not sure what this adds, actually
 /**
   * Dependencies
   */
-val akkaHttpVersion    = "10.2.10"
-val akkaVersion        = "2.6.21"
-val jacksonVersion     = "2.13.4"
+val akkaHttpVersion    = "1.1.0-M1"
+val akkaVersion        = "1.1.0-M1"
+val pekkoPersistenceVersion = "1.1.0-M1"
+val jacksonVersion     = "2.17.0"
 val enumeratumVersion  = "1.7.2"
-val swaggerVersion     = "2.2.4"
-val slickVersion       = "3.3.3"
+val swaggerVersion     = "2.2.22"
+val slickVersion       = "3.5.1"
 val jasperVersion      = "6.20.0"
 
 /**
   * Add runtime dependencies
   */
 libraryDependencies ++= Seq(
-  "com.typesafe.akka"         %% "akka-actor"                           % akkaVersion
-  , "com.typesafe.akka"       %% "akka-cluster-tools"                   % akkaVersion
-  , "com.typesafe.akka"       %% "akka-cluster-sharding"                % akkaVersion
-  , "com.typesafe.akka"       %% "akka-serialization-jackson"           % akkaVersion
-  , "com.typesafe.akka"       %% "akka-http"                            % akkaHttpVersion
-  , "com.typesafe.akka"       %% "akka-http-core"                       % akkaHttpVersion
-  , "com.typesafe.akka"       %% "akka-http-xml"                        % akkaHttpVersion
-  , "com.typesafe.akka"       %% "akka-http-jackson"                    % akkaHttpVersion
-  , "com.typesafe.akka"       %% "akka-persistence"                     % akkaVersion
-  , "com.typesafe.akka"       %% "akka-persistence-query"               % akkaVersion
-  , "com.lightbend.akka"      %% "akka-persistence-jdbc"                % "5.1.0"
-  , "com.typesafe.akka"       %% "akka-persistence-cassandra"           % "1.0.6"
+  "org.apache.pekko"         %% "pekko-actor"                           % akkaVersion
+  , "org.apache.pekko"       %% "pekko-cluster-tools"                   % akkaVersion
+  , "org.apache.pekko"       %% "pekko-cluster-sharding"                % akkaVersion
+  , "org.apache.pekko"       %% "pekko-serialization-jackson"           % akkaVersion
+  , "org.apache.pekko"       %% "pekko-http"                            % akkaHttpVersion
+  , "org.apache.pekko"       %% "pekko-http-core"                       % akkaHttpVersion
+  , "org.apache.pekko"       %% "pekko-http-xml"                        % akkaHttpVersion
+  , "org.apache.pekko"       %% "pekko-http-jackson"                    % akkaHttpVersion
+  , "org.apache.pekko"       %% "pekko-persistence"                     % pekkoPersistenceVersion
+  , "org.apache.pekko"       %% "pekko-persistence-query"               % pekkoPersistenceVersion
+  , "org.apache.pekko"      %% "pekko-persistence-jdbc"                 % pekkoPersistenceVersion
+  , "org.apache.pekko"       %% "pekko-persistence-cassandra"           % "1.0.0"
   , "com.datastax.oss"        %  "java-driver-core"                     % "4.15.0"
   , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.15.0"
 
   // Logging
-  , "com.typesafe.akka"       %% "akka-slf4j"                           % akkaVersion
-  , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
+  , "org.apache.pekko"       %% "pekko-slf4j"                           % akkaVersion
+  , "org.apache.pekko"       %% "pekko-stream"                          % akkaVersion
   , "com.typesafe"            %  "config"                               % "1.4.3"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
   , "ch.qos.logback"          %  "logback-classic"                      % "1.5.6"
   , "org.apache.commons"      %  "commons-text"                         % "1.11.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
-  , "ch.megard"               %% "akka-http-cors"                       % "1.2.0"
+  , "org.apache.pekko"               %% "pekko-http-cors"                       % "1.1.0-M1"
 
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
@@ -168,15 +169,19 @@ libraryDependencies ++= Seq(
   , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
 
   // DB Schema
-  , "org.flywaydb"            %  "flyway-core"                           % "7.2.1"
+  , "org.flywaydb"            %  "flyway-core"                          % "10.15.0"
+  , "org.flywaydb"            % "flyway-database-postgresql"            % "10.14.0"
+  , "org.flywaydb"            % "flyway-sqlserver"                      % "10.15.0"
+  , "org.flywaydb"            % "flyway-database-hsqldb"                % "10.15.0"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
   , "com.typesafe.slick"      %% "slick"                                % slickVersion
-  , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.7.0"
-  , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.8.0"
+  , "com.zaxxer"              % "HikariCP"                              % "5.1.0"
+  , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway"           % "0.11.0"
+  , "io.github.nafg.slick-migration-api" %% "slick-migration-api"                  % "0.10.0"
 
   , "com.fasterxml.jackson.core"   % "jackson-databind"			            % jacksonVersion
-  , "com.fasterxml.jackson.core"   % "jackson-core"					            % jacksonVersion
-  , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % jacksonVersion
+  , "com.fasterxml.jackson.core"   % "jackson-core"					            % "2.17.2"
+  , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % "2.17.2"
 
   // PDF Task support
   , "net.sf.jasperreports"    %  "jasperreports"                        % jasperVersion
@@ -195,10 +200,10 @@ libraryDependencies ++= Seq(
   , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
-  , "com.h2database"          %  "h2"                                   % "2.2.224"
-  , "org.hsqldb"              %  "hsqldb"                               % "2.7.3"
-  , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "org.postgresql"          %  "postgresql"                           % "42.7.3"
+  , "com.h2database"          %  "h2"                                   % "2.2.220"
+  , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
+  , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
+  , "org.postgresql"          %  "postgresql"                           % "42.5.5"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
   // Swagger support
@@ -206,13 +211,9 @@ libraryDependencies ++= Seq(
   , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-jaxrs2"                       % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
-  , "com.github.swagger-akka-http" %% "swagger-akka-http"               % "2.5.2"
-  , "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-akka-http :(
-  , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-akka-http :(
-
-  //security overrides
-  , "com.fasterxml.woodstox"  % "woodstox-core"                         % "6.4.0"
-  ,"net.minidev"              % "json-smart"                            % "2.5.1"
+  , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2"
+  , "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-pekko-http :(
+  , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
   ,"org.yaml"                 %"snakeyaml"                              % "2.0"
 )
 
@@ -225,9 +226,9 @@ libraryDependencies ++= Seq(
   , "org.scalamock"           %% "scalamock"                            % "5.2.0"
   , "org.scalatest"           %% "scalatest"                            % "3.2.19"
   , "commons-io"              %  "commons-io"                           % "20030203.000550"
-  , "com.typesafe.akka"       %% "akka-testkit"                         % akkaVersion
-  , "com.typesafe.akka"       %% "akka-http-testkit"                    % akkaHttpVersion
-  , "com.typesafe.akka"       %% "akka-multi-node-testkit"              % akkaVersion
-  , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
+  , "org.apache.pekko"       %% "pekko-testkit"                         % akkaVersion
+  , "org.apache.pekko"       %% "pekko-http-testkit"                    % akkaHttpVersion
+  , "org.apache.pekko"       %% "pekko-multi-node-testkit"              % akkaVersion
+  , "io.github.alstanchev"   %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
   , "com.github.tomakehurst"  %  "wiremock"                             % "2.27.2"
 ).map(dep => dep % Test)

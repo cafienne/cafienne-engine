@@ -17,8 +17,8 @@
 
 package org.cafienne.system.router
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import akka.util.Timeout
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props}
+import org.apache.pekko.util.Timeout
 import org.cafienne.cmmn.actorapi.command.CaseCommand
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand
 import org.cafienne.infrastructure.Cafienne
@@ -39,7 +39,7 @@ class CafienneGateway(caseSystem: CaseSystem) {
   private val defaultRouterService: ActorRef = system.actorOf(Props.create(classOf[LocalRouter], caseSystem, actors, terminationRequests), "default-router")
 
   def request(message: Any): Future[Any] = {
-    import akka.pattern.ask
+    import org.apache.pekko.pattern.ask
     implicit val timeout: Timeout = Cafienne.config.actor.askTimout
 
     getRouter(message).ask(message)

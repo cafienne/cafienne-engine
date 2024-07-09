@@ -1,8 +1,8 @@
 package org.cafienne.querydb.materializer.cases
 
-import akka.actor.{ActorContext, ActorRef}
-import akka.persistence.PersistentActor
-import akka.persistence.journal.Tagged
+import org.apache.pekko.actor.{ActorContext, ActorRef}
+import org.apache.pekko.persistence.PersistentActor
+import org.apache.pekko.persistence.journal.Tagged
 import org.cafienne.actormodel.event.ModelEvent
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala

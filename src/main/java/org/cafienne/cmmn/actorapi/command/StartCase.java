@@ -80,7 +80,7 @@ public class StartCase extends CaseCommand implements BootstrapMessage {
         this.definition = definition;
         this.rootCaseId = rootCaseId;
         this.parentCaseId = parentCaseId;
-        this.inputParameters = caseInputParameters;
+        this.inputParameters = caseInputParameters == null ? new ValueMap() : caseInputParameters;
         this.caseTeam = caseTeam;
         this.debugMode = debugMode;
     }

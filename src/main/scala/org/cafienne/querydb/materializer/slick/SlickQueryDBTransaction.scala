@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.slick
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.cmmn.actorapi.command.platform.NewUserInformation
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.infrastructure.jdbc.cqrs.OffsetStoreTables

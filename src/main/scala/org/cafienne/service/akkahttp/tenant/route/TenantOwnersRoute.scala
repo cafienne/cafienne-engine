@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.tenant.route
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -32,7 +32,7 @@ import org.cafienne.service.akkahttp.tenant.model.TenantAPI._
 import org.cafienne.system.CaseSystem
 import org.cafienne.tenant.actorapi.command._
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 import scala.jdk.CollectionConverters._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))

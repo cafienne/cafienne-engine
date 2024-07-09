@@ -17,13 +17,13 @@
 
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server._
-import ch.megard.akka.http.cors.scaladsl.model.HttpHeaderRange
-import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.http.cors.scaladsl.model.HttpHeaderRange
+import org.apache.pekko.http.cors.scaladsl.settings.CorsSettings
+import org.apache.pekko.http.scaladsl.model.HttpMethods._
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.server._
 import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.service.akkahttp.Headers
 import org.cafienne.system.CaseSystem
@@ -36,9 +36,9 @@ import org.w3c.dom.Node
 trait CaseServiceRoute extends LazyLogging {
   val caseSystem: CaseSystem
 
-  import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+  import org.apache.pekko.http.cors.scaladsl.CorsDirectives._
 
-  private val corsSettings = CorsSettings.defaultSettings
+  private val corsSettings = CorsSettings.default(caseSystem.system)
     .withAllowedHeaders(HttpHeaderRange("Authorization", "Content-Type", "X-Requested-With", Headers.CASE_LAST_MODIFIED, Headers.TENANT_LAST_MODIFIED, "accept", "origin"))
     .withAllowedMethods(Seq(GET, POST, HEAD, OPTIONS, PUT, DELETE))
     .withExposedHeaders(Seq(Headers.CASE_LAST_MODIFIED, Headers.TENANT_LAST_MODIFIED))

@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("/platform")

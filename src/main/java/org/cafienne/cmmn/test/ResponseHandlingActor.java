@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.test;
 
-import akka.actor.UntypedAbstractActor;
+import org.apache.pekko.actor.UntypedAbstractActor;
 
 /**
  * A too simple actor that is used by {@link TestScript} to receive messages back from the case system

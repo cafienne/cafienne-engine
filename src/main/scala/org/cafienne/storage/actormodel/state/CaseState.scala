@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.actormodel.state
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.cmmn.actorapi.event.plan.{PlanItemCreated, PlanItemTransitioned}
 import org.cafienne.cmmn.instance.PlanItemType
 import org.cafienne.storage.actormodel.ActorMetadata

@@ -19,7 +19,7 @@ package org.cafienne.service.akkahttp.tenant.route
 
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 
 @Path("/tenant")
 class TenantRoutes(override val caseSystem: CaseSystem) extends TenantRoute {

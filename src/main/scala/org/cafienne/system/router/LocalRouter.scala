@@ -17,7 +17,7 @@
 
 package org.cafienne.system.router
 
-import akka.actor.{ActorRef, Props, Terminated}
+import org.apache.pekko.actor.{ActorRef, Props, Terminated}
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.system.CaseSystem
