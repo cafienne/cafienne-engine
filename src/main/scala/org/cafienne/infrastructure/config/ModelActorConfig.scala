@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.config
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import org.cafienne.infrastructure.config.util.ChildConfigReader
 
 import scala.concurrent.duration.SECONDS

@@ -40,7 +40,7 @@ object SystemConfig extends LazyLogging {
     val newValue = "org.cafienne.infrastructure.serialization.CafienneSerializer"
     val newConfig = migrateConfigurationValue(config, serializerPath, key, deprecatedValue, newValue)
 
-    val bindingPath = "akka.actor.serialization-bindings"
+    val bindingPath = "pekko.actor.serialization-bindings"
     val oldKey = "org.cafienne.akka.actor.serialization.CafienneSerializable"
     val newKey = "org.cafienne.infrastructure.serialization.CafienneSerializable"
     migrateConfigurationProperty(newConfig, bindingPath, oldKey, newKey)
@@ -50,7 +50,7 @@ object SystemConfig extends LazyLogging {
     // Tagging is configured in the akka persistence journal.
     //  This journal has different configuration keys per type of persistence.
     //  Find the right path based on the config of the journal plugin.
-    val akkaJournalPath = config.root().toConfig.getString("akka.persistence.journal.plugin")
+    val akkaJournalPath = config.root().toConfig.getString("pekko.persistence.journal.plugin")
 
     val taggingPath = s"$akkaJournalPath.event-adapters"
     val key = "tagging"

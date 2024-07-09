@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.test;
 
-import akka.actor.ActorSystem;
+import org.apache.pekko.actor.ActorSystem;
 import org.cafienne.actormodel.response.CommandFailure;
 import org.cafienne.actormodel.response.ModelResponse;
 import org.cafienne.cmmn.actorapi.command.CaseCommand;

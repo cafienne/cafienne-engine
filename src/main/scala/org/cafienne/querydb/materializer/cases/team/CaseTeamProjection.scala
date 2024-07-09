@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.cases.team
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.team._
 import org.cafienne.cmmn.actorapi.event.team.deprecated.DeprecatedCaseTeamEvent

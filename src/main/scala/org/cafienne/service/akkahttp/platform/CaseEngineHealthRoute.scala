@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.platform
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Directives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -27,7 +27,7 @@ import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute
 import org.cafienne.system.CaseSystem
 import org.cafienne.system.health.HealthMonitor
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 
 @Path("/")
 class CaseEngineHealthRoute(override val caseSystem: CaseSystem) extends CaseServiceRoute {

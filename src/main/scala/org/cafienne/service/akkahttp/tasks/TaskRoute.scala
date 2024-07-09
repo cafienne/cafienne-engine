@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.tasks
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
 import org.cafienne.humantask.actorapi.command.HumanTaskCommand
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator

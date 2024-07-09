@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.repository
 
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -38,7 +38,7 @@ import org.cafienne.service.akkahttp.repository.RepositoryAPIFormat.ModelListRes
 import org.cafienne.system.CaseSystem
 import org.w3c.dom.Document
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 import scala.concurrent.ExecutionContext
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))

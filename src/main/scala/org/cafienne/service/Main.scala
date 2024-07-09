@@ -17,7 +17,7 @@
 
 package org.cafienne.service
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.schema.QueryDB

@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.actormodel
 
-import akka.persistence.PersistentActor
+import org.apache.pekko.persistence.PersistentActor
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.system.CaseSystem
 

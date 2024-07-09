@@ -17,11 +17,11 @@
 
 package org.cafienne.service.akkahttp.storage
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, onComplete}
-import akka.http.scaladsl.server.Route
-import akka.util.Timeout
+import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Directives.{complete, onComplete}
+import org.apache.pekko.http.scaladsl.server.Route
+import org.apache.pekko.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
@@ -67,7 +67,7 @@ object StorageRoute extends LazyLogging {
   }
 
   def askStorageCoordinator(command: StorageCommand): Route = {
-    import akka.pattern.ask
+    import org.apache.pekko.pattern.ask
     implicit val timeout: Timeout = Cafienne.config.actor.askTimout
 
     onComplete(storageCoordinator.ask(command)) {

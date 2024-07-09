@@ -17,11 +17,11 @@
 
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.marshalling.Marshaller
-import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
-import akka.http.scaladsl.server.Directives.{complete, optionalHeaderValueByName, respondWithHeader, respondWithHeaders}
-import akka.http.scaladsl.server.{Directive0, Route}
+import org.apache.pekko.http.scaladsl.marshalling.Marshaller
+import org.apache.pekko.http.scaladsl.model.headers.RawHeader
+import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
+import org.apache.pekko.http.scaladsl.server.Directives.{complete, optionalHeaderValueByName, respondWithHeader, respondWithHeaders}
+import org.apache.pekko.http.scaladsl.server.{Directive0, Route}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.response._
 import org.cafienne.service.akkahttp.LastModifiedHeader

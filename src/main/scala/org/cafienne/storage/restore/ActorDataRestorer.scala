@@ -17,8 +17,8 @@
 
 package org.cafienne.storage.restore
 
-import akka.persistence.journal.Tagged
-import akka.persistence.{DeleteMessagesSuccess, RecoveryCompleted}
+import org.apache.pekko.persistence.journal.Tagged
+import org.apache.pekko.persistence.{DeleteMessagesSuccess, RecoveryCompleted}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.storage.actormodel.message.StorageEvent

@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel;
 
-import akka.actor.Cancellable;
+import org.apache.pekko.actor.Cancellable;
 import org.cafienne.util.Guid;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class CaseScheduler {
     private final ModelActor actor;
-    private final akka.actor.Scheduler akkaScheduler;
+    private final org.apache.pekko.actor.Scheduler akkaScheduler;
     private final Map<String, Cancellable> jobs = new HashMap<>();
 
     /**

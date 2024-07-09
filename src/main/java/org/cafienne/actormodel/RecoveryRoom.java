@@ -17,8 +17,8 @@
 
 package org.cafienne.actormodel;
 
-import akka.persistence.RecoveryCompleted;
-import akka.persistence.SnapshotOffer;
+import org.apache.pekko.persistence.RecoveryCompleted;
+import org.apache.pekko.persistence.SnapshotOffer;
 import org.cafienne.actormodel.event.DebugEvent;
 import org.cafienne.actormodel.event.EngineVersionChanged;
 import org.cafienne.actormodel.event.ModelEvent;

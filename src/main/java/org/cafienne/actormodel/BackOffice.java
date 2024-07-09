@@ -17,7 +17,7 @@
 
 package org.cafienne.actormodel;
 
-import akka.actor.Cancellable;
+import org.apache.pekko.actor.Cancellable;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.exception.AuthorizationException;
 import org.cafienne.actormodel.exception.CommandException;

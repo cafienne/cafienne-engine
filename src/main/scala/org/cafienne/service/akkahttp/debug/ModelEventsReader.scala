@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.debug
 
-import akka.persistence.query.EventEnvelope
-import akka.stream.scaladsl.Source
+import org.apache.pekko.persistence.query.EventEnvelope
+import org.apache.pekko.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.actormodel.identity.PlatformUser
@@ -36,7 +36,7 @@ class ModelEventsReader(val caseSystem: CaseSystem) extends LazyLogging with Rea
 
   def getEvents(user: PlatformUser, actorId: String, from: Long, to: Long): Future[ValueList] = {
     val eventList = new ValueList
-    val source: Source[EventEnvelope, akka.NotUsed] = journal().currentEventsByPersistenceId(actorId, from, to)
+    val source: Source[EventEnvelope, org.apache.pekko.NotUsed] = journal().currentEventsByPersistenceId(actorId, from, to)
     source.runForeach {
       case EventEnvelope(offset, _, sequenceNr: Long, event: ModelEvent) =>
         if (user == null || user.tenants.contains(event.tenant) || user.isPlatformOwner) {

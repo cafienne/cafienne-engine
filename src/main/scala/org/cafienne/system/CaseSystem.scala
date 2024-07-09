@@ -17,7 +17,7 @@
 
 package org.cafienne.system
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache

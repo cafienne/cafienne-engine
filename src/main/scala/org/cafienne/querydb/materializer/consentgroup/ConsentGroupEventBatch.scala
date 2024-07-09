@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.consentgroup
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.consentgroup.actorapi.event.{ConsentGroupCreated, ConsentGroupMemberEvent, ConsentGroupModified}

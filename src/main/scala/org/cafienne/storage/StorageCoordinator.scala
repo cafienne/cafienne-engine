@@ -17,11 +17,11 @@
 
 package org.cafienne.storage
 
-import akka.Done
-import akka.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
-import akka.persistence.query.{EventEnvelope, Offset}
-import akka.stream.Materializer
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.Done
+import org.apache.pekko.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
+import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl.Sink
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider

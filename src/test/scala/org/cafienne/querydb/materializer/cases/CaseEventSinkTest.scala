@@ -1,8 +1,8 @@
 package org.cafienne.querydb.materializer.cases
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.event.{Logging, LoggingAdapter}
-import akka.testkit.{TestKit, TestProbe}
+import org.apache.pekko.actor.{ActorRef, ActorSystem, Props}
+import org.apache.pekko.event.{Logging, LoggingAdapter}
+import org.apache.pekko.testkit.{TestKit, TestProbe}
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.cmmn.actorapi.event.CaseEvent
 import org.cafienne.cmmn.definition.CaseDefinition

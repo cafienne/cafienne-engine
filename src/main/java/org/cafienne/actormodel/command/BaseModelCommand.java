@@ -17,8 +17,8 @@
 
 package org.cafienne.actormodel.command;
 
-import akka.actor.ActorPath;
-import akka.actor.ActorRef;
+import org.apache.pekko.actor.ActorPath;
+import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;

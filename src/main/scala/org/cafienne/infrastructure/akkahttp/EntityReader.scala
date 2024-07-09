@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
+import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.{ClassTagExtensions, DefaultScalaModule}
