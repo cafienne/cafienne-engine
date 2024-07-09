@@ -20,7 +20,7 @@ package org.cafienne.service.akkahttp.consentgroup.route
 import org.cafienne.infrastructure.akkahttp.route.AuthenticatedRoute
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 
 @Path("consent-group")
 class ConsentGroupRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {

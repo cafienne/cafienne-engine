@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.deletion
 
-import akka.persistence.DeleteMessagesSuccess
+import org.apache.pekko.persistence.DeleteMessagesSuccess
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.storage.actormodel.message.StorageEvent
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType, QueryDBStorageActor}

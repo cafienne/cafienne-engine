@@ -17,10 +17,14 @@
 
 package org.cafienne.service.akkahttp.swagger
 
-import com.github.swagger.akka._
-import com.github.swagger.akka.model.Info
+import com.github.swagger.pekko._
+import com.github.swagger.pekko.model.Info
 import io.swagger.v3.oas.models.security.{OAuthFlow, OAuthFlows, Scopes, SecurityScheme}
+import org.apache.pekko.http.cors.scaladsl.model.HttpHeaderRange
+import org.apache.pekko.http.cors.scaladsl.settings.CorsSettings
+import org.apache.pekko.http.scaladsl.model.HttpMethods.{DELETE, GET, HEAD, OPTIONS, POST, PUT}
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.service.akkahttp.Headers
 
 class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends SwaggerHttpService {
 
@@ -65,11 +69,11 @@ class SwaggerHttpServiceRoute(override val apiClasses: Set[Class[_]]) extends Sw
   //override def security: List[SecurityRequirement] = List(new SecurityRequirement().addList("openId"))
   def route = get {
     routes ~
-      pathPrefix("") {
+        pathPrefix("") {
         pathEndOrSingleSlash {
           getFromResource("swagger/index.html")
         }
       } ~ getFromResourceDirectory("swagger")
-  }
+    }
 
 }

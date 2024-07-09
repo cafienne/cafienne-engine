@@ -1,6 +1,6 @@
 package org.cafienne.infrastructure.cqrs.batch
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import org.cafienne.actormodel.command.ModelCommand
 import org.cafienne.actormodel.response.ModelResponse
 import org.cafienne.infrastructure.Cafienne

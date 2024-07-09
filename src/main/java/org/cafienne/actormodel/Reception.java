@@ -17,8 +17,8 @@
 
 package org.cafienne.actormodel;
 
-import akka.persistence.JournalProtocol;
-import akka.persistence.SnapshotProtocol;
+import org.apache.pekko.persistence.JournalProtocol;
+import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.actormodel.exception.InvalidCommandException;

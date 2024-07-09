@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.akkahttp.route
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.exception.AuthorizationException
 import org.cafienne.json.{CafienneJson, Value}
 import org.cafienne.querydb.query.exception.SearchFailure

@@ -17,7 +17,7 @@
 
 package org.cafienne.system.router
 
-import akka.actor.{Actor, Terminated}
+import org.apache.pekko.actor.{Actor, Terminated}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.infrastructure.serialization.DeserializationFailure

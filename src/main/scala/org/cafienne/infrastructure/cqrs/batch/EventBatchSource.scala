@@ -17,10 +17,10 @@
 
 package org.cafienne.infrastructure.cqrs.batch
 
-import akka.NotUsed
-import akka.stream.scaladsl.Source
-import akka.stream.stage.{GraphStage, GraphStageLogic}
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
+import org.apache.pekko.NotUsed
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.stream.stage.{GraphStage, GraphStageLogic}
+import org.apache.pekko.stream.{Attributes, FlowShape, Inlet, Outlet}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}

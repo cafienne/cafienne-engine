@@ -17,7 +17,7 @@
 
 package org.cafienne.service.akkahttp.consentgroup.route
 
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.ConsentGroupUser
 import org.cafienne.authentication.AuthenticatedUser
 import org.cafienne.consentgroup.actorapi.command.ConsentGroupCommand

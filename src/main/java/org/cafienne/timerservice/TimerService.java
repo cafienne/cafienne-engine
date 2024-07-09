@@ -17,7 +17,7 @@
 
 package org.cafienne.timerservice;
 
-import akka.persistence.SnapshotOffer;
+import org.apache.pekko.persistence.SnapshotOffer;
 import org.cafienne.actormodel.ModelActor;
 import org.cafienne.actormodel.event.ModelEvent;
 import org.cafienne.infrastructure.Cafienne;

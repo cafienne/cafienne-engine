@@ -17,8 +17,8 @@
 
 package org.cafienne.timerservice.persistence
 
-import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
-import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal
+import org.apache.pekko.persistence.cassandra.query.scaladsl.CassandraReadJournal
+import org.apache.pekko.persistence.jdbc.query.scaladsl.JdbcReadJournal
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 import org.cafienne.system.CaseSystem
 import org.cafienne.timerservice.persistence.cassandra.CassandraTimerStore

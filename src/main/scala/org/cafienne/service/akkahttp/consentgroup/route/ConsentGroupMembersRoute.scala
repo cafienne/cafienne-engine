@@ -17,7 +17,7 @@
 
 package org.cafienne.service.akkahttp.consentgroup.route
 
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -27,7 +27,7 @@ import org.cafienne.querydb.query.{TenantQueriesImpl, UserQueries}
 import org.cafienne.service.akkahttp.consentgroup.model.ConsentGroupAPI.{ConsentGroupResponseFormat, ConsentGroupUserFormat}
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs._
+import jakarta.ws.rs._
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
 @Path("consent-group")

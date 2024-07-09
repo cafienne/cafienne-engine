@@ -17,10 +17,10 @@
 
 package org.cafienne.service.akkahttp
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives.concat
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.server.Directives.concat
+import org.apache.pekko.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.akkahttp.route.CaseServiceRoute

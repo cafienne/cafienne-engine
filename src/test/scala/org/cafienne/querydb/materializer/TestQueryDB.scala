@@ -1,6 +1,6 @@
 package org.cafienne.querydb.materializer
 
-import akka.persistence.query.Offset
+import org.apache.pekko.persistence.query.Offset
 import org.cafienne.querydb.materializer.cases.TestCaseStorageTransaction
 import org.cafienne.querydb.materializer.consentgroup.ConsentGroupStorageTransaction
 import org.cafienne.querydb.materializer.tenant.TenantStorageTransaction

@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.cqrs.offset
 
-import akka.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
+import org.apache.pekko.persistence.query.{NoOffset, Offset, Sequence, TimeBasedUUID}
 
 import java.sql.Timestamp
 import java.time.Instant

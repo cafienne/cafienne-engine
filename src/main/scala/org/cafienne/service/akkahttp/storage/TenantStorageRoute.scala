@@ -17,8 +17,8 @@
 
 package org.cafienne.service.akkahttp.storage
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.model.StatusCodes
+import org.apache.pekko.http.scaladsl.server.Route
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -29,7 +29,7 @@ import org.cafienne.storage.StorageUser
 import org.cafienne.storage.actormodel.{ActorMetadata, ActorType}
 import org.cafienne.system.CaseSystem
 
-import javax.ws.rs.{DELETE, Path, Produces}
+import jakarta.ws.rs.{DELETE, Path, Produces}
 import scala.util.{Failure, Success}
 
 @SecurityRequirement(name = "oauth2", scopes = Array("openid"))
@@ -93,9 +93,9 @@ class TenantStorageRoute(override val caseSystem: CaseSystem) extends TenantRout
                   // ALTERNATE Implementation that gives tenant and case details back to the user
 //                  val json = Value.convert(usageResult)
 //                  println("Found groups in use somewhere else: " + json)
-//                  import akka.http.scaladsl.marshalling.Marshaller
-//                  import akka.http.scaladsl.model.HttpEntity
-//                  import akka.http.scaladsl.model.ContentTypes
+//                  import org.apache.pekko.http.scaladsl.marshalling.Marshaller
+//                  import org.apache.pekko.http.scaladsl.model.HttpEntity
+//                  import org.apache.pekko.http.scaladsl.model.ContentTypes
 //                  implicit val valueMarshaller: Marshaller[Value[_], HttpEntity.Strict] = Marshaller.withFixedContentType(ContentTypes.`application/json`) { value: Value[_] =>
 //                    HttpEntity(ContentTypes.`application/json`, value.toString)
 //                  }

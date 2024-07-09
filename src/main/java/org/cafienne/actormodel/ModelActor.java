@@ -17,11 +17,11 @@
 
 package org.cafienne.actormodel;
 
-import akka.actor.PoisonPill;
-import akka.persistence.AbstractPersistentActor;
-import akka.persistence.JournalProtocol;
-import akka.persistence.SnapshotOffer;
-import akka.persistence.SnapshotProtocol;
+import org.apache.pekko.actor.PoisonPill;
+import org.apache.pekko.persistence.AbstractPersistentActor;
+import org.apache.pekko.persistence.JournalProtocol;
+import org.apache.pekko.persistence.SnapshotOffer;
+import org.apache.pekko.persistence.SnapshotProtocol;
 import org.cafienne.actormodel.command.BootstrapMessage;
 import org.cafienne.actormodel.command.ModelCommand;
 import org.cafienne.actormodel.event.ActorModified;

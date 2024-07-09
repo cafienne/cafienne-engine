@@ -17,8 +17,8 @@
 
 package org.cafienne.infrastructure.serialization;
 
-import akka.actor.ExtendedActorSystem;
-import akka.serialization.SerializerWithStringManifest;
+import org.apache.pekko.actor.ExtendedActorSystem;
+import org.apache.pekko.serialization.SerializerWithStringManifest;
 import org.cafienne.infrastructure.serialization.serializers.CommandSerializers;
 import org.cafienne.infrastructure.serialization.serializers.EventSerializers;
 import org.cafienne.infrastructure.serialization.serializers.ResponseSerializers;

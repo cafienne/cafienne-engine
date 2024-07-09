@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.actormodel.event.CommitEvent
 import org.cafienne.infrastructure.cqrs.ModelEventEnvelope
 import org.cafienne.infrastructure.cqrs.batch.EventBatch

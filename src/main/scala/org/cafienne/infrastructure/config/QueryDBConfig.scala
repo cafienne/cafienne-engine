@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.config
 
-import akka.stream.RestartSettings
+import org.apache.pekko.stream.RestartSettings
 import org.cafienne.infrastructure.config.util.{ChildConfigReader, MandatoryConfig}
 
 import java.util.concurrent.TimeUnit
