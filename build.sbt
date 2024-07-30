@@ -202,7 +202,7 @@ libraryDependencies ++= Seq(
   // Persistence support
   , "com.h2database"          %  "h2"                                   % "2.2.220"
   , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
-  , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.0"  excludeAll ExclusionRule(organization = "org.apache.pekko")
+  , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1-SNAPSHOT"  excludeAll ExclusionRule(organization = "org.apache.pekko")
   , "org.postgresql"          %  "postgresql"                           % "42.5.5"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
@@ -229,6 +229,6 @@ libraryDependencies ++= Seq(
   , "org.apache.pekko"       %% "pekko-testkit"                         % akkaVersion
   , "org.apache.pekko"       %% "pekko-http-testkit"                    % akkaHttpVersion
   , "org.apache.pekko"       %% "pekko-multi-node-testkit"              % akkaVersion
-  , "io.github.alstanchev"   %% "pekko-persistence-inmemory"            % "1.1.0"  excludeAll ExclusionRule(organization = "org.apache.pekko")
+  , "io.github.alstanchev"   %% "pekko-persistence-inmemory"            % "1.1.1-SNAPSHOT"  excludeAll ExclusionRule(organization = "org.apache.pekko")
   , "com.github.tomakehurst"  %  "wiremock"                             % "2.27.2"
 ).map(dep => dep % Test)

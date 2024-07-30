@@ -5,10 +5,10 @@ import com.typesafe.config.ConfigFactory
 object TestConfig {
   val config = ConfigFactory.parseString(
     """
-      |      akka {
+      |      pekko {
       |        loglevel = "DEBUG"
       |        stdout-loglevel = "DEBUG"
-      |        loggers = ["akka.testkit.TestEventListener"]
+      |        loggers = ["org.apache.pekko.testkit.TestEventListener"]
       |        actor {
       |          default-dispatcher {
       |            executor = "fork-join-executor"
