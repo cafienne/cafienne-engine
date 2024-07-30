@@ -42,7 +42,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
 
     // ... and then schedule the reader to repeat itself at the configured interval
     val interval: FiniteDuration = Cafienne.config.engine.timerService.interval
-    scheduler.scheduleAtFixedRate(interval, interval)(reader)
+    scheduler.scheduleWithFixedDelay(interval, interval)(reader)
   }
 
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done] = {
@@ -72,6 +72,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
   }
 
   def scheduleTimer(timer: Timer): Unit = {
+    logger.debug("new timerjob {}", timer)
     activeTimers.getOrElseUpdate(timer.timerId, new TimerJob(timerService, timer, scheduler))
   }
 }
