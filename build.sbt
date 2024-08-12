@@ -14,7 +14,7 @@ resolvers ++= Seq(
   Resolver.jcenterRepo,
   Resolver.DefaultMavenRepository,
   "typesafe releases" at "https://repo.typesafe.com/typesafe/releases",
-) ++ Resolver.sonatypeOssRepos("releases")
+) ++ Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
 
 /**
   * Plugins used
