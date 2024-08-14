@@ -211,9 +211,9 @@ libraryDependencies ++= Seq(
   , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-jaxrs2"                       % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
-  , "com.github.swagger-akka-http" %% "swagger-pekko-http"               % "2.12.2"
-  //, "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-pekko-http :(
-  //, "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
+  , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2"
+  , "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-pekko-http :(
+  , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
 
   //security overrides
   //, "com.fasterxml.woodstox"  % "woodstox-core"                         % "6.4.0"
