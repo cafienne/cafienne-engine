@@ -153,10 +153,10 @@ libraryDependencies ++= Seq(
   // Logging
   , "com.typesafe.akka"       %% "akka-slf4j"                           % akkaVersion
   , "com.typesafe.akka"       %% "akka-stream"                          % akkaVersion
-  , "com.typesafe"            %  "config"                               % "1.4.2"
+  , "com.typesafe"            %  "config"                               % "1.4.3"
   , "com.typesafe.scala-logging"      %% "scala-logging"                % "3.9.5"
-  , "ch.qos.logback"          %  "logback-classic"                      % "1.4.12"
-  , "org.apache.commons"      %  "commons-text"                         % "1.10.0" // StrSubstitutor usage inside process tasks
+  , "ch.qos.logback"          %  "logback-classic"                      % "1.5.6"
+  , "org.apache.commons"      %  "commons-text"                         % "1.11.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
   , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
   , "ch.megard"               %% "akka-http-cors"                       % "1.2.0"
@@ -164,15 +164,15 @@ libraryDependencies ++= Seq(
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
   , "com.github.j5ik2o"       %% "sw4jj"                                % "1.1.60" // Simple scala Wrapper For Java-Jwt
-  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.31"
-  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "10.9.2"
+  , "com.nimbusds"            %  "nimbus-jose-jwt"                      % "9.40"
+  , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
 
   // DB Schema
   , "org.flywaydb"            %  "flyway-core"                           % "7.2.1"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
   , "com.typesafe.slick"      %% "slick"                                % slickVersion
-  , "io.github.nafg"          %% "slick-migration-api-flyway"           % "0.7.0"
-  , "io.github.nafg"          %% "slick-migration-api"                  % "0.8.0"
+  , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.7.0"
+  , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.8.0"
 
   , "com.fasterxml.jackson.core"   % "jackson-databind"			            % jacksonVersion
   , "com.fasterxml.jackson.core"   % "jackson-core"					            % jacksonVersion
@@ -195,10 +195,10 @@ libraryDependencies ++= Seq(
   , "org.springframework"     %  "spring-expression"                    % "5.3.23"
 
   // Persistence support
-  , "com.h2database"          %  "h2"                                   % "2.2.220"
-  , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
+  , "com.h2database"          %  "h2"                                   % "2.2.224"
+  , "org.hsqldb"              %  "hsqldb"                               % "2.7.3"
   , "com.github.dnvriend"     %% "akka-persistence-inmemory"            % "2.5.15.2"  excludeAll ExclusionRule(organization = "com.typesafe.akka")
-  , "org.postgresql"          %  "postgresql"                           % "42.5.5"
+  , "org.postgresql"          %  "postgresql"                           % "42.7.3"
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
   // Swagger support
@@ -212,7 +212,7 @@ libraryDependencies ++= Seq(
 
   //security overrides
   , "com.fasterxml.woodstox"  % "woodstox-core"                         % "6.4.0"
-  ,"net.minidev"              % "json-smart"                            % "2.4.10"
+  ,"net.minidev"              % "json-smart"                            % "2.5.1"
   ,"org.yaml"                 %"snakeyaml"                              % "2.0"
 )
 
@@ -220,10 +220,10 @@ libraryDependencies ++= Seq(
   * Add test dependencies
   */
 libraryDependencies ++= Seq(
-  "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.9.0"
+  "org.junit.jupiter"         %  "junit-jupiter-api"                    % "5.10.3"
   , "com.novocode"            %  "junit-interface"                      % "0.11"
   , "org.scalamock"           %% "scalamock"                            % "5.2.0"
-  , "org.scalatest"           %% "scalatest"                            % "3.2.14"
+  , "org.scalatest"           %% "scalatest"                            % "3.2.19"
   , "commons-io"              %  "commons-io"                           % "20030203.000550"
   , "com.typesafe.akka"       %% "akka-testkit"                         % akkaVersion
   , "com.typesafe.akka"       %% "akka-http-testkit"                    % akkaHttpVersion
