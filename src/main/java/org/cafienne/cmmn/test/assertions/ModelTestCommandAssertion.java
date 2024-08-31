@@ -23,13 +23,13 @@ public class ModelTestCommandAssertion {
     protected final CaseTestCommand testCommand;
 
     protected ModelTestCommandAssertion(CaseTestCommand testCommand) {
-        this(testCommand, false);
+        this(testCommand, false, "");
     }
 
-    protected ModelTestCommandAssertion(CaseTestCommand testCommand, boolean expectCommandFailure) {
+    protected ModelTestCommandAssertion(CaseTestCommand testCommand, boolean expectCommandFailure, String errorMessage) {
         this.testCommand = testCommand;
         if (expectCommandFailure) {
-            expectCommandFailure();
+            expectCommandFailure(errorMessage);
         } else {
             expectNoCommandFailure();
         }
@@ -41,13 +41,20 @@ public class ModelTestCommandAssertion {
 
     private void expectNoCommandFailure() {
         if (testCommand.getActualFailure() != null) {
-            throw new AssertionError("Unexpected failure in test step " + testCommand.getActionNumber() + " [" + testCommand.getActualCommand().getClass().getSimpleName() + "]\n" + testCommand.getActualFailure().exception());
+            raiseError("Received unexpected failure: " + testCommand.getActualFailure().exception());
         }
     }
 
-    private void expectCommandFailure() {
+    private void expectCommandFailure(String errorMessage) {
         if (testCommand.getActualFailure() == null) {
-            throw new AssertionError("Test script expected a failure from the case engine in step " + testCommand.getActionNumber() + " [" + testCommand.getActualCommand().getClass().getSimpleName() + "]");
+            raiseError(errorMessage);
         }
+    }
+
+    protected void raiseError(String errorMessage) {
+        if (!errorMessage.trim().isEmpty()) {
+            errorMessage = "\n  Expected error: " + errorMessage;
+        }
+        throw new AssertionError("Test script failed in step " + testCommand.getActionNumber() + " [user=" + testCommand.getUser().id() + "|command=" + testCommand.getActualCommand().getClass().getSimpleName() + "]\n" + errorMessage);
     }
 }

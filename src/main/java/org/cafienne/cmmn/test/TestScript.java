@@ -275,8 +275,30 @@ public class TestScript {
      * @param command
      * @param validator
      */
+    public void assertStepFails(CaseCommand command, FailureValidator validator, String errorMessage) {
+        addTestStep(command, e -> validator.validate(new FailureAssertion(e, errorMessage)));
+    }
+
+    /**
+     * Add a command that is expected to fail, and then invoke the validator with the failure to
+     * do more assertions.
+     *
+     * @param command
+     * @param validator
+     */
     public void assertStepFails(CaseCommand command, FailureValidator validator) {
         addTestStep(command, e -> validator.validate(new FailureAssertion(e)));
+    }
+
+    /**
+     * Add a command that is expected to fail, and then invoke the validator with the failure to
+     * do more assertions.
+     *
+     * @param command - The command to send to the case
+     * @param errorMessage - The message to expect during the failure
+     */
+    public void assertStepFails(CaseCommand command, String errorMessage) {
+        assertStepFails(command, failure -> failure.assertException(errorMessage), errorMessage);
     }
 
     /**
