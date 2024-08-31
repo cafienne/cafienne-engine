@@ -3,39 +3,21 @@
         <caseFileItem id="_vdfDP_15" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__vdfDP_0" name="eventlistener" autoComplete="false">
-        <planItem id="pi_ht__vdfDP_0" name="T1" definitionRef="ht__vdfDP_0">
-            <entryCriterion id="_vdfDP_11" name="UserEventOccurred" sentryRef="crit__vdfDP_1"/>
-        </planItem>
-        <planItem id="pi_ht__vdfDP_1" name="T2" definitionRef="ht__vdfDP_1">
-            <entryCriterion id="_vdfDP_13" name="CodeBasedWaiterOccurred" sentryRef="crit__vdfDP_2"/>
-        </planItem>
-        <planItem id="pi_tmr__vdfDP_0" name="CodeBasedWaiter" definitionRef="tmr__vdfDP_0"/>
-        <planItem id="pi_ue__vdfDP_0" name="UserEvent" definitionRef="ue__vdfDP_0"/>
-        <planItem id="pi_tmr__vdfDP_1" name="DateWaiter" definitionRef="tmr__vdfDP_1"/>
-        <planItem id="pi_tmr__vdfDP_2" name="PeriodWaiter" definitionRef="tmr__vdfDP_2"/>
-        <planItem id="pi_ht__vdfDP_2" name="naTimer" definitionRef="ht__vdfDP_2">
-            <entryCriterion id="_vdfDP_9" name="PeriodWaiterOccurs" sentryRef="crit__vdfDP_0"/>
-        </planItem>
-        <sentry id="crit__vdfDP_0" name="Sentry_0">
-            <planItemOnPart id="_vdfDP_10" name="PlanItemOnPart_0" sourceRef="pi_tmr__vdfDP_2">
-                <standardEvent>occur</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__vdfDP_1" name="Sentry_1">
-            <planItemOnPart id="_vdfDP_12" name="PlanItemOnPart_1" sourceRef="pi_ue__vdfDP_0">
-                <standardEvent>occur</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__vdfDP_2" name="Sentry_2">
-            <planItemOnPart id="_vdfDP_14" name="PlanItemOnPart_2" sourceRef="pi_tmr__vdfDP_0">
-                <standardEvent>occur</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <humanTask id="ht__vdfDP_0" name="T1" isBlocking="true"/>
-        <humanTask id="ht__vdfDP_1" name="T2" isBlocking="true"/>
-        <humanTask id="ht__vdfDP_2" name="naTimer" isBlocking="true"/>
-        <userEvent id="ue__vdfDP_0" name="UserEvent"/>
-        <timerEvent id="tmr__vdfDP_0" name="CodeBasedWaiter">
+        <humanTask id="pi_ht__vdfDP_0" name="T1" isBlocking="true">
+            <entryCriterion id="_vdfDP_11" name="UserEventOccurred">
+                <planItemOnPart id="_vdfDP_12" name="PlanItemOnPart_1" sourceRef="pi_ue__vdfDP_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </humanTask>
+        <humanTask id="pi_ht__vdfDP_1" name="T2" isBlocking="true">
+            <entryCriterion id="_vdfDP_13" name="CodeBasedWaiterOccurred">
+                <planItemOnPart id="_vdfDP_14" name="PlanItemOnPart_2" sourceRef="pi_tmr__vdfDP_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </humanTask>
+        <timerEvent id="pi_tmr__vdfDP_0" name="CodeBasedWaiter">
             <timerExpression id="_vdfDP_3">
                 <body>
                     <![CDATA[P0DT0H1M]]>
@@ -45,7 +27,8 @@
                 <standardEvent></standardEvent>
             </planItemStartTrigger>
         </timerEvent>
-        <timerEvent id="tmr__vdfDP_1" name="DateWaiter">
+        <userEvent id="pi_ue__vdfDP_0" name="UserEvent"/>
+        <timerEvent id="pi_tmr__vdfDP_1" name="DateWaiter">
             <timerExpression id="_vdfDP_5">
                 <body>
                     <![CDATA[P0DT0H1M]]>
@@ -55,7 +38,7 @@
                 <standardEvent></standardEvent>
             </planItemStartTrigger>
         </timerEvent>
-        <timerEvent id="tmr__vdfDP_2" name="PeriodWaiter">
+        <timerEvent id="pi_tmr__vdfDP_2" name="PeriodWaiter">
             <timerExpression id="_vdfDP_7">
                 <body>
                     <![CDATA[P0DT0H1M]]>
@@ -65,5 +48,13 @@
                 <standardEvent></standardEvent>
             </planItemStartTrigger>
         </timerEvent>
+        <humanTask id="pi_ht__vdfDP_2" name="naTimer" isBlocking="true">
+            <entryCriterion id="_vdfDP_9" name="PeriodWaiterOccurs">
+                <planItemOnPart id="_vdfDP_10" name="PlanItemOnPart_0" sourceRef="pi_tmr__vdfDP_2">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </humanTask>
     </casePlanModel>
+    <caseRoles/>
 </case>

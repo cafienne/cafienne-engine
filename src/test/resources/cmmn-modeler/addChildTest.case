@@ -1,4 +1,4 @@
-<case id="addChildTest.case" name="addChildTest" guid="_dTzf7">
+<case id="addChildTest.case" name="addChildTest" expressionLanguage="spel" guid="_dTzf7">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[test for addChild event]]>
@@ -12,16 +12,15 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm_addChildTest.case_0" name="addChildTest" autoComplete="true">
-        <planItem id="cm_addChildTest.case_197" name="Task_2" definitionRef="pid_cm_addChildTest.case_197">
-            <entryCriterion id="_dTzf7_0" name="EntryCriterion_0" sentryRef="cm_addChildTest.case_199"/>
-        </planItem>
-        <sentry id="cm_addChildTest.case_199">
-            <caseFileItemOnPart sourceRef="cfi_addChildTest.case_2">
-                <standardEvent>addChild</standardEvent>
-            </caseFileItemOnPart>
-        </sentry>
-        <humanTask id="pid_cm_addChildTest.case_197" name="Task_2" isBlocking="true"/>
+        <humanTask id="cm_addChildTest.case_197" name="Task_2" isBlocking="true">
+            <entryCriterion id="_dTzf7_0" name="EntryCriterion_0">
+                <caseFileItemOnPart sourceRef="cfi_addChildTest.case_2">
+                    <standardEvent>addChild</standardEvent>
+                </caseFileItemOnPart>
+            </entryCriterion>
+        </humanTask>
     </casePlanModel>
+    <caseRoles/>
     <output id="_uKIcG_outCPs_0" name="out"/>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{

@@ -1,4 +1,4 @@
-<case id="casefile.case" name="casefile" guid="_kWyIV">
+<case id="casefile.case" name="casefile" expressionLanguage="spel" guid="_kWyIV">
     <caseFileModel>
         <caseFileItem id="_kWyIV_1" name="RootCaseFileItem" multiplicity="ExactlyOne" definitionRef="rootcasefileitem.cfid">
             <children>
@@ -19,7 +19,7 @@
         <caseFileItem id="_kWyIV_2" name="RootCaseFileArray" multiplicity="ZeroOrMore" definitionRef="rootcasefileitem.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__kWyIV_0" name="casefile" autoComplete="true">
-        <planItem id="pi_ht__kWyIV_0" name="Simplistic Unused Task" definitionRef="ht__kWyIV_0"/>
-        <humanTask id="ht__kWyIV_0" name="Simplistic Unused Task" isBlocking="true"/>
+        <humanTask id="pi_ht__kWyIV_0" name="Simplistic Unused Task" isBlocking="true"/>
     </casePlanModel>
+    <caseRoles/>
 </case>

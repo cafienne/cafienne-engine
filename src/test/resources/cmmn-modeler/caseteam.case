@@ -1,14 +1,11 @@
-<case id="caseteam.case" name="caseteam" guid="_jAVt1">
+<case id="caseteam.case" name="caseteam" expressionLanguage="spel" guid="_jAVt1">
     <caseFileModel>
         <caseFileItem id="_jAVt1_3" name="Root" multiplicity="ExactlyOne" definitionRef="string.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__jAVt1_0" name="caseteam" autoComplete="true">
-        <planItem id="pi_ht__jAVt1_0" name="Approve" definitionRef="ht__jAVt1_0"/>
-        <planItem id="pi_ht__jAVt1_1" name="Request" definitionRef="ht__jAVt1_1"/>
-        <planItem id="pi_ht__jAVt1_2" name="Assist" definitionRef="ht__jAVt1_2"/>
-        <humanTask id="ht__jAVt1_0" name="Approve" isBlocking="true" performerRef="_jAVt1_1"/>
-        <humanTask id="ht__jAVt1_1" name="Request" isBlocking="true" performerRef="_jAVt1_0"/>
-        <humanTask id="ht__jAVt1_2" name="Assist" isBlocking="true" performerRef="_jAVt1_2"/>
+        <humanTask id="pi_ht__jAVt1_0" name="Approve" isBlocking="true" performerRef="_jAVt1_1"/>
+        <humanTask id="pi_ht__jAVt1_1" name="Request" isBlocking="true" performerRef="_jAVt1_0"/>
+        <humanTask id="pi_ht__jAVt1_2" name="Assist" isBlocking="true" performerRef="_jAVt1_2"/>
     </casePlanModel>
     <caseRoles>
         <role id="_jAVt1_0" name="Requestor"/>

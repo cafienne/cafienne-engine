@@ -1,4 +1,4 @@
-<case id="helloworld.case" name="HelloWorld" guid="_nTPPc">
+<case id="helloworld.case" name="HelloWorld" expressionLanguage="spel" guid="_nTPPc">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[Hello World]]>
@@ -9,23 +9,13 @@
         <caseFileItem id="cfi_csVQy_1" name="Response" multiplicity="ExactlyOne" definitionRef="response.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm_HelloWorld.case_HelloWorld_0" name="HelloWorld" autoComplete="true">
-        <planItem id="cm_csVQy_167" name="Receive Greeting and Send response" definitionRef="pid_cm_csVQy_167">
+        <humanTask id="cm_csVQy_167" name="Receive Greeting and Send response" isBlocking="true">
             <documentation textFormat="text/plain">
                 <text>
                     <![CDATA[Receive Greeting
 and Send response]]>
                 </text>
             </documentation>
-        </planItem>
-        <planItem id="cm_cs3hg_196" name="Read response" definitionRef="pid_cm_cs3hg_196">
-            <entryCriterion id="_nTPPc_0" name="EntryCriterion_0" sentryRef="cm_cs3hg_198"/>
-        </planItem>
-        <sentry id="cm_cs3hg_198">
-            <planItemOnPart id="ref_id_cm_csVQy_167" sourceRef="cm_csVQy_167">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <humanTask id="pid_cm_csVQy_167" name="Receive Greeting and Send response" isBlocking="true">
             <inputs id="inTP_cm_cs2F1_174_1" name="Greeting" bindingRef="cfi_csVQy_0"/>
             <outputs id="outTP_cm_cs2F1_174_1" name="Response" bindingRef="cfi_csVQy_1"/>
             <extensionElements mustUnderstand="false">
@@ -33,14 +23,14 @@ and Send response]]>
                     <parameterMapping id="inPM_cm_cshJq_4_0" sourceRef="inTP_cm_cs2F1_174_1" targetRef="Greeting"/>
                     <parameterMapping id="outPM_cm_csuYs_174_0" sourceRef="Response" targetRef="outTP_cm_cs2F1_174_1"/>
                     <assignment id="_nTPPc_3" name="Assignment_0" contextRef="cfi_csVQy_0">
-                        <condition id="_nTPPc_4" name="Expression_0" language="spel">
+                        <condition id="_nTPPc_4" name="Expression_0">
                             <body>
                                 <![CDATA[Greeting.To]]>
                             </body>
                         </condition>
                     </assignment>
                     <duedate id="_nTPPc_6" name="DueDate_0">
-                        <condition id="_nTPPc_7" name="Expression_1" language="spel">
+                        <condition id="_nTPPc_7" name="Expression_1">
                             <body>
                                 <![CDATA[T(java.time.Instant).now()]]>
                             </body>
@@ -49,20 +39,25 @@ and Send response]]>
                 </cafienne:implementation>
             </extensionElements>
         </humanTask>
-        <humanTask id="pid_cm_cs3hg_196" name="Read response" isBlocking="true">
+        <humanTask id="cm_cs3hg_196" name="Read response" isBlocking="true">
+            <entryCriterion id="_nTPPc_0" name="EntryCriterion_0">
+                <planItemOnPart id="ref_id_cm_csVQy_167" sourceRef="cm_csVQy_167">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
             <inputs id="inTP_cm_cs3hg_196_0" name="Response" bindingRef="cfi_csVQy_1"/>
             <extensionElements mustUnderstand="false">
                 <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="readresponse.humantask">
                     <parameterMapping id="inPM_cm_cs3hg_196_0" sourceRef="inTP_cm_cs3hg_196_0" targetRef="Response"/>
                     <assignment id="_nTPPc_9" name="Assignment_1" contextRef="cfi_csVQy_0">
-                        <condition id="_nTPPc_10" name="Expression_2" language="spel">
+                        <condition id="_nTPPc_10" name="Expression_2">
                             <body>
                                 <![CDATA[Greeting.From]]>
                             </body>
                         </condition>
                     </assignment>
                     <duedate id="_nTPPc_11" name="DueDate_1">
-                        <condition id="_nTPPc_12" name="Expression_3" language="spel">
+                        <condition id="_nTPPc_12" name="Expression_3">
                             <body>
                                 <![CDATA[T(java.time.Instant).now()]]>
                             </body>

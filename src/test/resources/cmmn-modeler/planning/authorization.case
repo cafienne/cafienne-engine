@@ -8,12 +8,10 @@
         <caseFileItem id="_AdNzA_4" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__AdNzA_0" name="Planning/Authorization" autoComplete="true">
-        <planItem id="pi_ht__AdNzA_0" name="Task" definitionRef="ht__AdNzA_0"/>
+        <humanTask id="pi_ht__AdNzA_0" name="Task" isBlocking="true"/>
         <planningTable id="_AdNzA_2" name="PlanningTable_0">
-            <discretionaryItem id="pi_ht__AdNzA_1" name="PlanMe" definitionRef="ht__AdNzA_1" authorizedRoleRefs="_AdNzA_3"/>
+            <humanTask id="pi_ht__AdNzA_1" name="PlanMe" authorizedRoleRefs="_AdNzA_3" isBlocking="true"/>
         </planningTable>
-        <humanTask id="ht__AdNzA_0" name="Task" isBlocking="true"/>
-        <humanTask id="ht__AdNzA_1" name="PlanMe" isBlocking="true"/>
     </casePlanModel>
     <caseRoles>
         <role id="_AdNzA_3" name="planner">

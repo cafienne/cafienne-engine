@@ -3,24 +3,22 @@
         <caseFileItem id="_v6SP3_1" name="in" multiplicity="ExactlyOne" definitionRef="string.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__v6SP3_0" name="milestonedependency" autoComplete="true">
-        <planItem id="pi_ms__v6SP3_0" name="ImmediateMilestone" definitionRef="ms__v6SP3_0"/>
-        <planItem id="pi__v6SP3_2" name="Stage" definitionRef="_v6SP3_2">
-            <entryCriterion id="_v6SP3_4" name="EntryCriterion_0" sentryRef="crit__v6SP3_0"/>
-        </planItem>
-        <sentry id="crit__v6SP3_0">
-            <ifPart id="_v6SP3_6" contextRef="_v6SP3_1">
-                <condition id="_v6SP3_7">
-                    <body>
-                        <![CDATA[true]]>
-                    </body>
-                </condition>
-            </ifPart>
-            <planItemOnPart id="_v6SP3_5" sourceRef="pi_ms__v6SP3_0">
-                <standardEvent>occur</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <milestone id="ms__v6SP3_0" name="ImmediateMilestone"/>
-        <stage id="_v6SP3_2" name="Stage" autoComplete="true"/>
+        <milestone id="pi_ms__v6SP3_0" name="ImmediateMilestone"/>
+        <stage id="pi__v6SP3_2" name="Stage" autoComplete="true">
+            <entryCriterion id="_v6SP3_4" name="EntryCriterion_0">
+                <ifPart id="_v6SP3_6" contextRef="_v6SP3_1">
+                    <condition id="_v6SP3_7">
+                        <body>
+                            <![CDATA[true]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <planItemOnPart id="_v6SP3_5" sourceRef="pi_ms__v6SP3_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </stage>
     </casePlanModel>
+    <caseRoles/>
     <input id="_v6SP3_8" name="in" bindingRef="_v6SP3_1"/>
 </case>

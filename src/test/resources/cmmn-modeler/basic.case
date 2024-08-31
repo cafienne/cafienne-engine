@@ -1,54 +1,42 @@
-<case id="basic.case" name="basic" guid="_Jjxp7">
+<case id="basic.case" name="basic" expressionLanguage="spel" guid="_Jjxp7">
     <caseFileModel>
         <caseFileItem id="_Jjxp7_17" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__Jjxp7_0" name="basic" autoComplete="true">
-        <planItem id="pi_ht__Jjxp7_0" name="Item1" definitionRef="ht__Jjxp7_0"/>
-        <planItem id="pi_ht__Jjxp7_1" name="Item2" definitionRef="ht__Jjxp7_1"/>
-        <planItem id="pi_ht__Jjxp7_2" name="Item3" definitionRef="ht__Jjxp7_2">
-            <entryCriterion id="_Jjxp7_6" name="S3" sentryRef="crit__Jjxp7_1"/>
-        </planItem>
-        <planItem id="pi__Jjxp7_3" name="Item4" definitionRef="_Jjxp7_3">
-            <exitCriterion id="_Jjxp7_5" name="S4" sentryRef="crit__Jjxp7_0"/>
-        </planItem>
-        <planItem id="pi_ms__Jjxp7_0" name="Milestone" definitionRef="ms__Jjxp7_0">
-            <entryCriterion id="_Jjxp7_8" name="S3.2" sentryRef="crit__Jjxp7_2"/>
-        </planItem>
-        <planItem id="pi_ue__Jjxp7_0" name="Listener" definitionRef="ue__Jjxp7_0"/>
-        <sentry id="crit__Jjxp7_0" name="Sentry_0">
-            <planItemOnPart id="_Jjxp7_12" name="PlanItemOnPart_2" sourceRef="pi_ht__Jjxp7_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-            <planItemOnPart id="_Jjxp7_13" name="PlanItemOnPart_3" sourceRef="pi_ht__Jjxp7_1">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__Jjxp7_1" name="Sentry_1">
-            <planItemOnPart id="_Jjxp7_10" name="PlanItemOnPart_0" sourceRef="pi_ht__Jjxp7_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__Jjxp7_2" name="Sentry_2">
-            <planItemOnPart id="_Jjxp7_11" name="PlanItemOnPart_1" sourceRef="pi_ht__Jjxp7_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__Jjxp7_3" name="Sentry_3">
+        <exitCriterion id="_Jjxp7_9" name="S5">
             <planItemOnPart id="_Jjxp7_14" name="PlanItemOnPart_4" sourceRef="pi_ht__Jjxp7_2">
                 <standardEvent>terminate</standardEvent>
             </planItemOnPart>
-        </sentry>
-        <exitCriterion id="_Jjxp7_9" name="S5" sentryRef="crit__Jjxp7_3"/>
-        <humanTask id="ht__Jjxp7_0" name="Item1" isBlocking="true"/>
-        <humanTask id="ht__Jjxp7_1" name="Item2" isBlocking="true"/>
-        <humanTask id="ht__Jjxp7_2" name="Item3" isBlocking="true"/>
-        <humanTask id="ht__Jjxp7_3" name="Item1.1" isBlocking="true"/>
-        <humanTask id="ht__Jjxp7_4" name="Item1.2" isBlocking="true"/>
-        <milestone id="ms__Jjxp7_0" name="Milestone"/>
-        <userEvent id="ue__Jjxp7_0" name="Listener"/>
-        <stage id="_Jjxp7_3" name="Item4" autoComplete="true">
-            <planItem id="pi_ht__Jjxp7_3" name="Item1.1" definitionRef="ht__Jjxp7_3"/>
-            <planItem id="pi_ht__Jjxp7_4" name="Item1.2" definitionRef="ht__Jjxp7_4"/>
+        </exitCriterion>
+        <humanTask id="pi_ht__Jjxp7_0" name="Item1" isBlocking="true"/>
+        <humanTask id="pi_ht__Jjxp7_1" name="Item2" isBlocking="true"/>
+        <humanTask id="pi_ht__Jjxp7_2" name="Item3" isBlocking="true">
+            <entryCriterion id="_Jjxp7_6" name="S3">
+                <planItemOnPart id="_Jjxp7_10" name="PlanItemOnPart_0" sourceRef="pi_ht__Jjxp7_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </humanTask>
+        <stage id="pi__Jjxp7_3" name="Item4" autoComplete="true">
+            <exitCriterion id="_Jjxp7_5" name="S4">
+                <planItemOnPart id="_Jjxp7_12" name="PlanItemOnPart_2" sourceRef="pi_ht__Jjxp7_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart id="_Jjxp7_13" name="PlanItemOnPart_3" sourceRef="pi_ht__Jjxp7_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </exitCriterion>
+            <humanTask id="pi_ht__Jjxp7_3" name="Item1.1" isBlocking="true"/>
+            <humanTask id="pi_ht__Jjxp7_4" name="Item1.2" isBlocking="true"/>
         </stage>
+        <milestone id="pi_ms__Jjxp7_0" name="Milestone">
+            <entryCriterion id="_Jjxp7_8" name="S3.2">
+                <planItemOnPart id="_Jjxp7_11" name="PlanItemOnPart_1" sourceRef="pi_ht__Jjxp7_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </milestone>
+        <userEvent id="pi_ue__Jjxp7_0" name="Listener"/>
     </casePlanModel>
+    <caseRoles/>
 </case>
