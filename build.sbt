@@ -34,7 +34,7 @@ Docker / packageName := "cafienne/engine"
 Docker / version := "latest"
 Docker / maintainer := """Cafienne <info@cafienne.io>"""
 Docker / defaultLinuxInstallLocation := "/opt/cafienne"
-dockerBaseImage := "eclipse-temurin:17.0.9_9-jre"
+dockerBaseImage := "eclipse-temurin:21.0.4_7-jre-jammy"
 dockerExposedPorts := Seq(2027, 9999)
 bashScriptDefines / scriptClasspath := Seq("../lib_ext/*") ++ (bashScriptDefines / scriptClasspath).value
 bashScriptExtraDefines += s"""addJava "-Dlogback.configurationFile=$${app_home}/../conf/logback.xml""""
@@ -50,11 +50,11 @@ Compile / doc / sources := List()
 Compile / mainClass := Some("org.cafienne.service.Main")
 // Package bin is required in case we ship a jar file with a manifest only. Think that's not happening at this moment.
 packageBin / mainClass.withRank(KeyRanks.Invisible) := Some("org.cafienne.service.Main")
-javacOptions ++= Seq("-source", "11", "-target", "11")
+//javacOptions ++= Seq("-source", "11", "-target", "11")
 scalacOptions := Seq(
   "-encoding", "UTF-8",
   "-unchecked",
-  "-release:11",
+  //"-release:11",
   "-deprecation",
   "-Xlint", "deprecation",
   "-Xlint", "unchecked",
@@ -126,9 +126,9 @@ configs(MultiJvm) // Not sure what this adds, actually
 val akkaHttpVersion    = "1.1.0-M1"
 val akkaVersion        = "1.1.0-M1"
 val pekkoPersistenceVersion = "1.1.0-M1"
-val jacksonVersion     = "2.17.0"
-val enumeratumVersion  = "1.7.2"
-val swaggerVersion     = "2.2.22"
+val jacksonVersion     = "2.17.2"
+val enumeratumVersion  = "1.7.4"
+val swaggerVersion     = "2.2.23"
 val slickVersion       = "3.5.1"
 val jasperVersion      = "6.20.0"
 
@@ -159,8 +159,8 @@ libraryDependencies ++= Seq(
   , "ch.qos.logback"          %  "logback-classic"                      % "1.5.6"
   , "org.apache.commons"      %  "commons-text"                         % "1.11.0" // StrSubstitutor usage inside process tasks
   , "com.beachape"            %% "enumeratum"                           % enumeratumVersion
-  , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.0" // Used in StringValue xsd date conversions
-  , "org.apache.pekko"               %% "pekko-http-cors"                       % "1.1.0-M1"
+  , "jakarta.xml.bind"        %  "jakarta.xml.bind-api"                 % "4.0.2" // Used in StringValue xsd date conversions
+  , "org.apache.pekko"        %% "pekko-http-cors"                       % "1.1.0-M1"
 
   // JWT Support
   , "com.github.t3hnar"       %% "scala-bcrypt"                         % "4.3.0"
@@ -169,10 +169,10 @@ libraryDependencies ++= Seq(
   , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
 
   // DB Schema
-  , "org.flywaydb"            %  "flyway-core"                          % "10.15.0"
+  , "org.flywaydb"            %  "flyway-core"                          % "10.15.2"
   , "org.flywaydb"            % "flyway-database-postgresql"            % "10.14.0"
   , "org.flywaydb"            % "flyway-sqlserver"                      % "10.15.0"
-  , "org.flywaydb"            % "flyway-database-hsqldb"                % "10.15.0"
+  , "org.flywaydb"            % "flyway-database-hsqldb"                % "10.15.2"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
   , "com.typesafe.slick"      %% "slick"                                % slickVersion
   , "com.zaxxer"              % "HikariCP"                              % "5.1.0"
@@ -180,8 +180,8 @@ libraryDependencies ++= Seq(
   , "io.github.nafg.slick-migration-api" %% "slick-migration-api"                  % "0.10.0"
 
   , "com.fasterxml.jackson.core"   % "jackson-databind"			            % jacksonVersion
-  , "com.fasterxml.jackson.core"   % "jackson-core"					            % "2.17.2"
-  , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % "2.17.2"
+  , "com.fasterxml.jackson.core"   % "jackson-core"					            % jacksonVersion
+  , "com.fasterxml.jackson.module" %% "jackson-module-scala"            % jacksonVersion
 
   // PDF Task support
   , "net.sf.jasperreports"    %  "jasperreports"                        % jasperVersion
@@ -192,7 +192,7 @@ libraryDependencies ++= Seq(
   // Mail & Calendar support
   , "com.sun.activation"      %  "jakarta.activation"                   % "2.0.1" // For mail & calendar support
   , "jakarta.activation"      %  "jakarta.activation-api"               % "2.1.0" // For mail & calendar support
-  , "jakarta.ws.rs"           %  "jakarta.ws.rs-api"                    % "3.1.0" // For mail & calendar support
+  //, "jakarta.ws.rs"           %  "jakarta.ws.rs-api"                    % "3.1.0" // For mail & calendar support
   , "org.mnode.ical4j"        %  "ical4j"                               % "3.2.3"
 
   // Expression support (SPEL and JSONPath)
@@ -207,14 +207,21 @@ libraryDependencies ++= Seq(
   , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
 
   // Swagger support
+  ,"jakarta.ws.rs" % "jakarta.ws.rs-api" % "4.0.0"
   , "io.swagger.core.v3"      %  "swagger-core"                         % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
-  , "io.swagger.core.v3"      %  "swagger-jaxrs2"                       % swaggerVersion
+  //, "io.swagger.core.v3"      %  "swagger-jaxrs2"                       % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
-  , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2"
-  , "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-pekko-http :(
+  , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
+  ,"com.github.swagger-akka-http"  %% "swagger-scala-module"            % "2.12.3" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
+  ,"com.github.swagger-akka-http"  %% "swagger-enumeratum-module"       % "2.9.0" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
+  //,"io.swagger.core.v3"           % "swagger-jaxrs2-jakarta"            % swaggerVersion
+  //, "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-pekko-http :(
   , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
   ,"org.yaml"                 %"snakeyaml"                              % "2.0"
+  // metrics support
+//  ,"io.kamon"                 %% "kamon-pekko"                          % "2.7.3"
+//  ,"io.kamon"                 % "kanela-agent"                          % "1.0.18"
 )
 
 /**
