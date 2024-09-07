@@ -3,52 +3,10 @@
         <caseFileItem id="cfi_csQA1_0" name="CaseFileItem" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm_planning.case_planning_0" name="planning" autoComplete="true">
-        <planItem id="cm_csQA1_4" name="T1" definitionRef="pid_cm_csQA1_4"/>
-        <planItem id="cm_csQA1_6" name="T2" definitionRef="pid_cm_csQA1_6"/>
-        <planItem id="cm_csQA1_8" name="T3" definitionRef="pid_cm_csQA1_8">
-            <entryCriterion id="_5pggv_0" name="EntryCriterion_0" sentryRef="cm_csQA1_12"/>
-        </planItem>
-        <planItem id="cm_csQA1_24" name="Stage" definitionRef="pid_cm_csQA1_24">
-            <entryCriterion id="_5pggv_1" name="EntryCriterion_1" sentryRef="cm_csQA1_26"/>
-        </planItem>
-        <sentry id="cm_csQA1_12">
-            <planItemOnPart id="ref_id_cm_csQA1_4" sourceRef="cm_csQA1_4">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-            <planItemOnPart id="ref_id_cm_csQA1_6" sourceRef="cm_csQA1_6">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="cm_csQA1_26">
-            <planItemOnPart id="ref_id_cm_csQA1_8" sourceRef="cm_csQA1_8">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <planningTable id="pt_cm_undefined_3">
-            <discretionaryItem id="cm_csQA1_10" name="T4" definitionRef="pid_cm_csQA1_10" applicabilityRuleRefs="rule_csQA1_1">
-                <itemControl>
-                    <repetitionRule id="cm_csQA1_10_repetitionRule">
-                        <condition>
-                            <body>
-                                <![CDATA[true]]>
-                            </body>
-                        </condition>
-                    </repetitionRule>
-                </itemControl>
-            </discretionaryItem>
-            <discretionaryItem id="cm_csQA1_16" name="Opnieuw T1" definitionRef="pid_cm_csQA1_16" applicabilityRuleRefs="rule_csQA1_1"/>
-            <applicabilityRule id="rule_csQA1_1" name="isValid">
-                <condition>
-                    <body>
-                        <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.T2 != null && stage.T2.state == T(org.cafienne.cmmn.instance.State).Active)]]>
-                    </body>
-                </condition>
-            </applicabilityRule>
-        </planningTable>
-        <humanTask id="pid_cm_csQA1_4" name="T1" isBlocking="true"/>
-        <humanTask id="pid_cm_csQA1_6" name="T2" isBlocking="true">
+        <humanTask id="cm_csQA1_4" name="T1" isBlocking="true"/>
+        <humanTask id="cm_csQA1_6" name="T2" isBlocking="true">
             <planningTable id="pt_cm_7">
-                <discretionaryItem id="cm_csQA1_13" name="Opnieuw T1" definitionRef="pid_cm_csQA1_13" applicabilityRuleRefs="rule_csQA1_0"/>
+                <humanTask id="cm_csQA1_13" name="Opnieuw T1" isBlocking="true"/>
                 <applicabilityRule id="rule_csQA1_0" name="isValid">
                     <condition>
                         <body>
@@ -58,17 +16,49 @@
                 </applicabilityRule>
             </planningTable>
         </humanTask>
-        <humanTask id="pid_cm_csQA1_8" name="T3" isBlocking="true"/>
-        <humanTask id="pid_cm_csQA1_27" name="T5" isBlocking="true"/>
-        <humanTask id="pid_cm_csQA1_10" name="T4" isBlocking="true"/>
-        <humanTask id="pid_cm_csQA1_13" name="Opnieuw T1" isBlocking="true"/>
-        <humanTask id="pid_cm_csQA1_16" name="Opnieuw T1" isBlocking="true"/>
-        <stage id="pid_cm_csQA1_24" name="Stage" autoComplete="false">
+        <humanTask id="cm_csQA1_8" name="T3" isBlocking="true">
+            <entryCriterion id="_5pggv_0" name="EntryCriterion_0">
+                <planItemOnPart id="ref_id_cm_csQA1_4" sourceRef="cm_csQA1_4">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart id="ref_id_cm_csQA1_6" sourceRef="cm_csQA1_6">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </humanTask>
+        <stage id="cm_csQA1_24" name="Stage" autoComplete="false">
+            <entryCriterion id="_5pggv_1" name="EntryCriterion_1">
+                <planItemOnPart id="ref_id_cm_csQA1_8" sourceRef="cm_csQA1_8">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
             <planningTable id="pt_cm_25">
-                <discretionaryItem id="cm_csQA1_27" name="T5" definitionRef="pid_cm_csQA1_27"/>
+                <humanTask id="cm_csQA1_27" name="T5" isBlocking="true"/>
             </planningTable>
         </stage>
+        <planningTable id="pt_cm_undefined_3">
+            <humanTask id="cm_csQA1_10" name="T4" isBlocking="true">
+                <itemControl>
+                    <repetitionRule id="cm_csQA1_10_repetitionRule">
+                        <condition>
+                            <body>
+                                <![CDATA[true]]>
+                            </body>
+                        </condition>
+                    </repetitionRule>
+                </itemControl>
+            </humanTask>
+            <humanTask id="cm_csQA1_16" name="Opnieuw T1" isBlocking="true"/>
+            <applicabilityRule id="rule_csQA1_1" name="isValid">
+                <condition>
+                    <body>
+                        <![CDATA[discretionaryItem.name=="Opnieuw T1" || (stage.T2 != null && stage.T2.state == T(org.cafienne.cmmn.instance.State).Active)]]>
+                    </body>
+                </condition>
+            </applicabilityRule>
+        </planningTable>
     </casePlanModel>
+    <caseRoles/>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{

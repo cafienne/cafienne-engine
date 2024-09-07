@@ -6,85 +6,13 @@
         <caseFileItem id="cfi_csvwt_4" name="TaskName" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm_SpelExpressions.case_SpelExpressions_0" name="SpelExpressions" autoComplete="true">
-        <planItem id="cm_csNHO_55" name="Stage" definitionRef="pid_cm_csNHO_55">
-            <exitCriterion id="_lRFiK_2" name="ExitCriterion_0" sentryRef="cm_csNHO_57"/>
-        </planItem>
-        <planItem id="cm_csd7G_38" name="Milestone" definitionRef="pid_cm_csd7G_38">
-            <entryCriterion id="_lRFiK_0" name="EntryCriterion_0" sentryRef="cm_csd7G_40"/>
-            <entryCriterion id="_lRFiK_1" name="EntryCriterion_1" sentryRef="cm_csvwt_46"/>
-        </planItem>
-        <sentry id="cm_csd7G_40">
-            <ifPart contextRef="cfi_csdZm_0">
-                <condition>
-                    <body>
-                        <![CDATA[Content != "basic"]]>
-                    </body>
-                </condition>
-            </ifPart>
-            <caseFileItemOnPart sourceRef="cfi_csdZm_0">
-                <standardEvent>create</standardEvent>
-            </caseFileItemOnPart>
-        </sentry>
-        <sentry id="cm_csvwt_46">
-            <ifPart contextRef="cfi_csY4k_2">
-                <condition>
-                    <body>
-                        <![CDATA[case.plan.Stage.HumanTask.size()>2 || Output == "stop now"]]>
-                    </body>
-                </condition>
-            </ifPart>
-            <planItemOnPart id="ref_id_cm_csdZm_17" sourceRef="cm_csdZm_17">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="cm_csNHO_57">
-            <planItemOnPart id="ref_id_cm_csd7G_38" sourceRef="cm_csd7G_38">
-                <standardEvent>occur</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <humanTask id="pid_cm_csdZm_17" name="HumanTask" isBlocking="true">
-            <inputs id="inTP_cm_csTql_4_3" name="HumanTaskInput" bindingRef="cfi_csdZm_0"/>
-            <outputs id="outTP_cm_csTql_4_3" name="TaskOutput" bindingRef="cfi_csY4k_2"/>
-            <outputs id="outTP_cm_csTql_4_4" name="TaskName" bindingRef="cfi_csvwt_4"/>
-            <outputs id="outTP_cm_csTql_4_5" name="CaseID" bindingRef="cfi_csvwt_2"/>
-            <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="expression/spelexpressionstask.humantask">
-                    <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
-                    <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
-                    <parameterMapping id="outPM_cm_csTql_4_1" targetRef="outTP_cm_csTql_4_4" sourceRef="">
-                        <transformation>
-                            <body>
-                                <![CDATA[task.name]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
-                    <parameterMapping id="outPM_cm_csTql_4_2" targetRef="outTP_cm_csTql_4_5" sourceRef="">
-                        <transformation>
-                            <body>
-                                <![CDATA[case.id]]>
-                            </body>
-                        </transformation>
-                    </parameterMapping>
-                    <assignment id="_lRFiK_12">
-                        <condition id="_lRFiK_13">
-                            <body>
-                                <![CDATA[user.id]]>
-                            </body>
-                        </condition>
-                    </assignment>
-                    <duedate id="_lRFiK_5">
-                        <condition id="_lRFiK_6">
-                            <body>
-                                <![CDATA[T(java.time.Instant).now()]]>
-                            </body>
-                        </condition>
-                    </duedate>
-                </cafienne:implementation>
-            </extensionElements>
-        </humanTask>
-        <milestone id="pid_cm_csd7G_38" name="Milestone"/>
-        <stage id="pid_cm_csNHO_55" name="Stage" autoComplete="true">
-            <planItem id="cm_csdZm_17" name="HumanTask" definitionRef="pid_cm_csdZm_17">
+        <stage id="cm_csNHO_55" name="Stage" autoComplete="true">
+            <exitCriterion id="_lRFiK_2" name="ExitCriterion_0">
+                <planItemOnPart id="ref_id_cm_csd7G_38" sourceRef="cm_csd7G_38">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </exitCriterion>
+            <humanTask id="cm_csdZm_17" name="HumanTask" isBlocking="true">
                 <itemControl>
                     <repetitionRule id="cm_csdZm_17_repetitionRule" contextRef="cfi_csY4k_2">
                         <condition>
@@ -94,9 +22,74 @@
                         </condition>
                     </repetitionRule>
                 </itemControl>
-            </planItem>
+                <inputs id="inTP_cm_csTql_4_3" name="HumanTaskInput" bindingRef="cfi_csdZm_0"/>
+                <outputs id="outTP_cm_csTql_4_3" name="TaskOutput" bindingRef="cfi_csY4k_2"/>
+                <outputs id="outTP_cm_csTql_4_4" name="TaskName" bindingRef="cfi_csvwt_4"/>
+                <outputs id="outTP_cm_csTql_4_5" name="CaseID" bindingRef="cfi_csvwt_2"/>
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="expression/spelexpressionstask.humantask">
+                        <parameterMapping id="inPM_cm_csTql_4_0" sourceRef="inTP_cm_csTql_4_3" targetRef="_f5oP_HumanTaskInput"/>
+                        <parameterMapping id="outPM_cm_csTql_4_0" sourceRef="_9oOB_TaskOutput" targetRef="outTP_cm_csTql_4_3"/>
+                        <parameterMapping id="outPM_cm_csTql_4_1" targetRef="outTP_cm_csTql_4_4">
+                            <transformation>
+                                <body>
+                                    <![CDATA[task.name]]>
+                                </body>
+                            </transformation>
+                        </parameterMapping>
+                        <parameterMapping id="outPM_cm_csTql_4_2" targetRef="outTP_cm_csTql_4_5">
+                            <transformation>
+                                <body>
+                                    <![CDATA[case.id]]>
+                                </body>
+                            </transformation>
+                        </parameterMapping>
+                        <assignment id="_lRFiK_12">
+                            <condition id="_lRFiK_13">
+                                <body>
+                                    <![CDATA[user.id]]>
+                                </body>
+                            </condition>
+                        </assignment>
+                        <duedate id="_lRFiK_5">
+                            <condition id="_lRFiK_6">
+                                <body>
+                                    <![CDATA[T(java.time.Instant).now()]]>
+                                </body>
+                            </condition>
+                        </duedate>
+                    </cafienne:implementation>
+                </extensionElements>
+            </humanTask>
         </stage>
+        <milestone id="cm_csd7G_38" name="Milestone">
+            <entryCriterion id="_lRFiK_0" name="EntryCriterion_0">
+                <ifPart contextRef="cfi_csdZm_0">
+                    <condition>
+                        <body>
+                            <![CDATA[Content != "basic"]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <caseFileItemOnPart sourceRef="cfi_csdZm_0">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </entryCriterion>
+            <entryCriterion id="_lRFiK_1" name="EntryCriterion_1">
+                <ifPart contextRef="cfi_csY4k_2">
+                    <condition>
+                        <body>
+                            <![CDATA[case.plan.Stage.HumanTask.size()>2 || Output == "stop now"]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <planItemOnPart id="ref_id_cm_csdZm_17" sourceRef="cm_csdZm_17">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+        </milestone>
     </casePlanModel>
+    <caseRoles/>
     <input id="csdZm_inCPs_0" name="InputContent" bindingRef="cfi_csdZm_0"/>
     <textAnnotation id="_lRFiK_shape_7">
         <text>

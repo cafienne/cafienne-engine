@@ -116,6 +116,7 @@ public enum Fields {
     script,
     waitTime,
     assignee,
+    delegate,
     dueDate,
     performer,
     taskModel,

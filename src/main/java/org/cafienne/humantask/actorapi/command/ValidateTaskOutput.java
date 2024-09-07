@@ -39,7 +39,7 @@ public class ValidateTaskOutput extends TaskOutputCommand {
 	}
 
 	@Override
-	public void processWorkflowCommand(WorkflowTask workflowTask) {
+	public void processTaskCommand(WorkflowTask workflowTask) {
 		ValidationResponse response = workflowTask.getTask().validateOutput(taskOutput);
 		if (response.isValid()) {
 			setResponse(new HumanTaskValidationResponse(this, response.getContent()));

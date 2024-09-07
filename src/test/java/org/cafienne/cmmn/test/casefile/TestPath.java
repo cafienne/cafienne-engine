@@ -81,10 +81,7 @@ public class TestPath {
 
     private void assertInvalidCaseFilePath(String invalidPath, String expectedMessage) {
         UpdateCaseFileItem update = new UpdateCaseFileItem(testUser, caseInstanceId, rootValue, new Path(invalidPath));
-        testCase.assertStepFails(update, result -> {
-            this.print(result);
-            result.assertException(expectedMessage);
-        });
+        testCase.assertStepFails(update, expectedMessage);
     }
 
     void print(Object o) {

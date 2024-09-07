@@ -19,18 +19,12 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm__qgYaQ_0" name="taskoutputvalidation" autoComplete="true">
-        <planItem id="pi_ht__qgYaQ_0" name="HumanTask" definitionRef="ht__qgYaQ_0">
-            <entryCriterion id="_qgYaQ_25" name="EntryCriterion_0" sentryRef="crit__qgYaQ_0"/>
-        </planItem>
-        <planItem id="pi_pt__qgYaQ_0" name="AssertMockServiceIsRunning" definitionRef="pt__qgYaQ_0"/>
-        <planItem id="pi_ht__qgYaQ_1" name="HumanTask2" definitionRef="ht__qgYaQ_1"/>
-        <planItem id="pi_ht__qgYaQ_2" name="HumanTask_0" definitionRef="ht__qgYaQ_2"/>
-        <sentry id="crit__qgYaQ_0">
-            <planItemOnPart id="_qgYaQ_27" sourceRef="pi_pt__qgYaQ_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <humanTask id="ht__qgYaQ_0" name="HumanTask" isBlocking="true">
+        <humanTask id="pi_ht__qgYaQ_0" name="HumanTask" isBlocking="true">
+            <entryCriterion id="_qgYaQ_25" name="EntryCriterion_0">
+                <planItemOnPart id="_qgYaQ_27" sourceRef="pi_pt__qgYaQ_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
             <inputs id="_qgYaQ_18" name="TaskInputParameter"/>
             <outputs id="_qgYaQ_15" name="TaskOutputParameter" bindingRef="_qgYaQ_5">
                 <extensionElements mustUnderstand="false">
@@ -57,20 +51,7 @@
                 </cafienne:implementation>
             </extensionElements>
         </humanTask>
-        <humanTask id="ht__qgYaQ_1" name="HumanTask2" isBlocking="true">
-            <outputs id="_qgYaQ_54" name="Decision">
-                <extensionElements mustUnderstand="false">
-                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
-                </extensionElements>
-            </outputs>
-            <extensionElements mustUnderstand="false">
-                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask">
-                    <parameterMapping id="_qgYaQ_55" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_54"/>
-                </cafienne:implementation>
-            </extensionElements>
-        </humanTask>
-        <humanTask id="ht__qgYaQ_2" name="HumanTask_0" isBlocking="true"/>
-        <processTask id="pt__qgYaQ_0" name="AssertMockServiceIsRunning" isBlocking="true" processRef="AssertMockServiceIsRunning.process">
+        <processTask id="pi_pt__qgYaQ_0" name="AssertMockServiceIsRunning" isBlocking="true" processRef="AssertMockServiceIsRunning.process">
             <inputs id="_qgYaQ_34" name="HTTPConfig" bindingRef="_qgYaQ_32"/>
             <outputs id="_qgYaQ_30" name="responseCode" bindingRef="_qgYaQ_37">
                 <extensionElements mustUnderstand="false">
@@ -86,7 +67,21 @@
                 </transformation>
             </parameterMapping>
         </processTask>
+        <humanTask id="pi_ht__qgYaQ_1" name="HumanTask2" isBlocking="true">
+            <outputs id="_qgYaQ_54" name="Decision">
+                <extensionElements mustUnderstand="false">
+                    <cafienne:implementation xmlns:cafienne="org.cafienne" required="true"/>
+                </extensionElements>
+            </outputs>
+            <extensionElements mustUnderstand="false">
+                <cafienne:implementation xmlns:cafienne="org.cafienne" humanTaskRef="humanTaskTest.humantask">
+                    <parameterMapping id="_qgYaQ_55" sourceRef="_DtOu_Decision" targetRef="_qgYaQ_54"/>
+                </cafienne:implementation>
+            </extensionElements>
+        </humanTask>
+        <humanTask id="pi_ht__qgYaQ_2" name="HumanTask_0" isBlocking="true"/>
     </casePlanModel>
+    <caseRoles/>
     <input id="_qgYaQ_22" name="TaskInput" bindingRef="_qgYaQ_0"/>
     <input id="_qgYaQ_23" name="DueDate" bindingRef="_qgYaQ_1"/>
     <input id="_qgYaQ_36" name="HTTPConfig" bindingRef="_qgYaQ_32"/>

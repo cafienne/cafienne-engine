@@ -20,7 +20,7 @@ package org.cafienne.service.akkahttp.tasks
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import org.cafienne.actormodel.identity.{CaseUserIdentity, UserIdentity}
-import org.cafienne.humantask.actorapi.command.WorkflowCommand
+import org.cafienne.humantask.actorapi.command.HumanTaskCommand
 import org.cafienne.infrastructure.akkahttp.route.CaseTeamValidator
 import org.cafienne.querydb.query._
 import org.cafienne.querydb.query.exception.TaskSearchFailure
@@ -61,10 +61,10 @@ trait TaskRoute extends CasesRoute with CaseTeamValidator {
   }
 
   trait CreateTaskCommandWithAssignee {
-    def apply(caseInstanceId: String, user: CaseMembership, member: CaseUserIdentity): WorkflowCommand
+    def apply(caseInstanceId: String, user: CaseMembership, member: CaseUserIdentity): HumanTaskCommand
   }
 
   trait CreateTaskCommand {
-    def apply(caseInstanceId: String, user: CaseMembership): WorkflowCommand
+    def apply(caseInstanceId: String, user: CaseMembership): HumanTaskCommand
   }
 }

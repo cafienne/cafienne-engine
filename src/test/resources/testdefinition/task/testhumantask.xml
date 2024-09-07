@@ -1,6 +1,6 @@
-<definitions>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:cafienne="org.cafienne">
     <caseFileItemDefinition name="string" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/Unspecified" id="string.cfid"/>
-    <case id="TestHumanTask.case" name="TestHumanTask" expressionLanguage="spel">
+    <case id="task/testhumantask.case" name="TestHumanTask" expressionLanguage="spel">
         <caseFileModel>
             <caseFileItem id="_kBPkc_0" name="TaskInput" multiplicity="ExactlyOne" definitionRef="string.cfid">
                 <children>
@@ -18,7 +18,7 @@
         <casePlanModel id="cm__kBPkc_0" name="TestHumanTask" autoComplete="true">
             <planItem id="pi_ht__kBPkc_0" name="HumanTask" definitionRef="ht__kBPkc_0"/>
             <planItem id="pi_ht__kBPkc_1" name="AdminTask" definitionRef="ht__kBPkc_1"/>
-            <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true">
+            <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true" performerRef="_kBPkc_17">
                 <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
                 <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
                 <extensionElements mustUnderstand="false">

@@ -14,9 +14,7 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm__kBPkc_0" name="TestHumanTask" autoComplete="true">
-        <planItem id="pi_ht__kBPkc_0" name="HumanTask" definitionRef="ht__kBPkc_0"/>
-        <planItem id="pi_ht__kBPkc_1" name="AdminTask" definitionRef="ht__kBPkc_1"/>
-        <humanTask id="ht__kBPkc_0" name="HumanTask" isBlocking="true">
+        <humanTask id="pi_ht__kBPkc_0" name="HumanTask" isBlocking="true" performerRef="_kBPkc_17">
             <inputs id="_kBPkc_18" name="TaskInputParameter" bindingRef="_kBPkc_0"/>
             <outputs id="_kBPkc_15" name="TaskOutputParameter" bindingRef="_kBPkc_5"/>
             <extensionElements mustUnderstand="false">
@@ -38,7 +36,7 @@
                 </cafienne:implementation>
             </extensionElements>
         </humanTask>
-        <humanTask id="ht__kBPkc_1" name="AdminTask" isBlocking="true" performerRef="_kBPkc_17"/>
+        <humanTask id="pi_ht__kBPkc_1" name="AdminTask" isBlocking="true" performerRef="_kBPkc_17"/>
     </casePlanModel>
     <caseRoles>
         <role id="_kBPkc_17" name="ADMIN"/>

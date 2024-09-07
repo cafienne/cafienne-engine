@@ -4,8 +4,7 @@
         <caseFileItem id="_nvtez_6" name="CaseOutput" multiplicity="ExactlyOne" definitionRef="unspecified.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__nvtez_0" name="case_with_output" autoComplete="true">
-        <planItem id="pi_ht__nvtez_0" name="SimpleTask" definitionRef="ht__nvtez_0"/>
-        <humanTask id="ht__nvtez_0" name="SimpleTask" isBlocking="true">
+        <humanTask id="pi_ht__nvtez_0" name="SimpleTask" isBlocking="true">
             <inputs id="_nvtez_9" name="CaseInput" bindingRef="_nvtez_5"/>
             <outputs id="_nvtez_10" name="CaseOutput" bindingRef="_nvtez_6"/>
             <extensionElements mustUnderstand="false">
@@ -16,6 +15,7 @@
             </extensionElements>
         </humanTask>
     </casePlanModel>
+    <caseRoles/>
     <input id="_nvtez_7" name="CaseInput" bindingRef="_nvtez_5"/>
     <output id="_nvtez_8" name="CaseOutput" bindingRef="_nvtez_6"/>
 </case>

@@ -27,11 +27,12 @@ import org.cafienne.cmmn.test.TestScript;
  *
  */
 public class FailureAssertion extends ModelTestCommandAssertion {
+    public FailureAssertion(CaseTestCommand testCommand, String errorMessage) {
+        super(testCommand, true, errorMessage);
+    }
+
     public FailureAssertion(CaseTestCommand testCommand) {
-        super(testCommand, true);
-        if (testCommand.getActualFailure() == null) {
-            throw new AssertionError("Test script expected a failure from the engine in step " + testCommand.getActionNumber() + " [" + testCommand.getActualCommand().getClass().getSimpleName() + "]");
-        }
+        this(testCommand, "");
     }
 
     public void print() {
@@ -56,10 +57,14 @@ public class FailureAssertion extends ModelTestCommandAssertion {
                 return t;
             }
             else {
-                throw new AssertionError("Case returned a command failure with exception of type "+t.getExceptionClass().getName()+", but we are expecting an exception of type "+expectedExceptionClass.getName());
+                raiseError("Case returned a command failure with exception of type "+t.getExceptionClass().getName()+", but we are expecting an exception of type "+expectedExceptionClass.getName());
+                // Will not happen because 'raiseError' throws an exception
+                return null;
             }
         }
-        throw new AssertionError("Case did not return an exception");
+        raiseError("Case did not return an exception");
+        // Will not happen because 'raiseError' throws an exception
+        return null;
     }
 
     /**
@@ -84,7 +89,7 @@ public class FailureAssertion extends ModelTestCommandAssertion {
         SerializedException exception = assertException(Exception.class);
         String message = exception.getMessage();
         if (! message.contains(expectedMessage)) {
-            throw new AssertionError("Received a CommandFailure with an unexpected message.\nExpecting :" + expectedMessage+"\nReceived  :"+message);
+            raiseError("Received a CommandFailure with an unexpected message.\nExpecting :" + expectedMessage+"\nReceived  :"+message);
         }
         return this;
     }

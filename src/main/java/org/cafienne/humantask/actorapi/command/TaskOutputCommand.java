@@ -21,16 +21,14 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
 
 /**
- * Saves the output in the task. This output is not yet stored back in the case file, since that happens only when the task is completed.
+ * A command that works on the output of the task (whether temporary for saving or validation or for completion)
  */
-@Manifest
-public abstract class TaskOutputCommand extends WorkflowCommand {
+public abstract class TaskOutputCommand extends HumanTaskCommand {
 	protected final ValueMap taskOutput;
 
 	protected TaskOutputCommand(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {
@@ -49,9 +47,8 @@ public abstract class TaskOutputCommand extends WorkflowCommand {
 
 	@Override
 	public void validate(HumanTask task) {
-		super.validateTaskOwnership(task);
-		super.mustBeActive(task);
-		super.verifyTaskPairRestrictions(task);
+		mustBeActive(task);
+		verifyTaskPairRestrictions(task);
 	}
 
 	@Override

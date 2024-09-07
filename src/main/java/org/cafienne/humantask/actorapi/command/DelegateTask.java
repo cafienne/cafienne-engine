@@ -17,32 +17,57 @@
 
 package org.cafienne.humantask.actorapi.command;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.actormodel.identity.CaseUserIdentity;
+import org.cafienne.cmmn.actorapi.command.team.CaseTeamUser;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
+import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
+import java.io.IOException;
+
 @Manifest
-public class DelegateTask extends AssignTask {
-    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity delegatee) {
-        super(user, caseInstanceId, taskId, delegatee);
+public class DelegateTask extends TaskManagementCommand {
+    private final CaseUserIdentity delegate;
+
+    public DelegateTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity delegate) {
+        super(user, caseInstanceId, taskId);
+        this.delegate = delegate;
     }
 
     public DelegateTask(ValueMap json) {
         super(json);
+        this.delegate = readUser(json.with(Fields.delegate));
     }
 
     @Override
-    public void validate(HumanTask task) {
-        super.validateTaskOwnership(task);
-        super.validateState(task, TaskState.Assigned);
-        super.validateCaseTeamMembership(task, assignee);
+    public void validateTaskAction(HumanTask task) {
+        verifyTaskPairRestrictions(task, delegate);
+        validateCaseTeamMembership(task, delegate);
+    }
+
+    protected void validateCaseTeamMembership(HumanTask task, CaseUserIdentity delegate) {
+        if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
+            // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
+            return;
+        }
+        // Validate that the new assignee is part of the team
+        CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(delegate.id());
+        if (member == null) {
+            raiseException("There is no case team member with id '" + delegate + "'");
+        }
     }
 
     @Override
-    public void processWorkflowCommand(WorkflowTask workflowTask) {
-        workflowTask.delegate(assignee);
+    public void processTaskCommand(WorkflowTask workflowTask) {
+        workflowTask.delegate(delegate);
+    }
+
+    @Override
+    public void write(JsonGenerator generator) throws IOException {
+        super.write(generator);
+        writeField(generator, Fields.delegate, delegate);
     }
 }

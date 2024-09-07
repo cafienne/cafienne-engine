@@ -1,51 +1,46 @@
-<case id="repeatrule.case" name="repeatrule" guid="_4kpJj">
+<case id="repeatrule.case" name="repeatrule" expressionLanguage="spel" guid="_4kpJj">
     <caseFileModel>
         <caseFileItem id="_4kpJj_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__4kpJj_0" name="repeatrule" autoComplete="true">
-        <planItem id="pi_ht__4kpJj_0" name="Item1" definitionRef="ht__4kpJj_0"/>
-        <planItem id="pi_ht__4kpJj_1" name="Item2" definitionRef="ht__4kpJj_1">
-            <entryCriterion id="_4kpJj_5" name="S1" sentryRef="crit__4kpJj_0"/>
-            <entryCriterion id="_4kpJj_12" name="EntryCriterion_1" sentryRef="crit__4kpJj_2"/>
+        <humanTask id="pi_ht__4kpJj_0" name="Item1" isBlocking="true"/>
+        <humanTask id="pi_ht__4kpJj_1" name="Item2" isBlocking="true">
+            <entryCriterion id="_4kpJj_5" name="S1">
+                <planItemOnPart id="_4kpJj_7" name="PlanItemOnPart_0" sourceRef="pi_ht__4kpJj_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+            <entryCriterion id="_4kpJj_12" name="EntryCriterion_1">
+                <planItemOnPart id="_4kpJj_13" sourceRef="pi_ms__4kpJj_0">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
             <itemControl id="_4kpJj_2" name="ItemControl_1">
                 <repetitionRule id="_4kpJj_3" name="Constraint_0">
-                    <condition id="_4kpJj_4" name="Expression_0" language="spel">
+                    <condition id="_4kpJj_4" name="Expression_0">
                         <body>
                             <![CDATA[task.index < 10]]>
                         </body>
                     </condition>
                 </repetitionRule>
             </itemControl>
-        </planItem>
-        <planItem id="pi_ms__4kpJj_0" name="RepeatUponCompletion" definitionRef="ms__4kpJj_0">
-            <entryCriterion id="_4kpJj_6" name="EntryCriterion_0" sentryRef="crit__4kpJj_1"/>
+        </humanTask>
+        <milestone id="pi_ms__4kpJj_0" name="RepeatUponCompletion">
+            <entryCriterion id="_4kpJj_6" name="EntryCriterion_0">
+                <planItemOnPart id="_4kpJj_8" sourceRef="pi_ht__4kpJj_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
             <itemControl id="_4kpJj_9">
                 <repetitionRule id="_4kpJj_10">
-                    <condition id="_4kpJj_11" language="spel">
+                    <condition id="_4kpJj_11">
                         <body>
                             <![CDATA[true]]>
                         </body>
                     </condition>
                 </repetitionRule>
             </itemControl>
-        </planItem>
-        <sentry id="crit__4kpJj_0" name="Sentry_0">
-            <planItemOnPart id="_4kpJj_7" name="PlanItemOnPart_0" sourceRef="pi_ht__4kpJj_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__4kpJj_1">
-            <planItemOnPart id="_4kpJj_8" sourceRef="pi_ht__4kpJj_1">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__4kpJj_2">
-            <planItemOnPart id="_4kpJj_13" sourceRef="pi_ms__4kpJj_0">
-                <standardEvent>occur</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <humanTask id="ht__4kpJj_0" name="Item1" isBlocking="true"/>
-        <humanTask id="ht__4kpJj_1" name="Item2" isBlocking="true"/>
-        <milestone id="ms__4kpJj_0" name="RepeatUponCompletion"/>
+        </milestone>
     </casePlanModel>
+    <caseRoles/>
 </case>

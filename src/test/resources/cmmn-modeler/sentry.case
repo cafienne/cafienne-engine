@@ -1,39 +1,33 @@
-<case id="sentry.case" name="sentry" guid="_wbsA2">
+<case id="sentry.case" name="sentry" expressionLanguage="spel" guid="_wbsA2">
     <caseFileModel>
         <caseFileItem id="_wbsA2_0" name="Root" multiplicity="ExactlyOne" definitionRef="root.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm__wbsA2_0" name="sentry" autoComplete="true">
-        <planItem id="pi_ht__wbsA2_0" name="Item1" definitionRef="ht__wbsA2_0"/>
-        <planItem id="pi__wbsA2_2" name="Stage1" definitionRef="_wbsA2_2">
-            <entryCriterion id="_wbsA2_4" name="entrySentry" sentryRef="crit__wbsA2_0"/>
-        </planItem>
-        <sentry id="crit__wbsA2_0" name="Sentry_0">
-            <ifPart id="_wbsA2_6" name="IfPart_0">
-                <condition id="_wbsA2_7" name="Expression_0" language="spel">
-                    <body>
-                        <![CDATA[true]]>
-                    </body>
-                </condition>
-            </ifPart>
-            <planItemOnPart id="_wbsA2_5" name="PlanItemOnPart_0" sourceRef="pi_ht__wbsA2_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <sentry id="crit__wbsA2_1" name="Sentry_1">
-            <planItemOnPart id="_wbsA2_11" name="PlanItemOnPart_1" sourceRef="pi_ht__wbsA2_0">
-                <standardEvent>complete</standardEvent>
-            </planItemOnPart>
-        </sentry>
-        <planningTable id="_wbsA2_12" name="PlanningTable_0">
-            <discretionaryItem id="pi_ht__wbsA2_2" name="Disc1" definitionRef="ht__wbsA2_2">
-                <entryCriterion id="_wbsA2_10" name="EntryCriterion_0" sentryRef="crit__wbsA2_1"/>
-            </discretionaryItem>
-        </planningTable>
-        <humanTask id="ht__wbsA2_0" name="Item1" isBlocking="true"/>
-        <humanTask id="ht__wbsA2_1" name="Item1.1" isBlocking="true"/>
-        <humanTask id="ht__wbsA2_2" name="Disc1" isBlocking="true"/>
-        <stage id="_wbsA2_2" name="Stage1" autoComplete="true">
-            <planItem id="pi_ht__wbsA2_1" name="Item1.1" definitionRef="ht__wbsA2_1"/>
+        <humanTask id="pi_ht__wbsA2_0" name="Item1" isBlocking="true"/>
+        <stage id="pi__wbsA2_2" name="Stage1" autoComplete="true">
+            <entryCriterion id="_wbsA2_4" name="entrySentry">
+                <ifPart id="_wbsA2_6" name="IfPart_0">
+                    <condition id="_wbsA2_7" name="Expression_0">
+                        <body>
+                            <![CDATA[true]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <planItemOnPart id="_wbsA2_5" name="PlanItemOnPart_0" sourceRef="pi_ht__wbsA2_0">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </entryCriterion>
+            <humanTask id="pi_ht__wbsA2_1" name="Item1.1" isBlocking="true"/>
         </stage>
+        <planningTable id="_wbsA2_12" name="PlanningTable_0">
+            <humanTask id="pi_ht__wbsA2_2" name="Disc1" isBlocking="true">
+                <entryCriterion id="_wbsA2_10" name="EntryCriterion_0">
+                    <planItemOnPart id="_wbsA2_11" name="PlanItemOnPart_1" sourceRef="pi_ht__wbsA2_0">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </entryCriterion>
+            </humanTask>
+        </planningTable>
     </casePlanModel>
+    <caseRoles/>
 </case>

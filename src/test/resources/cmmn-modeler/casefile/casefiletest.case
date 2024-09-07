@@ -1,4 +1,4 @@
-<case id="casefile/casefiletest.case" name="CaseFileTest" guid="_6KUSu">
+<case id="casefile/casefiletest.case" name="CaseFileTest" expressionLanguage="spel" guid="_6KUSu">
     <caseFileModel>
         <caseFileItem id="_6KUSu_4" name="aaa" multiplicity="ExactlyOne" definitionRef="aaa.cfid">
             <children>
@@ -7,45 +7,40 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm__6KUSu_0" name="CaseFileTest" autoComplete="true">
-        <planItem id="pi_ht__6KUSu_0" name="FirstTask" definitionRef="ht__6KUSu_0">
-            <entryCriterion id="_6KUSu_6" name="EntryCriterion_0" sentryRef="crit__6KUSu_0"/>
-        </planItem>
-        <planItem id="pi_ht__6KUSu_1" name="SecondTask" definitionRef="ht__6KUSu_1">
-            <entryCriterion id="_6KUSu_9" name="EntryCriterion_1" sentryRef="crit__6KUSu_1"/>
-        </planItem>
-        <planItem id="pi_ht__6KUSu_2" name="ThirdTask" definitionRef="ht__6KUSu_2">
-            <entryCriterion id="_6KUSu_12" name="EntryCriterion_2" sentryRef="crit__6KUSu_2"/>
-        </planItem>
-        <sentry id="crit__6KUSu_0" name="Sentry_0">
-            <ifPart id="_6KUSu_7" name="IfPart_0" contextRef="_6KUSu_4">
-                <condition id="_6KUSu_8" name="Expression_0" language="spel">
-                    <body>
-                        <![CDATA[aaa.child_of_aaa.child_of_aaa_1=='true']]>
-                    </body>
-                </condition>
-            </ifPart>
-        </sentry>
-        <sentry id="crit__6KUSu_1" name="Sentry_1">
-            <ifPart id="_6KUSu_10" name="IfPart_1" contextRef="_6KUSu_4">
-                <condition id="_6KUSu_11" name="Expression_1" language="spel">
-                    <body>
-                        <![CDATA[aaa.aaa1=='true']]>
-                    </body>
-                </condition>
-            </ifPart>
-        </sentry>
-        <sentry id="crit__6KUSu_2" name="Sentry_2">
-            <ifPart id="_6KUSu_13" name="IfPart_2" contextRef="_6KUSu_4">
-                <condition id="_6KUSu_14" name="Expression_2" language="spel">
-                    <body>
-                        <![CDATA[aaa.x.y=='true']]>
-                    </body>
-                </condition>
-            </ifPart>
-        </sentry>
-        <humanTask id="ht__6KUSu_0" name="FirstTask" isBlocking="true"/>
-        <humanTask id="ht__6KUSu_1" name="SecondTask" isBlocking="true"/>
-        <humanTask id="ht__6KUSu_2" name="ThirdTask" isBlocking="true"/>
+        <humanTask id="pi_ht__6KUSu_0" name="FirstTask" isBlocking="true">
+            <entryCriterion id="_6KUSu_6" name="EntryCriterion_0">
+                <ifPart id="_6KUSu_7" name="IfPart_0" contextRef="_6KUSu_4">
+                    <condition id="_6KUSu_8" name="Expression_0">
+                        <body>
+                            <![CDATA[aaa.child_of_aaa.child_of_aaa_1=='true']]>
+                        </body>
+                    </condition>
+                </ifPart>
+            </entryCriterion>
+        </humanTask>
+        <humanTask id="pi_ht__6KUSu_1" name="SecondTask" isBlocking="true">
+            <entryCriterion id="_6KUSu_9" name="EntryCriterion_1">
+                <ifPart id="_6KUSu_10" name="IfPart_1" contextRef="_6KUSu_4">
+                    <condition id="_6KUSu_11" name="Expression_1">
+                        <body>
+                            <![CDATA[aaa.aaa1=='true']]>
+                        </body>
+                    </condition>
+                </ifPart>
+            </entryCriterion>
+        </humanTask>
+        <humanTask id="pi_ht__6KUSu_2" name="ThirdTask" isBlocking="true">
+            <entryCriterion id="_6KUSu_12" name="EntryCriterion_2">
+                <ifPart id="_6KUSu_13" name="IfPart_2" contextRef="_6KUSu_4">
+                    <condition id="_6KUSu_14" name="Expression_2">
+                        <body>
+                            <![CDATA[aaa.x.y=='true']]>
+                        </body>
+                    </condition>
+                </ifPart>
+            </entryCriterion>
+        </humanTask>
     </casePlanModel>
+    <caseRoles/>
     <input id="_6KUSu_3" name="aaa" bindingRef="_6KUSu_4"/>
 </case>

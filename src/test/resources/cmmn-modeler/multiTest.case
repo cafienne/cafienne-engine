@@ -1,4 +1,4 @@
-<case id="multiTest.case" name="multiTest" guid="_HgC8N">
+<case id="multiTest.case" name="multiTest" expressionLanguage="spel" guid="_HgC8N">
     <documentation textFormat="text/plain">
         <text>
             <![CDATA[Test parent child with multiplicity]]>
@@ -13,16 +13,15 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm_multiTest.case_0" name="multiTest" autoComplete="true">
-        <planItem id="cm_multiTest.case_203" name="htask" definitionRef="pid_cm_multiTest.case_203">
-            <entryCriterion id="_HgC8N_0" name="EntryCriterion_0" sentryRef="cm_multiTest.case_205"/>
-        </planItem>
-        <sentry id="cm_multiTest.case_205">
-            <caseFileItemOnPart sourceRef="cfi_multiTest.case_0">
-                <standardEvent>create</standardEvent>
-            </caseFileItemOnPart>
-        </sentry>
-        <humanTask id="pid_cm_multiTest.case_203" name="htask" isBlocking="true"/>
+        <humanTask id="cm_multiTest.case_203" name="htask" isBlocking="true">
+            <entryCriterion id="_HgC8N_0" name="EntryCriterion_0">
+                <caseFileItemOnPart sourceRef="cfi_multiTest.case_0">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </entryCriterion>
+        </humanTask>
     </casePlanModel>
+    <caseRoles/>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{
   "schema":{

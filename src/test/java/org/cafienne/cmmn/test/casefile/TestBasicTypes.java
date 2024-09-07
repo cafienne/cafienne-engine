@@ -97,7 +97,7 @@ public class TestBasicTypes {
         inputs.put(wrongParameterName, contents);
 
         StartCase startCase = createCaseCommand(testUser, caseInstanceId, definitions, inputs.cloneValueNode());
-        testCase.assertStepFails(startCase, action -> action.assertException(Exception.class, "An input parameter with name " + wrongParameterName + " is not defined in the case"));
+        testCase.assertStepFails(startCase, "An input parameter with name " + wrongParameterName + " is not defined in the case");
 
         testCase.runTest();
     }

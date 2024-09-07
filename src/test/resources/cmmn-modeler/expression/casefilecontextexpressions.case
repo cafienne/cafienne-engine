@@ -12,8 +12,7 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm_X87XC_0" name="CaseFileContextExpressions" autoComplete="true">
-        <planItem id="cm__X87XC_1" name="TaskWithExpression" definitionRef="pid_cm__X87XC_1"/>
-        <humanTask id="pid_cm__X87XC_1" name="TaskWithExpression" isBlocking="true">
+        <humanTask id="cm__X87XC_1" name="TaskWithExpression" isBlocking="true">
             <inputs id="_X87XC_4" name="Container" bindingRef="cfi_X87XC_0"/>
             <outputs id="_iWNoI" name="Result"/>
             <extensionElements mustUnderstand="false">
@@ -37,6 +36,7 @@
             </extensionElements>
         </humanTask>
     </casePlanModel>
+    <caseRoles/>
     <input id="_quBMy_inCPs_0" name="Container" bindingRef="cfi_X87XC_0"/>
     <extensionElements mustUnderstand="false">
         <cafienne:start-case-model xmlns:cafienne="org.cafienne">{

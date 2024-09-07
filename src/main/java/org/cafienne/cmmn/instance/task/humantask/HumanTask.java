@@ -154,19 +154,10 @@ public class HumanTask extends Task<HumanTaskDefinition> {
         super.validateTransition(transition);
         if (transition == Transition.Complete) {
             // Now check if the user has the performer role.
-            if (!currentUserIsAuthorized()) {
+            if (!getCaseInstance().getCurrentTeamMember().hasRole(getPerformer())) {
                 throw new TransitionDeniedException("You do not have the permission to perform the task " + getName());
             }
         }
-    }
-
-    /**
-     * Checks whether the current user has the proper roles to perform this task
-     *
-     * @return
-     */
-    public boolean currentUserIsAuthorized() {
-        return getCaseInstance().getCurrentTeamMember().hasRole(getPerformer());
     }
 
     @Override

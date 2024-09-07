@@ -1,4 +1,4 @@
-<case id="casefile/repeatcasefilecreation.case" name="casefile/repeatcasefilecreation" guid="_vr0Df">
+<case id="casefile/repeatcasefilecreation.case" name="casefile/repeatcasefilecreation" expressionLanguage="spel" guid="_vr0Df">
     <caseFileModel>
         <caseFileItem id="_vr0Df_0" name="TopCase" multiplicity="ZeroOrOne" definitionRef="unspecified.cfid">
             <children>
@@ -12,25 +12,24 @@
         </caseFileItem>
     </caseFileModel>
     <casePlanModel id="cm__vr0Df_0" name="casefile/repeatcasefilecreation" autoComplete="true">
-        <planItem id="pi_ht__vr0Df_0" name="Review" definitionRef="ht__vr0Df_0">
-            <entryCriterion id="_vr0Df_5" name="EntryCriterion_0" sentryRef="crit__vr0Df_0"/>
+        <humanTask id="pi_ht__vr0Df_0" name="Review" isBlocking="true">
+            <entryCriterion id="_vr0Df_5" name="EntryCriterion_0">
+                <caseFileItemOnPart id="_vr0Df_6" sourceRef="_vr0Df_1">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </entryCriterion>
             <itemControl id="_vr0Df_4">
                 <repetitionRule id="_vr0Df_7" contextRef="_vr0Df_0">
-                    <condition id="_vr0Df_8" language="spel">
+                    <condition id="_vr0Df_8">
                         <body>
                             <![CDATA[TopCase.items.size() < 3]]>
                         </body>
                     </condition>
                 </repetitionRule>
             </itemControl>
-        </planItem>
-        <sentry id="crit__vr0Df_0">
-            <caseFileItemOnPart id="_vr0Df_6" sourceRef="_vr0Df_1">
-                <standardEvent>create</standardEvent>
-            </caseFileItemOnPart>
-        </sentry>
-        <humanTask id="ht__vr0Df_0" name="Review" isBlocking="true"/>
+        </humanTask>
     </casePlanModel>
+    <caseRoles/>
     <textAnnotation id="_vr0Df_shape_4">
         <text>
             <![CDATA[Repeat the ReviewTask as long as 

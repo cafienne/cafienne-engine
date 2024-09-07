@@ -167,20 +167,21 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
         return !Objects.equals(this.currentAssignee, newAssignee.id());
     }
 
-    private void addCaseTeamUser(CaseUserIdentity newMember) {
-        getCaseInstance().getCaseTeam().upsertCaseTeamUser(newMember, task.getPerformer());
+    private void addCaseTeamUser(CaseUserIdentity newMember, CaseRoleDefinition role) {
+        getCaseInstance().getCaseTeam().upsertCaseTeamUser(newMember, role);
     }
 
     public void assign(CaseUserIdentity newAssignee) {
         if (isNewAssignee(newAssignee)) {
-            addCaseTeamUser(newAssignee);
+            addCaseTeamUser(newAssignee, task.getPerformer());
             addEvent(new HumanTaskAssigned(task, newAssignee.id()));
             checkOwnershipChange(newAssignee.id());
         }
     }
 
-    public void claim(CaseUserIdentity claimer) {
-        if (isNewAssignee(claimer)) {
+    public void claim() {
+        CaseUserIdentity claimer = getCaseInstance().getCurrentUser();
+        if (isNewAssignee(claimer) || currentTaskState != TaskState.Assigned) {
             addEvent(new HumanTaskClaimed(task, claimer.id()));
             checkOwnershipChange(claimer.id());
         }
@@ -188,17 +189,20 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
 
     public void delegate(CaseUserIdentity newAssignee) {
         if (isNewAssignee(newAssignee)) {
-            addCaseTeamUser(newAssignee);
+            addCaseTeamUser(newAssignee, null);
             addEvent(new HumanTaskDelegated(task, newAssignee.id()));
         }
     }
 
     public void revoke() {
-        // When a task is revoked, it get's assigned to the previous assignee.
+        // When a task is revoked, it gets assigned to the previous assignee.
         //  - If the task is in Delegated state, it means the original assignee delegated it to someone else,
-        //    and now the delegatee revokes the task, so the task again get's assigned to the original owner.
+        //    and now the delegate revokes the task, so the task again gets assigned to the original owner.
         //  - If the task is in Assigned state, it means the assignee revokes, and the task goes back to Unassigned
         //    state. This means also that the owner should be removed;
+        if (currentTaskState == TaskState.Unassigned) {
+            return;
+        }
 
         TaskState nextState = currentTaskState == TaskState.Delegated ? TaskState.Assigned : TaskState.Unassigned;
         String nextAssignee = currentTaskState == TaskState.Delegated ? currentOwner : "";
@@ -208,7 +212,7 @@ public class WorkflowTask extends CMMNElement<WorkflowTaskDefinition> {
     }
 
     private void checkOwnershipChange(String newOwner) {
-        if (this.currentOwner.equalsIgnoreCase(newOwner)) return;
+        if (Objects.equals(this.currentOwner, newOwner)) return;
         addEvent(new HumanTaskOwnerChanged(task, newOwner));
     }
 

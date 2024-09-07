@@ -14,39 +14,12 @@
         <caseFileItem id="_LQXO7_6" name="DetailsContent" multiplicity="ZeroOrMore" definitionRef="details.cfid"/>
     </caseFileModel>
     <casePlanModel id="cm_casefile/getlist_getdetails.case_0" name="getlist_getdetails" autoComplete="false">
-        <planItem id="pi_pt__LQXO7_8" name="GetList" definitionRef="pt__LQXO7_8">
-            <entryCriterion id="_LQXO7_11" name="EntryCriterion_1" sentryRef="crit__LQXO7_1"/>
-        </planItem>
-        <planItem id="pi_pt__LQXO7_24" name="GetDetails" definitionRef="pt__LQXO7_24">
-            <entryCriterion id="_LQXO7_1" name="EntryCriterion_0" sentryRef="crit__LQXO7_0"/>
-            <itemControl id="_LQXO7_32" name="ItemControl_1">
-                <repetitionRule id="_LQXO7_33" name="Constraint_1">
-                    <condition id="_LQXO7_34" name="Expression_1">
-                        <body>
-                            <![CDATA[task.index<3]]>
-                        </body>
-                    </condition>
-                </repetitionRule>
-            </itemControl>
-        </planItem>
-        <sentry id="crit__LQXO7_0" name="Sentry_1">
-            <ifPart id="_LQXO7_37" contextRef="_LQXO7_7">
-                <condition id="_LQXO7_38">
-                    <body>
-                        <![CDATA[!DetailsKey.isEmpty()]]>
-                    </body>
-                </condition>
-            </ifPart>
-            <caseFileItemOnPart id="_LQXO7_0" name="CaseFileItemOnPart_1" sourceRef="_LQXO7_7">
-                <standardEvent>create</standardEvent>
-            </caseFileItemOnPart>
-        </sentry>
-        <sentry id="crit__LQXO7_1">
-            <caseFileItemOnPart id="_LQXO7_12" sourceRef="_LQXO7_4">
-                <standardEvent>create</standardEvent>
-            </caseFileItemOnPart>
-        </sentry>
-        <processTask id="pt__LQXO7_8" name="GetList" isBlocking="true" processRef="GetListWebService.process">
+        <processTask id="pi_pt__LQXO7_8" name="GetList" isBlocking="true" processRef="GetListWebService.process">
+            <entryCriterion id="_LQXO7_11" name="EntryCriterion_1">
+                <caseFileItemOnPart id="_LQXO7_12" sourceRef="_LQXO7_4">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </entryCriterion>
             <inputs id="_LQXO7_19" name="HTTPConfiguration" bindingRef="_LQXO7_4"/>
             <outputs id="_LQXO7_21" name="DetailsKey" bindingRef="_LQXO7_7"/>
             <parameterMapping id="_LQXO7_9" sourceRef="_LQXO7_19" targetRef="a">
@@ -58,7 +31,28 @@
             </parameterMapping>
             <parameterMapping id="_LQXO7_16" sourceRef="o_4" targetRef="_LQXO7_21"/>
         </processTask>
-        <processTask id="pt__LQXO7_24" name="GetDetails" isBlocking="true" processRef="GetDetailsWebService.process">
+        <processTask id="pi_pt__LQXO7_24" name="GetDetails" isBlocking="true" processRef="GetDetailsWebService.process">
+            <entryCriterion id="_LQXO7_1" name="EntryCriterion_0">
+                <ifPart id="_LQXO7_37" contextRef="_LQXO7_7">
+                    <condition id="_LQXO7_38">
+                        <body>
+                            <![CDATA[!DetailsKey.isEmpty()]]>
+                        </body>
+                    </condition>
+                </ifPart>
+                <caseFileItemOnPart id="_LQXO7_0" name="CaseFileItemOnPart_1" sourceRef="_LQXO7_7">
+                    <standardEvent>create</standardEvent>
+                </caseFileItemOnPart>
+            </entryCriterion>
+            <itemControl id="_LQXO7_32" name="ItemControl_1">
+                <repetitionRule id="_LQXO7_33" name="Constraint_1">
+                    <condition id="_LQXO7_34" name="Expression_1">
+                        <body>
+                            <![CDATA[task.index<3]]>
+                        </body>
+                    </condition>
+                </repetitionRule>
+            </itemControl>
             <inputs id="_LQXO7_30" name="HTTPConfiguration" bindingRef="_LQXO7_4"/>
             <inputs id="_LQXO7_35" name="DetailsKey" bindingRef="_LQXO7_7"/>
             <outputs id="_LQXO7_36" name="DetailsContent" bindingRef="_LQXO7_6"/>
@@ -73,4 +67,5 @@
             <parameterMapping id="_LQXO7_28" sourceRef="out1_details" targetRef="_LQXO7_36"/>
         </processTask>
     </casePlanModel>
+    <caseRoles/>
 </case>

@@ -18,7 +18,7 @@
 package org.cafienne.humantask.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.cafienne.humantask.actorapi.command.WorkflowCommand;
+import org.cafienne.humantask.actorapi.command.HumanTaskCommand;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -29,7 +29,7 @@ import java.io.IOException;
 public class HumanTaskValidationResponse extends HumanTaskResponse {
     private final ValueMap value;
 
-    public HumanTaskValidationResponse(WorkflowCommand command, ValueMap value) {
+    public HumanTaskValidationResponse(HumanTaskCommand command, ValueMap value) {
         super(command);
         this.value = value;
     }
