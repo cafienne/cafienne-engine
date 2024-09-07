@@ -31,7 +31,7 @@ import org.cafienne.json.ValueMap;
 import java.io.IOException;
 
 @Manifest
-public class AssignTask extends WorkflowCommand {
+public class AssignTask extends TaskManagementCommand {
     protected final CaseUserIdentity assignee;
 
     public AssignTask(CaseUserIdentity user, String caseInstanceId, String taskId, CaseUserIdentity assignee) {
@@ -45,22 +45,19 @@ public class AssignTask extends WorkflowCommand {
     }
 
     @Override
-    public void validate(HumanTask task) {
-        super.validateCaseOwnership(task);
-        TaskState currentTaskState = task.getImplementation().getCurrentState();
-        if (! currentTaskState.isActive()) {
-            raiseException("Cannot be done because the task is in " + currentTaskState + " state, but must be in an active state (Unassigned or Assigned)");
-        }
-        validateCaseTeamMembership(task, assignee);
-        super.verifyTaskPairRestrictions(task, assignee);
+    public void validateTaskAction(HumanTask task) {
+        verifyTaskPairRestrictions(task, assignee);
+        verifyCaseTeamMembershipOfAssignee(task, assignee);
     }
 
-    protected void validateCaseTeamMembership(HumanTask task, CaseUserIdentity assignee) {
+    private void verifyCaseTeamMembershipOfAssignee(HumanTask task, CaseUserIdentity assignee) {
+        // Case owners can always assign tasks to others, and also add them to the case team with the appropriate role
         if (task.getCaseInstance().getCurrentTeamMember().isOwner()) {
             // Case owners will add the team member themselves when assigning/delegating; no need to check membership.
             return;
         }
-        // Validate that the new assignee is part of the team
+
+        // Validate that the new assignee is part of the team and has the proper role
         CaseTeamUser member = task.getCaseInstance().getCaseTeam().getUser(assignee.id());
         if (member == null) {
             raiseException("There is no case team member with id '" + assignee + "'");

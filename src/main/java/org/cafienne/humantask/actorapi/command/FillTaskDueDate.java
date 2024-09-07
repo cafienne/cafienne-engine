@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Manifest
-public class FillTaskDueDate extends WorkflowCommand {
+public class FillTaskDueDate extends TaskManagementCommand {
 	private final Instant dueDate;
 
 	public FillTaskDueDate(CaseUserIdentity user, String caseInstanceId, String taskId, Instant dueDate) {
@@ -43,9 +43,8 @@ public class FillTaskDueDate extends WorkflowCommand {
 	}
 
 	@Override
-	public void validate(HumanTask task) {
-		// Only case owners can set the due date
-		super.validateTaskOwnership(task);
+	protected void validateTaskAction(HumanTask task) {
+		// Nothing to validate here
 	}
 
 	@Override

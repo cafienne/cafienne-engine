@@ -25,7 +25,7 @@ import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest
-public class RevokeTask extends WorkflowCommand {
+public class RevokeTask extends TaskManagementCommand {
     public RevokeTask(CaseUserIdentity user, String caseInstanceId, String taskId) {
         super(user, caseInstanceId, taskId);
     }
@@ -35,9 +35,14 @@ public class RevokeTask extends WorkflowCommand {
     }
 
     @Override
-    public void validate(HumanTask task) {
-        super.validateTaskOwnership(task);
-        super.validateState(task, TaskState.Assigned, TaskState.Delegated);
+    protected boolean requiresCaseRole() {
+        // This can also be done by the actual assignee (for delegated tasks)
+        return false;
+    }
+
+    @Override
+    public void validateTaskAction(HumanTask task) {
+        // Nothing to validate here
     }
 
     @Override

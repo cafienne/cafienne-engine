@@ -33,8 +33,6 @@ import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.humantask.instance.WorkflowTask;
 import org.cafienne.infrastructure.serialization.Fields;
-import org.cafienne.json.StringValue;
-import org.cafienne.json.ValueList;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
@@ -80,11 +78,12 @@ public abstract class WorkflowCommand extends CaseCommand {
         task = (HumanTask) planItem;
 
         // Commands can be sent when the task is Active or Suspended or Failed (and when Enabled/Disabled, but that is hardly in use).
-        State currentState = task.getState();
-        if ((currentState.isSemiTerminal() && currentState != State.Failed) || currentState == State.Null || currentState == State.Available) {
-            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be done because task " + planItem.getName() + " (" + taskId + ") is in state " + currentState);
+        if (!task.getState().isAlive()) {
+            throw new InvalidCommandException(this.getClass().getSimpleName() + " cannot be done because task " + planItem.getName() + " (" + taskId + ") is in state " + task.getState());
         }
 
+        // Validate that the current user has the authorization to perform the task
+        validateTaskAccess(task);
         // Now have the actual command do its own validation on the task
         validate(task);
     }
@@ -121,16 +120,10 @@ public abstract class WorkflowCommand extends CaseCommand {
     }
 
     protected void mustBeActive(HumanTask task) {
-        validateProperCaseRole(task);
-
         TaskState currentTaskState = task.getImplementation().getCurrentState();
         if (!currentTaskState.isActive()) {
             raiseException("Cannot be done because the task is not Active but " + currentTaskState);
         }
-    }
-
-    protected void verifyTaskPairRestrictions(HumanTask task) {
-        verifyTaskPairRestrictions(task, getUser());
     }
 
     private List<HumanTask> getReferencedTasks(TaskPairingDefinition taskPairingDefinition) {
@@ -151,12 +144,13 @@ public abstract class WorkflowCommand extends CaseCommand {
                 .collect(Collectors.toList());
     }
 
-    protected void verifyTaskPairRestrictions(HumanTask task, CaseUserIdentity user) {
+    protected void verifyTaskPairRestrictions(HumanTask task, CaseUserIdentity ...user) {
+        String userId = user.length > 0 ? user[0].id() : getUser().id();
         if (task.getItemDefinition().hasFourEyes()) {
             FourEyesDefinition verificationRules = task.getItemDefinition().getFourEyesDefinition();
             List<HumanTask> items = getReferencedTasks(verificationRules);
             task.getCaseInstance().addDebugInfo(() -> {
-                ValueMap logs = new ValueMap("FourEyes Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + user.id());
+                ValueMap logs = new ValueMap("FourEyes Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + userId);
                 logs.plus(" Related tasks", "Four eyes has been defined for " + verificationRules.getAllReferredItemNames());
                 String resultTag = " Verification result";
                 ValueMap details = logs.with(resultTag);
@@ -165,7 +159,7 @@ public abstract class WorkflowCommand extends CaseCommand {
                 } else {
                     // Log for each item it's comparison
                     items.forEach(item -> {
-                        String result = item.getImplementation().getAssignee().equals(user.id()) ? "check fails   " : "check succeeds";
+                        String result = item.getImplementation().getAssignee().equals(userId) ? "check fails   " : "check succeeds";
                         details.plus(item.getName(), result + " - task is assigned to " + item.getImplementation().getAssignee());
                     });
                     // Log items that have not been selected for comparison as well, as they are probably not yet assigned
@@ -178,7 +172,7 @@ public abstract class WorkflowCommand extends CaseCommand {
                 return logs;
             });
             items.forEach(item -> {
-                if (item.getImplementation().getAssignee().equals(user.id())) {
+                if (item.getImplementation().getAssignee().equals(userId)) {
                     raiseAuthorizationException("Since you have worked on " + item.getName() + " you cannot also work on " + task.getName());
                 }
             });
@@ -190,7 +184,7 @@ public abstract class WorkflowCommand extends CaseCommand {
             RendezVousDefinition verificationRules = task.getItemDefinition().getRendezVousDefinition();
             List<HumanTask> items = getReferencedTasks(verificationRules);
             task.getCaseInstance().addDebugInfo(() -> {
-                ValueMap logs = new ValueMap("RendezVous Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + user.id());
+                ValueMap logs = new ValueMap("RendezVous Verification on " + task.getName(), "Checking " + getClass().getSimpleName() +" constraints for user " + userId);
                 logs.plus(" Related tasks", "Rendez-vous has been defined on " + verificationRules.getAllReferredItemNames());
                 String resultTag = " Verification result";
                 ValueMap details = logs.with(resultTag);
@@ -198,7 +192,7 @@ public abstract class WorkflowCommand extends CaseCommand {
                     details.plus("ok", "none of the defined elements has been assigned yet, so no need for rendez vous check");
                 } else {
                     items.forEach(item -> {
-                        String result = item.getImplementation().getAssignee().equals(user.id()) ? "check succeeds" : "check fails   ";
+                        String result = item.getImplementation().getAssignee().equals(userId) ? "check succeeds" : "check fails   ";
                         details.plus(item.getName(), result + " - task is assigned to " + item.getImplementation().getAssignee());
                     });
                     verificationRules.getAllReferences().forEach(item -> {
@@ -210,7 +204,7 @@ public abstract class WorkflowCommand extends CaseCommand {
                 return logs;
             });
             items.forEach(item -> {
-                if (!item.getImplementation().getAssignee().equals(user.id())) {
+                if (!item.getImplementation().getAssignee().equals(userId)) {
                     raiseAuthorizationException("Since you have not worked on " + item.getName() + " you cannot work on " + task.getName());
                 }
             });
@@ -220,41 +214,25 @@ public abstract class WorkflowCommand extends CaseCommand {
     }
 
     /**
-     * Validate that the current user is owner to the case
-     */
-    protected void validateCaseOwnership(HumanTask task) {
-        if (!task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
-            raiseAuthorizationException("You must be case owner to perform this operation");
-        }
-    }
-
-    /**
-     * Validate that the current user has the proper role in the case team to perform the task
-     */
-    protected void validateProperCaseRole(HumanTask task) {
-        if (!task.currentUserIsAuthorized()) {
-            raiseAuthorizationException("You do not have permission to perform this operation");
-        }
-    }
-
-    /**
      * Tasks are "owned" by the assignee and by the case owners
      */
-    protected void validateTaskOwnership(HumanTask task) {
-        if (task.getCaseInstance().getCurrentTeamMember().isRoleManager(task.getPerformer())) {
-            // case owners have the privilege to do this too....
-            return;
-        }
-
-        String currentTaskAssignee = task.getImplementation().getAssignee();
-        if (currentTaskAssignee == null || currentTaskAssignee.isEmpty()) {
-            validateProperCaseRole(task);
-        } else {
-            String currentUserId = getUser().id();
-            if (!currentUserId.equals(currentTaskAssignee)) {
-                raiseAuthorizationException("You do not have permission to perform this operation");
+    protected void validateTaskAccess(HumanTask task) {
+        // You own the task if you have the right role, or if you're the current assigned person
+        if (!task.getCaseInstance().getCurrentTeamMember().hasRole(task.getPerformer())) {
+            String currentTaskAssignee = task.getImplementation().getAssignee();
+            if (currentTaskAssignee == null || currentTaskAssignee.isEmpty()) {
+                raisePermissionException();
+            } else {
+                String currentUserId = getUser().id();
+                if (!currentUserId.equals(currentTaskAssignee)) {
+                    raisePermissionException();
+                }
             }
         }
+    }
+
+    protected void raisePermissionException() {
+        raiseAuthorizationException("You do not have permission to perform this operation");
     }
 
     protected void raiseAuthorizationException(String msg) {

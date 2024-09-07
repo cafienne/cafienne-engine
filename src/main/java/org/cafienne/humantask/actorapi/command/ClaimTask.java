@@ -25,7 +25,7 @@ import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 @Manifest
-public class ClaimTask extends WorkflowCommand {
+public class ClaimTask extends TaskManagementCommand {
     public ClaimTask(CaseUserIdentity user, String caseInstanceId, String taskId) {
         super(user, caseInstanceId, taskId);
     }
@@ -35,14 +35,12 @@ public class ClaimTask extends WorkflowCommand {
     }
 
     @Override
-    public void validate(HumanTask task) {
-        super.validateProperCaseRole(task);
-        super.validateState(task, TaskState.Unassigned);
-        super.verifyTaskPairRestrictions(task);
+    public void validateTaskAction(HumanTask task) {
+        verifyTaskPairRestrictions(task, getUser());
     }
 
     @Override
     public void processWorkflowCommand(WorkflowTask workflowTask) {
-        workflowTask.claim(this.getUser());
+        workflowTask.claim();
     }
 }

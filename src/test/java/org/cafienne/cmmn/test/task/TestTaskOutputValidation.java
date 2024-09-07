@@ -76,37 +76,36 @@ public class TestTaskOutputValidation {
             long responseCode = tof.getTaskOutputParameters().raw("responseCode");
             TestScript.debugMessage("Ping mock service gave response code " + responseCode);
 
-            /**
-             * SaveTaskOutput - User should be able to save the task output for Unassigned task
-             */
+            //
+            // SaveTaskOutput - User should be able to save the task output for Unassigned task
+            //
             testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
                 action.getEvents().assertEventType(HumanTaskOutputSaved.class, 1);
                 action.getEvents().assertNotEmpty();
             });
 
-            /**
-             * ClaimTask - User should be able to claim the task
-             */
+            //
+            // ClaimTask - User should be able to claim the task
+            //
             testCase.addStep(new ClaimTask(pete, caseInstanceId, taskId), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 taskAssertion.assertAssignee("pete");
             });
 
-            /**
-             * ValidateTaskOutput - Task output validation fails on wrong user
-             */
-            testCase.assertStepFails(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()),
-                    failure -> failure.assertException("You do not have permission to perform this operation"));
+            //
+            // ValidateTaskOutput - Task output validation fails on wrong user
+            //
+            testCase.addStep(new ValidateTaskOutput(gimy, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()));
 
-            /**
-             * ValidateTaskOutput - Task output validation should result in a failure when we send "KILLSWITCH"
-             */
+            //
+            // ValidateTaskOutput - Task output validation should result in a failure when we send "KILLSWITCH"
+            //
             testCase.assertStepFails(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputFailingValidation.cloneValueNode()),
                     failure -> failure.assertException("Unexpected http response code 500"));
 
-            /**
-             * ValidateTaskOutput - Task output validation fails on wrong output
-             */
+            //
+            // ValidateTaskOutput - Task output validation fails on wrong output
+            //
             testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 Value<?> jsonResponse = taskAssertion.getValidationResponse().toJson();
@@ -125,9 +124,9 @@ public class TestTaskOutputValidation {
                 action.getTestCommand().getEvents().assertSize(0);
             });
 
-            /**
-             * ValidateTaskOutput - Task output validation should be ok with decision canceled
-             */
+            //
+            // ValidateTaskOutput - Task output validation should be ok with decision canceled
+            //
             testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionCanceled.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 Value<?> jsonResponse = taskAssertion.getValidationResponse().toJson();
@@ -141,29 +140,29 @@ public class TestTaskOutputValidation {
                 testCase.getEventListener().getNewEvents().assertSize(0);
             });
 
-            /**
-             * ValidateTaskOutput - Task output validation should be ok with decision approved, and it should not lead to new events
-             */
+            //
+            // ValidateTaskOutput - Task output validation should be ok with decision approved, and it should not lead to new events
+            //
             testCase.addStep(new ValidateTaskOutput(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> action.getEvents().assertSize(0));
 
-            /**
-             * SaveTaskOutput - User should be able to save the task with invalid output, and it should lead to new events
-             */
+            //
+            // SaveTaskOutput - User should be able to save the task with invalid output, and it should lead to new events
+            //
             testCase.addStep(new SaveTaskOutput(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()), action -> {
 //                casePlan.assertPlanItem("HumanTask").assertLastTransition(Transition.Start);
                 action.getEvents().assertEventType(HumanTaskOutputSaved.class, 1);
                 action.getEvents().assertNotEmpty();
             });
 
-            /**
-             * CompleteTaskOutput - User should not be able to complete the task with invalid output
-             */
+            //
+            // CompleteTaskOutput - User should not be able to complete the task with invalid output
+            //
             testCase.assertStepFails(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputInvalidDecision.cloneValueNode()),
                     failure -> failure.assertException(InvalidCommandException.class, "Output for task HumanTask is invalid"));
 
-            /**
-             * CompleteTask - Only the current task assignee should be able to complete the task
-             */
+            //
+            // CompleteTask - Only the current task assignee should be able to complete the task
+            //
             testCase.addStep(new CompleteHumanTask(pete, caseInstanceId, taskId, taskOutputDecisionApproved.cloneValueNode()), action -> {
                 HumanTaskAssertion taskAssertion = new HumanTaskAssertion(action);
                 testCase.getEventListener().awaitTaskOutputFilled(taskId, taskEvent -> {

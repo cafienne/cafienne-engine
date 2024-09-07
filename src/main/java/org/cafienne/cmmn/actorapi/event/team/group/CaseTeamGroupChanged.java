@@ -19,17 +19,13 @@ package org.cafienne.cmmn.actorapi.event.team.group;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.command.team.CaseTeamGroup;
-import org.cafienne.cmmn.actorapi.command.team.GroupRoleMapping;
 import org.cafienne.cmmn.actorapi.event.team.CaseTeamMemberChanged;
 import org.cafienne.cmmn.instance.team.CaseTeamError;
 import org.cafienne.cmmn.instance.team.Team;
-import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Event caused when a consent group is given access to the case.
