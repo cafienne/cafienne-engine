@@ -74,7 +74,7 @@ public class AssignTask extends TaskManagementCommand {
     }
 
     @Override
-    public void processWorkflowCommand(WorkflowTask workflowTask) {
+    public void processTaskCommand(WorkflowTask workflowTask) {
         workflowTask.assign(this.assignee);
     }
 

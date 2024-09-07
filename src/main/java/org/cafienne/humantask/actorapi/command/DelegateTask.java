@@ -61,7 +61,7 @@ public class DelegateTask extends TaskManagementCommand {
     }
 
     @Override
-    public void processWorkflowCommand(WorkflowTask workflowTask) {
+    public void processTaskCommand(WorkflowTask workflowTask) {
         workflowTask.delegate(delegate);
     }
 

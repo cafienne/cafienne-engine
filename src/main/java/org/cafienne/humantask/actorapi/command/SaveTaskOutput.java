@@ -36,7 +36,7 @@ public class SaveTaskOutput extends TaskOutputCommand {
 	}
 
 	@Override
-	public void processWorkflowCommand(WorkflowTask workflowTask) {
+	public void processTaskCommand(WorkflowTask workflowTask) {
 		workflowTask.saveOutput(this.taskOutput);
 	}
 }

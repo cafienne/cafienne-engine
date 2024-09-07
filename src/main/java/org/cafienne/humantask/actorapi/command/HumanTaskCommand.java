@@ -27,7 +27,6 @@ import org.cafienne.cmmn.definition.extension.workflow.RendezVousDefinition;
 import org.cafienne.cmmn.definition.extension.workflow.TaskPairingDefinition;
 import org.cafienne.cmmn.instance.Case;
 import org.cafienne.cmmn.instance.PlanItem;
-import org.cafienne.cmmn.instance.State;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
 import org.cafienne.humantask.actorapi.response.HumanTaskResponse;
 import org.cafienne.humantask.instance.TaskState;
@@ -40,11 +39,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class WorkflowCommand extends CaseCommand {
+public abstract class HumanTaskCommand extends CaseCommand {
     private final String taskId;
     private HumanTask task;
 
-    protected WorkflowCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
+    protected HumanTaskCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
         super(user, caseInstanceId);
         if (taskId == null || taskId.trim().isEmpty()) {
             throw new NullPointerException("Task id should not be null or empty");
@@ -53,7 +52,7 @@ public abstract class WorkflowCommand extends CaseCommand {
         this.taskId = taskId;
     }
 
-    protected WorkflowCommand(ValueMap json) {
+    protected HumanTaskCommand(ValueMap json) {
         super(json);
         this.taskId = json.readString(Fields.taskId);
     }
@@ -92,13 +91,13 @@ public abstract class WorkflowCommand extends CaseCommand {
 
     @Override
     public void processCaseCommand(Case caseInstance) {
-        processWorkflowCommand(task.getImplementation());
+        processTaskCommand(task.getImplementation());
         if (getResponse() == null) {
             setResponse(new HumanTaskResponse(this));
         }
     }
 
-    public abstract void processWorkflowCommand(WorkflowTask task);
+    public abstract void processTaskCommand(WorkflowTask task);
 
     @Override
     public void write(JsonGenerator generator) throws IOException {

@@ -19,14 +19,13 @@ package org.cafienne.humantask.actorapi.command;
 
 import org.cafienne.actormodel.identity.CaseUserIdentity;
 import org.cafienne.cmmn.instance.task.humantask.HumanTask;
-import org.cafienne.humantask.instance.TaskState;
 import org.cafienne.json.ValueMap;
 
 /**
  * This is the basis for tasks that can be executed during while the task is alive.
  * Examples: assign, claim, delegate, revoke, etc.
  */
-public abstract class TaskManagementCommand extends WorkflowCommand {
+public abstract class TaskManagementCommand extends HumanTaskCommand {
     protected TaskManagementCommand(CaseUserIdentity user, String caseInstanceId, String taskId) {
         super(user, caseInstanceId, taskId);
     }

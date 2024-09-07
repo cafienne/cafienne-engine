@@ -19,7 +19,7 @@ package org.cafienne.humantask.actorapi.response;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.cafienne.cmmn.actorapi.response.CaseResponse;
-import org.cafienne.humantask.actorapi.command.WorkflowCommand;
+import org.cafienne.humantask.actorapi.command.HumanTaskCommand;
 import org.cafienne.infrastructure.serialization.Fields;
 import org.cafienne.infrastructure.serialization.Manifest;
 import org.cafienne.json.ValueMap;
@@ -30,7 +30,7 @@ import java.io.IOException;
 public class HumanTaskResponse extends CaseResponse {
     private final String taskId;
 
-    public HumanTaskResponse(WorkflowCommand command) {
+    public HumanTaskResponse(HumanTaskCommand command) {
         super(command);
         this.taskId = command.actorId;
     }

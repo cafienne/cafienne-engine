@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * A command that works on the output of the task (whether temporary for saving or validation or for completion)
  */
-public abstract class TaskOutputCommand extends WorkflowCommand {
+public abstract class TaskOutputCommand extends HumanTaskCommand {
 	protected final ValueMap taskOutput;
 
 	protected TaskOutputCommand(CaseUserIdentity user, String caseInstanceId, String taskId, ValueMap taskOutput) {

@@ -40,7 +40,7 @@ public class ClaimTask extends TaskManagementCommand {
     }
 
     @Override
-    public void processWorkflowCommand(WorkflowTask workflowTask) {
+    public void processTaskCommand(WorkflowTask workflowTask) {
         workflowTask.claim();
     }
 }

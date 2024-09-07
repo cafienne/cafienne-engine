@@ -48,7 +48,7 @@ public class FillTaskDueDate extends TaskManagementCommand {
 	}
 
 	@Override
-	public void processWorkflowCommand(WorkflowTask workflowTask) {
+	public void processTaskCommand(WorkflowTask workflowTask) {
 		workflowTask.setDueDate(dueDate);
 	}
 
