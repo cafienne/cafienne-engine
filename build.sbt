@@ -124,8 +124,8 @@ configs(MultiJvm) // Not sure what this adds, actually
   * Dependencies
   */
 val akkaHttpVersion    = "1.1.0-M1"
-val akkaVersion        = "1.1.0-M1"
-val pekkoPersistenceVersion = "1.1.0-M1"
+val akkaVersion        = "1.1.0"
+val pekkoPersistenceVersion = "1.1.0"
 val jacksonVersion     = "2.17.2"
 val enumeratumVersion  = "1.7.4"
 val swaggerVersion     = "2.2.23"
@@ -146,10 +146,10 @@ libraryDependencies ++= Seq(
   , "org.apache.pekko"       %% "pekko-http-jackson"                    % akkaHttpVersion
   , "org.apache.pekko"       %% "pekko-persistence"                     % pekkoPersistenceVersion
   , "org.apache.pekko"       %% "pekko-persistence-query"               % pekkoPersistenceVersion
-  , "org.apache.pekko"      %% "pekko-persistence-jdbc"                 % pekkoPersistenceVersion
+  , "org.apache.pekko"      %% "pekko-persistence-jdbc"                 % "1.1.0-M1"
   , "org.apache.pekko"       %% "pekko-persistence-cassandra"           % "1.0.0"
-  , "com.datastax.oss"        %  "java-driver-core"                     % "4.15.0"
-  , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.15.0"
+  , "com.datastax.oss"        %  "java-driver-core"                     % "4.17.0"
+  , "com.datastax.oss"        %  "java-driver-query-builder"            % "4.17.0"
 
   // Logging
   , "org.apache.pekko"       %% "pekko-slf4j"                           % akkaVersion
@@ -169,15 +169,12 @@ libraryDependencies ++= Seq(
   , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
 
   // DB Schema
-  , "org.flywaydb"            %  "flyway-core"                          % "10.15.2"
-  , "org.flywaydb"            % "flyway-database-postgresql"            % "10.14.0"
-  , "org.flywaydb"            % "flyway-sqlserver"                      % "10.15.0"
-  , "org.flywaydb"            % "flyway-database-hsqldb"                % "10.15.2"
+  , "org.flywaydb"            %  "flyway-core"                          % "9.22.3"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
   , "com.typesafe.slick"      %% "slick"                                % slickVersion
   , "com.zaxxer"              % "HikariCP"                              % "5.1.0"
-  , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway"           % "0.11.0"
-  , "io.github.nafg.slick-migration-api" %% "slick-migration-api"                  % "0.10.0"
+  , "io.github.nafg.slick-migration-api" %% "slick-migration-api-flyway" % "0.11.0"
+  , "io.github.nafg.slick-migration-api" %% "slick-migration-api"       % "0.10.0"
 
   , "com.fasterxml.jackson.core"   % "jackson-databind"			            % jacksonVersion
   , "com.fasterxml.jackson.core"   % "jackson-core"					            % jacksonVersion
@@ -210,13 +207,9 @@ libraryDependencies ++= Seq(
   ,"jakarta.ws.rs" % "jakarta.ws.rs-api" % "4.0.0"
   , "io.swagger.core.v3"      %  "swagger-core"                         % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-annotations"                  % swaggerVersion
-  //, "io.swagger.core.v3"      %  "swagger-jaxrs2"                       % swaggerVersion
   , "io.swagger.core.v3"      %  "swagger-models"                       % swaggerVersion
   , "com.github.swagger-akka-http" %% "swagger-pekko-http"              % "2.12.2" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
   ,"com.github.swagger-akka-http"  %% "swagger-scala-module"            % "2.12.3" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
-  ,"com.github.swagger-akka-http"  %% "swagger-enumeratum-module"       % "2.9.0" excludeAll(ExclusionRule(organization = "org.apache.pekko"))
-  //,"io.swagger.core.v3"           % "swagger-jaxrs2-jakarta"            % swaggerVersion
-  //, "javax.ws.rs"             %  "javax.ws.rs-api"                      % "2.1.1" // Note: this one is still needed for swagger-pekko-http :(
   , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
   ,"org.yaml"                 %"snakeyaml"                              % "2.0"
   // metrics support
