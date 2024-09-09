@@ -213,8 +213,8 @@ libraryDependencies ++= Seq(
   , "javax.xml.bind"          %  "jaxb-api"                             % "2.3.1" // Note: this one is still needed for swagger-pekko-http :(
   ,"org.yaml"                 %"snakeyaml"                              % "2.0"
   // metrics support
-//  ,"io.kamon"                 %% "kamon-pekko"                          % "2.7.3"
-//  ,"io.kamon"                 % "kanela-agent"                          % "1.0.18"
+  //  ,"io.kamon"                 %% "kamon-pekko"                          % "2.7.3"
+  //  ,"io.kamon"                 % "kanela-agent"                          % "1.0.18"
 )
 
 /**
