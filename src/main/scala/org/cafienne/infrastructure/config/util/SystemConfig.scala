@@ -50,7 +50,10 @@ object SystemConfig extends LazyLogging {
     // Tagging is configured in the akka persistence journal.
     //  This journal has different configuration keys per type of persistence.
     //  Find the right path based on the config of the journal plugin.
-    val akkaJournalPath = config.root().toConfig.getString("pekko.persistence.journal.plugin")
+    if (!config.root().toConfig.hasPath("akka.persistence.journal.plugin")) {
+      return config
+    }
+    val akkaJournalPath = config.root().toConfig.getString("akka.persistence.journal.plugin")
 
     val taggingPath = s"$akkaJournalPath.event-adapters"
     val key = "tagging"
