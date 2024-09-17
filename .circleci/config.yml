@@ -390,6 +390,7 @@ workflows:
               only:
                 - main
                 - dependency-updates
+                - pekko
                 - run-compatibility-tests
       - branch-build:
           context: automation-context
@@ -398,6 +399,7 @@ workflows:
               ignore:
                 - main
                 - dependency-updates
+                - pekko
                 - run-compatibility-tests
       - release-build:
           context: automation-context
