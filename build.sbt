@@ -169,7 +169,7 @@ libraryDependencies ++= Seq(
   , "com.nimbusds"            %  "oauth2-oidc-sdk"                      % "11.12"
 
   // DB Schema
-  , "org.flywaydb"            %  "flyway-core"                          % "9.22.3"
+  , "org.flywaydb"            %  "flyway-core"                          % "7.2.1"
   , "com.typesafe.slick"      %% "slick-hikaricp"                       % slickVersion
   , "com.typesafe.slick"      %% "slick"                                % slickVersion
   , "com.zaxxer"              % "HikariCP"                              % "5.1.0"
