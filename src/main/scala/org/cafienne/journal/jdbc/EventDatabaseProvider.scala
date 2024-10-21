@@ -44,24 +44,13 @@ class EventDatabaseProvider(system: ActorSystem) extends DefaultSlickDatabasePro
 }
 
 object FlywayEventDB extends LazyLogging {
-  private val compatibilityFolder = "akka-jdbc-4/" // Akka JDBC 4.0.0 schema
-
   def validateSchema(db: JdbcBackend.Database, profile: JdbcProfile): MigrateResult = {
     val dataSource: DataSource = new DatabaseDataSource(db)
 
-    def checkCompatibilityRequirement(folder: String, sql: String): String = {
-      try {
-        dataSource.getConnection.createStatement().executeQuery(sql).next()
-        compatibilityFolder + folder
-      } catch {
-        case _: Throwable => folder
-      }
-    }
-
     val dbScriptsLocation = {
       val folder: String = profile match {
-        case _: PostgresProfile => checkCompatibilityRequirement("postgres", "SELECT * FROM journal LIMIT 1")
-        case _: SQLServerProfile => checkCompatibilityRequirement("sqlserver", "SELECT TOP(1) * FROM journal")
+        case _: PostgresProfile => "postgres"
+        case _: SQLServerProfile => "sqlserver"
         case _: H2Profile => "h2"
         //        case _: HsqldbProfile => "hsql" // not yet supported
         case _ => throw new IllegalArgumentException(s"Cannot start EventDatabase provider for unsupported JDBC profile of type ${profile.getClass.getName}")
