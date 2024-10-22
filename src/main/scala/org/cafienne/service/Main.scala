@@ -21,7 +21,7 @@ import org.apache.pekko.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.querydb.schema.QueryDB
-import org.cafienne.service.akkahttp.CafienneHttpServer
+import org.cafienne.service.http.CafienneHttpServer
 import org.cafienne.system.CaseSystem
 
 import scala.concurrent.duration._

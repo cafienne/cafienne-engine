@@ -15,11 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.infrastructure.http.authentication
 
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.service.http.Headers
+import org.cafienne.actormodel.identity.{PlatformUser, UserIdentity}
+import org.cafienne.querydb.record.TenantRecord
+import org.cafienne.service.http.LastModifiedHeader
 
-object CaseReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CASE_LAST_MODIFIED)
+import scala.concurrent.Future
+
+trait IdentityProvider {
+  def getTenant(tenant: String): Future[TenantRecord] = ???
+
+  def getPlatformUser(user: UserIdentity, tlm: LastModifiedHeader): Future[PlatformUser] = ???
+
+  def clear(userId: String): Unit = ???
 }
