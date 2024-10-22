@@ -15,11 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.service.http.identifiers.route
 
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.service.http.Headers
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
+import org.cafienne.querydb.record.CaseBusinessIdentifierRecord
 
-object CaseReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CASE_LAST_MODIFIED)
+final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
+  override def toValue: Value[_] = {
+    val list = new ValueList
+    records.foreach(record => list.add(new ValueMap("caseInstanceId", record.caseInstanceId, "tenant", record.tenant, "name", record.name, "value", record.value.orNull)))
+    list
+  }
 }
+

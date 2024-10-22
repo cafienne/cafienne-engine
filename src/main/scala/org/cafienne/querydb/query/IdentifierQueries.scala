@@ -21,7 +21,7 @@ import org.cafienne.actormodel.identity.UserIdentity
 import org.cafienne.infrastructure.jdbc.query.{Area, Sort}
 import org.cafienne.json.{CafienneJson, StringValue, Value}
 import org.cafienne.querydb.query.filter.IdentifierFilter
-import org.cafienne.service.akkahttp.identifiers.route.IdentifierSet
+import org.cafienne.service.http.identifiers.route.IdentifierSet
 
 import scala.concurrent.Future
 

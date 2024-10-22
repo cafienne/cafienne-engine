@@ -15,11 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.service.http.storage
 
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.service.http.Headers
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.cafienne.infrastructure.http.route.AuthenticatedRoute
+import org.cafienne.system.CaseSystem
 
-object CaseReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CASE_LAST_MODIFIED)
+import jakarta.ws.rs.Path
+
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
+@Path("/storage")
+class StorageRoutes(val caseSystem: CaseSystem) extends AuthenticatedRoute {
+  override val prefix = "storage"
+
+  addSubRoute(new CaseStorageRoute(caseSystem))
+  addSubRoute(new TenantStorageRoute(caseSystem))
 }
