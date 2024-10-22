@@ -25,10 +25,11 @@ import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
 
 /**
   * Configuration settings of this Cafienne Case System Platform
+  *
   * @param systemConfig
   */
 class CafienneConfig extends ConfigReader with LazyLogging {
-  val systemConfig: Config = SystemConfig.load()
+  val systemConfig: Config = SystemConfig.load().getConfig
   val path = "cafienne"
   override lazy val config: Config = {
     if (systemConfig.hasPath(path)) {

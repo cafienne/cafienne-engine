@@ -32,6 +32,7 @@ public class CaseDefinition extends ModelDefinition implements TaskImplementatio
     private final CaseFileDefinition caseFileModel;
     private final CasePlanDefinition casePlanModel;
     private final CaseTeamDefinition caseTeamModel;
+    private final String startCaseSchema;
 
     public CaseDefinition(Element definitionElement, DefinitionsDocument document) {
         super(definitionElement, document);
@@ -39,6 +40,11 @@ public class CaseDefinition extends ModelDefinition implements TaskImplementatio
         caseFileModel = parse("caseFileModel", CaseFileDefinition.class, true);
         casePlanModel = parse("casePlanModel", CasePlanDefinition.class, true);
         caseTeamModel = new CaseTeamDefinition(this);
+        startCaseSchema = parseExtension("start-case-model", String.class);
+    }
+
+    public String getStartCaseSchema() {
+        return startCaseSchema;
     }
 
     /**

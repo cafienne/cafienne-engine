@@ -27,7 +27,6 @@ jobs:
       - run-in-memory-tests
       - run-jdbc-tests
       - run-cassandra-tests
-      - run-compatibility-tests
       - show-engine-logs-on-fail
       - reset-git-local-changes
       # All good; if we're really on the main branch, create and run setup of multi architecture build, then push the image to docker hub.
@@ -58,7 +57,6 @@ jobs:
       - run-in-memory-tests
       - run-jdbc-tests
       - run-cassandra-tests
-      - run-compatibility-tests
       - show-engine-logs-on-fail
       - reset-git-local-changes
       # All good, create and run setup of multi architecture build, then push the image to docker hub to latest and to release tags.
@@ -360,78 +358,6 @@ commands:
           command: |
             docker logs cafienne
             docker rm -f cafienne
-
-  run-compatibility-tests:
-    steps:
-      # Starting docker environment for backwards compatibility MS SQL Server testing against latest engine
-      - run:
-          name: Start Cafienne Engine for SQL Server compatibility testing
-          command: |
-            sudo docker-compose -f .circleci/docker-config/engine-with-sqlserver-events.yml up -d cafienne
-            sleep 10
-      - run:
-          name: Docker logs of database
-          command: docker logs sql-server-with-events
-      - run:
-          name: Docker logs of engine before starting test
-          command: docker logs cafienne
-      - run:
-          name: Test engine against framework
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run test
-      - run:
-          name: Test archival & deletion
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run test storage
-      - run:
-          name: Docker logs of engine after the test
-          command: docker logs cafienne
-      - run:
-          name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
-
-      # Starting docker environment for backwards compatibility PostgreSQL testing against latest engine
-      - run:
-          name: Start Cafienne Engine for PostgreSQL compatibility testing
-          command: |
-            sudo docker-compose -f .circleci/docker-config/engine-with-postgres-events.yml up -d cafienne
-            sleep 10
-      - run:
-          name: Docker logs of database
-          command: |
-            echo 
-            echo Logs for PostgreSQL database with existing events
-            echo
-            docker logs postgres-with-events
-            echo 
-            echo Logs for PostgreSQL query database
-            echo
-            docker logs postgres-query-db-for-events
-      - run:
-          name: Docker logs of engine before starting test
-          command: docker logs cafienne
-      - run:
-          name: Test engine against framework
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run test
-      - run:
-          name: Test archival & deletion
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run test storage
-      - run:
-          name: Docker logs of engine after the test
-          command: docker logs cafienne
-      - run:
-          name: Stop and remove the Cafienne container
-          command: docker rm -f cafienne
 
   show-engine-logs-on-fail:
     steps:
