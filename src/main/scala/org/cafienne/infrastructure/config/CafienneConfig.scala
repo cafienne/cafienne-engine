@@ -21,6 +21,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.config.api.{ApiConfig, OIDCConfig}
 import org.cafienne.infrastructure.config.engine.EngineConfig
+import org.cafienne.infrastructure.config.migration.{DropTagging, MigrateEventDatabaseProvider, MigrateSerializer}
 import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
 
 /**
@@ -28,7 +29,7 @@ import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
   * @param systemConfig
   */
 class CafienneConfig extends ConfigReader with LazyLogging {
-  val systemConfig: Config = SystemConfig.load()
+  val systemConfig: Config = SystemConfig.load().migrate(DropTagging, MigrateEventDatabaseProvider, MigrateSerializer).getConfig
   val path = "cafienne"
   override lazy val config: Config = {
     if (systemConfig.hasPath(path)) {
