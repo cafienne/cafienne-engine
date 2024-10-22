@@ -20,7 +20,7 @@ package org.cafienne.system
 import org.apache.pekko.actor._
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
+import org.cafienne.infrastructure.http.authentication.IdentityCache
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.CafienneGateway
 import org.cafienne.timerservice.TimerService

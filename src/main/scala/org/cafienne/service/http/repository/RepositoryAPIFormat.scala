@@ -15,11 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.cases
+package org.cafienne.service.http.repository
 
-import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.service.http.Headers
+import io.swagger.v3.oas.annotations.media.Schema
 
-object CaseReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CASE_LAST_MODIFIED)
+import scala.annotation.meta.field
+
+object RepositoryAPIFormat {
+  @Schema(description = "List of models in the repository of the engine")
+  case class ModelListResponseFormat(@(Schema @field)(description = "List of case models") models: Seq[ModelResponseFormat])
+
+  case class ModelResponseFormat(@(Schema @field)(description = "Name of the case model", example = "helloworld.xml") definitions: String,
+                                 @(Schema @field)(description = "Description of the case definition", example = "Greetings to the world") description: String)
+
 }
