@@ -250,42 +250,6 @@ commands:
 
   run-jdbc-tests:
     steps:
-      # Starting docker environment for MS SQL Server testing
-      - run:
-          name: Start Cafienne Engine for MS SQL Server testing
-          command: |
-            sudo docker-compose -f .circleci/docker-config/engine-with-sqlserver-empty.yml up -d cafienne
-            sleep 10
-      - run:
-          name: Docker logs of database
-          command: |
-            docker logs empty-sql-server
-      - run:
-          name: Docker logs of engine before starting test
-          command: docker logs cafienne
-      - run:
-          name: Test engine against framework
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run test
-      - run:
-          name: Test archival & deletion
-          command: |
-            cd ..
-            cd ./cmmn-test-framework
-            npm run test storage
-      - run:
-          name: Docker logs of engine after the test
-          command: docker logs cafienne
-      # Stop engine, but also the sql server "without events" instance, and start the one "with events" for later usage
-      - run:
-          name: Stop and remove the Cafienne container, and also MS SQL Server container
-          command: |
-            docker rm -f cafienne empty-sql-server
-            sleep 3
-            docker-compose -f .circleci/docker-config/databases-compatibility.yml up -d sql-server-with-events
-
       # Starting docker environment for PostgreSQL testing
       - run:
           name: Start Cafienne Engine for PostgreSQL testing
@@ -324,6 +288,42 @@ commands:
       - run:
           name: Stop and remove the Cafienne container
           command: docker rm -f cafienne
+
+      # Starting docker environment for MS SQL Server testing
+      - run:
+          name: Start Cafienne Engine for MS SQL Server testing
+          command: |
+            sudo docker-compose -f .circleci/docker-config/engine-with-sqlserver-empty.yml up -d cafienne
+            sleep 10
+      - run:
+          name: Docker logs of database
+          command: |
+            docker logs empty-sql-server
+      - run:
+          name: Docker logs of engine before starting test
+          command: docker logs cafienne
+      - run:
+          name: Test engine against framework
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run test
+      - run:
+          name: Test archival & deletion
+          command: |
+            cd ..
+            cd ./cmmn-test-framework
+            npm run test storage
+      - run:
+          name: Docker logs of engine after the test
+          command: docker logs cafienne
+      # Stop engine, but also the sql server "without events" instance, and start the one "with events" for later usage
+      - run:
+          name: Stop and remove the Cafienne container, and also MS SQL Server container
+          command: |
+            docker rm -f cafienne empty-sql-server
+            sleep 3
+            docker-compose -f .circleci/docker-config/databases-compatibility.yml up -d sql-server-with-events
 
   run-cassandra-tests:
     steps:
