@@ -9,12 +9,12 @@ jobs:
     resource_class: large
     steps:
       - build-preparation
+      - sonarcloud/scan
       - docker-login
       - setup-test-infra
       - build-docker-image
       - run-in-memory-tests
       - show-engine-logs-on-fail
-      - sonarcloud/scan
 
   main-build:
     working_directory: ~/cafienne-engine
@@ -23,6 +23,7 @@ jobs:
     resource_class: large
     steps:
       - build-preparation
+      - sonarcloud/scan
       - docker-login
       - setup-test-infra
       - setup-databases
@@ -44,7 +45,6 @@ jobs:
             else
               echo "Not pushing image to docker hub"
             fi
-      - sonarcloud/scan
 
   
   release-build:
