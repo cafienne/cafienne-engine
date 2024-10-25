@@ -90,7 +90,7 @@ commands:
           command: sbt compile
       - run:
           name: Unit tests
-          command: sbt test
+          command: cat /dev/null | sbt coverage test coverageReport
       - run:
           name: Compile CMMN Test Framwork
           command: |
