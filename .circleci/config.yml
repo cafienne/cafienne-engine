@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0.0
 jobs:
   branch-build:
     working_directory: ~/cafienne-engine
@@ -12,6 +14,7 @@ jobs:
       - build-docker-image
       - run-in-memory-tests
       - show-engine-logs-on-fail
+      - sonarcloud/scan
 
   main-build:
     working_directory: ~/cafienne-engine
@@ -41,6 +44,7 @@ jobs:
             else
               echo "Not pushing image to docker hub"
             fi
+      - sonarcloud/scan
 
   
   release-build:
