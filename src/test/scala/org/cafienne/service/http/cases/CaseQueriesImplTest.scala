@@ -59,7 +59,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   )
 
   override def beforeAll() = {
-    QueryDB.verifyConnectivity()
+    QueryDB.initializeDatabaseSchema()
     caseUpdater.upsert(activeCase)
     caseUpdater.upsert(planItem1_1)
     caseUpdater.upsert(terminatedCase)
@@ -78,7 +78,7 @@ class CaseQueriesImplTest extends TestKit(ActorSystem("testsystem", TestConfig.c
   // *******************************************************************************************************************
 
   "Create a table" should "succeed the second time as well" in {
-    QueryDB.verifyConnectivity()
+    QueryDB.initializeDatabaseSchema()
   }
 
   "A query" should "retrieve an existing case" in {

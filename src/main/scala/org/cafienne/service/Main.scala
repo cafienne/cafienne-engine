@@ -17,9 +17,9 @@
 
 package org.cafienne.service
 
-import org.apache.pekko.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.Cafienne
+import org.cafienne.persistence.Persistence
 import org.cafienne.querydb.schema.QueryDB
 import org.cafienne.service.http.CafienneHttpServer
 import org.cafienne.system.CaseSystem
@@ -29,15 +29,17 @@ import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.util.{Failure, Success}
 
 object Main extends App with LazyLogging {
+  // Initialize the database schema for both query db and the event journal
+  Persistence.initializeDatabaseSchemas()
+
   try {
     // Create the Case System
     val caseSystem: CaseSystem = new CaseSystem
-    implicit val system: ActorSystem = caseSystem.system
-    implicit val ec: ExecutionContextExecutor = system.dispatcher
 
     // Start running the Event Sinks
-    QueryDB.open(caseSystem)
+    QueryDB.startEventSinks(caseSystem)
 
+    implicit val ec: ExecutionContextExecutor = caseSystem.system.dispatcher
     // Create and start the http server
     new CafienneHttpServer(caseSystem).start().onComplete {
       case Success(answer) =>

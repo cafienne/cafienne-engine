@@ -28,7 +28,9 @@ trait ChildConfigReader extends ConfigReader with LazyLogging {
   def path: String
   val exception: ConfigurationException = null
   def config: Config = {
-    if (parent.config.hasPath(path)) {
+    if (path.isBlank) {
+      parent.config
+    } else if (parent.config.hasPath(path)) {
       parent.config.getConfig(path)
     } else {
       ConfigFactory.empty()

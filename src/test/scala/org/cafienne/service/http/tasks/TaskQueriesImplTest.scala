@@ -31,7 +31,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   val userWithBandC = TestIdentityFactory.createPlatformUser("userAplusC", tenant, Set("B", "C"))
 
   override def beforeAll() = {
-    QueryDB.verifyConnectivity()
+    QueryDB.initializeDatabaseSchema()
 
     println("Writing cases")
     caseUpdater.upsert(CaseRecord(id = case33, tenant = tenant, rootCaseId = case33, caseName = "aaa bbb ccc", state = State.Failed.toString, failures = 0, lastModified = Instant.now, createdOn = Instant.now))
@@ -66,7 +66,7 @@ class TaskQueriesImplTest extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   "Create a table" should "succeed the second time as well" in {
-    QueryDB.verifyConnectivity()
+    QueryDB.initializeDatabaseSchema()
   }
 
   "A query" should "give a search failure when task not found" in {

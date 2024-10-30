@@ -19,6 +19,7 @@ package org.cafienne.querydb.materializer.consentgroup
 
 import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.actor.ActorSystem
 import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
 import org.cafienne.querydb.materializer.{QueryDBEventSink, QueryDBStorage}
 import org.cafienne.system.CaseSystem
@@ -26,7 +27,7 @@ import org.cafienne.system.CaseSystem
 import scala.concurrent.Future
 
 class ConsentGroupEventSink(val caseSystem: CaseSystem, storage: QueryDBStorage) extends QueryDBEventSink with LazyLogging {
-  override val system = caseSystem.system
+  override val system: ActorSystem = caseSystem.system
 
   override val tag: String = ConsentGroupEvent.TAG
 
