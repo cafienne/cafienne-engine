@@ -58,5 +58,5 @@ CREATE TABLE IF NOT EXISTS public.durable_state (
     state_timestamp BIGINT NOT NULL,
     PRIMARY KEY(persistence_id)
     );
-CREATE INDEX CONCURRENTLY state_tag_idx on public.durable_state (tag);
-CREATE INDEX CONCURRENTLY state_global_offset_idx on public.durable_state (global_offset);
+CREATE INDEX state_tag_idx on public.durable_state (tag);
+CREATE INDEX state_global_offset_idx on public.durable_state (global_offset);
