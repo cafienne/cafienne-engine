@@ -17,8 +17,8 @@
 
 package org.cafienne.system
 
-import org.apache.pekko.actor._
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.actor._
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.http.authentication.IdentityCache
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration

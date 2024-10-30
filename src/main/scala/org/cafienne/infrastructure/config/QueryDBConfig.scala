@@ -18,13 +18,14 @@
 package org.cafienne.infrastructure.config
 
 import org.apache.pekko.stream.RestartSettings
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.{ChildConfigReader, MandatoryConfig}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
 
 
-class QueryDBConfig(val parent: CafienneConfig) extends MandatoryConfig {
+class QueryDBConfig(val parent: PersistenceConfig) extends MandatoryConfig {
   def path = "query-db"
   override val msg = "Cafienne Query Database is not configured. Check local.conf for 'cafienne.query-db' settings"
 
