@@ -138,7 +138,7 @@ commands:
   setup-test-infra:
     steps:
       - run:
-          name: Pull DB, Mailcatcher and IDP docker images
+          name: Pull Mailcatcher and IDP docker images
           command: |
             docker-compose -f .circleci/docker-config/base-infra.yml pull
       # Start the basic container infrastructure
@@ -159,7 +159,7 @@ commands:
           command: |
             docker-compose -f .circleci/docker-config/databases.yml up -d
             sleep 10
-            docker-compose -f .circleci/docker-config/databases-compatibility.yml pull
+            # docker-compose -f .circleci/docker-config/databases-compatibility.yml pull
 
 
   run-in-memory-tests:
