@@ -25,7 +25,7 @@ import org.cafienne.tenant.actorapi.event.deprecated._
 
 import java.util
 
-final case class TenantUser(id: String, tenant: String, roles: Set[String] = Set(), isOwner: Boolean = false, name: String = "", email: String = "", enabled: Boolean = true) extends UserIdentity {
+final case class TenantUser(id: String, tenant: String, override val roles: Set[String] = Set(), isOwner: Boolean = false, name: String = "", email: String = "", enabled: Boolean = true) extends UserIdentity {
 
   import scala.jdk.CollectionConverters._
 

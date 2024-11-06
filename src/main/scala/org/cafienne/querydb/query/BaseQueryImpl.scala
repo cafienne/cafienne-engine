@@ -77,11 +77,16 @@ trait BaseQueryImpl
       .filter(_.caseInstanceId === caseInstanceId)
       .map(_.userId)
 
+    val userRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable]
+      .filter(_.caseInstanceId === caseInstanceId)
+      .filter(_.tenantRole.inSet(user.roles))
+      .map(_.tenantRole)
+
     val query =
       originQuery.joinLeft(
         // Note: order matters. Putting group membership at the end generates an invalid SQL statement
         //  guess that's some kind of issue in Slick
-        groupMembership.joinFull(tenantRoleBasedMembership.joinFull(userIdBasedMembership)))
+        groupMembership.joinFull(tenantRoleBasedMembership.joinFull(userIdBasedMembership.joinFull(userRoleBasedMembership))))
 
 //    println("CASE MEMBERSHIP QUERY:\n\n" + query.result.statements.mkString("\n")+"\n\n")
     val records = db.run(query.distinct.result)
@@ -92,7 +97,7 @@ trait BaseQueryImpl
         fail
       }
 
-      val originRecords = x.map(_._1)//filter(_.isDefined).map(_.get)
+      val originRecords = x.map(_._1) //filter(_.isDefined).map(_.get)
       if (originRecords.headOption.isEmpty) {
 //        println(" Failing because head option is empty")
         fail // Case does not exist
@@ -117,12 +122,14 @@ trait BaseQueryImpl
 
 
 
-      val membershipRecords: Seq[(Option[(String, Boolean, String)], Option[(Option[String], Option[String])])] = x.map(_._2).filter(_.isDefined).map(_.get)
+      val membershipRecords: Seq[(Option[(String, Boolean, String)], Option[(Option[String], Option[(Option[String], Option[String])])])] = x.map(_._2).filter(_.isDefined).map(_.get)
       val userAndRoleRecords = membershipRecords.map(_._2).filter(_.isDefined).map(_.get)
-      val userIdBasedMembership: Set[String] = userAndRoleRecords.map(_._2).filter(_.isDefined).map(_.get).toSet
+      val userBasedMembership: Set[(Option[String], Option[String])] = userAndRoleRecords.map(_._2).filter(_.isDefined).map(_.get).toSet
+      val userIdBasedMembership: Set[String] = userBasedMembership.filter(_._1.isDefined).map(_._1.get)
+      val userRoleBasedMembership: Set[String] = userBasedMembership.filter(_._2.isDefined).map(_._2.get)
 //      println(s"Found ${userRecords.size} user records")
 
-      val userTenantRoles: Set[String] = userAndRoleRecords.map(_._1).filter(_.isDefined).map(_.get).toSet
+      val userTenantRoles: Set[String] = userAndRoleRecords.map(_._1).filter(_.isDefined).map(_.get).toSet ++ userRoleBasedMembership
 //      println(s"Found ${tenantRoleRecords.size} tenant role records")
       val groupRecords: Set[ConsentGroupMemberRecord] = membershipRecords.map(_._1).filter(_.isDefined).map(_.get).map(group => ConsentGroupMemberRecord(group = group._1, userId = user.id, isOwner = group._2, role = group._3)).toSet
 //      println(s"Found ${groupRecords.size} group records")
@@ -187,10 +194,12 @@ trait BaseQueryImpl
       .filter(_.userId === user.id)
       .map(_.caseInstanceId)
 
+    val userIdentityRoleBasedMembership = TableQuery[CaseInstanceTeamTenantRoleTable].filter(_.caseInstanceId === caseInstanceId).filter(_.tenantRole.inSet(user.roles))
+
     // Return a filter on the case that also matches membership existence somewhere
     caseInstanceQuery
       .filter(_.id === caseInstanceId)
-      .filter(_ => userIdBasedMembership.exists || tenantRoleBasedMembership.exists || groupMembership.exists)
+      .filter(_ => userIdBasedMembership.exists || tenantRoleBasedMembership.exists || groupMembership.exists || userIdentityRoleBasedMembership.exists)
   }
 
   /**
@@ -210,7 +219,7 @@ trait BaseQueryImpl
       parseFilters
     }
 
-    def asQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq]  = {
+    def asQuery(caseInstanceId: Rep[String]): Query[CaseBusinessIdentifierTable, CaseBusinessIdentifierRecord, Seq] = {
       val topLevelQuery = filters.length match {
         case 0 =>
           // If no filter is specified, then there must be at least something in the business identifier table, i.e.,
