@@ -25,6 +25,7 @@ import com.datastax.oss.driver.api.core.`type`.DataTypes
 import com.datastax.oss.driver.api.core.cql._
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal
 import com.datastax.oss.driver.api.querybuilder.{QueryBuilder, SchemaBuilder}
+import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.timerservice.Timer
 import org.cafienne.timerservice.persistence.TimerStore
@@ -35,10 +36,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 class CassandraTimerStore(readJournal: CassandraReadJournal) extends TimerStore {
-  val keyspace: String = "akka" // For now store timers inside the akka keyspace, not too sure if that is handy
-  val timerTable: String = "cafienne_timer"
-  val offsetTable: String = "cafienne_timer_offset"
-  val cassandraTimeout: Timeout = Timeout(15.seconds)
+  private val keyspace: String = Cafienne.config.persistence.eventDB.journal.getString("keyspace") // Use configured keyspace of journal to also store timers
+  private val timerTable: String = "cafienne_timer"
+  private val offsetTable: String = "cafienne_timer_offset"
+  private val cassandraTimeout: Timeout = Timeout(15.seconds)
   override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
   // First create the schema inside the akka keyspace.
