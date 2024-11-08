@@ -58,8 +58,8 @@ public class PingCommand extends TestScriptCommand {
     /**
      * This method is known to the CaseTestingActor and holds the actual logic of the command.
      * The point here is, that the CaseTestingActor must wait a period in order to have
-     * the akka framework to proceed e.g. timer events. If this waiting is done inside the {@link PingCommand#process(Case)} method,
-     * the waiting is done when the case actor processes the command - which then blocks the akka framework.
+     * the actor framework to proceed e.g. timer events. If this waiting is done inside the {@link PingCommand#process(Case)} method,
+     * the waiting is done when the case actor processes the command - which then blocks the actor framework.
      */
     @Override
     public void beforeSendCommand(TestScript testScript) {

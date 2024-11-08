@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer;
 
-import akka.dispatch.Futures;
+import org.apache.pekko.dispatch.Futures;
 import org.cafienne.actormodel.response.ActorLastModified;
 import org.cafienne.actormodel.event.ActorModified;
 import org.slf4j.Logger;

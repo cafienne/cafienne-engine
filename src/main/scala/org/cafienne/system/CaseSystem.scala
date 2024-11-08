@@ -17,10 +17,10 @@
 
 package org.cafienne.system
 
-import akka.actor._
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.pekko.actor._
 import org.cafienne.infrastructure.Cafienne
-import org.cafienne.infrastructure.akkahttp.authentication.IdentityCache
+import org.cafienne.infrastructure.http.authentication.IdentityCache
 import org.cafienne.system.bootstrap.BootstrapPlatformConfiguration
 import org.cafienne.system.router.CafienneGateway
 import org.cafienne.timerservice.TimerService
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContextExecutor
 /**
   *
   * A CaseSystem can be started either in Clustered mode, or as a Local system.
-  * In the first case, it relies on Akka clustering and sharding to manage the case instances
+  * In the first case, it relies on actor clustering and sharding to manage the case instances
   * and forward messages to the proper case instance.
   * In the local scenario, the case system is run in-memory, and messages are forwarded by
   * a simple in-memory router.

@@ -17,10 +17,10 @@
 
 package org.cafienne.cmmn.test
 
-import akka.actor.ActorSystem
-import akka.persistence.query.{EventEnvelope, Offset}
-import akka.stream.scaladsl.{Sink, Source}
-import akka.{Done, NotUsed}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
+import org.apache.pekko.{Done, NotUsed}
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.cqrs.ReadJournalProvider
 

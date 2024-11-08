@@ -17,10 +17,10 @@
 
 package org.cafienne.infrastructure.cqrs.javadsl
 
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.persistence.query.Offset
-import akka.stream.javadsl
+import org.apache.pekko.NotUsed
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.persistence.query.Offset
+import org.apache.pekko.stream.javadsl
 import org.cafienne.infrastructure.cqrs.batch.public_events.PublicCaseEventBatch
 
 import scala.concurrent.Future

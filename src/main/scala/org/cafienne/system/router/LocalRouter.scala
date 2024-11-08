@@ -17,7 +17,7 @@
 
 package org.cafienne.system.router
 
-import akka.actor.{ActorRef, Props, Terminated}
+import org.apache.pekko.actor.{ActorRef, Props, Terminated}
 import org.cafienne.actormodel.command.{ModelCommand, TerminateModelActor}
 import org.cafienne.actormodel.response.ActorTerminated
 import org.cafienne.system.CaseSystem
@@ -25,7 +25,7 @@ import org.cafienne.system.CaseSystem
 import scala.collection.mutable
 
 /**
-  * In-memory router for akka messages sent in the CaseSystem.
+  * In-memory router for messages sent in the CaseSystem.
   * Facilitates actor management in a non-clustered actor system.
   */
 class LocalRouter(caseSystem: CaseSystem, actors: mutable.Map[String, ActorRef], terminationRequests: mutable.Map[String, ActorRef]) extends CaseMessageRouter {

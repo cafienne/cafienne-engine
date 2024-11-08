@@ -17,7 +17,7 @@
 
 package org.cafienne.cmmn.test;
 
-import akka.serialization.JSerializer;
+import org.apache.pekko.serialization.JSerializer;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -17,9 +17,9 @@
 
 package org.cafienne.timerservice
 
-import akka.Done
-import akka.actor.Scheduler
-import akka.persistence.query.Offset
+import org.apache.pekko.Done
+import org.apache.pekko.actor.Scheduler
+import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener.TimerSet
 import org.cafienne.infrastructure.Cafienne
@@ -42,7 +42,7 @@ class TimerMonitor(val timerService: TimerService) extends LazyLogging {
 
     // ... and then schedule the reader to repeat itself at the configured interval
     val interval: FiniteDuration = Cafienne.config.engine.timerService.interval
-    scheduler.scheduleAtFixedRate(interval, interval)(reader)
+    scheduler.scheduleWithFixedDelay(interval, interval)(reader)
   }
 
   def removeTimer(timerId: String, offset: Option[Offset]): Future[Done] = {

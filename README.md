@@ -1,7 +1,7 @@
 # Cafienne Engine for CMMN 1.1
 
 Cafienne hosts an open source Case Management Engine which natively executes the CMMN 1.1 standard.
-The engine is written in Java and Scala co-operated with the Akka toolkit, backed by Cassandra and Postgres.
+The engine is written in Java and Scala co-operated with the Pekko toolkit.
 This technical foundation makes it a platform for building highly concurrent,
 distributed, and resilient message-driven case management applications.
 
@@ -11,13 +11,13 @@ The suite comprises several components, namely;
 
 1. A multi-tenant service hosting among others a CMMN interpreter
 2. The Cafienne IDE, for creating models that are interpreted by the engine
-2. A basic User Interface that can help in running and debugging models
+3. A basic User Interface that can help in running and debugging models
 
 In this readme we limit to the installation of a working case engine.
 After you installed the case engine we advise you to follow the [Getting Started wiki](https://github.com/cafienne/cafienne-engine/wiki/Getting-Started).
 
 ## 1.1 Installation
-Currently we develop and work with the Case Service on Mac OS X and Windows.
+Currently, we develop and work with the Case Service on Mac OS X and Windows.
 Cassandra and Postgres configuration is the most comprehensive part of the installation.
 We assume you know how to install Java, Scala and sbt, etc.
 

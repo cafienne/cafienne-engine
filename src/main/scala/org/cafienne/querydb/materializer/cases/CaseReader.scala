@@ -18,7 +18,7 @@
 package org.cafienne.querydb.materializer.cases
 
 import org.cafienne.querydb.materializer.LastModifiedRegistration
-import org.cafienne.service.akkahttp.Headers
+import org.cafienne.service.http.Headers
 
 object CaseReader {
   val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CASE_LAST_MODIFIED)

@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.cqrs
 
-import akka.persistence.query.{EventEnvelope, Offset}
+import org.apache.pekko.persistence.query.{EventEnvelope, Offset}
 import org.cafienne.actormodel.event.ModelEvent
 
 case class ModelEventEnvelope(envelope: EventEnvelope) {

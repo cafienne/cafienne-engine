@@ -17,8 +17,8 @@
 
 package org.cafienne.timerservice.persistence.jdbc
 
-import akka.Done
-import akka.persistence.query.Offset
+import org.apache.pekko.Done
+import org.apache.pekko.persistence.query.Offset
 import org.cafienne.infrastructure.Cafienne
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 import org.cafienne.infrastructure.jdbc.CafienneJDBCConfig

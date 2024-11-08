@@ -21,6 +21,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.infrastructure.config.api.{ApiConfig, OIDCConfig}
 import org.cafienne.infrastructure.config.engine.EngineConfig
+import org.cafienne.infrastructure.config.persistence.PersistenceConfig
 import org.cafienne.infrastructure.config.util.{ConfigReader, SystemConfig}
 
 /**
@@ -39,7 +40,6 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     }
   }
 
-
   /**
     * Returns true of the debug route is open (for developers using IDE to do debugging)
     */
@@ -57,21 +57,12 @@ class CafienneConfig extends ConfigReader with LazyLogging {
     */
   val platform: PlatformConfig = new PlatformConfig(this)
 
-  /**
-    * Returns configuration options for the QueryDB
-    */
-  lazy val readJournal: String = {
-    if (config.hasPath("read-journal")) {
-      readString("read-journal")
-    } else {
-      queryDB.readJournal
-    }
-  }
+  lazy val persistence = new PersistenceConfig(this, systemConfig)
 
   /**
-    * Returns configuration options for the QueryDB
+    * Returns configuration options for the read journal
     */
-  lazy val queryDB: QueryDBConfig = new QueryDBConfig(this)
+  lazy val readJournal: String = persistence.readJournal
 
   /**
     * Returns configuration options for Model Actors

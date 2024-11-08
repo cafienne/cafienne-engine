@@ -17,7 +17,7 @@
 
 package org.cafienne.storage.archive
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.storage.actormodel.ActorMetadata
 import org.cafienne.storage.archival.Archive
 

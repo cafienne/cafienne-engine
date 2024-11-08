@@ -54,4 +54,3 @@ object RepositoryConfig extends App with LazyLogging {
   Cafienne.config.repository.setLocation("./NewLocation")
   println("New location: " + Cafienne.config.repository.location)
 }
-

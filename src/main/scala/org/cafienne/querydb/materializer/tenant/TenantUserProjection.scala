@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer.tenant
 
-import akka.Done
+import org.apache.pekko.Done
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.identity.TenantUser
 import org.cafienne.querydb.record.{UserRoleKey, UserRoleRecord}

@@ -12,7 +12,7 @@
     <!--    <logger name="org.cafienne.storage" level="DEBUG"/>-->
 
     <!-- Show HTTP traffic logging -->
-    <!--        <logger name="org.cafienne.service.akkahttp" level="DEBUG" />-->
+    <!--        <logger name="org.cafienne.service.http" level="DEBUG" />-->
 
     <!-- Show Authentication Setup logging -->
     <!--    <logger name="org.cafienne.authentication" level="INFO" />-->

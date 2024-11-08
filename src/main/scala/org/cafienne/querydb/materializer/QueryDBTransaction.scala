@@ -17,7 +17,7 @@
 
 package org.cafienne.querydb.materializer
 
-import akka.Done
+import org.apache.pekko.Done
 import org.cafienne.infrastructure.cqrs.offset.OffsetRecord
 
 import scala.concurrent.Future

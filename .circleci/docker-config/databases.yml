@@ -1,4 +1,3 @@
-version: '3.1'
 services:
   cassandra:
     image: cassandra:3.11
@@ -28,17 +27,29 @@ services:
     command: postgres --port=9432
 
   empty-sql-server:
-    image: batav/circle-ci:sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest
     network_mode: host
     expose:
       - 1433
-    hostname: sql-server
+    hostname: empty-sql-server
     container_name: empty-sql-server
     environment:
       SA_PASSWORD: Abc_123456
       ACCEPT_EULA: Y
-      QUERY_DB: cafienneQuery
-      EVENT_DB: cafienneEventstore
+    command: >
+      /bin/bash -c "
+      /opt/mssql/bin/sqlservr &
+
+      until /opt/mssql-tools18/bin/sqlcmd -l 1 -C -No -S 0.0.0.0 -U sa -P 'Abc_123456' -Q 'SELECT 1'; do
+        echo '>>>>>>>>>> SQL Server is unavailable - sleeping <<<<<<<<<<';
+        sleep 5;
+      done;
+      echo '>>>>>>>>>> SQL Server is ready - executing init script <<<<<<<<<<';
+      /opt/mssql-tools18/bin/sqlcmd -l 5 -C -No -S 0.0.0.0 -U sa -P 'Abc_123456' -d master -i /tmp/mssql-init.sql;
+      
+      sleep infinity;"
+    volumes:
+    - /home/circleci/cafienne-engine/.circleci/docker-config/mssql-init.sql:/tmp/mssql-init.sql
 
   postgres-empty-event-db:
     image: postgres:12.1-alpine

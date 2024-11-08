@@ -17,7 +17,7 @@
 
 package org.cafienne.timerservice
 
-import akka.actor.{Cancellable, Scheduler}
+import org.apache.pekko.actor.{Cancellable, Scheduler}
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.response.{CommandFailure, ModelResponse}
 import org.cafienne.cmmn.actorapi.command.plan.eventlistener.RaiseEvent

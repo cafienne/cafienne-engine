@@ -17,8 +17,8 @@
 
 package org.cafienne.actormodel.command;
 
-import akka.actor.ActorPath;
-import akka.actor.ActorRef;
+import org.apache.pekko.actor.ActorPath;
+import org.apache.pekko.actor.ActorRef;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -51,7 +51,7 @@ public abstract class BaseModelCommand<T extends ModelActor, U extends UserIdent
     private final U user;
 
     protected BaseModelCommand(U user, String actorId) {
-        // First, validate actor id to be akka compliant
+        // First, validate actor id
         if (actorId == null) {
             throw new InvalidCommandException("Actor id cannot be null");
         }

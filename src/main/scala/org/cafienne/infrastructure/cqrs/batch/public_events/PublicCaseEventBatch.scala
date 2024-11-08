@@ -17,7 +17,7 @@
 
 package org.cafienne.infrastructure.cqrs.batch.public_events
 
-import akka.persistence.query.Offset
+import org.apache.pekko.persistence.query.Offset
 import com.typesafe.scalalogging.LazyLogging
 import org.cafienne.actormodel.event.ModelEvent
 import org.cafienne.infrastructure.cqrs.batch.EventBatch

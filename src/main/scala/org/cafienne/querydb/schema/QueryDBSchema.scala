@@ -48,5 +48,5 @@ trait QueryDBSchema extends CafienneJDBCConfig {
 }
 
 object QueryDBSchema extends QueryDBSchema {
-   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.queryDB.config)
+   lazy val _db: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("", Cafienne.config.persistence.queryDB.config)
 }

@@ -91,11 +91,9 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
     /**
      * If the SubProcessDefinition can be run _within_ the Case, then override this method to return true.
-     * Note, and inline SubProcessDefinition is ran within the thread of the creation of the task in the case.
+     * Note, and inline SubProcessDefinition is run within the thread of the creation of the task in the case.
      * Also, the createInstance() method will be invoked with the Task as parameter, instead of the ProcessTaskActor.
-     * This method returns false by default - every process runs within it's own Akka Actor context.
-     *
-     * @return
+     * This method returns false by default - every process runs within its own actor context.
      */
     public boolean isInline() {
         return false;
@@ -103,15 +101,12 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
     /**
      * Create an instance of this definition that can provide the implementation for the process task
-     *
-     * @param processTaskActor
-     * @return
      */
     public abstract SubProcess<?> createInstance(ProcessTaskActor processTaskActor);
 
     /**
      * Gets the parameter mappings for the sub-process
-     * that must be executed when the subprocess succesfully completes
+     * that must be executed when the subprocess successfully completes
      *
      * @return parameter mapping
      */
@@ -133,8 +128,6 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
      * Returns true if this type of process needs to be executed asynchronously, or false if it must be executed
      * within the current thread upon activation of the process task. By default, process implementation are
      * executed asynchronously from the {@link Case} command handling mechanism.
-     *
-     * @return
      */
     public boolean isAsync() {
         return isAsync;
@@ -144,8 +137,6 @@ public abstract class SubProcessDefinition extends CMMNElementDefinition {
 
     /**
      * Returns the default exception parameter name.
-     *
-     * @return
      */
     protected Set<String> getExceptionParameterNames() {
         Set<String> names = new HashSet<>();

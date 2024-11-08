@@ -17,10 +17,10 @@
 
 package org.cafienne.timerservice
 
-import akka.Done
-import akka.actor.ActorSystem
-import akka.persistence.query.Offset
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.Done
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.persistence.query.Offset
+import org.apache.pekko.stream.scaladsl.Sink
 import org.cafienne.cmmn.actorapi.event.plan.eventlistener._
 import org.cafienne.infrastructure.cqrs.{ModelEventEnvelope, TaggedEventSource}
 import org.cafienne.system.CaseSystem
