@@ -202,7 +202,7 @@ libraryDependencies ++= Seq(
   , "org.hsqldb"              %  "hsqldb"                               % "2.7.2"
   , "io.github.alstanchev"    %% "pekko-persistence-inmemory"            % "1.1.1"  excludeAll ExclusionRule(organization = "org.apache.pekko")
   , "org.postgresql"          %  "postgresql"                           % "42.5.5"
-  , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "9.2.1.jre11"
+  , "com.microsoft.sqlserver" %  "mssql-jdbc"                           % "12.8.1.jre11"
 
   // Swagger support
   ,"jakarta.ws.rs" % "jakarta.ws.rs-api" % "4.0.0"
