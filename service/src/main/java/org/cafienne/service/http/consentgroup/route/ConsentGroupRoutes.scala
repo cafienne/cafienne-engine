@@ -15,10 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.service.http.consentgroup.route
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import org.cafienne.system.CaseSystem
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+import jakarta.ws.rs._
+import org.cafienne.service.infrastructure.route.AuthenticatedRoute
+
+@Path("consent-group")
+class ConsentGroupRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+  override val prefix: String = "consent-group"
+
+  addSubRoute(new ConsentGroupOwnersRoute(caseSystem))
+  addSubRoute(new ConsentGroupMembersRoute(caseSystem))
 }

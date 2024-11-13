@@ -15,10 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.service.http.identifiers.route
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.cafienne.system.CaseSystem
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+import jakarta.ws.rs._
+import org.cafienne.service.infrastructure.route.AuthenticatedRoute
+
+@SecurityRequirement(name = "oauth2", scopes = Array("openid"))
+@Path("/identifiers")
+class IdentifierRoutes(override val caseSystem: CaseSystem) extends AuthenticatedRoute {
+  override val prefix = "identifiers"
+
+  addSubRoute(new IdentifiersRoute(caseSystem))
 }

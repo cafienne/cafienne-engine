@@ -15,10 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.service.infrastructure.route
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import org.apache.pekko.http.scaladsl.server.Route
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+import scala.util.{Failure, Success}
+
+trait TenantValidator extends AuthenticatedRoute {
+  /**
+    * Check that the tenant exists
+    *
+    * @param tenant
+    * @param subRoute
+    * @return
+    */
+  def validateTenant(tenant: String, subRoute: => Route): Route = {
+    onComplete(userCache.getTenant(tenant)) {
+      case Success(_) => subRoute
+      case Failure(t: Throwable) => throw t
+    }
+  }
 }

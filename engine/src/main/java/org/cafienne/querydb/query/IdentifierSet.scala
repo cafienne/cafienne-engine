@@ -15,10 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cafienne.querydb.materializer.tenant
+package org.cafienne.querydb.query
 
-import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
+import org.cafienne.json.{CafienneJson, Value, ValueList, ValueMap}
+import org.cafienne.querydb.record.CaseBusinessIdentifierRecord
 
-object TenantReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.TENANT_LAST_MODIFIED)
+final case class IdentifierSet(records: Seq[CaseBusinessIdentifierRecord]) extends CafienneJson {
+  override def toValue: Value[_] = {
+    val list = new ValueList
+    records.foreach(record => list.add(new ValueMap("caseInstanceId", record.caseInstanceId, "tenant", record.tenant, "name", record.name, "value", record.value.orNull)))
+    list
+  }
 }
+

@@ -17,9 +17,8 @@
 
 package org.cafienne.querydb.materializer.consentgroup
 
-import org.cafienne.consentgroup.actorapi.event.ConsentGroupEvent
-import org.cafienne.querydb.materializer.LastModifiedRegistration
+import org.cafienne.querydb.lastmodified.{Headers, LastModifiedRegistration}
 
 object ConsentGroupReader {
-  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(ConsentGroupEvent.TAG)
+  val lastModifiedRegistration: LastModifiedRegistration = new LastModifiedRegistration(Headers.CONSENT_GROUP_LAST_MODIFIED)
 }
